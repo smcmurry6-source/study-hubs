@@ -10,7 +10,7 @@ this folder (deleting the line: the note carries it) or just does it, if it's sm
 (`- [x] ... (#123)`); ticked lines are cleared the next time someone goes through the inbox. Anything left to do from a chat
 lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the-vault.md)). See [README](README.md).
 
-- [ ] **Apply `migration_v88.sql` after its PR merges** (2026-11-20, a survey asks each person once): two functions replaced (`get_active_survey`, `get_my_survey`), no table touched, so any time of day, one statement a call through the connector, md5-checked. Fetch `main` first: if v88 was taken meanwhile, renumber. Then append it to `supabase/schema.sql`, take its line out of `supabase/pending-migrations.txt` and note it there, in a small PR. Until then linked devices work as before (the pop-up's Link this device works without it).
+- [x] **Apply `migration_v88.sql` after its PR merges** (done 2026-11-20 at about 5 am Central, right after #489 merged: md5-checked, recorded in the PR after it) (2026-11-20, a survey asks each person once): two functions replaced (`get_active_survey`, `get_my_survey`), no table touched, so any time of day, one statement a call through the connector, md5-checked. Fetch `main` first: if v88 was taken meanwhile, renumber. Then append it to `supabase/schema.sql`, take its line out of `supabase/pending-migrations.txt` and note it there, in a small PR. Until then linked devices work as before (the pop-up's Link this device works without it).
 
 - [ ] **The mastery read is slower a call than before the optimization pass** (2026-11-20, its readout): `get_hub_mastery`
   236 → 349 ms on the server on average (673 calls since phase 1), the evening's median 242 → 709 ms on 77 calls, 11% of the
