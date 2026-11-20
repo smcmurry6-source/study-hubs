@@ -919,6 +919,8 @@ HX.askStart = askStart; HX.askOn = askOn; HX.askLabel = askLabel; HX.askAbout = 
 /* ---- widget/hub-bank.js ---- */
 (window.SH_HUB_PARTS = window.SH_HUB_PARTS || {}).bank = function(HX){
 "use strict";
+function courses(){ return !!(HX.courses && HX.courses()); }
+function likelyName(){ return HX.likelyName ? HX.likelyName() : "High likelihood"; }
 var C = HX.C, HUB = HX.HUB, docEl = HX.docEl, $ = HX.$, $$ = HX.$$, esc = HX.esc, h = HX.h, pl = HX.pl,
 shuffled = HX.shuffled, seeded = HX.seeded, track = HX.track, ls = HX.ls, icon = HX.icon, mark = HX.mark,
 STATE = HX.STATE, ansOf = HX.ansOf, saveNow = HX.saveNow, saveState = HX.saveState, QBY = HX.QBY, QBL = HX.QBL,
@@ -935,7 +937,7 @@ if (!q || !q._base) return "";
 var L = "ABCDEF".charAt(q._w || 0) || "A";
 return '<span class="qc-ver num" title="Version ' + L + ' of this question"><span class="sr">Version </span>' + L + "</span>";
 }
-function likelyTag(q){ return q.likely ? '<button class="likely" type="button" data-lkwhy aria-expanded="false">' + icon("hints", 14) + 'High likelihood<span class="sr">: why?</span><span class="chev" aria-hidden="true">' + icon("chevron", 14) + "</span></button>" : ""; }
+function likelyTag(q){ return q.likely ? '<button class="likely" type="button" data-lkwhy aria-expanded="false">' + icon("hints", 14) + likelyName() + '<span class="sr">: why?</span><span class="chev" aria-hidden="true">' + icon("chevron", 14) + "</span></button>" : ""; }
 var BASIS = [[/^hints?$/i, "a hint from the professor"], [/^final review$/i, "the final's review"], [/^final focus$/i, "the final's focus list"],
 [/^(class )?review guide$/i, "the class's review guide"], [/^exam[- ]review$/i, "the class's exam review"], [/^live class$/i, "what was said in class"],
 [/^(\w+) check-?ins?$/i, "the $1's exam check-ins"], [/^check-?ins?$/i, "exam check-ins"], [/^study guide$/i, "the study guide"],
@@ -952,10 +954,10 @@ return parts.length > 1 ? parts.slice(0, -1).join(", ") + " and " + parts[parts.
 function likelyWhyHTML(q, id){
 var L = q.likely, lec = L.lec || q.lec, T = (HX.CORE.likelyTopics || []).filter(function(t){ return t.lec === lec; });
 var k = T.map(function(t){ return t.t; }).indexOf(L.t) + 1, rests = basisWords(L.basis);
-return '<div class="qc-lkwhy" id="' + id + '" data-lkbox><p><b>Why it\u2019s High likelihood:</b> it tests a predicted exam topic' + (L.t ? ", <i>" + esc(L.t) + "</i>" : "") +
+return '<div class="qc-lkwhy" id="' + id + '" data-lkbox><p><b>Why it\u2019s ' + likelyName() + ":</b> " + (courses() ? "it tests a topic its course stressed" : "it tests a predicted exam topic") + (L.t ? ", <i>" + esc(L.t) + "</i>" : "") +
 (k ? " (number " + k + " of " + T.length + " for " + esc(lecName(lec)) + ", strongest evidence first)" : " for " + esc(lecName(lec))) + ".</p>" +
-(rests ? '<p class="note">What it rests on: ' + esc(rests) + ".</p>" : "") +
-'<p><a class="lk" href="#more/hints" data-lkall>Every predicted topic, in Exam hints</a></p></div>';
+(rests ? '<p class="note">What it rests on' + (courses() ? ", in its course" : "") + ": " + esc(rests) + ".</p>" : "") +
+'<p><a class="lk" href="#more/hints" data-lkall>' + (courses() ? "Every high-yield topic, in High-yield points" : "Every predicted topic, in Exam hints") + "</a></p></div>";
 }
 function likelyWire(el, q){
 var b = $("[data-lkwhy]", el); if (!b || !q.likely) return;
@@ -1173,6 +1175,7 @@ if (!BASIS_IDS[b]) { var s = BASIS_IDS[b] = {}; (HX.CORE.likelyTopics || []).for
 return BASIS_IDS[b];
 }
 HX.lkBasis = lkBasis;
+function lkName(k){ return k === "likely" ? likelyName() : labelOf(LIKELY, k); }
 function isLk(k){ return LIKELY.some(function(x){ return x[0] === k; }); }
 function lkSpec(k){ for (var i = 0; i < LIKELY.length; i++) if (LIKELY[i][0] === k) return LIKELY[i][2] || null; return null; }
 function lkHas(q, k){ var sp = lkSpec(k); return sp ? (sp.basis ? !!lkBasis(sp.basis)[q.id] : !!q[sp.prop || "likely"]) && (!sp.lec || q.lec === sp.lec) : !!q[k]; }
@@ -1340,7 +1343,7 @@ x.lecs.map(function(l){ var on = picked.indexOf(l.id) > -1; return '<li><label><
 '<label class="search"><span class="sr">Search the questions</span>' + icon("search", 18) + '<input type="search" placeholder="Search the questions" value="' + esc(bankSearch) + '" data-search></label>' +
 "</div>" +
 '<div class="qbar-row chips"><span class="lab">Show</span><span class="chipset">' + SHOW.map(function(x){ return showChip(x[0], x[1]); }).join("") + "</span></div>" +
-'<div class="qbar-row chips only"><span class="lab">Only</span><span class="chipset" role="group" aria-label="Only">' + LIKELY.map(function(x){ return lkChip(x[0], x[1]); }).join("") + "</span></div>" +
+'<div class="qbar-row chips only"><span class="lab">Only</span><span class="chipset" role="group" aria-label="Only">' + LIKELY.map(function(x){ return lkChip(x[0], x[0] === "likely" ? likelyName() : x[1]); }).join("") + "</span></div>" +
 '<div class="qbar-row chips"><span class="lab">Sets</span><span class="chipset">' + SETS.map(function(x){ return setChip(x[0], x[1]); }).join("") + "</span></div>" +
 '<div class="qbar-row">' + (qview() === "questions" ? '<span class="lab">Order</span><span class="seg" role="group" aria-label="Order"><button type="button" data-order="in" aria-pressed="' + (STATE.ui.qorder !== "random") + '">In order</button><button type="button" data-order="random" aria-pressed="' + (STATE.ui.qorder === "random") + '">' + icon("shuffle", 16) + "Random</button></span>" +
 '<span class="lab" id="qzL">At a time</span><span class="seg seg-size" role="group" aria-labelledby="qzL">' + SIZES.map(function(x){ return '<button type="button" data-qsize="' + x[0] + '" aria-pressed="' + (qsize() === x[0]) + '"' + (x[0] === "all" ? ' aria-label="All at once"' : ' aria-label="' + x[1] + ' at a time"') + ">" + x[1] + "</button>"; }).join("") + "</span>" : "") +
@@ -1427,7 +1430,7 @@ var tags = [], picked = lecIds(), R = C.review || {};
 var nRev = list.filter(function(q){ return isReview(q.lec); }).length, n = list.length - nRev;
 if (!isDefaultLecs(picked)) tags.push(["lec", picked.length === 1 ? lecName(picked[0]) : picked.length === HX.LECS.length && R.tag ? R.tag : picked.length + " lectures"]);
 if (STATE.ui.qstatus && STATE.ui.qstatus !== "all") tags.push(["show", labelOf(SHOW, STATE.ui.qstatus)]);
-if (STATE.ui.qlikely) tags.push(["lk", labelOf(LIKELY, STATE.ui.qlikely)]);
+if (STATE.ui.qlikely) tags.push(["lk", lkName(STATE.ui.qlikely)]);
 if (STATE.ui.qfmt && STATE.ui.qfmt !== "all") tags.push(["fmt", labelOf(FMTS, STATE.ui.qfmt)]);
 if (STATE.ui.qsrc && STATE.ui.qsrc !== "all") tags.push(["src", (HX.CORE.srcLabel || {})[STATE.ui.qsrc] || STATE.ui.qsrc]);
 if (bankSearch.trim()) tags.push(["search", "“" + bankSearch.trim() + "”"]);
@@ -1437,10 +1440,10 @@ return '<p class="sumline">' + line + (STATE.ui.qorder === "random" ? ", in rand
 (tags.length ? '<span class="tags">' + tags.map(function(t){ return '<button class="tagx" type="button" data-tagoff="' + t[0] + '" aria-label="Remove the filter ' + esc(t[1]) + '">' + esc(t[1]) + icon("close", 14) + "</button>"; }).join("") + '<button class="btn btn-text" type="button" data-clearall>Clear all</button></span>' : "");
 }
 function emptyWhy(){
-var st = STATE.ui.qstatus || "all", lk = STATE.ui.qlikely ? labelOf(LIKELY, STATE.ui.qlikely) + " " : "";
+var st = STATE.ui.qstatus || "all", lk = STATE.ui.qlikely ? lkName(STATE.ui.qlikely) + " " : "";
 var only = !(STATE.ui.qfmt && STATE.ui.qfmt !== "all") && !(STATE.ui.qsrc && STATE.ui.qsrc !== "all") && !bankSearch.trim();
 if (!lecIds().length) return "No lectures are ticked, so there is nothing to show.";
-var sp = lkSpec(STATE.ui.qlikely); if (sp && sp.lec && LBY[sp.lec] && lecIds().indexOf(sp.lec) === -1) return labelOf(LIKELY, STATE.ui.qlikely) + " questions are in " + lecName(sp.lec) + ", which isn't ticked under Lectures.";
+var sp = lkSpec(STATE.ui.qlikely); if (sp && sp.lec && LBY[sp.lec] && lecIds().indexOf(sp.lec) === -1) return lkName(STATE.ui.qlikely) + " questions are in " + lecName(sp.lec) + ", which isn't ticked under Lectures.";
 if (st === "pinned" && !pins().length) return "No pinned questions yet. Tap Pin on any question to save it here.";
 if (st === "missed" && only) return lk ? "You haven't missed any " + lk + "questions in these lectures. Questions you get wrong come back here." : "Nothing missed in these lectures. Questions you get wrong come back here.";
 if (st === "unseen" && only) return "You have answered every " + lk + "question here. Try Missed last time, or another lecture.";
@@ -2113,7 +2116,7 @@ q("#questions", "questions", "Practice questions", pl(left, "question") + " for 
 q("#questions/drill", "drill", "Daily drill", "Misses and high-yield, a few minutes") +
 q("#notes/" + esc(cont.id), "notes", "Notes", lecLabel(cont) + " " + shortTitle(cont)) +
 q("#questions/mock", "mock", "Mock exam", pl(HX.mockTotal(), "question") + ", timed") +
-q("#more/hints", "hints", "Exam hints", "What " + (X.prof || "the professor") + " said to know") +
+q("#more/hints", "hints", hintsName(), courses() ? "What each course stressed most" : "What " + (X.prof || "the professor") + " said to know") +
 q("#more/cram", "cram", "Cram sheet", "Every lecture on one page") +
 (pod ? podMiniHTML(pod) : "") +
 "</nav>" +
@@ -2235,12 +2238,12 @@ foldBtn() +
 '<span class="note tool-tip">' + icon("highlight", 18) + "Select text to highlight it</span>" +
 "</div>" +
 '<div class="mmap" hidden></div>' +
-(hy ? '<p class="note hy-intro">' + icon("hints", 18) + "<span>Only what's most likely on the exam: " + pl(nTopics, "predicted topic") + ", strongest evidence first, each with the part of the notes that teaches it. <b>As taught</b> has everything.</span></p>" : "") +
+(hy ? '<p class="note hy-intro">' + icon("hints", 18) + "<span>" + (courses() ? "Only what the courses stressed most: " + pl(nTopics, "high-yield topic") : "Only what's most likely on the exam: " + pl(nTopics, "predicted topic")) + ", strongest evidence first, each with the part of the notes that teaches it. <b>As taught</b> has everything.</span></p>" : "") +
 '<div class="reading-prose' + (hy ? " hy" : "") + '">' + (text || "<p>Notes coming soon.</p>") + "</div>" +
 '<section class="lec-figs" hidden aria-labelledby="lfH"><h2 id="lfH">Diagrams</h2><div class="fig-grid"></div></section>' +
 (group && !hy ? '<section class="charts" aria-labelledby="lcH"><h2 id="lcH">Charts for this lecture</h2><p class="note">' + esc(group.blurb || "") + "</p>" + group.sections.map(function(sec, i){ return (sec.part ? '<h3 class="part">' + esc(sec.part) + "</h3>" : "") + sectionHTML(sec); }).join("") + "</section>" : "") +
 '<section class="check" aria-labelledby="ckH"><h2 id="ckH">Check yourself</h2><p class="note">Three questions from this lecture. Answers count like anywhere else.</p><div class="qlist" data-check></div></section>' +
-'<nav class="foot-acts" aria-label="Next">' + readBtnHTML(lec) + (hy && nLikely ? '<a class="btn btn-primary" href="#questions" data-lecq="' + esc(lec.id) + '" data-lqlk>' + icon("questions", 18) + "Practice the " + fmt(nLikely) + " High likelihood questions</a>" :
+'<nav class="foot-acts" aria-label="Next">' + readBtnHTML(lec) + (hy && nLikely ? '<a class="btn btn-primary" href="#questions" data-lecq="' + esc(lec.id) + '" data-lqlk>' + icon("questions", 18) + "Practice the " + fmt(nLikely) + " " + likelyName() + " questions</a>" :
 '<a class="btn btn-primary" href="#questions" data-lecq="' + esc(lec.id) + '">' + icon("questions", 18) + "Practice " + esc(lecLabel(lec)) + " questions</a>") +
 '<a class="btn" href="#more/cram" data-cram="' + esc(lec.id) + '">' + icon("cram", 18) + "Cram bullets</a></nav>" +
 footNavHTML(lec) +
@@ -2693,6 +2696,10 @@ function wireLecLinks(el){
 $$("[data-lecq]", el).forEach(function(a){ a.addEventListener("click", function(){ var lk = a.hasAttribute("data-lqlk") ? a.getAttribute("data-lqlk") || "likely" : ""; STATE.ui.qset = ""; STATE.ui.qlec = a.getAttribute("data-lecq"); STATE.ui.qstatus = "all"; STATE.ui.qlikely = lk; STATE.ui.qfmt = "all"; STATE.ui.qsrc = "all"; saveState(); track("notes:practice" + (lk ? "-" + lk : "")); }); });
 $$("[data-cram]", el).forEach(function(a){ a.addEventListener("click", function(){ setTimeout(function(){ var c = document.getElementById("cram-" + a.getAttribute("data-cram")); if (c) c.scrollIntoView({ block: "start" }); }, 80); }); });
 }
+function courses(){ return !!(CORE && CORE.hintsFrom === "courses"); }
+function hintsName(){ return courses() ? "High-yield points" : "Exam hints"; }
+function likelyName(){ return courses() ? "High yield" : "High likelihood"; }
+function moreList(){ return courses() ? MORE.map(function(m){ return m[0] === "hints" ? ["hints", "hints", hintsName(), "What each course stressed, and its highest-yield topics"] : m; }) : MORE; }
 var MORE = [
 ["timmy", "podcast", "Timmy Time", "The audio review, with likes and comments"],
 ["hints", "hints", "Exam hints", "What the professor said would be tested, and the most likely questions"],
@@ -2707,7 +2714,7 @@ var MORE = [
 var MORE_ROWS = [["ideas", "thumbup", "Idea board", "Ideas for the hubs from the class: vote on them, or post your own"]];
 function renderMore(el, s){
 var bits = String(s || "").split("/"), what = bits.slice(1).join("/"); s = bits[0];
-var page = MORE.concat(MORE_ROWS).filter(function(m){ return m[0] === s; })[0];
+var page = moreList().concat(MORE_ROWS).filter(function(m){ return m[0] === s; })[0];
 if (!page) { drawMoreMenu(el); return; }
 var back = '<a class="btn btn-text back" href="#more">' + icon("chevron", 18, "flip") + "More</a>";
 el.innerHTML = '<div class="hx-page more-page">' + back + "<h1>" + esc(page[2]) + '</h1><div class="more-body"><p class="note loading">Loading…</p></div></div>';
@@ -2719,7 +2726,7 @@ function moreMeta(k){
 var pod = CORE.podcast, X = C.arcade || {}, x = HX.rankXp();
 return ({
 timmy: pod ? Math.round((pod.duration || 0) / 60) + " min" + (pod.chapters ? " · " + pl(pod.chapters.length, "chapter") : "") : "",
-hints: pl((CORE.likelyTopics || []).length, "likely topic"),
+hints: pl((CORE.likelyTopics || []).length, courses() ? "high-yield topic" : "likely topic"),
 cram: pl(LECS.length, "lecture"),
 side: "Across every lecture",
 arcade: pl((X.games || []).length, "game"),
@@ -2738,7 +2745,7 @@ return '<li class="mt f-' + f + (big ? " is-big" : "") + '"><a href="#more/' + m
 '<span class="mt-meta num">' + esc(moreMeta(m[0])) + "</span></span>" + icon("chevron", 20) + "</a></li>";
 };
 el.innerHTML = '<div class="hx-page more"><h1>More</h1><p class="more-lede">Everything past the notes and the questions: the review, the games, your stats and your settings.</p>' +
-'<nav aria-label="Study and play"><ul class="more-tiles">' + MORE.filter(function(m){ return (m[0] !== "timmy" || pod) && (m[0] !== "side" || !CORE.noSide) && (m[0] !== "shop" || HX.hasShop()) && (m[0] !== "arcade" || ((C.arcade || {}).games || []).length); }).map(tile).join("") + "</ul></nav>" +
+'<nav aria-label="Study and play"><ul class="more-tiles">' + moreList().filter(function(m){ return (m[0] !== "timmy" || pod) && (m[0] !== "side" || !CORE.noSide) && (m[0] !== "shop" || HX.hasShop()) && (m[0] !== "arcade" || ((C.arcade || {}).games || []).length); }).map(tile).join("") + "</ul></nav>" +
 '<section class="panel menu talk" aria-labelledby="mwH"><h2 id="mwH">Talk to us</h2><ul class="rows">' +
 MORE_ROWS.map(function(m){ return '<li><a href="#more/' + m[0] + '">' + icon(m[1], 22) + "<span><b>" + esc(m[2]) + "</b><small>" + esc(m[3]) + "</small></span>" + icon("chevron", 18) + "</a></li>"; }).join("") +
 '<li><button type="button" data-sh-inbox>' + icon("inbox", 22) + "<span><b>Inbox</b><small>Replies to what you report or suggest, and notices to the class</small></span>" + icon("chevron", 18) + "</button></li>" +
@@ -2818,17 +2825,17 @@ var html = (X.banner ? '<p class="notice">' + icon("clock", 20) + "<span>" + esc
 LECS.map(function(l){ var items = hints.filter(function(x){ return x.lec === l.id; }); if (!items.length) return "";
 return '<div class="hint-group' + lc(l.id) + '"><h3>' + lecHead(l) + ' <a class="btn btn-text" href="#notes/' + esc(l.id) + '">Notes</a></h3>' + items.map(function(x){
 var said = x.kind !== "focus";
-return '<figure class="hint' + (said ? "" : " is-focus") + '"><blockquote>' + (said ? "“" : "") + esc(x.quote) + (said ? "”" : "") + '</blockquote><figcaption><span class="kind ' + esc(x.kind) + '">' + (x.kind === "deemphasize" ? "Less likely" : x.kind === "focus" ? "Focus list" : "Know this") + "</span>" + esc(x.take) + "</figcaption></figure>"; }).join("") + "</div>"; }).join("") + "</section>";
+return '<figure class="hint' + (said ? "" : " is-focus") + '"><blockquote>' + (said ? "“" : "") + esc(x.quote) + (said ? "”" : "") + '</blockquote><figcaption><span class="kind ' + esc(x.kind) + '">' + (x.kind === "deemphasize" ? (courses() ? "Said not needed" : "Less likely") : x.kind === "focus" ? "Focus list" : "Know this") + "</span>" + esc(x.take) + "</figcaption></figure>"; }).join("") + "</div>"; }).join("") + "</section>";
 body.innerHTML = html;
 $$("[data-likely]", body).forEach(function(b){ b.addEventListener("click", function(){ STATE.ui.qset = ""; STATE.ui.qlec = b.getAttribute("data-likely"); STATE.ui.qstatus = "all"; STATE.ui.qlikely = "likely"; STATE.ui.qfmt = "all"; STATE.ui.qsrc = "all"; saveState(); track("hints:likely-practice"); go("questions"); }); });
 }); }).catch(function(){ body.innerHTML = "<p>Couldn't load the hints. Check your connection.</p>"; });
 }
 function likelyHTML(X){
 var T = CORE.likelyTopics || [], counts = CORE.examCounts || {};
-return '<section class="panel likely-box" aria-labelledby="lkH"><h2 id="lkH">Most likely questions</h2><p class="note">' + esc(X.likely || "Each lecture's predicted topics, strongest evidence first.") + '</p><div class="likely-grid">' + LECS.map(function(l){
+return '<section class="panel likely-box" aria-labelledby="lkH"><h2 id="lkH">' + (courses() ? "Highest-yield topics" : "Most likely questions") + '</h2><p class="note">' + esc(X.likely || (courses() ? "Each part's high-yield topics, strongest evidence first: what its course stressed most." : "Each lecture's predicted topics, strongest evidence first.")) + '</p><div class="likely-grid">' + LECS.map(function(l){
 var ts = T.filter(function(t){ return t.lec === l.id; }); if (!ts.length) return "";
 var grp = CORE.mock && CORE.mock.groups ? Object.keys(CORE.mock.groups).filter(function(k){ return CORE.mock.groups[k].indexOf(l.id) > -1; })[0] : null;
-var cnt = grp && counts[grp] ? counts[grp] + " on the exam for " + CORE.mock.groups[grp].map(function(id){ return lecLabel(LBY[id]); }).join(" and ") + " together" : counts[l.id] ? counts[l.id] + " on the exam" : pl(ts.length, "predicted topic");
+var cnt = grp && counts[grp] ? counts[grp] + " on the exam for " + CORE.mock.groups[grp].map(function(id){ return lecLabel(LBY[id]); }).join(" and ") + " together" : counts[l.id] ? counts[l.id] + " on the exam" : pl(ts.length, courses() ? "high-yield topic" : "predicted topic");
 return '<div class="likely-lec' + lc(l.id) + '"><h3>' + lecHead(l) + ' <span class="note">' + esc(cnt) + "</span></h3><ol>" +
 ts.map(function(t){ return "<li>" + esc(t.t) + ' <span class="note">' + esc(t.basis) + "</span></li>"; }).join("") +
 '</ol><button class="btn" type="button" data-likely="' + esc(l.id) + '">Practice these (' + ts.reduce(function(k, t){ return k + t.ids.length; }, 0) + ")</button></div>";
@@ -3197,7 +3204,7 @@ if (CORE.podcast) window.SH_PODCAST = Object.assign({}, CORE.podcast, { src: ASS
 route();
 var idle = window.requestIdleCallback || function(f){ setTimeout(f, 300); };
 idle(function(){
-needNotes().then(function(){ return needStudy().catch(function(){}); }).then(function(){ exportSections(); }).catch(function(){}).then(startWidget);
+needNotes().then(function(){ return needStudy().catch(function(){}); }).then(function(){ exportSections(); if (courses()) SH_EXPORT.sections.forEach(function(x){ if (x.kind === "Exam hints") x.kind = hintsName(); }); }).catch(function(){}).then(startWidget);
 needQuestions().catch(function(){});
 });
 }).catch(function(e){ main.innerHTML = offlineHTML("this hub"); if (window.console) console.error(e); });
@@ -3216,7 +3223,7 @@ hasReview: hasReview, needQuestions: needQuestions, needVariants: needVariants, 
 needFigures: needFigures, needsFig: needsFig, liveNow: liveNow, paintLive: paintLive, parse: parse, route: route,
 go: go, section: section, lecStat: lecStat, lecProgress: lecProgress, srsMisses: srsMisses,
 offlineHTML: offlineHTML, tip: tip, whenWidget: whenWidget, lecBadge: lecBadge, lecListHTML: lecListHTML, wireLecPick: wireLecPick, wireLecLinks: wireLecLinks,
-followBtn: followBtn, wireFollow: wireFollow, foldBtn: foldBtn, foldParts: foldParts
+followBtn: followBtn, wireFollow: wireFollow, foldBtn: foldBtn, foldParts: foldParts, courses: courses, hintsName: hintsName, likelyName: likelyName
 };
 [["CORE", function(){ return CORE; }], ["QS", function(){ return QS; }], ["LECS", function(){ return LECS; }], ["GROUPS", function(){ return GROUPS; }],
 ["IDX", function(){ return IDX; }], ["NOTES", function(){ return NOTES; }], ["AUDIO_OFF", function(){ return AUDIO_OFF; }],

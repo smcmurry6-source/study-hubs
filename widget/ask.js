@@ -219,7 +219,8 @@
     if (isDash()) list.push(["exams", "When are my exams?"], ["site", "What can this site do?"]);
     else {
       if (pl && pl.lec) list.push(["simple", "Explain this lecture simply"]);
-      list.push(["likely", "What's most likely on the exam?"], ["site", "How do I use this hub?"]);
+      var co = opt("core");   // a hub whose topics come from the courses it reviews (core.json's hintsFrom, Review of Systems) has no predicted exam topics
+      list.push(["likely", co && co.hintsFrom === "courses" ? "What's highest yield here?" : "What's most likely on the exam?"], ["site", "How do I use this hub?"]);
     }
     list.forEach(function(s){
       var b = el("button", "ska-chip", { type: "button", "data-ska": "starter-" + s[0] }); b.textContent = s[1];
