@@ -1,12 +1,12 @@
 ---
 type: task
-status: open
+status: done
 hub: all
 created: 2026-11-18
 requested-by: Sam
 due:
 waiting-on:
-agent:
+agent: Claude Code
 pr: https://github.com/smcmurry6-source/study-hubs/pull/421, https://github.com/smcmurry6-source/study-hubs/pull/429, https://github.com/smcmurry6-source/study-hubs/pull/430, https://github.com/smcmurry6-source/study-hubs/pull/434, https://github.com/smcmurry6-source/study-hubs/pull/435, https://github.com/smcmurry6-source/study-hubs/pull/456, https://github.com/smcmurry6-source/study-hubs/pull/487
 ---
 
@@ -33,7 +33,7 @@ saves failed in bursts of 1 to 5 minutes, about eight times in the day, up to 1 
   (`pg_advisory_xact_lock('xp|' || visitor)`) behind its slower calls.
 - The database: the Free plan's Nano size (a shared CPU, up to 0.5 GB of memory; this note first said 1 GB and two cores,
   the paid Micro), 60 connections; anon's `statement_timeout` is 3 s
-  ([shared-infrastructure](../reference/shared-infrastructure.md)).
+  ([shared-infrastructure](../../reference/shared-infrastructure.md)).
 - Done in the PR that wrote this note (its link is in the Log): the admin page reads one query at a time and says "the database was
   busy" on a timeout; failed answer saves retry for about three minutes (same request id, so nothing counts twice); the A/B
   versions page has its own small query.
@@ -43,7 +43,7 @@ saves failed in bursts of 1 to 5 minutes, about eight times in the day, up to 1 
 - [x] The admin page's heavy reads are fast or cached: `get_insights`, `get_insight_retries`, `get_data_quality` (1 to 2 s
   each), `get_question_health` (`qh_report`, 1 to 3 s), `get_visitor_summary` / `_by_hub` / `_by_section` and
   `get_exam_debriefs` (about 1 s). For example worked out every 15 minutes by `pg_cron` into a small table the page reads.
-  **Done, both** (`migration_v83.sql`, [#456](https://github.com/smcmurry6-source/study-hubs/pull/456); how it works: [admin-operations](../reference/admin-operations.md)).
+  **Done, both** (`migration_v83.sql`, [#456](https://github.com/smcmurry6-source/study-hubs/pull/456); how it works: [admin-operations](../../reference/admin-operations.md)).
   Measured on a throwaway copy at the live size (222,000 answers, 114,000 question events, 310 visitors) with the live
   settings. *Faster:* `sh_surface()` ran once per hourly row instead of once per section in Insights and the data-quality
   report (the planner folded the lookup into the join, or tested it before the distinct): insights 1.05 → 0.43 s, data
@@ -63,7 +63,7 @@ saves failed in bursts of 1 to 5 minutes, about eight times in the day, up to 1 
   reads kept, no failed request; the times are in the Log ([#487](https://github.com/smcmurry6-source/study-hubs/pull/487)).
 - [x] The lessons audit's queries (`tools/economy.sql`, `tools/lessons-daily.sql`, `tools/retro.sql`) stay short, or the
   runbook says to run them when the class is quiet; the connector's queries have no time limit.
-  **Done, both** ([run-sql-on-the-live-database](../how-to/run-sql-on-the-live-database.md), [#434](https://github.com/smcmurry6-source/study-hubs/pull/434)). Timed on a throwaway copy at
+  **Done, both** ([run-sql-on-the-live-database](../../how-to/run-sql-on-the-live-database.md), [#434](https://github.com/smcmurry6-source/study-hubs/pull/434)). Timed on a throwaway copy at
   1.5 times the class's size: E3 (the wallets) took 4.7 s, because PostgreSQL inlined its CTE and worked each wallet out
   again for every column that reads it (most likely the audit's 11 and 13 s queries live); `as materialized` makes it 0.5 s,
   the same numbers. The retrospective's click list counted people once a row (0.3 s, 4.5 s without its `limit`), now in one
@@ -81,7 +81,7 @@ saves failed in bursts of 1 to 5 minutes, about eight times in the day, up to 1 
   Making them shorter is the first box's work (`get_data_quality` and `get_question_health` are the same functions); until then
   `tools/lessons-refresh.md` step 1 says to read both early in the day or in the quiet hours, never on a busy evening.
 - [x] `vault/how-to/` says to apply a migration with a backfill late at night (or in small batches), not while the class
-  studies. **Done:** [run-sql-on-the-live-database](../how-to/run-sql-on-the-live-database.md): the quiet hours (1 to 5 am
+  studies. **Done:** [run-sql-on-the-live-database](../../how-to/run-sql-on-the-live-database.md): the quiet hours (1 to 5 am
   Central, from `presence_hourly`, clear of the 3:23 am retention job), functions any time, a backfill kept out of the
   migration's transaction and run at night or a few thousand rows a call, `create index concurrently` alone in a call,
   `lock_timeout` before an `alter table` on a table the pages write, and data fixes kept small (they run at the merge,
@@ -89,7 +89,7 @@ saves failed in bursts of 1 to 5 minutes, about eight times in the day, up to 1 
   read-usage-data.
 - [x] Sam's call: a larger compute size for the Supabase project (more memory and CPU, at a monthly cost). Not needed if
   the boxes above are done; worth it for exam weeks. Asked 2026-11-18 during the outage (Pro, $25 a month with Micro, or
-  about $30 with Small): **"Stay free, keep fixing"** ([decisions](../decisions.md)). Open again if it happens after v72.
+  about $30 with Small): **"Stay free, keep fixing"** ([decisions](../../decisions.md)). Open again if it happens after v72.
 - [x] **The answer retries don't pile onto a struggling database.** In the 19:40-20:25 outage (Log) the failed saves were sent
   again up to four times each (#421), which doubled `record_answer_v2`'s calls while 9 in 10 failed and kept PostgREST's
   connection pool full. For example: one page sends one answer at a time while saves fail (a queue, the oldest first),
@@ -141,9 +141,10 @@ saves failed in bursts of 1 to 5 minutes, about eight times in the day, up to 1 
   first answer, the ring, the streak), once a person and hub, only for someone studying in that hub during the outage, 3
   answers a minute at most, until 11-21; `widget/hub-rewards.js` asks once on the next visit ("Saved from Wednesday's
   outage"). The answers themselves aren't re-added (no choice kept): medals and the class's numbers don't count them.
-- [ ] **A second free Supabase project for the analytics, when it's needed** (Sam, 2026-11-18: "i think adding the second
+- [x] ~~**A second free Supabase project for the analytics, when it's needed** (Sam, 2026-11-18: "i think adding the second
   database may be necessary at some point"): pings, clicks, feature events and question health (about a third of the
-  requests, over half the storage) move to their own free project; answers, XP and the shop stay. Not now.
+  requests, over half the storage) move to their own free project; answers, XP and the shop stay. Not now.~~ Parked:
+  moved to [the inbox](../inbox.md) as a parked line, 2026-11-20.
 - [x] **The lessons audit reads the database's size every run** (found 2026-11-19, when Sam saw the dashboard still at about
   400 MB after the rewrite: Log). Add one catalog query to `tools/lessons-refresh.md` step 1
   (`select pg_size_pretty(sum(pg_database_size(datname))) from pg_database`, plus the five biggest tables) and a line in
@@ -152,7 +153,7 @@ saves failed in bursts of 1 to 5 minutes, about eight times in the day, up to 1 
   hubs a busy week can add 150 MB or more: from about 420 MB, the analytics move (the box above) or a trim is due.
   Done 2026-11-19 by the lessons audit: the query is in `tools/lessons-refresh.md` step 1 and the skill; that afternoon it read
   323 MB (`personal_answers` 79 MB, `activity_pings` 36, `question_events` 35, `xp_seen` 31, `ui_click_reach` 24).
-- [x] [The optimization pass](done/2026-11-18-database-optimization-pass.md): the answer save is still 55% of the database's time.
+- [x] [The optimization pass](2026-11-18-database-optimization-pass.md): the answer save is still 55% of the database's time.
   **Done** 2026-11-20 (phases 1-3, #444 to #470): the answer save 31% of the database's time at 45 ms a call, the evening after.
 - [x] `personal_answers`' two indexes (`migration_v71.sql`: the person's answers newest first, and one question's answers)
   built on the live database with `create index concurrently`, then the file appended to `supabase/schema.sql` and its line
@@ -241,10 +242,10 @@ saves failed in bursts of 1 to 5 minutes, about eight times in the day, up to 1 
   the primary key 9 → 2 MB) and `analyze`. After: **318 MB**, the ping table 31 MB (86,372 rows, newest a few seconds old),
   every index valid, no failed request or database error in those minutes. The biggest tables now: `personal_answers` 76 MB,
   `xp_seen` 52 MB, `question_events` 34 MB, `ui_click_reach` 23 MB, `xp_awards` 22 MB, `answer_xp` 21 MB (for the
-  [optimization pass](done/2026-11-18-database-optimization-pass.md); `xp_seen` is worth a look).
+  [optimization pass](2026-11-18-database-optimization-pass.md); `xp_seen` is worth a look).
 - 2026-11-19, 4:10 am Central ([#444](https://github.com/smcmurry6-source/study-hubs/pull/444)): the rewrite read back from the catalog before
   the optimization pass's phase 1 went in: the ping table 31 MB (the table 12 MB, its five indexes 19 MB), the database
-  318 MB. `migration_v76.sql` and `migration_v77.sql` applied the same hour: [its note](done/2026-11-18-database-optimization-pass.md).
+  318 MB. `migration_v76.sql` and `migration_v77.sql` applied the same hour: [its note](2026-11-18-database-optimization-pass.md).
 - 2026-11-19, 5 am Central (Claude Code, read-only through the connector): Sam: "supabase is still saying its at like 400 mb
   and the memory commitment is at severe". The database read **318 MB** (332 MB with the two template databases, the sum
   the 500 MB limit counts). Supabase refreshes the dashboard's size once a day, so it still showed the figure from before
@@ -264,10 +265,10 @@ saves failed in bursts of 1 to 5 minutes, about eight times in the day, up to 1 
   pooler's, which the site doesn't use), so the levers are fewer, shorter queries (v72, v76, v77 and the changelog read,
   all live since this morning) and, past that, the analytics move or a larger compute size (Sam: stay free).
 - 2026-11-19 (the housekeeping package): the compute-size box ticked: Sam's call was made on 11-18 ("Stay free, keep
-  fixing", [decisions](../decisions.md)); it opens again only if the saves fail in bursts after v72.
+  fixing", [decisions](../../decisions.md)); it opens again only if the saves fail in bursts after v72.
 - 2026-11-19, noon Central (Claude Code): the optimization pass's phase 2 applied live at Sam's word, with the rewrites of
   `xp_seen` and `activity_visits`: **the database 349 → 323 MB** (it had grown 31 MB since the morning's 318 MB, Perio's final
-  day). No request failed ([the optimization pass](done/2026-11-18-database-optimization-pass.md), its Log).
+  day). No request failed ([the optimization pass](2026-11-18-database-optimization-pass.md), its Log).
 
 - 2026-11-19 (Claude Code, [#456](https://github.com/smcmurry6-source/study-hubs/pull/456)): the first box. Everything measured on a throwaway copy
   (live only: catalog reads, `pg_stats`, settings, the cron table). `migration_v83.sql` written and tested
@@ -297,3 +298,20 @@ saves failed in bursts of 1 to 5 minutes, about eight times in the day, up to 1 
   says "Being worked out".
 
 ## Outcome
+
+Answer saves no longer fail when something heavy runs. The admin page reads one query at a time, and its heavy reads come
+worked out ahead from `admin_cache` (`migration_v83.sql`, live 2026-11-20); the lessons audit's queries are short and sent one
+at a time under a 5 s limit, and migrations with a backfill go in at night
+([run-sql-on-the-live-database](../../how-to/run-sql-on-the-live-database.md)). A page that sees the server fail starts a
+quiet spell (one answer at a time, analytics held), and an unsent answer is kept on the device and sent by the next page with
+the same request id. The answer save's own cost fell (`migration_v72.sql`, then [the optimization
+pass](2026-11-18-database-optimization-pass.md): 31% of the database's time at 45 ms a call), `personal_answers` got its two
+indexes (`migration_v71.sql`), the outage's study time and answers were restored, and the ping table keeps 3 days
+(`migration_v74.sql`): the database went 465 → 318 MB on 2026-11-19 (323 MB that afternoon), under the Free plan's 500 MB.
+Sam stayed on the Free plan ([decisions](../../decisions.md)).
+
+An admin read with no kept copy yet no longer times out (`migration_v90.sql`, #495).
+
+Left, on the to-do list: the second free project for the analytics, parked in [the inbox](../inbox.md) until the database
+nears about 420 MB; `sh_data_quality` to read from the kept copy
+(the inbox).
