@@ -47,7 +47,10 @@ there and in [decisions](../decisions.md)); **deployed and applied at [the redes
    page change rewrites only its ~40k tokens, not the hub's 130-160k: "Limits and money" below); then the earlier turns; then this turn: `<page>` (hub, voice, today in Central time,
    view, lecture, paragraph), `<answered_question>` (its choices without letters, the student's pick by its words: the card
    shuffles the choices and shows no letters), `<progress>`, `<student>` (escaped: what a student types is data).
-   Model `claude-sonnet-5-5` (Sam, 2026-11-14; built and first tested on `claude-opus-5-5`), effort `medium`, structured output (the schema in `core.js`), the refusal fallback on.
+   Model `claude-haiku-5-5` (Sam, 2026-11-20: "we can switch timmy to run on haiku", when the Review of Systems hub's
+   content came in at about 180k tokens; `claude-sonnet-5-5` from 2026-11-14, built and first tested on `claude-opus-5-5`),
+   effort `medium`, structured output (the schema in `core.js`). Haiku has no server-side refusal fallback, so `withModel()`
+   sends none and a declined question gets the refusal nap; on another model the fallback is on.
 4. The answer is checked: every cite's quote must really be in the unit it names, at least three words or the whole of a
    shorter unit such as an exam date (a real quote under the wrong id is moved to the right unit). Only checked cites become links; the rest are stored as `unchecked` for the admin tab.
 5. `timmy_finish` stores the answer with its tokens and estimated cost, and the browser gets:
@@ -82,7 +85,7 @@ list, no limit on gap answers. they are uncommon" ([decisions](../decisions.md))
 
 - **When:** only when the answer from the notes is `not_covered` (not a partial answer, a declined question or off-topic).
   The notes still come first: Timmy's own rules (`RULES`) are unchanged, so anything the content covers is answered from it.
-- **The call** (`gapRequest` in `core.js`): Sonnet 5.5 at effort `low`, its own short rules (`GAP_RULES`), the API's **basic**
+- **The call** (`gapRequest` in `core.js`): the same model (`MODEL`) at effort `low`, its own short rules (`GAP_RULES`), the API's **basic**
   web search tool (`web_search_20250305`, two searches at most) and plain text, because a search's citations don't mix with
   structured output. The newer tool (`web_search_20260209`) was tried first: its filtering step runs code, which dropped the
   citations and let the model's working notes into the answer. Sent: the question, the last four messages as text, the
@@ -118,6 +121,10 @@ list, no limit on gap answers. they are uncommon" ([decisions](../decisions.md))
   estimated cost from the usage the API reports. Visitor ids are easy to reset, so this cap and **the Console's spending
   limit** (Sam sets it at the credit) are the real backstop.
 - `admin_timmy_config(secret, enabled, day_cap_usd, per_visitor_day)` turns him off or changes the limits at once.
+- **On Haiku 5.5** (since 2026-11-20; list prices: $0.10 in and $0.50 out a million up to a 100K-token prompt, $0.50 and
+  $2.50 past it, which every hub's content is; cache reads 0.1x, 1-hour cache writes 2x): writing a hub's content to the
+  cache is about $0.15 ($0.25 for Review of Systems), and a cached question under a cent. The Sonnet figures below are from
+  before the switch.
 - Cost per question (Sonnet 5.5 list prices on 2026-11-14: $2 in, $10 out, cache reads $0.10 a million, 1-hour cache
   writes 2x; measured on the eval that day): about 2 cents with the content cached (about 5 cents on the dashboard). A hub's
   content is 130-165k tokens (about 420k on the dashboard), cached for an hour that every question starts again, so the

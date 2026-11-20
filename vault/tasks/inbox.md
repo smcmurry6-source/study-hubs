@@ -18,6 +18,13 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
 - [ ] **Review of Systems: an arcade with its own skin** (2026-11-19, the hub's build): it shipped without one (More hides
   the tile). Sam's call whether it wants one; if so, its games, names and lobby art are its own
   ([arcade-skins](../rules/arcade-skins.md)), and the hub comes out of `TEXT_ONLY` in `sw.js`.
+- [ ] **Ask Timmy on Haiku: run the eval, with Review of Systems cases** (2026-11-20, [#480](https://github.com/smcmurry6-source/study-hubs/pull/480)):
+  Timmy moved to Haiku 5.5 (Sam: "we can switch timmy to run on haiku"; [decisions](../decisions.md)) without a new eval run,
+  because the session that switched him had no eval key (`TIMMY_EVAL_KEY`). The last Haiku run (2026-11-14) answered 83 of the
+  set's answerable cases against Sonnet's 98, with more "not covered" and "off topic" replies. Add about 40 cases for
+  `review-of-systems` to `tools/timmy/test-set.json`, run `node tools/timmy/eval.mjs` (Haiku is the function's model now),
+  compare with 2026-11-14's runs, and tell Sam; if Haiku falls short, going back is `MODEL` in
+  `supabase/functions/timmy/core.js` ([ask-timmy](../reference/ask-timmy.md)).
 - [ ] **Review of Systems: Cardio & Respiratory and Renal from their slides** (2026-11-19, the hub's build): their Drive
   folders had the thinnest sources (classmates' guides, no professor slides), so those sections rest most on standard
   references. If Sam can share their slides or transcripts, check those parts against them.
