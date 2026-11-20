@@ -329,6 +329,79 @@ async function wiringCheck(context, hub, label){
     await page.close();
   }
 }
+/* Visiting from a hub's arcade board (the inbox's "A smoke check for visiting from a hub's arcade board", 2026-11-20): a game's
+   game-over card shows the class's top five (get_arcade_leaderboard_v2, stubbed), and a classmate's name there is a button
+   (lbName() in the hub's content/arcade.js, window.shVisitPlace in widget/hub-timmy.js). A tap opens that place as a visit
+   (get_place, stubbed: "<name>'s place" in the title as text), Escape closes it and gives focus back to the name, a key
+   that opens nothing says so on its row, your own row isn't a button and a name with markup is drawn as text. Runs on a
+   hub whose arcade has Smile and visit buttons; none since Heme & Endo Exam 3's page came down (2026-11-20), so it is
+   skipped until the next hub with an arcade ships, like wiringCheck. */
+async function visitCheck(context, hub, label){
+  const name = `${hub}, visiting from the arcade board`, K = c => c.repeat(24), BAD = '<img src=x onerror="window.__visit=1">Bee';
+  const json = (route, body) => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(body) });
+  const rank = { xp: 2400, journey: 0, tier: 1, level: 2, step: 4, gtier: 1, step_at: 2000, next_at: 3000, tier_at: 1500, steps: 63, answers: 300, correct: 220, days: 12, badges: [], dark_seen: [], boost: null };
+  const shop = { day: '2026-11-20', seasons: [], throwback: false, wallet: { balance: 0 }, items: [], inventory: [], locked: [], equipped: {}, costumes: [], snacks_today: [], boost: null };
+  const rows = [{ rnk: 1, display_name: 'Visit Alpha', best: 500, is_me: false, flair: null, visit: K('a') }, { rnk: 2, display_name: BAD, best: 300, is_me: false, flair: null, visit: K('b') },
+    { rnk: 3, display_name: 'Test Molar', best: 100, is_me: true, flair: null, visit: K('e') }];
+  const places = { [K('a')]: { name: 'Visit Alpha', equipped: { home: 'castle', scene: 'beach' }, rank: { journey: 0, tier: 2, level: 1 }, flair: null } };
+  const page = await context.newPage(), errs = [];
+  page.on('pageerror', e => errs.push(e.message));
+  await page.addInitScript(() => { try { Object.defineProperty(Navigator.prototype, 'webdriver', { get: () => false, configurable: true }); } catch (e) {} });
+  let sids = 0;
+  await page.route(/supabase\.co\/rest\/v1\/rpc\/(get_widget_bootstrap_v2|get_rank_profile_v2|record_answer_v2|xp_session_start|xp_session_finish|get_arcade_leaderboard_v2|get_place)(\?|$)/, route => {
+    const fn = (/\/rpc\/([a-z0-9_]+)/.exec(route.request().url()) || [])[1];
+    if (fn === 'get_widget_bootstrap_v2') return json(route, { rank, mastery: [], shop });
+    if (fn === 'get_rank_profile_v2') return json(route, rank);
+    if (fn === 'record_answer_v2') return json(route, { ok: true, xp: 1, base: 1, mult: 1, why: null, bonus: [], boost: null, total: rank.xp });
+    if (fn === 'xp_session_start') return json(route, '00000000-0000-4000-8000-00000000b00' + (++sids));
+    if (fn === 'xp_session_finish') return json(route, { ok: true, xp: 0, mult: 1 });
+    if (fn === 'get_arcade_leaderboard_v2') return json(route, rows);
+    let a = {}; try { a = JSON.parse(route.request().postData() || '{}'); } catch (e) {}
+    return json(route, places[a.p_key] || null);
+  });
+  await page.goto(BASE() + `hubs/${hub}/index.html#more/arcade/smile`);
+  const go = await page.waitForSelector('#panel-arcade [data-start]', { timeout: 20000 }).catch(() => null);
+  if (!go) { problems.push(`${name} (${label}): Smile didn't open from #more/arcade/smile`); await page.close(); return; }
+  await go.click();
+  /* answer until the game is over: a wrong answer ends it, a right one is walked away from */
+  for (let i = 0; i < 6 && !(await page.$('#panel-arcade [data-overlay] [data-lb]')); i++) {
+    await page.waitForFunction(() => document.querySelector('#panel-arcade [data-overlay] [data-lb]') || (document.querySelectorAll('.ms-opt').length && !document.querySelector('.ms-opt.locked')), null, { timeout: 12000 }).catch(() => {});
+    if (await page.$('#panel-arcade [data-overlay] [data-lb]')) break;
+    const walk = await page.$('#panel-arcade [data-walk]:not([disabled])');
+    if (walk) await walk.click(); else await page.click('.ms-opt[data-ms="0"]').catch(() => {});
+    await page.waitForTimeout(1800);
+  }
+  const btn = await page.waitForSelector('#panel-arcade [data-lb] button[data-sh-visit]', { timeout: 12000 }).catch(() => null);
+  if (!btn) problems.push(`${name} (${label}): the game-over card's class board has no visit buttons`);
+  else {
+    await page.waitForTimeout(400);
+    const r = await page.evaluate(() => ({ n: document.querySelectorAll('#panel-arcade [data-lb] button[data-sh-visit]').length, labels: [...document.querySelectorAll('#panel-arcade [data-lb] button[data-sh-visit]')].map(b => b.getAttribute('aria-label')),
+      injected: !!window.__visit || !!document.querySelector('#panel-arcade [data-lb] img') }));
+    if (r.n !== 2) problems.push(`${name} (${label}): two classmates' rows should be buttons and your own shouldn't (${JSON.stringify(r.labels)})`);
+    if (r.injected) problems.push(`${name} (${label}): a leaderboard name with markup in it was drawn as markup`);
+    const alpha = '#panel-arcade [data-lb] button[data-key="' + K('a') + '"]';
+    await page.click(alpha);
+    const dlg = await page.waitForSelector('dialog.tpv[open]', { timeout: 20000 }).catch(() => null);
+    if (!dlg) problems.push(`${name} (${label}): tapping a name on the board didn't open that person's place`);
+    else {
+      await page.waitForTimeout(3000);   /* the trip through the clouds */
+      const t = await page.evaluate(() => { const h = document.querySelector('dialog.tpv #tpvT'); if (!h) return null; const c = h.cloneNode(true), n = c.querySelector('.tpv-num'); if (n) n.remove(); return { text: c.textContent.trim(), els: c.children.length }; });
+      if (!t || t.text !== 'Visit Alpha’s place' || t.els) problems.push(`${name} (${label}): the visited place's title should be "Visit Alpha's place" as text (${JSON.stringify(t)})`);
+      await page.keyboard.press('Escape'); await page.waitForTimeout(800);
+      const after = await page.evaluate(k => ({ open: !!document.querySelector('dialog.tpv[open]'), focus: (document.activeElement && document.activeElement.getAttribute('data-key')) === k }), K('a'));
+      if (after.open) problems.push(`${name} (${label}): Escape didn't close the visited place`);
+      else if (!after.focus) problems.push(`${name} (${label}): closing the visited place should give focus back to the name tapped`);
+    }
+    await page.click('#panel-arcade [data-lb] button[data-key="' + K('b') + '"]');
+    const msg = await page.waitForFunction(() => { const m = document.querySelector('#panel-arcade [data-lb] .sh-visit-msg'); return m && m.textContent; }, null, { timeout: 12000 }).catch(() => null);
+    const said = msg ? await msg.jsonValue() : '';
+    if (!/couldn.t be opened/.test(said || '')) problems.push(`${name} (${label}): a key that opens nothing should say so on its row (${JSON.stringify(said)})`);
+    if (await page.$('dialog.tpv[open]')) problems.push(`${name} (${label}): a key that opens nothing opened a place anyway`);
+    notes.push(`${name} (${label}): a name on Smile's game-over board opens that place as a visit, Escape gives focus back, a key that opens nothing says so`);
+  }
+  errs.forEach(e => problems.push(`${name} (${label}): JavaScript error: ${e}`));
+  await page.close();
+}
 async function stub(context){
   await noLeaks(context);   /* a closing page's last requests skip routing: answered in the page instead */
   await context.route(/^https?:\/\/(?!127\.0\.0\.1)/, route => {
@@ -900,6 +973,10 @@ function lint(hub, A){
       const live = smile.filter(h => !has(h, 'core.json', /"audio":\s*"off"/));
       const wh = live.find(h => has(h, 'core.json', /"podcast":\s*\{/)) || live[0] || smile[0];
       if (wh) await wiringCheck(context, wh, label).catch(e => problems.push(`${wh}, the game layer's wiring (${label}): the check stopped: ${e.message.split('\n')[0]}`));
+      /* visiting from a hub's arcade board (visitCheck, above): a live hub whose arcade has Smile and visit buttons */
+      const vh = live.find(h => has(h, 'arcade.js', /data-sh-visit/));
+      if (vh) await visitCheck(context, vh, label).catch(e => problems.push(`${vh}, visiting from the arcade board (${label}): the check stopped: ${e.message.split('\n')[0]}`));
+      else notes.push(`visiting from a hub's arcade board (${label}): skipped, no live hub has an arcade with Smile`);
     }
     /* Timmy's place (phase 4, part C: widget/place.js, its kit widget/hub-art/place.js and one file per set). On the
        game layer, with a made-up shop in the bootstrap: More has the tile once Timmy is adopted, nothing of the place
@@ -2023,8 +2100,14 @@ function lint(hub, A){
     await page.goto(BASE() + `hubs/${hub}/index.html#home`); await page.waitForTimeout(900);
     await page.click('.sh-archived-stay', { timeout: 500 }).catch(() => {});
     const views = ['home', 'notes', 'questions', 'questions/mock', 'more', 'more/arcade', 'more/hints', 'more/cram', 'more/side', 'more/stats', 'more/settings', 'more/timmy'];
-    for (const v of views) {
-      await page.evaluate(v => { location.hash = v; }, v); await page.waitForTimeout(v === 'more/arcade' ? 1500 : 700);
+    /* each arcade game too, once started (2026-11-20, the inbox's "The arcade games themselves at 320 px with the largest
+       text"): #more/arcade/<game>, then its Play button */
+    const games = await page.evaluate(() => (((window.SH_HUB || {}).arcade || {}).games || []).map(g => g.id)).catch(() => []);
+    for (const v of views.concat(games.map(g => 'more/arcade/' + g))) {
+      const game = /^more\/arcade\/./.test(v);
+      if (game) { await page.evaluate(() => { location.hash = 'more'; }); await page.waitForTimeout(300); }
+      await page.evaluate(v => { location.hash = v; }, v); await page.waitForTimeout(v === 'more/arcade' || game ? 1500 : 700);
+      if (game) { const st = await page.$('#panel-arcade [data-start]'); if (st) { await st.click().catch(() => {}); await page.waitForTimeout(1200); } }
       /* measured against the layout width, naming the element that reaches furthest past it, or the one whose words or
          drawing spill past its own box (a long word, a decoration): fixed parts (the bar, Timmy) can't scroll the page */
       const r = await page.evaluate(() => {
@@ -2057,7 +2140,7 @@ function lint(hub, A){
     });
     if (under) problems.push(`${hub} (320px, largest text): a toast sits under ${under} (BUG-126)`);
     errs.forEach(e => problems.push(`${hub} (320px, largest text): JavaScript error: ${e}`));
-    notes.push(`${hub}: ${views.length} views fit a 320px phone at the largest text, and a toast is clear of Timmy and the bar`);
+    notes.push(`${hub}: ${views.length} views${games.length ? ` and ${games.length} arcade games, started,` : ''} fit a 320px phone at the largest text, and a toast is clear of Timmy and the bar`);
     await context.close();
   }
   await browser.close(); server.close();
