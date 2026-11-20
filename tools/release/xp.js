@@ -1237,6 +1237,23 @@ try {
     eq(sv('xp-SV', { a: 'again' }).ok, false, 'a survey can\'t be answered twice');
     eq(anon(`select submit_survey(${sid}, 'xp-SV2', '{"a":"old page"}'::jsonb)`)[0][0], 't', 'the old name still answers true');
     eq(xpOf('xp-SV2'), 1000, 'and pays the same');
+    // migration_v88: a survey asks each person once, across Link my devices (the pop-up after any row, the Inbox until an answer)
+    const popup = v => anon(`select id from get_active_survey(${q(v)})`).map(r => Number(r[0]));
+    const inbox = v => anon(`select id from get_my_survey(${q(v)})`).map(r => Number(r[0]));
+    eq([popup('xp-SV9'), inbox('xp-SV9')], [[sid], [sid]], 'a new device is asked, and has it in the Inbox');
+    eq([popup('xp-SV'), inbox('xp-SV')], [[], []], 'whoever answered is asked no more');
+    eq(anon(`select redeem_link_code(${q(anon(`select create_link_code('xp-SV')`)[0][0])}, 'xp-SVc')`)[0][0], 'xp-SV', 'a device links to it');
+    eq([popup('xp-SVc'), inbox('xp-SVc')], [[], []], 'a device still on the id linked away from isn\'t asked (it used to be)');
+    eq(anon(`select redeem_link_code(${q(anon(`select create_link_code('xp-SVf')`)[0][0])}, 'xp-SVg')`)[0][0], 'xp-SVf', 'two devices that hadn\'t answered link');
+    eq(sv('xp-SVg', { a: 'from the old id' }).ok, true, 'one answers under the id it was linked away from');
+    eq([popup('xp-SVf'), inbox('xp-SVf')], [[], []], 'the other device isn\'t asked either (it used to be)');
+    eq(sv('xp-SVd', null).ok, true, 'a device says Later');
+    eq(anon(`select redeem_link_code(${q(anon(`select create_link_code('xp-SVd')`)[0][0])}, 'xp-SVe')`)[0][0], 'xp-SVd', 'and links another');
+    sql(`insert into survey_responses (survey_id, visitor_id, answers) values (${sid}, 'xp-SVd2', null)`);
+    sql(`insert into visitor_links (alias_id, primary_id) values ('xp-SVd2', 'xp-SVd')`);   /* a Later written under an alias id after the link */
+    eq([popup('xp-SVe'), inbox('xp-SVe')], [[], [sid]], 'Later on one device stops the pop-up on the others, and it waits in the Inbox');
+    eq([popup('xp-SVd2'), inbox('xp-SVd2')], [[], [sid]], 'the same from the alias id');
+    eq([popup(''), inbox('')], [[sid], [sid]], 'an empty id is still asked, as before');
     // a check-in: the first for each hub and exam pays; a second, or one after an earlier check-in, doesn't
     const ex = `${one(`select (now() at time zone 'America/Chicago')::date`)} Final`;
     const ci = (v, hub, exam) => anonJson(`submit_exam_debrief_v2(${q(hub)}, ${q(exam)}, ${q(v)}, '{"ready":4}'::jsonb)`);
@@ -1271,7 +1288,7 @@ try {
     sql('begin;\n' + v61 + '\ncommit;');
     eq(xpOf('xp-TU') - t0, 500, 'running the top-up again changes nothing');
     sql(`select sh_xp_rebuild(array['xp-TU'])`); eq(xpOf('xp-TU') - t0, 500, 'the rebuild agrees with the top-up');
-    notes.push('a survey or check-in: 1,000 XP and 1,000 crowns once each, nothing for "Later", a second check-in, an earlier one, a linked device or a closed check-in');
+    notes.push('a survey or check-in: 1,000 XP and 1,000 crowns once each, nothing for "Later", a second check-in, an earlier one, a linked device or a closed check-in; a survey asks each person once across linked devices (migration_v88)');
   }
 
   /* ---------- 14c. migration_v68: the crowns in every reply, and the prizes ---------- */

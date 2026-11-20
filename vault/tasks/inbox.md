@@ -10,6 +10,8 @@ this folder (deleting the line: the note carries it) or just does it, if it's sm
 (`- [x] ... (#123)`); ticked lines are cleared the next time someone goes through the inbox. Anything left to do from a chat
 lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the-vault.md)). See [README](README.md).
 
+- [ ] **Apply `migration_v88.sql` after its PR merges** (2026-11-20, a survey asks each person once): two functions replaced (`get_active_survey`, `get_my_survey`), no table touched, so any time of day, one statement a call through the connector, md5-checked. Fetch `main` first: if v88 was taken meanwhile, renumber. Then append it to `supabase/schema.sql`, take its line out of `supabase/pending-migrations.txt` and note it there, in a small PR. Until then linked devices work as before (the pop-up's Link this device works without it).
+
 - [ ] **Review of Systems: weigh the mock by what Mock 1 asked** (2026-11-19, the hub's build): the hub's 200-question mock
   spreads its questions by the size of each course (`core.json` `mock.blueprint`), a guess: the course announced no counts.
   After Mock 1 (Thu Dec 3, noon), read its exam check-ins (which courses felt heavy, what surprised people) and, before Mock 2
