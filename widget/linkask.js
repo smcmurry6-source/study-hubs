@@ -1,0 +1,311 @@
+/* study-hubs "Is this your other device?" When the name someone saves is already used by another device that isn't
+   linked to theirs (name_shared, migration_v41), they keep the name, and a card asks whether that other device is
+   theirs and offers to link the two right there (create_link_code / redeem_link_code, the same as Link my devices,
+   below). A device whose saved name is shared is also asked once a day on page load, so people who set the same name
+   on two devices before this existed get asked too. Only about a device used in the last 3 weeks (name_shared,
+   migration_v87; Sam, 2026-11-19): a cleared or given-up browser keeps its name for good, and the card went on asking
+   about it. The card's first screen also takes a code from the other device (2026-11-19): that device was asked too,
+   tapped Yes and made one, and its card used to say "when this card shows up there, tap Yes and type this code", but
+   it shows up a day or more later, after the code's 10 minutes, and Yes there made a fresh code instead.
+   "No, that's someone else" is remembered per name (sh_link_ask_no); "Not now" waits 3 days for the load check
+   (sh_link_ask_later; saving the name again still asks). Never in automated browsers, during a mock or the tour.
+   "Yes" makes a code at once and offers a link to send to the other device (share sheet or copy): opening
+   <site>/?link=CODE there asks "Link this device?" and links in one tap. Typing the code (it links at 6 characters)
+   still works, from this card on the other device or Link my devices (Settings, beside the name).
+   Link my devices itself is here too, as one card (shLinkAsk.link): every place a name can be changed has a button
+   for it beside the name one (Sam, 2026-11-18: "link my device is nowhere to be found"): the dashboard's You card,
+   name window and Settings; a hub's More → Settings, its name window, the idea board's and Timmy Time's "Posting as";
+   an old hub's Stats and Settings name boxes and its rank card.
+   Used by widget/v3.js (hubs) and the dashboard:
+     shLinkAsk.start({ sb: supabaseClient, hub: "perio" | "dashboard", section: fn })   // the once-a-day check
+     shLinkAsk.check(name)                                                              // right after a name is saved
+     shLinkAsk.link({ back: el, from: "settings" })                                     // the Link my devices card */
+(function(){
+  "use strict";
+  if (window.shLinkAsk) return;
+  var NO_KEY = "sh_link_ask_no", LATER_KEY = "sh_link_ask_later", DAY_KEY = "sh_link_ask_day";
+  var C = { sb: null, hub: "", section: function(){ return ""; }, bootstrap: null, bootstrapName: "" }, card = null;
+  /* the site's root (the dashboard), from this script's own address: <root>widget/linkask.js */
+  var ROOT = (function(){ try { return document.currentScript.src.replace(/widget\/linkask\.js.*$/, ""); } catch (e) { return location.origin + "/"; } })();
+
+  function ls(k, v){
+    try { if (v === undefined) return localStorage.getItem(k); if (v === null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) {}
+    return null;
+  }
+  function esc(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){ return { "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]; }); }
+  function track(k){ try { if (window.shTrack) window.shTrack("link-ask:" + k); } catch (e) {} }
+  function today(){ var d = new Date(); return d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate(); }
+  function visitor(){ return ls("sh_visitor_id") || ""; }
+  function norm(n){ return String(n || "").trim().toLowerCase(); }
+  function noList(){ try { return JSON.parse(ls(NO_KEY) || "[]") || []; } catch (e) { return []; } }
+  function rpc(fn, args){
+    /* before start() (a button tapped as the page loads), a hub's client is already on the page */
+    var sb = C.sb || window.shSupabase || null;
+    if (!sb) return Promise.resolve(null);
+    try { return sb.rpc(fn, args).then(function(r){ return r && !r.error ? r.data : null; }, function(){ return null; }); }
+    catch (e) { return Promise.resolve(null); }
+  }
+  function blocked(){
+    return !!(window.shAutomated || navigator.webdriver) || /mock/.test(String(C.section() || "")) ||
+      document.documentElement.classList.contains("sh-touring");
+  }
+
+  var CSS =
+    ".sh-la{position:fixed;inset:0;z-index:10003;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(10,14,18,.45);" +
+    "font-family:var(--font-body,var(--sans,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif));font-size:14.5px;line-height:1.45;" +
+    "--la-bg:var(--surface,#fff);--la-ink:var(--ink,#15202A);--la-ink2:var(--ink-soft,var(--ink-2,#4A5864));--la-line:var(--line,rgba(0,0,0,.12));" +
+    "--la-bg2:var(--surface-2,rgba(127,127,127,.08));--la-accent:var(--accent,var(--focus,#2F6FD6));color:var(--la-ink);animation:shLaFade .2s ease-out;}" +
+    "@keyframes shLaFade{from{opacity:0;}to{opacity:1;}}" +
+    ".sh-la *{box-sizing:border-box;}" +
+    ".sh-la [hidden]{display:none !important;}" +
+    ".sh-la-card{position:relative;width:min(440px,100%);max-height:100%;overflow:auto;padding:20px 20px 16px;border-radius:18px;background:var(--la-bg);" +
+    "border:1px solid var(--la-line);box-shadow:0 18px 50px -12px rgba(0,0,0,.45);}" +
+    ".sh-la-card h3{margin:0 30px 8px 0;font-size:18px;font-weight:700;font-family:inherit;color:var(--la-ink);}" +
+    ".sh-la-card p{margin:0 0 12px;}" +
+    ".sh-la-x{position:absolute;top:10px;right:10px;width:32px;height:32px;border:0;border-radius:50%;background:transparent;color:var(--la-ink2);font-size:22px;line-height:1;cursor:pointer;}" +
+    ".sh-la-x:hover{background:var(--la-bg2);}" +
+    ".sh-la-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px;}" +
+    ".sh-la-btn{border:1px solid var(--la-line);border-radius:999px;padding:9px 16px;font:inherit;font-weight:600;font-size:14px;cursor:pointer;background:transparent;color:var(--la-ink);}" +
+    ".sh-la-btn.is-main{border-color:transparent;background:var(--la-ink);color:var(--la-bg);}" +
+    ".sh-la-later{display:block;margin:10px 0 0;border:0;background:none;padding:0;font:inherit;font-size:13px;color:var(--la-ink2);text-decoration:underline;cursor:pointer;}" +
+    ".sh-la-step{border-top:1px solid var(--la-line);padding:12px 0 4px;}" +
+    ".sh-la-step b{display:block;margin-bottom:6px;}" +
+    ".sh-la-step small{display:block;color:var(--la-ink2);font-size:13px;margin-top:6px;}" +
+    ".sh-la-code{margin-top:8px;}" +
+    ".sh-la-big{display:block;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:26px;font-weight:700;letter-spacing:.12em;}" +
+    ".sh-la-enter{display:flex;gap:8px;}" +
+    ".sh-la-enter input{flex:1;min-width:0;padding:9px 12px;border:1px solid var(--la-line);border-radius:10px;font:inherit;font-size:16px;" +
+    "text-transform:uppercase;letter-spacing:.08em;background:var(--la-bg);color:var(--la-ink);}" +
+    ".sh-la-msg{min-height:1.4em;margin-top:6px;font-size:13.5px;color:var(--la-ink2);}" +
+    ".sh-la-codebox{margin:4px 0 12px;padding:12px 14px;border-radius:12px;background:var(--la-bg2);text-align:center;}" +
+    ".sh-la-codebox small{display:block;color:var(--la-ink2);font-size:12.5px;margin-top:4px;}" +
+    ".sh-la-card p.sh-la-note{margin:8px 0 4px;color:var(--la-ink2);font-size:13px;}" +
+    ".sh-la-first{margin-top:14px;}";
+  /* the code box (the ask card's first screen, its Yes screen) */
+  var ENTER = '<div class="sh-la-enter"><input type="text" maxlength="7" autocomplete="one-time-code" autocapitalize="characters" spellcheck="false" placeholder="Type the code" aria-label="Link code">' +
+    '<button type="button" class="sh-la-btn" data-la="go">Link</button></div>';
+  /* an iPhone's home-screen app keeps its own storage, apart from Safari, where a link opens: there it's a new device */
+  var HOME = "Use the hubs from your home screen there? Type the code instead: a link can open in the browser, which counts as a separate device.";
+  function css(){
+    if (document.getElementById("sh-la-css")) return;
+    var st = document.createElement("style"); st.id = "sh-la-css"; st.textContent = CSS; document.head.appendChild(st);
+  }
+
+  var back = null, escKey = null;   /* where focus goes when the Link my devices card closes; its Escape key */
+  function close(){
+    if (card) { card.remove(); card = null; }
+    if (escKey) { document.removeEventListener("keydown", escKey, true); escKey = null; }
+    var b = back; back = null;
+    try { if (b && b.isConnected) b.focus(); } catch (e) {}
+  }
+  /* redeem a code on this device: the same as an old hub's Stats → Link my devices (widget/ranks.js) */
+  function redeem(code, msg, tr){
+    tr = tr || track;
+    code = String(code || "").replace(/[^A-Za-z0-9]/g, "").toUpperCase();
+    if (code.length !== 6) { msg.textContent = "Codes are 6 letters and numbers."; return; }
+    if (redeem.busy) return;
+    redeem.busy = true; msg.textContent = "Linking…";
+    rpc("redeem_link_code", { p_code: code, p_visitor: visitor() }).then(function(id){
+      redeem.busy = false;
+      if (!id) { tr("fail"); msg.textContent = "That code didn’t work. Codes last 10 minutes; make a fresh one and try again."; return; }
+      if (id === visitor()) { msg.textContent = "This device is already linked to that one."; return; }
+      tr("linked");
+      try { if (window.shClicks && window.shClicks.flush) window.shClicks.flush(); } catch (e) {}
+      ls("sh_visitor_id", id); ls("sh_display_name", null); ls("sh_rank_tier", null); ls("sh_trophy_seen", null);
+      rpc("get_display_name", { p_visitor: id }).then(function(n){
+        if (n) ls("sh_display_name", n);
+        msg.textContent = "Linked! Reloading…";
+        setTimeout(function(){ location.reload(); }, 900);
+      });
+    });
+  }
+  function shell(title, html){
+    css();
+    card = document.createElement("div");
+    card.className = "sh-la";
+    card.innerHTML = '<div class="sh-la-card" role="dialog" aria-modal="true" aria-labelledby="sh-la-h">' +
+      '<button class="sh-la-x" type="button" aria-label="Close">&times;</button><h3 id="sh-la-h">' + title + '</h3><div class="sh-la-body">' + html + '</div></div>';
+    document.body.appendChild(card);
+    return card.querySelector(".sh-la-body");
+  }
+  /* typing a code links as soon as it has 6 characters */
+  function wireEnter(tr){
+    var inp = card.querySelector(".sh-la-enter input"), msg = inp && inp.closest(".sh-la-step").querySelector(".sh-la-msg");
+    if (inp) inp.addEventListener("input", function(){ if (inp.value.replace(/[^A-Za-z0-9]/g, "").length === 6) redeem(inp.value, msg, tr); });
+  }
+  /* opened from a link another device sent: <root>?link=CODE */
+  function fromUrl(){
+    var m = /[?&]link=([A-Za-z0-9]{6})(?:&|$)/.exec(location.search);
+    if (!m) return;
+    var code = m[1].toUpperCase();
+    try { history.replaceState(null, "", location.pathname + location.search.replace(/([?&])link=[^&]*&?/, "$1").replace(/[?&]$/, "") + location.hash); } catch (e) {}
+    if (card || window.shAutomated || navigator.webdriver) return;
+    track("url-open");
+    var body = shell("Link this device?",
+      '<p>This links this device to the one that sent the link, so they share one rank, streak, trophy case and question progress. Whatever this device has done so far moves over too.</p>' +
+      '<div class="sh-la-row"><button type="button" class="sh-la-btn is-main" data-la="url-go">Link this device</button><button type="button" class="sh-la-btn" data-la="url-no">Not this device</button></div>' +
+      '<div class="sh-la-msg" aria-live="polite"></div>');
+    card.addEventListener("click", function(e){
+      var b = e.target.closest("[data-la]"), a = b && b.getAttribute("data-la");
+      if (e.target === card || e.target.closest(".sh-la-x") || a === "url-no") { close(); return; }
+      if (a === "url-go") redeem(code, body.querySelector(".sh-la-msg"));
+    });
+  }
+  function share(code, out, fromCard){
+    var url = ROOT + "?link=" + code;
+    if (fromCard) linkTrack("share"); else track("share");
+    if (navigator.share) {
+      navigator.share({ title: "Link my study hubs", text: "Open this on my other device to link it", url: url }).catch(function(){});
+      return;
+    }
+    var done = function(){ out.textContent = "Link copied. Text or email it to yourself and open it on your other device."; };
+    try { navigator.clipboard.writeText(url).then(done, function(){ out.textContent = url; }); } catch (e) { out.textContent = url; }
+  }
+  function open(name){
+    if (card) return;
+    track("shown");
+    var body = shell("Is this your other device?",
+      '<p>Another device here already goes by <b>' + esc(name) + '</b>. If that one is yours too (your phone, tablet or laptop), link them so they share one rank, streak, trophy case and question progress.</p>' +
+      '<div class="sh-la-row"><button type="button" class="sh-la-btn is-main" data-la="yes">Yes, link them</button>' +
+      '<button type="button" class="sh-la-btn" data-la="no">No, that’s someone else</button></div>' +
+      '<div class="sh-la-step sh-la-first"><b>Have a code from your other device?</b>' + ENTER + '<div class="sh-la-msg" aria-live="polite"></div></div>' +
+      '<button type="button" class="sh-la-later" data-la="later">Not now</button>');
+    wireEnter();
+    /* on the page, not the card: after Yes the card's buttons are drawn again and focus leaves it */
+    escKey = function(e){ if (e.key === "Escape") { e.stopPropagation(); ls(LATER_KEY, String(Date.now())); close(); } };
+    document.addEventListener("keydown", escKey, true);
+    card.addEventListener("click", function(e){
+      var b = e.target.closest("[data-la]"), a = b && b.getAttribute("data-la");
+      if (e.target === card || e.target.closest(".sh-la-x") || a === "later") { ls(LATER_KEY, String(Date.now())); track("later"); close(); return; }
+      if (a === "no") {
+        var l = noList(); if (l.indexOf(norm(name)) < 0) l.push(norm(name));
+        ls(NO_KEY, JSON.stringify(l.slice(-20))); track("no");
+        body.innerHTML = '<p>Got it. You both show as <b>' + esc(name) + '</b> on the leaderboards; you can pick a different name any time by tapping your name.</p>' +
+          '<div class="sh-la-row"><button type="button" class="sh-la-btn is-main" data-la="done">OK</button></div>';
+        return;
+      }
+      if (a === "done") { close(); return; }
+      if (a === "yes") {
+        track("yes");
+        body.innerHTML = '<div class="sh-la-codebox"><span class="sh-la-big">…</span><small>Good for 10 minutes</small></div>' +
+          '<p>Do it now, while the code is good: on your other device, go to <b>Settings</b> (in a hub, it’s under More) and tap <b>Link my devices</b> next to your name, then type this code. Or send yourself the link and open it there.</p>' +
+          '<div class="sh-la-row"><button type="button" class="sh-la-btn is-main" data-la="share" disabled>' + (navigator.share ? "Send the link" : "Copy the link") + '</button></div>' +
+          '<div class="sh-la-msg sh-la-out" aria-live="polite"></div><p class="sh-la-note">' + HOME + '</p>' +
+          '<div class="sh-la-step"><b>Got a code from your other device instead?</b>' + ENTER + '<div class="sh-la-msg" aria-live="polite"></div></div>';
+        wireEnter();
+        rpc("create_link_code", { p_visitor: visitor() }).then(function(c){
+          if (!card) return;
+          var big = card.querySelector(".sh-la-big"), btn = card.querySelector('[data-la="share"]');
+          if (!c) { big.textContent = "—"; card.querySelector(".sh-la-out").textContent = "Couldn’t make a code. Are you online?"; return; }
+          track("code");
+          big.textContent = c.slice(0, 3) + " " + c.slice(3);
+          btn.disabled = false; btn.setAttribute("data-code", c);
+        });
+        return;
+      }
+      if (a === "share") { share(b.getAttribute("data-code") || "", card.querySelector(".sh-la-out")); return; }
+      if (a === "go") redeem(card.querySelector(".sh-la-enter input").value, card.querySelector(".sh-la-step .sh-la-msg"));
+    });
+  }
+
+  /* fromSave: the person just picked this name, so ask even inside the "Not now" wait */
+  function check(name, fromSave, knownShared){
+    name = String(name || "").trim();
+    var v = visitor();
+    if (!name || !v || !C.sb || card || blocked()) return;
+    if (noList().indexOf(norm(name)) >= 0) return;
+    if (!fromSave) {
+      if (Date.now() - (+ls(LATER_KEY) || 0) < 3 * 864e5) return;
+      /* a survey, check-in or the Inbox is up: try again in a while instead of stacking on top */
+      if (document.querySelector(".survey, .sh-inbox, .sh-name-dlg, .name-dlg, #sh-drill:not([hidden])")) { setTimeout(function(){ check(name, false); }, 30000); return; }
+      ls(DAY_KEY, today());
+    }
+    /* a save reaches the server first; give it a moment so the check sees the new name */
+    setTimeout(function(){
+      if (typeof knownShared === "boolean") {
+        if (knownShared && !blocked()) { if (window.shTour && window.shTour.whenIdle) window.shTour.whenIdle(function(){ open(name); }); else open(name); }
+        return;
+      }
+      rpc("name_shared", { p_visitor: v, p_name: name }).then(function(shared){
+        if (!shared || blocked()) return;
+        if (window.shTour && window.shTour.whenIdle) window.shTour.whenIdle(function(){ open(name); }); else open(name);
+      });
+    }, fromSave ? 1200 : 0);
+  }
+
+  /* ---------- Link my devices: one card, from every place a name can be changed ---------- */
+  function linkTrack(k){ try { if (window.shTrack) window.shTrack("link:" + k); } catch (e) {} }
+  var FROM = /^[a-z-]{1,16}$/;
+  function link(opts){
+    opts = opts || {};
+    if (card) close();
+    back = opts.back || document.activeElement || null;
+    linkTrack("open" + (FROM.test(String(opts.from || "")) ? "=" + opts.from : ""));
+    var body = shell("Link my devices",
+      '<p>Use one rank, streak, trophy case and question progress on your phone, tablet and laptop. Whatever each one has done so far comes along, and your name follows.</p>' +
+      '<div class="sh-la-step"><b>1. On the device you use most</b>' +
+        '<div class="sh-la-row" data-la-ask><button type="button" class="sh-la-btn is-main" data-la="make">Get a code</button></div>' +
+        '<div data-la-made hidden><div class="sh-la-codebox"><span class="sh-la-big">…</span><small>Good for 10 minutes</small></div>' +
+          '<div class="sh-la-row"><button type="button" class="sh-la-btn is-main" data-la="share" disabled>' + (navigator.share ? "Send the link" : "Copy the link") + '</button></div>' +
+          '<small>Open the link on your other device, or type the code there. ' + HOME + '</small></div>' +
+        '<div class="sh-la-msg sh-la-out" aria-live="polite"></div></div>' +
+      '<div class="sh-la-step"><b>2. On your other device</b>' +
+        '<div class="sh-la-enter"><input type="text" maxlength="7" autocomplete="one-time-code" autocapitalize="characters" spellcheck="false" placeholder="Type the code" aria-label="Link code">' +
+        '<button type="button" class="sh-la-btn" data-la="go">Link</button></div>' +
+        '<small>On that device it’s in Settings, next to your name, the same as here. It links as soon as the sixth character is in.</small>' +
+        '<div class="sh-la-msg" aria-live="polite"></div></div>');
+    card.classList.add("sh-la-link");
+    wireEnter(linkTrack);
+    var enterMsg = body.querySelector(".sh-la-enter").parentNode.querySelector(".sh-la-msg"), out = body.querySelector(".sh-la-out");
+    /* on the page, not the card: focus can leave it (the Get a code button turns off while the code is made) */
+    escKey = function(e){ if (e.key === "Escape") { e.stopPropagation(); close(); } };
+    document.addEventListener("keydown", escKey, true);
+    card.addEventListener("click", function(e){
+      var b = e.target.closest("[data-la]"), a = b && b.getAttribute("data-la");
+      if (e.target === card || e.target.closest(".sh-la-x")) { close(); return; }
+      if (a === "make") {
+        b.disabled = true; out.textContent = "Making a code…";
+        rpc("create_link_code", { p_visitor: visitor() }).then(function(c){
+          if (!card || !body.isConnected) return;
+          if (!c) { b.disabled = false; out.textContent = "Couldn’t make a code. Are you online?"; return; }
+          linkTrack("code");
+          out.textContent = "";
+          body.querySelector("[data-la-ask]").hidden = true;
+          var made = body.querySelector("[data-la-made]"), btn = made.querySelector('[data-la="share"]');
+          made.hidden = false;
+          made.querySelector(".sh-la-big").textContent = c.slice(0, 3) + " " + c.slice(3);
+          btn.disabled = false; btn.setAttribute("data-code", c);
+          try { btn.focus(); } catch (err) {}
+        });
+        return;
+      }
+      if (a === "share") { share(b.getAttribute("data-code") || "", out, true); return; }
+      if (a === "go") redeem(body.querySelector(".sh-la-enter input").value, enterMsg, linkTrack);
+    });
+    setTimeout(function(){ try { var f = card && card.querySelector('[data-la="make"]'); if (f) f.focus(); } catch (e) {} }, 30);
+  }
+
+  window.shLinkAsk = {
+    link: link,
+    start: function(opts){
+      C.sb = opts.sb || null; C.hub = opts.hub || "";
+      C.bootstrap = opts.bootstrap || (window.shBootstrap && window.shBootstrap.ready) || null;
+      C.bootstrapName = String(opts.bootstrapName == null ? "" : opts.bootstrapName).trim();
+      if (typeof opts.section === "function") C.section = opts.section;
+      setTimeout(function(){ if (window.shTour && window.shTour.whenIdle) window.shTour.whenIdle(fromUrl); else fromUrl(); }, 1500);
+      if (ls(DAY_KEY) === today()) return;
+      setTimeout(function(){
+        var n = ls("sh_display_name");
+        if (!n) return;
+        if (C.bootstrap && typeof C.bootstrap.then === "function") {
+          C.bootstrap.then(function(data){
+            if (data && Object.prototype.hasOwnProperty.call(data, "name_shared") && norm(n) === norm(C.bootstrapName)) check(n, false, !!data.name_shared);
+            else check(n, false);
+          }, function(){ check(n, false); });
+        } else check(n, false);
+      }, 6000);
+    },
+    check: function(name){ check(name, true); },
+    open: open
+  };
+})();

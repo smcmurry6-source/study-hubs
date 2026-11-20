@@ -1,0 +1,572 @@
+---
+type: task
+status: done
+hub: widget
+created: 2026-11-05
+requested-by: Sam
+due: 
+waiting-on:
+agent: Claude Code
+pr: https://github.com/smcmurry6-source/study-hubs/pull/332
+---
+
+# Redesign phase 4: the game layer's presentation
+
+## Goal
+
+Put the ranks, trophies and celebrations on the design system without changing their model: drawn mastery medals and trophy icons in place of emoji and the ??? grid (secret trophies as a silhouette with a one-line riddle), the rank name in flat metal, the tier cutscene and the level, trophy and mock cards on the site's type with their motion kept, one "you" panel shared by the hub and the dashboard, the arcade lobby redrawn by hand with one game up front.
+
+## Context
+
+- The plan and Sam's decisions: [the redesign audit and plan](2026-11-05-redesign-audit-and-plan.md), section 4.
+- Rules that matter most here: [preview-and-release-test](../../rules/preview-and-release-test.md) (every phase is tier 2 or 3:
+  preview link first, screenshots, the release suites, Sam's look), [about-page](../../rules/about-page.md),
+  [learner-data-privacy](../../rules/learner-data-privacy.md), the taste skill in full (Sam, 2026-11-04).
+- `widget/ranks.js`, `widget/rankup.js`, `widget/games.js`/`games.css`, each hub's skin, `widget/eggs.js` (pop-ups stay as they are: Sam).
+- Timmy's HP model stays as it is (Sam, 2026-11-05), except that the shop's snacks and floss now restore HP (Sam, 2026-11-06).
+- **Four more parts, agreed 2026-11-06 (Sam)**, each its own PR and art review, on top of the presentation work above:
+  - **A**: [three journeys, more XP and the Dark Matter unlock](2026-11-06-redesign-progression-journeys.md) (the client side);
+  - **B**: [Timmy's shop](2026-11-06-redesign-timmy-shop.md) (Shiny Gold Crowns, the rotating shop, rarity, snacks and floss, XP boosts,
+    rare costumes);
+  - **C**: [Timmy's place](2026-11-06-redesign-timmys-place.md) (the house card redrawn as a scene you build);
+  - **D**: [the bowling egg](2026-11-06-redesign-bowling-egg.md).
+  - **E** (Sam, 2026-11-12): [Ask Timmy](2026-11-12-redesign-ask-timmy.md), Timmy as every hub's study assistant. Its
+    part 4, **everyone has Timmy** ("adopting timmy is no longer an option"), changes `widget/pet.js`: do it with parts B
+    and C, or right after them, so it doesn't collide with their work on Timmy.
+  Their server side is [phase 5](2026-11-05-redesign-phase-5-backend.md), part 3. This changes "without changing their
+  model" in the goal: XP rules, the ladder, the house and HP change as those notes say.
+- **Released with the rest** (Sam, 2026-11-06, [decisions](../../decisions.md)): these widget files are shared with the
+  live hubs, so the new look goes in files or styles only the new versions load (see
+  [phase 1](2026-11-05-redesign-phase-1-hub-engine.md)), and the live hubs keep today's cards until
+  [the release](2026-11-06-redesign-release.md).
+
+## From here to the release (planned with Sam, 2026-11-12)
+
+Sam answered every open call for what is left of this phase on 2026-11-12 ([decisions](../../decisions.md)). Each session
+below has a **build spec** in its own note, written so a fresh session can start without asking Sam anything, and each
+spec ends with the prompt that starts it. One session each, in this order ([run-a-redesign-session](../../how-to/run-a-redesign-session.md)):
+
+| # | Session | Its spec | Needs first |
+|---|---|---|---|
+| 1 | **The shop's art**: the coin, snacks, boosts, rarity frames, the five undrawn outfits, the five rare costumes, and Timmy's door spot moved off the rank statue (BUG-089). **Done 2026-11-12** ([#339](https://github.com/smcmurry6-source/study-hubs/pull/339)), with the shop's look redrawn ("more epic") | [the shop](2026-11-06-redesign-timmy-shop.md), "Build spec, session 1" | [#335](https://github.com/smcmurry6-source/study-hubs/pull/335) merged |
+| 2 | **The shop's client** (part B): the shop, the balance, buying, snacks and HP, boosts, rare costumes. **Done 2026-11-12** ([#345](https://github.com/smcmurry6-source/study-hubs/pull/345), merged as `510dcb6`; its hand-off in the Log) | [the shop](2026-11-06-redesign-timmy-shop.md), "Build spec, session 2" | 1 |
+| 3 | **Timmy everywhere** (part E's part 4): everyone has Timmy, and he wears what you put on, on the bar, at his place, in the classroom and on the stage. **Done 2026-11-13** ([#348](https://github.com/smcmurry6-source/study-hubs/pull/348), merged as `c5ce92e`; its hand-off in the Log) | [Ask Timmy](2026-11-12-redesign-ask-timmy.md), "Build spec, part 4" | 2 (both edit `widget/pet.js`) |
+| 4 | **Visiting**: a row on the new dashboard's boards opens that person's place. **Done 2026-11-13** ([#352](https://github.com/smcmurry6-source/study-hubs/pull/352); its hand-off in the Log), in the leaderboard's theater look (Sam: "this window should be more epic"), getting there through the round-3 clouds | [visiting](2026-11-12-redesign-visiting.md) | 3 |
+| 5 | **The bowling egg** (part D). **Done 2026-11-13** (merged on Sam's "merge"; the hand-off in the Log) | [the bowling egg](2026-11-06-redesign-bowling-egg.md), "Build spec" | 2 (it hooks into `widget/place.js`'s lane) |
+| 6 | **The trophy case and the cards**: this note's original goal; Full Arch retired (Sam, 2026-11-12). **Done 2026-11-13** ([#356](https://github.com/smcmurry6-source/study-hubs/pull/356), merged on Sam's "merge when ready") (its hand-off in the Log), with the rest of More, Stats and trophies redrawn to match (Sam: "make it more epic") | [the trophy case and the cards](2026-11-12-redesign-trophy-case-and-cards.md) | 5 (so the case lists the bowling trophy and the journey trophies once) |
+| 7 | **Ask Timmy, part 2** (the chat). **Built 2026-11-12, ahead of its turn** (Sam asked for it then): the Ask icon shows whenever Timmy isn't on the page, so it works before and after session 3 | [Ask Timmy](2026-11-12-redesign-ask-timmy.md), its Log | (3) |
+| 8 | **The game layer's wiring** left by part A: the arcade's sessions, Timmy Time's minutes, the admin page's "Fixed". **Done 2026-11-13** ([#357](https://github.com/smcmurry6-source/study-hubs/pull/357); its hand-off in the Log); the episode lengths and the service worker's lists stay with the release | [the wiring](2026-11-12-redesign-game-layer-wiring.md) | 6 |
+| 9 | **Phase 5, part 2**: bundles, one stylesheet, the font, budgets lowered. **Done 2026-11-13** ([#358](https://github.com/smcmurry6-source/study-hubs/pull/358); its hand-off in the Log) | [phase 5](2026-11-05-redesign-phase-5-backend.md) | every session that adds a file (1 to 8) |
+| 10 | **The release** | [the release](2026-11-06-redesign-release.md) | all of the above, and Sam's look at the whole thing on its preview |
+
+Beside any of them, because they touch other files: **Ask Timmy, part 3** (the admin page's Timmy tab, `review/`) and
+**[Learn and Flashcards](2026-11-06-redesign-learn-and-flashcards.md)** (`widget/hub-bank.js`; its note wants a server
+part in the pending migration, which is Sam's call at the start of that session). After the release:
+[the later journeys' rank sets](../2026-11-12-redesign-later-journeys-rank-sets.md).
+
+**Which model** (Sam, 2026-11-12, [decisions](../../decisions.md)): every session above, and the two beside them, on Opus 5.5
+at Extra effort; sessions 9 (phase 5, part 2) and 10 (the release) on Fable 5.2 at High effort. Sam picks it when
+starting the session.
+
+**No date** (Sam, 2026-11-06, kept on 2026-11-12): one release with everything. Heme & Endo Exam 2's exam is Nov 13,
+Occlusion's final Nov 16 and Perio's Nov 19 (`HUBS` in `index.html`); ten sessions will not land by then, so the
+release switches the dashboard and whichever hub is live at that point, and a hub whose exam has passed keeps its old
+page ([the release](2026-11-06-redesign-release.md), Context).
+
+### For every session above
+
+These hold for each spec; a spec only adds to them.
+
+- **Start** from a fresh `origin/main`. Read `AGENTS.md`, this section, the spec and the notes it links. Grep the big
+  files (`widget/hub.js`, `widget/v3.js`, `widget/pet.js`, `widget/dash.js`, `migration_v54.sql`), never read them whole.
+  No subagents.
+- **Nothing students see changes before the release.** New code goes in files only the redesign's pages load
+  (`hubs/<id>/next/`, `next/`), or runs only there (the engine, `data-game="v2"` on the widget's tag, a `mount` option
+  the new pages pass). `widget/pet.js`, `eggs.js`, `ranks.js`, `rankup.js`, `games.js`, `podcast.js` and `v3.js` are
+  shared with the live hubs and the live dashboard: a change there must leave a live page behaving exactly as it does
+  today, and the smoke test on every hub is the proof. What the old pages do after the release doesn't matter (Sam,
+  2026-11-12: "Old pages arent accessible so they dont matter").
+- **`migration_v54.sql` and `migration_v55.sql` are not applied and not changed.** Where the client and the server as
+  written disagree, the client follows the server; the known cases and how each is worked around are in
+  [game-server](../../reference/game-server.md) ("Where the client works around the server as written"). A new one: stop
+  and tell Sam, don't change the migration.
+- **Request budgets** (`tools/release/budgets.json`, measured by `node tools/release/perf.js`): since the bundles
+  (session 9, 2026-11-13: [bundles](../../reference/bundles.md)) each new hub is at 11 of 12 requests and the new
+  dashboard at 9 of 10, counted over the whole load. A widget file that is in `tools/bundle/bundles.json` is rebuilt
+  into its bundle after every change (`node tools/bundle/build.mjs`, the bundles committed).
+  **Nothing new loads with a page**: fetch a new file the first time it is used (`loadScript` in the engine, the way
+  `HX.morePlace` fetches `widget/place.js`; on the dashboard the way `placeStart` waits for the first scroll, tap or
+  key), and make the smoke test fail if it loads with a page. No budget is raised.
+- **The preview's made-up data**: `tools/preview/runtime/preview.js` answers every database call in `rpc()`'s switch
+  from the six test accounts (`new`, `returning`, `high-xp`, `missed`, `archived`, `admin`; `?persona=`, `?xp=`,
+  `?now=`). A call a session adds gets its case there, shaped exactly as the migration returns it. Never a production
+  row, never the real admin secret.
+- **No hosted preview** (Sam, 2026-11-12, until the release's own). Use the change in a scripted browser on the
+  preview's made-up data (`node tools/preview/serve.js`), on a phone (390 px) and a laptop (1280 px), light and dark,
+  reduced motion too. Sam looks, doesn't test: send screenshots (`deviceScaleFactor: 2`), and a short recording for
+  anything that moves. **New art goes to Sam as a contact sheet, light and dark, and gets a yes before it goes into
+  the engine.**
+- **Clicks never record words**: every button in new UI carries a fixed `data-*` name (as `data-tp` in the place and
+  `data-shi` on the idea board), and the smoke test checks that none is missing. Names, item names and typed text are
+  drawn as text, never as markup.
+- **Tracking**: a new feature event gets its row in [event-taxonomy](../../reference/event-taxonomy.md) and its line in
+  [analytics-retention](../../reference/analytics-retention.md) in the same PR; never an item's name, a person's name or
+  typed text in a kind ([learner-data-privacy](../../rules/learner-data-privacy.md)).
+- **Tests**: while building, what you touched (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, the smoke test,
+  `node tools/release/xp.js` when the client meets the server); once on the finished code, `node tools/release/run.js`
+  ([long-tests-once](../../rules/long-tests-once.md)). The spec lists the checks to add.
+- **The About page and `tools/podcast/LORE.md`'s student-facing lines land at the release**: write them into
+  [the release note](2026-11-06-redesign-release.md)'s drafts ("From phase 4, ..."), as parts A and C did, and fix any
+  draft there that your session makes untrue.
+- **Write back** in the same PR: the spec's Done when ticked, a hand-off entry in this note's Log (what was built, what
+  the next session can call), [decisions](../../decisions.md) for anything Sam said, the bug log, `DEPLOY_NOTES.md`. Then
+  a draft PR with a test report; Sam's "merge" merges it.
+
+## Done when
+
+- [x] First, before parts A-D grow it: `widget/hub.js` split into its core and the parts each session changes (the
+  bank and study toggle, rewards and cards, Timmy and his place), loaded as now, with no behavior change and the
+  smoke, a11y and perf suites passing ([run-a-redesign-session](../../how-to/run-a-redesign-session.md), step 4) ([#330](https://github.com/smcmurry6-source/study-hubs/pull/330), 2026-11-12)
+- [x] The trophy case and the cards on the design system ([its note](2026-11-12-redesign-trophy-case-and-cards.md)),
+      reviewed by Sam in a recording from a scripted browser on made-up data, reduced motion too, and once more on the
+      release's own preview (Sam, 2026-11-12: no hosted preview before that one). Built 2026-11-13 ([#356](https://github.com/smcmurry6-source/study-hubs/pull/356); Sam: "merge when ready" after the recording);
+      the look on the release's preview is a box in [the release note](2026-11-06-redesign-release.md): Sam used the
+      whole redesign on it through four rounds and said "Merge" (2026-11-14)
+- [x] Part A, B, C and D done as their notes say (each note's "Done when"), and part E's "everyone has Timmy" (A, [the
+      wiring](2026-11-12-redesign-game-layer-wiring.md); B, [the shop](2026-11-06-redesign-timmy-shop.md); C,
+      [Timmy's place](2026-11-06-redesign-timmys-place.md); D, [the bowling egg](2026-11-06-redesign-bowling-egg.md);
+      E, [Ask Timmy](2026-11-12-redesign-ask-timmy.md); all released with [#359](https://github.com/smcmurry6-source/study-hubs/pull/359))
+- [x] Visiting from the new dashboard's boards ([its note](2026-11-12-redesign-visiting.md); Sam, 2026-11-12: in the release). Built 2026-11-13 ([#352](https://github.com/smcmurry6-source/study-hubs/pull/352))
+- [x] The arcade lobby of each live hub redrawn; game mechanics unchanged (done outside this phase: Occlusion's in
+      [phase 1](2026-11-05-redesign-phase-1-hub-engine.md), Heme & Endo Exam 2's and Perio's in
+      [phase 2](2026-11-05-redesign-phase-2-live-hubs.md), Perio's drawings approved 2026-11-11; the arcade's part of
+      the game layer is in [the wiring](2026-11-12-redesign-game-layer-wiring.md))
+- [x] The About page's trophy and rank entries updated (at the release: 27 trophies, 16 secret)
+- [x] CI passes (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, `node tools/ci/smoke.js`, `node tools/release/run.js`)
+- [x] Preview link, phone and laptop screenshots, and Sam's look, then Sam's "merge" (the release's preview, and Sam's
+      "Merge" on 2026-11-14)
+- [x] Vault written back (hub notes, decisions, `DEPLOY_NOTES.md`, the About page, this note's Outcome)
+
+## Log
+
+- 2026-11-05: written from the agreed plan.
+- 2026-11-06: parts A-D added (Sam's calls on the journeys, the shop, Timmy's place and the bowling egg).
+- 2026-11-06: part C's art drawn on the design page for Sam's look ([Timmy's place](2026-11-06-redesign-timmys-place.md), its log).
+- 2026-11-12 (Claude Code, **the split; hand-off**). `widget/hub.js` (2,064 lines, 188 KB, one closure) is now four
+  files, in [#330](https://github.com/smcmurry6-source/study-hubs/pull/330). Nothing students see changes, migration_v54 is still pending, and no other step of this note is started.
+  - **The files**, loaded by each new hub's page as four deferred scripts in this order:
+    - `widget/hub-rewards.js` (17 KB): the one answer path (`recordAnswer`, `xpFor`, the daily goal, the streak,
+      `achievements`), the rank (`RANK`, `rankName`, `rankXp`, `rankArt`, the `sh:rank-profile` listener), the bar's
+      meters (`paintMeters`), `reward` with the flying XP, the ring of teeth, the Today panel, the session recap.
+    - `widget/hub-timmy.js` (2 KB): `say`, `petHp`, `timmyReact` (his cheer or flinch on the bar, taken out of
+      `reward`) and `petFromBadges` (loading him when he was adopted on another device, taken out of the rank
+      listener). Small on purpose: it is where parts B and C put the shop and Timmy's place.
+    - `widget/hub-bank.js` (62 KB): the question card (`card`, `wireCard`, `result`, `whyHTML`, `classPicks`), the
+      bank with its panel and presets (`drawQuestions`, `filtered`, `SETS`, `fill`, `page`) and the mock.
+    - `widget/hub.js` (116 KB), the core, last: helpers, drawings, state, content, the frame, routing, Home, Notes,
+      Follow along, More (Timmy Time's page stays here: it is the podcast's player), the shared widget's hooks, boot.
+  - **How they share names** (written at the top and the end of `hub.js`, and at the top of each part): a part
+    registers a function in `window.SH_HUB_PARTS`; the core runs the three, in the order rewards, Timmy, bank, just
+    before it boots, and hands each one `HX`. A part takes the core's helpers and lookups under their own names in the
+    `var` list at its top (`esc`, `$`, `STATE`, `QBY`); what the core replaces after the page loads it reads as
+    `HX.CORE`, `HX.QS`, `HX.LECS`, `HX.IDX`, `HX.FIG`, `HX.view`; what a part has for the other files it puts on `HX`
+    at its end, and they call it as `HX.card(...)`. To use one more of the core's names in a part: add it to the `HX`
+    object in `hub.js` (most helpers are already there) and to the part's list. A name used but not taken is an error
+    only when that line runs, so click the new thing in the smoke test.
+  - **Every place the engine is listed**: the three pages' script tags, `tools/ci/syntax.js`, the smoke test's `ENGINE`
+    (it fails a page that doesn't load the four, deferred, in order), the service worker's list in
+    [the release note](2026-11-06-redesign-release.md) ("The engine's files"), [repo-map](../../reference/repo-map.md). The
+    preview copies `widget/` whole, so it needed nothing.
+  - **Request budgets**: three more requests a page. Occlusion 20 of 21, Heme & Endo Exam 2 20 of 22, Perio 18 of 21:
+    under, not raised. **A new file that loads with the page doesn't fit on Occlusion more than once**: load anything
+    new when it is first used (`loadScript`), or put it in the part it belongs to.
+  - **Checked**: a parser moved the code and confirmed that every name in the four files resolves, each of the 119
+    shared names is defined and no function was lost or doubled. The same scripted visit (both test accounts, phone
+    and laptop with reduced motion, every view, every page in More, every question format, the sets, the mock, the
+    widget's hooks, and Timmy's cheer, "Goal met!" and loading) on `main`'s copy and on the split, on the preview's
+    made-up data with the clock and the shuffles fixed: identical markup, saved state and events at all 368 steps,
+    once what differs between two runs of `main` itself was left out (the preview's own label, random ids, animated
+    figures' frames, the made-up live count, Timmy's idle chatter). One earlier run of the split drew the rank badge
+    one time fewer in one of its six visits, which changes an internal id and nothing shown; two repeats matched
+    `main` exactly, so it reads as load timing in the shared widget, not the split. The release suites: `node
+    tools/release/run.js` once on the finished code, all 14 passing (accessibility run by itself with `AXE_CORE_PATH`,
+    since this machine has no axe-core): the smoke test on every hub, accessibility at 37 screens with nothing new,
+    the performance budgets, the device matrix, the preview-safety and database suites.
+  - **The next session starts from**: this entry and the part it works in. **Part A**
+    ([journeys](2026-11-06-redesign-progression-journeys.md)): `widget/hub-rewards.js` (`xpFor`, `recordAnswer`, the
+    rank functions, `paintMeters`, `reward`, the recap), with `widget/ranks.js`, `rankup.js` and `pet.js` as its note
+    says. **Parts B and C with the bowling egg** ([shop](2026-11-06-redesign-timmy-shop.md),
+    [place](2026-11-06-redesign-timmys-place.md), [egg](2026-11-06-redesign-bowling-egg.md)): `widget/hub-timmy.js` for
+    what the engine shows of Timmy, `widget/pet.js` for the renderer; a new page in More also needs its row in the
+    core's `MORE` list and its entry in `renderMore`'s map (call the part's function as `HX.<name>`).
+    [Learn and Flashcards](2026-11-06-redesign-learn-and-flashcards.md): `widget/hub-bank.js`.
+- 2026-11-12: [#330](https://github.com/smcmurry6-source/study-hubs/pull/330) merged as `56a1fd9`, and `node tools/release/postcheck.js` passed (7 of 7 changed files live and identical to `main`; the dashboard and the three live hubs open with no errors).
+- 2026-11-12 (Claude Code, **part A, the journeys' client; hand-off**, [#332](https://github.com/smcmurry6-source/study-hubs/pull/332);
+  the split was [#330](https://github.com/smcmurry6-source/study-hubs/pull/330)). What was built, the calls Sam
+  answered and the five points where the client meets the server are in [the journeys note](2026-11-06-redesign-progression-journeys.md)
+  (its Log and "Open calls"). Nothing students see changes, and migration_v54 is still pending.
+  - **What every later part can use**:
+    - `window.shGame` (`widget/v3.js`, only where the page's widget tag has `data-game="v2"`, which the engine writes):
+      `v2()` (true once the database answered with a v2 profile), `boost()` (the running double XP or null),
+      `startSession(kind, game)` and `finishSession(id, score, total)` (a promise of the session's id, then of what
+      the finish paid; the finish waits for that session's answers to arrive). In the engine: `HX.gameOn()`, `HX.boost()`.
+    - **An answer under the game layer is `HX.recordAnswer(qid, lec, right, ctx, choice, picks, { order, session })`**:
+      give a one-choice question its pick index, select-all its picks, a sequence its order. The server's reply comes
+      as the `sh:answer-paid` event (`{ qid, ctx, session, res }`; `res` is `record_answer_v2`'s answer); a finished
+      session's as `sh:session-paid`. `widget/hub-rewards.js` already turns both into the pill's total, today's XP and
+      a toast, so a part that pays something new (a purchase, a game) only needs its own line there.
+    - **Ranks past the Handpiece**: `shRanks.nameOf(profile)`, `artOf(journey, tier, px, opt)`, `miniOf(journey, tier,
+      level)`, `legacy(profile)` (the Handpiece's own rank, for anything that reads tiers 0 to 6), `needJourneyArt(cb)`
+      and `journeys(cb)` (load the drawings, or the scenes too, on first use). `HX.rankArt(px)` draws your medallion;
+      any element with `data-rankart="<px>"` is repainted with it.
+    - **Scenes**: `shJourneys.handoff(d, done)`, `dark(d, done)`, `road(profile)`, `still(kind, d)`; ranks.js queues a
+      scene behind the rank-up cards with `rankup.js`'s new `scene(run)`. A full-screen moment for the shop or the
+      place can be queued the same way so two never overlap.
+    - The preview answers the game layer's calls from made-up data (`tools/preview/runtime/preview.js`: `answer2`,
+      `rank2`, sessions, the unlock mark) and takes `?xp=<n>`.
+  - **Request budgets are where the split left them** (Occlusion 20 of 21, Heme & Endo Exam 2 20 of 22, Perio 18 of
+    21): the journeys' two files load on first use. The same goes for anything parts B to D add.
+  - **Parts B and C with the bowling egg start from**: this entry; `widget/hub-timmy.js` (what the engine shows of
+    Timmy) and `widget/pet.js` (the renderer). For **the shop** ([note](2026-11-06-redesign-timmy-shop.md)): the
+    bootstrap already carries `shop` when the game layer is on (`window.shBootstrap.data.shop`); a shop boost comes back
+    in the profile's `boost` and the pill's chip shows it with no more work (`src` says which kind); a rank-up's +20
+    crowns is the server's. For **Timmy's place** ([note](2026-11-06-redesign-timmys-place.md)): the old house card
+    reads `sh_rank_tier`, which stays at 6 past 125,000 (`legacy()`), so the journey's pieces (the ModuPro on the porch,
+    Timmy in loupes, the rank sets for the later journeys) are drawn from the v2 profile's `journey` and `gtier`
+    (0 to 20), which `sh:rank-profile` hands every listener. For **the bowling egg** ([note](2026-11-06-redesign-bowling-egg.md)):
+    nothing here is in its way; if it pays XP it needs a session or an award on the server, which would be a change to
+    the migration, so ask Sam first.
+  - **Still open in this note**: parts B, C and D, the arcade lobby, the cards' and the cutscene's recording on a
+    preview, the About page (drafted in [the release note](2026-11-06-redesign-release.md), "From phase 4, part A").
+- 2026-11-12: [#332](https://github.com/smcmurry6-source/study-hubs/pull/332) merged as `048bcdb`, and `node tools/release/postcheck.js` passed (10 of 10 changed files live and identical to `main`; the dashboard and the three live hubs open with no errors).
+- 2026-11-12 (Claude Code): **part C is built: Timmy's place as a real client**
+  ([#335](https://github.com/smcmurry6-source/study-hubs/pull/335)); what it is and what it does is in
+  [the place's note](2026-11-06-redesign-timmys-place.md) (its Log). Nothing students see changes: only the new pages
+  load it, `widget/pet.js` is untouched, migration_v54 is still not applied and wasn't changed. Flame levels 4 and 5
+  (blue from 10 days, Dark Matter from 30) are in the new hubs' and the new dashboard's flame.
+  - **Request budgets are unchanged**: the new hubs' pages 20, 20 and 18 of 21, 22 and 21, the new dashboard 30 of
+    30. The place's renderer, kit and set files all load on first use; the smoke test fails if one loads with a page.
+  - **Part B (the shop) starts from**: `window.shPlace` (`widget/place.js`): `setup({ shop })` takes the bootstrap's
+    `shop` or a fresh `get_my_shop` answer (call it again after a purchase and `repaint()`), `open({ customize: true })`
+    opens the customizer, and `state()` says what's owned and equipped. The customizer lists what `shop.inventory`
+    owns and nothing else; its "Get more in the shop" link is left out until there is a shop to open (the drawer's
+    foot in `side()`, beside "Surprise me"). The kit's thumbnails (`SH_PLACE.thumb(kind, key)`, `setInfo(id)` for a
+    set piece's name, rarity and price) and `dress()` are what the shop's cards need; load the kit with
+    `shPlace.ready()`. The preview's `shop2()` already carries a wallet and empty shelves to fill
+    (`tools/preview/runtime/preview.js`). Still the shop's: `buy_item`, the balance on the "you" panel, snacks and
+    their HP (`get_pet_days_v2`'s `hp`, which `widget/pet.js` doesn't read yet), the rare costumes' art, and **the
+    five everyday outfits with no drawing** ([task](2026-11-12-five-outfits-without-a-drawing.md), Sam's call).
+  - **Part D (the bowling egg) starts from**: the bowling lane is a yard piece (`bowling-lane`, wide: the side yard
+    and the front corner), drawn by the kit with its own tap surprise (`EGGS.lane`: it rolls a mint, "Strike! Well,
+    close."). In the full view every tappable thing is a `.tp-egg[data-egg]` inside the stage's shadow root and
+    `playEgg(n)` in `widget/place.js` plays it; a clip for the lane hooks in there. Whether someone has the lane out
+    is `shPlace.state().equipped["yard-side"] === "bowling-lane"`. If the egg pays XP it needs something on the
+    server, which is a change to the migration: ask Sam first.
+  - **Visiting and "everyone has Timmy" start from**: `shPlace.open({ place })` draws what `get_place` returns (the
+    name in the title, no HP, Timmy always well, no customizer); nothing calls it yet. Timmy on a hub's bar doesn't
+    wear his place's outfit: that is pet.js's, for "everyone has Timmy" ([the release](2026-11-06-redesign-release.md),
+    "From phase 4, part C").
+  - **Still open in this note**: parts B and D, part E, the arcade lobby, the recording on a preview, the About page.
+- 2026-11-12: [#335](https://github.com/smcmurry6-source/study-hubs/pull/335) merged as `a529c0f` (Sam: "Merge"; `main` with Occlusion L10, #336, was brought into the branch first, which moved the place's three bug rows up one: BUG-088 the card's name, BUG-089 the statue, BUG-090 the five outfits), and `node tools/release/postcheck.js` passed (23 of 23 changed files live and identical to `main`; the dashboard and the live hubs open with no errors).
+- 2026-11-12 (Claude Code, **planning only, no code**): what is left of this phase turned into build specs. Sam
+  answered one list of 23 calls ([decisions](../../decisions.md)); the order, what holds for every session and the link to
+  each spec are in "From here to the release" above. Found while reading: this note's original goal (the trophy case
+  and the cards) was never built, so it has [its own note](2026-11-12-redesign-trophy-case-and-cards.md) now; visiting
+  had no session ([its note](2026-11-12-redesign-visiting.md)); the bowling egg's eight clips were already drawn on
+  [#291](https://github.com/smcmurry6-source/study-hubs/pull/291) and are carried over, not redrawn; and the server
+  refuses a new trophy kind as written, so the bowling trophy is kept on the device until the first migration after
+  the release ([game-server](../../reference/game-server.md)). The arcade lobby box is ticked: phases 1 and 2 did it.
+  **Next: session 1, the shop's art.**
+- 2026-11-12 (Claude Code): **session 7, Ask Timmy's chat, was built ahead of its turn**, because Sam asked for part 2
+  then ([its Log](2026-11-12-redesign-ask-timmy.md)). It doesn't need session 3: the Ask icon takes Timmy's spot
+  whenever he isn't on the page. Sessions 2 and 3 edit `widget/pet.js` after it: it adds "Ask me" to Timmy's tap
+  bubble and his house, only where `window.shAsk` exists. Session 9 counts its two files (`widget/ask.js`,
+  `widget/ask.css`; the stylesheet loads only when the chat is drawn). It also fixed BUG-086 (`widget/hub.css` makes an
+  empty `<i>` upright, so the new dashboard no longer downloads the italic font). Merged as `d6bd18b`
+  ([#338](https://github.com/smcmurry6-source/study-hubs/pull/338), Sam: "Merge"); `postcheck.js` passed. **Next: still
+  session 1, the shop's art.**
+- 2026-11-12 (Claude Code), **session 1, the shop's art**
+  ([#339](https://github.com/smcmurry6-source/study-hubs/pull/339)). Art only: no client code, nothing students
+  see, `migration_v54.sql` unchanged (nothing disagreed with it). **Hand-off for session 2**: "What session 1 built"
+  in [the shop's note](2026-11-06-redesign-timmy-shop.md) (read it before the spec). In short:
+  - new `widget/hub-art/shop.js`, `window.SH_SHOP_ART` (from `tools/figures/site/shop.mjs`): `coin(px)`,
+    `coinBody(small)`, `thumb(id)` for the four snacks and two boosts, `frame(rarity)`, `RARITIES`, `ITEMS`,
+    `store(layer)` and `stand(rarity)` (the storefront and the showcase's stand), `CSS`.
+    The frames and the coin left the place's kit (`SH_PLACE.frame`, `.coin` and `.RARITIES` are gone; `.burst` stays);
+  - the ten outfits are `SH_PLACE.OUTFITS` entries keyed by the shop's id, a costume marked `costume: true`; four
+    are on `NO_LOUPES` (safety glasses, pirate, astronaut, Captain Enamel);
+  - Timmy's door spot moved in all 22 homes (BUG-089 closed), with the left yard spot, the path's lamp and nine
+    statues; BUG-090 closed; BUG-095 opened (a tall piece right of the path now stands in front of Timmy's gum at
+    the door), accepted as it is with Sam's "Everything looks good";
+  - sizes, compressed: the kit 77.1 to 80.6 KB, `outfits.js` 29.7 to 33.6 KB, `shop.js` 11.4 KB, none loaded with a
+    page; `tools/release/xp.js` 358 checks; `widget/hub-art/shop.js` is in `tools/ci/syntax.js`'s list. Session 2's
+    smoke test checks that it never loads with a page (its spec); the service worker's lists are session 8's.
+  - **the shop's look changed** after the sheets (Sam: "I want the shop ui to be more epic"): the design page's
+    shop is now a storefront, "Today's showcase" and shelves whose cards fill them, and session 2's spec says to
+    build the page to it ("The shop's look" in the shop's note). Sam: "Everything looks good. Merge when ready",
+    "i like the redesign".
+  **Next: session 2, the shop's client.**
+- 2026-11-12: beside the sessions, Ask Timmy part 3 (the admin page's Ask Timmy tab, `review/`) merged as `e0737a1`
+  ([#341](https://github.com/smcmurry6-source/study-hubs/pull/341), Sam: "merge"); `postcheck.js` passed. **Next: still
+  session 2, the shop's client**, then session 3 (Ask Timmy part 4).
+- 2026-11-12 (Claude Code): **Learn and Flashcards built beside the sessions above** ([its note](2026-11-06-redesign-learn-and-flashcards.md)),
+  in [#344](https://github.com/smcmurry6-source/study-hubs/pull/344), merged as `7efb1ad` (Sam: "Merge"; `postcheck.js` passed). Its server part is a new pending migration, `migration_v56.sql` (Sam: "B"), after
+  v54 and v55, which it doesn't change. For the sessions still to come: `widget/hub-bank.js` now draws the "Study as"
+  toggle above the panel and exports `HX.qParts`, `HX.drawQuestions` and `HX.qview`; `widget/hub-rewards.js` has
+  `HX.recordCard` and `HX.doneToday` (the ring and Today count flashcards); the preview's `rpc()` answers
+  `record_card_v2`, `reset_my_learn` and `get_my_cards` (keep them in a conflict). **Session 9** counts two more files,
+  `widget/study-modes.js` and `widget/study-modes.css`, loaded on first use, not with the page; **session 8**'s service
+  worker list and the release add them (the release note says so).
+- 2026-11-12 (Claude Code), **session 2, the shop's client; hand-off for session 3** ([#345](https://github.com/smcmurry6-source/study-hubs/pull/345)). Nothing students see changes:
+  the shop runs only on the redesign's pages, on the game layer; `migration_v54.sql` is unchanged and nothing in it
+  disagreed with the client. Screenshots and a recording of one purchase were sent to Sam (no hosted preview).
+  - **New `widget/shop.js` + `widget/shop.css`**, `window.shShop`: `setup({ sb, visitor, shop, profile, onBought })`,
+    `mount(el, { level, title })`, `open({ onClose })`, `close()`, `balance()`, `read()` (one `get_my_shop`), `ready()`,
+    `state()`. Fetched on first use only (14 KB + 8 KB compressed, and `hub-art/shop.js` 11 KB); it fetches the shop's art
+    and the place's kit (`shPlace.ready()`, loading `place.js` if needed) itself. It dispatches `sh:shop` with the new
+    shop after every read or purchase; the hub and the dashboard listen. Every button has a fixed `data-shop` name first.
+  - **The page**, built to the design page's shop: the storefront (Timmy in a bow tie behind the counter, the balance
+    on its plaque, "How you earn gold crowns"), Today's showcase (the rarest piece on sale you don't own, the dearest of
+    those), Today's picks, This week beside Back for today, a shelf per season on sale (with a poster of the set at the
+    place), Spotted (the five costumes, unseen ones as shapes), Always here. An item's sheet: the piece large, its
+    price against the balance, Buy; then "Put it on" / "Place it", which opens the customizer on that piece's tab
+    (`shPlace.open({ pick })`, new). Refusals each have a line; a dropped connection charges nothing and the retry
+    sends the same request id.
+  - **`widget/hub.js`**: the `shop` row in `MORE` (after `place`), its tile shows the balance (`HX.shopMeta()`) and
+    the coin (`HX.shopCoin`); the row shows only when `HX.hasShop()`: a `shop` in the bootstrap **and Timmy adopted**
+    (the shop draws him in the outfits, and pet.js loads on a new hub only once he's adopted). **Session 3, "everyone
+    has Timmy", takes the adoption condition out of `hasShop()`** (`widget/hub-timmy.js`). `startWidget` calls
+    `HX.shopStart()`.
+  - **`widget/hub-timmy.js`**: `moreShop` (waits for the bootstrap, so a link straight to `#more/shop` works),
+    `shopStart` (the rare costume of the day), `shopBought` (a boost's `boost_until` to `shGame.setBoost` unless a
+    longer boost runs, then `HX.paintMeters()`), `costumeOfDay(visitor, day, holiday)`. **`widget/dash.js`** has the
+    same `costumeOfDay` (xp.js checks the two agree, over three years), `#youShop` on the "you" card (the coin, the
+    balance, "Timmy's shop"), and opens the shop as a dialog on the button's first tap.
+  - **`widget/pet.js`** (shared with the live pages, which compute exactly as before): `simulate()` adds each server
+    row's `hp` (snacks) after that day's change; `loadRemote()` asks `get_pet_days_v2` on the game layer (`shGame.v2()`
+    on a new hub, a v2 bootstrap with `shop` on the new dashboard); `refresh(true)` reads his days again (the shop calls
+    it after a snack, then Timmy says the snack's line). **Session 3 changes pet.js again**: keep these three.
+  - **`widget/place.js`**: "Get more in the shop" (`data-tp="shop"`) beside Surprise me; the place closes while the
+    shop is open and comes back on the same tab; `open({ pick })`.
+  - **The preview** sells the catalog read from `migration_v54.sql` at build time (`tools/preview/transform.js`,
+    `shopCatalog()`), with a wallet per test account (new 0, returning 300, missed 80, high-xp 20,000), `buyCore`
+    (the server's order of checks, run by xp.js against `sh_buy`), snack HP in `get_pet_days_v2` and the bootstrap's
+    `pet_days`, shop boosts, `record_costume_sighting`. A rare costume to look at: `?persona=returning&now=2027-01-07T10:00`.
+  - **Tests**: the smoke test (a new hub's shop: the tile, no shop file with the page, the shelves, a purchase, a
+    dropped connection and its retry with the same id, a double tap, a refusal, a snack at 100 HP, `data-shop` first,
+    an item's name as text, "Put it on"; the new dashboard's balance and button; a live hub never asks for the shop);
+    `xp.js` 367 checks (17 purchases through the preview's `buyCore` and `sh_buy`, the costume of the day over three
+    years); `a11y.js` (the shop, its sheet, the shop in dark mode: no issues, in the baseline). Bugs found and fixed:
+    BUG-098 to BUG-104.
+  - **Left for later, written down**: `sw.js`'s `PRECACHE` (session 8) and the shop on the release's preview, in [the
+    release note](2026-11-06-redesign-release.md) ("From phase 4, part B", with the About page's draft).
+  **Next: session 3, Timmy everywhere** ([Ask Timmy](2026-11-12-redesign-ask-timmy.md), "Build spec, part 4").
+- 2026-11-12: [#345](https://github.com/smcmurry6-source/study-hubs/pull/345) (session 2, the shop's client) merged as
+  `510dcb6`. Session 2 is done.
+- 2026-11-13 (Claude Code), **session 3, Timmy everywhere; hand-off for session 4** ([#348](https://github.com/smcmurry6-source/study-hubs/pull/348); [Ask Timmy](2026-11-12-redesign-ask-timmy.md),
+  part 4, its Log). Nothing students see changes. On the redesign's pages everyone has Timmy (no adoption, one hello
+  for a first visit, 100 HP for a Timmy met on or after the release) and he wears only the outfit on at his place,
+  nothing otherwise, on a holiday too. What the next sessions can use:
+  - **`shPet.fit()`** on a new page is the outfit's kit id (`"sun-hat"`) or `""`, never `"<holiday>:<outfit>"`; the
+    live pages still return the holiday form. **`shPet.setOutfit(id, parts)`** changes it at once (parts: the kit's
+    `{ back, face, top }`, from `SH_PLACE.outfitParts(k)` or `SH_OUTFITS.parts[id]`; without them pet.js fetches
+    `widget/hub-art/outfits.js` after the first scroll, wheel, tap or key) and does nothing on a live page. It fires
+    **`sh:pet-fit`** on `document` when the id changes (`widget/v3.js` sends the presence again on it).
+  - **Visiting** (session 4): someone else's Timmy is drawn with `shPet.art({ hp: 100, hat: "" }, px)` and dressed
+    from their own equipped outfit, as `widget/dash.js`'s `timmyArt()` does. Without `hat: ""` and `fit`, on a new
+    page `shPet.art()` dresses him in **this** visitor's outfit (the bar's own drawing and the chat's avatar rely on
+    that), so a drawing of someone else's Timmy always passes `hat: ""`.
+  - **`FULL_FROM`** in `widget/pet.js` (`9999-12-31` until the release; the preview swaps in its test account's start,
+    `tools/preview/transform.js`) is the release's day: a box in [the release note](2026-11-06-redesign-release.md),
+    "From Ask Timmy, part 4", with the adoption code that comes out then.
+  - **`widget/place.js`** calls `setOutfit` after the outfit slot changes and after the server answers differently;
+    `timmySvg()` always passes `hat: ""`. **`widget/hub-timmy.js`**: `hasTimmy()` is true and `hasShop()` is only "a
+    `shop` in the bootstrap".
+  - Tests: the smoke test's "Everyone has Timmy" block (a new hub, the new dashboard, the live hub and dashboard as
+    before); the Ask checks now turn Timmy off before they wait for the Ask icon. Bugs: BUG-105 to BUG-109. For the tests: Timmy is now on every new hub's page, so
+    the answers a test gives there go into his tally of the day (`sh_pet_log`); a check of his HP starts without it.
+  **Next: session 4, visiting** ([visiting](2026-11-12-redesign-visiting.md)), or session 5, the bowling egg.
+- 2026-11-13: [#348](https://github.com/smcmurry6-source/study-hubs/pull/348) (session 3) merged as `c5ce92e` (Sam:
+  "Merge when ready"). `postcheck.js` passed (7 of 7 changed files live and identical to `main`; the live dashboard and hubs open with no errors). Session 3 is done. **Next: session 4, visiting** ([visiting](2026-11-12-redesign-visiting.md)).
+- 2026-11-13 (Claude Code), **session 5, the bowling egg; hand-off for session 6** ([the bowling egg](2026-11-06-redesign-bowling-egg.md)).
+  Run ahead of session 4 (it needs only session 2); session 3 (#348) merged while it waited. Nothing students see changes, no XP, nothing on the server:
+  neither pending migration is applied or changed, and nothing in them disagreed with the client.
+  - **The clips**: #291's kit carried over unchanged (`tools/figures/site/bowling.mjs`), built by `build.mjs` into
+    `widget/hub-art/bowling.js` (`window.SH_BOWL`, 56 KB, 18 KB compressed) and the design page's "The bowling egg"
+    section; the build checks every clip, still and playing, and that every class a clip's CSS moves is in its drawing.
+    A recording of the eight and their stills went to Sam: "Looks good. Merge when ready." #291 closed unmerged.
+  - **New `widget/bowling.js`**, `window.shBowl`: `play(clip, { host, say, queue, still, onClose })`, `random()`, `seen()`,
+    `trophy()`, `off()`, `ready()`, `close()`, `showing()`, `KEYS`, `STRIKES`, `TROPHY`. Its styles are inside it; it
+    fetches its drawings itself; on the bar it queues through `shRankUp.scene` when rank-up cards are on the page. The
+    page hears `sh:bowl-trophy` when the eighth clip is seen.
+  - **`widget/hub-rewards.js`**: `bowlRun()` in `recordAnswer` (the run, `sh_bowl_run`; the day's first answers,
+    `sh_bowl_today`); it fetches `bowling.js` at a strike. **`widget/place.js`**: the lane plays a clip in the full view
+    (`playLane`), its own surprise with the eggs off; `shut()` closes a clip.
+  - **For session 6, the trophy case**: the Bowling trophy is `EGG_TROPHIES.bowling` in `medals.mjs` and
+    `shBowl.TROPHY`'s words; what to take from where is in [its note](2026-11-12-redesign-trophy-case-and-cards.md)
+    ("What the bowling egg left for it").
+  - **For session 8 and session 9**: `sw.js`'s `PRECACHE` gains `widget/bowling.js` and `widget/hub-art/bowling.js`
+    (the release note's "From phase 4, part D" has the box); both load on first use, so phase 5 part 2 counts them among
+    those. Budgets unchanged.
+  - Tests: the smoke test's bowling block on a new hub (desktop and phone), `a11y.js`'s clip card. BUG-110 and BUG-111.
+  **Next: session 4, visiting** ([visiting](2026-11-12-redesign-visiting.md)), then 6.
+- 2026-11-13: [#349](https://github.com/smcmurry6-source/study-hubs/pull/349) (session 5, the bowling egg) merged as `c496249` (Sam: "merge now"). `postcheck.js` passed (4 of 4 changed files live and identical to `main`; the live dashboard and hubs open with no errors). Session 5 is done. **Next: session 4, visiting** ([visiting](2026-11-12-redesign-visiting.md)), then 6.
+- 2026-11-13 (Claude Code), **session 4, visiting; hand-off for session 6** ([#352](https://github.com/smcmurry6-source/study-hubs/pull/352); [visiting](2026-11-12-redesign-visiting.md),
+  its Outcome). Nothing students see changes. On the new dashboard, on the game layer, a row of Ranks or Study streaks
+  (and each of the stage's top three, and a winner's Timmy on the stage) opens that person's Timmy's place; your own row
+  opens yours. Sam, seeing it: "this window should be more epic", so a visit opens in the leaderboard's theater look,
+  and "there should be a clouds animation" ("i already approved a cloud animation before"), so it gets there through the
+  trip Sam approved on the design page in round 3.
+  What the next sessions can use:
+  - **`widget/dash.js`**: `visitKey(row)` (the key if it's 24 hex characters, else ""), `getPlace(sb, key)` (one
+    `get_place` a page for a person, kept unless the call failed; `loadFits` uses it), `visit(key, me)`, `visitSay(key,
+    msg)` (the plain line on a row, kept through `paintBoard`). The name's button is `.dx-visit[data-dash="visit"]`, the
+    key on its `li[data-visit]`. `placeLoad()` now resolves once the place is set up (or failed: check `window.shPlace`).
+  - **`widget/place.js`**: `open({ place, onClose })` draws a visit in its theater look (`dlg.is-visit`; `tripIn` and
+    `tripOut` for the trip through the clouds, the design page's `clouds()` ported as it is; `guestCard()` for the
+    panel) and counts `place:visit`; your own place is unchanged. The bowling lane's clips play at a visited place too.
+    The tour (Sam: "build the random visit and next/back", after #352): `open({ place, nav })`, where `nav` is `{ at, list:
+    [{ name, rank }], load(i) }` from `widget/dash.js` (names and ranks only, the keys stay there); `hop(i | "home")` rolls
+    the clouds in, and once they cover the screen and the next place is here, `shut()`s this window and `open()`s the next
+    under the same clouds (`covered`), which then scatter. `onClose(at)` says where the tour ended, for the focus.
+  - **For session 6, the trophy case**: the visit's guest card draws hub medals with `shRanks.medal(lvl, 44, hub)` from
+    the place's `flair`; a trophy shelf for a visited place, if one is wanted, has nothing to read: `get_place` gives no
+    trophies (and migration_v54 isn't changed).
+  - **The preview**: the made-up classmates have places (`FAKE_PLACES`), ranks from one XP each (`fakeXp`; Fixture
+    Fluoride a ModuPro) and one medal each for three (`FAKE_FLAIR`, one each because of BUG-112); your own key opens your
+    own place; your own row stays on the rank board below the top ten.
+  - Tests: the smoke test's "visiting" block (desktop and phone), `a11y.js`'s boards and visited place (light and dark,
+    in the baseline at zero). Bugs: BUG-112 (`widget/ranks.js`'s "+1" medal button, at the release) to BUG-115.
+  **Next: session 6, the trophy case and the cards** ([its note](2026-11-12-redesign-trophy-case-and-cards.md)).
+- 2026-11-13: [#352](https://github.com/smcmurry6-source/study-hubs/pull/352) merged as `86b81a3` (Sam: "merge when ready").
+  Then Sam: "build the random visit and next/back": the tour, in [#354](https://github.com/smcmurry6-source/study-hubs/pull/354)
+  ([visiting](2026-11-12-redesign-visiting.md)'s Outcome): Visit someone random under the board, arrows and Back to
+  mine in a visit, each hop through the clouds. Nothing on the server; `widget/place.js`'s `open()` takes `nav` and
+  `covered` (above). **Next: session 6** still.
+- 2026-11-13: [#354](https://github.com/smcmurry6-source/study-hubs/pull/354) merged as `0cba9fc` (Sam: "merge");
+  `postcheck.js` passed. Then Sam: "i want random to be for the whole class" ([#355](https://github.com/smcmurry6-source/study-hubs/pull/355)): the pick moved to the server, in **a new
+  pending migration, `migration_v57.sql`** (`get_random_place`; v54 unchanged; applied at the release after v56: its box
+  is in [the release](2026-11-06-redesign-release.md), "From phase 4, visiting"). `widget/place.js`'s `nav` can carry
+  `more()` (a random trip: Next past the last rolls the die again, Previous goes back through the trip);
+  `widget/dash.js`'s `visitRandom()` falls back to the board's rows without the function. Details:
+  [visiting](2026-11-12-redesign-visiting.md)'s Outcome, [game-server](../../reference/game-server.md), "Visiting".
+  **Next: session 6** still.
+  In the same PR, Sam: "skip people with zero customization" (the random pick needs a place with something chosen) and
+  a number badge for the top ten on a visit (`top` on a place, `.tpv-num`).
+- 2026-11-13 (Claude Code), **session 6, the trophy case and the cards; hand-off for session 7 on** ([#356](https://github.com/smcmurry6-source/study-hubs/pull/356); [its note](2026-11-12-redesign-trophy-case-and-cards.md),
+  its Outcome). One live change, BUG-116's fix (Sam: "ship the BUG-116 live fix too"); otherwise nothing students see
+  changes: the live hubs and dashboard keep 24 trophies, Full Arch, the old Stats
+  panel and today's cards (the smoke test compares the live cards' markup with `main`'s). Neither pending migration
+  was applied or changed. Sam saw two contact sheets ("It needs to be more epic", then "sounds good") and asked for the
+  rest of the Stats page to match ("make it more epic").
+  What the next sessions can use:
+  - **The gate**: `NEW` in `widget/ranks.js` and `widget/rankup.js` is the `shx` class the redesign's pages put on
+    `<html>` (`widget/hub.js`, `next/index.html`), read in a `try` (the art build's stub has no `document`).
+    `widget/eggs.js`'s `ARCH_OFF` is that class or a `data-game="v2"` widget tag.
+  - **`widget/ranks.js`** is the case's loader: `trophyCase(cb)` (the drawings, then `widget/trophies.js`, as
+    `window.shTrophies`), `trophyCss(cb)` (`<link id="sh-trophies-css">`), `needTrophyArt(cb)`, `trophyStats(cb, sb)`
+    (`get_trophy_stats_v2`, then `get_trophy_stats`; kept 10 minutes; one copy for the case, the cards and the old panel),
+    `shareOf(k)` (`{ n, total, p, label }`, or `null` for a kind the server doesn't count), `caseCount(badges)` (`{ won, of }`)
+    and `RETIRED` (Full Arch's row). On the redesign `TROPHIES` is 27 rows: 8, the journeys (`scene: true`: the hand-off
+    awards them, `trackTrophies` skips them), 15 secrets, Bowling (`device: "sh_bowl_trophy"`).
+  - **`widget/trophies.js`**: `shTrophies.mount(el, { profile, stats, sb, onBoards })`; it waits for its stylesheet,
+    redraws when the shares arrive and when `sh:bowl-trophy` fires, keeps focus on a redraw, and records no events of its
+    own (its buttons carry `data-sht`). **`widget/trophies.css`** holds the case (`.sht`), the rest of the Stats page
+    (`.stx`, drawn by `statsEpic` in `widget/hub.js`) and the cards' redesign look (`html.shx .sh-ru...`).
+  - **`widget/rankup.js`**: on the redesign a card waits for that stylesheet and the drawings (`xready`, 2.5 s at most;
+    scenes don't); `trophyArt(ic, px, key, k)` draws from `SH_TROPHY_ART`; a card's `next` line; `PLACE_SET`, the rank's
+    pieces for Timmy's place (from `tools/figures/site/sets.mjs`: change both together); `data-metal` on the cards and
+    `data-band` on the mock card. BUG-116 (a level-up card stopped the queue) is fixed on every page (Sam: "ship the BUG-116 live fix too"): the one
+    live change in this PR.
+  - **For session 8 (the wiring) and session 9 (bundles)**: three files load on first use and join `sw.js`'s
+    `PRECACHE` (a box in [the release note](2026-11-06-redesign-release.md), "From phase 4, session 6"). The page-load
+    files grew a little: `widget/ranks.js` (+7 KB), `widget/rankup.js` (+5 KB), `widget/hub.js` (+7 KB), `widget/dash.js`.
+  - **Open for Sam**: the live About page's secret count ([the inbox](../inbox.md)); a shelf for the hub trophies in the
+    case (the release note's box).
+  - Tests: the smoke test's trophy-case block (a new hub, the new dashboard, a live hub; desktop and phone), `a11y.js`'s
+    "trophy case" and "trophy card". Bugs: BUG-116 to BUG-121.
+  **Next: session 7 is built (Ask Timmy, part 2), so session 8, the wiring** ([its note](2026-11-12-redesign-game-layer-wiring.md)).
+- 2026-11-13 (Claude Code), **session 8, the game layer's wiring; hand-off for session 9 on** ([#357](https://github.com/smcmurry6-source/study-hubs/pull/357); [its note](2026-11-12-redesign-game-layer-wiring.md),
+  its Outcome). Nothing students see changes: every new call runs only where `shGame.v2()` is true, and the smoke test
+  plays two arcade games and Timmy Time on a live hub with this branch's `widget/games.js` and `widget/podcast.js` and
+  with `main`'s, and fails unless the calls are the same. Neither pending migration was applied or changed, and the
+  client agrees with both. No hosted preview (Sam).
+  What the next sessions can use:
+  - **`window.shGames`** (`widget/games.js`): `played(game, name)`, `over(game, score, today)` (a promise, or `null`
+    when no session was started, so the caller makes today's call), `session()` (the running game's session id) and
+    `ran(id)` (`{ game, name }`). `tools/hub-next/build.mjs`'s `gameHooks` writes the same two hooks into a hub's own
+    games (`arcade.js`) and fails the build when a game's start can't be found; a new hub's own game needs nothing else.
+  - **`sh:pod-paid`** (`widget/podcast.js`, `{ hub, ep, minute, res }`), beside `sh:answer-paid` and `sh:session-paid`;
+    `widget/hub-rewards.js` handles all three. The device keeps the minutes sent in `sh_pod_min:<hub>:<episode>`.
+  - **The admin page**: `reportsRpc()` and `repV2` in `review/index.html` (the Inbox on `get_reports_v2` /
+    `admin_resolve_report_v2`, today's functions otherwise).
+  - **For session 9 (bundles)**: no new file. `widget/games.js` (+3 KB, loaded when the arcade opens),
+    `widget/podcast.js` (+4 KB, loaded after the page by a hub with an episode) and `widget/hub-rewards.js` (+1 KB) grew.
+  - **For the release**: the episode lengths (Occlusion `midterm-review` 2688 s, Heme & Endo Exam 2 `exam2-review`
+    3101 s), step 4 of its migration steps; until they are loaded, `pod_minute_v2` answers `unknown` and the page stops
+    asking for the visit.
+  - Tests: `tools/ci/smoke.js`'s `wiringCheck`, `tools/release/admin-ui.js`'s Inbox block. Bugs: BUG-122 (the preview's).
+  **Next: session 9, phase 5 part 2** ([phase 5](2026-11-05-redesign-phase-5-backend.md)).
+
+- 2026-11-13 (Claude Code), **session 9, phase 5 part 2: the bundles; hand-off for session 10, the release**
+  ([#358](https://github.com/smcmurry6-source/study-hubs/pull/358); [phase 5](2026-11-05-redesign-phase-5-backend.md),
+  its Log and Outcome; [bundles](../../reference/bundles.md) says how it works). Nothing students see changes: the live
+  pages load what they loaded (the smoke test fails if one asks for a bundle, and checks the 8-bit code on a live hub
+  still adds its Google Fonts link). Neither pending migration was applied or changed. No hosted preview (Sam).
+  What the release session needs to know:
+  - **A redesigned page loads built files**: `widget/hub.bundle.js` or `widget/dash.bundle.js` with the page, then
+    `widget/rest.bundle.js` and (a hub) `widget/hub-rest.bundle.js`, and one stylesheet, `widget/site.bundle.css`.
+    `tools/bundle/bundles.json` lists what is in each. **Edit the sources, never a `.bundle.` file, then
+    `node tools/bundle/build.mjs` and commit both**; CI fails on a stale bundle.
+  - **The three pages' tags changed**: a hub's page has its own art file and `hub.bundle.js`; the dashboard's has
+    `hubs.js` and `dash.bundle.js`. A file added to the engine is a line in `bundles.json`, not a tag.
+  - **`widgetFile()`** in `widget/v3.js` is the one loader for v3.js's other files; `loadScript()` in `widget/hub.js`
+    and `loadLate()` in `widget/dash.js` ask the bundle first too. A file not in a bundle is fetched as before.
+  - **The database client on the redesign's pages is the slim one** (`widget/vendor/supabase-lite-2.117.2.js`, inside
+    `rest.bundle.js`): `from`, `rpc`, realtime; no auth, storage or functions. A page that needs one of those would have
+    to load the full client; none does.
+  - **No font from another site** on a redesigned page: the 8-bit code's face is `assets/fonts/vt323.woff2`
+    (`@font-face` in `widget/hub.css`, fetched only when the code is entered), and the saved recap image is drawn in
+    Nunito Sans (`font: FACE` in `saveRecap`; Sam's call is open in the release note).
+  - **`node tools/release/perf.js` measures the whole load** (BUG-128), so numbers from before today aren't
+    comparable. The redesign's budgets are set on it; the release moves them to the pages' own addresses.
+  - **For the release**: `sw.js`'s `PRECACHE` takes the bundles, the stylesheet and the three font files instead of
+    the bundled files, and the content JSON's stale-while-revalidate: [the release note](2026-11-06-redesign-release.md),
+    "From phase 5, part 2", which also corrects the earlier sections' lists.
+  - Tests: `tools/ci/smoke.js`'s `bundleCheck`, `ownFiles` and `eightBit`; `node tools/bundle/build.mjs --check`;
+    `node tools/bundle/client/wire-check.mjs` (by hand, read-only, both clients against the project: 10 of 10 the
+    same). Bugs: BUG-127, BUG-128, BUG-129.
+  **Next: session 10, the release** ([the release](2026-11-06-redesign-release.md)).
+- 2026-11-13 (Claude Code): every session in "From here to the release" is merged, and the switch PR is built and waiting for
+  Sam's "merge" ([the release](2026-11-06-redesign-release.md), "The merge, step by step"). What this phase left for it is
+  ticked there or in [the inbox](../inbox.md).
+- 2026-11-17 (Claude Code, closed after the release; the inbox's "the redesign's other task notes are still open", #401): every session in "From here to the release" merged and shipped; nothing left.
+
+## Outcome
+
+**Done with the redesign's release** (2026-11-14, [#359](https://github.com/smcmurry6-source/study-hubs/pull/359)). The
+ten sessions in "From here to the release" all merged: the shop's art and client, Timmy everywhere, visiting, the bowling
+egg, the trophy case and the cards (Full Arch retired), Ask Timmy's chat, the wiring, phase 5 part 2, then the release,
+with Ask Timmy's admin tab and Learn and Flashcards beside them. `migration_v54` to `v58` are applied and the game layer
+is what the dashboard, Occlusion and Perio run on. Nothing is left in this note; what came after is its own task:
+[the later journeys' rank sets](../2026-11-12-redesign-later-journeys-rank-sets.md).
+
+## Opening prompts
+
+Each session's prompt is at the end of its own note; in order:
+1 and 2, [the shop](2026-11-06-redesign-timmy-shop.md) (the art, then the client) ·
+3, [Ask Timmy](2026-11-12-redesign-ask-timmy.md) (part 4, Timmy everywhere) ·
+4, [visiting](2026-11-12-redesign-visiting.md) ·
+5, [the bowling egg](2026-11-06-redesign-bowling-egg.md) ·
+6, [the trophy case and the cards](2026-11-12-redesign-trophy-case-and-cards.md) ·
+7, [Ask Timmy](2026-11-12-redesign-ask-timmy.md) (part 2, the chat) ·
+8, [the wiring](2026-11-12-redesign-game-layer-wiring.md) ·
+9, [phase 5](2026-11-05-redesign-phase-5-backend.md) (part 2) ·
+10, the release:
+
+> Work in smcmurry6-source/study-hubs. Read `AGENTS.md`, then `RELEASE_TEST_PLAN.md` and
+> `vault/tasks/done/2026-11-06-redesign-release.md` (its Done when, and every "From ..." draft). Before anything else,
+> check that each session in "From here to the release" in `vault/tasks/2026-11-05-redesign-phase-4-game-layer.md`
+> is merged, and tell me what isn't. Then ask me which hubs are live and get switched, and whether I want the
+> preview now. Nothing is applied, deployed or merged before I say so. Grep the big files, never read them whole.
+> No subagents.

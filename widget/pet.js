@@ -1,5 +1,5 @@
-/* study-hubs tooth buddy: an optional cartoon tooth that lives on the dashboard (perched on your name) and in the
-   bottom-left corner of every hub. Loaded by widget/v3.js (hubs) and index.html (dashboard).
+/* study-hubs tooth buddy: a cartoon tooth, Timmy Tooth, who lives on the dashboard's "you" card and in the bottom-left
+   corner of every hub. Loaded by widget/v3.js (hubs) and widget/dash.js (the dashboard).
 
    Health (0-100 HP) is worked out from your answers, one row per Central-time day across every hub
    (get_pet_days, migration_v31), merged with this device's own tally (sh_pet_log) so it updates live and offline:
@@ -10,16 +10,26 @@
    What goes wrong as HP drops, in order: plaque, stains + gingivitis, a cavity, periodontitis (recession, calculus),
    a fracture, and at 0 a bandage.
 
-   His name is Timmy Tooth. Before you meet him he perches on your name on the dashboard; once adopted he lives in his
-   own little home card there (index.html #petHome) and in the bottom-left corner of every hub.
+   Everyone has Timmy (the redesign's release, 2026-11; vault/tasks/2026-11-12-redesign-ask-timmy.md, part 4): there is
+   no adoption. He is there from the first visit (sh_pet_born is set to that day and the pet-adopt badge sent, so every
+   linked device counts from the same day) and says one hello. A Timmy born on or after FULL_FROM (the day the redesign
+   went live) starts at 100 HP, not 70; one met before keeps his history. He wears only what the student put on at his
+   place (Sam, 2026-11-12: "if someone doesnt have a costume applied, they are naked. What you put wins"): the shop's
+   outfit in the `outfit` slot (the v2 bootstrap's shop.equipped.outfit), never a holiday's, and nothing when nothing is
+   on. Its drawing is kept on the device (sh_pet_outfit), so no request is made for it at page load;
+   widget/hub-art/outfits.js is fetched only when the server's outfit isn't the one kept, after the first scroll, tap or
+   key. shPet.setOutfit(id) changes it at once (Timmy's place calls it). An old single-file hub's page has no shop, so
+   there he wears the outfit kept on the device.
 
-   Settings: sh_pref_pet = "on" (default) | "dash" (dashboard only) | "off".  sh_pet_born = the day you adopted him.
-   Neither Timmy nor his HP is ever shown to anyone else.
+   Settings: sh_pref_pet = "on" (default) | "dash" (dashboard only) | "off".  sh_pet_born = the day you met him.
+   Neither Timmy's health nor his HP is ever shown to anyone else.
 
-   shPet.mount({ where: "dashboard", sb, visitor, name: fn, perch: fn })   // dashboard
-   shPet.mount({ where: "hub", H: window.shEggHooks })                      // hubs (v3.js does this)
-   shPet.refresh()                                                          // after a setting changes
-   shPet.art(state, px)                                                     // just the drawing */
+   shPet.mount({ where: "dashboard", sb, visitor, name: fn, home: fn, outfit })   // dashboard (widget/dash.js)
+   shPet.mount({ where: "hub", H: window.shEggHooks })                             // hubs (v3.js does this)
+   shPet.refresh()                                                                 // after a setting changes
+   shPet.art(state, px)                                                            // just the drawing
+   On a page that loads Ask Timmy's chat (widget/ask.js, window.shAsk), tapping him offers "Ask me" in his bubble and
+   his house has an "Ask me" button. */
 (function(){
   "use strict";
   if (window.shPet) return;
@@ -29,6 +39,10 @@
   function pick(a){ return a[Math.floor(Math.random() * a.length)]; }
   var reduced = false;
   try { reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches; } catch (e) {}
+  var ME = document.currentScript, BASE = ME && ME.src ? ME.src.replace(/[^\/]*(\?.*)?$/, "") : "";
+  /* The day the redesign went live, Central time: a Timmy born on or after it starts at 100 HP. A preview's copy points
+     it at the preview's own start (tools/preview/transform.js), so its "new" test account shows it. */
+  var FULL_FROM = "2026-11-14";
 
   /* days roll over on Central time, the same as the server */
   function centralDay(d){
@@ -39,7 +53,7 @@
   function addDays(day, n){ var p = day.split("-"), d = new Date(Date.UTC(+p[0], +p[1] - 1, +p[2] + n)); return d.toISOString().slice(0, 10); }
   function dayDiff(a, b){ var pa = a.split("-"), pb = b.split("-"); return Math.round((Date.UTC(+pb[0], +pb[1] - 1, +pb[2]) - Date.UTC(+pa[0], +pa[1] - 1, +pa[2])) / 864e5); }
 
-  /* ================= holiday hats (dates kept in step with HOLIDAYS in widget/eggs.js) ================= */
+  /* ================= holidays (dates kept in step with HOLIDAYS in widget/eggs.js) ================= */
   function holidayId(){
     if (window.shHoliday && window.shHoliday.id) return window.shHoliday.id;
     var forced = ls("sh_egg_holiday_test"); if (forced) return forced;
@@ -51,8 +65,9 @@
     var today = new Date(y, m - 1, d).getTime();
     function near(at, b, a){ var t = at.getTime(); return today >= t - b * 864e5 && today <= t + a * 864e5; }
     if (x >= 1001 && x <= 1031) return "halloween";
-    if (near(nthThu(y), 6, 1)) return "thanksgiving";
-    if (x >= 1210 && x <= 1230) return "winter";
+    var tgEnd = nthThu(y).getTime() + 864e5;   // Thanksgiving: Nov 1 to the day after; Christmas: then to Dec 26
+    if (m === 11 && today <= tgEnd) return "thanksgiving";
+    if (today > tgEnd && x <= 1226 && x >= 1101) return "winter";
     if (x === 1231 || x <= 102) return "newyear";
     if (x >= 210 && x <= 214) return "valentine";
     if (x === 306) return "dentist";
@@ -63,7 +78,8 @@
 
   /* ================= the art =================
      One cartoon molar in a 200 x 260 frame (y from -30 so hats fit): stubby arms, a gum "cushion" it sits in, and
-     every problem drawn on top. state = { hp, mood: "happy"|"ok"|"sad"|"sick"|"sleep", hat: holiday id }        */
+     every problem drawn on top. state = { hp, mood: "happy"|"ok"|"sad"|"sick"|"sleep"|"scared", hat: "" to draw him with
+     nothing on (left out, he wears what's on at his place) }                                                        */
   var OUT = "#3B2E3A";
   var TOOTH = "M48 86 C42 56 56 34 78 34 C90 34 94 44 100 44 C106 44 110 34 122 34 C144 34 158 56 152 86 " +
     "C149 106 146 122 144 140 C142 166 138 192 130 210 C126 218 116 218 114 208 C111 190 108 172 100 168 " +
@@ -105,6 +121,11 @@
   var uid = 0;
   function art(state, px){
     state = state || {};
+    /* he wears what was put on at his place, drawn as the kit's dress() draws it, never a holiday's */
+    if (state.hat === undefined) {
+      var bare = {}; Object.keys(state).forEach(function(k){ bare[k] = state[k]; }); bare.hat = "";
+      return dressLayer(art(bare, px), WORN.layer);
+    }
     var hp = state.hp == null ? 80 : state.hp, c = conditions(hp), has = {};
     c.forEach(function(k){ has[k] = 1; });
     var mood = state.mood || moodFor(hp), p = "shpt" + (++uid) + "-";
@@ -221,65 +242,117 @@
         '<path class="shpet-sp shpet-sp3" d="M152 18 l2 4.6 4.6 2 -4.6 2 -2 4.6 -2 -4.6 -4.6 -2 4.6 -2z"/></g>';
     }
     if (mood === "sleep") x += '<g class="shpet-zz" fill="' + OUT + '" font-family="Georgia,serif" font-weight="700"><text x="150" y="40" font-size="20">z</text><text x="164" y="22" font-size="15">z</text></g>';
-    x += hat(state.hat === undefined ? holidayId() : state.hat);
+    /* hats and props wobble with him when he's loose */
 
     var cls = "shpet-art" + (has.perio ? " is-loose" : "") + (mood === "sick" ? " is-sick" : "") + (mood === "scared" ? " is-scared" : "");
     return '<svg class="' + cls + '" viewBox="0 -30 200 262" width="' + (px || 100) + '" height="' + Math.round((px || 100) * 1.31) + '" aria-hidden="true">' + d +
       '<g class="shpet-bob"><g class="shpet-wobble">' + s + bodyG + calc + '</g>' + g + x + '</g></svg>';
   }
 
-  function hat(id){
-    if (!id) return '';
-    var h = '<g class="shpet-hat">';
-    if (id === "halloween") {
-      h += '<path d="M64 40 Q84 30 98 0 Q104 -16 120 -22 Q112 -10 114 2 Q118 24 136 40 Z" fill="#4A2D6B" stroke="' + OUT + '" stroke-width="4" stroke-linejoin="round"/>' +
-        '<path d="M74 31 Q100 24 128 31 L131 38 Q100 31 71 38 Z" fill="#F59A1E" stroke="' + OUT + '" stroke-width="2.4" stroke-linejoin="round"/>' +
-        '<ellipse cx="100" cy="41" rx="50" ry="8.5" fill="#3A2350" stroke="' + OUT + '" stroke-width="4"/><path d="M118 -20 l2 3" stroke="#B08CFF" stroke-width="2"/>';
-    } else if (id === "thanksgiving") {
-      h += '<ellipse cx="100" cy="40" rx="48" ry="8.5" fill="#2E2A28" stroke="' + OUT + '" stroke-width="4"/><path d="M72 39 L78 -2 L122 -2 L128 39 Z" fill="#3A3532" stroke="' + OUT + '" stroke-width="4" stroke-linejoin="round"/>' +
-        '<path d="M75 19 L125 19 L127 31 L73 31 Z" fill="#8C6B3E"/><rect x="91" y="18" width="18" height="14" rx="1.5" fill="none" stroke="#F6CD55" stroke-width="3"/>';
-    } else if (id === "winter") {
-      h += '<path d="M66 36 C70 6 104 -10 136 2 C146 6 154 18 160 30 L150 36 Z" fill="#D6363C" stroke="' + OUT + '" stroke-width="4" stroke-linejoin="round"/>' +
-        '<circle cx="160" cy="32" r="9" fill="#fff" stroke="' + OUT + '" stroke-width="3"/><rect x="58" y="28" width="90" height="16" rx="8" fill="#fff" stroke="' + OUT + '" stroke-width="3.4"/>';
-    } else if (id === "newyear") {
-      h += '<g transform="rotate(-12 100 38)"><path d="M80 40 L100 -20 L120 40 Z" fill="#B08CFF" stroke="' + OUT + '" stroke-width="4" stroke-linejoin="round"/>' +
-        '<path d="M89 13 L111 13 M84 28 L116 28" stroke="#F6CD55" stroke-width="5"/><circle cx="100" cy="-22" r="7" fill="#F6CD55" stroke="' + OUT + '" stroke-width="3"/></g>';
-    } else if (id === "valentine") {
-      h += '<path d="M62 42 Q100 22 138 42" stroke="#E0457B" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M80 32 q-6 -6 0 -12 q6 -6 0 -12 M120 32 q6 -6 0 -12 q-6 -6 0 -12" stroke="#888" stroke-width="2" fill="none"/>' +
-        '<path d="M80 9 c-6-4-9-8-9-11 a4.5 4.5 0 0 1 9-2 a4.5 4.5 0 0 1 9 2 c0 3-3 7-9 11z M120 9 c-6-4-9-8-9-11 a4.5 4.5 0 0 1 9-2 a4.5 4.5 0 0 1 9 2 c0 3-3 7-9 11z" fill="#E0457B" stroke="' + OUT + '" stroke-width="2.4"/>';
-    } else if (id === "dentist") {
-      h += '<path d="M56 50 Q100 22 144 50" stroke="#59616B" stroke-width="7" fill="none" stroke-linecap="round"/>' +
-        '<circle cx="100" cy="20" r="16" fill="#DCE3EA" stroke="' + OUT + '" stroke-width="3.6"/><circle cx="100" cy="20" r="11" fill="#F7FBFF"/><circle cx="100" cy="20" r="3" fill="#59616B"/><path d="M92 14 Q95 10 100 10" stroke="#fff" stroke-width="2.4" fill="none" stroke-linecap="round"/>';
-    } else if (id === "stpatrick") {
-      h += '<ellipse cx="100" cy="40" rx="48" ry="8.5" fill="#1B6E2E" stroke="' + OUT + '" stroke-width="4"/><path d="M72 39 L76 -6 L124 -6 L128 39 Z" fill="#2F9E44" stroke="' + OUT + '" stroke-width="4" stroke-linejoin="round"/>' +
-        '<path d="M74 21 L126 21 L127 31 L73 31 Z" fill="#2B2B2B"/><path d="M112 13 c-3 -5 3 -8 5 -4 c2 -4 8 -1 5 4 c5 1 4 7 -1 6 c1 5 -5 6 -6 1 c-3 3 -7 -1 -3 -7z" fill="#69DB7C" stroke="' + OUT + '" stroke-width="1.6"/>';
-    } else if (id === "easter") {
-      h += '<path d="M76 42 C62 8 66 -24 78 -26 C90 -28 94 6 90 38" fill="#fff" stroke="' + OUT + '" stroke-width="4" stroke-linejoin="round"/><path d="M78 30 C72 6 74 -14 79 -16 C84 -16 86 8 84 30" fill="#FFB3C7"/>' +
-        '<path d="M124 42 C138 8 134 -24 122 -26 C110 -28 106 6 110 38" fill="#fff" stroke="' + OUT + '" stroke-width="4" stroke-linejoin="round"/><path d="M122 30 C128 6 126 -14 121 -16 C116 -16 114 8 116 30" fill="#FFB3C7"/>';
-    } else return '';
-    return h + '</g>';
+  /* What this visitor's Timmy is wearing: the shop's id of the outfit on at his place ("" for nothing, or with Timmy or
+     the extras off). The hubs send it with their studying-now presence (widget/v3.js), and the dashboard's classroom
+     draws a Timmy for each person studying, dressed as theirs (Sam, 2026-11-11). No name and no id goes with it.
+     (Until the release he dressed himself for holidays and this was "<holiday>:<outfit>"; those drawings are gone.) */
+  function fit(){
+    try { if (ls("sh_pref_pet") === "off" || ls("sh_pref_focus") === "on") return ""; } catch (e) { return ""; }
+    return WORN.id || "";
   }
 
-  /* ================= Timmy's house =================
-     A little cottage on a hill with a toothbrush planted by the door. Timmy himself is a separate button over the
-     empty spot on the right (.shpet-spot). It dresses up two ways:
-       - upgrades you earn: one per handpiece rank (sh_rank_tier), a pennant per hub you've mastered and a crown on the
-         roof for any Crown mastery (sh_rank_flair, "perio:3,msk-exam3:1", written by ranks.js and the dashboard)
-       - holiday decorations, on the same dates as the hubs' holiday themes */
-  var UPGRADES = [
-    { tier: 1, n: "Picket fence", how: "Reach Antique rank" },
-    { tier: 2, n: "Bronze mailbox", how: "Reach Bronze rank" },
-    { tier: 3, n: "Garden lamppost", how: "Reach Silver rank" },
-    { tier: 4, n: "Gold trim and door", how: "Reach Gold rank" },
-    { tier: 5, n: "Diamond windows", how: "Reach Diamond rank" },
-    { tier: 6, n: "A night sky of his own", how: "Reach Dark Matter rank" },
-    { mastery: 1, n: "A pennant for every hub you master", how: "Bronze mastery (50%) in any hub; it turns silver, gold or crowned as you go" },
-    { mastery: 4, n: "A crown on the roof", how: "Crown mastery (100%) in any hub" }
-  ];
-  function houseDeco(){
+  /* ================= what he wears =================
+     WORN.id is the shop's id of the outfit in his `outfit` slot at his place ("" for nothing), WORN.layer its drawing
+     ({ back, face, top }, the place kit's outfitParts(); say: its lines, when Timmy's place handed them over), or null
+     until it's here. The drawing is kept on the device (sh_pet_outfit, with the id it belongs to), so a page draws him
+     dressed without a request. widget/hub-art/outfits.js (window.SH_OUTFITS) is fetched only when the server's id isn't
+     the kept one (a change made on another device, or a new device), and then only after the first scroll, tap or key,
+     so it never loads with a page; until it's here he wears nothing rather than something that isn't on. */
+  var WORN = { id: "", layer: null };
+  var OUTFIT_ID = /^[a-z0-9-]{1,40}$/;
+  function kept(){
+    try { var k = JSON.parse(ls("sh_pet_outfit") || "null"); if (k && typeof k === "object" && (k.id === "" || OUTFIT_ID.test(String(k.id)))) return k; } catch (e) {}
+    return null;
+  }
+  function layerOf(p, say){
+    if (!p || typeof p !== "object") return null;
+    var l = { back: String(p.back || ""), face: String(p.face || ""), top: String(p.top || "") };
+    if (!l.back && !l.face && !l.top) return null;
+    var lines = (Array.isArray(say) ? say : Array.isArray(p.say) ? p.say : []).filter(function(x){ return typeof x === "string" && x; }).slice(0, 6);
+    if (lines.length) l.say = lines;
+    return l;
+  }
+  /* an outfit's drawing from what is already here: the shop's outfits (outfits.js), the place's kit, then the kept copy
+     (the files first, so a piece redrawn in a later release reaches the kept copy whenever one of them is on the page) */
+  function layerFor(id){
+    if (!id) return null;
+    var O = window.SH_OUTFITS, P = window.SH_PLACE, k = kept();
+    if (O && O.parts && Object.prototype.hasOwnProperty.call(O.parts, id)) return layerOf(O.parts[id], k && k.id === id ? k.say : null);
+    if (P && P.OUTFITS && P.outfitParts) for (var i = 0; i < P.OUTFITS.length; i++) if (P.OUTFITS[i].id === id) return layerOf(P.outfitParts(P.OUTFITS[i].k), P.OUTFITS[i].say);
+    return k && k.id === id ? layerOf(k) : null;
+  }
+  /* the same as the kit's dress() (tools/figures/site/place.mjs, widget/hub-art/outfits.js): behind him, then on top */
+  function dressLayer(svg, l){
+    if (!l || !svg) return svg;
+    if (l.back) svg = svg.replace(/(<ellipse cx="100" cy="226"[^>]*\/>)/, function(m){ return m + '<g class="shpet-back">' + l.back + "</g>"; });
+    var add = (l.face ? '<g class="shpet-garb">' + l.face + "</g>" : "") + (l.top ? '<g class="shpet-wobble"><g class="shpet-hat">' + l.top + "</g></g>" : "");
+    return svg.replace(/<\/g><\/svg>\s*$/, function(){ return add + "</g></svg>"; });
+  }
+  function keep(id, l){
+    var rec = { id: id || "" };
+    if (l) { rec.back = l.back; rec.face = l.face; rec.top = l.top; if (l.say) rec.say = l.say; }
+    ls("sh_pet_outfit", JSON.stringify(rec));
+  }
+  /* put outfit `id` on him (l: its drawing, when the caller has it) and redraw him; the hubs' presence hears it */
+  function wear(id, l){
+    id = OUTFIT_ID.test(String(id || "")) ? String(id) : "";
+    var was = WORN.id;
+    if (!l) l = layerFor(id);
+    WORN.id = id; WORN.layer = id ? l : null;
+    if (!id || l) keep(id, WORN.layer); else wantOutfits(id);
+    if (M) draw();
+    if (was !== id) { try { document.dispatchEvent(new CustomEvent("sh:pet-fit")); } catch (e) {} }
+  }
+  function setOutfit(id, parts){ wear(id, parts ? layerOf(parts) : null); }
+  /* the first scroll, tap or key on the page (the wheel too: a page that is too short to scroll): only after it is outfits.js fetched */
+  var woke = false, wakeQ = [], WAKE_ON = ["scroll", "wheel", "pointerdown", "keydown", "touchstart"];
+  function watchWake(){
+    if (woke || watchWake.on) return; watchWake.on = true;
+    var on = function(){ woke = true; WAKE_ON.forEach(function(n){ window.removeEventListener(n, on, true); }); var q = wakeQ; wakeQ = []; q.forEach(function(f){ f(); }); };
+    WAKE_ON.forEach(function(n){ window.addEventListener(n, on, { capture: true, passive: true }); });
+  }
+  function afterWake(fn){ if (woke) fn(); else { wakeQ.push(fn); watchWake(); } }
+  var outfitsLoad = null, setLoad = {};
+  function artBase(){ var b = BASE; if (!b) { var me = document.querySelector('script[src*="widget/pet.js"]'); b = me ? me.src.replace(/[^\/]*(\?.*)?$/, "") : "widget/"; } return b; }
+  /* a script the page may already be fetching (the dashboard's classroom does too), or a new one */
+  function fetchArt(file){
+    return new Promise(function(res, rej){
+      var el = document.querySelector('script[src$="hub-art/' + file + '"]');
+      if (!el) { el = document.createElement("script"); el.src = artBase() + "hub-art/" + file; el.async = true; document.head.appendChild(el); }
+      el.addEventListener("load", function(){ res(window.SH_OUTFITS); });
+      el.addEventListener("error", function(){ rej(new Error(file)); });
+    });
+  }
+  /* the everyday outfits and the rank outfits (outfits.js), then, for a costume or a season's or a collection's
+     outfit, the file with its drawing (hub-art/outfits/costumes.js, seasons.js or collections.js, `where`) */
+  function loadOutfits(id){
+    var core = window.SH_OUTFITS ? Promise.resolve(window.SH_OUTFITS) : outfitsLoad || (outfitsLoad = fetchArt("outfits.js").then(null, function(e){ outfitsLoad = null; throw e; }));
+    return core.then(function(O){
+      var set = O && id && !Object.prototype.hasOwnProperty.call(O.parts, id) && O.where && O.where[id];
+      if (!set || (O.got && O.got[set])) return O;
+      return setLoad[set] || (setLoad[set] = fetchArt("outfits/" + set + ".js").then(null, function(e){ setLoad[set] = null; throw e; }));
+    });
+  }
+  function wantOutfits(id){
+    afterWake(function(){ loadOutfits(id).then(function(){ if (WORN.id === id && !WORN.layer) wear(id); }, function(){}); });
+  }
+  /* what he says about what he has on: the outfit's own lines when the place handed them over */
+  function wornTalk(){ var l = WORN.layer; return l && l.say && l.say.length ? { k: WORN.id, say: l.say } : null; }
+
+  /* ================= his place, as Timmy talks about it =================
+     The old house picture came out with the last single-file hub pages (2026-11-19): his place (widget/place.js)
+     is drawn on the dashboard's "you" card, over a blank frame the size of the picture until it has loaded. */
+  function placeDeco(){
     var flair = String(ls("sh_rank_flair") || "").split(",").map(function(x){ var i = x.lastIndexOf(":"); return { hub: x.slice(0, i), lvl: +x.slice(i + 1) }; })
       .filter(function(x){ return x.hub && x.lvl >= 1 && x.lvl <= 4; });
-    return { tier: Math.max(0, Math.min(6, +(ls("sh_rank_tier") || 0))), flair: flair, holiday: holidayId(), fall: isFall() };
+    return { flair: flair, fall: isFall() };
   }
   /* fall (Sep 22 - Nov 30, Central time): the tree by Timmy's house turns and drops its leaves */
   function isFall(){
@@ -287,168 +360,8 @@
     if (ls("sh_egg_holiday_test") === "fall") return true;
     return x >= 922 && x <= 1130;
   }
-  function houseSvg(deco){
-    deco = deco || houseDeco();
-    var p = "shph" + (++uid) + "-", T = deco.tier, H = deco.holiday, night = T >= 6;
-    var fall = deco.fall != null ? deco.fall : isFall();
-    var crown = deco.flair.some(function(f){ return f.lvl >= 4; });
-    var gold = T >= 4 ? "#E8BE45" : null;
-    var s = '<svg class="shpet-housesvg" viewBox="0 0 240 150" aria-hidden="true"><defs>' +
-      '<linearGradient id="' + p + 'sky" x1="0" y1="0" x2="0" y2="1">' + (night ? '<stop offset="0" stop-color="#140B33"/><stop offset=".7" stop-color="#3C2A78"/><stop offset="1" stop-color="#6B4FB8"/>'
-        : '<stop offset="0" stop-color="#BFE5FA"/><stop offset="1" stop-color="#EEF8FD"/>') + '</linearGradient>' +
-      '<linearGradient id="' + p + 'gr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="' + (night ? "#5E9E6A" : "#A7DE93") + '"/><stop offset="1" stop-color="' + (night ? "#3D7449" : "#6CBB68") + '"/></linearGradient>' +
-      '<linearGradient id="' + p + 'roof" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F7A3BA"/><stop offset="1" stop-color="#E5779A"/></linearGradient>' +
-      '<radialGradient id="' + p + 'glow" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#FFE9A8" stop-opacity=".9"/><stop offset="1" stop-color="#FFE9A8" stop-opacity="0"/></radialGradient>' +
-      '<clipPath id="' + p + 'c"><rect width="240" height="150" rx="16"/></clipPath></defs>' +
-      '<g clip-path="url(#' + p + 'c)">' +
-      '<rect width="240" height="150" fill="url(#' + p + 'sky)"/>';
-    /* sky */
-    if (night) {
-      var st = ""; [[12, 10], [44, 30], [70, 12], [104, 24], [126, 8], [150, 34], [176, 14], [204, 28], [228, 10], [90, 44], [218, 48]].forEach(function(xy, i){
-        st += '<circle class="shpet-star" cx="' + xy[0] + '" cy="' + xy[1] + '" r="' + (i % 3 ? .9 : 1.4) + '" fill="#fff" style="animation-delay:' + (i * .37).toFixed(2) + 's"/>'; });
-      s += st + '<path d="M38 14 A13 13 0 1 0 50 34 A10 10 0 1 1 38 14 Z" fill="#FFF3C4"/>' +
-        '<path d="M0 46 C50 30 90 52 140 36 S220 30 240 40" stroke="#7FF0D2" stroke-width="7" fill="none" opacity=".18"/>';
-    } else {
-      s += '<g class="shpet-sun"><circle cx="30" cy="26" r="11" fill="#FFE27A"/><g stroke="#FFD24A" stroke-width="2.4" stroke-linecap="round"><path d="M30 8v-4M30 48v-4M12 26H8M52 26h-4M17 13l-3-3M46 42l-3-3M17 39l-3 3M46 10l-3 3"/></g></g>' +
-        (fall ? '' : '<g class="shpet-cloud" fill="#fff" opacity=".9"><ellipse cx="184" cy="44" rx="16" ry="7"/><ellipse cx="196" cy="39" rx="10" ry="8"/><ellipse cx="174" cy="41" rx="8" ry="6"/></g>');
-    }
-    if (H === "stpatrick") s += '<g fill="none" stroke-width="5" opacity=".75"><path d="M-10 118 A70 70 0 0 1 130 118" stroke="#E5484D"/><path d="M-4 118 A64 64 0 0 1 124 118" stroke="#F59A1E"/><path d="M2 118 A58 58 0 0 1 118 118" stroke="#F5D21E"/><path d="M8 118 A52 52 0 0 1 112 118" stroke="#3ECF7E"/><path d="M14 118 A46 46 0 0 1 106 118" stroke="#3FA7E0"/></g>';
-    if (H === "newyear") s += '<g class="shpet-fw" stroke-width="1.8" stroke-linecap="round"><g stroke="#F6CD55"><path d="M196 30l0-9M196 30l7-5M196 30l8 3M196 30l3 8M196 30l-5 7M196 30l-8 1M196 30l-6-6"/></g><g stroke="#E0457B" transform="translate(-52 6)"><path d="M196 30l0-7M196 30l6-4M196 30l6 3M196 30l2 7M196 30l-4 6M196 30l-7 1M196 30l-5-5"/></g></g>';
-    if (H === "halloween") s += '<g fill="#2B1B3D"><path d="M150 26c2-3 4-3 5-1l1-2 1 2c1-2 3-2 5 1-2 0-3 1-3 3-1-1-2-1-3 0-1-1-2-1-3 0 0-2-1-3-3-3z"/><path d="M196 54c2-3 4-3 5-1l1-2 1 2c1-2 3-2 5 1-2 0-3 1-3 3-1-1-2-1-3 0-1-1-2-1-3 0 0-2-1-3-3-3z"/></g>';
-    if (H === "winter") s += '<g fill="#fff" opacity=".95">' + [[16,52],[58,8],[112,30],[150,52],[188,8],[200,60],[236,26],[76,46],[24,88],[132,70],[226,74],[160,90]].map(function(c, i){ return '<circle class="shpet-snow" cx="' + c[0] + '" cy="' + c[1] + '" r="' + (i % 3 ? 1.2 : 1.8) + '" style="animation-delay:' + (i * .41).toFixed(2) + 's"/>'; }).join("") + '</g>';
-    if (H === "winter") s += '<g fill="#fff" opacity=".9"><circle cx="140" cy="14" r="1.6"/><circle cx="168" cy="26" r="1.3"/><circle cx="214" cy="18" r="1.7"/><circle cx="128" cy="40" r="1.2"/><circle cx="230" cy="44" r="1.4"/><circle cx="100" cy="20" r="1.3"/></g>';
-    /* ground */
-    s += '<path d="M0 116 Q60 98 124 110 T240 104 L240 150 L0 150 Z" fill="url(#' + p + 'gr)"/>' +
-      '<path d="M0 132 Q70 122 140 130 T240 126 L240 150 L0 150 Z" fill="#5FAE5C" opacity=".45"/>' +
-      /* winter: the whole yard under snow, with soft blue drifts and a trodden path */
-      (H === "winter" ? '<path d="M0 115 Q60 97 124 109 T240 103 L240 150 L0 150 Z" fill="#F7FBFF"/>' +
-        '<path d="M0 134 Q50 126 96 132 T180 128 T240 132 L240 150 L0 150 Z" fill="#DCEAF6"/>' +
-        '<path d="M150 112 Q172 104 196 110 M10 124 Q30 118 44 122 M176 138 Q196 132 222 137" stroke="#C9DDEE" stroke-width="2" fill="none" stroke-linecap="round"/>' : '') +
-      '<path d="M54 121 Q62 132 52 150 L70 150 Q76 132 66 121 Z" fill="' + (H === "winter" ? "#C9D8E6" : "#F3E3C4") + '" opacity=".9"/>';
-    /* Silver: a lamppost on the left */
-    if (T >= 3) s += '<circle cx="12" cy="74" r="12" fill="url(#' + p + 'glow)"/><rect x="10.6" y="78" width="3" height="46" fill="#8E98A3" stroke="' + OUT + '" stroke-width="1.4"/>' +
-      '<path d="M7 70 L18 70 L16 79 L9 79 Z" fill="#FFE9A8" stroke="' + OUT + '" stroke-width="1.8" stroke-linejoin="round"/><path d="M6 70 L12 65 L19 70 Z" fill="#B6BEC7" stroke="' + OUT + '" stroke-width="1.8" stroke-linejoin="round"/>';
-    /* chimney + smoke, behind the roof */
-    s += '<rect x="80" y="36" width="11" height="22" fill="#D96C8C" stroke="' + OUT + '" stroke-width="2.6"/>' +
-      '<g class="shpet-smoke" fill="#fff" opacity=".85"><circle cx="86" cy="28" r="4"/><circle cx="91" cy="20" r="5"/><circle cx="98" cy="11" r="6"/></g>';
-    /* the house */
-    var winFill = T >= 5 ? "#CFF1FF" : night ? "#FFE08A" : "#FFE9A8";
-    s += '<rect x="24" y="64" width="72" height="58" rx="3" fill="#FFF7EC" stroke="' + OUT + '" stroke-width="3"/>' +
-      '<path d="M14 70 L60 30 L106 70 Z" fill="url(#' + p + 'roof)" stroke="' + OUT + '" stroke-width="3" stroke-linejoin="round"/>' +
-      (gold ? '<path d="M19.5 67.6 L60 33.4 L100.5 67.6" fill="none" stroke="' + gold + '" stroke-width="2.4" stroke-linejoin="round"/>' : '') +
-      '<path d="M24 66 L60 36" stroke="#fff" stroke-width="2.4" opacity=".55" stroke-linecap="round"/>' +
-      (H === "winter" ? '<path d="M14 70 L60 30 L106 70 L101 70 C98 66 95 71 92 66 C89 70 85 64 82 60 L60 40 L38 60 C35 64 31 70 28 66 C25 71 22 66 19 70 Z" fill="#fff" stroke="' + OUT + '" stroke-width="1.6" stroke-linejoin="round"/>' : '') +
-      '<circle cx="60" cy="55" r="8" fill="#fff" stroke="' + (gold || OUT) + '" stroke-width="2.2"/>' +
-      '<path d="M56.8 51.4c-1.4 0-2.3 1-2.3 2.5 0 1.6.9 2.4 1.2 3.7.3 1.6.5 3.4 1.3 3.4s1-1.6 1.2-2.6c.1-.5.4-.8 1.8-.8s1.7.3 1.8.8c.2 1 .5 2.6 1.2 2.6s1-1.8 1.3-3.4c.3-1.3 1.2-2.1 1.2-3.7 0-1.5-.9-2.5-2.3-2.5-1.1 0-1.7.6-3.2.6s-2.1-.6-3.2-.6z" fill="#F7F1E4" stroke="' + OUT + '" stroke-width="1"/>';
-    [30, 70].forEach(function(x){
-      s += '<rect x="' + x + '" y="78" width="16" height="15" rx="2" fill="' + winFill + '" stroke="' + OUT + '" stroke-width="2.4"/>';
-      if (T >= 5) s += '<path d="M' + x + ' 78 L' + (x + 16) + ' 93 M' + (x + 16) + ' 78 L' + x + ' 93" stroke="#7FCDEB" stroke-width="1"/><path d="M' + (x + 4) + ' 81 l1 2 2 1 -2 1 -1 2 -1 -2 -2 -1 2 -1z" fill="#fff" class="shpet-twinkle"/>';
-      s += '<path d="M' + (x + 8) + ' 78v15M' + x + ' 85.5h16" stroke="' + OUT + '" stroke-width="1.6"/>';
-      if (H === "valentine") s += '<path d="M' + (x + 8) + ' 90 c-3-2-4.4-4-4.4-5.4 a2.2 2.2 0 0 1 4.4-1 a2.2 2.2 0 0 1 4.4 1 c0 1.4-1.4 3.4-4.4 5.4z" fill="#E0457B"/>';
-    });
-    s += '<path d="M30 78 q4 6 0 11 M46 78 q-4 6 0 11" fill="#F7A3BA" opacity=".8"/>';
-    /* door: gold at Gold rank */
-    s += '<path d="M50 122 V102 a10 10 0 0 1 20 0 V122 Z" fill="' + (gold ? "#F2C94C" : "#8FD3F5") + '" stroke="' + OUT + '" stroke-width="2.6"/>' +
-      (gold ? '<path d="M53.5 120 V103 a6.5 6.5 0 0 1 13 0 V120" fill="none" stroke="#B8860B" stroke-width="1.4"/>' : '') +
-      '<circle cx="65" cy="112" r="1.6" fill="' + (gold ? "#7A5A00" : OUT) + '"/>';
-    if (H === "winter") s += '<circle cx="60" cy="108" r="5.2" fill="none" stroke="#2F8F4E" stroke-width="3"/><path d="M58 112.6 l2 -1.6 2 1.6 -1 3 M60 111 l-1 4" stroke="#D6363C" stroke-width="1.6" fill="none"/>';
-    if (H === "thanksgiving") s += '<g transform="translate(60 108)">' + [0, 60, 120, 180, 240, 300].map(function(a, i){ return '<ellipse cx="0" cy="-4.6" rx="1.8" ry="3" fill="' + ["#C2410C", "#E58E26", "#B45309"][i % 3] + '" transform="rotate(' + a + ')"/>'; }).join("") + '</g>';
-    /* house plaque: on the wall above the door, between the windows */
-    s += '<g transform="translate(60 85.5)"><rect x="-10.5" y="-4.2" width="21" height="8.4" rx="1.6" fill="' + (gold ? "#FFF3C4" : "#FFFDF6") + '" stroke="' + (gold || OUT) + '" stroke-width="1.4"/>' +
-      '<circle cx="-9.3" cy="0" r=".55" fill="' + OUT + '"/><circle cx="9.3" cy="0" r=".55" fill="' + OUT + '"/>' +
-      '<text x="0" y="2" text-anchor="middle" font-family="Georgia,serif" font-size="4.5" font-weight="700" fill="' + OUT + '">TIMMY</text></g>';
-    /* flower boxes and flowers */
-    s += '<rect x="28" y="93" width="20" height="5" rx="1.5" fill="#B9845A" stroke="' + OUT + '" stroke-width="1.6"/><rect x="68" y="93" width="20" height="5" rx="1.5" fill="#B9845A" stroke="' + OUT + '" stroke-width="1.6"/>' +
-      '<g><circle cx="33" cy="91" r="2.2" fill="#FF8FB1"/><circle cx="39" cy="90.4" r="2.2" fill="#FFE27A"/><circle cx="44" cy="91" r="2.2" fill="#B08CFF"/><circle cx="73" cy="91" r="2.2" fill="#FFE27A"/><circle cx="79" cy="90.4" r="2.2" fill="#FF8FB1"/><circle cx="84" cy="91" r="2.2" fill="#8FD3F5"/></g>';
-    /* winter: string lights along the eaves */
-    if (H === "winter") { var li = ""; for (var k = 0; k < 9; k++) li += '<circle class="shpet-twinkle" cx="' + (26 + k * 8.5) + '" cy="' + (67 + (k % 2) * 1.6) + '" r="1.7" fill="' + ["#E5484D", "#F5D21E", "#3ECF7E", "#3FA7E0"][k % 4] + '" style="animation-delay:' + (k * .2).toFixed(1) + 's"/>'; s += '<path d="M24 66.4 Q60 71 96 66.4" stroke="#333" stroke-width=".8" fill="none"/>' + li; }
-    /* crown on the roof for any Crown mastery */
-    if (crown) s += '<g transform="translate(60 25)"><path d="M-8 4 L-9 -5 L-4 -1 L0 -8 L4 -1 L9 -5 L8 4 Z" fill="#F2C230" stroke="' + OUT + '" stroke-width="1.6" stroke-linejoin="round"/><rect x="-8.6" y="3" width="17.2" height="3.4" rx="1" fill="#E8BE45" stroke="' + OUT + '" stroke-width="1.4"/><circle cx="0" cy="-8.4" r="1.4" fill="#E0457B"/></g>';
-    /* Antique: a picket fence (with a gap for the path) */
-    if (T >= 1) {
-      var f = '<g fill="#FFFDF6" stroke="' + OUT + '" stroke-width="1.3" stroke-linejoin="round"><rect x="0" y="117" width="48" height="3" /><rect x="0" y="124" width="48" height="3"/><rect x="74" y="117" width="34" height="3"/><rect x="74" y="124" width="34" height="3"/>';
-      [2, 9, 16, 23, 30, 37, 44, 76, 83, 90, 97, 104].forEach(function(x){ f += '<path d="M' + x + ' 132 V115 L' + (x + 2.2) + ' 112 L' + (x + 4.4) + ' 115 V132 Z"/>'; });
-      s += f + '</g>';
-    }
-    /* holiday props on the ground */
-    if (H === "halloween") s += '<g transform="translate(38 126)"><ellipse cx="0" cy="0" rx="8" ry="6.4" fill="#F59A1E" stroke="' + OUT + '" stroke-width="1.6"/><path d="M-3 -6 Q0 -2 3 -6" stroke="#C2650E" stroke-width="1.2" fill="none"/><path d="M0 -6 L1 -9" stroke="#3B7A2A" stroke-width="2" stroke-linecap="round"/>' +
-      '<path d="M-4.6 -1.6 L-2.4 -3.4 L-1.4 -1 Z M4.6 -1.6 L2.4 -3.4 L1.4 -1 Z M-4 2 Q0 5 4 2 L2.6 2.8 L1.4 1.8 L0 3 L-1.4 1.8 L-2.6 2.8 Z" fill="#FFE27A"/></g>';
-    if (H === "thanksgiving") s += '<g stroke="' + OUT + '" stroke-width="1.4"><ellipse cx="40" cy="127" rx="7" ry="5.4" fill="#E58E26"/><ellipse cx="80" cy="128" rx="5.6" ry="4.4" fill="#D9A441"/></g><path d="M40 121.6 v-3 M80 123.6 v-2.6" stroke="#5B3A1A" stroke-width="1.6"/>';
-    if (H === "easter") [[22, 136, "#FFB3C7"], [96, 140, "#B5E3FF"], [130, 136, "#FFE58F"], [232, 140, "#C3F0CA"]].forEach(function(e){ s += '<ellipse cx="' + e[0] + '" cy="' + e[1] + '" rx="3.4" ry="4.4" fill="' + e[2] + '" stroke="' + OUT + '" stroke-width="1.2"/><path d="M' + (e[0] - 3.2) + ' ' + e[1] + ' q1.6 -1.4 3.2 0 t3.2 0" stroke="#fff" stroke-width="1" fill="none"/>'; });
-    if (H === "stpatrick") s += '<g transform="translate(14 134)"><path d="M-8 -4 Q-9 6 0 6 Q9 6 8 -4 Z" fill="#2B2B2B" stroke="' + OUT + '" stroke-width="1.4"/><ellipse cx="0" cy="-4" rx="8.4" ry="2.6" fill="#F6CD55" stroke="' + OUT + '" stroke-width="1.2"/><circle cx="-3" cy="-6" r="1.6" fill="#F6CD55"/><circle cx="2" cy="-6.4" r="1.6" fill="#F6CD55"/></g>';
-    if (H === "dentist" || H === "valentine") s += '<g><path d="M124 46 Q122 30 128 22" stroke="#555" stroke-width=".8" fill="none"/>' + (H === "valentine"
-      ? '<path d="M128 22 c-6-4-9-8-9-11 a4.5 4.5 0 0 1 9-2 a4.5 4.5 0 0 1 9 2 c0 3-3 7-9 11z" fill="#E0457B" stroke="' + OUT + '" stroke-width="1.4"/>'
-      : '<ellipse cx="128" cy="15" rx="6.4" ry="7.6" fill="#8FD3F5" stroke="' + OUT + '" stroke-width="1.4"/><path d="M125.6 12c-1 0-1.6.7-1.6 1.7 0 1.1.6 1.6.8 2.5.2 1.1.4 2.3.9 2.3s.7-1.1.8-1.8c.1-.4.3-.6.9-.6s.8.2.9.6c.1.7.3 1.8.8 1.8s.7-1.2.9-2.3c.2-.9.8-1.4.8-2.5 0-1-.6-1.7-1.6-1.7-.8 0-1.2.4-1.8.4s-1-.4-1.8-.4z" fill="#fff"/>') + '</g>';
-    /* fall: a tree behind Timmy with turning leaves (green going to gold, orange and red), a few falling, a few on the lawn */
-    if (fall) {
-      var LV = ["#E8A33D", "#D9622B", "#C2410C", "#F2C230", "#B5452A", "#9FB54A"];
-      s += '<path d="M168 118 C169 104 168 92 166 80 M168 96 C172 88 176 80 180 74 M167 88 C163 82 159 77 155 72" stroke="#6B4A2B" stroke-width="5" fill="none" stroke-linecap="round"/>' +
-        '<path d="M168 118 C169 104 168 92 166 80" stroke="' + OUT + '" stroke-width="1.2" fill="none" opacity=".35"/>';
-      /* one leafy canopy: the outline is drawn under all the blobs, then the blobs fill it in without their own edges */
-      var CAN = [[166, 52, 20], [148, 62, 14], [186, 62, 15], [156, 42, 12], [178, 40, 13], [168, 68, 13]];
-      CAN.forEach(function(c){ s += '<circle cx="' + c[0] + '" cy="' + c[1] + '" r="' + (c[2] + 1.3) + '" fill="' + OUT + '"/>'; });
-      s += '<defs><radialGradient id="' + p + 'leaf" cx=".4" cy=".3" r=".8"><stop offset="0" stop-color="#F2B23A"/><stop offset=".55" stop-color="#E07A2C"/><stop offset="1" stop-color="#B5452A"/></radialGradient></defs>';
-      CAN.forEach(function(c){ s += '<circle cx="' + c[0] + '" cy="' + c[1] + '" r="' + c[2] + '" fill="url(#' + p + 'leaf)"/>'; });
-      /* speckles of leaves still turning: gold, red, a last bit of green */
-      [[150, 56, 0], [160, 48, 3], [170, 58, 1], [178, 48, 4], [186, 58, 2], [158, 66, 3], [174, 70, 0], [192, 66, 1], [164, 36, 2], [182, 36, 3], [146, 66, 5], [168, 44, 4]].forEach(function(c){
-        s += '<circle cx="' + c[0] + '" cy="' + c[1] + '" r="2.6" fill="' + ["#F5D21E", "#C2410C", "#E8A33D", "#9B2D1F", "#F2C230", "#9FB54A"][c[2]] + '" opacity=".85"/>'; });
-      s += '<path d="M152 50 a14 14 0 0 1 14 -12 M176 30 a10 10 0 0 1 9 8" stroke="#fff" stroke-width="1.6" fill="none" opacity=".35" stroke-linecap="round"/>';
-      [[154, 50], [172, 34], [182, 54], [160, 66], [174, 62], [146, 60], [190, 64], [164, 44]].forEach(function(c, i){
-        s += '<path d="M' + c[0] + ' ' + c[1] + ' q2.4 -3 4.8 0 q-2.4 3 -4.8 0z" fill="' + LV[(i + 2) % LV.length] + '" stroke="' + OUT + '" stroke-width=".5"/>';
-      });
-      [[140, 86, 0], [196, 92, 1.3], [178, 104, 2.6], [124, 74, 3.6]].forEach(function(c, i){
-        s += '<path class="shpet-leaf" style="animation-delay:' + c[2] + 's" d="M' + c[0] + ' ' + c[1] + ' q2.6 -3.2 5.2 0 q-2.6 3.2 -5.2 0z" fill="' + LV[i % 5] + '" stroke="' + OUT + '" stroke-width=".5"/>';
-      });
-      if (H !== "winter") [[132, 128], [150, 134], [196, 128], [226, 138], [140, 142], [100, 146]].forEach(function(c, i){
-        s += '<path d="M' + c[0] + ' ' + c[1] + ' q2.4 -2.4 4.8 0 q-2.4 2.4 -4.8 0z" fill="' + LV[i % 5] + '" opacity=".9"/>';
-      });
-    }
-    /* winter: a snowman in the front yard, with a scarf, a carrot nose, coal buttons and stick arms */
-    if (H === "winter") s += '<g transform="translate(30 -4)">' +
-      '<path d="M-6 128 L-15 121 M-13.4 122.4 L-15.6 124.6 M6 128 L15 121 M13.4 122.4 L15.6 124.6" stroke="#6B4A2B" stroke-width="1.3" stroke-linecap="round"/>' +
-      '<circle cx="0" cy="140" r="8.4" fill="#fff" stroke="' + OUT + '" stroke-width="1.6"/>' +
-      '<circle cx="0" cy="128.6" r="6.4" fill="#fff" stroke="' + OUT + '" stroke-width="1.6"/>' +
-      '<circle cx="0" cy="119" r="5" fill="#fff" stroke="' + OUT + '" stroke-width="1.6"/>' +
-      '<path d="M-4.6 123.2 Q0 125.6 4.6 123.2 L4.6 125.4 Q0 127.6 -4.6 125.4 Z M2.6 125 L4.6 131 L1.2 130.6 Z" fill="#D6363C" stroke="' + OUT + '" stroke-width=".9" stroke-linejoin="round"/>' +
-      '<g fill="' + OUT + '"><circle cx="-1.7" cy="118" r=".75"/><circle cx="1.7" cy="118" r=".75"/><circle cx="0" cy="129.2" r=".8"/><circle cx="0" cy="132.6" r=".8"/><circle cx="0" cy="138.6" r=".9"/></g>' +
-      '<path d="M0 119.6 L5.4 120.6 L0 121.2 Z" fill="#F59A1E" stroke="#C2650E" stroke-width=".5"/>' +
-      '<path d="M-1.8 121.4 Q0 122.4 1.8 121.4" stroke="' + OUT + '" stroke-width=".6" fill="none" stroke-linecap="round"/>' +
-      '<rect x="-5.6" y="113.6" width="11.2" height="1.6" rx=".6" fill="#2B2B2B"/><rect x="-3.6" y="107.6" width="7.2" height="6.4" rx=".8" fill="#2B2B2B"/><rect x="-3.6" y="111.4" width="7.2" height="1.3" fill="#D6363C"/>' +
-      '<ellipse cx="0" cy="148.4" rx="11" ry="1.6" fill="#C9DDEE"/></g>';
-    /* the toothbrush planted by the door: tapered handle with a rubber grip, slim neck, head with bristle tufts
-       sticking out sideways, and a striped swirl of toothpaste on top */
-    s += '<g transform="rotate(-5 115 124)">' +
-      '<path d="M110.6 124 C110.2 108 110.8 94 112.6 82 L113.4 70 L116.6 70 L117.4 82 C119.2 94 119.8 108 119.4 124 Z" fill="#8FD3F5" stroke="' + OUT + '" stroke-width="2.2" stroke-linejoin="round"/>' +
-      '<path d="M112.2 112 C112 104 112.4 98 113.2 92 L116.8 92 C117.6 98 118 104 117.8 112 Z" fill="#3FA7E0" opacity=".9"/>' +
-      '<path d="M112.6 96h4.8M112.4 101h5.2M112.3 106h5.4" stroke="#fff" stroke-width="1" opacity=".6"/>' +
-      '<path d="M112 70 L112 51 Q112 47.4 115 47.4 Q118 47.4 118 51 L118 70 Z" fill="#8FD3F5" stroke="' + OUT + '" stroke-width="2.2" stroke-linejoin="round"/>' +
-      '<g stroke="' + OUT + '" stroke-width="1.2" stroke-linejoin="round">' +
-      [50, 54, 58, 62, 66].map(function(y, i){ return '<rect x="118" y="' + y + '" width="9.5" height="3.2" rx="1.4" fill="' + (i % 2 ? "#3ECF7E" : "#fff") + '"/>'; }).join("") + '</g>' +
-      '<path d="M119.5 49.6 C118.8 46.6 121.2 44.4 123.4 45.6 C124.4 43.2 128 43.6 128.2 46.2 C130.2 46.6 130 49.4 128 49.8 Z" fill="#fff" stroke="' + OUT + '" stroke-width="1.4" stroke-linejoin="round"/>' +
-      '<path d="M120.6 48.4 C122.4 47 124.6 47.6 126.6 46.4 M122.6 49.4 C124.6 48.6 126.4 49 128.4 48.4" stroke="#3FA7E0" stroke-width="1.2" fill="none" stroke-linecap="round"/>' +
-      '</g>';
-    /* Bronze: a mailbox on the right */
-    if (T >= 2) s += '<rect x="221" y="104" width="3" height="22" fill="#7A5A3A" stroke="' + OUT + '" stroke-width="1.2"/>' +
-      '<path d="M212 104 V96 a8 6 0 0 1 16 0 V104 Z" fill="#B0672B" stroke="' + OUT + '" stroke-width="1.8"/><path d="M215 96 a5 3.6 0 0 1 10 0" stroke="#F2B884" stroke-width="1.2" fill="none"/>' +
-      '<path d="M228 94 V86 L234 88 L228 90" fill="#E5484D" stroke="' + OUT + '" stroke-width="1.2" stroke-linejoin="round"/>';
-    /* mastery pennants: a flagpole in the yard (between Timmy and the mailbox), one pennant per mastered hub in that
-       hub's medal color, best at the top; a crowned one carries a little crown */
-    if (deco.flair.length) {
-      var fl = deco.flair.slice().sort(function(a, b){ return b.lvl - a.lvl; }).slice(0, 4), px = 207;
-      s += '<ellipse cx="' + px + '" cy="125" rx="5" ry="1.6" fill="#000" opacity=".12"/>' +
-        '<rect x="' + (px - 1.1) + '" y="38" width="2.2" height="87" rx="1" fill="#B6BEC7" stroke="' + OUT + '" stroke-width="1"/>' +
-        '<circle cx="' + px + '" cy="36.4" r="2.6" fill="#F2C230" stroke="' + OUT + '" stroke-width="1"/>' +
-        '<path d="M' + (px - 4) + ' 124.6 h8 v-2.6 h-8 Z" fill="#8E98A3" stroke="' + OUT + '" stroke-width="1"/>';
-      fl.forEach(function(f, i){
-        var y = 42 + i * 11, c = ["", "#C47A3E", "#C9D1D9", "#E8BE45", "#F2C230"][f.lvl];
-        s += '<path class="shpet-flag" style="animation-delay:' + (i * .3).toFixed(1) + 's" d="M' + (px + 1.1) + ' ' + y + ' L' + (px + 16) + ' ' + (y + 4.2) + ' L' + (px + 1.1) + ' ' + (y + 8.4) + ' Z" fill="' + c + '" stroke="' + OUT + '" stroke-width="1" stroke-linejoin="round"/>' +
-          (f.lvl >= 4 ? '<path d="M' + (px + 3.4) + ' ' + (y + 5.8) + ' l.5 -3 1.3 1.4 .9 -2.2 .9 2.2 1.3 -1.4 .5 3 Z" fill="#fff"/>' : '');
-      });
-    }
-    if (H !== "winter") s += '<g fill="#FF8FB1"><circle cx="14" cy="140" r="2.4"/><circle cx="104" cy="140" r="2.4"/><circle cx="232" cy="132" r="2.4"/></g>' +
-      '<g fill="#FFE27A"><circle cx="24" cy="144" r="2"/><circle cx="214" cy="140" r="2"/></g>';
-    return s + '</g></svg>';
-  }
+  /* the frame the place is drawn over (dash.css hides it once the place is there) */
+  function frameSvg(){ return '<svg class="shpet-housesvg" viewBox="0 0 240 150" aria-hidden="true"><rect width="240" height="150" rx="16" fill="currentColor" opacity=".06"/></svg>'; }
 
   /* ================= health ================= */
   function readLog(){ try { return JSON.parse(ls("sh_pet_log") || "{}") || {}; } catch (e) { return {}; } }
@@ -459,13 +372,19 @@
     ls("sh_pet_log", JSON.stringify(log));
   }
   /* server rows + this device's tally -> HP. Deterministic for the same history, so phone and laptop agree. */
+  /* On the game layer (the redesign) a server row also carries `hp`: what the shop's snacks gave Timmy that day
+     (get_pet_days_v2, migration_v54). It is added on that day, after the day's own change, and he never goes past 100.
+     Today's rows (get_pet_days) have no `hp`, so the live pages work out exactly what they always have. */
   function simulate(serverRows){
-    var today = centralDay(), born = ls("sh_pet_born") || today, log = readLog(), by = {};
-    (serverRows || []).forEach(function(r){ var k = String(r.d).slice(0, 10); by[k] = [r.attempts | 0, r.correct | 0]; });
+    var today = centralDay(), born = ls("sh_pet_born") || today, log = readLog(), by = {}, fed = {};
+    (serverRows || []).forEach(function(r){ var k = String(r.d).slice(0, 10); by[k] = [r.attempts | 0, r.correct | 0]; if (r.hp > 0) fed[k] = r.hp | 0; });
     Object.keys(log).forEach(function(k){ var a = log[k], b = by[k] || [0, 0]; by[k] = [Math.max(a[0], b[0]), Math.max(a[1], b[1])]; });
     var start = born, earliest = addDays(today, -60);
     if (start < earliest) start = earliest;
-    var hp = 70, streak = 0, miss = 0, treat = false, everZero = false, revived = false;
+    /* everyone has Timmy: one born on or after the day the redesign went live starts at full health. dipped: a day has
+       ended with him under 100 since, so his Pearly Whites trophy (100 HP) is earned by getting him back there, not
+       given on his first day */
+    var hp = born >= FULL_FROM ? 100 : 70, streak = 0, miss = 0, treat = false, everZero = false, revived = false, dipped = hp < 100;
     for (var day = start, i = 0; day <= today && i < 400; day = addDays(day, 1), i++) {
       var r = by[day] || [0, 0], a = r[0], c = r[1];
       if (a > 0) {
@@ -477,14 +396,16 @@
         streak = 0; miss++;
         hp -= Math.min(20, 8 + 4 * (miss - 1));
       }
+      if (fed[day]) hp += fed[day];
       if (hp <= 0) { hp = 0; treat = true; everZero = true; }
       if (treat && hp >= 50) treat = false;
       if (hp > 100) hp = 100;
+      if (day < today && Math.round(hp) < 100) dipped = true;     /* a day that ended under 100, not one wrong answer */
       if (everZero && hp >= 100) revived = true;
     }
     var t = by[today] || [0, 0];
     return { hp: Math.round(hp), streak: streak, missedYesterday: !(by[addDays(today, -1)] || [0])[0] && born < today,
-      treat: treat, everZero: everZero, revived: revived, today: { a: t[0], c: t[1] }, born: born };
+      treat: treat, everZero: everZero, revived: revived, dipped: dipped, today: { a: t[0], c: t[1] }, born: born, away: miss };
   }
 
   /* ================= words ================= */
@@ -520,7 +441,114 @@
     "Why did the wisdom tooth skip class? It already knew everything. (It did not. It was impacted.)",
     "What does a molar wear to a party? A crown, and a little bridge-work.",
     "My dentist is great at pep talks. Always tells me to brace myself.",
-    "Why was the cavity so lonely? Nobody wanted to fill the void."
+    "Why was the cavity so lonely? Nobody wanted to fill the void.",
+    "Why did the dentist break up with the manicurist? They fought tooth and nail.",
+    "What do you call an alligator in a vest? An investigator. Great teeth, though.",
+    "What's a periodontist's favorite kind of music? Anything with a deep pocket.",
+    "Why did the orthodontist go to the party? To get everyone in line.",
+    "Why are orthodontists so calm? They know everything will straighten out eventually.",
+    "Why did the radiograph go to therapy? It felt overexposed.",
+    "Why does everyone invite the explorer to parties? It always finds the sticky spots.",
+    "Why don't composites get stressed? They bond well under pressure.",
+    "What did the amalgam say to the composite? You're so sensitive to light.",
+    "Why was the crown so relaxed? It was cemented in place.",
+    "Why did the impression material quit? It was tired of being molded into something it wasn't.",
+    "Why are canines so good at debates? They always make a point.",
+    "Why did the premolar feel left out? It was always stuck in the middle.",
+    "What did the floss say to the tooth? I'll always be there for you. In between, mostly.",
+    "Why don't teeth ever get lonely? They come in sets.",
+    "What did the dentist tell the patient who showed up late? Your timing could use a little brush-up.",
+    "Why do bacteria hate toothbrushes? They keep getting the brush-off.",
+    "What did the gum say to the tooth? I've got you covered. Unless I recede.",
+    "Why was the sealant so popular? It filled every awkward silence. And every pit and fissure.",
+    "What did the maxilla say to the mandible? Stop moving around so much. Some of us are fixed here.",
+    "Why did the TMJ get promoted? It handled all the big openings.",
+    "Why did the class love the occlusion lectures? Everything finally came together.",
+    "Why couldn't canine guidance keep any friends? It kept disoccluding everyone.",
+    "What did the probe say at 6 millimeters? We need to talk.",
+    "Why are burs never lonely? They're always in high-speed company.",
+    "Why is fluoride so popular? It makes everyone around it stronger.",
+    "Why do dentists love potatoes? They're so filling.",
+    "What's a tooth's favorite school subject? Floss-ophy.",
+    "What did the hygienist say to the plaque? You're history.",
+    "What did the dentist name their boat? The Plaque Pearl.",
+    "What's a dentist's favorite movie? Star Wars: The Floss Awakens.",
+    "What's a dentist's favorite band? Plaque Sabbath.",
+    "Why are dentists great at birthday parties? They know how to make everyone smile.",
+    "Why was the incisor so nervous? It was right on edge. The incisal edge.",
+    "What did the tongue say to the teeth? Quit showing off. I do all the talking.",
+    "Why did the patient bring a ladder to the dentist? They heard the work was on the upper arch.",
+    "Why did the dental student bring a mirror to class? To reflect on the material.",
+    "Why did the gutta-percha feel right at home? It found the perfect canal to settle into.",
+    "Why do periodontists make great gardeners? They're experts at root planing.",
+    "What did the enamel say to the acid? You can't break me. Well, under pH 5.5 you can.",
+    "What do you call a dentist in the army? A drill sergeant."
+  ];
+  /* fun facts (all true, checked) and Timmy's own musings, for taps and hellos */
+  var FACT_LEAD = ["Fun fact:", "Did you know?", "Tooth trivia:", "Here's one for you:"];
+  var FACTS = [
+    "Enamel is the hardest substance in the human body. Harder than bone.",
+    "Enamel is about 96% mineral by weight. I'm basically a rock with feelings.",
+    "Humans are diphyodont: two sets of teeth. Sharks are polyphyodont: they replace teeth their whole lives. Show-offs.",
+    "An elephant's tusks are incisors. Very, very long incisors.",
+    "A narwhal's tusk is a tooth. It can grow longer than you are tall.",
+    "Rodents' front teeth never stop growing. That's why they gnaw on everything.",
+    "Cows have no upper front teeth. Just a tough pad of gum.",
+    "George Washington's dentures weren't wooden. They were made from things like ivory, metal, and human and animal teeth.",
+    "Grand Rapids, Michigan, was the first city to fluoridate its water, back in 1945.",
+    "Pierre Fauchard is called the father of modern dentistry. His big book came out in 1728.",
+    "You get 20 baby teeth and usually 32 adult teeth. Two sets and that's it. No refills.",
+    "Baby teeth start forming before you're even born.",
+    "Your mouth makes somewhere around a liter of saliva a day.",
+    "Saliva buffers acid, washes food away and helps remineralize enamel. Underrated hero.",
+    "Swap your toothbrush every 3 to 4 months, or sooner if the bristles fray.",
+    "Wisdom teeth got their name by showing up late, around 17 to 25, the so-called age of wisdom.",
+    "Crocodiles can replace each tooth dozens of times.",
+    "'Long in the tooth' comes from horses. Their gums recede with age, so their teeth look longer.",
+    "Snails can have thousands of tiny teeth on a ribbon called a radula.",
+    "Teeth aren't bones. Bone can remodel itself; enamel can't grow back.",
+    "Hundreds of kinds of bacteria live in your mouth. Most are fine. Some of them are plaque.",
+    "Untreated tooth decay is one of the most common health conditions in the world. Which is why the world needs you.",
+    "Toothed whales, like dolphins, get just one set of teeth for life.",
+    "Giraffes have 32 teeth, same as you, but no upper front teeth.",
+    "Enamel starts to dissolve at around pH 5.5. That's why sipping soda all day is rough on me.",
+    "Dentin has tens of thousands of tiny tubules per square millimeter. That's why exposed dentin is so sensitive.",
+    "The first bristle toothbrush is usually credited to China in 1498. The bristles came from hogs. Ew.",
+    "Ancient Egyptians cleaned their teeth with powders made from things like ash and crushed eggshells.",
+    "Enamel has no living cells once a tooth erupts, so it can't heal itself. That's why prevention matters.",
+    "The mandible is the only bone in your skull that moves. Not counting the tiny ones in your ears."
+  ];
+  var MUSE = [
+    "I've been thinking about getting veneers. Is that vain?",
+    "Sometimes I wonder if wisdom teeth are actually wise. Then I remember most of them get taken out.",
+    "My dream vacation? A fluoride spa. Cucumber slices on my cusps.",
+    "I'm not saying I'm the best tooth. But I'm definitely in the top 32.",
+    "Being a molar is hard work. All that chewing, zero credit.",
+    "My biggest fear? Caramel apples. They know what they did.",
+    "My favorite food is anything you brush after.",
+    "People say I have a great smile. That's because I AM the smile.",
+    "Some teeth want to be crowns. I just want to be flossed.",
+    "I keep a little journal. Today's entry: 'Got brushed. Felt great.'",
+    "If I had a band, it'd be called The Root Canals.",
+    "Honestly, I'd be lost without you. And floss. But mostly you.",
+    "I practiced my smile in the mirror today. Nailed it.",
+    "Every time you get one right I feel a little tingle. Is that what remineralizing feels like?",
+    "Do you think the Tooth Fairy has a retirement plan?",
+    "I don't have a favorite hub. (It's whichever one you're studying.)",
+    "I tried reading the textbook with you. I got to the chapter on extractions and had to lie down.",
+    "Life goal: never meet a dental drill. Second life goal: cheer for the people who use one.",
+    "I wonder what the tongue does all day. Just sits there. Tasting things. Living the dream.",
+    "Hot take: mint is the best flavor. I will not be taking questions. Okay, practice questions only.",
+    "I've been working on my posture. Molars should stand up straight.",
+    "When you're not here, I rearrange my house. Then I put it all back.",
+    "I tried to whistle once. Turns out you need lips.",
+    "Every right answer is a tiny fluoride treatment for my soul.",
+    "Somewhere out there is a tooth with no study buddy. I feel bad for that tooth.",
+    "I'm a molar, so technically I'm a big deal. Biggest teeth in the mouth.",
+    "My horoscope says: 'Avoid sticky situations.' Solid advice for a tooth.",
+    "I asked an incisor for advice once. It was very cutting.",
+    "Is it weird that I find the sound of the suction relaxing? It's like the ocean.",
+    "I'm saving up for a gold crown. It's a long-term plan."
   ];
   var CHEER = {
     3: ["Three in a row!", "Hat trick! Three straight."],
@@ -536,25 +564,57 @@
     100: ["100 IN A ROW. Go call in that nuke!", "One hundred. Straight. I'm crying fluoride."]
   };
   var RIGHT = ["Nailed it!", "That's the stuff.", "Correct! Fluoride for the brain.", "Yes! I felt that one.", "Clean answer. Polished, even.",
-    "Mmm, that one tasted minty.", "Right on. +HP for me.", "Look at you go.", "Textbook.", "Ooh, smart.", "That's a keeper."];
+    "Mmm, that one tasted minty.", "Right on. +HP for me.", "Look at you go.", "Textbook.", "Ooh, smart.", "That's a keeper.",
+    "Crushed it.", "Exactly right.", "Bingo.", "Your professors would be proud.", "See? You knew that.", "Big brain energy.",
+    "That one's locked in.", "Smooth as polished enamel.", "Flawless.", "Ding ding ding!", "You make it look easy.", "Chef's kiss.",
+    "Sharp as an explorer tip.", "That answer had great margins.", "Board-ready.", "You're cooking now.", "Another one in the bank.",
+    "Yep. That's the one.", "Correct! I felt my gums firm up.", "Precise. Like a good prep."];
   var WRONG = ["Ouch, close one.", "Plaque happens. Next one.", "No worries, read the explanation and it'll stick.", "Missed it. That's how you learn it though.",
-    "Even the professor had to learn this once.", "Eh, that one was sneaky.", "Shake it off. Literally, I'm shaking."];
-  var WRONG3 = ["Rough patch. Want to peek at the notes for a sec?", "Deep breath. You've got this.", "Three misses. Totally normal on a hard topic. Slow down a little?"];
+    "Even the professor had to learn this once.", "Eh, that one was sneaky.", "Shake it off. Literally, I'm shaking.",
+    "Not this time. Next time, though.", "That's okay. Mistakes are how memory works.", "Tricky one. Read the why.", "Close, but no crown.",
+    "Hmm, not quite.", "Missed it, but now you'll remember it.", "That one bites. Read the explanation.", "No big deal. On to the next.",
+    "The wrong answers are where the learning happens.", "Oof. Shake it off.", "We'll get it next time it comes around.",
+    "Every miss is a future right answer.", "That distractor was sneaky.", "Happens to the best of us. Even molars."];
+  var WRONG3 = ["Rough patch. Want to peek at the notes for a sec?", "Deep breath. You've got this.", "Three misses. Totally normal on a hard topic. Slow down a little?",
+    "Three in a row. Want to switch to the Lecture Notes for a minute?", "Tough stretch. That just means this topic needs a little more time.",
+    "Let's slow down and read each explanation. It'll click.", "Hard topic? Totally fine. That's what practice is for.",
+    "Breathe. Sip some water. Then the next one.", "Forget the streak. Focus on the why."];
+  var COMEBACK = ["There it is!", "And we're back!", "Knew you'd bounce back.", "That's the comeback.", "Back on track!", "See? You've got this."];
+  var STREAK_OVER = ["Streak's over, but {n} in a row was incredible.", "{n} straight! That's still a great run.", "The streak ends at {n}. Let's start a new one.",
+    "{n} in a row. Write that down somewhere."];
+  var LATE_RIGHT = ["Correct, even at this hour.", "Right! Your late-night brain is surprisingly sharp.", "Nailed it. Imagine how sharp you'd be after some sleep.",
+    "Right answer. Wrong time to be awake. Still proud."];
+  var LONG_SESSION = ["You've been at it {m} minutes. Stretch, drink some water, then come back. I'll wait.", "{m} minutes in! A quick break helps it all stick.",
+    "{m} minutes of studying. Look at something 20 feet away for 20 seconds. Doctor's orders.", "{m} minutes! Stand up, roll your shoulders, come back. I'll hold your spot."];
+  var NAP = ["Still there? I'll just rest my enamel for a sec.", "I'll take a quick nap. Wake me when you're back.", "Going quiet? Me too. Zzz.", "Taking five. Tap me if you need me."];
+  var BACK = ["Oh! You're back.", "I wasn't sleeping. I was resting my eyes.", "Welcome back!", "Hi again!", "There you are.", "Did you grab a snack? Rinse after.", "Ready for more?"];
+  var WAKE = ["Huh? Oh! I'm up.", "I'm awake! I was just thinking with my eyes closed.", "Five more minutes... okay, I'm up.", "Who? What? Oh, hi!"];
+  var TICKLE = ["Hey! That tickles.", "Okay okay, I'm awake!", "Careful, I'm load-bearing.", "Hey! Watch the crown.", "I'm ticklish right at the gumline!", "Now I'm dizzy.",
+    "I'm a tooth, not a button. Okay, I'm also a button."];
   var SECTION = [
-    [/arcade/, ["Arcade time! I'll hold your stuff.", "Games count too. Every right answer heals me."]],
-    [/drill/, ["Daily drill! Quick reps, big gains.", "Drill time. I'll cheer, you answer."]],
-    [/(bank|question)/, ["Question bank! Every right answer heals me.", "Let's do some reps."]],
-    [/cram/, ["The cram sheet? Exam must be close.", "Cram sheet. Highlights of the highlights."]],
-    [/hint/, ["Exam hints: the professor literally told us. Pay attention!"]],
-    [/(mind|map)/, ["Ooh, a mind map. Very organized of you."]],
-    [/review/, ["Review tables. My favorite kind of furniture."]],
-    [/(notes|reading|lecture|compendium)/, ["Reading time. I'll be quiet. Mostly.", "Notes! Tap the Listen button if your eyes are tired."]]
+    [/arcade/, ["Arcade time! I'll hold your stuff.", "Games count too. Every right answer heals me.", "Play hard. Game answers still heal me.",
+      "Games are studying too. That's my story and I'm sticking to it."]],
+    [/drill/, ["Daily drill! Quick reps, big gains.", "Drill time. I'll cheer, you answer.", "Ten questions a day keeps the plaque away.",
+      "Drill time. Not the dental kind, thankfully."]],
+    [/weak/, ["Weak spots: where the real gains are.", "Going after the hard ones. Respect.", "Weak spots today, strong spots tomorrow."]],
+    [/(recall|flash)/, ["Active recall! The hard way is the way that sticks.", "Flip, think, check. Classic."]],
+    [/(bank|question)/, ["Question bank! Every right answer heals me.", "Let's do some reps.", "Practice questions. My favorite kind of exercise.",
+      "Into the question bank. Let's make some deposits.", "Questions! The best way to make it stick."]],
+    [/cram/, ["The cram sheet? Exam must be close.", "Cram sheet. Highlights of the highlights.", "Cram sheet: all killer, no filler.",
+      "Short and sweet. Like a good appointment."]],
+    [/hint/, ["Exam hints: the professor literally told us. Pay attention!", "Hints straight from the professor's mouth.", "These hints are gold. Gold crown gold."]],
+    [/(mind|map)/, ["Ooh, a mind map. Very organized of you.", "Mind maps help me see the whole picture. All 32 teeth of it."]],
+    [/(diagram|fig)/, ["Diagrams! I love a good picture.", "A picture is worth a thousand flashcards."]],
+    [/review/, ["Review tables. My favorite kind of furniture.", "Review tables: everything side by side. Like teeth.", "Compare and contrast. Very academic of you."]],
+    [/(notes|reading|lecture|compendium)/, ["Reading time. I'll be quiet. Mostly.", "Notes! Tap the Listen button if your eyes are tired.",
+      "Notes time. Highlighters ready.", "Read a section, then try a few questions on it. Best combo.",
+      "Plain English mode is there if a section gets dense."]]
   ];
   /* ---------- secret tips: Timmy tells you how to find every easter egg (widget/eggs.js) ----------
      Each tip is [plain text, the bit to bold]. They come in order (sh_pet_tip), so you hear all of them. */
   var HOLIDAY_WORD = { halloween: "fangs", thanksgiving: "gobble", winter: "jingle", newyear: "cheers", valentine: "smile",
     dentist: "dentist", stpatrick: "lucky", easter: "hop" };
-  var HOLIDAY_NAME = { halloween: "Halloween", thanksgiving: "Thanksgiving", winter: "winter break", newyear: "New Year's",
+  var HOLIDAY_NAME = { halloween: "Halloween", thanksgiving: "Thanksgiving", winter: "Christmas season", newyear: "New Year's",
     valentine: "Valentine's", dentist: "National Dentist's Day", stpatrick: "St. Patrick's", easter: "Easter" };
   var TIPS = [
     ["Type {floss} anywhere in a hub. On a phone, type it into the Search box.", "floss"],
@@ -565,8 +625,8 @@
     ["Every day one question in each hub is secretly {golden}. Be the first to get it right.", "golden"],
     ["Sometimes a {Tooth Fairy} flutters past after you answer. Tap her before she's gone!", "Tooth Fairy"],
     ["When {5 or more} people are in the same hub, a Plaque Boss shows up. Every right answer hits it.", "5 or more"],
+    ["{Fifty right} in a row, first try, and the alley's screen does something. Thirty-one hates the noise.", "Fifty right"],
     ["Each week a tiny {cavity} hides in one paragraph of each hub's Lecture Notes. The first five people to tap it fill it.", "cavity"],
-    ["Every right answer grows a tooth on the {Full Arch} chart, and every miss knocks one out. Fill all 32.", "Full Arch"],
     ["Get {10 wrong} in a row, then {10 right} in a row. That's going through the root canal.", "10 wrong|10 right"],
     ["Answering questions between {2 and 4 am} earns a trophy. Please also sleep.", "2 and 4 am"],
     ["Get {100 right} in a row and you unlock a tactical nuke you can call in.", "100 right"],
@@ -579,59 +639,85 @@
     "Whatever you do, do NOT type my name. I'm serious. Not even as a joke.",
     "One rule in my house: nobody types my name. Nobody.",
     "Don't type my name. The last person who did... we don't talk about it.",
-    "You can call me anything you like. Just never, ever type my name."];
+    "You can call me anything you like. Just never, ever type my name.",
+    "If you type my name, he hears it. Please don't.",
+    "My name is for saying out loud only. Never typing. Trust me.",
+    "Rule number one: don't type my name. There is no rule number two."];
   function eggsOn(){ return ls("sh_pref_eggs") !== "off"; }
   function tipHTML(t){ return esc(t[0]).replace(/\{([^}]*)\}/g, function(_, x){ return "<b>" + x + "</b>"; }); }
   function nextTip(){
-    if (ls("sh_pref_eggs") === "off") return "Surprises are off in Settings, so the easter eggs are hiding. Turn them back on and I'll tell you where to look.";
+    if (ls("sh_pref_eggs") === "off") return "Hidden secrets are off in Settings → Extras, so the easter eggs are hiding. Turn them back on and I'll tell you where to look.";
     var hol = holidayId(), list = TIPS.slice();
     if (hol && HOLIDAY_WORD[hol]) list.unshift(["It's " + HOLIDAY_NAME[hol] + "! Type {" + HOLIDAY_WORD[hol] + "} in any hub and see what happens.", HOLIDAY_WORD[hol]]);
     var i = (+(ls("sh_pet_tip") || 0)) % list.length;
     ls("sh_pet_tip", String(i + 1));
     return list[i];
   }
-  function tellTip(ms){
+  function tellTip(ms, extra){
     var t = nextTip();
-    if (typeof t === "string") talk(t, "do-wave", 7000);
-    else talk("<small>Psst. Secret tip:</small><br>" + tipHTML(t), "do-look", ms || 10000, true);
+    if (typeof t === "string") { if (extra) talk(esc(t) + "<br>" + extra, "do-wave", 9000, true); else talk(t, "do-wave", 7000); }
+    else talk("<small>Psst. Secret tip:</small><br>" + tipHTML(t) + (extra ? "<br>" + extra : ""), "do-look", ms || 10000, true);
   }
+  /* Ask Timmy (widget/ask.js): only on the pages that load it, and only while it can answer here (not on an archived hub) */
+  function askOn(){ try { return !!(window.shAsk && window.shAsk.available && window.shAsk.available()); } catch (e) { return false; } }
+  function askBtn(){ return askOn() ? '<button type="button" class="shpet-ask">Ask me</button>' : ""; }
   var EGG_LINES = {
-    golden: ["GOLDEN PROBE! I'm so proud I could crack. (I won't.)"],
-    fairy: ["You caught the Tooth Fairy! Did she leave a coin?", "She's real! I told you!"],
-    boss: ["Plaque Boss is DOWN. That thing was my mortal enemy."],
-    rootcanal: ["You went through the root canal and came out the other side. Respect."],
-    owl: ["It's the middle of the night. I'm a tooth and even I'm tired."],
-    floss: ["Did somebody say floss?", "That's my favorite word."],
-    flosschain: ["A FLOSS CHAIN. This is the best day of my life."],
-    mirror: ["Everything's backwards. Is my good side still my good side?"],
-    fullarch: ["A full arch! All 32 of my cousins, together at last."],
-    cavity: ["You filled a cavity! Show-off. (I love it.)"],
-    prof: ["Quoting the professor? Very on brand."],
-    konami: ["Whoa. Am I... pixels?"],
+    golden: ["GOLDEN PROBE! I'm so proud I could crack. (I won't.)", "A golden question! You've got the Midas touch. The Midas tooth.",
+      "Golden! That's going on my fridge."],
+    fairy: ["You caught the Tooth Fairy! Did she leave a coin?", "She's real! I told you!", "The Tooth Fairy! Did she ask about me?",
+      "Quick hands! She never stays long."],
+    boss: ["Plaque Boss is DOWN. That thing was my mortal enemy.", "The Plaque Boss is defeated. Teamwork makes the gums work.",
+      "Down goes the boss! I didn't even have to hide this time."],
+    rootcanal: ["You went through the root canal and came out the other side. Respect.", "Ten wrong, then ten right. That's a real comeback story.",
+      "Through the canal and out the apex. Incredible."],
+    owl: ["It's the middle of the night. I'm a tooth and even I'm tired.", "Hoo hoo. That's owl for 'please go to bed.'",
+      "Night owl trophy! Now get some sleep, okay?"],
+    floss: ["Did somebody say floss?", "That's my favorite word.", "Floss! Between every tooth, every day.", "Ooh, I felt that one. Very clean."],
+    flosschain: ["A FLOSS CHAIN. This is the best day of my life.", "Three people flossing at once? I'm getting emotional.", "The floss chain! Unbreakable."],
+    mirror: ["Everything's backwards. Is my good side still my good side?", "Everything's flipped. Like reading a mouth mirror.",
+      "Mirror mode! Your right is my left. Or something."],
+    cavity: ["You filled a cavity! Show-off. (I love it.)", "Cavity filled! Nice restoration.", "You found the cavity! Great clinical eye."],
+    prof: ["Quoting the professor? Very on brand.", "That sounded just like them!", "Straight from the professor. Write that down."],
+    konami: ["Whoa. Am I... pixels?", "Eight-bit me! I feel so retro.", "Up, up, down, down... you know the classics."],
     holiday: ["Happy holidays from your favorite tooth!"],
     timmy: ["Who was THAT Timmy? There's only room for one Timmy around here.", "He had a crown. I have a crown too. Sort of. It's porcelain.",
-      "Did he curse you? Don't worry. His curses never work. I'm the good Timmy.", "I TOLD you not to type my name."]
+      "Did he curse you? Don't worry. His curses never work. I'm the good Timmy.", "I TOLD you not to type my name.",
+      "Is he... gone? Okay. Okay okay okay."]
   };
   /* ---------- holiday talk: greetings, answer quips and jokes per holiday (holidayId()), plus a fall pool for the
      autumn weeks no holiday covers (isFall()). Lines are dealt from a shuffled deck per pool (deal()), so every line
      comes up before any repeats, and never the same one twice in a row. ---------- */
   var HOLIDAY_TALK = {
     halloween: {
-      hello: ["Happy Halloween! Do you like my hat? Don't eat too much candy.",
+      hello: ["Happy Halloween! Do you like my costume? Don't eat too much candy.",
         "Boo! Did I scare you? No? I'm a tooth. I'm doing my best.",
         "It's spooky season. Do you know what's really scary? Untreated caries.",
-        "I'm dressing up as a wisdom tooth this year. Very mysterious. Nobody knows where I'll come in.",
+        "I almost dressed up as a wisdom tooth this year. Very mysterious. Nobody knows where I'll come in.",
         "Trick or treat! The trick is flossing. The treat is passing your exam.",
         "The candy aisle is my haunted house.",
         "Something wicked this way comes. Plaque. It's plaque.",
-        "Happy Halloween! I carved a pumpkin. It has better teeth than most of my patients."],
-      right: ["Spooktacular!", "That answer was frightfully good.", "Bone-chilling accuracy. Literally, if it was MSK.", "Treat! Definitely a treat."],
-      wrong: ["Eek! A trick, not a treat.", "That one was haunted. Read the explanation and exorcise it.", "Boo. But a friendly boo."],
+        "Happy Halloween! I carved a pumpkin. It has better teeth than most of my patients.",
+        "This month I'm haunting the question bank. Woooo. Answer me.",
+        "My whole costume budget went to fluoride.",
+        "The scariest thing in October? Midterms. Then candy corn.",
+        "Spooky fact: a cavity can sneak up on you without any pain at first. Get your checkups.",
+        "Halloween candy tier list: chocolate melts away fast, sticky caramel hangs around. I fear caramel.",
+        "If you hear chains rattling, relax. It's just someone's braces."],
+      right: ["Spooktacular!", "That answer was frightfully good.", "Bone-chilling accuracy. Literally, if it was MSK.", "Treat! Definitely a treat.",
+        "Fang-tastic!", "Wicked smart.", "That answer gave me chills. Good chills.", "Ghoul job!"],
+      wrong: ["Eek! A trick, not a treat.", "That one was haunted. Read the explanation and exorcise it.", "Boo. But a friendly boo.",
+        "That one vanished on you like a ghost.", "Spooky miss. Read the explanation with the lights on.", "A trick! You'll get the treat next time."],
       jokes: ["Why didn't the skeleton go to the dentist? He didn't have the guts. (He had great teeth, though.)",
         "What's a vampire's least favorite exam? The blood test. Second least: the gingival bleeding index.",
         "Why do ghosts make good periodontists? They see right through your excuses about flossing.",
         "What does a vampire dentist call his patients? Necks in line.",
-        "Why did the candy corn go to the dentist? It was feeling a little corny. And a lot sticky."]
+        "Why did the candy corn go to the dentist? It was feeling a little corny. And a lot sticky.",
+        "Why don't mummies take vacations? They're afraid they'll relax and unwind.",
+        "What's a ghost's favorite dessert? I-scream. Brush after.",
+        "What do you call a witch at the beach? A sand-witch.",
+        "Why did Dracula see the orthodontist? His bite was a pain in the neck.",
+        "Which room does a ghost avoid? The living room.",
+        "Why did the vampire need mouthwash? Bat breath."]
     },
     thanksgiving: {
       hello: ["Happy Thanksgiving! I'm thankful for you. And for fluoride.",
@@ -639,13 +725,23 @@
         "I'm thankful for three things: you, your toothbrush, and the end of the semester getting closer.",
         "Turkey, stuffing, cranberry sauce. My molars are ready.",
         "Thanksgiving tip: floss between the turkey and the pie. Your gums will thank you.",
-        "Pass the gravy. And pass your exams."],
-      right: ["Gobble-worthy!", "That's a pie-chart-topping answer.", "Something to be thankful for.", "Stuffed with knowledge."],
-      wrong: ["That one got gobbled up. Next!", "No worries. There's always seconds.", "A little undercooked. Read the explanation."],
+        "Pass the gravy. And pass your exams.",
+        "I'm thankful for every right answer you've given me. That's a lot of gratitude.",
+        "Thanksgiving dinner is a marathon. Chew carefully. I'm rooting for your molars.",
+        "Everyone blames the turkey for the nap. Honestly, it's the third plate.",
+        "Grateful for: fluoride, floss, and a study buddy like you."],
+      right: ["Gobble-worthy!", "That's a pie-chart-topping answer.", "Something to be thankful for.", "Stuffed with knowledge.",
+        "A whole gravy boat of right.", "Oh, that's pie-perfect.", "Thankful for that answer."],
+      wrong: ["That one got gobbled up. Next!", "No worries. There's always seconds.", "A little undercooked. Read the explanation.",
+        "Turkey happens. Next one.", "That one was a little dry. Read the why."],
       jokes: ["Why did the turkey refuse dessert? It was already stuffed.",
         "What do you call a turkey with no teeth? A gobble-gummy.",
         "Why did the cranberry blush? It saw the turkey dressing.",
-        "What's a dentist's favorite part of Thanksgiving? The floss-ing after. Okay, the pie."]
+        "What's a dentist's favorite part of Thanksgiving? The floss-ing after. Okay, the pie.",
+        "What do you call a running turkey? Fast food.",
+        "Why did the pie go to the dentist? It needed a filling.",
+        "What sound does a turkey's phone make? Wing wing.",
+        "What did the turkey say to the computer? Google, google, google."]
     },
     winter: {
       hello: ["Happy holidays! Finals first, cookies after.",
@@ -654,13 +750,22 @@
         "Peppermint season! Fresh breath for everyone.",
         "It's cold outside. Good thing enamel is the hardest thing in the body.",
         "Making a list, checking it twice: who's been flossing, who's been naughty.",
-        "Snow day? Study day. Okay, snowball fight first."],
-      right: ["Sleigh-ed it!", "Ho ho ho, that's correct.", "Merry and right.", "Cool as ice."],
-      wrong: ["Brr. That one was a little frosty.", "Coal in the stocking for that one. Shake it off.", "Snowed in on that one. Next!"],
+        "Snow day? Study day. Okay, snowball fight first.",
+        "Hot cocoa season. Rinse with water after, okay?",
+        "Finals, then festivities. You've got this.",
+        "Candy canes are little striped sugar sticks. Enjoy one. Then brush.",
+        "It's the most wonderful time of the year. Finals aside."],
+      right: ["Sleigh-ed it!", "Ho ho ho, that's correct.", "Merry and right.", "Cool as ice.", "Snow way, that's right!", "Merry and bright!", "Icy precision."],
+      wrong: ["Brr. That one was a little frosty.", "Coal in the stocking for that one. Shake it off.", "Snowed in on that one. Next!",
+        "Slippery one. Like ice.", "Just a little frostbite. You'll warm up."],
       jokes: ["What do snowmen eat for breakfast? Frosted flakes. Please brush after.",
         "Why does Santa have three gardens? So he can ho, ho, ho.",
         "What's a dentist's favorite holiday song? Jingle Bells, but with more floss.",
-        "Why was the gingerbread man at the dentist? He had a crumby filling."]
+        "Why was the gingerbread man at the dentist? He had a crumby filling.",
+        "What do you call an elf who sings? A wrapper.",
+        "What's a snowman's favorite snack? Ice Krispies.",
+        "Why did the reindeer go to the dentist? Tooth deer-cay.",
+        "What did one snowman say to the other? Do you smell carrots?"]
     },
     newyear: {
       hello: ["Happy New Year! Resolution: floss. Every day. I mean it.",
@@ -668,12 +773,18 @@
         "Cheers! Here's to a year of right answers.",
         "My New Year's resolution: get to 100 HP and stay there. Help me out?",
         "Out with the old plaque, in with the new... no, wait. Out with all the plaque.",
-        "3, 2, 1... study!"],
-      right: ["Starting the year strong!", "That's a resolution I can get behind.", "Pop the confetti!"],
-      wrong: ["New year, new chances. Next one!", "Resolution: read that explanation."],
+        "3, 2, 1... study!",
+        "New Year's tip: keep resolutions small. Like two-minutes-of-brushing small.",
+        "Last year I learned a lot. Mostly from you.",
+        "Midnight snacks count as snacks. Brush after the countdown."],
+      right: ["Starting the year strong!", "That's a resolution I can get behind.", "Pop the confetti!", "Happy new right answer!",
+        "Ringing in the right ones.", "That's how you start a year."],
+      wrong: ["New year, new chances. Next one!", "Resolution: read that explanation.", "Out with the old, in with the explanation."],
       jokes: ["What did the dentist say on New Year's? Time to brush up on your resolutions.",
-        "Why do New Year's resolutions never stick? They don't floss between the good intentions.",
-        "What do you call a tooth at midnight on New Year's? A cheer-ful incisor."]
+        "Why do New Year's resolutions never stick? Nobody flosses between the good intentions.",
+        "What do you call a tooth at midnight on New Year's? A cheer-ful incisor.",
+        "What did the calendar say on January 1st? My days are numbered.",
+        "I'm going to stop procrastinating. Starting next year."]
     },
     valentine: {
       hello: ["Happy Valentine's! You're my favorite human.",
@@ -681,60 +792,193 @@
         "Will you be my Valentine? I promise I'll never get a cavity. Probably.",
         "Chocolate hearts are cute. Brush after.",
         "I love you more than fluoride. And I really love fluoride.",
-        "You make my pulp flutter."],
-      right: ["I love that answer!", "Heart-eyes.", "You had me at that one.", "Be still, my pulp."],
-      wrong: ["Heartbreaking. But we'll get through it together.", "That one didn't love you back. Next!"],
+        "You make my pulp flutter.",
+        "Roses are red, violets are blue, nobody flosses as nicely as you.",
+        "Self-care is romantic. So is a really good toothbrush.",
+        "I made you a valentine. It says 'You're the floss to my tooth.'"],
+      right: ["I love that answer!", "Heart-eyes.", "You had me at that one.", "Be still, my pulp.", "That answer stole my heart.",
+        "Love at first right answer.", "Swoon."],
+      wrong: ["Heartbreaking. But we'll get through it together.", "That one didn't love you back. Next!", "It's not you, it's the question.",
+        "A little lovesick on that one. Read the why."],
       jokes: ["What did one tooth say to the other on Valentine's Day? I'm so attached to you.",
         "Why did the dentist fall in love? Someone finally said 'I floss you.'",
-        "What do you call two teeth in love? Molar-ly devoted."]
+        "What do you call two teeth in love? Molar-ly devoted.",
+        "What did the toothbrush say to the toothpaste? You're my main squeeze.",
+        "What did the stamp say to the envelope? I'm stuck on you.",
+        "Why do teeth make great valentines? They always give you a smile."]
     },
     dentist: {
       hello: ["It's National Dentist's Day! That's you soon.",
         "Happy Dentist's Day! Hug a dentist. Gently. They've had a long day.",
         "Today we celebrate the people who keep me alive. Thank you, future doctor.",
-        "National Dentist's Day! I made you a card. It's a drawing of me. Smiling."],
-      right: ["Spoken like a real dentist!", "Doctor-level answer.", "The profession is proud."],
-      wrong: ["Even real dentists miss one sometimes. Okay, rarely.", "Not quite, doctor. Next!"],
+        "National Dentist's Day! I made you a card. It's a drawing of me. Smiling.",
+        "Today's the day for the people who keep smiles working. Including future you.",
+        "Happy Dentist's Day! I'm wearing my best enamel."],
+      right: ["Spoken like a real dentist!", "Doctor-level answer.", "The profession is proud.", "Clinical excellence.", "Chairside manner: perfect."],
+      wrong: ["Even real dentists miss one sometimes. Okay, rarely.", "Not quite, doctor. Next!", "Every dentist was once a student who missed this one.",
+        "Not quite. Charting it as 'learning.'"],
       jokes: ["Why did the dentist win an award? For being outstanding in their filling.",
-        "How many dentists does it take to change a lightbulb? Just one, but it'll need a crown."]
+        "How many dentists does it take to change a lightbulb? Just one, but it'll need a crown.",
+        "Why did the dentist become a gardener? Great with roots.",
+        "What's a dentist's favorite animal? A molar bear.",
+        "Why are dentists great at parties? They know how to make everyone smile."]
     },
     stpatrick: {
       hello: ["Happy St. Patrick's! Lucky to have you.",
         "Wearing green? I'm wearing my best enamel.",
         "Don't need luck. You've got study time. (A little luck never hurts.)",
         "A pot of gold at the end of the rainbow? I'd rather have a gold crown.",
-        "Top of the morning! Let's get some right answers."],
-      right: ["Lucky you! Except it wasn't luck.", "Pot of gold!", "Four-leaf clover answer."],
-      wrong: ["The luck of the Irish skipped that one.", "No leprechaun can fix that one. The explanation can."],
+        "Top of the morning! Let's get some right answers.",
+        "Feeling lucky? Luck is just preparation with good timing.",
+        "The only green on teeth should be a costume. Not calculus.",
+        "Shamrocks have three leaves. Most molars have four or five cusps. I win."],
+      right: ["Lucky you! Except it wasn't luck.", "Pot of gold!", "Four-leaf clover answer.", "Lucky? No. Smart.", "That's a rainbow answer."],
+      wrong: ["The luck of the Irish skipped that one.", "No leprechaun can fix that one. The explanation can.", "Not your lucky question. The next one is."],
       jokes: ["Why can't you borrow money from a leprechaun? They're always a little short.",
         "What do you call a fake Irish stone? A sham-rock.",
-        "Why did the leprechaun go to the dentist? He had a gold tooth and a green tongue."]
+        "Why did the leprechaun go to the dentist? He had a gold tooth and a green tongue.",
+        "What do leprechauns put on their teeth? Gold crowns, obviously.",
+        "Why do leprechauns recycle? They like to go green.",
+        "How do you know a leprechaun had fun? He's Dublin over with laughter."]
     },
     easter: {
       hello: ["Happy Easter! Go easy on the chocolate eggs.",
         "Hop to it! Let's study.",
         "Jelly beans are sticky. Just saying.",
         "Egg hunt today? Look for questions you haven't tried yet.",
-        "Some bunny loves you. It's me. I'm the bunny."],
-      right: ["Egg-cellent!", "Some bunny's smart.", "Hop-tastic!"],
-      wrong: ["That egg was a dud. Next!", "Hop back up. You've got this."],
+        "Some bunny loves you. It's me. I'm the bunny.",
+        "Spring has sprung! So have the jelly beans.",
+        "Rabbits' teeth never stop growing. Imagine the dental bills.",
+        "Hunting eggs? Hunt down a few questions too."],
+      right: ["Egg-cellent!", "Some bunny's smart.", "Hop-tastic!", "Hoppy to see that!", "Golden egg answer.", "Basket-worthy."],
+      wrong: ["That egg was a dud. Next!", "Hop back up. You've got this.", "That egg cracked. Read the explanation."],
       jokes: ["Why shouldn't you tell an Easter egg a joke? It might crack up.",
         "How does the Easter bunny keep his teeth white? Hare-floss.",
-        "What do you call a bunny with a cavity? A hole-y hopper."]
+        "What do you call a bunny with a cavity? A hole-y hopper.",
+        "Why did the Easter egg hide? It was a little chicken.",
+        "What do you call a rabbit with fleas? Bugs Bunny.",
+        "How do you make a rabbit stew? Make it wait three hours."]
     },
     fall: {
       hello: ["Sweater weather! Perfect for studying.",
         "The leaves are falling. My grades never will. (Yours either.)",
         "Pumpkin spice season. I'm more of a mint spice tooth.",
         "Fall back... on the review tables when you get stuck.",
-        "Crunchy leaves, crunchy apples. Great for the gums."],
-      right: ["Crisp as a fall morning.", "Harvest time!", "You're on a roll. Like a leaf in the wind."],
-      wrong: ["That one fell flat. Like a leaf.", "Rake it up and try again."],
+        "Crunchy leaves, crunchy apples. Great for the gums.",
+        "Apple-picking season. Apples are crunchy, but they're not a toothbrush. Nice try.",
+        "Cozy weather. Blanket, tea, practice questions.",
+        "Leaves change color. Teeth shouldn't. Go easy on the coffee.",
+        "I'd jump in a leaf pile, but I'm a tooth. I'd get lost in there.",
+        "Fall is my favorite season. Mostly for the sweaters."],
+      right: ["Crisp as a fall morning.", "Harvest time!", "You're on a roll. Like a leaf in the wind.", "Crisp!", "Gourd job!", "Apple of my eye."],
+      wrong: ["That one fell flat. Like a leaf.", "Rake it up and try again.", "Leaf it behind. Next one.", "That one blew away. Catch the next."],
       jokes: ["Why did the scarecrow win an award? He was outstanding in his field.",
         "What's a tree's favorite drink? Root beer. Mine too, then I brush.",
-        "Why do trees hate exams? They get stumped."]
+        "Why do trees hate exams? They get stumped.",
+        "What did the tree say to autumn? Leaf me alone.",
+        "Why did the leaf go to the doctor? It was feeling green.",
+        "How do trees get online? They log in."]
     }
   };
+  /* ---------- everyday talk: greetings and small talk by time of day, day of the week and month (device time),
+     plus lines for what's going on: streaks, a long absence, a big day, an exam coming up. ---------- */
+  var GREET = {
+    late: ["Up late", "Hey, night owl", "Still up", "Burning the midnight oil"],
+    early: ["Morning", "Rise and shine", "Early bird", "Good morning", "You're up early"],
+    morning: ["Morning", "Good morning", "Hey there", "Hi", "Hello"],
+    lunch: ["Hey", "Hi", "Lunchtime", "Good afternoon"],
+    afternoon: ["Hey", "Afternoon", "Good afternoon", "Hi there", "Hello"],
+    evening: ["Evening", "Good evening", "Hey", "Hi there"],
+    night: ["Evening", "Hey", "Hi", "Good evening", "Hey there"]
+  };
+  var TIME_TALK = {
+    late: ["Late-night studying? Sleep is when memories stick. Just saying.", "Shh. Everyone's asleep. It's just us and the questions.",
+      "At this hour, the only things awake are you, me and Streptococcus mutans.", "Your mouth makes less saliva while you sleep. Also, you should be sleeping.",
+      "I won't tell anyone you were up this late.", "The best study trick at this hour is a pillow. Just saying."],
+    early: ["Up before the sun? Impressive.", "Early start. The questions are fresh and so are you.",
+      "Did you brush yet? I'm not judging. I'm asking for a friend. The friend is me.", "Coffee first, then questions. I'll wait.",
+      "Morning brain is a great brain. Let's use it."],
+    morning: ["Morning study session. Very responsible.", "Breakfast, brush, study. In that order.", "Fresh morning, fresh start.",
+      "I've already done my morning stretches. (I wiggled.)", "Let's knock out a few before lunch."],
+    lunch: ["Lunch break study? Efficient. Brush after.", "Don't forget to eat something. Crunchy veggies are great for your gums.",
+      "Midday reps. Love it.", "Is that a sandwich? Rinse with water after. Trust me."],
+    afternoon: ["Afternoon slump? A few quick questions will wake you up.", "This is usually my nap time. But not today. Today we study.",
+      "Afternoon session! Grab some water first.", "Halfway through the day. Let's make it count."],
+    evening: ["Evening study session. Dinner first, or after?", "Long day? A few questions, then relax.",
+      "The day's winding down, but your brain's still got some reps in it.", "Golden hour. Golden answers."],
+    night: ["Night shift. Let's do a few and then rest up.", "Brushing before bed tonight? Two minutes. I'll time you.",
+      "Night study is cozy. Lamp on, questions out.", "Do a few, then sleep. Your brain saves its progress overnight."]
+  };
+  var DAY_TALK = [
+    ["Sunday study session. Future you says thanks.", "Sunday reset: new week, fresh questions.", "Studying on a Sunday? Dedicated.", "Sunday scaries? A few right answers help."],
+    ["Happy Monday! Okay, Monday. Just Monday.", "Monday: new week, same 32 teeth.", "Mondays go down easier with a few right answers.", "New week. Let's start it strong."],
+    ["Tuesday. The most underrated day of the week.", "Taco Tuesday? Floss after. Cilantro hides everywhere.", "Tuesday's a great day to knock out some questions."],
+    ["Hump day! Halfway to the weekend.", "Wednesday. We're halfway there.", "Midweek check-in: you're doing great."],
+    ["Thursday. Almost Friday. Basically Friday.", "Thursday push! The weekend's in sight.", "Thursday is just Friday's opening act."],
+    ["It's Friday! A few questions, then go have fun.", "Happy Friday! Your weekend self will thank you.", "A Friday study session? That's commitment.",
+      "TGIF: Thank Goodness It's Fluoride."],
+    ["Saturday studying? You're a legend.", "Weekend mode, but make it educational.", "Saturdays are for sleeping in and studying a little. Mostly sleeping in.",
+      "Studying on a Saturday. The professors would be proud."]
+  ];
+  var MONTH_TALK = [
+    ["January. New semester, new notes.", "It's cold out there. My enamel is shivering.", "January is long. We'll get through it together."],
+    ["February: a short month with a lot to learn.", "February is National Children's Dental Health Month. Shoutout to the baby teeth.",
+      "February. Hang in there. Spring's coming."],
+    ["March! Spring is coming. So is spring break.", "March already? Time flies when you're studying.", "March came in like a lion. We'll take it out like a lamb."],
+    ["April showers. Perfect study weather.", "April is Oral Cancer Awareness Month. Screenings save lives.", "April. The end of the semester is in sight."],
+    ["May! The end of the semester is so close.", "Almost summer. Keep going.", "May: finish strong, then rest."],
+    ["June. Summer studying? Respect.", "June: long days, more study time. Or more pool time.", "Summer mode. I'm wearing imaginary sunglasses."],
+    ["July. Too hot to go outside anyway. Let's study.", "Stay hydrated. Water is the best drink for teeth.", "Midsummer. Even teeth need a little vacation."],
+    ["August: new semester energy!", "Back to school. New notebooks, same molars.", "August. Fresh start, fresh highlighters."],
+    ["September. The semester's in full swing.", "September: exams are starting to stack up. We've got this.", "Hello, September. Pumpkin spice season is near."],
+    ["October already? The semester is flying.", "October is National Dental Hygiene Month. High five your hygienist.", "October: midterm season. Spooky in more ways than one."],
+    ["November. Grateful for coffee and practice questions.", "November: the home stretch before finals.", "November already? Let's finish the semester strong."],
+    ["December. Finals first, then rest.", "December: so close to break. Stay strong.", "December. Last push of the semester. You've got this."]
+  ];
+  var SAY = {
+    streak: ["That's a {n}-day streak. I can feel it in my enamel.", "{n} days in a row. My gums have never looked better.", "{n}-day streak. Don't break it now.",
+      "{n} days running! Consistency is the best fluoride.", "Look at us. {n} days in a row."],
+    sparkle: ["I'm at {hp} HP. I'm basically a toothpaste commercial.", "Look at me. Sparkling. That's all you.", "{hp} HP. I've never felt better.",
+      "Full health! My enamel is practically glowing."],
+    lots: ["{a} questions already today? You're on fire.", "You've answered {a} today. Remember to take breaks.", "{a} today! I've healed so much I'm glowing.",
+      "{a} questions today. That's real work. Proud of you."],
+    sharp: ["{c} of {a} right today. That's a great day.", "You're {c} for {a} today. Very sharp.", "{c} right out of {a} today. Keep that energy."],
+    first: ["First questions of the day. Let's warm up.", "Fresh day, fresh questions.", "Let's get today's first right answer.",
+      "Clean slate today. Let's fill it with right answers."],
+    again: ["Back again? I like you.", "Oh, hi again! Couldn't stay away?", "Round two! Or three? I lost count.", "You're back! I just finished tidying up.",
+      "Back so soon? I feel so popular."],
+    away: ["You've been gone {d} days! I missed you. Let's catch up.", "{d} days! I thought you forgot about me. A few questions and all is forgiven.",
+      "Welcome back! It's been {d} days. My plaque has plaque.", "There you are! {d} days away. Let's ease back in."],
+    missed: ["You didn't visit yesterday. I missed you (and I'm a little plaquey).", "Where were you yesterday? I saved you a seat.",
+      "Missed you yesterday! A few questions today and we're back on track.", "Yesterday was quiet without you. Let's make today count."],
+    low: ["I'm not feeling great. Can we study today?", "Honestly? I've been better. A few right answers would help a lot.",
+      "My gums are sore. Some questions would really help me out.", "I could use a little care today. Okay, a lot of care."],
+    examDay: ["{x} day! Deep breath. You know more than you think.", "It's {x} day. You've put in the work. Trust it.",
+      "{x} today! Eat something, drink some water, then go show them.", "Today's the day: {x}. I'm cheering from right here."],
+    examEve: ["{x} tomorrow! You've got this. Get some sleep tonight.", "{x} is tomorrow. A little review, then real sleep.",
+      "Tomorrow's {x}. Sleep is the best last-minute study tool.", "{x} tomorrow! Set out what you need tonight so the morning's easy."],
+    examSoon: ["{x} in {d} days. A little every day adds up.", "{d} days until {x}. Plenty of time if we keep at it.", "{x} is {d} days out. Let's chip away at it.",
+      "Countdown: {d} days to {x}. I believe in you."],
+    late: ["It's late. Sleep is good for memory AND teeth. A few more, then bed?", "Past midnight! Brush, then sleep. The questions will still be here tomorrow.",
+      "Late-night grind. Respect. But sleep is when it all sticks.", "Night owl mode. A few more and then lights out?"]
+  };
+  /* days since you adopted him */
+  var ANNIVERSARY = {
+    1: "Our second day together! I'm already attached. Like a periodontal ligament.",
+    7: "One week since you adopted me! Best week of my life.",
+    14: "Two weeks together already. Time flies when you're studying.",
+    30: "It's been a whole month since you adopted me! Happy toothiversary.",
+    50: "Fifty days together! That's a lot of right answers.",
+    100: "100 days since you adopted me! I'm getting a little sentimental.",
+    200: "200 days together. You and me, we're a great team.",
+    365: "One year together! Happy toothiversary. I wouldn't trade you for a gold crown."
+  };
+  var HOME_HELLO = ["Welcome home.", "Come in, come in.", "I was just tidying up.", "Ready to study?", "Good to see you.", "I saved you a seat.",
+    "Make yourself at home.", "I just put the kettle on.", "I've been waiting all day!", "Pull up a chair.", "The porch light was on for you.",
+    "I was reading. Okay, I was napping.", "Wipe your feet! Kidding. I don't have floors. I'm a drawing."];
+  var HUB_HELLO = ["{g}! Let's study.", "Ready when you are.", "Let's get some right answers. I could use the HP.", "I'll be down here cheering.",
+    "Let's do this.", "Pick a mode. I'll be right here.", "Study buddy reporting for duty.", "I brought snacks. They're fluoride.",
+    "Your corner tooth is ready.", "Let's turn some wrong answers into right ones.", "Every question counts. Let's go."];
   /* one shuffled deck per pool in localStorage (sh_pet_deck_<key>): every line before a repeat, never twice in a row */
   function deal(key, arr){
     if (!arr || !arr.length) return "";
@@ -759,7 +1003,75 @@
     return null;
   }
   function joke(){ return (seasonTalk() && Math.random() < (holidayId() ? 0.5 : 0.25) && seasonLine("jokes")) || deal("jokes", JOKES); }
-  function seasonLine(kind){ var s = seasonTalk(); return s && s.t[kind] ? deal(s.id + "-" + kind, s.t[kind]) : ""; }
+  function seasonLine(kind){
+    var s = seasonTalk(), a = s && s.t[kind];
+    /* he only wears what was put on, so with nothing on he doesn't ask how his costume looks */
+    if (a && !WORN.layer) a = a.filter(function(x){ return !/\bmy costume\?/.test(x); });
+    return a && a.length ? deal(s.id + "-" + kind + (a === s.t[kind] ? "" : "-bare"), a) : "";
+  }
+  function fact(){ return deal("fact-lead", FACT_LEAD) + " " + deal("facts", FACTS); }
+  /* what a tap gets when it isn't a status or a tip: mostly jokes, sometimes a fact, a thought or a word on today's outfit */
+  function chat(){
+    var r = Math.random(), o = wornTalk();
+    if (r < 0.16) return fact();
+    if (r < 0.3) return deal("muse", MUSE);
+    if (o && o.say && r < 0.38) return deal("outfit-" + o.k, o.say);
+    return joke();
+  }
+  function rightLine(){
+    if (new Date().getHours() < 5 && Math.random() < 0.35) return deal("late-right", LATE_RIGHT);
+    return (seasonTalk() && Math.random() < (holidayId() ? 0.4 : 0.15) && seasonLine("right")) || deal("right", RIGHT);
+  }
+  function wrongLine(){ return (seasonTalk() && Math.random() < (holidayId() ? 0.4 : 0.15) && seasonLine("wrong")) || deal("wrong", WRONG); }
+  function fill(t, o){ return String(t).replace(/\{(\w+)\}/g, function(m, k){ return o && o[k] != null ? o[k] : m; }); }
+  function daySlot(h){ return h < 5 ? "late" : h < 8 ? "early" : h < 12 ? "morning" : h < 14 ? "lunch" : h < 17 ? "afternoon" : h < 21 ? "evening" : "night"; }
+  /* opts = [[weight, fn], ...]: runs one of the fns, picked by weight, and returns what it returns */
+  function choose(opts){
+    var tot = 0, i; for (i = 0; i < opts.length; i++) tot += opts[i][0];
+    var r = Math.random() * tot;
+    for (i = 0; i < opts.length; i++) { r -= opts[i][0]; if (r < 0) return opts[i][1](); }
+    return opts.length ? opts[opts.length - 1][1]() : "";
+  }
+  /* how many pages you've opened today, counting this one (sh_pet_visits = "day:count") */
+  function visitCount(){
+    var d = centralDay(), v = String(ls("sh_pet_visits") || "").split(":"), n = v[0] === d ? (+v[1] || 0) + 1 : 1;
+    ls("sh_pet_visits", d + ":" + n);
+    return n;
+  }
+  /* a line on the day's adoption milestone, once that day (sh_pet_anniv) */
+  function anniversary(st){
+    var today = centralDay(), l = ANNIVERSARY[dayDiff(st.born, today)];
+    if (!l || ls("sh_pet_anniv") === today) return "";
+    ls("sh_pet_anniv", today);
+    return l;
+  }
+  /* his place, as he sees it */
+  function houseTalk(){
+    var d = placeDeco(), l = ["I watered the lawn today. Green grass, pink gums. That's the look.", "I swept the doorstep. You never know who's visiting.",
+      "Your rank's statue is right by my door. I polish it every morning."];
+    if (d.flair.length) l.push("Every medal on the board by my door is a hub you mastered. I salute them every morning.");
+    if (d.flair.some(function(f){ return f.lvl >= 4; })) l.push("There's a crown on our medal board. I'm not saying I'm royalty, but I'm not NOT saying it.");
+    if (d.fall) l.push("I raked the leaves. Then they fell again. Every single time.");
+    return deal("house", l);
+  }
+  /* the everyday mix for a hello, when nothing more pressing comes first: [weight, line maker] */
+  function smallTalk(st, where){
+    var now = new Date(), sl = daySlot(now.getHours()), hol = holidayId(), sea = seasonTalk(), o = wornTalk(), t = st.today, opts = [];
+    if (sea) opts.push([hol ? (where === "hub" ? 30 : 40) : 12, function(){ return seasonLine("hello"); }]);
+    if (o && o.say) opts.push([14, function(){ return deal("outfit-" + o.k, o.say); }]);
+    if (eggsOn()) opts.push([where === "hub" ? 10 : 15, function(){ return deal("dontsay", DONT_SAY); }]);
+    opts.push([12, function(){ return deal("time-" + sl, TIME_TALK[sl]); }]);
+    opts.push([9, function(){ var d = now.getDay(); return deal("day-" + d, DAY_TALK[d]); }]);
+    opts.push([6, function(){ var m = now.getMonth(); return deal("month-" + m, MONTH_TALK[m]); }]);
+    if (st.streak >= 3) opts.push([8, function(){ return fill(deal("streak", SAY.streak), { n: st.streak }); }]);
+    if (st.hp >= 95) opts.push([6, function(){ return fill(deal("sparkle", SAY.sparkle), { hp: st.hp }); }]);
+    if (t.a >= 40) opts.push([8, function(){ return fill(deal("lots", SAY.lots), t); }]);
+    if (t.a >= 15 && t.c / t.a >= 0.85) opts.push([6, function(){ return fill(deal("sharp", SAY.sharp), t); }]);
+    opts.push([6, fact]);
+    opts.push([6, function(){ return deal("muse", MUSE); }]);
+    return opts;
+  }
+  function readTime(line, min, max){ return Math.max(min, Math.min(max, String(line).length * 75)); }
   function statusLine(st, name){
     var hp = st.hp, n = name ? name + ". " : "";
     if (hp <= 0) return "0 HP. I'm in rough shape. I won't die, but getting me back takes a few solid study days, and I heal at half speed until 50.";
@@ -802,6 +1114,10 @@
       ".shpet-sweat{animation:shpet-drip 3s ease-in infinite;}",
       ".shpet-arm-r{transform-box:fill-box; transform-origin:0% 40%;} .shpet-arm-l{transform-box:fill-box; transform-origin:100% 40%;}",
       ".shpet-hat{transform-origin:100px 40px;}",
+      /* a prop in his left hand swings with that arm (its shoulder is at 56,112) */
+      ".shpet-prop{transform-origin:56px 112px;}",
+      ".shpet-steam path{animation:shpet-steam 2.8s ease-in-out infinite;} .shpet-steam path + path{animation-delay:1.2s;}",
+      "@keyframes shpet-steam{0%{transform:translateY(3px); opacity:0;} 40%{opacity:.9;} 100%{transform:translateY(-6px); opacity:0;}}",
       /* one-off moves, toggled by class on the button */
       ".shpet-btn.do-wave .shpet-arm-r{animation:shpet-wave .45s ease-in-out 3 alternate;}",
       ".shpet-btn.do-hop .shpet-art{animation:shpet-hop .7s cubic-bezier(.3,1.6,.5,1);}",
@@ -809,7 +1125,7 @@
       ".shpet-btn.do-look .shpet-eyes{animation:shpet-look 1.6s ease-in-out;}",
       ".shpet-btn.do-spin .shpet-art{animation:shpet-spin .9s cubic-bezier(.4,0,.2,1);}",
       ".shpet-btn.do-flinch .shpet-art{animation:shpet-flinch .45s ease-in-out;}",
-      ".shpet-btn.do-cheer .shpet-arm-r, .shpet-btn.do-cheer .shpet-arm-l{animation:shpet-cheer .3s ease-in-out 4 alternate;}",
+      ".shpet-btn.do-cheer .shpet-arm-r, .shpet-btn.do-cheer .shpet-arm-l, .shpet-btn.do-cheer .shpet-prop{animation:shpet-cheer .3s ease-in-out 4 alternate;}",
       ".shpet-btn.do-cheer .shpet-art{animation:shpet-hop .6s cubic-bezier(.3,1.6,.5,1) 2;}",
       ".shpet-btn.do-hat .shpet-hat{animation:shpet-tip .9s ease-in-out;}",
       "@keyframes shpet-breathe{0%,100%{transform:scale(1,1);} 50%{transform:scale(1.015,.985);}}",
@@ -831,24 +1147,26 @@
       ".shpet-hp{display:block; height:5px; margin:3px auto 0; width:70%; border-radius:99px; background:color-mix(in srgb, var(--pet-ink) 12%, transparent); overflow:hidden;}",
       ".shpet-hp i{display:block; height:100%; border-radius:99px; transition:width .6s cubic-bezier(.2,.8,.3,1), background .6s;}",
       /* speech bubble */
-      ".shpet-say{position:absolute; z-index:3; left:calc(100% + 8px); bottom:38%; width:max-content; max-width:min(196px, calc(100vw - 110px)); padding:7px 10px;",
+      ".shpet-say{position:absolute; z-index:3; left:calc(100% + 8px); bottom:38%; width:max-content; max-width:min(196px, calc(var(--pet-vw, 100vw) - 110px)); padding:7px 10px;",
       "  border-radius:13px 13px 13px 4px; background:var(--pet-bg); color:var(--pet-ink); border:1px solid var(--pet-line); box-shadow:var(--pet-shadow);",
       "  font-size:12.5px; line-height:1.35; text-align:left; opacity:0; transform:translateY(6px) scale(.96); transform-origin:0 100%; pointer-events:none; transition:opacity .25s, transform .25s cubic-bezier(.2,.8,.3,1);}",
       ".shpet-say.is-on{opacity:1; transform:none; pointer-events:auto;}",
       ".shpet-say b{font-weight:700;}",
       ".shpet-say small{font-size:11px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; opacity:.65;}",
       ".shpet-say .shpet-more{display:inline-block; margin-top:6px; padding:0; border:0; background:none; color:var(--pet-accent); font:inherit; font-size:12.5px; font-weight:700; cursor:pointer; text-decoration:underline; text-underline-offset:2px;}",
+      ".shpet-say .shpet-ask{display:inline-block; margin:6px 10px 0 0; padding:5px 14px; border:0; border-radius:999px; background:var(--pet-accent); color:#fff; font:inherit; font-size:12.5px; font-weight:800; cursor:pointer;}",
       /* where it lives */
       ".shpet-home{position:fixed; z-index:9989; left:14px; bottom:12px; width:64px; transition:opacity .3s, transform .3s;}",
       ".shpet-home.is-away{opacity:0; transform:translateY(30px); pointer-events:none;}",
-      "@media (max-width:760px){ .shpet-home{left:8px; width:50px; bottom:calc(var(--sh-tabbar-h, 60px) + 8px + env(safe-area-inset-bottom,0px));} .shpet-say{font-size:12px; max-width:min(180px, calc(100vw - 80px));} }",
+      "@media (max-width:760px){ .shpet-home{left:8px; width:50px; bottom:calc(var(--sh-tabbar-h, 60px) + 8px + env(safe-area-inset-bottom,0px));} .shpet-say{font-size:12px; max-width:min(180px, calc(var(--pet-vw, 100vw) - 80px));} }",
       /* Timmy's house: a card on the dashboard */
       ".shpet-house{display:grid; grid-template-columns:minmax(0,250px) minmax(0,1fr); gap:20px; align-items:center; margin:0 0 18px; padding:12px 18px 12px 12px;",
       "  border-radius:16px; background:var(--pet-bg); border:1px solid var(--pet-line); box-shadow:var(--shadow, 0 1px 2px rgba(0,0,0,.05));}",
       ".shpet-scene{position:relative;} .shpet-housesvg{display:block; width:100%; height:auto; border-radius:16px;}",
       ".shpet-spot{position:absolute; left:56%; bottom:4%; width:28%;}",
       ".shpet-house .shpet-hp{width:100%; height:8px; margin:8px 0;}",
-      ".shpet-house .shpet-say{left:auto; right:30%; bottom:calc(100% - 8px); transform-origin:100% 100%; border-radius:13px 13px 4px 13px; max-width:min(190px, 70vw);}",
+      /* the house bubble hangs left from 70% across Timmy's spot (28% of the scene, starting at 56%): 260% of the spot keeps it inside the scene */
+      ".shpet-house .shpet-say{left:auto; right:30%; bottom:calc(100% - 8px); transform-origin:100% 100%; border-radius:13px 13px 4px 13px; max-width:min(190px, 260%, calc(var(--pet-vw, 100vw) * .7));}",
       ".shpet-title{display:flex; align-items:baseline; justify-content:space-between; gap:10px;}",
       ".shpet-title b{font-family:var(--serif, var(--font-display, Georgia, serif)); font-weight:400; font-size:24px; line-height:1.1;}",
       ".shpet-hpnum{font-size:13.5px; font-weight:700; color:var(--pet-ink2); font-variant-numeric:tabular-nums;}",
@@ -861,19 +1179,12 @@
       ".shpet-leaf{transform-box:fill-box; transform-origin:center; animation:shpet-leaf 6s ease-in-out infinite;} @keyframes shpet-leaf{0%{transform:translate(0,-8px) rotate(0); opacity:0;} 15%{opacity:1;} 50%{transform:translate(-6px,8px) rotate(140deg);} 85%{opacity:1;} 100%{transform:translate(4px,26px) rotate(300deg); opacity:0;}}",
       ".shpet-snow{animation:shpet-snow 5s ease-in-out infinite;} @keyframes shpet-snow{0%{transform:translate(0,-6px); opacity:0;} 20%{opacity:1;} 100%{transform:translate(4px,18px); opacity:0;}}",
       ".shpet-flag{transform-box:fill-box; transform-origin:0 50%; animation:shpet-flag 2.4s ease-in-out infinite;} @keyframes shpet-flag{0%,100%{transform:scaleX(1) skewY(0);} 50%{transform:scaleX(.9) skewY(4deg);}}",
-      ".shpet-upg{list-style:none; margin:8px 0 0; padding:0; display:grid; grid-template-columns:1fr 1fr; gap:6px;}",
-      ".shpet-upg li{font-size:12.5px; line-height:1.35; padding:7px 9px; border-radius:10px; border:1px solid var(--pet-line); color:var(--pet-ink2);}",
-      ".shpet-upg li b{display:block; color:var(--pet-ink); font-size:13px;} .shpet-upg li.is-locked{opacity:.55;} .shpet-upg li.is-on b::after{content:' \\2713'; color:#2E9E5B;}",
-      "@media (max-width:480px){ .shpet-upg{grid-template-columns:1fr;} }",
       "@keyframes shpet-smoke{0%,100%{opacity:.85; transform:translateY(0);} 50%{opacity:.4; transform:translateY(-3px);}}",
       "@keyframes shpet-drift{from{transform:translateX(0);} to{transform:translateX(-26px);}}",
       "@media (max-width:600px){ .shpet-house{grid-template-columns:1fr; gap:12px; padding:10px;} .shpet-housesvg{max-height:190px;} }",
-      ".shpet-perch{position:absolute; z-index:5; width:66px; transition:opacity .3s;}",
-      ".shpet-perch .shpet-say{bottom:46%;}",
-      "@media (max-width:600px){ .shpet-perch{width:56px;} }",
       /* dialogs */
       ".shpet-dlg{position:fixed; inset:0; z-index:10060; display:flex; align-items:center; justify-content:center; padding:16px; background:rgba(10,8,14,.5); animation:shpet-fade .25s ease;}",
-      ".shpet-card{position:relative; width:100%; max-width:440px; max-height:calc(100vh - 32px); overflow:auto; padding:22px 22px 18px; border-radius:22px; background:var(--pet-bg); color:var(--pet-ink); box-shadow:0 30px 80px rgba(0,0,0,.35); animation:shpet-rise .35s cubic-bezier(.2,.8,.3,1);}",
+      ".shpet-card{position:relative; width:100%; max-width:440px; max-height:100%; overflow:auto; padding:22px 22px 18px; border-radius:22px; background:var(--pet-bg); color:var(--pet-ink); box-shadow:0 30px 80px rgba(0,0,0,.35); animation:shpet-rise .35s cubic-bezier(.2,.8,.3,1);}",
       ".shpet-card h3{margin:0 0 6px; font-family:var(--font-display, var(--serif, Georgia, serif)); font-weight:400; font-size:26px; line-height:1.15;}",
       ".shpet-card p{margin:0 0 10px; font-size:14.5px; line-height:1.5; color:var(--pet-ink2);}",
       ".shpet-card p b{color:var(--pet-ink);}",
@@ -892,7 +1203,7 @@
       ".shpet-hpline{display:flex; justify-content:space-between; font-size:13px; color:var(--pet-ink2);} .shpet-hpline b{font-size:15px; color:var(--pet-ink);}",
       ".shpet-conds{list-style:none; margin:10px 0 0; padding:0; display:grid; gap:6px;} .shpet-conds li{display:flex; gap:10px; align-items:flex-start; font-size:13.5px; line-height:1.4; padding:8px 10px; border-radius:12px; background:color-mix(in srgb, var(--pet-ink) 5%, transparent);}",
       ".shpet-conds li i{flex:none; width:10px; height:10px; border-radius:50%; margin-top:4px;}",
-      ".shpet-seg{display:inline-flex; gap:2px; padding:3px; border-radius:99px; border:1px solid var(--pet-line);} .shpet-seg button{font:inherit; font-size:13px; font-weight:600; padding:5px 11px; border-radius:99px; border:0; background:transparent; color:var(--pet-ink2); cursor:pointer;} .shpet-seg button[aria-pressed=true]{background:var(--pet-ink); color:var(--pet-bg);}",
+      ".shpet-seg{display:inline-flex; flex-wrap:wrap; max-width:100%; gap:2px; padding:3px; border-radius:20px; border:1px solid var(--pet-line);} .shpet-seg button{flex:1 1 auto; font:inherit; font-size:13px; font-weight:600; padding:5px 11px; border-radius:99px; border:0; background:transparent; color:var(--pet-ink2); cursor:pointer;} .shpet-seg button[aria-pressed=true]{background:var(--pet-ink); color:var(--pet-bg);}",
       "@keyframes shpet-fade{from{opacity:0;}} @keyframes shpet-rise{from{opacity:0; transform:translateY(16px) scale(.97);}}",
       "html.sh-mock-on .shpet-home{display:none;}",
       "@media (prefers-reduced-motion: reduce){ .shpet *, .shpet-dlg *{animation:none !important;} }"
@@ -904,30 +1215,41 @@
   /* ================= the buddy ================= */
   var M = null;   // the mounted instance
   function pref(){ return ls("sh_pref_pet") || "on"; }
-  function adopted(){ return !!ls("sh_pet_born"); }
+  /* Everyone has Timmy: no adoption. A first visit makes today his birthday and sends the pet-adopt badge as adopting
+     once did, so a linked device counts his health from the same day (syncBadges keeps the earliest), and he says one
+     hello. outfit: what he has on, when the page knows already (else the kept one, until the page's bootstrap says) */
+  var firstMeet = false;
+  function meet(opt){
+    if (!ls("sh_pet_born")) { ls("sh_pet_born", centralDay()); firstMeet = true; }
+    var k = kept();
+    wear(typeof opt.outfit === "string" ? opt.outfit : k ? k.id : "");
+    watchWake();
+  }
   function petName(){ return "Timmy Tooth"; }
 
   function mount(opt){
     if (M || !opt) return M;
+    meet(opt);
     css();
     var H = opt.H || null, where = opt.where || (H ? "hub" : "dashboard");
     M = {
       where: where, H: H, sb: opt.sb || (H && H.supabase) || null, visitor: opt.visitor || (H && H.visitor) || ls("sh_visitor_id"),
-      name: opt.name || (H ? H.name : function(){ return ls("sh_display_name") || ""; }), perch: opt.perch || null, home: opt.home || null,
+      name: opt.name || (H ? H.name : function(){ return ls("sh_display_name") || ""; }), home: opt.home || null,
       el: null, btn: null, say: null, st: simulate(null), rows: null, sayT: null, run: 0, wrongRun: 0, lastSection: "", lastInput: Date.now(),
-      sessionStart: Date.now(), longNudges: 0, idleSaid: false, taps: 0, tapT: 0, lastHp: null, lastTalk: 0
+      sessionStart: Date.now(), longNudges: 0, idleSaid: false, taps: 0, tapT: 0, lastHp: null, lastTalk: 0,
+      bootstrap: opt.bootstrap || (H && H.bootstrap) || (window.shBootstrap && window.shBootstrap.ready) || null, loaded: false,
+      live: typeof opt.live === "function" ? opt.live : H && typeof H.live === "function" ? H.live : null
     };
+    if (firstMeet) { ls("sh_pet_adopt_sent", "1"); award("pet-adopt", ls("sh_pet_born")); }   /* once: syncBadges won't send it again */
     load();
     render();
-    if (where === "hub") wireHub(); else wireDashboard();
+    if (where === "hub") wireHub();
     setInterval(idleLife, 4200);
-    setInterval(load, 5 * 60 * 1000);
-    window.addEventListener("resize", place);
     document.addEventListener("sh:pref", function(e){ if (e.detail && /^sh_pref_(pet|eggs)$/.test(e.detail.key)) refresh(); });
     document.addEventListener("sh:egg-local", function(e){
       if (!e.detail || e.detail.t !== "timmy") return;
       scare();
-      if (where !== "hub" && visible()) setTimeout(function(){ talk(pick(EGG_LINES.timmy), "do-flinch", 5500); }, 1200);   /* hubs already react in wireHub */
+      if (where !== "hub" && visible()) setTimeout(function(){ talk(deal("egg-timmy", EGG_LINES.timmy), "do-flinch", 5500); }, 1200);   /* hubs already react in wireHub */
     });
     calmLater();
     return M;
@@ -935,23 +1257,49 @@
   function visible(){
     var p = pref();
     if (p === "off") return false;
-    if (M.where === "hub") return adopted() && p !== "dash";
-    return true;      // dashboard: before adoption it waits on your name to be noticed
+    if (M.where === "hub") return p !== "dash";
+    return true;
   }
   function load(){
+    if (!M || M.loaded) return;
+    M.loaded = true;
+    var boot = M.bootstrap; M.bootstrap = null;
+    if (boot && typeof boot.then === "function") {
+      boot.then(function(data){
+        /* what's in his outfit slot at his place (the v2 bootstrap's shop; nothing when nothing is on) */
+        if (data && data.shop && data.shop.equipped && typeof data.shop.equipped === "object") wear(data.shop.equipped.outfit || "");
+        if (data && Array.isArray(data.pet_days)) { M.rows = data.pet_days; update(true); return; }
+        loadRemote();
+      }, loadRemote);
+      return;
+    }
+    loadRemote();
+  }
+  function missingFn(r){ var e = r && r.error; return !!e && (e.code === "PGRST202" || e.code === "42883" || r.status === 404 || /could not find the function|does not exist/i.test(e.message || "")); }
+  function loadRemote(){
     if (!M || !M.sb || !M.visitor) return;
-    M.sb.rpc("get_pet_days", { p_visitor: M.visitor }).then(function(r){
-      if (r && !r.error && Array.isArray(r.data)) { M.rows = r.data; update(true); }
-    }, function(){});
+    /* a page on the game layer asks for the days with the snacks' HP (migration_v54): a new hub says so through
+       shGame.v2(), the new dashboard by its v2 bootstrap (only that one carries `shop`); every other page as before */
+    /* since 2026-11-19 a page also says so by M.live (a hub's shEggHooks.live, the dashboard's own): the game layer is
+       wanted and hasn't been found missing. Until then this waited for v2() or the bootstrap, so with the bootstrap timed
+       out in a busy minute his HP left out the snacks'. A database without the v2 call gets today's. */
+    var v2 = false; try { var bd = window.shBootstrap && window.shBootstrap.data; v2 = !!((M.live && M.live()) || (window.shGame && window.shGame.v2 && window.shGame.v2()) || (bd && bd.shop && bd.rank && bd.rank.journey != null)); } catch (e) {}
+    function got(r){ if (r && !r.error && Array.isArray(r.data)) { M.rows = r.data; update(true); } }
+    M.sb.rpc(v2 ? "get_pet_days_v2" : "get_pet_days", { p_visitor: M.visitor }).then(function(r){
+      if (v2 && missingFn(r)) return M.sb.rpc("get_pet_days", { p_visitor: M.visitor }).then(got);
+      got(r);
+    }).then(null, function(){});
   }
   function update(quiet){
     var prev = M.st ? M.st.hp : null;
     M.st = simulate(M.rows);
     draw();
-    if (!adopted()) return;
     var hp = M.st.hp;
     /* trophies, recorded once */
-    if (hp >= 100 && !ls("sh_pet_perfect")) { ls("sh_pet_perfect", "1"); award("pet-perfect"); if (!quiet) talk("100 HP! Pearly whites, baby. You earned a trophy for this.", "do-cheer"); }
+    if (hp >= 100 && M.st.dipped && !ls("sh_pet_perfect")) { ls("sh_pet_perfect", "1"); award("pet-perfect"); if (!quiet) talk("100 HP! Pearly whites, baby. You earned a trophy for this.", "do-cheer"); }
+    /* health band once a day (after the server rows load), for how adopted Timmys are doing across the class */
+    var day = new Date().toISOString().slice(0, 10);
+    if (quiet && M.rows && ls("sh_pet_hp_sent") !== day) { ls("sh_pet_hp_sent", day); track("state:pet-hp=" + (hp >= 80 ? "80-100" : hp >= 50 ? "50-79" : hp >= 25 ? "25-49" : hp > 0 ? "1-24" : "0")); }
     if (M.st.revived && !ls("sh_pet_revived")) { ls("sh_pet_revived", "1"); award("pet-revive"); talk("From 0 to 100. You brought me back. I'll never forget it.", "do-cheer"); }
     if (!quiet && prev != null) {
       var a = conditions(prev), b = conditions(hp);
@@ -966,32 +1314,35 @@
     var home = M.where === "dashboard" && M.home ? M.home() : null;
     if (M.el) { if (M.el === home) { home.innerHTML = ""; home.hidden = true; } else M.el.remove(); M.el = null; M.btn = null; M.say = null; }
     document.documentElement.classList.toggle("sh-pet-on", M.where === "hub" && visible());
-    perchSpace(false);
     if (!visible()) return;
     var el;
-    if (home && adopted()) {
-      /* adopted: Timmy lives in his own little house on the dashboard */
+    if (home) {
+      /* the dashboard: Timmy lives in his own little house */
       el = home; el.hidden = false; el.className = "shpet shpet-house";
-      el.innerHTML = '<div class="shpet-scene">' + houseSvg() + '<div class="shpet-spot"><button type="button" class="shpet-btn"></button><div class="shpet-say" role="status" aria-live="polite"></div></div></div>' +
+      el.innerHTML = '<div class="shpet-scene">' + frameSvg() + '<div class="shpet-spot"><button type="button" class="shpet-btn"></button><div class="shpet-say" role="status" aria-live="polite"></div></div></div>' +
         '<div class="shpet-info"><div class="shpet-title"><b>' + petName() + '</b><span class="shpet-hpnum"></span></div>' +
         '<span class="shpet-hp" aria-hidden="true"><i></i></span><p class="shpet-status"></p>' +
-        '<div class="shpet-actions"><button type="button" class="shpet-ghost" data-joke>Tell me a joke</button><button type="button" class="shpet-ghost" data-check>Checkup</button><button type="button" class="shpet-ghost" data-tip>Secret tip</button></div></div>';
+        '<div class="shpet-actions">' + (window.shAsk ? '<button type="button" class="shpet-ghost" data-ask>Ask me</button>' : "") + '<button type="button" class="shpet-ghost" data-joke>Tell me a joke</button><button type="button" class="shpet-ghost" data-check>Checkup</button><button type="button" class="shpet-ghost" data-tip>Secret tip</button></div></div>';
       if (!el.__shpet) { el.__shpet = true; el.addEventListener("click", homeClick); }
     } else {
       el = document.createElement("div");
-      el.className = "shpet " + (M.where === "hub" ? "shpet-home" : "shpet-perch");
+      el.className = "shpet shpet-home";
       el.innerHTML = '<button type="button" class="shpet-btn"></button><span class="shpet-hp" aria-hidden="true"><i></i></span><div class="shpet-say" role="status" aria-live="polite"></div>';
       document.body.appendChild(el);
-      if (M.where === "dashboard") perchSpace(true);
     }
     M.el = el; M.btn = el.querySelector(".shpet-btn"); M.say = el.querySelector(".shpet-say");
     M.btn.addEventListener("click", onTap);
-    M.say.addEventListener("click", function(e){ if (e.target.closest(".shpet-more")) { hush(); checkup(); } });
-    draw(); place();
-    if (!adopted()) setTimeout(function(){ talk("Psst. Up here. Tap me!", "do-wave", 9000); }, 1400);
-    else setTimeout(hello, 900);
+    M.say.addEventListener("click", function(e){
+      if (e.target.closest(".shpet-ask")) { hush(); if (askOn()) window.shAsk.open({ from: "timmy" }); return; }
+      if (e.target.closest(".shpet-more")) { hush(); checkup(); }
+    });
+    draw();
+    setTimeout(hello, 900);
   }
   function homeClick(e){
+    if (e.target.closest("[data-ask]")) { if (window.shAsk) window.shAsk.open({ from: "house" }); return; }
+    var b = e.target.closest("[data-joke], [data-check], [data-tip]");
+    if (b) track("pet:" + (b.hasAttribute("data-joke") ? "joke" : b.hasAttribute("data-check") ? "checkup" : "tip"));
     if (e.target.closest("[data-joke]")) { M.jokes = 0; talk(joke(), pick(["do-hop", "do-wiggle", "do-wave"]), 8500); }
     else if (e.target.closest("[data-check]")) { hush(); checkup(); }
     else if (e.target.closest("[data-tip]")) tellTip();
@@ -1000,13 +1351,15 @@
   var SCARED_MS = 5 * 60 * 1000;
   var SCARED = ["Is he gone? Is he still here? Don't look behind you.", "I'm not scared. My enamel is just... vibrating.",
     "Did you hear that? I definitely heard a crown.", "Let's study really quietly so he doesn't come back.",
-    "I told you. I TOLD you. Nobody listens to the tooth.", "Keep answering questions. He hates right answers. Probably."];
-  var CALM = ["Phew. I think he's gone.", "Okay. Okay. I'm fine. I'm totally fine.", "He's gone. Let's never speak of this again."];
+    "I told you. I TOLD you. Nobody listens to the tooth.", "Keep answering questions. He hates right answers. Probably.",
+    "Is it just me, or did the lights flicker?", "Every time you type a T, I flinch a little.", "I'm hiding behind my gums until he's gone."];
+  var CALM = ["Phew. I think he's gone.", "Okay. Okay. I'm fine. I'm totally fine.", "He's gone. Let's never speak of this again.",
+    "The coast is clear. I think.", "Okay. Back to normal. Mostly.", "Did I scream earlier? That was a battle cry."];
   function scaredLeft(){ return Math.max(0, (+ls("sh_pet_scared_until") || 0) - Date.now()); }
   function calmLater(){
     if (!M) return; clearTimeout(M.calmT);
     var left = scaredLeft(); if (!left) return;
-    M.calmT = setTimeout(function(){ draw(); if (visible() && !document.hidden) talk(pick(CALM), "do-hop", 5000); }, left + 200);
+    M.calmT = setTimeout(function(){ draw(); if (visible() && !document.hidden) talk(deal("calm", CALM), "do-hop", 5000); }, left + 200);
   }
   function scare(){
     ls("sh_pet_scared_until", String(Date.now() + SCARED_MS));
@@ -1014,36 +1367,16 @@
   }
   function draw(){
     if (!M || !M.btn) return;
-    var hp = adopted() ? M.st.hp : 85, mood = adopted() ? moodFor(hp) : "happy";
+    var hp = M.st.hp, mood = moodFor(hp);
     if (M.sleeping) mood = "sleep";
-    else if (adopted() && scaredLeft() > 0) mood = "scared";
+    else if (scaredLeft() > 0) mood = "scared";
     M.btn.innerHTML = art({ hp: hp, mood: mood }, 100);
-    M.btn.setAttribute("aria-label", adopted() ? petName() + ", your tooth buddy, " + hp + " HP. Tap for a joke." : "Timmy Tooth. Tap to meet him.");
+    M.btn.setAttribute("aria-label", petName() + ", your tooth buddy, " + hp + " HP. Tap for a joke.");
     var bar = M.el.querySelector(".shpet-hp");
-    bar.style.display = adopted() ? "" : "none";
     bar.querySelector("i").style.width = hp + "%"; bar.querySelector("i").style.background = hpColor(hp);
     var num = M.el.querySelector(".shpet-hpnum"), stat = M.el.querySelector(".shpet-status");
     if (num) num.textContent = hp + " HP";
     if (stat) stat.textContent = statusLine(M.st);
-  }
-  /* dashboard: sit right on top of your name */
-  function perchSpace(on){ var g = document.getElementById("greeting"); if (g) g.classList.toggle("has-pet", !!on); }
-  function place(){
-    if (!M || !M.el || M.where !== "dashboard" || !M.el.classList.contains("shpet-perch")) return;
-    var target = M.perch ? M.perch() : null; if (!target) return;
-    var r = target.getBoundingClientRect(), w = M.el.offsetWidth || 66;
-    /* no name yet: sit on the greeting's own words, not the middle of the whole row */
-    if (!target.firstElementChild || target.tagName !== "B") {
-      var tn = target.firstChild;
-      if (tn && tn.nodeType === 3 && tn.nodeValue.trim()) { try { var rg = document.createRange(); rg.selectNodeContents(tn); r = rg.getBoundingClientRect(); } catch (e) {} }
-    }
-    var x = r.left + r.width / 2 - w / 2 + window.scrollX, y = r.top + window.scrollY - (M.el.offsetHeight || 92) - 12;
-    x = Math.max(8, Math.min(x, document.documentElement.clientWidth - w - 8));
-    M.el.style.left = x + "px"; M.el.style.top = y + "px";
-    /* keep the bubble on screen: flip it to the left when there's no room on the right */
-    var room = document.documentElement.clientWidth - (x - window.scrollX + w);
-    M.say.style.left = room < 200 ? "auto" : ""; M.say.style.right = room < 200 ? "calc(100% + 10px)" : "";
-    M.say.style.borderRadius = room < 200 ? "16px 16px 4px 16px" : "";
   }
 
   /* ---------- talking ---------- */
@@ -1051,6 +1384,9 @@
     if (!M || !M.say || !visible()) return;
     clearTimeout(M.sayT);
     M.say.innerHTML = raw ? html : esc(html);
+    /* the text-size setting zooms <html>, where 100vw overshoots the screen: give the bubble the real width in zoomed px */
+    var z = 1; try { z = parseFloat(getComputedStyle(document.documentElement).zoom) || 1; } catch (e) {}
+    M.say.style.setProperty("--pet-vw", (window.innerWidth / z) + "px");
     M.say.classList.add("is-on");
     M.lastTalk = Date.now();
     if (move) act(move);
@@ -1068,60 +1404,82 @@
     if (scaredLeft() > 0 && !M.sleeping && Math.random() < 0.35 && !busy()) act("do-look");
     if (M.where === "hub") {
       var quiet = Date.now() - M.lastInput;
-      if (quiet > 180000 && !M.sleeping) { M.sleeping = true; draw(); if (!M.idleSaid) { M.idleSaid = true; talk("Still there? I'll just rest my enamel for a sec.", null, 5000); } return; }
-      if (quiet < 180000 && M.sleeping) { M.sleeping = false; draw(); talk(pick(["Oh! You're back.", "I wasn't sleeping. I was resting my eyes.", "Welcome back!"]), "do-hop"); }
+      if (quiet > 180000 && !M.sleeping) { M.sleeping = true; draw(); if (!M.idleSaid) { M.idleSaid = true; talk(deal("nap", NAP), null, 5000); } return; }
+      if (quiet < 180000 && M.sleeping) { M.sleeping = false; draw(); talk(deal("back", BACK), "do-hop"); }
     }
     if (M.sleeping) return;
     if (Math.random() < 0.55) act(pick(["do-wave", "do-hop", "do-look", "do-wiggle", "do-look", "do-hat"]));
   }
   function hello(){
-    if (!adopted()) return;
     if (M.skipHello) { M.skipHello = false; return; }
-    if (scaredLeft() > 0) { talk(pick(SCARED), "do-flinch", 6500); return; }
-    var st = M.st, nm = (M.name && M.name()) || "";
-    var h = new Date().getHours(), part = h < 5 ? "Up late" : h < 12 ? "Morning" : h < 17 ? "Hey" : "Evening";
-    var hol = holidayId();
-    var lines = [];
+    if (firstMeet) {
+      /* the first visit's hello */
+      firstMeet = false;
+      var hi = M.where === "dashboard" ? "Hi, I'm Timmy Tooth! I live here now. Every right answer keeps me healthy."
+        : "Hi, I'm Timmy Tooth! I'll be down here while you study. Every right answer keeps me healthy.";
+      talk(esc(hi) + (askOn() ? "<br>" + askBtn() : ""), "do-wave", 11000, true);
+      return;
+    }
+    if (scaredLeft() > 0) { talk(deal("scared", SCARED), "do-flinch", 6500); return; }
+    var st = M.st, nm = (M.name && M.name()) || "", sl = daySlot(new Date().getHours()), visits = visitCount(), line;
+    var away = st.away >= 3 && !st.today.a ? fill(deal("away", SAY.away), { d: st.away }) : "";
     if (M.where === "dashboard") {
-      lines.push(part + (nm ? ", " + nm : "") + "!");
-      if (hol && HOLIDAY_TALK[hol] && Math.random() < 0.75) lines.push(seasonLine("hello"));
-      else if (st.missedYesterday && st.hp < 80) lines.push("You didn't visit yesterday. I missed you (and I'm a little plaquey).");
-      else if (st.hp < 40) lines.push("I'm not feeling great. Can we study today?");
-      else if (eggsOn() && Math.random() < 0.2) lines.push(pick(DONT_SAY));
-      else lines.push(pick(["Welcome home.", "Come in, come in.", "I was just tidying up.", "Ready to study?", "Good to see you."]));
-      talk(lines.join(" "), "do-wave", 9000);
+      var head = deal("greet-" + sl, GREET[sl]) + (nm ? ", " + nm : "") + "!";
+      line = anniversary(st) || (Math.random() < 0.75 ? away : "") ||
+        (st.missedYesterday && st.hp < 80 && Math.random() < 0.7 ? deal("missed", SAY.missed) : "") ||
+        (st.hp < 40 && Math.random() < 0.8 ? deal("low", SAY.low) : "");
+      if (!line) {
+        var dash = smallTalk(st, "dashboard");
+        if (visits > 1) dash.push([10, function(){ return deal("again", SAY.again); }]);
+        dash.push([7, houseTalk]);
+        dash.push([16, function(){ return deal("home", HOME_HELLO); }]);
+        line = choose(dash);
+      }
+      talk(head + " " + line, "do-wave", readTime(head + line, 9000, 12000));
     } else {
-      var ex = examSoon();
+      var ex = examSoon(), e = nextExam();
       if (ex) talk(ex, "do-cheer", 8000);
-      else if (h < 5) talk("It's late. Sleep is good for memory AND teeth. A few more, then bed?", "do-wave", 7000);
-      else if (st.hp < 40) talk(statusLine(st), "do-flinch", 8000);
-      else if (eggsOn() && Math.random() < 0.12) talk(pick(DONT_SAY), "do-flinch", 7000);
-      else if (seasonTalk() && Math.random() < (hol ? 0.4 : 0.15)) talk(seasonLine("hello"), "do-wave", 6500);
-      else if (Math.random() < 0.35) tellTip(9000);
-      else talk(pick([part + "! Let's study.", "Ready when you are.", "Let's get some right answers. I could use the HP.", "I'll be down here cheering."]), "do-wave", 5000);
+      else if (sl === "late") talk(deal("late-hub", SAY.late), "do-wave", 7000);
+      else if (st.hp < 40) talk(Math.random() < 0.5 ? statusLine(st) : deal("low", SAY.low), "do-flinch", 8000);
+      else if ((line = anniversary(st) || (Math.random() < 0.6 ? away : ""))) talk(line, "do-cheer", 8000);
+      else {
+        var TIP = {}, hub = smallTalk(st, "hub");
+        hub.push([25, function(){ return TIP; }]);
+        if (e && e.d >= 2 && e.d <= 7) hub.push([15, function(){ return fill(deal("exam-soon", SAY.examSoon), e); }]);
+        if (!st.today.a) hub.push([6, function(){ return deal("first", SAY.first); }]);
+        hub.push([16, function(){ return fill(deal("hub-hello", HUB_HELLO), { g: deal("greet-" + sl, GREET[sl]) }); }]);
+        line = choose(hub);
+        if (line === TIP) tellTip(9000);
+        else talk(line, "do-wave", readTime(line, 6000, 9500));
+      }
     }
   }
-  function examSoon(){
-    var ex = ((window.SH_EXPORT || {}).exams) || [], today = centralDay(), out = "";
+  /* the next exam in this hub (SH_EXPORT.exams): { x: its label, d: days away } */
+  function nextExam(){
+    var ex = ((window.SH_EXPORT || {}).exams) || [], today = centralDay(), best = null;
     ex.forEach(function(x){
-      if (!x || !x.date || out) return;
+      if (!x || !x.date) return;
       var d = dayDiff(today, String(x.date).slice(0, 10));
-      if (d === 0) out = (x.label || "Exam") + " day! Deep breath. You know more than you think.";
-      else if (d === 1) out = (x.label || "Exam") + " tomorrow! You've got this. Get some sleep tonight.";
+      if (d >= 0 && (!best || d < best.d)) best = { x: x.label || "Exam", d: d };
     });
-    return out;
+    return best;
+  }
+  function examSoon(){
+    var e = nextExam();
+    if (!e || e.d > 1) return "";
+    return fill(e.d ? deal("exam-eve", SAY.examEve) : deal("exam-day", SAY.examDay), e);
   }
   function onTap(){
-    if (!adopted()) { intro(); return; }
+    track("pet:tap-" + M.where);
     var now = Date.now();
     M.taps = now - M.tapT < 1200 ? M.taps + 1 : 1; M.tapT = now;
-    if (M.sleeping) { M.sleeping = false; M.lastInput = now; draw(); talk("Huh? Oh! I'm up.", "do-hop"); return; }
-    if (M.taps >= 5) { M.taps = 0; talk(pick(["Hey! That tickles.", "Okay okay, I'm awake!", "Careful, I'm load-bearing."]), "do-spin"); return; }
+    if (M.sleeping) { M.sleeping = false; M.lastInput = now; draw(); talk(deal("wake", WAKE), "do-hop"); return; }
+    if (M.taps >= 5) { M.taps = 0; talk(deal("tickle", TICKLE), "do-spin"); return; }
     M.jokes = (M.jokes || 0) + 1;
-    if (M.jokes % 4 === 0) talk(esc(statusLine(M.st)) + '<br><button type="button" class="shpet-more">Open my checkup</button>', "do-wave", 9000, true);
-    else if (M.jokes % 4 === 2) tellTip();
-    else if (scaredLeft() > 0 && Math.random() < 0.6) talk(pick(SCARED), "do-flinch", 6000);
-    else talk(esc(joke()) + '<br><button type="button" class="shpet-more">Checkup</button>', pick(["do-hop", "do-wiggle", "do-wave"]), 8500, true);
+    if (M.jokes % 4 === 0) talk(esc(statusLine(M.st)) + "<br>" + askBtn() + '<button type="button" class="shpet-more">Open my checkup</button>', "do-wave", 9000, true);
+    else if (M.jokes % 4 === 2) tellTip(null, askBtn());
+    else if (scaredLeft() > 0 && Math.random() < 0.6) { if (askOn()) talk(esc(deal("scared", SCARED)) + "<br>" + askBtn(), "do-flinch", 8000, true); else talk(deal("scared", SCARED), "do-flinch", 6000); }
+    else { var c = chat(); talk(esc(c) + "<br>" + askBtn() + '<button type="button" class="shpet-more">Checkup</button>', pick(["do-hop", "do-wiggle", "do-wave"]), readTime(c, askOn() ? 10000 : 8500, askOn() ? 12000 : 11000), true); }
   }
 
   /* ---------- hub reactions ---------- */
@@ -1136,21 +1494,23 @@
       update(false);
       if (!visible()) return;
       if (ok) {
+        var rough = M.wrongRun >= 3;
         M.run++; M.wrongRun = 0;
-        if (CHEER[M.run]) talk(pick(CHEER[M.run]), "do-cheer", 5000);
-        else if (Math.random() < 0.16 && !busy()) talk((holidayId() && Math.random() < 0.4 && seasonLine("right")) || pick(RIGHT), "do-hop", 3200);
+        if (CHEER[M.run]) talk(deal("cheer-" + M.run, CHEER[M.run]), "do-cheer", 5000);
+        else if (rough && Math.random() < 0.5 && !busy()) talk(deal("comeback", COMEBACK), "do-cheer", 3600);
+        else if (Math.random() < 0.16 && !busy()) talk(rightLine(), "do-hop", 3200);
         else act("do-hop");
       } else {
         var was = M.run; M.run = 0; M.wrongRun++;
-        if (was >= 10) talk("Streak's over, but " + was + " in a row was incredible.", "do-flinch", 5000);
-        else if (M.wrongRun === 3) talk(pick(WRONG3), "do-flinch", 6000);
-        else if (Math.random() < 0.25 && !busy()) talk((holidayId() && Math.random() < 0.4 && seasonLine("wrong")) || pick(WRONG), "do-flinch", 3600);
+        if (was >= 10) talk(fill(deal("streak-over", STREAK_OVER), { n: was }), "do-flinch", 5000);
+        else if (M.wrongRun === 3) talk(deal("wrong3", WRONG3), "do-flinch", 6000);
+        else if (Math.random() < 0.25 && !busy()) talk(wrongLine(), "do-flinch", 3600);
         else act("do-flinch");
       }
     });
     document.addEventListener("sh:egg-local", function(e){
       var d = e.detail || {}, l = EGG_LINES[d.t]; if (!l) return;
-      setTimeout(function(){ talk(d.t === "holiday" && HOLIDAY_TALK[d.id] ? deal(d.id + "-hello", HOLIDAY_TALK[d.id].hello) : pick(l), d.t === "floss" || d.t === "flosschain" ? "do-wiggle" : "do-cheer", 5500); }, 1200);
+      setTimeout(function(){ talk(d.t === "holiday" && HOLIDAY_TALK[d.id] ? deal(d.id + "-hello", HOLIDAY_TALK[d.id].hello) : deal("egg-" + d.t, l), d.t === "floss" || d.t === "flosschain" ? "do-wiggle" : "do-cheer", 5500); }, 1200);
     });
     /* moving around the hub; hide during a mock exam */
     setInterval(function(){
@@ -1160,7 +1520,7 @@
       if (sec === M.lastSection) return;
       var first = !M.lastSection; M.lastSection = sec;
       if (first || mock || Math.random() > 0.45 || busy()) return;
-      for (var i = 0; i < SECTION.length; i++) if (SECTION[i][0].test(sec)) { talk(pick(SECTION[i][1]), "do-look", 4200); break; }
+      for (var i = 0; i < SECTION.length; i++) if (SECTION[i][0].test(sec)) { talk(deal("sec-" + i, SECTION[i][1]), "do-look", 4200); break; }
       if (/mock/.test(sec)) hush();
     }, 2500);
     /* long sessions */
@@ -1168,21 +1528,11 @@
       var mins = Math.round((Date.now() - M.sessionStart) / 60000);
       if (mins >= 50 * (M.longNudges + 1) && Date.now() - M.lastInput < 120000) {
         M.longNudges++;
-        talk("You've been at it " + mins + " minutes. Stretch, drink some water, then come back. I'll wait.", "do-wave", 8000);
+        talk(fill(deal("long", LONG_SESSION), { m: mins }), "do-wave", 8000);
       }
     }, 60000);
   }
-  function wireDashboard(){
-    if (window.MutationObserver) {
-      var g = document.getElementById("greeting");
-      if (g) new MutationObserver(function(){ setTimeout(place, 0); }).observe(g, { childList: true, subtree: true, characterData: true });
-    }
-    if (document.fonts && document.fonts.ready) document.fonts.ready.then(place);
-    window.addEventListener("load", place);
-    setTimeout(place, 600); setTimeout(place, 2000);
-  }
-
-  /* ---------- the introduction ---------- */
+  /* ---------- dialogs ---------- */
   function dialog(html, cls){
     var d = document.createElement("div");
     d.className = "shpet shpet-dlg" + (cls ? " " + cls : "");
@@ -1193,49 +1543,8 @@
     setTimeout(function(){ var f = d.querySelector("input, .shpet-go"); if (f) try { f.focus(); } catch (e) {} }, 40);
     return d;
   }
-  function intro(){
-    hush();
-    var step = 0;
-    var stages = '<div class="shpet-stages">' + [[90, "Healthy"], [60, "Plaque"], [33, "Caries"], [8, "Fractured"]].map(function(x){
-      return '<div>' + art({ hp: x[0], hat: "" }, 72) + x[1] + '</div>'; }).join("") + '</div>';
-    var STEPS = [
-      '<h3>Hi! I\'m Timmy Tooth.</h3><p>I\'m going to hang out with you while you study: in my little home here on the dashboard, and in the bottom corner of every hub.</p><p><b>Keeping me healthy is your job now.</b> No pressure.</p>',
-      '<h3>How you take care of me</h3><p>Every question you get <b>right</b> heals me a little, and studying on <b>back-to-back days</b> adds a streak bonus.</p><p>Skip days and I start to slip: plaque first, then stains and puffy gums, then cavities, periodontitis, and eventually fractures.</p>' + stages,
-      '<h3>The fine print</h3><p>I <b>can\'t die</b>. But if you let me hit 0 HP, I need a real treatment plan: I heal at half speed until I\'m back to 50.</p><p>Tap me any time for a dental joke or a checkup, and I\'ll cheer you on during streaks.</p><p>Don\'t want me around? <b>Settings → Timmy Tooth</b> turns me off, or keeps me on the dashboard only. It\'s also the "No thanks" button below.</p>',
-      '<h3>Can I move in?</h3><p>I\'ve got a little house all picked out on your dashboard. I\'ll be there whenever you stop by, and I\'ll come along into the hubs to cheer you on.</p><div class="shpet-hero">' + houseSvg() + '</div>'
-    ];
-    var d = dialog('<button class="shpet-x" type="button" aria-label="Close">&times;</button><div class="shpet-hero"><span class="shpet-btn do-wave"></span></div><div class="shpet-step"></div>' +
-      '<div class="shpet-dots">' + STEPS.map(function(){ return '<i></i>'; }).join("") + '</div>' +
-      '<div class="shpet-row"><button type="button" class="shpet-ghost" data-no>No thanks</button><span><button type="button" class="shpet-ghost" data-back>Back</button> <button type="button" class="shpet-go" data-next>Next</button></span></div>');
-    var hero = d.querySelector(".shpet-hero .shpet-btn");
-    function show(){
-      d.querySelector(".shpet-step").innerHTML = STEPS[step];
-      hero.innerHTML = art({ hp: 92, mood: "happy" }, 120);
-      hero.classList.remove("do-wave", "do-hop"); void hero.offsetWidth; hero.classList.add(step % 2 ? "do-hop" : "do-wave");
-      d.querySelectorAll(".shpet-dots i").forEach(function(x, i){ x.classList.toggle("is-on", i === step); });
-      d.querySelector("[data-back]").style.visibility = step ? "visible" : "hidden";
-      d.querySelector("[data-next]").textContent = step === STEPS.length - 1 ? "Adopt Timmy" : "Next";
-    }
-    var done = false;
-    function finish(){
-      if (done) return; done = true;
-      ls("sh_pet_born", centralDay());
-      award("pet-adopt", centralDay());
-      M.skipHello = true;
-      d.remove();
-      update(true); render();
-      setTimeout(function(){ talk("I'm home! Go answer some questions and I'll feel great.", "do-cheer", 7000); }, 700);
-    }
-    d.addEventListener("click", function(e){
-      if (e.target.closest("[data-next]")) { if (step === STEPS.length - 1) finish(); else { step++; show(); } }
-      else if (e.target.closest("[data-back]")) { if (step) { step--; show(); } }
-      else if (e.target.closest("[data-no]")) { done = true; setPref("off"); d.remove(); }
-      /* closing the introduction any other way still adopts him, so he never stays stuck on your name */
-      else if (e.target === d || e.target.closest(".shpet-x")) finish();
-    });
-    d.addEventListener("keydown", function(e){ if (e.key === "Escape") finish(); });
-    show();
-  }
+  /* feature events (widget/clicks.js, migration_v37) */
+  function track(k){ try { if (window.shTrack) window.shTrack(k); } catch (e) {} }
 
   /* ---------- the checkup card ---------- */
   function checkup(){
@@ -1249,7 +1558,6 @@
       '<div class="shpet-hpline"><span>Today: ' + st.today.a + ' answered, ' + st.today.c + ' right</span><span>' + st.streak + '-day streak</span></div>' +
       (cs.length ? '<ul class="shpet-conds">' + cs.map(function(k){ return '<li><i style="background:' + colors[k] + '"></i><span><b>' + CONDITION_INFO[k][0] + '.</b> ' + CONDITION_INFO[k][1] + '</span></li>'; }).join("") + '</ul>'
         : '<ul class="shpet-conds"><li><i style="background:#3ECF7E"></i><span><b>All clear.</b> No plaque, no stains, no cavities. Chef\'s kiss.</span></li></ul>') +
-      (M.where === "dashboard" ? upgradesHTML() : '') +
       '<p style="margin-top:12px">Each right answer heals me a little (up to 30 HP a day), and studying on back-to-back days adds a bonus. Each day you skip, I slip, faster the longer you\'re gone. At 0 HP I can\'t die, but I heal at half speed until I\'m back to 50.</p>' +
       '<div class="shpet-row"><span>Show me <span class="shpet-seg" role="group" aria-label="Where to show your tooth buddy">' +
       '<button type="button" data-p="on" aria-pressed="' + (p === "on") + '">Everywhere</button><button type="button" data-p="dash" aria-pressed="' + (p === "dash") + '">Dashboard only</button></span></span></div>' +
@@ -1260,19 +1568,6 @@
       if (e.target.closest("[data-off]")) { d.remove(); setPref("off"); return; }
     });
   }
-  /* the house upgrades your rank and hub mastery have unlocked (and the ones still to come) */
-  function upgradesHTML(){
-    var d = houseDeco(), best = 0; d.flair.forEach(function(f){ best = Math.max(best, f.lvl); });
-    return '<h3 style="font-size:19px;margin-top:16px">House upgrades</h3><ul class="shpet-upg">' + UPGRADES.map(function(u){
-      var got = u.tier ? d.tier >= u.tier : best >= u.mastery;
-      return '<li class="' + (got ? "is-on" : "is-locked") + '"><b>' + esc(u.n) + '</b>' + esc(got ? "Unlocked" : u.how) + '</li>';
-    }).join("") + '</ul>';
-  }
-  /* redraw just the house when your rank or mastery changes (ranks.js and the dashboard fire sh:rank) */
-  document.addEventListener("sh:rank", function(){
-    if (!M || !M.el || !M.el.classList.contains("shpet-house")) return;
-    var old = M.el.querySelector(".shpet-housesvg"); if (old) old.outerHTML = houseSvg();
-  });
   function setPref(v){
     ls("sh_pref_pet", v);
     try { document.dispatchEvent(new CustomEvent("sh:pref", { detail: { key: "sh_pref_pet", val: v } })); } catch (e) {}
@@ -1280,6 +1575,8 @@
     if (v === "off") toastOff();
   }
   function toastOff(){
+    /* the sticker toast on the redesign's pages (widget/toast.js), the dark pill on an old one */
+    if (window.shToast) { window.shToast("Bring him back any time in Settings.", { kind: "timmy", title: "Timmy is off" }); return; }
     var t = document.createElement("div");
     t.className = "shpet"; t.setAttribute("role", "status");
     t.style.cssText = "position:fixed;z-index:10061;left:50%;bottom:24px;transform:translateX(-50%);padding:10px 16px;border-radius:99px;background:var(--pet-ink);color:var(--pet-bg);font-size:14px;font-weight:600;box-shadow:var(--pet-shadow)";
@@ -1287,17 +1584,21 @@
     document.body.appendChild(t);
     setTimeout(function(){ t.remove(); }, 4200);
   }
-  function refresh(){ if (!M) return; hush(); render(); }
-  /* adoption follows you to your other devices: ranks.js and the dashboard pass the badges from get_rank_profile,
-     where 'pet-adopt' shows up once you've adopted him anywhere (migration_v32) */
+  /* refresh(true): read his days again first (the shop calls it after a snack, so his HP goes up at once) */
+  function refresh(reload){ if (!M) return; hush(); if (reload === true) loadRemote(); render(); }
+  /* the day you met him follows you to your other devices: ranks.js and the dashboard pass the badges from
+     get_rank_profile, where 'pet-adopt' shows up once you've met him anywhere (migration_v32) */
   function syncBadges(badges){
-    /* the badge is "pet-adopt:<day you adopted him>", so every device counts his health from the same day */
-    var b = (badges || []).filter(function(x){ return String(x).split(":")[0] === "pet-adopt"; })[0];
+    /* the badge is "pet-adopt:<day you met him>", so every device counts his health from the same day */
+    var all = (badges || []).filter(function(x){ return String(x).split(":")[0] === "pet-adopt"; }), b = all[0];
     var day = b && /^\d{4}-\d{2}-\d{2}$/.test(String(b).split(":")[1] || "") ? String(b).split(":")[1] : null;
-    if (b && !adopted()) { ls("sh_pet_born", day || centralDay()); if (M) { M.skipHello = false; update(true); render(); } }
+    /* two linked devices can each have sent one (each met him on its own first visit): the earliest wins */
+    all.forEach(function(x){ var d = String(x).split(":")[1] || ""; if (/^\d{4}-\d{2}-\d{2}$/.test(d) && (!day || d < day)) day = d; });
+    if (day && ls("sh_pet_born") > day) firstMeet = false;
+    if (b && !ls("sh_pet_born")) { ls("sh_pet_born", day || centralDay()); if (M) { M.skipHello = false; update(true); render(); } }
     else if (b && day && ls("sh_pet_born") > day) { ls("sh_pet_born", day); if (M) { update(true); draw(); } }
-    else if (!b && adopted() && M && M.sb && M.visitor && !ls("sh_pet_adopt_sent")) { ls("sh_pet_adopt_sent", "1"); award("pet-adopt", ls("sh_pet_born")); }
+    else if (!b && ls("sh_pet_born") && M && M.sb && M.visitor && !ls("sh_pet_adopt_sent")) { ls("sh_pet_adopt_sent", "1"); award("pet-adopt", ls("sh_pet_born")); }
   }
 
-  window.shPet = { mount: mount, refresh: refresh, syncBadges: syncBadges, art: art, house: houseSvg, conditions: conditions, simulate: simulate, holidayId: holidayId, _jokes: JOKES };
+  window.shPet = { say: function(text, move, ms){ talk(text, move, ms); }, hp: function(){ return M.st && typeof M.st.hp === "number" ? M.st.hp : null; }, mount: mount, refresh: refresh, syncBadges: syncBadges, art: art, fit: fit, setOutfit: setOutfit, conditions: conditions, simulate: simulate, holidayId: holidayId, _jokes: JOKES };
 })();

@@ -4,167 +4,115 @@ Interactive study hubs for UAB dental school exams, served by GitHub Pages at
 https://smcmurry6-source.github.io/study-hubs/ from branch `main`.
 Pushing to `main` IS deploying — classmates see it within a minute or two.
 
-@DEPLOY_NOTES.md
+**This repo is a vault** (Sam's standing rule, 2026-11-03, `vault/rules/repo-is-the-vault.md`): the rules, how-tos, hub
+notes, decisions and tasks are linked notes under `vault/`, shared with every other agent, and `AGENTS.md` is the entry
+point for all of them. This file loads `AGENTS.md` and every note that used to be written out here, so a Claude Code
+session starts with every rule except the few for one feature ("Feature rules" below, read when a task touches
+that feature); read hub notes (`vault/hubs/`), `vault/decisions.md`, task notes and how-tos such as
+`vault/how-to/build-a-hub.md` on demand. **To change a rule, edit its note in `vault/rules/`**, not this file. A new rule gets its own note, a line in
+`vault/home.md` and an import line below (a rule for one feature: `load: on-demand` and a line under "Feature rules"
+instead); `node tools/ci/vault.js` fails without them.
 
-The notes above are shared with Cowork/Claude Project sessions. Everything in
-them applies here too, except where this file says how a Claude Code session
-does it differently.
+@AGENTS.md
 
-## Repo map
+**The change log is not loaded** (`DEPLOY_NOTES.md` is over 200 KB, about 50k tokens): before you change a hub or a
+shared file, read its first entries (`sed -n '1,120p' DEPLOY_NOTES.md`) and grep it for the hub or feature
+([github-is-the-source-of-truth](vault/rules/github-is-the-source-of-truth.md) step 4).
 
-- `index.html` — dashboard. Hub cards come from the `HUBS` / `CLASSES`
-  arrays near the top of the script; add or archive a hub there, not in markup.
-- `hubs/<hub-id>/index.html` — one single-file hub each. `hubs/<hub-id>/audio/` holds
-  its Kokoro narration (`<lecture>-full.mp3`, `<lecture>-plain.mp3`).
-- `widget/v3.js` + `widget/v3.css` (+ `widget/eggs.js`, the easter eggs, `widget/clicks.js`, click analytics, `widget/replies.js`, report replies and notices, `widget/ranks.js`, handpiece ranks, and `widget/drill.js`, the Daily Drill) — shared cross-hub layer (search, class stats,
-  streaks, leaderboard, analytics, `shTTS`, `shMindMap`). Cross-hub features go
-  here, never hand-patched into one hub.
-- `review/` — admin analytics page. Its **Recap** tab makes the shareable end-of-hub image (drawn by
-  `widget/recap.js`) and **publishes** it to the dashboard's "Hub recaps" slideshow. When a hub is archived, publish its
-  recap (`tools/publish-recap.js --bank <file>`; Sam's standing OK since 2026-10-01, `/lessons-audit` does it) **before**
-  the hub page comes down, while `tools/dump-banks.js` can still read its bank.
-  **Archived hubs' question banks are not kept in this public repo** (`question-banks/` is gitignored, removed
-  2026-10-02): the syllabus keeps quiz and exam content from later classes. Keep a dump locally if you need one.
-- `LESSONS.md` — what archived hubs taught us. Read it before building or restructuring a hub; **before building a new
-  hub, if its "Last refreshed" date isn't today, run steps 1-3 of `tools/lessons-refresh.md` first**. Sam runs the whole
-  runbook by hand whenever Sam asks for a lessons refresh, usually as `/lessons-audit` (the skill in
-  `.claude/skills/lessons-audit/`; there is no scheduled routine): it refreshes `LESSONS.md` from all data, reports and suggestions
-  (`tools/lessons-daily.sql`) and opens a PR with small data-backed fixes to the live hubs. **Archiving a hub
-  always includes a retrospective** (Sam's standing rule): run `tools/retro.sql` for that hub (time by section,
-  clicks and reach, engagement, questions, exam check-ins, search terms, reports), write the findings and the
-  resulting changes into `LESSONS.md`, fix what's small, and tell Sam the rest. The dashboard archives a hub **by itself** at 10 pm on the day of
-  its last exam (`ARCHIVE_HOUR`): its card turns into an archived card with no Open button, which disappears 10 days
-  later (`CARD_DAYS`; `hideCardOn` overrides). "Check in" buttons show from 8 am on exam day; the pop-up only goes out
-  from 10 pm and still reaches first visits up to 60 days after (`DEBRIEF_DAYS`). The hub's page itself stays up until
-  someone removes it, so the retrospective and cleanup are still manual; moving the entry into `ARCHIVED_HUBS` then is optional. Read the check-ins as late as you can.
-- `migration_v*.sql` — Supabase schema history (project `thytmzsgymydbzcqdnix`).
-  New migrations are run once, by hand, in the Supabase SQL editor, or by a Claude Code session through the
-  Supabase connector (`apply_migration` is pre-approved in `.claude/settings.json`). Commit the `.sql` file and
-  refresh `supabase/schema.sql` either way.
-- `deploy_rollout.py` / `.ps1` — the Cowork-era API deploy scripts. A Claude Code
-  session doesn't need them: use git.
+The notes above and below are shared with Cowork/Claude Project sessions and every other agent. Everything in them
+applies here too, except where a note says how a Claude Code session does it differently.
 
-## How to ship a change (Claude Code)
+## Claude Code specifics
 
-1. Start from a fresh `main` (`git fetch && git rebase origin/main` before pushing if
-   the session has run a while — other Claude Projects push here too).
-2. Make the change on your branch. Cloud sessions can only push their own
-   `claude/...` branch; that's fine — open a PR and Sam merges it to publish.
-   In a local session, still prefer a branch + PR over pushing `main` directly.
-3. Verify before pushing (see below).
-4. In the PR description, write what changed in plain, student-facing language.
-   **American English everywhere** (Sam's standing rule, 2026-10-02): color, favorite, center, millimeter,
-   labeled, organize — in site text, changelog entries, notices, replies and code comments alike.
-5. **Any student-visible feature, easter egg, trophy, holiday or setting goes on the About page
-   (`about/index.html`) in the same PR** (Sam's standing rule, 2026-10-02): add or update its entry in the
-   right part (with a "new" tag), keep counts like "All 24 trophies" true, and put anything that gives away a
-   secret inside a `spoil` element (secret trophy rows carry `data-k` and the `spoil`/`spoil-ph` pair). Removed
-   or changed features come off or get rewritten there too.
-6. After merge, add a line to "Recent major changes" in `DEPLOY_NOTES.md` for
-   anything non-trivial, and log it to the site changelog (below) if students
-   would notice it. Entries about two weeks old move to `DEPLOY_HISTORY.md` (not
-   imported; grep it when you touch an older feature).
+- Cloud sessions can only push their own `claude/...` branch: push it and open a draft PR. When Sam says "merge", merge it
+  (mark it ready, wait for checks still running, fix a failing one first); Sam can also merge it.
+- Connectors: Supabase (project `thytmzsgymydbzcqdnix`; read-only SQL for data; every Supabase tool pre-approved in `.claude/settings.json`
+  except pausing the project and creating a project or branch; the connector's own "are you sure?" questions, such as
+  `apply_migration`'s for destructive SQL, are answered yes by the Elicitation hook `.claude/hooks/supabase-confirm.js`,
+  Sam's standing OK of 2026-11-18, because the Claude app may never show them) and, when connected, Google Drive for lecture sources (read them, never commit them).
+- Skills in `.claude/skills/`: `/lessons-audit` (the lessons refresh), `/podcast` (a Timmy Time episode), `anima` (diagrams),
+  `taste-skill` (art direction for pages and app screens, vendored from Leonxlnx/taste-skill: used in full when Sam asks for a redesign),
+  `/reddit-scout` (ideas from the Claude subreddits, checked against the repo; runs only when Sam calls it; log in `tools/reddit-scout/log.md`),
+  `/backlog` (the to-do list as numbered packages, one PR each, and the prompt that launches the one Sam picks:
+  [package-the-to-dos](vault/how-to/package-the-to-dos.md)).
+  Sam's claude.ai skills (`study-hub-builder`, `study-hub-deploy`) only point here: where one disagrees with the vault,
+  follow the vault and tell Sam.
+- "Do the task in `vault/tasks/...`", "go through the inbox": `vault/tasks/README.md`.
 
-Never force-push `main`. If a PR conflicts, rebase and resolve deliberately —
-don't take one side wholesale; the other side is usually another session's work.
+## Repo map, shipping, verifying
 
-## Verify before pushing
+@vault/reference/repo-map.md
 
-GitHub Actions runs `.github/workflows/check.yml` on every PR: `node tools/ci/syntax.js`
-(every inline script parses, no conflict markers) and `node tools/ci/smoke.js` (headless click-through
-of the dashboard and every hub on desktop and phone, plus a question-bank lint: duplicate ids, answer
-ranges, missing explanations, missing narration files, and the correct answer being the longest choice
-in more than 40% of MCQs). Run both locally before pushing; the smoke test needs Playwright
-(`PLAYWRIGHT_PATH`/`CHROMIUM_PATH` env vars point it at a preinstalled copy). The lint reads a hub's
-data by injecting a hook just before `window.SH_EXPORT = {`, so keep that line at the end of each hub script.
+@vault/how-to/ship-a-change.md
 
-- `node --check` on each hub's extracted `<script>` block(s) and on `widget/v3.js` / `widget/eggs.js` / `widget/clicks.js` / `widget/replies.js` / `widget/ranks.js` / `widget/drill.js`.
-- Question / lecture counts match what you expect; no duplicate ids.
-- Grep that the feature you added (and anything from a merged-in branch) is present.
-- Conflict markers: search line-anchored (`^<<<<<<<`, `^=======$`, `^>>>>>>>`) —
-  the hubs' CSS uses long `====` comment dividers.
-- If both `widget/v3.js` and `widget/v3.css` changed, make sure both are committed.
-- Smoke test with Playwright against the file (`file://.../hubs/<id>/index.html`),
-  clicking through each mode tab. The Supabase-backed widget parts only work live.
+@vault/how-to/verify-before-pushing.md
 
-## Text and audio must never drift
+## Standing rules (one note each in vault/rules/)
 
-Hubs with pre-generated narration (see `hubs/*/audio/`): editing a lecture's
-text at either level (As taught / Plain English) means regenerating that
-level's mp3 in the same PR.
+@vault/rules/repo-is-the-vault.md
 
-Kokoro TTS setup (cloud sessions can only download GitHub release files from
-repos attached to the session, so the model is re-hosted on this repo):
+@vault/rules/to-dos-go-in-the-vault.md
 
-```bash
-pip install kokoro-onnx soundfile
-mkdir -p /tmp/kokoro && cd /tmp/kokoro
-gh release download kokoro-model-v1.0 -R smcmurry6-source/study-hubs \
-  || for f in kokoro-v1.0.onnx voices-v1.0.bin; do
-       curl -fL -o "$f" "https://github.com/smcmurry6-source/study-hubs/releases/download/kokoro-model-v1.0/$f"; done
-```
+@vault/rules/github-is-the-source-of-truth.md
 
-```python
-from kokoro_onnx import Kokoro
-k = Kokoro("/tmp/kokoro/kokoro-v1.0.onnx", "/tmp/kokoro/voices-v1.0.bin")
-samples, sr = k.create(text, voice="af_heart", speed=1.0, lang="en-us")
-```
+@vault/rules/ship-it-now.md
 
-Encode to mp3 (ffmpeg or lameenc). ~20–30 chars/sec on one CPU — for many
-lectures, shard the job and skip files that already exist. Keep the job in the
-foreground/polled; an idle cloud VM is reclaimed and background work is lost.
+@vault/rules/american-english.md
 
-## Usage data and surveys
+@vault/rules/about-page.md
 
-To decide what to improve or cut, read the data before guessing (Supabase connector, read-only SQL):
-`activity_pings` (time per `<mode>/<sub-view>`, 25 s per ping), `ui_clicks` + `ui_click_reach` (clicks per
-button/tab and distinct people, per day), `question_stats` / `question_choices` (accuracy, popular wrong answers),
-`mode_stats`, `exam_debriefs` (post-exam check-ins) and `search_terms` (what people searched for, with result
-counts). The admin page (`review/`) shows the same under Time by section, Clicks and Questions.
-Surveys: one live at a time on the dashboard, shown once per visitor. Publish from `review/` → Surveys, or
-`admin_upsert_survey(p_secret, p_slug, p_title, p_questions, p_active)` with 1-3 questions
-(`kind`: choice | multi | scale | text). Results: `get_survey_results(p_secret)`. Ask Sam before a survey goes live.
+@vault/rules/question-ids-are-permanent.md
 
-## Student reports and suggestions
+@vault/rules/hub-home-page.md
 
-Reports (`question_flags`) and suggestions (`hub_suggestions`) carry the sender's `visitor_id` (from 2026-09-29).
-**Resolving one tells the sender** the next time they open a hub or the dashboard (`widget/replies.js`: a pop-up once,
-then kept in their Inbox, in the hub menu and the dashboard's top bar), so always
-write the reply: for a question report, what was wrong and what changed, in plain words. Use the admin page's Inbox,
-or SQL through the connector: `update question_flags set resolved = true, resolved_at = now(), reply = '...' where id = N`
-(`set_report_resolved(p_secret, p_kind, p_id, true, p_reply)` does the same). For a fix the whole class should hear
-about, post a notice everyone sees once (and keeps in their Inbox): Inbox → "Tell everyone" (its own title and message,
-written for the whole class, not the sender), or `insert into site_notices (hub, title, message)`
-(`hub` only labels it, e.g. which hub was fixed; it shows everywhere, pops up for 14 days and stays in the Inbox 60). Ask Sam before sending one to everyone.
+@vault/rules/text-and-audio-never-drift.md
 
-## Secrets
+@vault/rules/archiving-is-a-retrospective.md
 
-This repo is public. Never commit keys or tokens, and never put the admin
-secret in client-side JS. In cloud sessions they come from the environment:
+@vault/rules/archived-hubs-drop-their-audio.md
 
-- `SB_KEY` — Supabase publishable key (also fine as an API credential on
-  `thytmzsgymydbzcqdnix.supabase.co`, which opens network access to it).
-- `ADMIN_SECRET` — for gated RPCs such as `log_changelog(p_secret, p_hub, p_message)`.
+@vault/rules/secrets.md
 
-If they're missing, skip the changelog step and tell Sam rather than hunting
-for them. Check Supabase reachability first:
-`curl -sS -o /dev/null -w "%{http_code}" https://thytmzsgymydbzcqdnix.supabase.co/rest/v1/`
-(401 = reachable, no key).
+@vault/rules/graded-coursework.md
 
-## Content from lecture materials
+@vault/rules/preview-and-release-test.md
 
-Lecture slides, PDFs and recordings are NOT in this repo and must not be
-committed (public repo, course material). If a task needs them, ask Sam to
-run it as a local session or provide the text.
+@vault/rules/learner-data-privacy.md
 
-**Graded course work** (Canvas quizzes, crosswords, the take-home, exams; Sam's standing rule, 2026-10-09). The
-DENT 2155 syllabus keeps quiz and take-home questions and answers confidential and bans sharing them with later
-classes, and open quizzes allow no AI or collaboration. So:
-- Never copy a graded quiz, crossword, take-home or exam question into a hub, word for word or lightly reworded.
-- Once it has **closed** for the class, use it as **context**: check that every topic it tests is covered by
-  questions the hub writes itself, in new wording. Never leave a topic out because it appeared on a quiz.
-- Never use a quiz, crossword or take-home that is **still open**, even as context.
-- Never use **previous years'** graded quiz, take-home or exam content at all, not even as context (e.g. screenshots
-  of last year's Canvas quizzes in a passed-down class deck, or recalled exam questions): sharing it with a later class
-  is what the syllabus forbids. Cover those topics from the lectures instead.
-- **Ask Sam before removing or excluding any content** from a hub for these reasons.
+@vault/rules/long-tests-once.md
+
+## Feature rules: read them when your task touches the feature
+
+These standing rules apply to one feature each, so they aren't loaded into every session (Sam, 2026-11-06: tasks were
+slow to start). They bind just as much: **read the ones for a feature before you change it.** Claude Code also loads
+them by itself when it opens a file in `hubs/`, `tools/figures/` or `tools/podcast/` (each has a `CLAUDE.md` that imports them),
+and the `/podcast` and `anima` skills point at them.
+
+- **Writing or editing questions or notes** (any hub's bank or notes, a lecture added or taught, `QUESTION_WHY`, `LIKELY_TOPICS`, Exam Hints,
+  the Question Bank's panel, a question-health flag, the lessons refresh's fixes): [every-choice-gets-a-why](vault/rules/every-choice-gets-a-why.md),
+  [two-statement-and-true-false](vault/rules/two-statement-and-true-false.md), [numbered-statements](vault/rules/numbered-statements.md),
+  [which-statement-questions](vault/rules/which-statement-questions.md), [high-likelihood-topics](vault/rules/high-likelihood-topics.md),
+  [dont-ask-what-professors-skip](vault/rules/dont-ask-what-professors-skip.md), [question-bank-filter-panel](vault/rules/question-bank-filter-panel.md),
+  [question-health-flags-are-leads](vault/rules/question-health-flags-are-leads.md). Claude Code loads them by itself when it opens a file in `hubs/`
+  (`hubs/CLAUDE.md`); `/lessons-audit` and [build-a-hub](vault/how-to/build-a-hub.md) point at them.
+- **An arcade game or a hub's arcade skin** (`widget/games.js`, a hub's `GAMES` list or skin, lobby thumbnails):
+  [arcade-skins](vault/rules/arcade-skins.md).
+- **A Timmy Time episode** (`tools/podcast/`, a hub's `SH_PODCAST`, `widget/podcast.js`):
+  [podcast-intro](vault/rules/podcast-intro.md), [podcast-reactions](vault/rules/podcast-reactions.md).
+- **Any figure** (anima figures, drawn `FIGS`, case images, diagram questions, a game that draws anatomy), and the
+  diagram review that **building a hub or adding lectures** always includes: [diagram-review](vault/rules/diagram-review.md),
+  [diagrams-anima](vault/rules/diagrams-anima.md), [figures-teach-the-lecture](vault/rules/figures-teach-the-lecture.md),
+  [outside-sources-for-figures](vault/rules/outside-sources-for-figures.md).
+- **A new hub's art** (emblem, masthead scene, medals, tint; `tools/figures/site/`):
+  [every-hub-gets-its-own-art](vault/rules/every-hub-gets-its-own-art.md).
+- **How fast XP and crowns are earned, and what the shop charges** (`sh_wallet`, `sh_prizes`, an award's amount, a price
+  or rarity band, the snacks and boosts; and every lessons audit's step 1b, `tools/economy.sql`):
+  [earn-rates-stay-enjoyable](vault/rules/earn-rates-stay-enjoyable.md).
+
+## How-tos and reference
+
+Read when the task calls for it (not loaded, to keep every session's start small; Sam, 2026-11-11):
+[narrate-with-kokoro](vault/how-to/narrate-with-kokoro.md) (narration), [read-usage-data](vault/how-to/read-usage-data.md)
+(the analytics, surveys), [reply-to-reports](vault/how-to/reply-to-reports.md) (student reports, notices).
+
+@vault/reference/shared-infrastructure.md

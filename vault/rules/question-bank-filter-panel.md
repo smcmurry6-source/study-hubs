@@ -1,0 +1,59 @@
+---
+type: rule
+load: on-demand
+tags: [questions, hub-ui]
+---
+
+# Question Bank: the filter panel, lecture picker, order and pins
+
+Sam's rules, 2026-10-30, 2026-11-03 ("refine the filtering ... people don't know how to use it") and 2026-11-06, for every live and future hub
+(not `heme-endo-exam1`: Sam said leave it as it is). The bank's filters are **one labeled panel** (`.qbar`), never a row of unlabeled
+dropdowns. Since the redesign's release (2026-11) **the engine draws it for every hub** (`widget/hub-bank.js`); a hub never copies
+it, and adds only its own toggles (`SH_HUB.bank.only`). The single-file hubs archived before then keep the panel they shipped with
+(the names below are theirs and the engine's alike):
+- **Lectures** (Perio: Sessions): a **tick-box list** (`lecPickHTML()` / `wireLecPick()`, every lecture ticked by default, All lectures /
+  Untick all) where **every row has an "Only" button** (one tap for one lecture; it closes the list). Beside it, the search box.
+- **Show**: chips for `STATE.ui.qstatus` (`BANK_SHOW`: All, Not answered yet, Missed last time, Pinned), one at a time, each with
+  the number of questions it would give under the other filters (`bankFiltered(search, {st})`).
+- **Only**: the **High likelihood** toggle (`STATE.ui.qlikely`, `BANK_LIKELY`; Perio `QBANK_FILTER.likely`), a tick-box chip on its own
+  line under Show that works **on top of any Show chip** (Sam, 2026-11-06: "filter by both high likelihood and not answered yet or
+  missed last time or pinned"): High likelihood + Missed last time, + Not answered yet, + Pinned, or + All for every High likelihood
+  question. Tapping it again turns it off; its count follows the Show chip (`bankFiltered(search, {lk})`), and on a phone "Only" stays
+  on the toggle's row. A saved Show chip `likely` from before (`bankNormShow()`, Perio `qbankNorm()`) becomes the toggle. A hub may add a
+  toggle for its own case, one on at a time (Heme & Endo Exam 2: **Exam 1 High likelihood**, `likely1`, the Exam 1 Refresher's
+  predicted-topic questions; Sam, 2026-11-06; Heme & Endo Exam 3: **On the study guide**, `{ basis: "study guide" }`, the questions of
+  the topics that rest on Dr. Herr's study guide; Sam, 2026-11-20). A toggle's spec is `{ prop, lec }` (a question property, in one
+  lecture) or `{ basis }` (the topics whose `basis` names those words, worked out on the page from `likelyTopics`: a topic's `picks` when it has
+  them, else its `ids`; Exam 3's guide topics pick 115 of their 209, each point asked once, Sam, 2026-11-20). Exam Hints' "Practice these" opens the bank with the toggle on and Show on All; Home's
+  buttons into the bank start with it off.
+- **Sets**: a row under Show: Daily drill, Yesterday's misses, Weak spots, Mock exam (`#questions/<set>`). A set replaces the list
+  until it's closed; the filters stay as they were. Above the panel, **Study as** picks how the chosen questions are asked:
+  Questions, Learn or Flashcards (`widget/study-modes.js`; the mock is always questions). In Learn and Flashcards the
+  launcher (how far along, Start) comes first and the panel follows under "Which questions" (Sam, 2026-11-13).
+- **Order**: **In order / Random** only (with **At a time** beside it, above) (`STATE.ui.qorder`; In order = by lecture, then bank order; Random shuffles once and keeps that
+  order until Random is tapped again). **No "Likely first"** (Sam, 2026-11-03): High likelihood is a filter, either those questions or the whole bank.
+- **More filters** (folded, with a "n on" badge): question type (`STATE.ui.qfmt`, only the formats the bank has, each with its count) and
+  where it's from (`STATE.ui.qsrc`).
+- Under the panel, `.qsum` says "Showing n of N questions" with a **removable tag for every filter that's on** and **Clear all**; when
+  nothing matches it names the filter in the way and offers "Show all N questions". The bank opens with the filters and order used last
+  time (saved in `STATE.ui`; Perio `STATE.ui.qbank`), which is why the tags matter: a saved filter is never hidden.
+- Filter changes are tracked (`bank:show=` for a Show chip or a toggle turned on, `bank:show=<toggle>-off`, `bank:lec-only`, `bank:type=`, `bank:src=`, `bank:tag-off=`, `bank:clear`, `bank:more`,
+  `bank:search`, `bank:order=`), since `widget/clicks.js` doesn't see `<select>` changes.
+- **At a time** (Sam, 2026-11-15: "I want the questions to be shown in intervals of 100 unless there are less questions than that in
+  the filter. Showing all 844 feels unmanageable", then "an option by the filters with how many questions to show at a time.
+  50/100/200/all"): beside Order (`STATE.ui.qsize`, 100 to start, `bank:size=`), a list longer than the size is shown a set at a
+  time. Above it, "Questions [101–200] of 845" with Previous and Next (`.qsets`, `setsBar()`); at the end of a set, "Next 100
+  questions". All is one list. Inside a set the cards still come fifty at a time and load by themselves (Sam, 2026-11-14). The
+  bank keeps its place while the filters stay the same (`STATE.ui.qpage`, the set's first question, so a new size keeps it too),
+  except Not answered yet and Missed last time, which start at their first set.
+- **The card**: Report and Pin sit in each card's head (`.qc-tools`), right of the lecture and status. Before the lecture, the card's
+  **number in its set** (Sam, 2026-11-15, from a classmate's idea: "so we know how many more are left"): "Question 12 of 100", or of
+  what a shorter set or list has ("of 84"; All: "of 845"), in the bank, the Daily drill (counting the ones done today), Yesterday's misses, Weak
+  spots and the mock (`qNum()` in `widget/hub-bank.js`); "Try it again" keeps it, the missed question that comes back a few cards
+  later has none. After an answer, one row:
+  **Try it again** (Retry on a phone), the shared widget's **Find this in the notes** (on a miss), **Ask Timmy** and **Good question?**
+  at its end. No "Notes for <lecture>" link (Sam, 2026-11-06: Find this in the notes does that job). On a laptop a Today column (the
+  goal ring, streak, XP, this session) sits beside the questions.
+- **Pinned questions**: the hub sets `window.SH_PINS = true`, the shared widget then adds a Pin button beside Report on every card
+  (`window.shPins`, saved in `sh_pins_<hub>` and synced across devices by `set_pins` / `get_my_pins` (migration_v46), `sh:pins` event,
+  which refreshes the chip counts). `STATE.ui.qlec` may be `'all'`, one id or an array of ids.

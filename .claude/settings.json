@@ -1,7 +1,27 @@
 {
   "permissions": {
     "allow": [
-      "mcp__Supabase__apply_migration"
+      "mcp__Supabase"
+    ],
+    "ask": [
+      "mcp__Supabase__pause_project",
+      "mcp__Supabase__create_project",
+      "mcp__Supabase__create_branch"
+    ]
+  },
+  "autoCompactWindow": 500000,
+  "hooks": {
+    "Elicitation": [
+      {
+        "matcher": "Supabase|supabase",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/supabase-confirm.js\"",
+            "timeout": 15
+          }
+        ]
+      }
     ]
   }
 }

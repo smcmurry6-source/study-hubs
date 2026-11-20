@@ -9,6 +9,10 @@
         exam-review guide...). No more than 3 from one lecture in this pass.
    Any shortfall is filled from what's left. The set is picked once a day and saved, so it doesn't
    change under you; "10 more" picks another set that skips everything already seen today.
+   Length (survey round 2, 2026-10-20): 10, 20 or 30 questions, picked on the intro screen and remembered for every
+   hub in sh_drill_size; the caps above scale with it (spaced review up to 60% of the set, misses 80%, 30% per lecture).
+   Switching before you start grows the set (keeps what was picked, adds more) or trims it. The finish screen offers
+   more in any of the three lengths.
 
    The hub supplies the questions and draws each card with its own renderer (so every question type,
    the explanation, class % and Report button look the way they do everywhere else):
@@ -23,12 +27,14 @@
    and Weak Spots all update as usual. Any element with data-sh-drill opens the drill; so does
    opening a hub at #drill (the dashboard links there).
 
-   This device only: sh_drill_<hub> = { day, items:[{id, why, note}], res:{qid: 1 | 0 | "s"},
+   This device only: sh_drill_size = "10" | "20" | "30"; sh_drill_<hub> = { day, items:[{id, why, note}], res:{qid: 1 | 0 | "s"},
    start (first item of the current set), done (the day's first set is finished), cheer };
    sh_drill_days = { "YYYY-MM-DD": 1 } for the drill streak (a finished set in any hub counts). ============ */
 (function(){
   if (window.shDrill) return;
-  var SIZE = 10;
+  var SIZES = [10, 20, 30];
+  function size(){ var n = 10; try { n = +localStorage.getItem("sh_drill_size") || 10; } catch (e) {} return SIZES.indexOf(n) >= 0 ? n : 10; }
+  function setSize(n){ try { localStorage.setItem("sh_drill_size", String(n)); } catch (e) {} try { if (window.shTrack) window.shTrack("drill:size=" + n); } catch (e) {} }
   var H = null, HUB = "", KEY = "", DAYS_KEY = "sh_drill_days";
   var dlg = null, body = null, opener = null, isOpen = false, cur = -1, stats = null;
 
@@ -39,6 +45,7 @@
   var IC_SKIP = svg('<path d="M6 12h12"/>');
   var IC_FLAME = svg('<path d="M12 21c3.6 0 6-2.4 6-5.6 0-3.4-2.4-5.3-3.4-8.4-.4 1.9-1.4 3.1-2.6 3.7.2-2.7-.9-5.3-3.2-6.7.3 3.1-2.8 5.4-2.8 9.3C6 18.6 8.4 21 12 21z"/>');
 
+  function still(){ try { return window.matchMedia("(prefers-reduced-motion: reduce)").matches; } catch (e) { return false; } }
   function hook(){ var d = window.SH_DRILL; return d && typeof d.pool === "function" && typeof d.render === "function" ? d : null; }
   function esc(s){ return H.esc(s); }
   function today(){ return H.day(0); }
@@ -105,11 +112,11 @@
     var rest = P.filter(function(p){ return !skip[p.id] && !srs[p.id] && p.last !== false; });
     var near = ranked(rest.filter(function(p){ return !any || studied[p.lec]; }));
     var far = any ? ranked(rest.filter(function(p){ return !studied[p.lec]; })) : [];
-    var perLec = {}, spread = near.filter(function(p){ perLec[p.lec] = (perLec[p.lec] || 0) + 1; return perLec[p.lec] <= 3; });
+    var perLec = {}, lecCap = Math.max(3, Math.round(n * .3)), spread = near.filter(function(p){ perLec[p.lec] = (perLec[p.lec] || 0) + 1; return perLec[p.lec] <= lecCap; });
     var out = [], used = {};
     function take(list, max){ for (var i = 0; i < list.length && out.length < max; i++) if (!used[list[i].id]) { used[list[i].id] = 1; out.push(list[i]); } }
-    take(due, Math.min(6, n));
-    take(missed, Math.min(8, n));
+    take(due, Math.round(n * .6));
+    take(missed, Math.round(n * .8));
     take(spread.map(hyItem), n);
     take(due, n); take(missed, n); take(near.map(hyItem), n); take(far.map(hyItem), n);
     return shuffle(out);
@@ -131,17 +138,20 @@
       else if (act === "start") { var s = loadSet(); if (s) showQ(s, Math.max(firstOpen(s), 0)); }
       else if (act === "skip") skip();
       else if (act === "next") next();
-      else if (act === "more") more();
+      else if (act === "more") more(+b.getAttribute("data-n") || size());
+      else if (act === "size") resize(+b.getAttribute("data-n"));
     });
   }
   function top(right){
     return '<div class="shd-top"><span class="shd-kicker">' + IC_BOLT + 'Daily drill</span>' + (right || '') +
       '<button type="button" class="shd-x" data-shd="close" aria-label="Close the daily drill">&times;</button></div>';
   }
-  function streakLine(done){
+  /* roll: the set that was just finished started today's streak day, so the number rolls up from yesterday's */
+  function streakLine(done, roll){
     var n = streak(), counted = !!(lsGet(DAYS_KEY) || {})[today()];
     if (!n) return done ? '' : '<p class="shd-streak">' + IC_FLAME + 'Finish a set today to start a drill streak.</p>';
-    if (done || counted) return '<p class="shd-streak">' + IC_FLAME + '<span><b>' + n + '-day</b> drill streak' + (n === 1 ? '. Come back tomorrow to keep it going.' : '. A set in any hub counts.') + '</span></p>';
+    var num = roll ? '<span class="shd-roll"><i class="o" aria-hidden="true">' + (n - 1) + '</i><i class="n">' + n + '</i></span>' : n;
+    if (done || counted) return '<p class="shd-streak">' + IC_FLAME + '<span><b>' + num + '-day</b> drill streak' + (n === 1 ? '. Come back tomorrow to keep it going.' : '. A set in any hub counts.') + '</span></p>';
     return '<p class="shd-streak">' + IC_FLAME + '<span><b>' + n + '-day</b> drill streak. Finish today\'s set to make it ' + (n + 1) + '.</span></p>';
   }
   function questionText(id){
@@ -168,9 +178,28 @@
       '<h2 id="shd-title">Today\'s drill</h2>' +
       '<p class="shd-lead">' + items.length + (items.length === 1 ? ' question' : ' questions') + ', about ' + Math.max(2, Math.round(items.length * .6)) + ' minutes' + (sc ? ' · ' + esc(sc) : '') + '</p>' +
       '<ul class="shd-mix">' + rows + '</ul>' +
+      (s.start || countDone(s) ? "" : lengthHTML()) +
       '<p class="shd-how">Miss one and it comes back tomorrow. Get it right and it comes back after 1, 2, 4, then 7 days, and never later than the day before the exam, so what you studied stays fresh. A new set is picked every day.</p>' +
       '<div class="shd-actions"><button type="button" class="shd-btn is-primary" data-shd="start">Start</button></div>' +
       streakLine(false);
+  }
+  /* how many questions: 10, 20 or 30 (only before the day's first set is started) */
+  function lengthHTML(){
+    return '<div class="shd-len" role="group" aria-label="How many questions"><span>Length</span>' + SIZES.map(function(n){
+      return '<button type="button" class="shd-len-btn" data-shd="size" data-n="' + n + '" aria-pressed="' + (n === size()) + '">' + n + '</button>';
+    }).join("") + '</div>';
+  }
+  function resize(n){
+    if (SIZES.indexOf(n) < 0) return;
+    var s = loadSet(); setSize(n);
+    if (!s || s.start || countDone(s)) { if (s) showIntro(s); return; }
+    if (s.items.length > n) { s.items = s.items.slice(0, n); saveSet(s); showIntro(s); refreshEntry(); return; }
+    loadStats(function(){
+      var seen = {}; s.items.forEach(function(it){ seen[it.id] = 1; });
+      s.items = s.items.concat(pick(n - s.items.length, seen)); saveSet(s);
+      if (isOpen) showIntro(s);
+      refreshEntry();
+    });
   }
   function showQ(s, i){
     var it = s.items[i]; if (!it) { showDone(s); return; }
@@ -195,9 +224,10 @@
     for (j = s.start || 0; j < i; j++) if (!has(s, s.items[j].id)) return j;
     return -1;
   }
+  var freshDay = false;   // the set just finished was the first one today (showDone rolls the streak number)
   function finishCheck(s){
     if (firstOpen(s) >= 0) return;
-    if (!s.done) { s.done = true; markDay(); }
+    if (!s.done) { s.done = true; freshDay = !(lsGet(DAYS_KEY) || {})[today()]; markDay(); }
   }
   function next(){
     var s = loadSet(); if (!s) { close(); return; }
@@ -214,31 +244,46 @@
     cur = -1;
     var items = round(s), right = 0, wrong = 0, skipped = 0;
     items.forEach(function(it){ var r = s.res[it.id]; if (r === 1) right++; else if (r === 0) wrong++; else skipped++; });
-    var extra = (s.start || 0) > 0;
-    body.innerHTML = top() +
-      '<div class="shd-done-mark">' + IC_CHECK + '</div>' +
+    var extra = (s.start || 0) > 0, fresh = s.cheer !== s.items.length && right + wrong > 0, roll = fresh && freshDay;
+    freshDay = false;
+    /* the check draws itself, the score counts up, the results tick in one by one (CSS in v3.css) */
+    body.innerHTML = top() + '<div class="shd-done' + (fresh ? ' is-fresh' : '') + '">' +
+      '<div class="shd-done-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path pathLength="1" d="m5 12.5 4.2 4.2L19 7"/></svg></div>' +
       '<h2 id="shd-title">' + (extra ? 'Extra set done' : 'Drill done for today') + '</h2>' +
-      '<p class="shd-lead">' + (right + wrong ? right + ' of ' + (right + wrong) + ' right' : 'All skipped') + (skipped && right + wrong ? ' · ' + skipped + ' skipped' : '') + '</p>' +
+      '<p class="shd-lead">' + (right + wrong ? '<b class="shd-cnt">' + right + '</b> of ' + (right + wrong) + ' right' : 'All skipped') + (skipped && right + wrong ? ' · ' + skipped + ' skipped' : '') + '</p>' +
       '<p class="shd-how">' + (wrong ? (wrong === 1 ? 'The one you missed comes back tomorrow. ' : 'The ' + wrong + ' you missed come back tomorrow. ') : '') +
         (right ? 'The ones you got right come back in a day or two, a little later each time, and before the exam.' : '') + '</p>' +
-      streakLine(true) +
-      '<div class="shd-actions"><button type="button" class="shd-btn is-primary" data-shd="more">' + SIZE + ' more</button>' +
-      '<button type="button" class="shd-btn" data-shd="close">Close</button></div>' +
-      '<ol class="shd-results" aria-label="How you did">' + items.map(function(it){
+      streakLine(true, roll) +
+      '<div class="shd-actions">' + SIZES.map(function(n){ return '<button type="button" class="shd-btn' + (n === size() ? ' is-primary' : '') + '" data-shd="more" data-n="' + n + '">' + n + ' more</button>'; }).join("") +
+      '<button type="button" class="shd-btn is-quiet" data-shd="close">Close</button></div>' +
+      '<ol class="shd-results" aria-label="How you did">' + items.map(function(it, i){
         var r = s.res[it.id], cls = r === 1 ? "ok" : r === 0 ? "bad" : "skip";
-        return '<li class="is-' + cls + '"><span class="shd-res-ic" role="img" aria-label="' + (r === 1 ? 'Right' : r === 0 ? 'Missed' : 'Skipped') + '">' + (r === 1 ? IC_CHECK : r === 0 ? IC_X : IC_SKIP) + '</span><span>' + esc(questionText(it.id)) + '</span></li>';
-      }).join("") + '</ol>';
-    if (s.cheer !== s.items.length && right + wrong) { s.cheer = s.items.length; saveSet(s); try { H.confetti(); } catch (e) {} }
+        return '<li class="is-' + cls + '" style="--i:' + Math.min(i, 14) + '"><span class="shd-res-ic" role="img" aria-label="' + (r === 1 ? 'Right' : r === 0 ? 'Missed' : 'Skipped') + '">' + (r === 1 ? IC_CHECK : r === 0 ? IC_X : IC_SKIP) + '</span><span>' + esc(questionText(it.id)) + '</span></li>';
+      }).join("") + '</ol></div>';
+    var cnt = body.querySelector(".shd-cnt");
+    if (cnt && right > 1 && !still()) {
+      var t0 = performance.now() + 250;
+      cnt.textContent = "0";
+      (function tick(now){
+        var u = Math.max(0, Math.min(1, (now - t0) / 700));
+        cnt.textContent = Math.round(right * (1 - Math.pow(1 - u, 3)));
+        if (u < 1 && cnt.isConnected) requestAnimationFrame(tick);
+      })(performance.now());
+    }
+    if (fresh) { s.cheer = s.items.length; saveSet(s); try { H.confetti(); } catch (e) {} }
     focusPanel();
   }
-  function more(){
+  function more(n){
     var s = loadSet(); if (!s) return;
-    var btn = body.querySelector('[data-shd="more"]'); if (btn) btn.disabled = true;
+    if (n !== size()) setSize(n);
+    try { if (window.shTrack) window.shTrack("drill:more=" + n); } catch (e) {}
+    var btns = body.querySelectorAll('[data-shd="more"]');
+    btns.forEach(function(b){ b.disabled = true; });
     loadStats(function(){
       var seen = {}; s.items.forEach(function(it){ seen[it.id] = 1; });
-      var add = pick(SIZE, seen);
+      var add = pick(n, seen);
       if (!add.length) {
-        if (btn) { btn.disabled = false; btn.hidden = true; }
+        btns.forEach(function(b){ b.hidden = true; });
         var how = body.querySelector(".shd-how"); if (how) how.textContent = "That's every question in scope for today. Come back tomorrow for a fresh set.";
         return;
       }
@@ -268,7 +313,7 @@
       loadStats(function(){
         if (!isOpen) return;
         var s2 = loadSet();
-        if (!s2) { var items = pick(SIZE, {}); if (items.length) { s2 = { day: today(), items: items, res: {}, start: 0 }; saveSet(s2); } }
+        if (!s2) { var items = pick(size(), {}); if (items.length) { s2 = { day: today(), items: items, res: {}, start: 0 }; saveSet(s2); } }
         route(s2);
         refreshEntry();
       });
@@ -325,11 +370,40 @@
     if (chip) {
       chip.hidden = st.state === "done" || isOpen;
       var lab = chip.querySelector(".shd-chip-sub");
-      if (lab) lab.textContent = st.state === "going" ? st.n + " of " + st.total : st.due ? st.due + " due" : SIZE + " questions";
+      if (lab) lab.textContent = st.state === "going" ? st.n + " of " + st.total : st.due ? st.due + " due" : size() + " questions";
     }
   }
 
   window.shDrill = {
+    /* the redesigned hubs (widget/hub.js, not live yet) show the day's set as a preset of their question bank instead
+       of this dialog: set(cb) hands over today's set, picked and saved exactly as the dialog does it, and mark() records
+       an answer to one of its questions. The live hubs never call these. */
+    set: function(cb){
+      if (!H || !hook()) { cb(null); return; }
+      var s = loadSet(); if (s) { cb(s); return; }
+      loadStats(function(){
+        var s2 = loadSet();
+        if (!s2) { var items = pick(size(), {}); if (items.length) { s2 = { day: today(), items: items, res: {}, start: 0 }; saveSet(s2); } }
+        refreshEntry(); cb(s2 || null);
+      });
+    },
+    more: function(n, cb){
+      if (!H || !hook()) { cb(null); return; }
+      var s = loadSet(), skip = {}; if (!s) { this.set(cb); return; }
+      s.items.forEach(function(it){ skip[it.id] = 1; });
+      var items = pick(SIZES.indexOf(n) >= 0 ? n : size(), skip);
+      if (!items.length) { cb(s); return; }
+      s.start = s.items.length; s.items = s.items.concat(items); s.done = false; saveSet(s);
+      try { if (window.shTrack) window.shTrack("drill:more=" + n); } catch (e) {}
+      refreshEntry(); cb(s);
+    },
+    mark: function(qid, correct){
+      var s = loadSet(); if (!s || isOpen) return;
+      var it = round(s).filter(function(x){ return x.id === String(qid); })[0];
+      if (!it || s.res[it.id] === 1 || s.res[it.id] === 0) return;
+      s.res[it.id] = correct ? 1 : 0; finishCheck(s); saveSet(s); refreshEntry();
+    },
+    streak: function(){ return H ? streak() : 0; },
     mount: function(hooks){
       if (H || !hooks) return;
       H = hooks; HUB = hooks.hub; KEY = "sh_drill_" + HUB;

@@ -1,0 +1,220 @@
+# Timmy Tooth: the canon
+
+Timmy Time episodes build on each other. Before writing a new one, read this, keep every fact here true, add a few
+new tidbits (two to four, short, never more than a paragraph each), and append them below in the same PR.
+Where the widgets already do something (`widget/pet.js`, `widget/timmy.js`), the lore has to match what students see.
+
+## Who he is
+
+- **Timmy Tooth**: the hubs' cartoon tooth (`widget/pet.js`). Small, round, "frankly adorable", with a deep voice
+  (MSK Exam 4: "Small tooth. Big voice.").
+- He is a **lower first molar with two roots**, number thirty (Occlusion: his distobuccal cusp lands "somewhere between
+  the oblique ridge and the distal fossa" of number three; "I like to keep them guessing").
+- "I'm hard, I'm white, and I have one job" (MSK Exam 4, about skin doing everything).
+- He can feel a twenty-five micron hair between his teeth (Occlusion).
+
+## Where he lives
+
+- His **place** (the redesign, 2026-11; `widget/place.js`): the cottage on a hill is every Timmy's first home, with the
+  toothbrush planted by the front door and a tree out front (Occlusion). A student can move him (a castle, a giant
+  mushroom, a treehouse, a beach hut, a lighthouse, an igloo, an observatory, and a home in each seasonal set) and set the
+  scene around it (the beach, the forest, above the clouds, a snowy mountain, the night sky), so an episode never says
+  where he lives today: "my place", "the yard", "the front door" are always true. The yard follows the seasons (spring
+  blossom, fall leaves, winter snow): say nothing that contradicts that.
+- **By the door**: the toothbrush (it talks now), and a statue of the student's rank in the rank's metal; past the
+  Handpiece a ModuPro shares the pedestal, and in the Loupes journey Timmy wears loupes. The medal board by the house
+  hangs one medal for every hub the student has mastered. (The old house card's picket fence, lamppost and pennants
+  went with the old dashboard; the episodes never named them.)
+- **Neighbors, seen from the yard**: Number thirty-one's house is the small one up the hill (tap it and he takes his
+  temperature; his letters come to Timmy's mailbox, usually about a bump). The rabbit down the hill has a burrow at
+  the bottom of the yard. New, and only at certain scenes: a crab on the beach (it has moved into a sandcastle), an
+  owl in the forest, a yeti behind a rock on the mountain, a friend in a crater under the night sky, a whale off the
+  beach, and the dog in the doghouse, who brushes twice a day.
+- **The podcast studio** is a yard piece: where it stands, that's where Timmy Time is recorded. Nothing in an episode
+  says otherwise so far; don't place the studio anywhere else.
+  **Its inside** was first drawn for the redesign's launch trailer (`tools/trailer/studio.mjs`, 2026-11-14), so
+  keep to it: plum acoustic-foam walls, one window with sky in it (never the yard, so it fits wherever the studio
+  stands), an ON AIR lamp that comes on when he starts and goes off when he signs off, a framed Timmy Time poster,
+  a shelf, a desk with a small mixer, his mug, his pages, and a microphone on a boom arm with a pop filter. He wears
+  the headphones. The trailer is not an episode ("this is not Timmy Time"): it has no number, no likes and no
+  comments, and it adds no other lore.
+- **His health shows in how he moves** at his place (bouncing when sparkling, on the doorstep when he needs
+  treatment), the same HP as everywhere else. A visitor never sees it: a visited Timmy is always drawn well.
+- **Number thirty-one**, the second molar who lives right behind him, is his neighbor (Heme & Endo Exam 1). A hypochondriac
+  who listens to the lectures through the wall and believes he has every disease in them: asked whether his jaw looks
+  heavy after hearing about acromegaly ("You don't have a jaw. You live in one."), wore a tiny scarf for cold intolerance,
+  and decided he only has the diseases on Exam Two. After the implant lectures (PCD Implants Exam 1) he decided he was a
+  failing implant: tapped himself with a spoon for percussion pain, asked whether he looked radiolucent ("You were never
+  osseointegrated. You have a ligament."), then took a periapical of himself: "Very nice crest." He thinks the turkey
+  costume is a cry for help.
+  On Exam Two, the diseases he said he has (Heme & Endo Exam 2), he bought a **glucose meter** after the diabetes lecture
+  and checks himself after every meal, "not his meal, yours" ("You don't have a pancreas."). His glucose is normal; he
+  credits metformin, which he isn't on (and which wouldn't lower a normal glucose anyway: Dr. Fasinu).
+  After the diagnosis lecture (Perio final) he **staged himself**: probed with a toothpick, found a four and announced Stage
+  four, Grade C ("A toothpick is not a probe. You have no bone loss. And a four is not a stage. You're not staged. You're
+  anxious."; he doesn't smoke "and you don't have a pancreas", so no Grade C either). By the sign-off he was "Stage zero"
+  ("That's not a stage either, thirty-one. It's called health."). He asked whether he has a cervical enamel projection:
+  as a lower second molar he is "the likelier of the two of us" (true: they're more common on mandibular molars, about
+  30%, and on second molars). And Dr. Kaur's number thirty-one implant case, heard through the wall, "was a different
+  number thirty-one."
+  After the Occlusion final's L7 he decided he **grinds at night** and wants a **night guard for one tooth**: that's partial
+  coverage (Dr. Givan wants full coverage in almost every situation, and a small splint is an aspiration hazard at night),
+  and bruxism is centrally mediated ("You don't have a brainstem."). He ordered it anyway and says he'll wear it in the
+  daytime too; he's a mandibular tooth, so that makes it a mandibular splint, the daytime kind. After L10 he **checked his
+  own mobility** between two mirror handles (Miller's index), decided he's a Class three, and pressed down on himself for
+  vertical movement: nothing. He moved about a tenth of a millimeter, physiologic ("You have a ligament. It's supposed to
+  give.").
+  After the lymphoma lecture (Heme & Endo Exam 3) he wrote Timmy a letter about **a bump**: firm, painless, "there as long as
+  I can remember", with night sweats, and asked whether he should be staged. It's his cusp ("You've had it since you
+  erupted. You don't have lymph nodes. You're a tooth."), and the night sweats are the tiny scarf he's slept in since Exam
+  One ("The tissue makes the diagnosis, and your tissue is enamel."). He accepted it, still wants it biopsied, and asks that
+  it be sent fresh, not in formalin. In the comments he found more bumps: he has four cusps (true: a lower second molar has
+  four, two buccal and two lingual).
+- **The rabbit down the hill** (new in the implants episode's comments): offended that Timmy called rabbits "showy" for
+  teeth that never stop growing (true: rabbit teeth grow all their lives and are worn down by chewing). Proud that
+  osseointegration was found in rabbit bone (Brånemark, 1952).
+- **The toothbrush by the front door** (canon since Occlusion) talks now, in the comments: feels left out of every episode,
+  and reminds everyone that implants need cleaning too.
+  **Its big episode was the Perio final**: Phase one starts with oral hygiene instruction, which Dr. Litz called "arguably
+  the most important appointment", and "we clean their teeth two to four times a year; they clean them seven hundred to
+  eight hundred" (it asked Timmy to say it twice; he said it once, and its own summary, "seven hundred brushings at home
+  beat four cleanings in the chair", is "near enough"). Nobody has told it that toothbrushing is the most common
+  traumatic factor in recession ("It's having a big episode. Let it have tonight."). Its comment: it's soft-bristled.
+  It was **also vindicated, by Dr. Lawson's L9** (the Occlusion final): brushes
+  used without toothpaste made no cervical lesions, so the toothpaste matters more than the brush. It spent the week
+  saying "I told you so" to the doormat. Its comment there: soft bristles (for the gums too), **no pressure sensor**, and
+  it is sensitive about that. (Still nobody has told it about recession.)
+- **The bowling alley** (the redesign's bowling egg, `widget/bowling.js`, from its release): a bowling lane can stand in
+  his yard, and the alley's screen plays odd cartoons after a strike, the way real alleys do. The pins are the Plaque crew
+  from the boss fights (Plaque Boss, Tartar Titan, Biofilm Blob, the Strep Mutans Swarm, Cavity Creep, the Gingivitis
+  Goblin, Halitosis Haze and the Red Complex), never teeth, and the ball is a giant **sugar-free mint**. Number thirty-one
+  comes to watch from the gallery with a thermometer in his mouth and **faints at the noise** of a strike; the head pin
+  fans him with a scorecard. The toothbrush by the door sweeps up the pins, and three strikes bring out a turkey in
+  Timmy's pilgrim hat. Never say Timmy bowls with a tooth or that a pin is a tooth.
+
+## Costumes
+
+- Until the redesign's release (2026-11) he dressed himself for holidays and the fall weeks. Halloween 2026: four costumes, a witch hat,
+  a vampire cape with fangs ("just very long canines with big ambitions"), a pumpkin cap with a candy pail, and a black cat.
+  **He couldn't pick one, so he wore the next one each time a page loaded.** He never revealed a single
+  costume as "the one", because students saw different ones. This is canon for the episodes already out.
+- **From the redesign on, the student dresses him** ([Ask Timmy](../../vault/tasks/done/2026-11-12-redesign-ask-timmy.md),
+  part 4; Sam, 2026-11-12: "What you put wins"). Everyone has Timmy (nobody adopts him any more; he says hello on a first
+  visit), and he wears only what the student put on at his place, from the shop or his rank: on the hub's bar, on the
+  dashboard, at his place, in the classroom and on the leaderboard's stage. With nothing on he wears nothing, on a holiday
+  too; he no longer picks a holiday costume himself. An episode written after the release never says what he's wearing
+  (each student dresses theirs), and never that he picked it: "whatever you put me in" is the line. His holiday looks are
+  the shop's seasonal sets now (a floss mummy and a bedsheet ghost at Halloween, a holiday sweater and an elf suit in the
+  winter), and the old "he can't pick one" can be a joke about the past ("I used to dress myself. You saw how that went.").
+- **Rare costumes** (the redesign's shop, [released 2026-11](../../vault/tasks/done/2026-11-06-redesign-release.md)):
+  ten costumes (five at the release, five more on 2026-11-18) that turn up at Timmy's shop now and then, about one ordinary day in twelve, never on a holiday or in the
+  fall weeks, a different day for each student. When one turns up he says so once ("Something rare came in at the shop
+  today: the pirate costume"), and it waits on the shop's Spotted shelf until it's bought. Each student spots them in
+  their own order, so an episode never says which one is out, and never that he owns one. What he says in each (the
+  kit, `tools/figures/site/place.mjs`, is where they live):
+  - **The pirate** (Epic, 2,000 gold crowns): a hat with a tooth and crossed brushes, an eye patch, a hook. "Arr. X marks
+    the spot. The spot is your back molars. Brush there." "No scurvy on this ship." "Yo ho ho and a bottle of mouthwash.
+    Swish, don't swallow."
+  - **The astronaut** (Epic, 2,500): a helmet with a gold visor and an antenna. "One small step for a tooth. One giant
+    leap for your streak." "Houston, we have no cavities." "In space nobody can hear you floss. Do it anyway."
+  - **The detective** (Epic, 1,800): a deerstalker, a caped coat, a magnifying glass. "The case of the missing floss. I
+    suspect everyone." "Elementary. The plaque did it. It always does." "I've found a clue. It's between your teeth."
+  - **The chef** (Epic, 1,500): a pleated toque, a wooden spoon. "Tonight's special: carrots from my garden." "The secret
+    ingredient is never sugar." "Order up! One study session, well done."
+  - **Captain Enamel** (Legendary, 4,000): a red cape, a blue mask, a gold shield with a tooth on it. "The hardest
+    substance in the human body, at your service." "My one weakness? Acid. Don't tell the plaque." "Fear not, citizen.
+    I'll guard your smile. You do the flossing."
+  - **The wizard** (Epic, 2,000): a tall starry hat with a floppy tip, a robe of stars and moons, a staff topped with a
+    glowing crystal tooth. "Abracadabra! The plaque vanishes. The trick? Two minutes, twice a day."
+  - **The robot** (Epic, 2,200): a square silver helmet with two antennae and a visor his face shows through, a chest
+    panel of buttons and lights, a dial. "Beep boop. Scanning for plaque. Scan complete: you missed a spot."
+  - **The firefighter** (Epic, 1,600): a red helmet with a tooth on its shield, a tan turnout coat with reflective
+    stripes, a hose nozzle with a little spray. "I fight fires and inflammation. Gingivitis doesn't stand a chance."
+  - **The shark** (Epic, 2,400): a gray hood with a dorsal fin, its mouth open round his face with two rows of soft teeth,
+    fins and a tail. "Sharks grow new teeth all their lives. I'm not jealous. Okay, I'm a little jealous."
+  - **The dragon** (Legendary, 4,500): a green-scaled hood with horns, a frill and its own friendly eyes, bat wings, a
+    golden belly plate, a tail curled round the front. "Dragons guard treasure. I guard enamel. Same thing, really."
+- **The shop** itself (same release): he runs it, in a bow tie, behind the counter. Its money is **Shiny Gold Crowns**
+  (said in full the first time, "gold crowns" after, never just "crowns"): five for every 10 XP, more for trophies,
+  medals and rank-ups; spending never lowers XP or rank. Snacks (an apple, a cheese cube, floss, a fluoride rinse) give
+  him HP back, one of each a day; a boost doubles XP for an hour or three.
+- Occlusion (Oct 21): "it's October, so yes, I'm in costume. I'm not going to tell you which one."
+- The Occlusion final (Nov 16, the first exam after the release): "Back then it was October, I was in costume, and I
+  wouldn't tell you which one. I used to dress myself. You saw how that went. These days I wear whatever you put me in."
+- Thanksgiving 2026 (Nov 1 to the day after Thanksgiving, as in the widget): three costumes, a pilgrim hat with a buckle, turkey
+  feathers, and a chef's hat with a pie, the next one each page load, never revealed (PCD Implants Exam 1).
+  The pie is not a snack, "it is a postprandial event"; it stays uneaten and is "decorative" ("Postprandial events are for
+  people with a pancreas.") (Heme & Endo Exam 2).
+- **After the release** (Perio final, Nov 19, a week before Thanksgiving): "I used to dress myself for the holidays. You saw
+  how that went. These days you dress me, so whatever you put me in, that's what I'm wearing." One thing hasn't changed:
+  the pie is still decorative, still a postprandial event, and he's keeping an eye on it.
+
+## TIMMY, the other one
+
+- TIMMY (all capitals) is the other Timmy, "the one with a crown" (`widget/timmy.js`, the easter egg you type). He
+  frightens Timmy Tooth (`widget/pet.js` draws him scared for five minutes after the show).
+- After someone typed it, he "didn't sleep for a week" (Occlusion) and had a full fight-or-flight response: pounding heart,
+  dry mouth, racing thoughts. "I'm a tooth. I don't have an adrenal medulla. I felt it anyway." (Heme & Endo Exam 1).
+- Episodes never say the name in capitals out loud or tell students to type it. Hint at it, never instruct.
+
+## Teeth facts he uses about himself
+
+- Enamel has no cells, so PTH can't take calcium from him: "The bank is bone. Nobody's home to make a withdrawal." And
+  nobody can rebuild it, "That's why I floss." (Heme & Endo Exam 1). Keep self-facts true: check them like any content.
+- **He is proud of his periodontal ligament** (PCD Implants Exam 1): a tooth gives twenty-five to a hundred microns when you
+  bite, an implant three to five, and the ligament is how he feels a twenty-five micron hair. "An implant is a very
+  impressive piece of titanium, and it feels nothing. So please, don't tie me to one."
+- Rabbits are "a little showy" for teeth that never stop growing: "Some of us got one set of roots and made it work."
+- **He came from a follicle too** (Heme & Endo Exam 2, beside the ovarian follicles): every tooth grows inside a dental
+  follicle, the sac of tissue around the developing tooth, and his made his cementum, his periodontal ligament and the bone
+  around his roots (true: the dental follicle forms the cementum, the ligament and the alveolar bone proper). "You know
+  how I feel about my ligament. Turns out it runs in the family."
+- **He has blood too** (Heme & Endo Exam 3, the hematology lecture): his pulp has blood vessels and nerves running up
+  through his roots, "so technically, this lecture is about me." Keep it to vessels and nerves (no lymph nodes, no marrow).
+- **"A tooth for every baby" is an old saying, not physiology** (Heme & Endo Exam 3, with pregnancy): a pregnancy doesn't
+  pull calcium out of the mother's teeth; the baby's calcium comes from her diet and her bone ("The bank is bone,
+  remember."). What pregnancy does do is the gums: pregnancy gingivitis and the pyogenic granuloma (Dr. Taylor's Lecture
+  A). "The saying gets the mouth right and the reason wrong."
+- **His own furcation** (Perio final): as a lower first molar he has two furcation entrances, buccal and lingual, on a
+  short root trunk, about 2.4 and 2.5 mm from the CEJ (Bower, the S5 notes): "about two and a half millimeters of
+  attachment loss, and you're in my furcation. Please be gentle with the Nabers probe." His mesial root has the concavity
+  every lower first molar has facing the furcation, about 0.7 mm, 100% of the time: "It's not a flaw. It's character."
+  He thanks Dr. Litz, "on behalf of my furcation", for never taking down furcation bone in osseous surgery. And his
+  first periodontics episode: "periodontics is about me. The gum around me, the ligament holding me in, the bone around
+  my roots."
+- **Denture teeth are not teeth** (the Occlusion final, Dr. Givan's own words: no pulp, no enamel or dentin, no biology,
+  a tooth-colored piece of plastic). "That's Doctor Givan, not me. I just think it's worth saying out loud."
+- **Two roots, so he moves less**: single-rooted teeth are more mobile than multi-rooted ones (Dr. Givan's L7, Dr.
+  Abou-Arraj's L10). "I have two roots. I'm just saying."
+- **He'd like to keep his enamel**: dentin has a higher critical pH than enamel, so acid digs out exposed dentin first
+  (the cupped cusp tips, Dr. Lawson's L9).
+
+## Who comments
+
+Every episode's card carries 1-3 comments from these characters (`SH_PODCAST.fans`, [rule](../../vault/rules/podcast-reactions.md)):
+number thirty-one, the rabbit down the hill, the toothbrush by the door. Add a new one here before using them.
+
+## How he talks
+
+- Opens: "Hey. It's Timmy, and this is Timmy Time." Closes: "This has been Timmy Time. I'm Timmy. Brush, floss, and ..."
+  with a new ending each time (MSK: "go get it"; Occlusion: "bite down with confidence"; Heme & Endo: "keep your feedback
+  negative"; PCD Implants: "torque responsibly"; Heme & Endo Exam 2: "surge when it counts", the L-H surge; Perio final: "mind the furcation"; the Occlusion
+  final: "stay balanced", the denture's bilateral balance; Heme & Endo Exam 3: "keep your blasts under twenty", acute
+  leukemia's threshold).
+- Lightning round intro: answer out loud, "nobody can hear you. Except me." (Heme & Endo added "And, apparently, number
+  thirty-one.")
+- Warm, dry, a little vain. Jokes are short and come after the fact, never instead of it. He quotes the professors
+  word for word and says when he is quoting.
+
+## Episodes so far
+
+| Hub | Script | Length | Lore added |
+| --- | --- | --- | --- |
+| `msk-exam4` | `msk-exam4/script.md` | 42 min | Small tooth, big voice; "I have one job"; they grind |
+| `occlusion` (midterm) | `occlusion/midterm.md` | 45 min | The cottage; lower first molar, two roots; October costume (unrevealed); TIMMY kept him up a week. Replaced on the hub by the final's episode, 2026-11-15 |
+| `heme-endo-exam1` | `heme-endo-exam1/script.md` | 53 min | Four Halloween costumes, one per page load; neighbor number thirty-one; TIMMY as adrenaline; enamel is not a calcium bank |
+| `pcd-implants-exam1` | `pcd-implants-exam1/script.md` | 48 min | Thanksgiving costumes, one per page load; proud of his ligament; thirty-one thinks he's a failing implant; Brånemark's rabbit. First episode with comments: thirty-one, the rabbit down the hill, the toothbrush by the door |
+| `heme-endo-exam2` | `heme-endo-exam2/script.md` | 52 min | Thirty-one's glucose meter ("You don't have a pancreas"); Timmy came from a dental follicle; the pie is a postprandial event. Comments: thirty-one, the toothbrush by the door |
+| `perio` | `perio/script.md` | 52 min | Timmy's own furcation (two entrances, about 2.5 mm down; the mesial root concavity); thirty-one stages himself with a toothpick ("You're not staged. You're anxious."), may have an enamel projection, and wasn't Dr. Kaur's thirty-one; wants "a natural tooth is almost always better than an implant" framed over his furcation (S6, rewritten from the class 2026-11-18); the toothbrush's big episode (Phase one starts with oral hygiene); the pie, still decorative, after the release. Comments: thirty-one, the toothbrush by the door |
+| `occlusion` (final) | `occlusion/script.md` | 48 min | The first exam after the release: "whatever you put me in"; thirty-one's one-tooth night guard ("You don't have a brainstem") and his self-checked mobility ("You have a ligament. It's supposed to give."); the toothbrush vindicated by L9, with no pressure sensor; denture teeth are not teeth; two roots move less. Comment: the toothbrush by the door |
+| `heme-endo-exam3` | `heme-endo-exam3/script.md` | 52 min | Thirty-one's letter about a bump ("That's your cusp"; the night sweats are the tiny scarf; send it fresh, not in formalin); "a tooth for every baby" is a saying, not physiology; Timmy has blood too (his pulp). Comment: thirty-one, who has four cusps |

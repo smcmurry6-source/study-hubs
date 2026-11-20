@@ -1,0 +1,275 @@
+---
+type: hub
+tags: [hub, archived]
+hub: heme-endo-exam2
+status: archived
+---
+
+# Heme & Endo Exam 2
+
+**Its page came down 2026-11-19**, with the other five old single-file hub pages (Sam: "lets go ahead and take down all
+old pages", [decisions](../decisions.md)). Its `hubs.js` entry (the check-ins, the recap),
+`tools/question-ids/heme-endo-exam2.txt`, its art, its figure kit (`tools/figures/heme-endo-exam2/`), its Timmy Time
+script (`tools/podcast/heme-endo-exam2/`) and the class's data in Supabase stay. The page is still in git:
+`git show a897c0c:hubs/heme-endo-exam2/index.html` (the last `main` commit with it); its questions and lectures as JSON:
+`tools/dump-banks.js` on a copy of that commit ([repo map](../reference/repo-map.md)).
+
+**Archived 2026-11-13 at 10 pm**, after its exam that morning. Its retrospective is in `LESSONS.md` ("Hub retrospectives", written
+by the 11-13 lessons audit from 9 check-ins: later ones go into the next audit), its recap is on the dashboard, and **its narration,
+High yield recordings and Timmy Time came off the site** the same night ([archived-hubs-drop-their-audio](../rules/archived-hubs-drop-their-audio.md):
+`data-audio="off"` on its widget tag; `next/content/notes.json`'s `hyAudio` is empty). Its card leaves the dashboard 11-23.
+**Its exam check-in is closed** (Sam, 2026-11-19; `checkinClosed:true` on the exam in `hubs.js`, and refused by the server since
+`migration_v86.sql`). Answers already sent stay on `review/`.
+
+DENT 2160 Hematology & Endocrinology Exam 2: 50 questions, **5 on Exam 1 material, 8 on L11, 9 on L12 (both hours), 7 each on
+L13-L16** (Sam, 2026-11-10, from Dr. Herr: `EXAM_COUNTS`). **L16 is the last lecture on it**, so L17 and L18 aren't either
+(they go to Exam 3 with A). **Dr. Taylor's Lecture A is not on it** (Sam, 2026-11-10: Dr. Herr said he forgot about it, so it will likely be on the next exam; "i guess save all
+that for exam 3"): the hub's A came out whole that day, and everything it had (notes, narration, 58 questions, hints,
+tables, topics) waits for the Exam 3 hub in [the carry-over task](../tasks/done/2026-11-10-heme-endo-exam3-carry-lecture-a.md). Fri Nov 13, 10:00-11:30 am (the dental sitting). Exam date and check-in hours: its entry in `hubs.js`.
+
+## Before you work on it
+
+- **Source of truth:** `hubs/heme-endo-exam2/index.html` (single file; edit it directly). It was generated once by a
+  build script from per-lecture data files; that script isn't kept, so edit the hub itself.
+- **Built on:** the PCD Implants Exam 1 engine (Home, the labeled Question Bank panel, pins, High Likelihood, the mock),
+  without the Patient Box case kit (`PCASES` is empty; Patient Box questions are text boxes). Palette "Luteal" (aubergine
+  ink, blush paper, a berry accent and corpus-luteum gold); Literata / Hanken Grotesk / Overpass Mono. State key
+  `hee2-state-v1`, answered event `hee2:answered`.
+- **Lectures:** L11 Diabetes pharmacology (`dmpharm`), L12a and L12b Endocrine pathology (`path1`, `path2`), L13 and L14 Male and female reproductive histology (`mhisto`, `fhisto`), L15 and L16 Male and
+  female reproductive physiology (`mphys`, `fphys`) and R, the **Exam 1 Refresher** (`refresh`): 93 questions copied
+  from `heme-endo-exam1` with ids `r-<exam1 id>`, for the exam's five Exam 1 questions: **every Exam 1 High Likelihood
+  question on L2, L3, L6 and L10** (under those lectures' 23 predicted topics, in Exam 1's topic order). (It held 219 from
+  2026-11-06, every Exam 1 High Likelihood question plus 13 of its hardest; 55, then 80, after the high-yield cut below;
+  207 from 2026-11-10, Sam: "include all of the exam 1 high likelihood questions. do not cut them", all 206 plus
+  `r-pa-2s-2`.) **Only Exam 1's L2, L3, L6 and L10 are on Exam 2** (Sam, 2026-11-11: "the exam 1 questions for heme and
+  endo exam 2 will come from l2,6,3, and 10"): R's `LIKELY_TOPICS` keep those four lectures' 23 topics (93 questions: L2 20,
+  L3 38, L6 18, L10 17), so the mock's five, Exam 1 High likelihood and the drill use them alone. The other six lectures' 114
+  questions were cut the same day (Sam: "cut the refresher questions that arent from tested lectures"; `retired` in
+  `tools/question-ids/heme-endo-exam2.txt`, `r-pa-2s-2` among them). R's
+  notes (both levels, narration regenerated) and cram sheet cover only the four, and an R `focus` hint, Home's chips and exam
+  card, `EXAM_INFO`, the mock's intro and the About page say so. A copy is the Exam 1 question unchanged except its id, `lec: 'refresh'`, "(Exam 1 · L#
+  Title)" after the explanation and `pcase` prefixed `r-`; the Refresher's `LIKELY_TOPICS` are Exam 1's, "L# Title: "
+  before each topic and "Exam 1 " before its basis. Its notes are Exam 1's cram sheet. **The mock's five Exam 1
+  questions come only from R's High Likelihood questions** (Sam, 2026-11-06), **drawn at random** (Sam, 2026-11-10: "pull
+  randomly from them for the mock"): `MOCK_LIKELY_ONLY` and `mockLikelyPick`. **How the five break down** (Sam, 2026-11-11: "theres 2 questions from l2,
+  question on which hormones synergize, and pth maintenance"; the fifth wasn't named): `MOCK_PLAN.refresh` fills 2 slots
+  from topics starting "L2 ", 1 from a topic matching /synergi/ and 1 from "How PTH maintains", then 1 from any R High
+  Likelihood question. Three R topics hold them (basis "Exam 2 breakdown"): PTH and calcitriol synergize (`r-ca-synergy`,
+  new, and `r-ca-pth-synergy`, an Exam 1 copy), How PTH maintains blood calcium (`r-ca-pth-maintain`, new, and the copy
+  `r-ca-pth-net`) and T3 synergizes with GH on bone (`r-gr-synergy`, new, and the copy `r-gr-tf-8`; a hedge in case
+  "synergize" meant T3). R's notes (both levels, narration regenerated), cram and a second R `focus` hint say it. A topic
+  name that the plan matches must keep its wording, or the mock loses that slot (it falls back to any R question).
+  **The Question Bank leaves R out by default** (Sam, 2026-11-10: "do not include them in the default question bank filter
+  unless you click to include them"): `qlec: 'all'` means the Exam 2 lectures (`bankDefaultIds`); R joins when it is ticked
+  in the Lectures list, when Exam 1 High likelihood is turned on (which ticks R, and unticks it again when turned off:
+  `STATE.ui.qE1auto`), or when a search jump matches a Refresher question; a tag "Exam 2 lectures + R" shows it's in.
+  The Question Bank's Only line has an extra toggle for them, **Exam 1 High likelihood** (`likely1`, Sam, 2026-11-06): only R's
+  High Likelihood questions; turning it on ticks R if it isn't ticked, and turns "High likelihood" (every lecture's) off. Either
+  one works on top of the Show chip (Missed last time, Not answered yet, Pinned).
+  **R is review only and not in the hub's totals** (Sam, 2026-11-06: "they are just available for review since the exam 2
+  will have 5 questions from that pool"): `COUNT_SKIP` / `COUNTED_QS` keep it out of the header's progress, Home's
+  readiness ring and "you haven't tried" (whose button opens the other lectures), Where to next, the bank's "of N" (which
+  adds "+ n Exam 1 review") and, through `SH_EXPORT.uncounted()`, the mastery medal in `widget/ranks.js`. Its answers
+  still count for XP, streaks and leaderboards, and the bank, mock, drill and search still use its questions.
+- **Exam 2's in-class review (Wed 11/11, Dr. Madison)** (Sam, 2026-11-11, with its PollEv questions: "add these exact
+  questions and then use each question to make a similar question with a different option as the answer. My professor
+  basically gives his questions to chatgpt and tells it to make a new question from it"): its 20 questions are in the bank
+  as given (`src: 'review2'`, "Exam 2 in-class review"; ids `rv-<topic>`, one typo fixed, "Nephorpathy"), each followed by a
+  twin (`src: 'twin'`, "Like an Exam 2 review question"; id `rv-<topic>-twin`) whose key is a different choice. They sit at
+  the top of the question code, so they come first in each lecture's bank order: L2's steroid item and its twin in R; L11 5;
+  L12a 1 and L12b 2; L13 3; L14 2; L15 3; L16 3. `rv-btb-twin` (granulosa cells' gap junctions, no blood-follicle barrier)
+  is filed under L14, its review question (`rv-btb`, Sertoli tight junctions) under L13. Each lecture has an "Exam 2 in-class
+  review (11/11)" High Likelihood topic (basis "Exam 2 review") with its items: first in the lecture, except L13 and L14,
+  where the picture topic stays first. The PollEv file isn't in the repo.
+- **The two picture questions** (Sam, 2026-11-11: "The two images on the exam are sertoli and female reproductive stages
+  picture question"; the picture is the follicle stages): a `focus` hint first in L13 (the Sertoli cell) and L14 (the
+  follicle stages), the first topic of each (basis "image on the exam + focus list + recording") and an `EXAM_INFO`
+  "Pictures" row. The Sertoli cell already has its drawing (`FIGS.sertoli`, `mh-fig-label`, `mh-fig-seq`). The follicle stages
+  got theirs the same day (Sam: "Yes, draw it"; then, with a screenshot of the slide: "This is actually the female question he
+  was talking about"): `FIGS.follicles`, built by `tools/figures/heme-endo-exam2/follicles.mjs` with follicle.mjs's own
+  drawing helpers (exported for it), **laid out like Dr. Herr's slide** (the screenshot isn't in the repo): the five stages in
+  a column, numbered 1-5 as he numbers them (primordial, unilaminar primary, multilaminar primary, antral, mature graafian),
+  and each of his 18 labels a letter, the same letter wherever he repeats one, out of order (A zona pellucida, B antrum,
+  C follicular cell, D corona radiata, E granulosa cells, F theca externa, G oocyte, H basal lamina, I cumulus oophorus,
+  J theca interna, K stromal cells). It sits under L14's "Telling the stages apart" (`FIG_PLACE`) above the stepped anima
+  figure, and six picture questions use it (`fh-fig-graafian`, `fh-fig-multi`, `fh-fig-order`, `fh-fig-theca`,
+  `fh-fig-cumulus`, `fh-fig-zona`), first in L14's picture topic. Changing the drawing's numbers or letters means changing
+  those questions' keys.
+- **Taught or slides-only:** L11 and L12 were written from their class recordings (11/3, 11/4). A (since removed), L13,
+  L14 and L15 went to taught on 2026-11-08 from their 11/6 recordings (Drive, the four `GMT20261106-*` transcripts: 8 am A, 9 am L13,
+  10 am L15, and 1:42 pm L14, which Dr. Herr re-recorded and posted after class, so its in-class emphasis isn't on it).
+  Every Zoom caption is labeled "Michael Herr" because the room's account is his: A is Dr. Taylor and L15 Dr. Madison.
+  Their questions' `src` is `rec` where the point was said aloud. **L16 went taught on 2026-11-11** from its 11/10 recording (Drive,
+  `GMT20261110-190013`, 1 pm; Dr. Madison, captioned "Michael Herr" like the rest): see L16 in the content flags. L17 and L18
+  aren't on Exam 2 (Sam, 2026-11-10: "L16 is the last lecture on the test"), so this hub doesn't get them:
+  [the task](../tasks/done/2026-11-05-heme-endo-exam2-l17-l18-and-recordings.md).
+- **Sources:** Drive, "Hematology and Endocrinology" → "Exam 2" (slides, schedule, syllabus, the recordings'
+  transcripts). **Not used**, by the [graded-coursework](../rules/graded-coursework.md) rule: everything in "Resources
+  from D3s" (last year's Exam 2 study guide, Anki deck of practice questions, a female repro study doc), Quiz 3 (open
+  until 11/12), Quiz 4, the take-home.
+- **Figures:** `tools/figures/heme-endo-exam2/` (`node tools/figures/heme-endo-exam2/build.mjs`; `--check` fails if
+  the hub's `anima:css`/`anima:js` blocks are stale). Sam said yes to every animation (2026-11-05). Nine, each under a notes
+  heading and in its lecture's Review: `drugsites` and `insulins` (L11), `axislab` (L12a and L12b), `cah` (L12b), `tubule`
+  and `ducts` (L13), `follicle` (L14), `cycle` (L14 and L16), `hpg` (L15). Where each goes is in the hub's `FIG_PLACE` /
+  `FIG_BY_LEC` (matched by heading text, both levels; `place.json` keeps the same list): renaming a heading unplaces its
+  figure. The slide images were too large to read, so curve shapes, histology and the steroid chart follow the slide text
+  and standard textbook layout; each figure's "What this shows, and what's simplified" says what was assumed (detemir
+  drawn without a peak, hCG unnamed because the slides don't name it). Check them against the slides when the recordings land. `hpg` follows Dr. Madison's in-class
+  correction since 2026-11-08 (aromatase mostly in the Sertoli cells, some in the Leydig cells; its slide said Leydig from
+  puberty on). **Midcycle FSH follows Dr. Herr** (Sam, 2026-11-08: "Go with dr herrs version"): in L14 he walks his
+  graph with FSH dipping, then peaking alongside LH just before ovulation, the smaller peak (10:52, 20:39), so `cycle`
+  (`cycle.mjs`) draws that peak, and the L14 and L16 notes, both levels, the cram sheet, the note tables, the ovulation
+  sequence and `fh-tf-fshpeak` say it. In L16's recording (2026-11-11) Dr. Madison said the same: FSH rises, far less than LH, because
+  inhibin holds it back (his slide's "FSH is suppressed by production of inhibin"). No question's key depends on FSH falling at midcycle (`fp-inhibin` and `fp-lhr-granulosa` stay retired).
+- **Narration:** `hubs/heme-endo-exam2/audio/<lecture>-full.mp3` and `-plain.mp3`, made with `tools/narrate.py`
+  (`python3 tools/narrate.py hubs/heme-endo-exam2/index.html --lec <id> --force`). **High yield** was narrated for all eight lectures on 2026-11-12 for this hub's new version;
+  those recordings (`audio/*-hy.mp3`) went with that version at the redesign's release (below), since the old page has no
+  High yield level. The rest came off at archiving (2026-11-13, the lessons audit).
+- **Timmy Time** (2026-11-11): `hubs/heme-endo-exam2/audio/timmy-time.mp3`, 52 min, script `tools/podcast/heme-endo-exam2/script.md`
+  (L11-L16 by system, male then female, plus a short Exam 1 refresher on L2, L3, L6 and L10 only, opening with the class's
+  split of the five; the histology segments name the two picture questions, the Sertoli cell and the follicle stages;
+  written from the As taught notes, hints, cram sheet, High Likelihood topics, the 11/11 in-class review's questions and
+  LESSONS.md's live signals). `SH_PODCAST` (two lore comments: thirty-one, the toothbrush) sits
+  before `SH_EXPORT`; the card is on Home under the quick-start row, `#timmy` opens Home, and Home's "Also here" links it.
+  **A notes change means fixing the script and rebuilding the episode in the same PR**
+  ([text-and-audio-never-drift](../rules/text-and-audio-never-drift.md)): `--only N --force` for the segment, then `produce.py`.
+- **Arcade:** the Cycle Arcade, skin `HEE2_SKIN` (sample tubes, the pathology lab escape room with a glucose meter, a
+  follicle that ripens into a corpus luteum).
+- **The bank is high yield** (Sam, 2026-11-08: "803 is way too many questions. They need to be higher yield"): it was cut
+  from 803 to 339, one question per fact: near-duplicates in other formats, minor details and slide numbers nobody
+  stressed, long ordering, matching and select-all items, stained-section identification (Dr. Herr: stained images aren't
+  tested) and points a professor played down came out, and their ids are retired.
+- **Coverage, not a count, decides what's in it** (Sam, 2026-11-08: "be sure the emphasized points are covered,
+  deemphasized points are left out ... other content is sufficiently covered without being overwhelming ... the rest of the
+  questions should be filling in the gaps ... be sure that the high likelihood questions are sufficient"; 2026-11-10: "i
+  definitely want the stressed topics to be the core of the bank, but i do think its important to fill in the gaps a
+  little more"). Audited twice on 2026-11-10: each `emphasize` hint and each of Dr. Herr's focus slides has a question; no
+  question's key depends on a `deemphasize` hint ("the numbers may not be accurate" is not one: the rule of 10s,
+  `p2-num-4`, and Dr. Taylor's metformin example, `dc-metformin-skip`, are back); **each High Likelihood topic has one HL
+  question for each point it names** (no two on the same fact); and then **each testable key term in the notes** (not only
+  each section) has a question, the untagged questions filling those gaps (about 5-10 more per lecture; stained-section
+  identification, near-duplicates and slide trivia stay out). On the Exam 2 lectures, 133 cut questions came back as they were (ids
+  un-retired; the Refresher's 206 are counted on their own) and 4 were written for points nothing tested (`dm-met-lactic`, `mh-spermio-phases`, `mh-sertoli-fridge`,
+  `fh-tf-atresia`). With the "which statement" items and without Lecture A (2026-11-10), the Exam 2 lectures held 393
+  (451 before; A had 58): L11 67, L12a 56, L12b 58, L13 55, L14 62, L15 52, L16 43. L16 going taught (2026-11-11) brought it to
+  402: L16 52 (7 new for what Dr. Madison stressed, and `fp-2s-default` and `fp-lh-block` back as they were).
+- **The exam's count per lecture** (Sam, 2026-11-10, from Dr. Herr: "5 review, 8 for l11, 9 for l12, and 7 for the rest"):
+  `EXAM_COUNTS = { dmpharm 8, L12 9, mhisto 7, fhisto 7, mphys 7, fphys 7, refresh 5 }`, and `MOCK_BLUEPRINT` is the same
+  object, so the mock is the exam's 50. L12's two hours share their 9 (`EXAM_GROUPS`): the mock draws the 9 from L12a and
+  L12b together, at random, and the "Most likely questions" box says "9 on the exam for L12a and L12b together".
+  **The counts never trim High Likelihood** (Sam, 2026-11-10: "Dont remove any high likelihood questions. If they were
+  hinted to be exam questions, they need to be high likelihood"; now in [high-likelihood-topics](../rules/high-likelihood-topics.md)):
+  every lecture keeps all its topics (74 on the Exam 2 lectures, 269 questions since L16 went taught; the Refresher's 23, L2, L3, L6 and L10 only, since 2026-11-11), and the box only
+  shows the count beside each lecture. When the 11/11 review flags a topic, add it or rank it higher. L16's ten topics
+  were re-ranked from its recording on 2026-11-11 (basis "recording"; every question that was High Likelihood stayed so):
+  follicular versus luteal first ("high yield for exam"), then the two-cell slide ("very important slide").
+- **Dr. Herr's in-class focus list** (Sam, 2026-11-09: "He wanted us to focus on slides 8-10, 12, 19-21 for male repro
+  histology. And slides 18-21, 30-31, 33-34, 38-39, and 31 for female repro histology"): a `focus` Exam Hint at the top of
+  L13 and L14 (drawn as "focus list", no quotation marks, since it came from the class) that says what is on those slides,
+  and the topics on them rank first, basis "focus list + recording". What is on the slides comes from the decks' own slide
+  order (Drive copies of 2026-11-04; L13 46 slides, L14 50; Sam confirmed L14 38-39): **L13** 8-10 the Sertoli cell (shape,
+  occluding junctions and the blood-testis barrier, FSH, its functions, on the labeled seminiferous-epithelium drawing), 12
+  the Leydig cells outside the tubules, 19 the three spermatogonia and the clonal path to sperm, 20 a vascular cast (image
+  only), 21 a labeled tubule; **L14** 18-21 the secondary (antral) and Graafian follicles, 30-31 the uterine tube's cells
+  (ciliated and peg cells), 33-34 the uterine wall's layers and the endometrium's structure, 38-39 the endometrium's layers
+  and menstruation. Not on them: spermiogenesis (L13 22), the uterus's regions (L14 32), the cycle graphs (23-25, 35), the
+  cervix and vagina (41-44). L14 has a topic for 33-34, "The uterine wall".
+- **What a professor says you don't need isn't asked** (Sam, 2026-11-08; now a standing rule for every hub,
+  [dont-ask-what-professors-skip](../rules/dont-ask-what-professors-skip.md)): no question tests it. On 2026-11-08 every
+  recording (L11, L12a, L12b, A, L13-L15) and Exam 1's de-emphasis hints (for the Refresher) were checked; only `mh-2s-6`
+  tested such a point, and it was retired. Questions that only mention a skipped point in a wrong choice or an
+  explanation stay. L16 was checked on 2026-11-11 (the other steroid enzymes, the in-between follicle names, the whole-body actions slide 33,
+  which has no text): no question's key depended on them. When the review comes in, check its "you don't need" remarks the same way.
+- **Vetted:** every question was checked against its slides and recording by a second reviewer on 2026-11-05 (about
+  1 in 4 rewritten). Where the lecture disagrees with a textbook or with itself, the hub keeps what was taught; those
+  places are listed below so whoever takes a lecture to taught can check them against its recording.
+
+## Content flags (kept as taught; check when the recording or review lands)
+
+- **L11:** at about 1:29 the answer read aloud to slide practice question 4 (glucose-dependent insulin release) was
+  sulfonylureas; the summary slide says GLP-1 agonists / DPP-4 inhibitors, and the hub follows the slide (the notes
+  mention the mix-up). The fluoroquinolone slide has the K-ATP effect backwards (not tested). Dulaglutide half-life:
+  slide 5 days, said 7 (hub: 5).
+- **L12a:** Hashimoto's taught as TSH-receptor-blocking antibodies (slide and recording 23:42; textbooks say anti-TPO /
+  anti-thyroglobulin); no key depends on it. Calcitonin "might" cause hypercalcemia in medullary carcinoma (said 33:20,
+  against his own slide; not tested).
+- **L12b:** the pheochromocytoma rule of 10s is taught with his warning that the numbers are dated. CAH: the slide's
+  "1/3 of cases have sodium wasting" may be inverted (references say most classic cases); p2-tf-12 is keyed True to the
+  slide. Adrenal cortical carcinoma "> 2 cm" on the slide (likely meant larger).
+- **A:** no longer in this hub (2026-11-10); its content flags moved with it to
+  [the carry-over task](../tasks/done/2026-11-10-heme-endo-exam3-carry-lecture-a.md).
+- **L13 (taught, 11/6 recording):** he said "lower" for the testis temperature (3:58), so 35 °C stays from the slide;
+  74 days said aloud (14:59). Slips the hub doesn't follow: "gap junctions" for the Sertoli occluding junctions (7:09),
+  "ductus deferens" for the efferent ductules (1:45), "seminiferous tubules" for the seminal vesicles (33:35). His
+  release order is bulbourethral, prostate, then seminal vesicles with the sperm (36:01; textbooks put most sperm in the
+  prostatic fraction). He said the labeled Sertoli cell drawing "is actually on your exam" (5:19) and stained images won't
+  be tested (18:29). `mh-2s-6`, on the erectile blood-supply figure he said you don't need, was removed and retired on 2026-11-08 (Sam).
+- **L15 (taught, 11/6 recording):** 34 °C said three times (L13's slide: 35); each lecture's questions use its own.
+  "Two months" for sperm maturation is only on his slide (L13 says 74 days aloud). At 26:42 he had the class cross out
+  his slide's "aromatase in the Leydig cells from puberty on": the Sertoli cells carry most of it from fetal development
+  on, the Leydig cells some; the notes, questions (`mp-2s-2` rewritten, same key) and `hpg` follow him. He tied the testes
+  dropping in warmth to the cremaster, and put each meiotic division one step early (18:41); the notes keep the standard
+  order and say so. The speaker note that the right testis hangs lower stays out (anatomy texts say the left).
+- **L14 (taught, posted recording):** he read the LH-driven edema as "theca externa" (22:48) and the secondary oocyte
+  as "entering prophase" (23:06); the hub keeps the slides' theca interna and metaphase II. Cycle length: slide 28-30
+  days, said 28-33 (no key depends on it). FSH peaks with LH before ovulation in his lecture, which the whole hub
+  follows (above); in class L16's Dr. Madison agreed (inhibin keeps FSH's peak small). Lactation "activated by estrogen and progesterone surges
+  during pregnancy and after childbirth" (35:48; check against L17). He calls the corpus luteum "more translucent" (not
+  used). ZP1-3: "you don't need to know those".
+- **L14 / L16:** follicle names (L16's slides call any follicle with an antrum Graafian; in class Dr. Madison called the
+  in-between one tertiary or antral and said not to worry about those names) and day counts (L16 ovarian 0-14 / 14-28, L14
+  uterine 1-5 / 5-14 / 15-28) differ; each lecture's questions use its own.
+- **L16 (taught, 11/10 recording):** **midcycle FSH is settled**: he said FSH rises too, far less than LH, because inhibin
+  "is going to preferentially inhibit FSH ... that's why we don't call it an LH-FSH surge" (28:38-29:29), which agrees
+  with Dr. Herr's graph; the notes, cram, `fp-inhibin-peak` and the `cycle` figure's text say so (`fp-inhibin` and
+  `fp-lhr-granulosa` stay retired). He put the switch to positive feedback "in the hypothalamus" (28:06; the slides: the
+  pituitary is sensitized); no key depends on where. Turner syndrome is his example of primary amenorrhea (43:16; the
+  slide files it under disorders of sexual differentiation); both are in the notes, and `fp-x-amen` still holds. Hot
+  flashes: linked to the GnRH peak, "still a lot of research to be done" (42:05); `fp-meno-2` stays. Caption slips the
+  hub doesn't follow: "20-day cycle" (20:18, his 14 + 14 is 28), "abruptly start producing" (35:43, stop),
+  "hypoprolactinemia" (44:23, hyper). The slide 30 effects on the myometrium weren't said aloud (`src` stays `slides`).
+
+- **Static drawn figures** (`FIGS`): `tools/figures/heme-endo-exam2/sertoli.mjs` (Dr. Herr's two-Sertoli-cell drawing,
+  report #38, drawn for the hub and laid out like his slide, which Sam sent as a screenshot (not kept in the repo): his ten
+  labels numbered (type A dark, type A pale and type B pale spermatogonia, the peritubular myoid cells and "pachytene" come
+  from the slide; the notes say only type A and type B) and the two compartments lettered, numbers deliberately out of order
+  so `mh-fig-seq` isn't given away). `build.mjs` writes the hub's `var FIGS = {...};` line along with the anima blocks; edit
+  the module, never the line. It sits above `mh-fig-seq` and `mh-fig-label` and under L13's "Sertoli cells" heading.
+- **"Which statement" items** (2026-11-10, [rule](../rules/which-statement-questions.md)): `which()` and `whichf()` sit right
+  after `mq()`, followed by one block of two of each per lecture (ids `<prefix>-ws-*` and `<prefix>-wf-*`; A's four,
+  `dc-*`, left with it). L16's (`fphys`)
+  four were checked against its recording on 2026-11-11. Six older items are
+  tagged `which` too (`p1-graves-2`, `p2-pth-fragments`, `p2-cortex-adenoma`, `mh-cilia-stereo`, `r-h1-ccell`,
+  `r-ca-calcitonin`).
+
+## It keeps its old page (the redesign's release)
+
+Sam, at the release (2026-11-13): "Only hubs still live when it merges get switched: Heme & Endo Exam 2's exam was Nov
+13, so it keeps its old page". So this hub stays a single-file hub (`hubs/heme-endo-exam2/index.html` is the source; it
+is under `legacy` in `hubs.js`), and its new version, `hubs/heme-endo-exam2/next/`, was deleted in the release's PR
+with the High yield recordings only that version played (`audio/*-hy.mp3`, 59 MB). Git keeps both (the commit before
+the release's merge). What that version taught the engine stayed in it for the next Heme & Endo hub: review-only
+lectures (`core.reviewOnly`, `SH_EXPORT.uncounted`), a hub's own Only toggle (`SH_HUB.bank.only` with `{ prop, lec }`),
+grouped mock counts (`mock.groups`, `mock.likelyOnly`) and a color per lecture.
+
+On its old page since the release: everyone has Timmy (no adoption; he wears the outfit kept on the device or nothing),
+Full Arch is retired, and the dashboard opens it from Past hubs once it archives. No game layer, Ask Timmy, place or shop
+there. **Its audio comes off at its archiving** ([the to-do](../tasks/done/2026-11-12-audio-off-at-archiving.md)).
+
+## Pending
+
+Open tasks for this hub: `vault/tasks/` notes with `hub: heme-endo-exam2`.
+
+## Archived, audio off (2026-11-13)
+
+Sam, 2026-11-13: "You can also remove the audio for heme and endo 2 and archive it." In the release's PR (#359): `hubs.js`
+gives it `archiveOn` noon Nov 13 (it is under Past hubs from the merge), its narration and Timmy Time are off the site
+(`data-audio="off"` on the v3.js tag; Listen reads in the device's voice) and it keeps its old single-file page. **Still to
+do:** its retrospective and its recap ([inbox](../tasks/inbox.md)). To bring the audio back:
+[archived-hubs-drop-their-audio](../rules/archived-hubs-drop-their-audio.md).
+
+## History
+
+Grep "Recent major changes" in `DEPLOY_NOTES.md` for `heme-endo-exam2`. Retrospective (once archived): `LESSONS.md`.
+
+Related: [home](../home.md) · [heme-endo-exam1](heme-endo-exam1.md) · [high-likelihood-topics](../rules/high-likelihood-topics.md)

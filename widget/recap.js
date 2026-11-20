@@ -1,11 +1,14 @@
 /* Hub recap image: draws a 1080-wide (about 1900 tall) shareable summary of how the class used a hub onto a canvas.
    window.shRecap.draw(canvas, recap, opts) -- recap is get_hub_recap's jsonb; opts:
    { title, subtitle, color, names (bool), question: {text, answer, wrong} for the toughest question,
-     sectionLabel(id) -> friendly name }. Pure drawing, no network. */
+     sectionLabel(id) -> friendly name, font: one CSS font family for the whole image }. Pure drawing, no network. */
 (function(){
   var W = 1080, H = 1640, PAD = 72, TOP_H = 1236;
   var INK = "#F3F1EC", INK2 = "#B9BDC4", INK3 = "#858B95", BG = "#12161C", PANEL = "#1B2029", LINE = "#2A303B";
-  var SERIF = "'Fraunces', Georgia, serif", SANS = "'Work Sans', -apple-system, 'Segoe UI', sans-serif";
+  /* the image's two faces: the ones it has always used (the page fetches them before it draws), unless draw() is given
+     opts.font, one family for the whole image (the redesign's pages pass their own, which is already on the page) */
+  var SERIF_OWN = "'Fraunces', Georgia, serif", SANS_OWN = "'Work Sans', -apple-system, 'Segoe UI', sans-serif";
+  var SERIF = SERIF_OWN, SANS = SANS_OWN;
 
   function fmt(n){ return Math.round(n || 0).toLocaleString("en-US"); }
   function hours(min){ var h = (min || 0) / 60; return h >= 10 ? fmt(h) : h.toFixed(1); }
@@ -52,6 +55,7 @@
 
   function draw(canvas, R, o){
     o = o || {};
+    SERIF = o.font || SERIF_OWN; SANS = o.font || SANS_OWN;
     var accent = o.color || "#DDAE52";
     var awards = awardList(R), AWARD_ROW = 104, awardsH = awards.length ? 78 + Math.ceil(awards.length / 2) * AWARD_ROW : 0;
     H = TOP_H + 226 + 20 + (awards.length ? awardsH + 20 : 0) + 76;
