@@ -34,16 +34,16 @@ jobs:
       CF_PROJECT: ${{ vars.CLOUDFLARE_PAGES_PROJECT || 'study-hubs-preview' }}
       WRANGLER_SEND_METRICS: 'false'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
       # a run by hand has no pull request in its event: find the open one for this branch, for the pr-<n> link and comment
       - name: Which pull request?
         id: pr
-        uses: actions/github-script@v7
+        uses: actions/github-script@v9
         with:
           script: |
             if (context.payload.pull_request) return core.setOutput('number', String(context.payload.pull_request.number));
@@ -53,7 +53,7 @@ jobs:
       - name: Build the preview to download (fixture data, noindex, narration from the live site unless changed here)
         run: node tools/preview/build.js --out _preview_full --label "${{ steps.pr.outputs.number && format('PR {0}', steps.pr.outputs.number) || github.ref_name }}"
       - name: Upload it (download, unzip, then node tools/preview/serve.js --dir <folder>)
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: preview-site
           path: _preview_full
@@ -111,7 +111,7 @@ jobs:
           echo "**Preview:** $URL (this branch on made-up data; noindex)" >> "$GITHUB_STEP_SUMMARY"
       - name: Put the preview link on the pull request
         if: steps.deploy.outputs.url && steps.pr.outputs.number
-        uses: actions/github-script@v7
+        uses: actions/github-script@v9
         env:
           URL: ${{ steps.deploy.outputs.url }}
           SHA: ${{ github.event.pull_request.head.sha || github.sha }}

@@ -11,7 +11,8 @@
 //   - question health's A/B versions (migration_v67): the version shown is kept on each answer, first tries are split
 //     by version, and a gap of 20 points with 10+ people a version is flagged (ab_gap);
 //   - the A/B versions page (migration_v70): get_ab_summary needs the secret and returns totals only;
-//   - the heavy reads worked out ahead (migration_v83): each the same as its function, kept and worked out again by
+//   - the heavy reads worked out ahead (migration_v83): a first read "being worked out", left for the job (v90), then
+//     each the same as its function, kept and worked out again by
 //     sh_admin_cache_tick when due (sooner for new arguments or Refresh, later while the class is busy), reviews and
 //     reports laid over question health at once, a failed or timed-out refresh waits, the table closed to anon;
 //   - sh_surface() (the Insights tab's "Where time goes") places every section the engine sends (widget/hub.js
@@ -28,6 +29,15 @@ const db = throwaway(SECRET), { sql, q } = db;
 /* as the anonymous role (every visitor's browser, and the admin page's) */
 function anon(text){ return sql(`begin; set local role anon; ${text}; commit;`); }
 function anonJson(text){ const r = anon(`select (${text})::text`); try { return JSON.parse(r[0][0]); } catch (e) { throw new Error(`no JSON from ${text.slice(0, 120)}: ${JSON.stringify(r).slice(0, 200)}`); } }
+/* an admin read worked out ahead (v83): its first read is "being worked out" and left for the job (v90), so let the job
+   work it out (as sh-admin-cache does within a minute) and read it again */
+function adminJson(text){
+  const r = anonJson(text);
+  if (sql(`select to_regclass('public.admin_cache') is not null`)[0][0] !== 't') return r;
+  let n = 0;
+  while (sql(`select count(*) from admin_cache where body is null`)[0][0] !== '0' && n++ < 8) sql(`select sh_admin_cache_tick()`);
+  return n ? anonJson(text) : r;
+}
 function raises(fn, code, what){
   try { fn(); ok(false, `${what}: expected an error${code ? ' ' + code : ''}, got none`); }
   catch (e) { ok(!code || e.code === code, `${what}: expected ${code}, got ${e.code || e.message.split('\n')[0]}`); }
@@ -142,7 +152,7 @@ try {
        insert into survey_responses (survey_id, visitor_id, answers, created_at) select id, 'fx-2', '{"q1":"third"}', '2026-10-04 00:00+00' from surveys where slug = 'fx-new';
        insert into survey_responses (survey_id, visitor_id, answers, created_at) select id, 'fx-3', '{"q1":"second-a"}', '2026-10-03 00:00+00' from surveys where slug = 'fx-new';
        insert into survey_responses (survey_id, visitor_id, answers, created_at) select id, 'fx-4', '{"q1":"second-b"}', '2026-10-03 00:00+00' from surveys where slug = 'fx-new';`);
-  const D = anonJson(`(select coalesce(json_agg(x), '[]') from get_exam_debriefs(${S}) x)`);
+  const D = adminJson(`(select coalesce(json_agg(x), '[]') from get_exam_debriefs(${S}) x)`);
   ok(D.map(x => x.visitor_id).join(',') === 'fx-h,fx-h2,fx-s,fx-o,fx-p', `check-ins newest first, the later id first on a tie (${D.map(x => x.visitor_id)})`);
   const SV = anonJson(`(select coalesce(json_agg(x), '[]') from get_survey_results(${S}) x)`);
   ok(SV.map(x => x.slug).join(',') === 'fx-tie,fx-new,fx-old', `surveys newest first, the later id first on a tie (${SV.map(x => x.slug)})`);
@@ -186,7 +196,7 @@ try {
     ok(W === '0=30 1=54 null=3', `record_qh keeps the version shown (0 = A, 1 = B; none or out of range: null): ${W}`);
     ok(anon(`select count(*) from question_events`)[0][0] === '0', 'question_events: anon reads no rows');
     raises(() => anon(`select get_question_health('wrong', 'perio')`), '28000', 'question health with a wrong secret');
-    const QH = anonJson(`get_question_health(${S}, 'perio')`), by = {};
+    const QH = adminJson(`get_question_health(${S}, 'perio')`), by = {};
     QH.forEach(r => { by[r.qid] = r; });
     const wa = by.qa && by.qa.wordings, codes = r => (r && r.flags || []).map(f => f.code);
     ok(wa && wa['0'] && wa['0'].n === 12 && wa['0'].c === 10 && wa['1'] && wa['1'].n === 12 && wa['1'].c === 3,
@@ -240,7 +250,40 @@ try {
     raises(() => anon(`select sh_admin_cached('insights', '{}')`), '42501', 'sh_admin_cached: anon runs it');
     sql(`delete from admin_cache`);
 
-    /* each read is what its function works out, the first time (at once) and from the copy after */
+    /* the first read of each (v90): a row with no body for the job and "being worked out", never worked out inline, so a
+       read that takes longer than a visitor's 3 s can't fail and leave nothing behind */
+    const dbr = () => anonJson(`(select coalesce(json_agg(x), '[]') from get_exam_debriefs(${S}) x)`);
+    const firsts = {
+      insights: () => anonJson(`get_insights(${S}, '{"perio":"2026-11-19"}'::jsonb)`),
+      retries: () => anonJson(`get_insight_retries(${S})`),
+      quality: () => anonJson(`get_data_quality(${S})`),
+      debriefs: dbr,
+      'features:30': () => anonJson(`(select coalesce(json_agg(x), '[]') from get_feature_events(${S}, 30) x)`),
+      'clicks:30': () => anonJson(`(select coalesce(json_agg(x), '[]') from get_click_summary(${S}, 30) x)`),
+      'visitors:30': byHub
+    };
+    /* insights slower than the visitor's limit: the first read still answers at once */
+    sql(`alter function public.sh_insights(jsonb) rename to sh_insights_real;
+         create function public.sh_insights(p jsonb default '{}'::jsonb) returns jsonb language sql as $$ select pg_sleep(2); select '{}'::jsonb $$;`);
+    const slow = JSON.parse(anon(`set local statement_timeout = '600ms'; select get_insights(${S}, '{"perio":"2026-11-19"}'::jsonb)::text`).pop()[0]);
+    ok(slow.pending === true && row('insights') && !row('insights').body, `a first read slower than the time limit: "being worked out" at once, a row left for the job (${JSON.stringify(slow)})`);
+    sql(`drop function public.sh_insights(jsonb); alter function public.sh_insights_real(jsonb) rename to sh_insights;`);
+    for (const [k, f] of Object.entries(firsts)) {
+      const r = f(), st = status()[k];
+      ok((Array.isArray(r) ? r.length === 0 : r.pending === true) && row(k) && !row(k).body && st && st.pending === true && st.at === null,
+        `${k}: the first read is "being worked out", with a row for the job (${JSON.stringify(r).slice(0, 100)}, ${JSON.stringify(st)})`);
+    }
+    ok(firsts.quality().retention !== undefined, 'get_data_quality being worked out: its retention part is still there');
+    const qhPend = anonJson(`get_question_health(${S}, 'perio', 120, '{"qa":"v1"}'::jsonb)`);
+    ok(qhPend.pending === true && !row('qh:perio').body && status()['qh:perio'].pending === true, `question health's first read: "being worked out" (${JSON.stringify(qhPend)})`);
+    ok(firsts.retries().pending === true && sql(`select count(*) from admin_cache`)[0][0] === '8', 'a second read before the job: still "being worked out", no second row');
+    /* the job works out the new ones first: three a minute while the class is quiet */
+    let ticks = 0;
+    while (sql(`select count(*) from admin_cache where body is null`)[0][0] !== '0' && ticks < 8) { tick(); ticks++; }
+    ok(ticks < 8 && Object.keys(firsts).concat('qh:perio').every(k => row(k).body && status()[k].pending === false),
+      `the job: every new read worked out within ${ticks} ticks`);
+
+    /* each read is then what its function works out, from the copy */
     /* key order aside (a table function's rows and a JSON object list their fields in different orders) */
     const canon = v => Array.isArray(v) ? v.map(canon) : v && typeof v === 'object' ? Object.keys(v).sort().reduce((o, k) => { o[k] = canon(v[k]); return o; }, {}) : v;
     const same = (what, a, b) => ok(JSON.stringify(canon(a)) === JSON.stringify(canon(b)), `${what}: the admin read and the read worked out directly differ (${JSON.stringify(canon(a)).slice(0, 120)} / ${JSON.stringify(canon(b)).slice(0, 120)})`);
@@ -281,7 +324,7 @@ try {
     const qh = cur => anonJson(`get_question_health(${S}, 'perio', 120, ${q(JSON.stringify(cur))}::jsonb)`);
     const inHub = (rows, id) => (rows.find(r => r.qid === id) || {}).in_hub;
     const q1 = qh({ qa: 'v1' });
-    ok(inHub(q1, 'qa') === true && inHub(q1, 'qb') === false, 'question health: worked out at once from the page\'s fingerprints');
+    ok(inHub(q1, 'qa') === true && inHub(q1, 'qb') === false, 'question health: worked out by the job from the page\'s fingerprints');
     const q2 = qh({ qa: 'v1', qb: 'v1' });
     ok(inHub(q2, 'qb') === false && status()['qh:perio'].waiting === true, 'question health: new fingerprints get the copy, and a new one is on its way');
     ok(tick() >= 1 && status()['qh:perio'].waiting === false && inHub(qh({ qa: 'v1', qb: 'v1' }), 'qb') === true, 'the tick: new fingerprints worked out first, at once');

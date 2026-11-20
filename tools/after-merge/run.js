@@ -22,6 +22,9 @@
 //   node tools/after-merge/run.js ... --fix tools/data-fixes/<file>.sql   also run that data fix (added earlier, by hand)
 //   node tools/after-merge/run.js ... --only keys,changelog     only some steps (--only checkins runs that step even
 //                                                               when hubs.js didn't change)
+//   node tools/after-merge/run.js ... --since-last-run          (the workflow, on a push) start where the last push run
+//                                                               that wasn't canceled ended, not at --from, so a canceled
+//                                                               run's push is covered (needs GITHUB_TOKEN; coverFrom below)
 //
 // Secrets come from the environment and are never printed (vault/rules/secrets.md): SB_KEY and ADMIN_SECRET for keys,
 // podcast and changelog; SUPABASE_ACCESS_TOKEN for timmy, checkins and fixes. A step whose secret is missing is "blocked", and the
@@ -93,6 +96,35 @@ function addedLines(from, to){
 }
 function engineHubs(sha){
   return git('ls-tree', '--name-only', `${sha}:hubs`).toString().split('\n').filter(h => HUB_RE.test(h) && show(sha, `hubs/${h}/content/core.json`));
+}
+
+/* ------------------------------------------------------------------------------------------------------ canceled runs
+   GitHub's concurrency group keeps one After merge run going and one waiting: when a third push comes, the waiting one is
+   canceled, and its push's steps would never run (#467's, 2026-11-19, behind #469's when #472 merged). So a push run
+   starts where the last push run that wasn't canceled ended (its head_sha), not at the push's own `before`. A failed run
+   counts as covered: it went red on main and is run again by hand (vault/how-to/after-a-merge.md). Manual runs
+   (workflow_dispatch) don't count: they redo a range someone chose. Pure, for tools/after-merge/test.js: `runs` are the
+   API's workflow runs (any order), `before` the push's own start, `isAncestor(a, b)` git's. Returns { from, skipped, note }. */
+function coverFrom({ runs, runNumber, before, isAncestor }){
+  const older = (runs || []).filter(r => r.event === 'push' && r.run_number < runNumber).sort((a, b) => b.run_number - a.run_number);
+  const skipped = [];
+  for (const r of older) {
+    if (r.status === 'completed' && (r.conclusion === 'cancelled' || r.conclusion === 'skipped')) { skipped.push(r); continue; }
+    if (!skipped.length) return { from: before, skipped, note: null };
+    /* the canceled pushes sit between that run's commit and this push's start; anything odd (a force-push, a run on
+       another line of history) keeps the push's own range, with a warning */
+    if (!r.head_sha || !isAncestor(r.head_sha, before)) return { from: before, skipped, note: `run ${r.run_number}'s commit isn't behind this push: only this push's own range is covered; redo the canceled run(s) ${skipped.map(x => x.run_number).join(', ')} by hand` };
+    return { from: r.head_sha, skipped, note: `covers the canceled run(s) ${skipped.map(x => `${x.run_number} (${String(x.head_sha).slice(0, 7)})`).join(', ')} too: from ${r.head_sha.slice(0, 7)}, where run ${r.run_number} ended` };
+  }
+  return { from: before, skipped, note: skipped.length ? `no earlier push run that wasn't canceled in the last ${older.length}: only this push's own range is covered; redo the canceled run(s) by hand` : null };
+}
+async function lastRuns(){
+  const repo = process.env.GITHUB_REPOSITORY, token = process.env.GITHUB_TOKEN;
+  if (!repo || !token) throw new Error('needs GITHUB_REPOSITORY and GITHUB_TOKEN (the workflow passes them)');
+  const r = await fetch(`https://api.github.com/repos/${repo}/actions/workflows/after-merge.yml/runs?branch=main&event=push&per_page=30`,
+    { headers: { Authorization: 'Bearer ' + token, Accept: 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28' } });
+  if (!r.ok) throw new Error(`GitHub's API answered ${r.status}`);
+  return (await r.json()).workflow_runs || [];
 }
 
 /* ------------------------------------------------------------------------------------------------------ calls */
@@ -205,11 +237,20 @@ async function main(){
   let from = arg('from');
   if (!from || /^0+$/.test(from)) from = to + '^1';
   from = git('rev-parse', from).toString().trim();
+  const notes = [];
+  if (argv.includes('--since-last-run')) {
+    const isAncestor = (a, b) => spawnSync('git', ['merge-base', '--is-ancestor', a, b], { cwd: ROOT }).status === 0;
+    try {
+      const c = coverFrom({ runs: await lastRuns(), runNumber: +process.env.GITHUB_RUN_NUMBER || Infinity, before: from, isAncestor });
+      from = c.from; if (c.note) notes.push(c.note);
+    } catch (e) { notes.push(`couldn't read the earlier runs (${scrub(e.message)}): only this push's own range is covered`); }
+  }
   const extraFixes = all('fix').map(f => f.replace(/^\.\//, ''));
   for (const f of extraFixes) if (!/^tools\/data-fixes\/[A-Za-z0-9._-]+\.sql$/.test(f) || !show(to, f)) { console.error(`✗ --fix ${f}: not a data fix in tools/data-fixes/ at ${to.slice(0, 7)}`); process.exit(2); }
 
   const P = plan({ changes: changesBetween(from, to), extraFixes, engineHubs: engineHubs(to), added: addedLines(from, to),
     podcast: hub => ({ before: episode(from, hub), after: episode(to, hub) }) });
+  P.warnings.unshift(...notes);
   const status = (() => { try { return require(path.join(ROOT, 'tools', 'release', 'lib.js')).hubStatus(); } catch (e) { return {}; } })();
   const liveHubs = engineHubs(to).filter(h => status[h] === 'live');
 
@@ -272,5 +313,5 @@ async function main(){
   console.log('\n✓ after-merge steps done');
 }
 
-module.exports = { plan, isSite, checkHub, closedCheckins, closedCheckinsSql };
+module.exports = { plan, isSite, checkHub, closedCheckins, closedCheckinsSql, coverFrom };
 if (require.main === module) main().catch(e => { console.error(scrub(String(e && e.stack || e))); process.exit(1); });

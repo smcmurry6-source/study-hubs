@@ -19,7 +19,7 @@ plan. Rework only: nothing students see changes, and nothing is cut.
 
 ## Context
 
-- Sam, 2026-11-18, after the evening outage ([database-load](../2026-11-18-database-load.md)): "are there any other settings we
+- Sam, 2026-11-18, after the evening outage ([database-load](2026-11-18-database-load.md)): "are there any other settings we
   can use that would help, or would it be worth doing a pass over with fable to see if the existing database could be
   optimized further. what things are necessary/could be reworked vs cut to optimize". Then: **"dont cut anything for now"**
   and "i dont want to upgrade the plan. stay free" ([decisions](../../decisions.md)). Any model can do this pass; what matters
@@ -157,7 +157,7 @@ much (29 ms a check, not 1), which made the first timings meaningless. Live tabl
   The rewrite is `cluster ... using activity_visits_pkey` (unlike `vacuum full`, it runs inside the connector's call). Applied
   live and rewritten: the box below. Since `migration_v83.sql` that summary is worked out ahead
   (`sh_visitor_summary`, at most every 15 minutes while the admin page is in use), so a slower scan without the index costs
-  little ([database-load](../2026-11-18-database-load.md)).
+  little ([database-load](2026-11-18-database-load.md)).
 - [x] **The class's numbers on each card** (`question_stats` and `question_choices`, `widget/v3.js`): 20.6% of every
   request and another 14.6% of preflights, two reads a card. (Only 0.5% of the database's time, live: the gain is in
   requests, so it matters when the request limit or the connection count is what's tight.) The answer's reply could carry them (the save has just
@@ -215,7 +215,7 @@ much (29 ms a check, not 1), which made the first timings meaningless. Live tabl
   care. **Done: `migration_v80.sql`.** The count joins the row only to leave out mock answers and runs only outside a mock,
   so it counts the answer either way (the file's header); the same replies and rows on the copy. Applied live: the box below.
 - [x] **`xp_seen`'s size**: 52 MB for about 177,000 rows (2026-11-19; the second biggest table after
-  `personal_answers`, 76 MB), found by the ping table's rewrite ([database-load](../2026-11-18-database-load.md), its Log). Its
+  `personal_answers`, 76 MB), found by the ping table's rewrite ([database-load](2026-11-18-database-load.md), its Log). Its
   rows are four short columns, so most of it is likely the primary key's index and space left by Link my devices'
   rebuilds: look at the table's and the index's sizes apart before deciding on a rewrite.
   **Looked at:** the table 29.9 MB and the index 24.8 MB, both about twice what the rows need. **Decided: rewrite it once at
@@ -393,9 +393,9 @@ anything for now", "stay free"):
   Timmy's days read one day (`v84`).
 The evening after phases 1 and 2: the answer save 45 ms a call on the live database, from 106, and 31% of its time, from
 55%; a third fewer requests a student (fewer preflights, one read a card, one analytics call); 3 failed saves of 4,706, in
-one minute of a CPU stall. What's left for the database is on [database-load](../2026-11-18-database-load.md) (the analytics
+one minute of a CPU stall. What's left for the database is on [database-load](2026-11-18-database-load.md) (the analytics
 move to a second project, when it's needed) and in the inbox (`xp_seen`'s growth, watched by every lessons audit's size read).
 
-Related: [database-load](../2026-11-18-database-load.md) · [shared-infrastructure](../../reference/shared-infrastructure.md) ·
+Related: [database-load](2026-11-18-database-load.md) · [shared-infrastructure](../../reference/shared-infrastructure.md) ·
 [game-server](../../reference/game-server.md) · [decisions](../../decisions.md) ·
 [run-sql-on-the-live-database](../../how-to/run-sql-on-the-live-database.md)
