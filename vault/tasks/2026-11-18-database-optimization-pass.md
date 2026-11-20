@@ -7,7 +7,7 @@ requested-by: Sam
 due:
 waiting-on:
 agent:
-pr: https://github.com/smcmurry6-source/study-hubs/pull/444, https://github.com/smcmurry6-source/study-hubs/pull/457, https://github.com/smcmurry6-source/study-hubs/pull/459
+pr: https://github.com/smcmurry6-source/study-hubs/pull/444, https://github.com/smcmurry6-source/study-hubs/pull/457, https://github.com/smcmurry6-source/study-hubs/pull/459, https://github.com/smcmurry6-source/study-hubs/pull/486
 ---
 
 # The database optimization pass: the same site for less of the Free plan's CPU
@@ -355,7 +355,7 @@ much (29 ms a check, not 1), which made the first timings meaningless. Live tabl
   past the newest, no visitor, the grants. `tools/release/xp.js` (+5 checks), `rls.js`, `admin-ops.js`, `retention.js`,
   `timmy.js` pass with it pending; `tools/ci/quiet.js`'s `history()` checks the page both ways (with v84: the copy kept,
   the cursor sent, the two new answers in place; without: asked again without the cursor, no copy kept).
-- 2026-11-20, 1:30-1:45 am Central (Claude Code, the readout, the session of #457): the evening of Heme & Endo Exam 3's eve,
+- 2026-11-20, 1:30-1:45 am Central (Claude Code, the readout, [#486](https://github.com/smcmurry6-source/study-hubs/pull/486)): the evening of Heme & Endo Exam 3's eve,
   with phase 1 and phase 2 live (`migration_v76.sql`, `v77` and `v79` to `v82`; also `v85` to `v87`; `v83` and `v84` still
   waiting). Read only, one call at a time.
   - **Edge logs, 2026-11-20 00:00-04:00 UTC (6 to 10 pm Central)**, against the same hours the evening before the Perio
