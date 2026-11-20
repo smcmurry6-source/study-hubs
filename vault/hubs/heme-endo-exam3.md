@@ -67,7 +67,7 @@ entry in `hubs.js`.
   L22's lichens) and a one-line `gd-trap` "Watch for"; then each lecture's `more`: "Also stressed in class" (emphasize hints the
   guide doesn't list: L17's ZP3 and ZP2, L21's urothelial carcinoma and smoking, L22's ovary, breast receptors and Paget) and
   "Said not needed" (its deemphasize hints); key terms are one line each. A new hint on a guide topic goes into that item's
-  quotes, one not on the guide into "Also stressed in class". `index.html`'s `SH_HUB.notes.guide` names it. No Lecture A (the guide skips it). It's hand-written, not built: **when a lecture's
+  quotes, one not on the guide into "Also stressed in class". `index.html`'s `SH_HUB.notes.guide` names it. **The bank's On the study guide toggle** (Sam, 2026-11-20: "a filter ... that is only the high likelihood questions from the study guide"): `SH_HUB.bank.only`, `["guide", "On the study guide", { basis: "study guide" }]`, shows the questions of every topic whose `basis` names the study guide (209 on 2026-11-20), so a topic added with that basis joins it by itself; the guide page's Practice buttons open the bank with it on. No Lecture A (the guide skips it). It's hand-written, not built: **when a lecture's
   notes or a key changes, check its guide entry too**. **Its narration** (Sam, 2026-11-19: "add kokoro") is `audio/guide.mp3`
   with its words file, spoken from the page's readable part (`tools/hub-next/guide.mjs`), so the
   [text-and-audio](../rules/text-and-audio-never-drift.md) rule binds it: **a change to `study.json`'s `guide` (or to the title of

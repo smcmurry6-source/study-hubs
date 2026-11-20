@@ -40,8 +40,14 @@
       if (HX.view !== "notes") return;
       var I = info(), S = secs(), counts = HX.CORE.examCounts || {};
       var mp3 = !HX.AUDIO_OFF && (HX.NOTES || {}).guideAudio ? HX.ASSETS + "audio/guide.mp3" : "";
+      /* the bank's study guide toggle, when the hub has one (SH_HUB.bank.only with basis "study guide"; Sam, 2026-11-20): each
+         lecture's Practice button, and one for the whole guide, open the bank with it on, so only the guide's questions show */
+      var GT = ((HX.C.bank || {}).only || []).filter(function(x){ return x[2] && /study guide/i.test(x[2].basis || ""); })[0];
+      var gIds = GT && HX.lkBasis ? HX.lkBasis(GT[2].basis) : null;
+      var gOf = function(id){ return (QBL[id] || []).filter(function(r){ return gIds[r.id]; }).length; };
+      var gAll = gIds ? S.reduce(function(t, g){ return t + gOf(g.lec); }, 0) : 0;
       var body = S.map(function(g){
-        var l = LBY[g.lec], n = counts[l.id], nLikely = (QBL[l.id] || []).filter(function(r){ return r.likely; }).length;
+        var l = LBY[g.lec], n = counts[l.id], nG = gIds ? gOf(l.id) : 0, nLikely = nG || (QBL[l.id] || []).filter(function(r){ return r.likely; }).length;
         return '<section class="gd-lec' + lc(l.id) + '" id="gd-' + esc(l.id) + '" aria-labelledby="gdh-' + esc(l.id) + '">' +
           '<h2 class="gd-h" id="gdh-' + esc(l.id) + '"><span data-sh-noread>' + HX.lecBadge(l) + "</span><span>" + esc(lecLabel(l) + " · " + shortTitle(l)) + "</span></h2>" +
           '<p class="note gd-meta" data-sh-noread>' + esc(l.who) + (n ? " · " + pl(n, "question") + " on the exam" : "") + "</p>" +
@@ -49,7 +55,7 @@
           (g.more || []).map(function(it){ return '<h3 class="gd-item gd-more">' + esc(it.h) + "</h3>" + (it.body || ""); }).join("") +   // not on the guide: what else was said in class
           ((g.terms || []).length ? '<h3 class="gd-item">Key terms</h3><dl class="gd-terms">' + g.terms.map(function(t){ return "<div><dt>" + esc(t.t) + "</dt><dd>" + t.d + "</dd></div>"; }).join("") + "</dl>" : "") +
           '<p class="gd-acts" data-sh-noread><a class="btn" href="#notes/' + esc(l.id) + '">' + icon("notes", 18) + esc(lecLabel(l)) + "'s notes</a>" +
-            '<a class="btn" href="#questions" data-lecq="' + esc(l.id) + '"' + (nLikely ? " data-lqlk" : "") + ">" + icon("questions", 18) + (nLikely ? "Practice its " + fmt(nLikely) + " High likelihood questions" : "Practice " + esc(lecLabel(l)) + " questions") + "</a></p>" +
+            '<a class="btn" href="#questions" data-lecq="' + esc(l.id) + '"' + (nG ? ' data-lqlk="' + esc(GT[0]) + '"' : nLikely ? " data-lqlk" : "") + ">" + icon("questions", 18) + (nG ? "Practice its " + fmt(nG) + " study guide questions" : nLikely ? "Practice its " + fmt(nLikely) + " High likelihood questions" : "Practice " + esc(lecLabel(l)) + " questions") + "</a></p>" +
           "</section>";
       }).join("");
       var art = '<article class="reading guide" id="guide">' +
@@ -62,6 +68,7 @@
           '<span class="note tool-tip">' + icon("highlight", 18) + "Select text to highlight it</span>" +
         "</div>" +
         '<nav class="gd-jump" aria-label="Lectures on the guide">' + S.map(function(g){ var l = LBY[g.lec]; return '<button type="button" class="chip gd-chip' + lc(l.id) + '" data-gdjump="' + esc(l.id) + '"><span class="ld" aria-hidden="true"></span>' + esc(lecLabel(l) + " " + shortTitle(l)) + "</button>"; }).join("") + "</nav>" +
+        (gAll ? '<p class="gd-acts gd-all" data-sh-noread><a class="btn btn-primary" href="#questions" data-gdall>' + icon("questions", 18) + "Practice all " + fmt(gAll) + " study guide questions</a></p>" : "") +
         '<div class="reading-prose gd">' + body + "</div>" +
         '<p class="foot-report"><button class="btn btn-text" type="button" data-report-notes>' + icon("report", 18) + "Report a mistake in the study guide</button></p>" +
         "</article>";
@@ -76,6 +83,7 @@
         track("notes:report"); if (window.shOpenFlag) window.shOpenFlag({ lec: "guide", label: I.title }); else toast("The report form is still loading. Try again in a moment.");
       }); });
       HX.wireLecLinks(el);
+      $$("[data-gdall]", el).forEach(function(a){ a.addEventListener("click", function(){ var U = STATE.ui; U.qset = ""; U.qlec = "all"; U.qstatus = "all"; U.qlikely = GT[0]; U.qfmt = "all"; U.qsrc = "all"; HX.saveState(); track("notes:practice-guide-all"); }); });
       track("notes:guide");
     }
     return { ready: ready, entry: entry, pick: pick, draw: draw };
