@@ -2,7 +2,11 @@
    linked to theirs (name_shared, migration_v41), they keep the name, and a card asks whether that other device is
    theirs and offers to link the two right there (create_link_code / redeem_link_code, the same as Link my devices,
    below). A device whose saved name is shared is also asked once a day on page load, so people who set the same name
-   on two devices before this existed get asked too.
+   on two devices before this existed get asked too. Only about a device used in the last 3 weeks (name_shared,
+   migration_v87; Sam, 2026-11-19): a cleared or given-up browser keeps its name for good, and the card went on asking
+   about it. The card's first screen also takes a code from the other device (2026-11-19): that device was asked too,
+   tapped Yes and made one, and its card used to say "when this card shows up there, tap Yes and type this code", but
+   it shows up a day or more later, after the code's 10 minutes, and Yes there made a fresh code instead.
    "No, that's someone else" is remembered per name (sh_link_ask_no); "Not now" waits 3 days for the load check
    (sh_link_ask_later; saving the name again still asks). Never in automated browsers, during a mock or the tour.
    "Yes" makes a code at once and offers a link to send to the other device (share sheet or copy): opening
@@ -74,7 +78,14 @@
     "text-transform:uppercase;letter-spacing:.08em;background:var(--la-bg);color:var(--la-ink);}" +
     ".sh-la-msg{min-height:1.4em;margin-top:6px;font-size:13.5px;color:var(--la-ink2);}" +
     ".sh-la-codebox{margin:4px 0 12px;padding:12px 14px;border-radius:12px;background:var(--la-bg2);text-align:center;}" +
-    ".sh-la-codebox small{display:block;color:var(--la-ink2);font-size:12.5px;margin-top:4px;}";
+    ".sh-la-codebox small{display:block;color:var(--la-ink2);font-size:12.5px;margin-top:4px;}" +
+    ".sh-la-card p.sh-la-note{margin:8px 0 4px;color:var(--la-ink2);font-size:13px;}" +
+    ".sh-la-first{margin-top:14px;}";
+  /* the code box (the ask card's first screen, its Yes screen) */
+  var ENTER = '<div class="sh-la-enter"><input type="text" maxlength="7" autocomplete="one-time-code" autocapitalize="characters" spellcheck="false" placeholder="Type the code" aria-label="Link code">' +
+    '<button type="button" class="sh-la-btn" data-la="go">Link</button></div>';
+  /* an iPhone's home-screen app keeps its own storage, apart from Safari, where a link opens: there it's a new device */
+  var HOME = "Use the hubs from your home screen there? Type the code instead: a link can open in the browser, which counts as a separate device.";
   function css(){
     if (document.getElementById("sh-la-css")) return;
     var st = document.createElement("style"); st.id = "sh-la-css"; st.textContent = CSS; document.head.appendChild(st);
@@ -157,8 +168,12 @@
       '<p>Another device here already goes by <b>' + esc(name) + '</b>. If that one is yours too (your phone, tablet or laptop), link them so they share one rank, streak, trophy case and question progress.</p>' +
       '<div class="sh-la-row"><button type="button" class="sh-la-btn is-main" data-la="yes">Yes, link them</button>' +
       '<button type="button" class="sh-la-btn" data-la="no">No, that’s someone else</button></div>' +
+      '<div class="sh-la-step sh-la-first"><b>Have a code from your other device?</b>' + ENTER + '<div class="sh-la-msg" aria-live="polite"></div></div>' +
       '<button type="button" class="sh-la-later" data-la="later">Not now</button>');
-    card.addEventListener("keydown", function(e){ if (e.key === "Escape") { ls(LATER_KEY, String(Date.now())); close(); } });
+    wireEnter();
+    /* on the page, not the card: after Yes the card's buttons are drawn again and focus leaves it */
+    escKey = function(e){ if (e.key === "Escape") { e.stopPropagation(); ls(LATER_KEY, String(Date.now())); close(); } };
+    document.addEventListener("keydown", escKey, true);
     card.addEventListener("click", function(e){
       var b = e.target.closest("[data-la]"), a = b && b.getAttribute("data-la");
       if (e.target === card || e.target.closest(".sh-la-x") || a === "later") { ls(LATER_KEY, String(Date.now())); track("later"); close(); return; }
@@ -173,11 +188,10 @@
       if (a === "yes") {
         track("yes");
         body.innerHTML = '<div class="sh-la-codebox"><span class="sh-la-big">…</span><small>Good for 10 minutes</small></div>' +
-          '<p>Send yourself the link and open it on your other device. Or, when this card shows up there, tap Yes and type this code.</p>' +
+          '<p>Do it now, while the code is good: on your other device, go to <b>Settings</b> (in a hub, it’s under More) and tap <b>Link my devices</b> next to your name, then type this code. Or send yourself the link and open it there.</p>' +
           '<div class="sh-la-row"><button type="button" class="sh-la-btn is-main" data-la="share" disabled>' + (navigator.share ? "Send the link" : "Copy the link") + '</button></div>' +
-          '<div class="sh-la-msg sh-la-out" aria-live="polite"></div>' +
-          '<div class="sh-la-step"><b>Got a code from your other device instead?</b><div class="sh-la-enter"><input type="text" maxlength="7" autocomplete="one-time-code" autocapitalize="characters" placeholder="Type it here" aria-label="Link code">' +
-          '<button type="button" class="sh-la-btn" data-la="go">Link</button></div><div class="sh-la-msg" aria-live="polite"></div></div>';
+          '<div class="sh-la-msg sh-la-out" aria-live="polite"></div><p class="sh-la-note">' + HOME + '</p>' +
+          '<div class="sh-la-step"><b>Got a code from your other device instead?</b>' + ENTER + '<div class="sh-la-msg" aria-live="polite"></div></div>';
         wireEnter();
         rpc("create_link_code", { p_visitor: visitor() }).then(function(c){
           if (!card) return;
@@ -233,7 +247,7 @@
         '<div class="sh-la-row" data-la-ask><button type="button" class="sh-la-btn is-main" data-la="make">Get a code</button></div>' +
         '<div data-la-made hidden><div class="sh-la-codebox"><span class="sh-la-big">…</span><small>Good for 10 minutes</small></div>' +
           '<div class="sh-la-row"><button type="button" class="sh-la-btn is-main" data-la="share" disabled>' + (navigator.share ? "Send the link" : "Copy the link") + '</button></div>' +
-          '<small>Open the link on your other device, or type the code there.</small></div>' +
+          '<small>Open the link on your other device, or type the code there. ' + HOME + '</small></div>' +
         '<div class="sh-la-msg sh-la-out" aria-live="polite"></div></div>' +
       '<div class="sh-la-step"><b>2. On your other device</b>' +
         '<div class="sh-la-enter"><input type="text" maxlength="7" autocomplete="one-time-code" autocapitalize="characters" spellcheck="false" placeholder="Type the code" aria-label="Link code">' +
