@@ -296,10 +296,21 @@
   /* A toggle may name its own test: [key, label, { prop, lec }] shows the questions whose `prop` is set in that lecture
      only (Heme & Endo Exam 2's Exam 1 High likelihood: likely, in the Refresher), and turning it on ticks that lecture if it
      isn't ticked, then unticks it again when the toggle goes off (STATE.ui.qE1auto, as on the live hub). */
+  /* Or [key, label, { basis }]: the questions a predicted topic lists whose basis names those words (core.json's
+     likelyTopics), in whatever lecture (Heme & Endo Exam 3's On the study guide, basis "study guide"; Sam, 2026-11-20: "make
+     a filter ... that is only the high likelihood questions from the study guide"). HX.lkBasis is also the study guide page's. */
   var LIKELY = [["likely", "High likelihood"]].concat((C.bank && C.bank.only) || []);
+  var BASIS_IDS = {};
+  function lkBasis(b){
+    b = String(b || "").toLowerCase();
+    if (!HX.CORE) return {};
+    if (!BASIS_IDS[b]) { var s = BASIS_IDS[b] = {}; (HX.CORE.likelyTopics || []).forEach(function(t){ if (String(t.basis || "").toLowerCase().indexOf(b) > -1) (t.ids || []).forEach(function(id){ s[id] = 1; }); }); }
+    return BASIS_IDS[b];
+  }
+  HX.lkBasis = lkBasis;
   function isLk(k){ return LIKELY.some(function(x){ return x[0] === k; }); }
   function lkSpec(k){ for (var i = 0; i < LIKELY.length; i++) if (LIKELY[i][0] === k) return LIKELY[i][2] || null; return null; }
-  function lkHas(q, k){ var sp = lkSpec(k); return sp ? !!q[sp.prop || "likely"] && (!sp.lec || q.lec === sp.lec) : !!q[k]; }
+  function lkHas(q, k){ var sp = lkSpec(k); return sp ? (sp.basis ? !!lkBasis(sp.basis)[q.id] : !!q[sp.prop || "likely"]) && (!sp.lec || q.lec === sp.lec) : !!q[k]; }
   /* turn a toggle on (k) or off (""): its lecture ticked for it, or unticked again when the toggle had ticked it */
   function setLk(k){
     var was = lkSpec(STATE.ui.qlikely), sp = lkSpec(k);

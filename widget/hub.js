@@ -1059,8 +1059,9 @@
     (need ? needFigures() : Promise.resolve()).then(function(){ if (!host.isConnected) return; pick.forEach(function(q){ host.appendChild(HX.card(q, { ctx: "check" })); }); });
   }
   function wireLecLinks(el){
-    /* High yield's button opens the lecture's High likelihood questions (the bank's toggle on), the others the whole lecture */
-    $$("[data-lecq]", el).forEach(function(a){ a.addEventListener("click", function(){ var lk = a.hasAttribute("data-lqlk"); STATE.ui.qset = ""; STATE.ui.qlec = a.getAttribute("data-lecq"); STATE.ui.qstatus = "all"; STATE.ui.qlikely = lk ? "likely" : ""; STATE.ui.qfmt = "all"; STATE.ui.qsrc = "all"; saveState(); track("notes:practice" + (lk ? "-likely" : "")); }); });
+    /* High yield's button opens the lecture's High likelihood questions (the bank's toggle on), the others the whole lecture;
+       a data-lqlk with a value turns on that toggle instead (the study guide page's: its SH_HUB.bank.only toggle) */
+    $$("[data-lecq]", el).forEach(function(a){ a.addEventListener("click", function(){ var lk = a.hasAttribute("data-lqlk") ? a.getAttribute("data-lqlk") || "likely" : ""; STATE.ui.qset = ""; STATE.ui.qlec = a.getAttribute("data-lecq"); STATE.ui.qstatus = "all"; STATE.ui.qlikely = lk; STATE.ui.qfmt = "all"; STATE.ui.qsrc = "all"; saveState(); track("notes:practice" + (lk ? "-" + lk : "")); }); });
     $$("[data-cram]", el).forEach(function(a){ a.addEventListener("click", function(){ setTimeout(function(){ var c = document.getElementById("cram-" + a.getAttribute("data-cram")); if (c) c.scrollIntoView({ block: "start" }); }, 80); }); });
   }
 

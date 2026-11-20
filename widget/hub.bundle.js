@@ -1165,9 +1165,17 @@ var n = $("[data-classnote]", el); if (n) { n.textContent = "The % beside each c
 }
 var SHOW = [["all", "All"], ["unseen", "Not answered yet"], ["missed", "Missed last time"], ["pinned", "Pinned"]];
 var LIKELY = [["likely", "High likelihood"]].concat((C.bank && C.bank.only) || []);
+var BASIS_IDS = {};
+function lkBasis(b){
+b = String(b || "").toLowerCase();
+if (!HX.CORE) return {};
+if (!BASIS_IDS[b]) { var s = BASIS_IDS[b] = {}; (HX.CORE.likelyTopics || []).forEach(function(t){ if (String(t.basis || "").toLowerCase().indexOf(b) > -1) (t.ids || []).forEach(function(id){ s[id] = 1; }); }); }
+return BASIS_IDS[b];
+}
+HX.lkBasis = lkBasis;
 function isLk(k){ return LIKELY.some(function(x){ return x[0] === k; }); }
 function lkSpec(k){ for (var i = 0; i < LIKELY.length; i++) if (LIKELY[i][0] === k) return LIKELY[i][2] || null; return null; }
-function lkHas(q, k){ var sp = lkSpec(k); return sp ? !!q[sp.prop || "likely"] && (!sp.lec || q.lec === sp.lec) : !!q[k]; }
+function lkHas(q, k){ var sp = lkSpec(k); return sp ? (sp.basis ? !!lkBasis(sp.basis)[q.id] : !!q[sp.prop || "likely"]) && (!sp.lec || q.lec === sp.lec) : !!q[k]; }
 function setLk(k){
 var was = lkSpec(STATE.ui.qlikely), sp = lkSpec(k);
 if (STATE.ui.qE1auto && was && was.lec && (!sp || sp.lec !== was.lec)) { STATE.ui.qlec = lecValue(lecIds().filter(function(id){ return id !== was.lec; })); STATE.ui.qE1auto = false; }
@@ -2608,7 +2616,7 @@ var need = pick.some(needsFig);
 (need ? needFigures() : Promise.resolve()).then(function(){ if (!host.isConnected) return; pick.forEach(function(q){ host.appendChild(HX.card(q, { ctx: "check" })); }); });
 }
 function wireLecLinks(el){
-$$("[data-lecq]", el).forEach(function(a){ a.addEventListener("click", function(){ var lk = a.hasAttribute("data-lqlk"); STATE.ui.qset = ""; STATE.ui.qlec = a.getAttribute("data-lecq"); STATE.ui.qstatus = "all"; STATE.ui.qlikely = lk ? "likely" : ""; STATE.ui.qfmt = "all"; STATE.ui.qsrc = "all"; saveState(); track("notes:practice" + (lk ? "-likely" : "")); }); });
+$$("[data-lecq]", el).forEach(function(a){ a.addEventListener("click", function(){ var lk = a.hasAttribute("data-lqlk") ? a.getAttribute("data-lqlk") || "likely" : ""; STATE.ui.qset = ""; STATE.ui.qlec = a.getAttribute("data-lecq"); STATE.ui.qstatus = "all"; STATE.ui.qlikely = lk; STATE.ui.qfmt = "all"; STATE.ui.qsrc = "all"; saveState(); track("notes:practice" + (lk ? "-" + lk : "")); }); });
 $$("[data-cram]", el).forEach(function(a){ a.addEventListener("click", function(){ setTimeout(function(){ var c = document.getElementById("cram-" + a.getAttribute("data-cram")); if (c) c.scrollIntoView({ block: "start" }); }, 80); }); });
 }
 var MORE = [

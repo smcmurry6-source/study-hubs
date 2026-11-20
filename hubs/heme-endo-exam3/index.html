@@ -45,6 +45,9 @@ window.SH_HUB = {
     prof: "the professors",
     onExam: "On Exam 3"
   },
+  /* the bank's own Only toggle (Sam, 2026-11-20): the High likelihood questions whose topic rests on Dr. Herr's study guide
+     (likelyTopics' basis "study guide ..."), L17-L22; the study guide page's Practice buttons open the bank with it on */
+  bank: { only: [["guide", "On the study guide", { basis: "study guide" }]] },
   notes: { onExam: "On Exam 3",
     guide: { title: "Dr. Herr's study guide", sub: "Every item on the Exam 3 study guide, with what the professors said in class",
       note: "Dr. Herr gave a study guide instead of an in-class review, and he called it very indicative of the exam. Each item on it is a heading here, with what the professor said about it in class, the short list to know and the mix-ups to watch for. Each lecture then lists what else was stressed in class, what was said not to be needed, and the guide's key terms. It covers L17 to L22: the guide skips Dr. Taylor's Lecture A, so it isn't here (its notes and Exam Hints are)." } },

@@ -76,3 +76,4 @@ all | When the database is busy, a mock exam's or an arcade game's answers now w
 heme-endo-exam3 | Four explanations now say more about the wrong answer most of the class picks: testosterone cypionate, prolactin before delivery, Proscar and Propecia (whose question is also worded more clearly), and the acromegaly case's age.
 heme-endo-exam3 | Every chart can now cover its answers so you can test yourself: press Cover the answers beside a chart's title, then Show on a cell to check it, or Show all.
 all | The "Is this your other device?" card now only asks about a device used in the last 3 weeks, says to type the code on your other device right away, and takes a code from your other device on its first screen.
+heme-endo-exam3 | New filter in the Question Bank: under Only, tick On the study guide to practice just the questions on Dr. Herr's study guide (209 of them). The study guide page has a button for all of them and one per lecture.
