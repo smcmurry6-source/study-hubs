@@ -99,7 +99,7 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   by name (`review/` keeps the full client). The sources of a bundle are never deleted. `legacy` goes only with the
   `dash.js` code that reads it (it tells the dashboard a hub has no `content/`). Also the old pages' leftovers in
   `tools/ci/smoke.js` (`WHY_EXEMPT` and the other exemption sets, the `OLD` hub's checks, the old cards' markup check). (#496)
-- [ ] **What the old pages' cleanup left** (2026-11-20, from #496; none of it changes what students see):
+- [x] **What the old pages' cleanup left** (2026-11-20, from #496; none of it changes what students see; done in #PRNUM, (2) as `:root` since the bare selectors changed the pages):
   (1) `widget/hub-art/<hub>.js` for the hubs whose pages came down (`generic`, `heme-endo-exam2`, `heme-endo-exam3`, `occlusion`,
   `pcd-implants-exam1`, `perio`, `special-patient-care`): `tools/figures/site/build.mjs` writes one for every hub in its list
   and no page loads them; trim its list, keeping what the dashboard's art (`hub-art/dash.js`) and the recaps still need.
@@ -111,6 +111,14 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   modes), `tools/release/lib.js`, `tools/ci/cases.js` and `tools/ci/preview.js` (the single-file case), and the line in
   `AGENTS.md` and [verify-before-pushing](../how-to/verify-before-pushing.md) about keeping `window.SH_EXPORT = {` last in an
   old hub's script.
+- [ ] **The rest of the fallbacks for a database without the game layer** (2026-11-20, found in #PRNUM; nothing students see):
+  every page asks for the game layer now, but `widget/v3.js` still falls back to `get_widget_bootstrap` (`GAME.want`,
+  `GAME.on = false`), `widget/ranks-hub.js` to `get_rank_profile`, `widget/ranks.js` to `get_trophy_stats`, and
+  `widget/replies.js` and `widget/dash.js` to `submit_survey` (and `submit_exam_debrief`), with the preview's answers to
+  each (`tools/preview/runtime/preview.js`) and the smoke test's stubs. Take them out together, with `tools/ci/quiet.js`
+  run, since a missing `_v2` call then fails instead of falling back. Also: the five archived hubs' tint lines in
+  `widget/hub.css` (`:root[data-hx-hub="perio"]`... `.hx[data-hub=...]`: check the dashboard's Past hubs and the idea
+  board's notes still need the `.hx` half) and whether pages still need to set the `shx` class (`widget/eggs.js` reads it).
 - [ ] **The hubs' own arcade lobby, never shown on the engine** (2026-11-19, found retesting BUG-012): More's Arcade on a hub on
   the engine draws its own lobby (`moreArcade()` in `widget/hub.js`) and opens a game on its stage, so the lobby inside a hub's
   `content/arcade.js` (`lobby()` in Perio's, with the `.ar-board-tabs` boards; Heme & Endo Exam 3's has `.ar-board-grid`) looks

@@ -1635,9 +1635,6 @@
         var by = {}; answersFor(hub).forEach(function(r){ var dd = day(r[1] * 1000), x = by[dd] || (by[dd] = { answer_date: dd, attempts: 0, correct: 0 }); x.attempts++; x.correct += r[2]; });
         return { data: Object.keys(by).sort().map(function(k){ return by[k]; }) };
       }
-      case "get_pet_days": {
-        return { data: bootstrapPetDays(t) };
-      }
       case "get_hub_mastery": {
         var hubs = {}; Object.keys(db.answers).forEach(function(h){ var last = {}; db.answers[h].forEach(function(r){ last[r[0]] = r[2]; });
           var ks = Object.keys(last); hubs[h] = { hub: h, seen: ks.length, latest_correct: ks.filter(function(q){ return last[q]; }).length }; });
@@ -1673,7 +1670,6 @@
       case "set_pins":
         if (v === db.visitor) { var pins = db.pins[hub] || (db.pins[hub] = {}); (a.p_pins || []).forEach(function(r){ if (Array.isArray(r) && r[0]) pins[r[0]] = [r[1] ? 1 : 0, +r[2] || 0]; }); save(); }
         return { write: true, data: null };
-      case "get_my_inbox": return { data: bootstrapInbox(v) };
       case "mark_reply_seen": db.inbox.forEach(function(m){ if (m.id === a.p_id) m.seen = true; }); save(); return { write: true, data: null };
       case "get_active_survey": return { data: bootstrapSurvey(t, true) };
       case "get_my_survey": return { data: bootstrapSurvey(t) };

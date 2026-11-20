@@ -1,5 +1,5 @@
 /* Timmy's shop (widget/shop.js): the storefront, the showcase, the shelves and an item's sheet. Loaded by shop.js on
-   first use, on the redesign's pages only, and drawn on the design system's tokens (widget/hub.css: html.shx). Built to
+   first use, on the redesign's pages only, and drawn on the design system's tokens (widget/hub.css). Built to
    the design page's shop (tools/preview/design: Sam, 2026-11-12, "more epic"): a wooden shop with plank walls inside a
    timber frame under a striped awning, Timmy at the counter, each shelf a cabinet. The wood is the shop's own surface in
    both themes, deeper at night; the cards are paper in both, so one drawing serves both. */
@@ -18,9 +18,9 @@
   font-size: var(--fs-body, 16px); line-height: 1.45;
   background: repeating-linear-gradient(180deg, transparent 0 46px, var(--w-seam) 46px 48px), repeating-linear-gradient(180deg, var(--w-wall) 0 48px, var(--w-wall2) 48px 96px);
   box-shadow: inset 0 0 0 7px var(--w-trim), inset 0 0 0 9px #3B2E3A, inset 0 -14px 0 0 var(--w-trim2); }
-html.shx[data-theme="dark"] .tsh-store { --w-wall: #7A5538; --w-wall2: #704C31; --w-cab: #5C3E29; --w-cab2: #543824; --w-trim: #A66C36; --w-trim2: #86552A; --w-board: #B9773F; --w-board2: #8A5226; --w-seam: rgba(20, 12, 10, .34);
+:root[data-theme="dark"] .tsh-store { --w-wall: #7A5538; --w-wall2: #704C31; --w-cab: #5C3E29; --w-cab2: #543824; --w-trim: #A66C36; --w-trim2: #86552A; --w-board: #B9773F; --w-board2: #8A5226; --w-seam: rgba(20, 12, 10, .34);
   --w-text: #FFF1D8; --w-note: #EBD3B0; --w-plaque: #F0D5A4; }
-@media (prefers-color-scheme: dark) { html.shx:not([data-theme="light"]) .tsh-store { --w-wall: #7A5538; --w-wall2: #704C31; --w-cab: #5C3E29; --w-cab2: #543824; --w-trim: #A66C36; --w-trim2: #86552A; --w-board: #B9773F; --w-board2: #8A5226; --w-seam: rgba(20, 12, 10, .34);
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .tsh-store { --w-wall: #7A5538; --w-wall2: #704C31; --w-cab: #5C3E29; --w-cab2: #543824; --w-trim: #A66C36; --w-trim2: #86552A; --w-board: #B9773F; --w-board2: #8A5226; --w-seam: rgba(20, 12, 10, .34);
   --w-text: #FFF1D8; --w-note: #EBD3B0; --w-plaque: #F0D5A4; } }
 /* the board ends, staggered row by row, and a nail by each */
 .tsh-store::before, .tsh-store::after { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
