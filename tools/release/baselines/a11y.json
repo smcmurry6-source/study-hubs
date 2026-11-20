@@ -1,6 +1,6 @@
 {
  "about": "Known accessibility issues per screen, so tools/release/a11y.js can fail only on new ones. Lower these numbers; never raise them to make a check pass (fix the page instead), except for a deliberate change Sam approved.",
- "updated": "2026-11-19",
+ "updated": "2026-11-20",
  "pages": {
   "about": {
    "axe": {},
@@ -67,7 +67,7 @@
    "focus": null,
    "motion": 0
   },
-  "heme-endo-exam3 · home": {
+  "review-of-systems · home": {
    "axe": {},
    "focus": {
     "invisible": 0,
@@ -77,37 +77,37 @@
    },
    "motion": 0
   },
-  "heme-endo-exam3 · notes": {
+  "review-of-systems · notes": {
    "axe": {},
    "focus": null,
    "motion": 0
   },
-  "heme-endo-exam3 · questions": {
+  "review-of-systems · questions": {
    "axe": {},
    "focus": null,
    "motion": 0
   },
-  "heme-endo-exam3 · more": {
+  "review-of-systems · more": {
    "axe": {},
    "focus": null,
    "motion": 0
   },
-  "heme-endo-exam3 · place": {
+  "review-of-systems · place": {
    "axe": {},
    "focus": null,
    "motion": 0
   },
-  "heme-endo-exam3 · place, full view": {
+  "review-of-systems · place, full view": {
    "axe": {},
    "focus": null,
    "motion": 0
   },
-  "heme-endo-exam3 · place, customize": {
+  "review-of-systems · place, customize": {
    "axe": {},
    "focus": null,
    "motion": 0
   },
-  "heme-endo-exam3 · shop": {
+  "review-of-systems · shop": {
    "axe": {},
    "focus": {
     "invisible": 0,
@@ -117,17 +117,17 @@
    },
    "motion": 0
   },
-  "heme-endo-exam3 · shop, an item's sheet": {
+  "review-of-systems · shop, an item's sheet": {
    "axe": {},
    "focus": null,
    "motion": 0
   },
-  "heme-endo-exam3 · bowling clip": {
+  "review-of-systems · bowling clip": {
    "axe": {},
    "focus": null,
    "motion": 0
   },
-  "heme-endo-exam3 · trophy case": {
+  "review-of-systems · trophy case": {
    "axe": {},
    "focus": {
     "invisible": 0,
@@ -137,7 +137,7 @@
    },
    "motion": 0
   },
-  "heme-endo-exam3 · trophy card": {
+  "review-of-systems · trophy card": {
    "axe": {},
    "focus": null,
    "motion": 0
@@ -172,7 +172,7 @@
    "focus": null,
    "motion": 0
   },
-  "heme-endo-exam3 (dark)": {
+  "review-of-systems (dark)": {
    "axe": {},
    "focus": null,
    "motion": 0
@@ -187,7 +187,7 @@
    "focus": null,
    "motion": 0
   },
-  "heme-endo-exam3 · shop (dark)": {
+  "review-of-systems · shop (dark)": {
    "axe": {},
    "focus": null,
    "motion": 0

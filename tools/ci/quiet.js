@@ -51,10 +51,10 @@ async function run(browser, failFirst){
   const page = await context.newPage(), errs = [];
   page.on('pageerror', e => errs.push(e.message));
   await page.addInitScript(() => { try { Object.defineProperty(Navigator.prototype, 'webdriver', { get: () => false, configurable: true }); } catch (e) {} });
-  await page.goto(BASE() + 'hubs/heme-endo-exam3/index.html#questions');
+  await page.goto(BASE() + 'hubs/review-of-systems/index.html#questions');
   const on = await page.waitForFunction(() => window.shGame && window.shGame.v2() && window.shDb, null, { timeout: 20000 }).catch(() => null);
   if (!on) { problems.push(`${failFirst ? 'failing' : 'working'} database: the page didn't come up on the game layer with window.shDb`); await context.close(); return; }
-  const ev = await page.evaluate(() => { const s = [...document.scripts].find(x => x.dataset && x.dataset.answeredEvent); return s ? s.dataset.answeredEvent : 'hee3:answered'; });
+  const ev = await page.evaluate(() => { const s = [...document.scripts].find(x => x.dataset && x.dataset.answeredEvent); return s ? s.dataset.answeredEvent : 'ros:answered'; });
   const from = log.length;
   for (const q of ['pq-1', 'pq-2', 'pq-3']) {
     await page.evaluate(([e, qid]) => document.dispatchEvent(new CustomEvent(e, { detail: { qid, choice: 0, correct: true, ctx: 'bank' } })), [ev, q]);
@@ -94,7 +94,7 @@ async function run(browser, failFirst){
 }
 
 async function kept(browser){
-  const context = await browser.newContext(), t0 = Date.now(), log = [], KEY = 'sh_answers_kept:heme-endo-exam3';
+  const context = await browser.newContext(), t0 = Date.now(), log = [], KEY = 'sh_answers_kept:review-of-systems';
   if (context.routeWebSocket) await context.routeWebSocket(/.*/, ws => ws.close());
   let failing = true;
   await context.route(/^https?:\/\/(?!127\.0\.0\.1)/, async route => {
@@ -117,14 +117,14 @@ async function kept(browser){
   await context.addInitScript(() => { try { Object.defineProperty(Navigator.prototype, 'webdriver', { get: () => false, configurable: true }); } catch (e) {} });
   const errs = [], open = async () => {
     const page = await context.newPage(); page.on('pageerror', e => errs.push(e.message));
-    await page.goto(BASE() + 'hubs/heme-endo-exam3/index.html#questions');
+    await page.goto(BASE() + 'hubs/review-of-systems/index.html#questions');
     return (await page.waitForFunction(() => window.shGame && window.shGame.v2() && window.shDb, null, { timeout: 20000 }).catch(() => null)) ? page : null;
   };
   const show = (page, hidden) => page.evaluate(h => { Object.defineProperty(document, 'visibilityState', { configurable: true, get: () => h ? 'hidden' : 'visible' }); document.dispatchEvent(new Event('visibilitychange')); }, hidden);
   const stored = page => page.evaluate(k => { try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch (e) { return 'unreadable'; } }, KEY);
   const a = await open();
   if (!a) { problems.push("kept answers: the page didn't come up on the game layer"); await context.close(); return; }
-  const ev = await a.evaluate(() => { const s = [...document.scripts].find(x => x.dataset && x.dataset.answeredEvent); return s ? s.dataset.answeredEvent : 'hee3:answered'; });
+  const ev = await a.evaluate(() => { const s = [...document.scripts].find(x => x.dataset && x.dataset.answeredEvent); return s ? s.dataset.answeredEvent : 'ros:answered'; });
   for (const q of ['pq-1', 'pq-2']) {
     await a.evaluate(([e, qid]) => document.dispatchEvent(new CustomEvent(e, { detail: { qid, choice: 0, correct: true, ctx: 'bank' } })), [ev, q]);
     await a.waitForTimeout(2500);
@@ -189,7 +189,7 @@ async function pings(browser, missing){
   const page = await context.newPage(), errs = [];
   page.on('pageerror', e => errs.push(e.message));
   await page.clock.install();
-  await page.goto(BASE() + 'hubs/heme-endo-exam3/index.html#questions');
+  await page.goto(BASE() + 'hubs/review-of-systems/index.html#questions');
   if (!(await page.waitForFunction(() => window.shGame && window.shGame.v2() && window.shDb, null, { timeout: 20000 }).catch(() => null))) {
     problems.push(`${what}: the page didn't come up on the game layer`); await context.close(); return;
   }
@@ -248,10 +248,10 @@ async function phase2(browser, missing){
     let a = {}; try { a = JSON.parse(route.request().postData() || '{}'); } catch (e) {}
     log.push({ fn, a });
     const json = (b, s) => route.fulfill({ status: s || 200, contentType: 'application/json', body: JSON.stringify(b) });
-    if (fn === 'get_widget_bootstrap_v2') return json({ rank: Object.assign({}, rank, { best_run: 30 }), mastery: [{ hub: 'heme-endo-exam3', latest_correct: 5, seen: 8 }],
+    if (fn === 'get_widget_bootstrap_v2') return json({ rank: Object.assign({}, rank, { best_run: 30 }), mastery: [{ hub: 'review-of-systems', latest_correct: 5, seen: 8 }],
       answers: [['pq-1', 1763500000, 0], ['pq-2', 1763500100, 1]] });
     if (fn === 'get_rank_profile_v2') return json(Object.assign({}, rank, { best_run: 30 }));
-    if (fn === 'get_hub_mastery') return json([{ hub: 'heme-endo-exam3', latest_correct: 5, seen: 8 }]);
+    if (fn === 'get_hub_mastery') return json([{ hub: 'review-of-systems', latest_correct: 5, seen: 8 }]);
     if (missing && (fn === 'get_class_numbers' || fn === 'record_analytics')) return json(gone, 404);
     if (fn === 'get_class_numbers') return json({ stats: [{ qid: 'pq-1', attempts: 9, correct: 4 }], choices: [{ qid: 'pq-1', choice: 2, picks: 3 }] });
     if (fn === 'question_stats') return json([{ qid: 'pq-1', attempts: 9, correct: 4 }]);
@@ -262,7 +262,7 @@ async function phase2(browser, missing){
   await context.addInitScript(() => { try { Object.defineProperty(Navigator.prototype, 'webdriver', { get: () => false, configurable: true }); } catch (e) {} });
   const page = await context.newPage(), errs = [];
   page.on('pageerror', e => errs.push(e.message));
-  await page.goto(BASE() + 'hubs/heme-endo-exam3/index.html#questions');
+  await page.goto(BASE() + 'hubs/review-of-systems/index.html#questions');
   if (!(await page.waitForFunction(() => window.shGame && window.shGame.v2() && window.shDb && window.shAnalytics && window.shClicks, null, { timeout: 20000 }).catch(() => null))) {
     problems.push(`${what}: the page didn't come up on the game layer`); await context.close(); return;
   }
@@ -305,7 +305,7 @@ async function phase2(browser, missing){
   if (!missing) {
     // the tenth answer, on the page: nine quick answers, then a tenth once they are saved
     await page.evaluate(() => { window.__p2 = []; document.addEventListener('sh:rank-profile', e => window.__p2.push(e.detail)); });
-    const ev = await page.evaluate(() => { const s = [...document.scripts].find(x => x.dataset && x.dataset.answeredEvent); return s ? s.dataset.answeredEvent : 'hee3:answered'; });
+    const ev = await page.evaluate(() => { const s = [...document.scripts].find(x => x.dataset && x.dataset.answeredEvent); return s ? s.dataset.answeredEvent : 'ros:answered'; });
     const answer = async qs => {
       const saved = count(0, 'record_answer_v2') + qs.length;
       for (const q of qs) await page.evaluate(([e, qid]) => document.dispatchEvent(new CustomEvent(e, { detail: { qid, choice: 0, correct: true, ctx: 'bank' } })), [ev, q]);
@@ -364,13 +364,13 @@ async function history(browser, missing){
   const what = `the answer history on the device (${missing ? 'a database without v84' : 'v84'})`, errs = [];
   const open = async () => {
     const page = await context.newPage(); page.on('pageerror', e => errs.push(e.message));
-    await page.goto(BASE() + 'hubs/heme-endo-exam3/index.html#questions');
+    await page.goto(BASE() + 'hubs/review-of-systems/index.html#questions');
     await page.waitForFunction(() => window.shBootstrap && window.shBootstrap.data, null, { timeout: 20000 }).catch(() => null);
     await page.waitForTimeout(800);
     return page;
   };
   const a = await open();
-  const kept = await a.evaluate(() => { try { return JSON.parse(localStorage.getItem('sh_answers_hist:heme-endo-exam3')); } catch (e) { return null; } });
+  const kept = await a.evaluate(() => { try { return JSON.parse(localStorage.getItem('sh_answers_hist:review-of-systems')); } catch (e) { return null; } });
   if (!kept || kept.id !== 130 || kept.n !== 30 || !Array.isArray(kept.a) || kept.a.length !== 30) problems.push(`${what}: the first page didn't keep the history with its id and count (${JSON.stringify(kept && { id: kept.id, n: kept.n })})`);
   if (boots[0] && boots[0].p_answers_after != null) problems.push(`${what}: the first page sent a cursor it didn't have`);
   await a.close();
@@ -378,7 +378,7 @@ async function history(browser, missing){
   const second = boots.slice(1);
   if (!second[0] || second[0].p_answers_after !== 130 || second[0].p_answers_n !== 30) problems.push(`${what}: the second page didn't send the device's id and count (${JSON.stringify(second[0])})`);
   const got = await b.evaluate(() => window.shBootstrap.data && window.shBootstrap.data.answers);
-  const stored = await b.evaluate(() => { try { return JSON.parse(localStorage.getItem('sh_answers_hist:heme-endo-exam3')); } catch (e) { return null; } });
+  const stored = await b.evaluate(() => { try { return JSON.parse(localStorage.getItem('sh_answers_hist:review-of-systems')); } catch (e) { return null; } });
   if (!missing) {
     const want = JSON.stringify(old.concat(fresh).map((r, i) => [r, i]).sort((x, y) => x[0][1] - y[0][1] || x[1] - y[1]).map(x => x[0]));
     if (JSON.stringify(got) !== want) problems.push(`${what}: the second page's history isn't the copy with the two new answers in place (${got && got.length})`);
@@ -429,7 +429,7 @@ async function mock(browser, closeFirst){
   const errs = [], open = async clock => {
     const page = await context.newPage(); page.on('pageerror', e => errs.push(e.message));
     if (clock) await page.clock.install();
-    await page.goto(BASE() + 'hubs/heme-endo-exam3/index.html#questions');
+    await page.goto(BASE() + 'hubs/review-of-systems/index.html#questions');
     if (clock) for (let i = 0; i < 40 && !(await page.evaluate(() => !!(window.shGame && window.shGame.v2() && window.shDb))); i++) { await page.clock.runFor(500); await page.waitForTimeout(100); }
     if (!(await page.waitForFunction(() => window.shGame && window.shGame.v2() && window.shDb, null, { timeout: 20000 }).catch(() => null))) return null;
     await page.evaluate(() => { window.__paid = []; document.addEventListener('sh:session-paid', e => window.__paid.push(e.detail)); });
@@ -439,7 +439,7 @@ async function mock(browser, closeFirst){
   const tick = async (pg, ms) => { if (!clocked || pg !== a) return pg.waitForTimeout(ms); for (let t = 0; t < ms; t += 1000) { await pg.clock.runFor(1000); await pg.waitForTimeout(40); } };
   const a = await open(clocked);
   if (!a) { problems.push(`${what}: the page didn't come up on the game layer`); await context.close(); return; }
-  const ev = await a.evaluate(() => { const s = [...document.scripts].find(x => x.dataset && x.dataset.answeredEvent); return s ? s.dataset.answeredEvent : 'hee3:answered'; });
+  const ev = await a.evaluate(() => { const s = [...document.scripts].find(x => x.dataset && x.dataset.answeredEvent); return s ? s.dataset.answeredEvent : 'ros:answered'; });
   const sid = await a.evaluate(() => window.shGame.startSession('mock'));
   if (sid !== SID) { problems.push(`${what}: no session (${sid})`); await context.close(); return; }
   for (const q of ['pq-1', 'pq-2']) await a.evaluate(([e, qid, s]) => document.dispatchEvent(new CustomEvent(e, { detail: { qid, choice: 0, correct: true, ctx: 'mock', session: s } })), [ev, q, SID]);
@@ -454,7 +454,7 @@ async function mock(browser, closeFirst){
   let page = a, from = log.length;
   if (closeFirst) {
     await a.evaluate(() => { Object.defineProperty(document, 'visibilityState', { configurable: true, get: () => 'hidden' }); document.dispatchEvent(new Event('visibilitychange')); });
-    const k = await a.evaluate(() => { try { return JSON.parse(localStorage.getItem('sh_answers_kept:heme-endo-exam3') || 'null'); } catch (e) { return null; } });
+    const k = await a.evaluate(() => { try { return JSON.parse(localStorage.getItem('sh_answers_kept:review-of-systems') || 'null'); } catch (e) { return null; } });
     const kinds = Array.isArray(k) ? k.map(e => e.f ? 'finish' : e.a.p_qid) : null;
     if (JSON.stringify(kinds) !== '["pq-1","pq-2","finish"]') problems.push(`${what}: hidden, the device should keep pq-1, pq-2, then the finish (${JSON.stringify(kinds)})`);
     await a.close();
@@ -474,7 +474,7 @@ async function mock(browser, closeFirst){
   }
   const paid = await page.evaluate(() => window.__paid);
   if (!paid.length || paid[0].session !== SID || paid[0].kind !== 'mock' || !paid[0].res || paid[0].res.xp !== 50) problems.push(`${what}: no sh:session-paid for the mock's +50 (${JSON.stringify(paid)})`);
-  if (await page.evaluate(() => localStorage.getItem('sh_answers_kept:heme-endo-exam3'))) problems.push(`${what}: still kept on the device after they were sent`);
+  if (await page.evaluate(() => localStorage.getItem('sh_answers_kept:review-of-systems'))) problems.push(`${what}: still kept on the device after they were sent`);
   if (errs.length) problems.push(`${what}, page errors: ${errs.join(' | ')}`);
   await context.close();
 }
@@ -495,7 +495,7 @@ async function timedOut(browser){
   await context.addInitScript(() => { try { Object.defineProperty(Navigator.prototype, 'webdriver', { get: () => false, configurable: true }); } catch (e) {} });
   const page = await context.newPage(), errs = [];
   page.on('pageerror', e => errs.push(e.message));
-  await page.goto(BASE() + 'hubs/heme-endo-exam3/index.html#home');
+  await page.goto(BASE() + 'hubs/review-of-systems/index.html#home');
   if (!(await page.waitForFunction(() => window.shGame && window.shGame.live(), null, { timeout: 20000 }).catch(() => null))) { problems.push(`${what}: no shGame`); await context.close(); return; }
   for (let i = 0; i < 30 && !(log.some(f => /^get_pet_days/.test(f)) && log.some(f => /^get_my_inbox/.test(f))); i++) await page.waitForTimeout(500);
   if (await page.evaluate(() => window.shGame.v2())) problems.push(`${what}: shGame.v2() should still be false (the check is pointless otherwise)`);

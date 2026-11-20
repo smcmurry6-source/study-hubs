@@ -99,8 +99,12 @@ window.SH_DASH_DATA = {
      "promptHour": 10
     }
    ],
+   "archiveOn": {
+    "date": "2026-11-20",
+    "hour": 9
+   },
    "updated": "2026-11-18",
-   "desc": "Dr. Taylor's Lecture A (dental endocrinology, moved here from Exam 2), L17 Pregnancy and lactation, L18 Estrogens and androgens, L19 Introduction to hematology, L20 Lymphomas and leukemias, and Dr. Dal Zotto's L21 and L22, the pathology of the male and female reproductive systems. The exam is Fri Nov 20, 8:00-9:30 am (35 questions, new material only). Its own home page with your countdown and progress, notes in three reading levels with narration, 24 interactive diagrams, Patient Box cases, two-statement, true/false, numbered and which-statement questions with every choice explained, High Likelihood Exam Questions, exam hints from the recordings, review tables with side-by-side look-alikes, a mock exam and the Cycle Arcade.",
+   "desc": "Dr. Taylor's Lecture A (dental endocrinology, moved here from Exam 2), L17 Pregnancy and lactation, L18 Estrogens and androgens, L19 Introduction to hematology, L20 Lymphomas and leukemias, and Dr. Dal Zotto's L21 and L22, the pathology of the male and female reproductive systems. The exam is Fri Nov 20, 8:00-9:30 am (35 questions, new material only). Its own home page with your countdown and progress, notes in three reading levels, 24 interactive diagrams, Patient Box cases, two-statement, true/false, numbered and which-statement questions with every choice explained, High Likelihood Exam Questions, exam hints from the recordings, review tables with side-by-side look-alikes, a mock exam and the Cycle Arcade.",
    "modes": [
     "Home",
     "Compendium",
@@ -108,15 +112,9 @@ window.SH_DASH_DATA = {
     "Diagrams",
     "Review tables",
     "Mock exam",
-    "Arcade",
-    "Listen",
-    "Timmy Time"
+    "Arcade"
    ],
-   "stateKey": "hee3-state-v1",
-   "podcast": {
-    "name": "Timmy Time",
-    "sub": "The last-minute review, 52 min"
-   }
+   "stateKey": "hee3-state-v1"
   },
   {
    "id": "pcd-implants-exam1",
