@@ -76,7 +76,7 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   **Read 2026-11-20, 2:30 am: 17 + 16 MB** (187,763 rows; 30.7 MB after the noon rewrite), under 40 MB with the last live
   hub's exam that morning, so nothing to do now. Every lessons audit reads the table sizes (`tools/lessons-refresh.md` step 1):
   past about 40 MB, write a new line for the partial rebuild (#488).
-- [ ] **An admin read the kept copies don't have yet still times out, and leaves nothing for the job** (2026-11-20, found
+- [x] **An admin read the kept copies don't have yet still times out, and leaves nothing for the job** (2026-11-20, found
   applying `migration_v83.sql`, [the database-load note](2026-11-18-database-load.md)'s Log). Live, insights takes 4.1 s to
   work out, Perio's question health 3.6 s and clicks up to 3.2 s, over a visitor's 3 s limit. A key with a row is fine (the page
   gets the kept copy and `sh-admin-cache`, with 10 s, works out the new one), and the night of the apply filled the usual ones.
@@ -84,7 +84,7 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   when that stops at 3 s, the error rolls back with it, so no row is left and the job never picks it up: the page shows the
   error until a quiet moment. A fix: on a first read, insert the row with no body and return a "being worked out" marker the
   admin page shows (with its "newer numbers on the way" and the 30 s look) instead of working it out inline. Small; needs
-  `review/index.html` and a migration, tested in `tools/release/admin-ops.js`.
+  `review/index.html` and a migration, tested in `tools/release/admin-ops.js`. Done: `migration_v90.sql` (a first read inserts the row empty and answers "being worked out"; the page says so and redraws) (#495)
 - [ ] **Read the data-quality report** (2026-11-18, the evening lessons refresh; 2026-11-19, the Perio retrospective):
   `select sh_data_quality();` stopped at the audit's 5 s limit both times (80 people in Perio on its final's eve; then at 12:40 pm
   the next day, between the Perio final and the Heme & Endo Exam 3 eve). `qh_report('perio')` was read with the retrospective
