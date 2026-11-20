@@ -1606,8 +1606,11 @@ function lint(hub, A){
              to close, since under the <dialog> it would be hidden and take the Escape that closes the place */
           if (v.forms) problems.push(`${name} (${label}): the check-in or survey window opened under a classmate's place`);
           if (placeCalls[K('b')] !== 1) problems.push(`${name} (${label}): get_place was asked ${placeCalls[K('b')] || 0} times for one of the top three: the stage's outfits and the visit share one answer`);
+          /* where focus goes first: a check-in waiting in the made-up data opens 0-1.5 s after the place closes
+             (whenUncovered in widget/dash.js looks every 1.5 s) and takes focus then, which is fine once the row had it */
+          await page.evaluate(() => { window.__focusSeq = []; document.addEventListener('focusin', e => window.__focusSeq.push((e.target.getAttribute && e.target.getAttribute('aria-label')) || ''), true); });
           await page.keyboard.press('Escape'); await page.waitForTimeout(500);
-          const back = await page.evaluate(() => ({ open: !!document.querySelector('dialog.tpv'), focus: document.activeElement ? document.activeElement.getAttribute('aria-label') || '' : '', tracked: window.__tracked || [] }));
+          const back = await page.evaluate(() => ({ open: !!document.querySelector('dialog.tpv'), focus: (window.__focusSeq || []).filter(l => l !== 'Exam check-in')[0] || (document.activeElement ? document.activeElement.getAttribute('aria-label') || '' : ''), tracked: window.__tracked || [] }));
           if (back.open || !/^Visit <img/.test(back.focus)) problems.push(`${name} (${label}): closing the place should give focus back to the row (${JSON.stringify(back.focus)})`);
           const vt = back.tracked.filter(k => /^place:/.test(k));
           if (!vt.includes('place:visit') || vt.some(k => /bbbb|Bee|img/.test(k))) problems.push(`${name} (${label}): a visit should be counted as place:visit and nothing about whose (${vt.join(', ')})`);

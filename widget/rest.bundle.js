@@ -3783,6 +3783,7 @@ refresh();
 if (v === "off") toastOff();
 }
 function toastOff(){
+if (window.shToast) { window.shToast("Bring him back any time in Settings.", { kind: "timmy", title: "Timmy is off" }); return; }
 var t = document.createElement("div");
 t.className = "shpet"; t.setAttribute("role", "status");
 t.style.cssText = "position:fixed;z-index:10061;left:50%;bottom:24px;transform:translateX(-50%);padding:10px 16px;border-radius:99px;background:var(--pet-ink);color:var(--pet-bg);font-size:14px;font-weight:600;box-shadow:var(--pet-shadow)";
