@@ -4,7 +4,7 @@ Sam's standing rule (2026-09-29): **every time a hub is archived, use all the da
 next hubs.** This file is where that lands. It is shared by every session (Claude Code, Cowork, each hub's Claude
 Project): read it before building or restructuring a hub, and add to it whenever one is archived.
 
-**Last refreshed: 2026-11-20** (8:30 am Central, Heme & Endo Exam 3's exam morning: its retrospective and recap; the game economy is read too, Sam's rule since 11-18). Sam
+**Last refreshed: 2026-11-20** (3 pm Central, a quiet afternoon after Heme & Endo Exam 3; the 8:30 am audit wrote its retrospective and recap; the game economy is read too, Sam's rule since 11-18). Sam
 runs the lessons refresh by hand (`tools/lessons-refresh.md`): it updates this file from all tracked data, reports and suggestions
 and ships small fixes to the live hubs. **Before building a new hub, if this date isn't today, run steps 1-3 of
 `tools/lessons-refresh.md` first.**
@@ -97,43 +97,40 @@ What each signal tells an author, and what to do with it in the next hub (and in
 
 ## Live signals (rewritten by each refresh)
 
-**2026-11-20, morning (data read 8:30 to 9:30 am Central, during Heme & Endo Exam 3; studying in its hub stopped at 8).** "Since" =
-last evening's audit (6 pm). Live hubs: **Review of Systems** (two mock boards, Dec 3 and Dec 10; opened 11-19, a handful of people so
-far) and **Heme & Endo Exam 3** until it archives at 10 pm tonight; its retrospective is below. **The database is 358 MB** of the Free
-plan's 500 MB (`personal_answers` 84 MB, `activity_pings` 46, `question_events` 38, `xp_seen` 33, `answer_xp` 27), 29 MB more than last
-evening (the Exam 3 eve). **Data quality** (the admin page's kept copy, 1:41 am): no test rows in clicks, events, time or answers, every
-table writing, 25 visitor-hours counted twice (164 minutes in all, small), 323 visitor ids with 38 linked. The smoke test's rows
-of 11-19 are gone (this hub's arcade is down to a single player). **One more leak, found by reading question health:** 13 made-up
-visitors since 11-19 2:59 pm, two answers each on two questions no hub has (`pq-1`, `pq-2`, ctx "mock"), plus 6 in Perio: the mock
-checks of `tools/ci/quiet.js` run from branches older than `tools/ci/no-leaks.js` (#476). Today's `quiet.js`, run behind a proxy that
-logs and refuses every request, sends nothing past its routes (with the guard taken out it sends two); `tools/data-fixes/2026-11-20-quiet-test-rows.sql`
-takes them out after the merge, and the 2026-11-21 re-run in the inbox runs it again.
+**2026-11-20, afternoon (data read 3 to 3:30 pm Central).** "Since" = this morning's audit (8:30 am). Live hub: **Review of Systems**
+alone (two mock boards, Dec 3 and Dec 10). Heme & Endo Exam 3 archived at 9 am (`archiveOn`) and its page came down at 10 (#503); a few
+people still had it open after 8 am (about 30 minutes in all, most of it in its cram sheet during the exam hour), a few past 10. **The database is 358
+MB** of the Free plan's 500 MB, the same as this morning (`personal_answers` 84 MB, `activity_pings` 46, `question_events` 38, `xp_seen`
+33, `answer_xp` 27). **Data quality** (the admin page's kept copy, still 1:41 am: nobody opened the admin page since): no test rows in
+clicks, events, time or answers. **This morning's data fix ran** (After merge, #503, green): no `pq-` rows are left in question events,
+stats or answers (BUG-192's retest; the 11-21 re-run in the inbox still stands).
 
-**Student voice since 6 pm:** no reports; suggestion #17 (a question bank from Dr. Herr's study guide alone), which Sam answered that
-evening with the On the study guide filter's 115 picks. Check-ins: 20 more for the Perio final (**29 in all**, in its retrospective:
-About right 23); Heme & Endo Exam 3's open at 10 am. No survey answers. Searches: 14, in Exam 3 ("study guide" three times, and a
-platelet disorder no lecture taught).
+**Since 8:30 am the class rested** (the morning after back-to-back exams): Review of Systems had a handful of people for a few minutes each
+(13 minutes over its first two days, 21 answers from a couple of people), no reports, suggestions, searches or mocks, and nothing for
+question health to read. No survey answers. **Check-ins:** a few for Heme & Endo Exam 3 by 3 pm (fewer than 5; the button opened at 10 am),
+all "About right" and "Better than I expected" (in its retrospective); none more for the Perio final (29). Searches: only this morning's
+three in Exam 3 (the platelet disorder no lecture taught).
 
-**Did the last refresh work?** Its four explanation fixes in Exam 3 (`ea-tf-ratio`, `pg-no-milk`, `ea-tf-proscar`, `dc-acro`, live
-5:20 pm): first tries 36% of 47 before, 56% of 45 since; the 25 unfixed items as low went 39% of 283 to 59% of 344. Retries after a
-miss since: the fixed 22 of 22 right, the unfixed 91% of 159. **Can't tell**, as the standing lesson says: low items rose by the same
-20 points by themselves.
+**Did the last refresh work?** Nothing to measure: this morning's audit changed no question (its hub came down the same morning). The
+evening audit's four explanation fixes in Exam 3 were read this morning: first tries 36% of 47 before, 56% of 45 after, against 39% to
+59% for the 25 unfixed items as low, so **can't tell**, as the standing lesson says.
 
 **The game economy** (Sam's standing rule since 2026-11-18, [earn-rates-stay-enjoyable](vault/rules/earn-rates-stay-enjoyable.md);
 `tools/economy.sql` over 11-19 and 11-20, since `migration_v78` took out the "A miss fixed" bonus; the prices unchanged since 11-18).
-**Skews:** both are exam days (the Perio final and the Exam 3 eve, then exam morning), and `migration_v89` (11-20, 7 am) pays 5,000
-crowns for Dark Matter and 20,000 and 30,000 for the ModuPro and the Loupes, back pay included (fewer than 5 people so far).
+Read again at 3 pm: the class barely studied after this morning's reading, so it moved by a few crowns. **Skews:** both are exam
+days (the Perio final and the Exam 3 eve, then exam morning), and `migration_v89` (11-20, 7 am) pays 5,000 crowns for Dark Matter and
+20,000 and 30,000 for the ModuPro and the Loupes, back pay included (fewer than 5 people so far).
 - **Earning:** the median study day earned **about 950 crowns** (25th percentile 460, 75th 2,200, 90th 3,450; 100 study days from 79
   people; a median 89 minutes in the hubs against 149 in the last reading): 345 from study XP, 150 from hub time, prizes 870 at the
-  75th percentile. **Per hour of study: 650 crowns and 1,185 XP**, as before (700 and 1,125). The class's rhythm (E2, 28 days, 117
-  people): the median student has 7 study days in four weeks (the middle half 2 to 14).
+  75th percentile. **Per hour of study: 650 crowns and 1,195 XP** (this morning 650 and 1,185; the reading before, 700 and 1,125).
+  The class's rhythm (E2, 28 days, 117 people): the median student has 7 study days in four weeks (the middle half 2 to 14).
 - **The ladder in median study days** (at 950; a heavy day of 2,200 in brackets): Common 0.1-0.2 (0.0-0.1), Uncommon 0.3-0.5 (0.1-0.2),
   Rare 0.7-1.3 (0.3-0.5), Epic 1.6-3.0 (0.7-1.3), Legendary 4.2-8.5 (1.8-3.6). Every band is still under the yardstick (Rare 2-4, Epic
   5-10, Legendary 10-20); the shorter days of exam week bring it closer than any reading yet.
-- **Wallets** (74 who answered on 11-19 or 11-20): median **11,140 crowns** (10th percentile 1,270, 25th 4,970, 75th 16,600, 90th
-  26,050); 44 could buy the priciest piece (8,000), 55 a Legendary, 65 an Epic, 68 a Rare; 2 hold under a Common. 20 have ever bought
-  something, and **12% of all crowns earned has been spent** (11% last evening). Since 11-19: 14 purchases, about 19,300 crowns, mostly
-  yards (77 purchases from 22 people and about 122,000 crowns all time); 19 opened their place, 12 the shop; 23 have customized it.
+- **Wallets** (74 who answered on 11-19 or 11-20): median **11,140 crowns** (10th percentile 1,370, 25th 4,970, 75th 16,640, 90th
+  26,050); 44 could buy the priciest piece (8,000), 55 a Legendary, 66 an Epic, 68 a Rare; 2 hold under a Common. 21 have ever bought
+  something, and **12% of all crowns earned has been spent** (11% the evening before). Since 11-19: 15 purchases, about 20,240 crowns,
+  mostly yards (78 purchases from 23 people and about 122,900 crowns all time); 19 opened their place, 12 the shop; 23 have customized it.
   **Signs seen: too fast** (the median wallet still buys anything; an Epic in 2-3 median days) and **hoarding at the line** (12%); not
   "too slow", not "nothing to want".
 - **The leaderboards** (E7a, totals): 50 names. The rank board's top ten hold 33,970-54,370 XP (median 39,620) against everyone's
@@ -484,8 +481,9 @@ Dr. Herr's study guide (11-17) set the High Likelihood topics, then got its own 
 went in on the eve. Data: **88 people, 169 h**, half of Exam 2's 360; 38 came on one day only, 16 on 3+ days, median **68 min** each
 (Exam 2's 169), 11 under 5 min. **11,126 answers from 57 people** (median 123, most 1,107; 20 answered on 2+ days), 77% (**first
 tries 67% of 6,728**, the lowest of any hub: Perio's final 78%). Recap on the dashboard since 11-20 (featured: `ll-num-bsx`, the B
-symptoms). Its narration and Timmy Time came off the site with this audit (283 MB, the site 327 -> 44 MB). No check-ins yet: the button opens at 10 am,
-so they go into the next audit.
+symptoms). Its narration and Timmy Time came off the site with this audit (283 MB, the site 327 -> 44 MB). Check-ins: **a few by 3 pm on exam
+day** (fewer than 5; the button opened at 10 am, the morning after back-to-back exams), every one "About right" and "Better than I
+expected"; later ones go into the next audit.
 
 **The hub got one evening.** The Perio final was the morning before, and 75 of this hub's 88 people had studied for it in its last
 three days. Until then the hub was nearly empty: 11-17 97 min (20 people), 11-18 455 (14). Then **11-19, from the Perio final's
