@@ -1416,15 +1416,20 @@ var host = bar.parentElement, row = host && host.parentElement, scope = bar.clos
 var label = row ? (row.textContent || "").replace(/[\d%.,/·:()+\-]+/g, " ").replace(/\s+/g, " ").trim() : "";
 return (scope ? scope.id : "") + "|" + (host ? host.className : "") + "|" + (label.length <= 80 ? label : "");
 }
-function fillBars(node){
-var bars = node.matches(BAR_SEL) ? [node] : node.querySelectorAll(BAR_SEL);
+var barQ = [];
+function fillBars(nodes){
+var todo = [];
+for (var n = 0; n < nodes.length; n++) {
+var node = nodes[n], bars = node.matches(BAR_SEL) ? [node] : node.querySelectorAll(BAR_SEL);
 for (var i = 0; i < bars.length; i++) {
 var bar = bars[i], to = bar.style.width;
 if (!to || to.indexOf("%") < 0 || !bar.getClientRects().length) continue;
 var key = barKey(bar), from = Object.prototype.hasOwnProperty.call(barMem, key) ? barMem[key] : "0%";
 barMem[key] = to;
-if (from !== to) anim(bar, [{ width: from }, { width: to }], { duration: 900, delay: Math.min(i, 8) * 45, easing: "cubic-bezier(.2,.8,.2,1)", fill: "backwards" });
+if (from !== to) todo.push([bar, from, to, i]);
 }
+}
+todo.forEach(function(b){ anim(b[0], [{ width: b[1] }, { width: b[2] }], { duration: 900, delay: Math.min(b[3], 8) * 45, easing: "cubic-bezier(.2,.8,.2,1)", fill: "backwards" }); });
 }
 var NAV_ATTRS = ["data-mode", "data-sub", "data-lec", "data-go", "data-group", "data-qs", "data-view", "data-goto-lecture", "data-rv-lec"];
 var NAV_SEL = NAV_ATTRS.map(function(a){ return "[" + a + "]"; }).join(", ") + ', [role="tab"], .subtab';
@@ -1453,25 +1458,26 @@ els.forEach(function(el){ anim(el, [{ opacity: 0, transform: "translateY(8px)" }
 }
 function watch(){
 new MutationObserver(function(recs){
-var live = tap && performance.now() <= tap.until;
+var live = tap && performance.now() <= tap.until, fill = [];
 for (var i = 0; i < recs.length; i++) {
 var r = recs[i];
 if (r.type === "childList") {
 var any = false;
-for (var j = 0; j < r.addedNodes.length; j++) { var n = r.addedNodes[j]; if (n.nodeType === 1) { any = true; fillBars(n); } }
+for (var j = 0; j < r.addedNodes.length; j++) { var n = r.addedNodes[j]; if (n.nodeType === 1) { any = true; fill.push(n); } }
 if (any && nav && r.target.nodeType === 1) nav.added.push(r.target);
 } else if (r.attributeName === "hidden") {
 if (nav && !r.target.hidden) nav.shown.push(r.target);
-if (!r.target.hidden) fillBars(r.target);
+if (!r.target.hidden) fill.push(r.target);
 } else if (live) answerRec(r);
 }
+if (fill.length) { if (!barQ.length) requestAnimationFrame(function(){ var q = barQ; barQ = []; fillBars(q); }); barQ.push.apply(barQ, fill); }
 }).observe(document.body, { subtree: true, childList: true, attributes: true, attributeOldValue: true, attributeFilter: ["class", "data-state", "hidden"] });
 document.addEventListener("click", function(e){
 var c = e.target && e.target.closest ? e.target.closest(".qcard") : null;
 tap = c ? { card: c, btn: e.target.closest("button"), until: performance.now() + 900 } : null;
 navClick(e);
 }, true);
-fillBars(document.body);
+fillBars([document.body]);
 }
 var FIRE_O = "M12 21.5c3.9 0 6.5-2.6 6.5-6.1 0-3.7-2.6-5.7-3.7-9.1-.4 2-1.5 3.4-2.8 4 .2-2.9-1-5.7-3.5-7.3.3 3.4-3 5.9-3 10.1 0 3.8 2.6 8.4 6.5 8.4z";
 var FIRE_I = "M12 21c2 0 3.4-1.4 3.4-3.2 0-1.9-1.3-2.9-1.9-4.7-.4 1.3-1.1 1.9-1.8 2.2.1-1.6-.5-3-1.8-3.8.2 1.8-1.6 3.1-1.6 5.3 0 2.4 1.6 4.2 3.7 4.2z";
@@ -6041,9 +6047,11 @@ if (!EXPORT_ONLY) (function(){
 var root = document.documentElement;
 function zoom(){ try { return parseFloat(getComputedStyle(root).zoom) || parseFloat(root.style.zoom) || 1; } catch (e) { return 1; } }
 function headH(){ var h = document.querySelector("header.hub-header, .hub-header"); return h ? h.offsetHeight : 0; }
+function setVar(k, v){ if (root.style.getPropertyValue(k) !== v) root.style.setProperty(k, v); }
 function fit(){
-root.style.setProperty("--sh-vh", (window.innerHeight / zoom()) + "px");
-root.style.setProperty("--sh-head-h", headH() + "px");
+var vh = (window.innerHeight / zoom()) + "px", hh = headH() + "px";
+setVar("--sh-vh", vh);
+setVar("--sh-head-h", hh);
 fitFigs();
 }
 function esc(t){ return String(t == null ? "" : t).replace(/[&<>"]/g, function(c){ return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
@@ -6103,9 +6111,10 @@ go(lay, dir === "prev" ? cur - 1 : cur + 1);
 art.appendChild(bar);
 }
 function fitFigs(){
+var all = document.querySelectorAll(".anima"); if (!all.length) return;
 var wide = window.matchMedia("(min-width: 861px)").matches;
 var room = window.innerHeight / zoom() - headH();
-document.querySelectorAll(".anima").forEach(function(a){
+all.forEach(function(a){
 var figs = a.querySelectorAll(":scope > figure.iso-figure"), ctl = a.querySelector(":scope > .am-controls");
 var f = figs.length === 1 && ctl ? figs[0] : null;
 a.querySelectorAll(":scope > figure.sh-fig-pin").forEach(function(x){ if (x !== f) x.classList.remove("sh-fig-pin"); });

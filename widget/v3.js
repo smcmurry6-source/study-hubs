@@ -3804,9 +3804,13 @@
     var root = document.documentElement;
     function zoom(){ try { return parseFloat(getComputedStyle(root).zoom) || parseFloat(root.style.zoom) || 1; } catch (e) { return 1; } }
     function headH(){ var h = document.querySelector("header.hub-header, .hub-header"); return h ? h.offsetHeight : 0; }
+    /* measure first, then write, and only what changed: writing --sh-vh before measuring the bar made the browser lay the
+       whole page out twice on every call (a slow phone felt it after Home, 2026-11-20) */
+    function setVar(k, v){ if (root.style.getPropertyValue(k) !== v) root.style.setProperty(k, v); }
     function fit(){
-      root.style.setProperty("--sh-vh", (window.innerHeight / zoom()) + "px");
-      root.style.setProperty("--sh-head-h", headH() + "px");
+      var vh = (window.innerHeight / zoom()) + "px", hh = headH() + "px";
+      setVar("--sh-vh", vh);
+      setVar("--sh-head-h", hh);
       fitFigs();
     }
     function esc(t){ return String(t == null ? "" : t).replace(/[&<>"]/g, function(c){ return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
@@ -3870,9 +3874,10 @@
        while its controls and explanation scroll up beside it, so the picture and what you change are on screen together.
        Only on wide screens, only when the picture fits in about 70% of the screen (v3.css caps the drawing's height). */
     function fitFigs(){
+      var all = document.querySelectorAll(".anima"); if (!all.length) return;
       var wide = window.matchMedia("(min-width: 861px)").matches;
       var room = window.innerHeight / zoom() - headH();
-      document.querySelectorAll(".anima").forEach(function(a){
+      all.forEach(function(a){
         var figs = a.querySelectorAll(":scope > figure.iso-figure"), ctl = a.querySelector(":scope > .am-controls");
         var f = figs.length === 1 && ctl ? figs[0] : null;
         a.querySelectorAll(":scope > figure.sh-fig-pin").forEach(function(x){ if (x !== f) x.classList.remove("sh-fig-pin"); });

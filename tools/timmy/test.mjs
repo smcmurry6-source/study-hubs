@@ -34,7 +34,7 @@ let pw = null; try { pw = require("playwright"); } catch (e) {}
 if (!pw) notes.push("BLOCKED: paragraph addresses against Chromium need Playwright (npm i playwright); the rest ran");
 else {
   const src = fs.readFileSync(path.join(ROOT, "widget/hub.js"), "utf8");
-  const at = src.indexOf("function exportSections(){");
+  const at = src.indexOf("function exportSections(pace){");
   let depth = 0, end = -1;
   for (let i = src.indexOf("{", at); i < src.length; i++) { if (src[i] === "{") depth++; else if (src[i] === "}" && --depth === 0) { end = i + 1; break; } }
   const exportSrc = at >= 0 && end > 0 ? src.slice(at, end) : null;
@@ -60,7 +60,7 @@ else {
       const LECS = core.lectures, NOTES = notes, STUDY = study, C = { core, notes, study }, LBY = {}; LECS.forEach(l => { LBY[l.id] = l; });
       const lecLabel = l => l ? (l.label || ("L" + l.num)) : "";
       window.SH_EXPORT = {};
-      eval("(" + fn.replace(/^function exportSections\(\)/, "function()") + ")")();
+      eval("(" + fn.replace(/^function exportSections\(pace\)/, "function(pace)") + ")")();
       return window.SH_EXPORT.sections;
     }, { fn: exportSrc, core: d.core, notes: d.notes, study: d.study });
     const corpus = T.buildCorpus(h, d, "");
