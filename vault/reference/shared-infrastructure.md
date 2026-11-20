@@ -120,7 +120,7 @@ tags: [widget, supabase]
   with `security definer` or its own `search_path` (all of ours) can't be inlined, so it is parsed and planned again on
   every call, while a PL/pgSQL one keeps its plans for the life of the connection; that planning was about a third of every
   answer save. `pg_stat_statements` with `track = all` on a throwaway copy shows it
-  ([the optimization pass](../tasks/2026-11-18-database-optimization-pass.md)). The admin page reads one query at a time,
+  ([the optimization pass](../tasks/done/2026-11-18-database-optimization-pass.md)). The admin page reads one query at a time,
   and its heavy reads come worked out ahead from `admin_cache`, refreshed by pg_cron's `sh-admin-cache` job (every 15
   minutes while the page is in use, hourly while the class is busy, one read a minute; `migration_v83.sql`)
   ([admin-operations](admin-operations.md)), and `widget/v3.js` holds a failed answer and sends it again with the same
