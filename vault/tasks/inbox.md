@@ -54,18 +54,15 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   clicks of 11-19 as test runs. **Run `tools/data-fixes/2026-11-20-quiet-test-rows.sql` again with it** (2026-11-20, the Exam 3
   retrospective): `tools/ci/quiet.js`'s mock checks, run from those same older branches, wrote two `pq-` rows each into question
   health (13 made-up visitors to 6:37 am on 11-20); today's `quiet.js` sends nothing past its routes (checked behind a refusing proxy).
-- [ ] **After 10 pm on 2026-11-20: Heme & Endo Exam 3 out of `HUBS` in `sw.js`** (2026-11-20, its retrospective): it archives
-  itself then (`hubs.js`), and an archived hub leaves the service worker's precache, with `VERSION` bumped
-  ([archived-hubs-drop-their-audio](../rules/archived-hubs-drop-their-audio.md) step 2). Not before: `tools/ci/syntax.js` fails a live
-  engine hub missing from `HUBS`. A small PR any time after 10 pm Central; Review of Systems is the one hub left in it.
-- [ ] **Sam's call: take Heme & Endo Exam 3's page down?** (2026-11-20, its retrospective; Perio's came down the afternoon of its
-  final). Its retrospective and recap are done and its audio is off, so nothing else needs the page. If yes, in the same PR: what
-  names it moves to Review of Systems or goes (`grep -rln heme-endo-exam3 tools .github widget review sw.js`: `tools/ci/quiet.js`,
-  `tools/release/admin-ui.js`, `perf.js`, `budgets.json` and `baselines/a11y.json`, Ask Timmy's `tools/timmy/test-set.json`,
-  `tools/after-merge/test.js`, the preview's `serve.js` and `design/`, its figure build in `.github/workflows/check.yml`; the smoke
-  test's game-layer check needs a hub with Million-Dollar Smile, which Review of Systems hasn't), its About entries (the Cycle
-  Arcade column, "Heme & Endo Exam 3: Lab Sort"), and `archiveOn` in `hubs.js` so the dashboard never links to a missing page
-  ([the hub note](../hubs/heme-endo-exam3.md)).
+- [x] **Heme & Endo Exam 3 out of `HUBS` in `sw.js`** (2026-11-20, its retrospective): done with its page coming down, `sh-v68`
+  with Review of Systems alone (#503).
+- [x] **Sam's call: take Heme & Endo Exam 3's page down?** Sam, the morning of the exam: "Yes come down. Merge". `hubs/heme-endo-exam3/`
+  is gone, `archiveOn` 9 am on 2026-11-20, and what named it moved to Review of Systems or went (#503,
+  [the hub note](../hubs/heme-endo-exam3.md)).
+- [ ] **The smoke test's game-layer wiring check runs again on the next hub with an arcade** (2026-11-20, Exam 3's page down):
+  `tools/ci/smoke.js`'s `wiringCheck` (Million-Dollar Smile's sessions and answers, Timmy Time's minutes) needs a live engine hub
+  with Smile in its `content/arcade.js`, and Review of Systems has no arcade, so it is skipped until one is built. When the next
+  hub with an arcade ships, check its smoke run prints "the game layer's wiring" for it (nothing to change: it picks the hub itself).
 - [ ] **The arcade games themselves at 320 px with the largest text** (2026-11-19, left from BUG-168's fix): the lobby and
   every view of a hub now fit a 320 px phone at XX-Large (220 px of layout), and the smoke test checks them, but a game once
   it's started (each hub's own `content/arcade.css` and `widget/games.css`) wasn't swept. Open each in a scripted browser at

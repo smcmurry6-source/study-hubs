@@ -554,8 +554,8 @@ MCQ on the fact (`hi-humoral` 83%) and make the swapped word the point of the st
 (4) **a lecture of many look-alike diseases is the hardest on a first try** (L20's lymphomas and leukemias, 55%): a side-by-side
 table per category and a "which category" item for each disease, from the start; (5) **exam morning is the notes', High yield's and
 Timmy Time's** (two morning exams in a row now): Home's exam-day view should lead with them; (6) the extras (Learn, the mock, the
-drill, the arcade) reached a few people each in a one-evening hub. Cleanup still to do: the page stays up for now (Sam's call); it
-leaves `HUBS` in `sw.js` after it archives at 10 pm; moving its entry into `archived` in `hubs.js` is optional.
+drill, the arcade) reached a few people each in a one-evening hub. Cleanup: done the same morning (Sam: "Yes come down. Merge"): its page came down, it archives
+at 9 am (`archiveOn`) and left `HUBS` in `sw.js`; moving its entry into `archived` in `hubs.js` is optional.
 
 ### Periodontology (`perio`), midterm 2026-10-01, final 2026-11-19 (cumulative, in the morning: studying stopped at 10 am), archived 2026-11-19 (written that afternoon)
 

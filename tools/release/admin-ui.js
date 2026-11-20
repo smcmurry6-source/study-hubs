@@ -41,7 +41,7 @@ const FIX = 'https://fixtures.preview.invalid/rest/v1/rpc/';
     await p.click(`.nav [data-tab=${view}]`);
     await p.waitForFunction(v => !document.querySelector(`[data-panel=${v}]`).hidden, view);
   }
-  async function hubsTab(p){ await go(p, 'hubs'); await p.waitForSelector('[data-arch-hub="heme-endo-exam3"] .state', { timeout: 15000 }); await p.waitForTimeout(400); }
+  async function hubsTab(p){ await go(p, 'hubs'); await p.waitForSelector('[data-arch-hub="review-of-systems"] .state', { timeout: 15000 }); await p.waitForTimeout(400); }
   async function setState(p, hub, st, until, note){
     await p.click(`[data-arch-edit="${hub}"]`);
     await p.check(`[data-arch-form="${hub}"] input[value=${st}]`);
@@ -267,77 +267,78 @@ const FIX = 'https://fixtures.preview.invalid/rest/v1/rpc/';
     ok(await liveCalls() === c3 + 1, 'Live checks at once when the page is visible again');
     notes.push('Live: 5 people, names by hub, no ids; polls every 30 s only while open and visible');
 
-    /* Hubs: archive Heme & Endo Exam 3 by hand, with the confirmation step (Occlusion's, then Perio's, until their pages came down, 2026-11-19) */
+    /* Hubs: archive Review of Systems by hand, with the confirmation step (Occlusion's, then Perio's, until their pages came down, 2026-11-19;
+       then Heme & Endo Exam 3's, until its page came down, 2026-11-20) */
     await hubsTab(page);
-    ok(await page.$eval('[data-arch-hub="heme-endo-exam3"] .state', e => e.textContent) === 'Live', 'Heme & Endo Exam 3 starts Live (automatic)');
+    ok(await page.$eval('[data-arch-hub="review-of-systems"] .state', e => e.textContent) === 'Live', 'Review of Systems starts Live (automatic)');
     const removedLive = await page.$('[data-arch-hub="hepatobiliary"]') ? await (async () => { await page.click('[data-arch-edit="hepatobiliary"]'); const d = await page.$eval('[data-arch-form="hepatobiliary"] input[value=live]', e => e.disabled); await page.keyboard.press('Escape'); return d; })() : true;
     ok(removedLive, 'a hub whose page is removed can\'t be set to Live');
-    await page.click('[data-arch-edit="heme-endo-exam3"]');
+    await page.click('[data-arch-edit="review-of-systems"]');
     ok(await page.evaluate(() => document.activeElement && document.activeElement.value === 'auto'), 'opening the form puts focus on the current state');
     await page.keyboard.press('Escape');
-    ok(await page.evaluate(() => document.activeElement && document.activeElement.getAttribute('data-arch-edit') === 'heme-endo-exam3' && !document.querySelector('[data-arch-form="heme-endo-exam3"]')), 'Escape closes the form and returns focus to Change…');
-    await setState(page, 'heme-endo-exam3', 'archived', null, 'Test: exam moved');
-    await page.waitForSelector('[data-arch-form="heme-endo-exam3"] .arch-confirm');
-    const ctext = await page.textContent('[data-arch-form="heme-endo-exam3"] .arch-confirm');
+    ok(await page.evaluate(() => document.activeElement && document.activeElement.getAttribute('data-arch-edit') === 'review-of-systems' && !document.querySelector('[data-arch-form="review-of-systems"]')), 'Escape closes the form and returns focus to Change…');
+    await setState(page, 'review-of-systems', 'archived', null, 'Test: exam moved');
+    await page.waitForSelector('[data-arch-form="review-of-systems"] .arch-confirm');
+    const ctext = await page.textContent('[data-arch-form="review-of-systems"] .arch-confirm');
     ok(/Archived/.test(ctext) && /until you change it/.test(ctext) && /progress stay/.test(ctext), `the confirmation says what changes and what stays ("${ctext.slice(0, 90)}…")`);
     ok(await page.evaluate(() => document.activeElement && document.activeElement.classList.contains('arch-confirm')), 'focus moves to the confirmation');
     ok(await writes(page) === 0, 'nothing is saved before Confirm');
     await page.screenshot({ path: path.join(shots, 'hubs-confirm-desktop-light.png'), fullPage: true });
-    await confirm(page, 'heme-endo-exam3');
+    await confirm(page, 'review-of-systems');
     ok(await writes(page) === 1, 'Confirm saves once');
-    ok(/Archived/.test(await page.$eval('[data-arch-hub="heme-endo-exam3"] .state', e => e.textContent)) && /Set by hand/.test(await page.textContent('[data-arch-hub="heme-endo-exam3"]')), 'Heme & Endo Exam 3 shows Archived, set by hand');
-    ok(/Heme & Endo Exam 3:\s*Automatic → Archived[\s\S]*Test: exam moved/.test(await page.textContent('.log-list')), 'the change log has it, with the note');
+    ok(/Archived/.test(await page.$eval('[data-arch-hub="review-of-systems"] .state', e => e.textContent)) && /Set by hand/.test(await page.textContent('[data-arch-hub="review-of-systems"]')), 'Review of Systems shows Archived, set by hand');
+    ok(/Review of Systems:\s*Automatic → Archived[\s\S]*Test: exam moved/.test(await page.textContent('.log-list')), 'the change log has it, with the note');
     await page.screenshot({ path: path.join(shots, 'hubs-saved-desktop-light.png'), fullPage: true });
 
     let cards = await dashboard(ctx);
-    const occ = card(cards, 'heme-endo-exam3');
-    ok(!occ && cards.length, `the dashboard has no tab and no link for Heme & Endo Exam 3 once it's archived (${JSON.stringify(cards)})`);
-    const hp = await open(ctx, 'hubs/heme-endo-exam3/');
+    const occ = card(cards, 'review-of-systems');
+    ok(!occ && cards.length, `the dashboard has no tab and no link for Review of Systems once it's archived (${JSON.stringify(cards)})`);
+    const hp = await open(ctx, 'hubs/review-of-systems/');
     const notice = await hp.waitForSelector('.sh-archived', { timeout: 8000 }).then(() => hp.textContent('.sh-archived'), () => '');
     ok(/This hub is archived/.test(notice) && /being updated right now/.test(notice), `the hub page says it is archived (got "${notice.slice(0, 80)}")`);
     await hp.close();
 
     /* reverse it: Back to automatic */
     await page.bringToFront();
-    await page.click('[data-arch-auto="heme-endo-exam3"]');
-    ok(/goes back to Automatic/.test(await page.textContent('[data-arch-form="heme-endo-exam3"] .arch-confirm')), 'Back to automatic asks first');
-    await confirm(page, 'heme-endo-exam3');
-    ok(await page.$eval('[data-arch-hub="heme-endo-exam3"] .state', e => e.textContent) === 'Live', 'Heme & Endo Exam 3 is Live again');
+    await page.click('[data-arch-auto="review-of-systems"]');
+    ok(/goes back to Automatic/.test(await page.textContent('[data-arch-form="review-of-systems"] .arch-confirm')), 'Back to automatic asks first');
+    await confirm(page, 'review-of-systems');
+    ok(await page.$eval('[data-arch-hub="review-of-systems"] .state', e => e.textContent) === 'Live', 'Review of Systems is Live again');
     cards = await dashboard(ctx);
-    ok((card(cards, 'heme-endo-exam3') || {}).open, `the dashboard shows Heme & Endo Exam 3 open again (${JSON.stringify(cards)})`);
-    const hp2 = await open(ctx, 'hubs/heme-endo-exam3/');
+    ok((card(cards, 'review-of-systems') || {}).open, `the dashboard shows Review of Systems open again (${JSON.stringify(cards)})`);
+    const hp2 = await open(ctx, 'hubs/review-of-systems/');
     await hp2.waitForTimeout(4000);
     ok(!(await hp2.$('.sh-archived')), 'the hub page no longer says it is archived');
     await hp2.close();
     notes.push('Hubs: archive by hand -> dashboard card and hub notice; back to automatic -> open again');
 
-    /* an end time: Heme & Endo Exam 3 (live by its dates) archived by hand until 6 pm, then its dates again. Until
+    /* an end time: Review of Systems (live by its dates) archived by hand until 6 pm, then its dates again. Until
        2026-11-19 this reopened Heme & Endo Exam 1 (gone by its dates); its page came down with the other old pages, and a
        hub whose page is removed can't be set to Live (checked above), so the one hub with a page left takes the end time. */
-    await setState(page, 'heme-endo-exam3', 'archived', '2026-11-10T09:00');
-    await page.waitForSelector('[data-arch-hub="heme-endo-exam3"] .arch-msg.msg-err');
+    await setState(page, 'review-of-systems', 'archived', '2026-11-10T09:00');
+    await page.waitForSelector('[data-arch-hub="review-of-systems"] .arch-msg.msg-err');
     ok(await writes(page) === 2, 'an end time in the past is refused before saving');
-    await page.fill('[data-arch-form="heme-endo-exam3"] [name=until]', '2026-11-10T18:00');
-    await page.click('[data-arch-form="heme-endo-exam3"] [type=submit]');
-    ok(/until .*Nov.* 10/.test(await page.textContent('[data-arch-form="heme-endo-exam3"] .arch-confirm')), 'the confirmation names the end time');
-    await confirm(page, 'heme-endo-exam3');
+    await page.fill('[data-arch-form="review-of-systems"] [name=until]', '2026-11-10T18:00');
+    await page.click('[data-arch-form="review-of-systems"] [type=submit]');
+    ok(/until .*Nov.* 10/.test(await page.textContent('[data-arch-form="review-of-systems"] .arch-confirm')), 'the confirmation names the end time');
+    await confirm(page, 'review-of-systems');
     cards = await dashboard(ctx);
-    ok(!card(cards, 'heme-endo-exam3') && cards.length, `archived until 6 pm: the dashboard has no tab for Heme & Endo Exam 3 before its end time (${JSON.stringify(cards)})`);
+    ok(!card(cards, 'review-of-systems') && cards.length, `archived until 6 pm: the dashboard has no tab for Review of Systems before its end time (${JSON.stringify(cards)})`);
     cards = await dashboard(ctx, '&now=2026-11-10T19:00');
-    ok((card(cards, 'heme-endo-exam3') || {}).open, `after its end time Heme & Endo Exam 3 goes back to its dates (open again: ${JSON.stringify(cards)})`);
+    ok((card(cards, 'review-of-systems') || {}).open, `after its end time Review of Systems goes back to its dates (open again: ${JSON.stringify(cards)})`);
     await page.bringToFront();
-    await page.click('[data-arch-auto="heme-endo-exam3"]'); await confirm(page, 'heme-endo-exam3');   /* the stale-tab check below starts from Automatic */
+    await page.click('[data-arch-auto="review-of-systems"]'); await confirm(page, 'review-of-systems');   /* the stale-tab check below starts from Automatic */
     notes.push('end time: archived by hand until 6 pm, its dates again at 7 pm');
 
     /* a change from a stale page is refused, not overwritten */
     const a = await admin(ctx, `review/?persona=admin&now=${NOW}`), b = await admin(ctx, `review/?persona=admin&now=${NOW}`);
     await hubsTab(a); await hubsTab(b);
-    await setState(a, 'heme-endo-exam3', 'hidden'); await confirm(a, 'heme-endo-exam3');
-    await setState(b, 'heme-endo-exam3', 'archived'); await b.waitForSelector('[data-arch-form="heme-endo-exam3"] .arch-confirm'); await b.click('[data-arch-confirm="heme-endo-exam3"]');
-    await b.waitForSelector('[data-arch-hub="heme-endo-exam3"] .arch-msg.msg-err', { timeout: 10000 });
-    ok(/changed in another tab/.test(await b.textContent('[data-arch-hub="heme-endo-exam3"] .arch-msg')), 'the stale page is told someone else changed it');
-    ok(await b.$eval('[data-arch-hub="heme-endo-exam3"] .state', e => e.textContent) === 'Hidden', 'the stale page reloads the real state');
-    await b.click('[data-arch-auto="heme-endo-exam3"]'); await confirm(b, 'heme-endo-exam3');
+    await setState(a, 'review-of-systems', 'hidden'); await confirm(a, 'review-of-systems');
+    await setState(b, 'review-of-systems', 'archived'); await b.waitForSelector('[data-arch-form="review-of-systems"] .arch-confirm'); await b.click('[data-arch-confirm="review-of-systems"]');
+    await b.waitForSelector('[data-arch-hub="review-of-systems"] .arch-msg.msg-err', { timeout: 10000 });
+    ok(/changed in another tab/.test(await b.textContent('[data-arch-hub="review-of-systems"] .arch-msg')), 'the stale page is told someone else changed it');
+    ok(await b.$eval('[data-arch-hub="review-of-systems"] .state', e => e.textContent) === 'Hidden', 'the stale page reloads the real state');
+    await b.click('[data-arch-auto="review-of-systems"]'); await confirm(b, 'review-of-systems');
     await a.close(); await b.close();
     notes.push('a change from a stale tab is refused and the tab reloads');
 
@@ -386,7 +387,7 @@ const FIX = 'https://fixtures.preview.invalid/rest/v1/rpc/';
     for (const tab of ['overview', 'live', 'checkins', 'inbox', 'hubs', 'health', 'ab', 'timmy']) {
       await go(m, tab);
       if (tab === 'live') await m.waitForFunction(() => (document.querySelector('#liveTotal') || {}).textContent === '5');
-      if (tab === 'hubs') { await m.waitForSelector('[data-arch-hub="heme-endo-exam3"] .state'); await m.waitForTimeout(400); await m.tap('[data-arch-edit="heme-endo-exam3"]'); await m.tap('[data-arch-form="heme-endo-exam3"] input[value=hidden]'); await m.tap('[data-arch-form="heme-endo-exam3"] [type=submit]'); await m.waitForSelector('.arch-confirm'); }
+      if (tab === 'hubs') { await m.waitForSelector('[data-arch-hub="review-of-systems"] .state'); await m.waitForTimeout(400); await m.tap('[data-arch-edit="review-of-systems"]'); await m.tap('[data-arch-form="review-of-systems"] input[value=hidden]'); await m.tap('[data-arch-form="review-of-systems"] [type=submit]'); await m.waitForSelector('.arch-confirm'); }
       if (tab === 'checkins') await m.waitForSelector('[data-checkin-group]');
       if (tab === 'overview') await m.waitForSelector('[data-panel=overview] .card');
       if (tab === 'health') await m.waitForSelector('[data-panel=health] .qh-item', { timeout: 30000 });   /* Question health: the fixture flags on a live hub */
@@ -395,7 +396,7 @@ const FIX = 'https://fixtures.preview.invalid/rest/v1/rpc/';
       await m.waitForTimeout(300);
       /* touch targets, measured while that tab is the one showing (hidden ones have no size) */
       if (tab === 'hubs') {
-        const tap = await m.$$eval('[data-arch-form="heme-endo-exam3"] .arch-opt, [data-arch-form="heme-endo-exam3"] .btn', els => els.filter(e => e.offsetParent).map(e => Math.round(e.getBoundingClientRect().height)));
+        const tap = await m.$$eval('[data-arch-form="review-of-systems"] .arch-opt, [data-arch-form="review-of-systems"] .btn', els => els.filter(e => e.offsetParent).map(e => Math.round(e.getBoundingClientRect().height)));
         ok(tap.length && tap.every(h => h >= 40), `touch targets in the form are at least 40 px tall (${tap})`);
       }
       if (tab === 'timmy') {

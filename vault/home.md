@@ -126,9 +126,8 @@ Hub building
 Live
 - [Review of Systems](hubs/review-of-systems.md): the two mock board exams, every course on them
 
-Archived (page still up)
-- [Heme & Endo Exam 3](hubs/heme-endo-exam3.md) (its exam 2026-11-20; archives at 10 pm that night, its audio off that morning)
-- Removed (no folder, labels only): [Periodontology](hubs/perio.md) (2026-11-19, the day of its final), [Occlusion](hubs/occlusion.md) (2026-11-19),
+Archived
+- Removed (no folder, labels only): [Heme & Endo Exam 3](hubs/heme-endo-exam3.md) (2026-11-20, the morning of its exam), [Periodontology](hubs/perio.md) (2026-11-19, the day of its final), [Occlusion](hubs/occlusion.md) (2026-11-19),
   the six old single-file pages (2026-11-19: [Heme & Endo Exam 2](hubs/heme-endo-exam2.md) · [PCD Implants Exam 1](hubs/pcd-implants-exam1.md) ·
   [Heme & Endo Exam 1](hubs/heme-endo-exam1.md) · [MSK Exam 4](hubs/msk-exam4.md) · [PCD Fixed Pros Exam 3](hubs/pcd-exam3.md) ·
   [MSK Exam 3](hubs/msk-exam3.md)), [Special Patient Care](hubs/special-patient-care.md) (2026-11-14), GI Exam 1 (`gi-exam1`),

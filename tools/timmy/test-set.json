@@ -4,9 +4,9 @@
 
 
 
-    { "id": "db-01", "hub": "dashboard", "type": "dashboard", "text": "What does 5-alpha-reductase do?", "expect": { "kind": ["answer"], "lec": ["heme-endo-exam3:L3"] } },
-    { "id": "db-02", "hub": "dashboard", "type": "dashboard", "text": "what's the philadelphia chromosome", "expect": { "kind": ["answer"], "lec": ["heme-endo-exam3:L5"] } },
-    { "id": "db-03", "hub": "dashboard", "type": "dashboard", "text": "Which hub has the stuff on breastfeeding and prolactin?", "expect": { "kind": ["answer"], "lec": ["heme-endo-exam3:L2"] } },
+    { "id": "db-01", "hub": "dashboard", "type": "dashboard", "text": "What does ALARA mean for dental x-rays?", "expect": { "kind": ["answer"], "lec": ["review-of-systems:rd-biosafety"] } },
+    { "id": "db-02", "hub": "dashboard", "type": "dashboard", "text": "what's the philadelphia chromosome", "expect": { "kind": ["answer"], "lec": ["review-of-systems:he-heme"] } },
+    { "id": "db-03", "hub": "dashboard", "type": "dashboard", "text": "Which hub has the stuff on breastfeeding and prolactin?", "expect": { "kind": ["answer"], "lec": ["review-of-systems:he-repro"] } },
     { "id": "db-04", "hub": "dashboard", "type": "dashboard", "text": "Do any of the hubs talk about smoking?", "expect": { "kind": ["answer"], "cites": 1 } },
     { "id": "db-05", "hub": "dashboard", "type": "not_covered", "text": "How do I treat a dry socket?", "expect": { "kind": ["not_covered"] }, "absent": ["dry socket", "alveolar osteitis"] },
     { "id": "db-07", "hub": "dashboard", "type": "site", "text": "how do I send luck before an exam?", "expect": { "kind": ["answer"], "site": true } },

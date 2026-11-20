@@ -15,18 +15,21 @@ and lactation (Dr. Madison, 11/10), **L18** Estrogens and androgens (Dr. Fasinu,
 reproductive systems (Dr. Dal Zotto, 11/18). Exam date and check-in hours: its
 entry in `hubs.js`.
 
-**The exam is over** (Sam, the morning of 11-20: "Hematology is over. You can do what you need to do"); the hub **archives
-itself at 10 pm on 2026-11-20** (its date in `hubs.js`). Its **retrospective** is in `LESSONS.md` ("Hub retrospectives", written
-that morning, before any check-in: they open at 10 am and go into the next audit) and its **recap** is on the dashboard (published
-with it; featured: `ll-num-bsx`). **Its narration, the study guide's recording and Timmy Time came off the site the same morning**
-([archived-hubs-drop-their-audio](../rules/archived-hubs-drop-their-audio.md): the 23 mp3s and 22 words files, 283 MB;
-`"audio": "off"` in `content/core.json`, so the build emptied `hyAudio` and set `guideAudio` false; Listen, Timmy Time and the
-`podcast` came out of its `hubs.js` entry). `content/core.json`'s `podcast` and `tools/podcast/heme-endo-exam3/` stay. To bring the
-audio back: `git checkout b0057d1 -- hubs/heme-endo-exam3/audio`, take `"audio": "off"` out and rebuild. **The page is still up**
-(Sam's call whether it comes down, as Perio's did): it is the page several tests run on (`tools/ci/quiet.js`, `tools/release/admin-ui.js`,
-the smoke test's game-layer check with its Million-Dollar Smile, the preview's design pages), so taking it down means moving them to
-Review of Systems (which has no arcade) in the same PR. **After 10 pm** it leaves `HUBS` in `sw.js` (with `VERSION` bumped): until then
-`tools/ci/syntax.js` fails a live engine hub missing from it ([inbox](../tasks/inbox.md)).
+**The exam is over** (Sam, the morning of 11-20: "Hematology is over. You can do what you need to do"). Its **retrospective** is
+in `LESSONS.md` ("Hub retrospectives", written that morning, before any check-in: they open at 10 am and go into the next audit)
+and its **recap** is on the dashboard (published with it; featured: `ll-num-bsx`). **Its narration, the study guide's recording and
+Timmy Time came off the site the same morning** ([archived-hubs-drop-their-audio](../rules/archived-hubs-drop-their-audio.md): the
+23 mp3s and 22 words files, 283 MB; `"audio": "off"` in `content/core.json`; Listen, Timmy Time and the `podcast` came out of its
+`hubs.js` entry), and **then its page** (Sam, the same morning: "Yes come down. Merge"): `hubs/heme-endo-exam3/` is gone, its
+`hubs.js` entry archives it at 9 am on 2026-11-20 (`archiveOn`) and keeps its check-in from 10 am, and `sw.js` precaches Review of
+Systems alone (`sh-v68`). **The page and its content are in git**: `git worktree add <dir> b0057d1` (with its audio) and run that
+copy's `node tools/dump-banks.js <out>` for its bank. What stays in the repo: `tools/question-ids/heme-endo-exam3.txt`,
+`tools/podcast/heme-endo-exam3/`, the figure kit in `tools/figures/heme-endo-exam3/` (its `build.mjs` has nothing to write to now,
+so CI no longer runs its `--check`), its site art (`widget/hub-art/heme-endo-exam3.js`, the dashboard's emblem for its check-in and
+recap) and its labels on the admin page. The tests that ran on its page run on Review of Systems now (`tools/ci/quiet.js`,
+`tools/release/admin-ui.js`, the accessibility baselines, Ask Timmy's dashboard questions in `tools/timmy/test-set.json`). Review of
+Systems has no arcade, so **the smoke test's game-layer wiring check (Million-Dollar Smile and Timmy Time) has no hub to run on**
+until the next hub with an arcade: it comes back by itself then ([inbox](../tasks/inbox.md)).
 
 ## Before you work on it
 
