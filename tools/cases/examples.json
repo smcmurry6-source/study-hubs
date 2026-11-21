@@ -1,5 +1,5 @@
 {
-  "about": "Patient Box v2's example cases (v2.1 added the bridge-and-post and the trauma cases): made-up patients assembled from modules, checked by node tools/ci/cases.js like a hub's (every module, view and check runs on them) and drawn for the screenshots in its PR. Not on any page. A new hub copies one into its content/core.json's pcases (vault/how-to/draw-a-patient-box-case.md).",
+  "about": "Patient Box v2's example cases (v2.1 added the bridge-and-post and the trauma cases, and the buccal-decay case): made-up patients assembled from modules, checked by node tools/ci/cases.js like a hub's (every module, view and check runs on them) and drawn for the screenshots in its PR. Not on any page. A new hub copies one into its content/core.json's pcases (vault/how-to/draw-a-patient-box-case.md).",
   "pcases": {
     "v2-full-mouth": {
       "title": "Full mouth, first visit",
@@ -75,6 +75,26 @@
       },
       "figs": [{ "kind": "film" }, { "kind": "view" }],
       "expect": { "kind": "health" }
+    },
+    "v21-buccal-decay": {
+      "title": "Lower left: decay seen from the cheek side",
+      "spec": {
+        "teeth": ["18", "19", "20", "21", "22"], "age": 74, "sex": "woman", "smoke": 0, "medical": "Takes an antidepressant; her mouth feels dry",
+        "cc": "My bottom teeth look dark near the gums.",
+        "modules": [
+          { "m": "recession", "teeth": ["21", "22"], "mm": 3 },
+          { "m": "recession", "teeth": ["18"], "mm": 2 },
+          { "m": "caries", "tooth": "22", "surface": "F", "depth": "dentin", "root": true },
+          { "m": "caries", "tooth": "21", "surface": "B", "depth": "dentin", "root": true, "arrested": true },
+          { "m": "caries", "tooth": "20", "surface": "B", "depth": "enamel", "stage": "white-spot" },
+          { "m": "caries", "tooth": "19", "surface": "B", "depth": "dentin" },
+          { "m": "caries", "tooth": "19", "surface": "D", "depth": "dentin" },
+          { "m": "restoration", "tooth": "18", "material": "crown", "crown": "pfm" },
+          { "m": "caries", "tooth": "18", "surface": "B", "depth": "dentin", "recurrent": true }
+        ]
+      },
+      "figs": [{ "kind": "view" }, { "kind": "film" }],
+      "expect": { "kind": "health" }
     }
   },
   "questions": [
@@ -99,6 +119,14 @@
         "A vertical root fracture runs along the root's length (often a J-shaped radiolucency beside a treated root) and is rare in an untreated young tooth; this line runs across the root.",
         "The crown fracture into dentin is #8's: its mesioincisal corner is gone. #9's crown is whole.",
         "The dark line across #9's root is a fracture; it is not part of normal anatomy."
+            ] },
+    { "id": "v21-ex-5", "pcase": "v21-buccal-decay", "rests": ["caries"],
+      "stem": "A 74-year-old with a dry mouth. On the drawn cheek-side view, what is the soft, yellow-brown lesion on #22's exposed root?", "choices": ["Active root caries", "Arrested root caries", "An active white-spot lesion", "Recurrent caries at a crown margin"], "answer": 0,
+      "why": [
+        "Right: #22's gum has receded about 3 mm, and the lesion sits on the exposed root between the CEJ and the gum, spreading along the CEJ. Yellow to light brown and soft is how active root caries looks.",
+        "Arrested root caries is dark brown to black, hard and shiny, like #21's lesion next to it, not yellow-brown.",
+        "A white-spot lesion is chalky white enamel at the crown's cervical third, like #20's; a root has no enamel.",
+        "#22 has no crown. The recurrent caries in this view is #18's, the dark band just below its crown's margin."
       ] }
   ]
 }

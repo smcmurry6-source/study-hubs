@@ -150,3 +150,16 @@
 .dc-ow .dc-o-sep{fill:none;stroke:var(--o-caries);stroke-width:1.8;stroke-linecap:round}
 .dc-ow .dc-o-fx{fill:none;stroke:var(--o-caries);stroke-width:1.4;stroke-linejoin:round;stroke-linecap:round}
 .dc-ow .dc-o-crack{fill:none;stroke:var(--o-caries);stroke-width:1.3;stroke-dasharray:2 1.6;stroke-linecap:round}
+/* decay seen from the buccal (cases.js buccalLesion; ICDAS's and Nyvad's looks): a white spot chalky and matte, a brown spot when
+   arrested; a cavity light to mid brown inside a chalky rim, dark and rimless when arrested; root caries yellow-brown, dark when
+   arrested; recurrent caries a brown-gray band at the margin; a proximal lesion a gray shadow through an incisor's enamel. The
+   view keeps its own colors in both themes, like the rest of it */
+.dc-view .io-ws{fill:#fdfbf4;stroke:#fffef9;stroke-width:.5;stroke-linejoin:round}.dc-view .io-ws-edge{opacity:.55;stroke:none}
+.dc-view .io-ws.io-arr{fill:#b88a4f;stroke:#a3773f}.dc-view .io-ws-edge.io-arr{fill:#c9a26c;stroke:none}
+.dc-view .io-cav-rim{fill:#f9f5ea;opacity:.9}
+.dc-view .io-cav{fill:#9a6631;stroke:#714720;stroke-width:.7;stroke-linejoin:round}.dc-view .io-cav.io-arr{fill:#3e2414;stroke:#241409}
+.dc-view .io-cav-deep{fill:#4a2914}.dc-view .io-cav-deep.io-arr{fill:#1f1009}
+.dc-view .io-rc{fill:#b5813b;stroke:#8f6227;stroke-width:.6;stroke-linejoin:round}.dc-view .io-rc.io-arr{fill:#4b2d17;stroke:#2c190b}
+.dc-view .io-rc-deep{fill:#7a4d22}.dc-view .io-rc-deep.io-arr{fill:#24130a}
+.dc-view .io-rec{fill:#5e4a3a;stroke:#3d2f24;stroke-width:.5;opacity:.9;stroke-linejoin:round}
+.dc-view .io-prox{fill:#6f6252;opacity:.32}.dc-view .io-prox.io-prox-deep{opacity:.52}
