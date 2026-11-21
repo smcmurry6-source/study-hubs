@@ -195,8 +195,49 @@
   var EXAM = null, EXAM_LECS = {}, REVIEW = {};
   var memo = {};
   function getJSON(name){
-    return memo[name] || (memo[name] = fetch(BASE + name).then(function(r){ if (!r.ok) throw new Error(name + " " + r.status); return r.json(); })
+    return memo[name] || (memo[name] = fetch(BASE + name).then(function(r){ if (!r.ok) throw new Error(name + " " + r.status); return STEPPED[name] ? r.text().then(function(t){ return parseSteps(t); }) : r.json(); })
       .catch(function(e){ delete memo[name]; throw e; }));
+  }
+  /* The two big files (about 1.2 MB each on Review of Systems) are read a few lines at a time (2026-11-20): one JSON.parse
+     of either was a task of about 90 ms on perf.js's slow phone, which blocked a tap right after Home. The build lays them
+     out a lecture or a question to a line (tools/hub-next/build.mjs), so each line is a whole value: a line that opens
+     or closes an object or a list ("{", "[", ' "full": {', "},"), or one entry ('"hn-neck": "...",', '{"id": ...},').
+     parseSteps(text, pace) builds the same value from them, about 15 ms of lines a step, each step in its own task (pace,
+     setTimeout by default); a file laid out any other way, or a line that doesn't parse, is read whole with JSON.parse,
+     so the result is always JSON.parse's. tools/ci/syntax.js checks it against JSON.parse on every engine hub's files. */
+  var STEPPED = { "notes.json": 1, "questions.json": 1, "variants.json": 1 };
+  function parseSteps(text, pace){
+    pace = pace || function(f){ setTimeout(f, 0); };
+    var P = window.performance, now = P && P.now ? function(){ return P.now(); } : Date.now;
+    return new Promise(function(done, fail){
+      var at = 0, stack = [], root, have = false, KEY = /^"((?:[^"\\]|\\.)*)"\s*:\s*/;
+      function put(v, k){
+        var top = stack[stack.length - 1];
+        if (!top) { if (have) throw 0; root = v; have = true; return; }
+        if (Array.isArray(top.v)) { if (k !== null) throw 0; top.v.push(v); }
+        else { if (k === null || k === "__proto__" || Object.prototype.hasOwnProperty.call(top.v, k)) throw 0; top.v[k] = v; }
+      }
+      function whole(){ try { done(JSON.parse(text)); } catch (e) { fail(e); } }
+      function step(){
+        var end = now() + 15;
+        try {
+          for (var first = at; at < text.length;) {
+            if (at > first && now() > end) { pace(step); return; }   /* at least a line a step */
+            var nl = text.indexOf("\n", at); if (nl < 0) nl = text.length;
+            var t = text.slice(at, nl).trim(); at = nl + 1; if (!t) continue;
+            if (t.charAt(t.length - 1) === ",") t = t.slice(0, -1);
+            var k = null, top = stack[stack.length - 1], m = top && !Array.isArray(top.v) && KEY.exec(t);
+            if (m) { k = JSON.parse('"' + m[1] + '"'); t = t.slice(m[0].length); }
+            if (t === "{" || t === "[") { if (have && !stack.length) throw 0; stack.push({ v: t === "{" ? {} : [], k: k }); continue; }
+            if ((t === "}" || t === "]") && k === null) { var c = stack.pop(); if (!c || (t === "]") !== Array.isArray(c.v)) throw 0; put(c.v, c.k); continue; }
+            put(JSON.parse(t), k);
+          }
+          if (stack.length || !have) throw 0;
+        } catch (e) { whole(); return; }
+        done(root);
+      }
+      pace(step);   /* not in the task that read the file */
+    });
   }
   /* a script, once: a widget file the page's bundles carry (window.SH_BUNDLE, tools/bundle/build.mjs) runs from there,
      anything else is fetched */
@@ -546,15 +587,47 @@
     var y = day(-1); return Object.keys(all).filter(function(id){ var r = all[id]; return r && r.t === y && !r.b && QBL[(IDX.filter(function(x){ return x.id === id; })[0] || {}).lec]; });
   }
   var homeTimer = 0;
-  function renderHome(el){
-    clearInterval(homeTimer);
+  /* Home's links into the bank: the practice button starts fresh (the exam's lectures, not answered yet, High likelihood
+     off: the rule), and "n flashcards due" opens the bank as flashcards, every lecture, so every due card is in the deck */
+  function wireHome(root){
+    $$("[data-cardsdue]", root).forEach(function(a){ a.addEventListener("click", function(){ HX.bankReset(); HX.bankSearch = ""; STATE.ui.qview = "cards"; saveState(); track("home:cards-due"); }); });
+    $$("[data-home-practice]", root).forEach(function(a){ a.addEventListener("click", function(){ var ex = LECS.filter(function(l){ return isExamLec(l.id); }).map(function(l){ return l.id; }); HX.bankReset(); STATE.ui.qlec = ex.length ? HX.lecValue(ex) : "all"; STATE.ui.qstatus = "unseen"; HX.bankSearch = ""; saveState(); }); });
+  }
+  /* Home again with new answers (another device's, SH_SYNC.merge): only the parts whose numbers changed are drawn again
+     (each one a data-hp: the quick starts, Where to next, the progress line and each lecture's row; Today is
+     paintMeters'), so the browser lays out a few rows, not the whole page (2026-11-20: the whole of Home again was about
+     130 ms on perf.js's slow phone, then about 110 laying it out). Each part's markup from the last draw is kept (HOME_HP)
+     and compared as text, so nothing is parsed or read back from the page but the parts that changed. A part added or
+     gone, or no Home drawn by renderHome on the page: all of it again. */
+  var HOME_HP = null, HP = null;
+  function hp(k, html){ if (HP) HP[k] = html; return html; }
+  function refreshHome(el){
+    var page = el && el.firstElementChild, was = HOME_HP;
+    if (!was || !page || page !== was.page) return route();
+    renderHome(el, function(){
+      var next = HOME_HP, keys = Object.keys(next.parts), live = {};
+      if (keys.join("|") !== Object.keys(was.parts).join("|")) { HOME_HP = null; route(); return; }
+      next.page = page;
+      var changed = keys.filter(function(k){ return next.parts[k] !== was.parts[k]; });
+      if (!changed.length) return;
+      /* the changed parts parsed in one go (a row on its own is an <li>: a template takes it as it is) */
+      var t = document.createElement("template"), made = {};
+      t.innerHTML = changed.map(function(k){ return next.parts[k]; }).join("");
+      $$("[data-hp]", t.content).forEach(function(n){ made[n.getAttribute("data-hp")] = n; });
+      $$("[data-hp]", page).forEach(function(n){ live[n.getAttribute("data-hp")] = n; });
+      changed.forEach(function(k){ var o = live[k], n = made[k]; if (!o || !n) return; o.replaceWith(n); wireHome(n); });
+    });
+  }
+  function renderHome(el, redraw){
+    if (!redraw) clearInterval(homeTimer);
+    HP = {};
     /* the words for the exam it counts down to (home.byExam[<exam id>]: a hub with two sittings) over the hub's own */
     var X = Object.assign({}, C.home || {}, ((C.home || {}).byExam || {})[EXAM && EXAM.id] || {}), rows = LECS.map(lecProgress), fin = rows.filter(function(r){ return isExamLec(r.l.id); });
     var total = fin.reduce(function(n, r){ return n + r.total; }, 0), right = fin.reduce(function(n, r){ return n + r.right; }, 0);
     var left = IDX.filter(function(q){ return !ansOf(q.id) && isExamLec(q.lec); }).length;
     var cont = LBY[STATE.ui.lec] || LECS[0], d = EXAM ? calDays(EXAM.date) : null, M = AH.masthead || { body: "", label: "" };
     var mis = srsMisses().length, examWeek = d !== null && d >= 0 && d <= 7;
-    var pod = CORE.podcast;
+    var pod = CORE.podcast, today = HX.todayPanel();
     var q = function(href, ic, title, sub, cls){ return '<a class="ql' + (cls ? " " + cls : "") + '" href="' + href + '"' + (cls === "is-primary" ? " data-home-practice" : "") + ">" + icon(ic, 22) + "<span><b>" + esc(title) + "</b><small>" + esc(sub) + "</small></span></a>"; };
     var html = '<div class="hx-page home">' +
       '<div class="home-top">' +
@@ -566,7 +639,7 @@
           '<p class="live-line" data-liveline></p>' +
           (X.chips ? '<p class="exam-facts">' + X.chips.map(esc).join(" · ") + "</p>" : "") +
         "</div>" +
-        '<nav class="quick' + (pod ? " has-pod" : "") + '" aria-label="Start studying">' +
+        hp("quick", '<nav class="quick' + (pod ? " has-pod" : "") + '" aria-label="Start studying" data-hp="quick">' +
           q("#questions", "questions", "Practice questions", pl(left, "question") + " for the exam you haven't tried", "is-primary") +
           q("#questions/drill", "drill", "Daily drill", "Misses and high-yield, a few minutes") +
           q("#notes/" + esc(cont.id), "notes", "Notes", lecLabel(cont) + " " + shortTitle(cont)) +
@@ -574,25 +647,25 @@
           q("#more/hints", "hints", hintsName(), courses() ? "What each course stressed most" : "What " + (X.prof || "the professor") + " said to know") +
           q("#more/cram", "cram", "Cram sheet", "Every lecture on one page") +
           (pod ? podMiniHTML(pod) : "") +
-        "</nav>" +
+        "</nav>") +
         /* a hub's own links under the quick starts (SH_HUB.home.links: { href, icon, title, sub }), a row of their own so
            the grid above keeps its shape; Perio's Stage & Grade game (2026-11-17) */
         (X.links && X.links.length ? '<nav class="quick-more" aria-label="More to do">' + X.links.map(function(l){ return q(l.href, l.icon || "arcade", l.title, l.sub || "", "ql-wide"); }).join("") + "</nav>" : "") +
       "</div>" +
       (X.notice ? '<p class="notice">' + icon("notes", 20) + "<span><b>" + esc(X.notice[0]) + "</b> " + esc(X.notice[1]) + "</span></p>" : "") +
       '<div class="home-grid">' +
-        '<section class="panel next" aria-labelledby="hnH"><h2 id="hnH">Where to next</h2>' + nextHTML(rows, mis, examWeek) + "</section>" +
-        HX.todayPanel() +
-        '<section class="panel lecs" aria-labelledby="hlH"><h2 id="hlH">Your progress by lecture</h2><p class="note">How much of each lecture\'s bank you\'ve tried; the solid part is right on your latest try. ' + right + " of " + total + " for the exam right so far.</p>" + lecsHTML(fin.concat(rows.filter(function(r){ return !isExamLec(r.l.id); }))) + "</section>" +
+        hp("next", '<section class="panel next" aria-labelledby="hnH" data-hp="next"><h2 id="hnH">Where to next</h2>' + nextHTML(rows, mis, examWeek) + "</section>") +
+        today +
+        '<section class="panel lecs" aria-labelledby="hlH"><h2 id="hlH">Your progress by lecture</h2>' + hp("lecs-note", '<p class="note" data-hp="lecs-note">How much of each lecture\'s bank you\'ve tried; the solid part is right on your latest try. ' + right + " of " + total + " for the exam right so far.</p>") + lecsHTML(fin.concat(rows.filter(function(r){ return !isExamLec(r.l.id); }))) + "</section>" +
         '<div class="home-side">' +
           '<section class="panel" aria-labelledby="htH"><h2 id="htH">Course timeline</h2>' + timelineHTML() + "</section>" +
         "</div>" +
       "</div></div>";
-    el.innerHTML = html;
-    /* Home's way into the bank starts fresh: the exam's lectures, not answered yet, High likelihood off (the rule) */
-    /* "n flashcards due": the bank as flashcards, every lecture, so every due card is in the deck */
-    $$("[data-cardsdue]", el).forEach(function(a){ a.addEventListener("click", function(){ HX.bankReset(); HX.bankSearch = ""; STATE.ui.qview = "cards"; saveState(); track("home:cards-due"); }); });
-    $$("[data-home-practice]", el).forEach(function(a){ a.addEventListener("click", function(){ var ex = LECS.filter(function(l){ return isExamLec(l.id); }).map(function(l){ return l.id; }); HX.bankReset(); STATE.ui.qlec = ex.length ? HX.lecValue(ex) : "all"; STATE.ui.qstatus = "unseen"; HX.bankSearch = ""; saveState(); }); });
+    HOME_HP = { parts: HP, page: null }; HP = null;
+    if (redraw) return redraw();
+    el.innerHTML = html; HOME_HP.page = el.firstElementChild;
+    var tp = $("[data-today]", el); if (tp) tp._hxH = today;   /* paintMeters leaves it be until its numbers change */
+    wireHome(el);
     paintLive();
     homeTimer = setInterval(function(){ var c = $("#hxCount"); if (!c || !c.isConnected || view !== "home") { clearInterval(homeTimer); return; } c.innerHTML = countHTML(); }, 30000);
     tip(el, "home", "Your daily goal is the ring in the bar: " + HX.goal() + " questions a day. The flame counts the days in a row you study. Change the goal in More, Settings.");
@@ -628,9 +701,9 @@
         var gt = GROUPS ? (GROUPS.filter(function(g){ return g.id === grp; })[0] || {}).title || "" : grp === "on" ? (X.onExam || "On the exam") : (X.offExam || "Earlier lectures");
         head = '<li class="grp' + (GROUPS ? " grp-c" : "") + '">' + esc(gt) + "</li>"; last = grp;
       }
-      return head + '<li class="' + lc(r.l.id).trim() + '">' + lecBadge(r.l, "lb-s") + '<div class="lr-main"><p><b><span class="sr">' + esc(lecLabel(r.l)) + " · </span>" + esc(shortTitle(r.l)) + "</b>" + (isRead(r.l.id) ? ' <span class="read-tag">' + icon("check", 14) + "Notes done</span>" : "") + '</p><span class="bar" role="img" aria-label="' + r.tried + " of " + r.total + " tried, " + r.right + ' right"><i class="tried" style="width:' + tw + '%"></i><i class="right" style="width:' + rw + '%"></i></span>' +
+      return head + hp("lec:" + r.l.id, '<li class="' + lc(r.l.id).trim() + '" data-hp="lec:' + esc(r.l.id) + '">' + lecBadge(r.l, "lb-s") + '<div class="lr-main"><p><b><span class="sr">' + esc(lecLabel(r.l)) + " · </span>" + esc(shortTitle(r.l)) + "</b>" + (isRead(r.l.id) ? ' <span class="read-tag">' + icon("check", 14) + "Notes done</span>" : "") + '</p><span class="bar" role="img" aria-label="' + r.tried + " of " + r.total + " tried, " + r.right + ' right"><i class="tried" style="width:' + tw + '%"></i><i class="right" style="width:' + rw + '%"></i></span>' +
         '<p class="note num">' + r.tried + " of " + r.total + " tried" + (r.pct !== null ? " · " + r.pct + "% of answers right" : "") + "</p></div>" +
-        '<span class="lr-acts"><a class="btn btn-text" href="#notes/' + esc(r.l.id) + '" aria-label="Notes for ' + esc(lecLabel(r.l)) + (isRead(r.l.id) ? ", done" : "") + '">Notes</a><a class="btn btn-text" href="#questions" data-lecq="' + esc(r.l.id) + '" aria-label="Questions for ' + esc(lecLabel(r.l)) + '">Questions</a></span></li>';
+        '<span class="lr-acts"><a class="btn btn-text" href="#notes/' + esc(r.l.id) + '" aria-label="Notes for ' + esc(lecLabel(r.l)) + (isRead(r.l.id) ? ", done" : "") + '">Notes</a><a class="btn btn-text" href="#questions" data-lecq="' + esc(r.l.id) + '" aria-label="Questions for ' + esc(lecLabel(r.l)) + '">Questions</a></span></li>');
     }).join("") + "</ul>";
   }
   function timelineHTML(){
@@ -1776,7 +1849,9 @@
       if (!ANSWERED) STATE.days.sort(); HX.achievements(true); saveNow(); HX.paintMeters();
       if (added) toast(pl(added, "question") + " from your other devices", "sync");
       /* Home, or a bank not yet answered in, redraws with the merged answers (its counts and Missed last time) */
-      if (Date.now() - LOADED < 8000 && (view === "home" || (view === "questions" && !HX.SESSION.n && !parse()[1] && !(document.activeElement && document.activeElement.matches("input, textarea"))))) route();
+      /* in a task of its own, after the merge and the meters (one long task was both, 2026-11-20) */
+      if (Date.now() - LOADED < 8000 && view === "home") setTimeout(function(){ if (view === "home") refreshHome($('.hx-view[data-view="home"]')); }, 0);
+      else if (Date.now() - LOADED < 8000 && view === "questions" && !HX.SESSION.n && !parse()[1] && !(document.activeElement && document.activeElement.matches("input, textarea"))) route();
     }
   };
   window.SH_DRILL = {

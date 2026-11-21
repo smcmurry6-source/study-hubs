@@ -6154,7 +6154,8 @@ var h = document.querySelector("header.hub-header, .hub-header");
 if (h && window.ResizeObserver) new ResizeObserver(fit).observe(h);
 document.addEventListener("sh:pref", function(){ setTimeout(fit, 30); });
 }
-if (document.body) start(); else document.addEventListener("DOMContentLoaded", start);
+function soon(){ if (window.requestAnimationFrame) requestAnimationFrame(start); else start(); }
+if (document.body) soon(); else document.addEventListener("DOMContentLoaded", soon);
 })();
 var clicksSb = !supabase ? null : { rpc: function(fn, a){
 if ((fn === "record_clicks" || fn === "record_events") && a && Array.isArray(a.p_items)) { window.shAnalytics.send(fn === "record_clicks" ? "clicks" : "events", a.p_items); return Promise.resolve({ data: null, error: null }); }
