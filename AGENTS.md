@@ -76,5 +76,4 @@ Knowledge left only in your chat or memory is lost to the next agent.
 - **Ship it now:** never hold a change until after an exam ([ship-it-now](vault/rules/ship-it-now.md)).
 - Shared features go in `widget/`, never patched into one hub. A hub's content is edited in `hubs/<id>/content/`, then
   `node tools/hub-next/build.mjs`; after a merge that changed questions, load the hub's answer keys
-  ([build-a-hub](vault/how-to/build-a-hub.md)). In an old single-file hub, keep `window.SH_EXPORT = {` as the last
-  statement of its script (the CI lint hooks in there).
+  ([build-a-hub](vault/how-to/build-a-hub.md)).

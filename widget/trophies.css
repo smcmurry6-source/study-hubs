@@ -1,7 +1,7 @@
 /* study-hubs: the trophy case and, on the redesign's pages, the celebration cards' look (redesign phase 4, session 6).
    Loaded on first use, never with a page: by widget/trophies.js when the case opens, and by widget/ranks.js
-   (shRanks.trophyCss) before the first card on a page with html.shx. Built on widget/hub.css's tokens. A live page never
-   loads it, and every card rule is keyed on html.shx, so its cards are today's.
+   (shRanks.trophyCss) before the first card. Built on widget/hub.css's tokens; its rules start :root (the page root), which
+   outweighs the cards' own styles in widget/rankup.js.
    The case: the rank (a hall-of-fame header, the medallion in front of turning rays), the showcase (the trophy you picked
    on a gold stand) and the cabinet (wood, a brass plaque, a velvet back, lit shelves). Its layout follows the width it is
    given (container queries), so it fits a hub's More and the new dashboard's dialog alike. Flat fills, ink outlines. */
@@ -10,10 +10,10 @@
 .sht, .sh-ru, .sh-ru-lv, .sh-mk {
   --m-stone: #6b665e; --m-antique: #86602b; --m-bronze: #9b4f1d; --m-silver: #586573; --m-gold: #8a5d00; --m-diamond: #0f6e9b; --m-dark: #6b3fb6;
 }
-html.shx[data-theme="dark"] .sht, html.shx .sh-ru-lv, html.shx .sh-mk, html.shx .sh-ru {
+:root[data-theme="dark"] .sht, :root .sh-ru-lv, :root .sh-mk, :root .sh-ru {
   --m-stone: #cfc9bf; --m-antique: #e3ba77; --m-bronze: #f2a56b; --m-silver: #cdd7e1; --m-gold: #f2c14e; --m-diamond: #84d4f6; --m-dark: #c0a4ff;
 }
-@media (prefers-color-scheme: dark) { html.shx:not([data-theme="light"]) .sht {
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .sht {
   --m-stone: #cfc9bf; --m-antique: #e3ba77; --m-bronze: #f2a56b; --m-silver: #cdd7e1; --m-gold: #f2c14e; --m-diamond: #84d4f6; --m-dark: #c0a4ff;
 } }
 .sht [data-metal="stone"], .sh-ru[data-metal="stone"], .sh-ru-lv[data-metal="stone"] { --metal: var(--m-stone); }
@@ -147,128 +147,128 @@ html.shx[data-theme="dark"] .sht, html.shx .sh-ru-lv, html.shx .sh-mk, html.shx 
 @container sht (max-width: 300px) {
   .sht-me { flex-direction: column; align-items: stretch; }
 }
-@media (prefers-reduced-motion: reduce) { .sht-rays, .sht-show-obj, html.shx .sh-ru-lv-medal::before, html.shx .sh-mk-ring::before { animation: none !important; } }
+@media (prefers-reduced-motion: reduce) { .sht-rays, .sht-show-obj, :root .sh-ru-lv-medal::before, :root .sh-mk-ring::before { animation: none !important; } }
 
 /* the case in the dark (the theme picked, or the device's) */
-html.shx[data-theme="dark"] .sht-show { background: #262426; color: #F5F2F4; box-shadow: inset 0 0 0 6px #C9971C, inset 0 0 0 8.5px #3B2E3A; }
-html.shx[data-theme="dark"] .sht-show-art { background: #3A2E14; } html.shx[data-theme="dark"] .sht-show.is-secret .sht-show-art, html.shx[data-theme="dark"] .sht-show.is-open .sht-show-art { background: #343034; }
-html.shx[data-theme="dark"] .sht-show .sht-tag { color: #3B2E3A; }
-html.shx[data-theme="dark"] .sht-show.is-secret, html.shx[data-theme="dark"] .sht-show.is-open { box-shadow: inset 0 0 0 6px #4A444A, inset 0 0 0 8.5px #3B2E3A; }
-html.shx[data-theme="dark"] .sht-mbar { background: #1c1b1c; }
+:root[data-theme="dark"] .sht-show { background: #262426; color: #F5F2F4; box-shadow: inset 0 0 0 6px #C9971C, inset 0 0 0 8.5px #3B2E3A; }
+:root[data-theme="dark"] .sht-show-art { background: #3A2E14; } :root[data-theme="dark"] .sht-show.is-secret .sht-show-art, :root[data-theme="dark"] .sht-show.is-open .sht-show-art { background: #343034; }
+:root[data-theme="dark"] .sht-show .sht-tag { color: #3B2E3A; }
+:root[data-theme="dark"] .sht-show.is-secret, :root[data-theme="dark"] .sht-show.is-open { box-shadow: inset 0 0 0 6px #4A444A, inset 0 0 0 8.5px #3B2E3A; }
+:root[data-theme="dark"] .sht-mbar { background: #1c1b1c; }
 @media (prefers-color-scheme: dark) {
-  html.shx:not([data-theme="light"]) .sht-show { background: #262426; color: #F5F2F4; box-shadow: inset 0 0 0 6px #C9971C, inset 0 0 0 8.5px #3B2E3A; }
-  html.shx:not([data-theme="light"]) .sht-show-art { background: #3A2E14; } html.shx:not([data-theme="light"]) .sht-show.is-secret .sht-show-art, html.shx:not([data-theme="light"]) .sht-show.is-open .sht-show-art { background: #343034; }
-  html.shx:not([data-theme="light"]) .sht-show .sht-tag { color: #3B2E3A; }
-  html.shx:not([data-theme="light"]) .sht-show.is-secret, html.shx:not([data-theme="light"]) .sht-show.is-open { box-shadow: inset 0 0 0 6px #4A444A, inset 0 0 0 8.5px #3B2E3A; }
-  html.shx:not([data-theme="light"]) .sht-mbar { background: #1c1b1c; }
+  :root:not([data-theme="light"]) .sht-show { background: #262426; color: #F5F2F4; box-shadow: inset 0 0 0 6px #C9971C, inset 0 0 0 8.5px #3B2E3A; }
+  :root:not([data-theme="light"]) .sht-show-art { background: #3A2E14; } :root:not([data-theme="light"]) .sht-show.is-secret .sht-show-art, :root:not([data-theme="light"]) .sht-show.is-open .sht-show-art { background: #343034; }
+  :root:not([data-theme="light"]) .sht-show .sht-tag { color: #3B2E3A; }
+  :root:not([data-theme="light"]) .sht-show.is-secret, :root:not([data-theme="light"]) .sht-show.is-open { box-shadow: inset 0 0 0 6px #4A444A, inset 0 0 0 8.5px #3B2E3A; }
+  :root:not([data-theme="light"]) .sht-mbar { background: #1c1b1c; }
 }
 
-/* =================== the cards, on the redesign's pages (html.shx) =================== */
+/* =================== the cards =================== */
 /* the rank-up cutscene: the dark stage and its rays stay; the site's type; "New rank" on a ribbon in the rank's metal; the name in flat metal */
-html.shx .sh-ru { font-family: var(--font); }
-html.shx .sh-ru-bg { background: #0f0d10; }
-html.shx .sh-ru-title { display: inline-block; padding: 14px 64px 26px; font: 800 40px/1 var(--font); letter-spacing: -.01em; white-space: nowrap; text-shadow: none; color: #3B2E3A;
+:root .sh-ru { font-family: var(--font); }
+:root .sh-ru-bg { background: #0f0d10; }
+:root .sh-ru-title { display: inline-block; padding: 14px 64px 26px; font: 800 40px/1 var(--font); letter-spacing: -.01em; white-space: nowrap; text-shadow: none; color: #3B2E3A;
   background: center / 100% 100% no-repeat; }
-html.shx .sh-ru[data-metal="stone"] .sh-ru-title { background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20400%20100%22%20preserveAspectRatio%3D%22none%22%3E%3Cpath%20d%3D%22M4%2030%20H64%20V92%20H4%20L24%2061Z%22%20fill%3D%22%23cfc9bf%22%20stroke%3D%22%233B2E3A%22%20stroke-width%3D%223%22%20vector-effect%3D%22non-scaling-stroke%22%20stroke-linejoin%3D%22round%22%20opacity%3D%22.8%22/%3E%3Cpath%20d%3D%22M396%2030%20H336%20V92%20H396%20L376%2061Z%22%20fill%3D%22%23cfc9bf%22%20stroke%3D%22%233B2E3A%22%20stroke-width%3D%223%22%20vector-effect%3D%22non-scaling-stroke%22%20stroke-linejoin%3D%22round%22%20opacity%3D%22.8%22/%3E%3Cpath%20d%3D%22M44%206%20H356%20V80%20H44Z%22%20fill%3D%22%23cfc9bf%22%20stroke%3D%22%233B2E3A%22%20stroke-width%3D%223%22%20vector-effect%3D%22non-scaling-stroke%22%20stroke-linejoin%3D%22round%22/%3E%3Cpath%20d%3D%22M56%2018%20H200%22%20stroke%3D%22%23fff%22%20stroke-width%3D%225%22%20stroke-linecap%3D%22round%22%20opacity%3D%22.5%22%20vector-effect%3D%22non-scaling-stroke%22/%3E%3C/svg%3E"); }
-html.shx .sh-ru[data-metal="antique"] .sh-ru-title { background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20400%20100%22%20preserveAspectRatio%3D%22none%22%3E%3Cpath%20d%3D%22M4%2030%20H64%20V92%20H4%20L24%2061Z%22%20fill%3D%22%23e3ba77%22%20stroke%3D%22%233B2E3A%22%20stroke-width%3D%223%22%20vector-effect%3D%22non-scaling-stroke%22%20stroke-linejoin%3D%22round%22%20opacity%3D%22.8%22/%3E%3Cpath%20d%3D%22M396%2030%20H336%20V92%20H396%20L376%2061Z%22%20fill%3D%22%23e3ba77%22%20stroke%3D%22%233B2E3A%22%20stroke-width%3D%223%22%20vector-effect%3D%22non-scaling-stroke%22%20stroke-linejoin%3D%22round%22%20opacity%3D%22.8%22/%3E%3Cpath%20d%3D%22M44%206%20H356%20V80%20H44Z%22%20fill%3D%22%23e3ba77%22%20stroke%3D%22%233B2E3A%22%20stroke-width%3D%223%22%20vector-effect%3D%22non-scaling-stroke%22%20stroke-linejoin%3D%22round%22/%3E%3Cpath%20d%3D%22M56%2018%20H200%22%20stroke%3D%22%23fff%22%20stroke-width%3D%225%22%20stroke-linecap%3D%22round%22%20opacity%3D%22.5%22%20vector-effect%3D%22non-scaling-stroke%22/%3E%3C/svg%3E"); }
-html.shx .sh-ru[data-metal="bronze"] .sh-ru-title { background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20400%20100%22%20preserveAspectRatio%3D%22none%22%3E%3Cpath%20d%3D%22M4%2030%20H64%20V92%20H4%20L24%2061Z%22%20fill%3D%22%23f2a56b%22%20stroke%3D%22%233B2E3A%22%20stroke-width%3D%223%22%20vector-effect%3D%22non-scaling-stroke%22%20stroke-linejoin%3D%22round%22%20opacity%3D%22.8%22/%3E%3Cpath%20d%3D%22M396%2030%20H336%20V92%20H396%20L376%2061Z%22%20fill%3D%22%23f2a56b%22%20stroke%3D%22%233B2E3A%22%20stroke-width%3D%223%22%20vector-effect%3D%22non-scaling-stroke%22%20stroke-linejoin%3D%22round%22%20opacity%3D%22.8%22/%3E%3Cpath%20d%3D%22M44%206%20H356%20V80%20H44Z%22%20fill%3D%22%23f2a56b%22%20stroke%3D%22%233B2E3A%22%20stroke-width%3D%223%22%20vector-effect%3D%22non-scaling-stroke%22%20stroke-linejoin%3D%22round%22/%3E%3Cpath%20d%3D%22M56%2018%20H200%22%20stroke%3D%22%23fff%22%20stroke-width%3D%225%22%20stroke-linecap%3D%22round%22%20opacity%3D%22.5%22%20vector-effect%3D%22non-scaling-stroke%22/%3E%3C/svg%3E"); }
-html.shx .sh-ru[data-metal="silver"] .sh-ru-title { background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20400%20100%22%20preserveAspectRatio%3D%22none%22%3E%3Cpath%20d%3D%22M4%2030%20H64%20V92%20H4%20L24%2061Z%22%20fill%3D%22%23cdd7e1%22%20stroke%3D%22%233B2E3A%22%20stroke-width%3D%223%22%20vector-effect%3D%22non-scaling-stroke%22%20stroke-linejoin%3D%22round%22%20opacity%3D%22.8%22/%3E%3Cpath%20d%3D%22M396%2030%20H336%20V92%20H396%20L376%2061Z%22%20fill%3D%22%23cdd7e1%22%20stroke%3D%22%233B2E3A%22%20stroke-width%3D%223%22%20vector-effect%3D%22non-scaling-stroke%22%20stroke-linejoin%3D%22round%22%20opacity%3D%22.8%22/%3E%3Cpath%20d%3D%22M44%206%20H356%20V80%20H44Z%22%20fill%3D%22%23cdd7e1%22%20stroke%3D%22%233B2E3A%22%20stroke-width%3D%223%22%20vector-effect%3D%22non-scaling-stroke%22%20stroke-linejoin%3D%22round%22/%3E%3Cpath%20d%3D%22M56%2018%20H200%22%20stroke%3D%22%23fff%22%20stroke-width%3D%225%22%20stroke-linecap%3D%22round%22%20opacity%3D%22.5%22%20vector-effect%3D%22non-scaling-stroke%22/%3E%3C/svg%3E"); }
-html.shx .sh-ru[data-metal="gold"] .sh-ru-title { background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20400%20100%22%20preserveAspectRatio%3D%22none%22%3E%3Cpath%20d%3D%22M4%2030%20H64%20V92%20H4%20L24%2061Z%22%20fill%3D%22%23f2c14e%22%20stroke%3D%22%233B2E3A%22%20stroke-width%3D%223%22%20vector-effect%3D%22non-scaling-stroke%22%20stroke-linejoin%3D%22round%22%20opacity%3D%22.8%22/%3E%3Cpath%20d%3D%22M396%2030%20H336%20V92%20H396%20L376%2061Z%22%20fill%3D%22%23f2c14e%22%20stroke%3D%22%233B2E3A%22%20stroke-width%3D%223%22%20vector-effect%3D%22non-scaling-stroke%22%20stroke-linejoin%3D%22round%22%20opacity%3D%22.8%22/%3E%3Cpath%20d%3D%22M44%206%20H356%20V80%20H44Z%22%20fill%3D%22%23f2c14e%22%20stroke%3D%22%233B2E3A%22%20stroke-width%3D%223%22%20vector-effect%3D%22non-scaling-stroke%22%20stroke-linejoin%3D%22round%22/%3E%3Cpath%20d%3D%22M56%2018%20H200%22%20stroke%3D%22%23fff%22%20stroke-width%3D%225%22%20stroke-linecap%3D%22round%22%20opacity%3D%22.5%22%20vector-effect%3D%22non-scaling-stroke%22/%3E%3C/svg%3E"); }
-html.shx .sh-ru[data-metal="diamond"] .sh-ru-title { background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20400%20100%22%20preserveAspectRatio%3D%22none%22%3E%3Cpath%20d%3D%22M4%2030%20H64%20V92%20H4%20L24%2061Z%22%20fill%3D%22%2384d4f6%22%20stroke%3D%22%233B2E3A%22%20stroke-width%3D%223%22%20vector-effect%3D%22non-scaling-stroke%22%20stroke-linejoin%3D%22round%22%20opacity%3D%22.8%22/%3E%3Cpath%20d%3D%22M396%2030%20H336%20V92%20H396%20L376%2061Z%22%20fill%3D%22%2384d4f6%22%20stroke%3D%22%233B2E3A%22%20stroke-width%3D%223%22%20vector-effect%3D%22non-scaling-stroke%22%20stroke-linejoin%3D%22round%22%20opacity%3D%22.8%22/%3E%3Cpath%20d%3D%22M44%206%20H356%20V80%20H44Z%22%20fill%3D%22%2384d4f6%22%20stroke%3D%22%233B2E3A%22%20stroke-width%3D%223%22%20vector-effect%3D%22non-scaling-stroke%22%20stroke-linejoin%3D%22round%22/%3E%3Cpath%20d%3D%22M56%2018%20H200%22%20stroke%3D%22%23fff%22%20stroke-width%3D%225%22%20stroke-linecap%3D%22round%22%20opacity%3D%22.5%22%20vector-effect%3D%22non-scaling-stroke%22/%3E%3C/svg%3E"); }
-html.shx .sh-ru[data-metal="dark"] .sh-ru-title { background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20400%20100%22%20preserveAspectRatio%3D%22none%22%3E%3Cpath%20d%3D%22M4%2030%20H64%20V92%20H4%20L24%2061Z%22%20fill%3D%22%23c0a4ff%22%20stroke%3D%22%233B2E3A%22%20stroke-width%3D%223%22%20vector-effect%3D%22non-scaling-stroke%22%20stroke-linejoin%3D%22round%22%20opacity%3D%22.8%22/%3E%3Cpath%20d%3D%22M396%2030%20H336%20V92%20H396%20L376%2061Z%22%20fill%3D%22%23c0a4ff%22%20stroke%3D%22%233B2E3A%22%20stroke-width%3D%223%22%20vector-effect%3D%22non-scaling-stroke%22%20stroke-linejoin%3D%22round%22%20opacity%3D%22.8%22/%3E%3Cpath%20d%3D%22M44%206%20H356%20V80%20H44Z%22%20fill%3D%22%23c0a4ff%22%20stroke%3D%22%233B2E3A%22%20stroke-width%3D%223%22%20vector-effect%3D%22non-scaling-stroke%22%20stroke-linejoin%3D%22round%22/%3E%3Cpath%20d%3D%22M56%2018%20H200%22%20stroke%3D%22%23fff%22%20stroke-width%3D%225%22%20stroke-linecap%3D%22round%22%20opacity%3D%22.5%22%20vector-effect%3D%22non-scaling-stroke%22/%3E%3C/svg%3E"); }
-html.shx .sh-ru-name { margin-top: 6px; font: 800 48px/1.1 var(--font); letter-spacing: -.015em; }
-html.shx .sh-ru-mt { background: none; -webkit-background-clip: border-box; background-clip: border-box; color: var(--metal); -webkit-text-fill-color: var(--metal); animation: none; }
-html.shx .sh-ru-namewrap { filter: none; }
-html.shx .sh-ru-from { gap: 8px; padding: 4px 14px 4px 6px; font-size: var(--fs-meta); font-weight: 700; color: #f5f2f4; background: rgba(255, 255, 255, .1); border: 0; }
-html.shx .sh-ru-stat { font-size: var(--fs-label); color: #b8b0b6; }
-html.shx .sh-ru-unl { max-width: 420px; gap: 8px; }
-html.shx .sh-ru-unl li { gap: 12px; padding: 10px 14px 10px 10px; border: 2.5px solid #3B2E3A; border-radius: 14px; background: #262426; font-size: var(--fs-label); color: #f5f2f4; box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .08); }
-html.shx .sh-ru-unl b { font-size: var(--fs-meta); font-weight: 800; letter-spacing: 0; text-transform: none; color: var(--metal); }
-html.shx .sh-ru-ic { width: 40px; height: 40px; border-radius: 10px; background-color: #3a363a; box-shadow: none; }
-html.shx .sh-ru-go { font: 800 16px/1 var(--font); letter-spacing: 0; padding: 15px 40px; color: #3B2E3A; background: var(--metal); border: 3px solid #3B2E3A; box-shadow: inset 0 3px 0 rgba(255, 255, 255, .45); }
-@media (max-width: 520px) { html.shx .sh-ru-title { font-size: 30px; padding: 12px 52px 22px; } html.shx .sh-ru-name { font-size: 36px; } }
-@media (max-height: 700px) { html.shx .sh-ru-title { font-size: 28px; } html.shx .sh-ru-name { font-size: 32px; } }
+:root .sh-ru[data-metal="stone"] .sh-ru-title { background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20400%20100%22%20preserveAspectRatio%3D%22none%22%3E%3Cpath%20d%3D%22M4%2030%20H64%20V92%20H4%20L24%2061Z%22%20fill%3D%22%23cfc9bf%22%20stroke%3D%22%233B2E3A%22%20stroke-width%3D%223%22%20vector-effect%3D%22non-scaling-stroke%22%20stroke-linejoin%3D%22round%22%20opacity%3D%22.8%22/%3E%3Cpath%20d%3D%22M396%2030%20H336%20V92%20H396%20L376%2061Z%22%20fill%3D%22%23cfc9bf%22%20stroke%3D%22%233B2E3A%22%20stroke-width%3D%223%22%20vector-effect%3D%22non-scaling-stroke%22%20stroke-linejoin%3D%22round%22%20opacity%3D%22.8%22/%3E%3Cpath%20d%3D%22M44%206%20H356%20V80%20H44Z%22%20fill%3D%22%23cfc9bf%22%20stroke%3D%22%233B2E3A%22%20stroke-width%3D%223%22%20vector-effect%3D%22non-scaling-stroke%22%20stroke-linejoin%3D%22round%22/%3E%3Cpath%20d%3D%22M56%2018%20H200%22%20stroke%3D%22%23fff%22%20stroke-width%3D%225%22%20stroke-linecap%3D%22round%22%20opacity%3D%22.5%22%20vector-effect%3D%22non-scaling-stroke%22/%3E%3C/svg%3E"); }
+:root .sh-ru[data-metal="antique"] .sh-ru-title { background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20400%20100%22%20preserveAspectRatio%3D%22none%22%3E%3Cpath%20d%3D%22M4%2030%20H64%20V92%20H4%20L24%2061Z%22%20fill%3D%22%23e3ba77%22%20stroke%3D%22%233B2E3A%22%20stroke-width%3D%223%22%20vector-effect%3D%22non-scaling-stroke%22%20stroke-linejoin%3D%22round%22%20opacity%3D%22.8%22/%3E%3Cpath%20d%3D%22M396%2030%20H336%20V92%20H396%20L376%2061Z%22%20fill%3D%22%23e3ba77%22%20stroke%3D%22%233B2E3A%22%20stroke-width%3D%223%22%20vector-effect%3D%22non-scaling-stroke%22%20stroke-linejoin%3D%22round%22%20opacity%3D%22.8%22/%3E%3Cpath%20d%3D%22M44%206%20H356%20V80%20H44Z%22%20fill%3D%22%23e3ba77%22%20stroke%3D%22%233B2E3A%22%20stroke-width%3D%223%22%20vector-effect%3D%22non-scaling-stroke%22%20stroke-linejoin%3D%22round%22/%3E%3Cpath%20d%3D%22M56%2018%20H200%22%20stroke%3D%22%23fff%22%20stroke-width%3D%225%22%20stroke-linecap%3D%22round%22%20opacity%3D%22.5%22%20vector-effect%3D%22non-scaling-stroke%22/%3E%3C/svg%3E"); }
+:root .sh-ru[data-metal="bronze"] .sh-ru-title { background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20400%20100%22%20preserveAspectRatio%3D%22none%22%3E%3Cpath%20d%3D%22M4%2030%20H64%20V92%20H4%20L24%2061Z%22%20fill%3D%22%23f2a56b%22%20stroke%3D%22%233B2E3A%22%20stroke-width%3D%223%22%20vector-effect%3D%22non-scaling-stroke%22%20stroke-linejoin%3D%22round%22%20opacity%3D%22.8%22/%3E%3Cpath%20d%3D%22M396%2030%20H336%20V92%20H396%20L376%2061Z%22%20fill%3D%22%23f2a56b%22%20stroke%3D%22%233B2E3A%22%20stroke-width%3D%223%22%20vector-effect%3D%22non-scaling-stroke%22%20stroke-linejoin%3D%22round%22%20opacity%3D%22.8%22/%3E%3Cpath%20d%3D%22M44%206%20H356%20V80%20H44Z%22%20fill%3D%22%23f2a56b%22%20stroke%3D%22%233B2E3A%22%20stroke-width%3D%223%22%20vector-effect%3D%22non-scaling-stroke%22%20stroke-linejoin%3D%22round%22/%3E%3Cpath%20d%3D%22M56%2018%20H200%22%20stroke%3D%22%23fff%22%20stroke-width%3D%225%22%20stroke-linecap%3D%22round%22%20opacity%3D%22.5%22%20vector-effect%3D%22non-scaling-stroke%22/%3E%3C/svg%3E"); }
+:root .sh-ru[data-metal="silver"] .sh-ru-title { background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20400%20100%22%20preserveAspectRatio%3D%22none%22%3E%3Cpath%20d%3D%22M4%2030%20H64%20V92%20H4%20L24%2061Z%22%20fill%3D%22%23cdd7e1%22%20stroke%3D%22%233B2E3A%22%20stroke-width%3D%223%22%20vector-effect%3D%22non-scaling-stroke%22%20stroke-linejoin%3D%22round%22%20opacity%3D%22.8%22/%3E%3Cpath%20d%3D%22M396%2030%20H336%20V92%20H396%20L376%2061Z%22%20fill%3D%22%23cdd7e1%22%20stroke%3D%22%233B2E3A%22%20stroke-width%3D%223%22%20vector-effect%3D%22non-scaling-stroke%22%20stroke-linejoin%3D%22round%22%20opacity%3D%22.8%22/%3E%3Cpath%20d%3D%22M44%206%20H356%20V80%20H44Z%22%20fill%3D%22%23cdd7e1%22%20stroke%3D%22%233B2E3A%22%20stroke-width%3D%223%22%20vector-effect%3D%22non-scaling-stroke%22%20stroke-linejoin%3D%22round%22/%3E%3Cpath%20d%3D%22M56%2018%20H200%22%20stroke%3D%22%23fff%22%20stroke-width%3D%225%22%20stroke-linecap%3D%22round%22%20opacity%3D%22.5%22%20vector-effect%3D%22non-scaling-stroke%22/%3E%3C/svg%3E"); }
+:root .sh-ru[data-metal="gold"] .sh-ru-title { background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20400%20100%22%20preserveAspectRatio%3D%22none%22%3E%3Cpath%20d%3D%22M4%2030%20H64%20V92%20H4%20L24%2061Z%22%20fill%3D%22%23f2c14e%22%20stroke%3D%22%233B2E3A%22%20stroke-width%3D%223%22%20vector-effect%3D%22non-scaling-stroke%22%20stroke-linejoin%3D%22round%22%20opacity%3D%22.8%22/%3E%3Cpath%20d%3D%22M396%2030%20H336%20V92%20H396%20L376%2061Z%22%20fill%3D%22%23f2c14e%22%20stroke%3D%22%233B2E3A%22%20stroke-width%3D%223%22%20vector-effect%3D%22non-scaling-stroke%22%20stroke-linejoin%3D%22round%22%20opacity%3D%22.8%22/%3E%3Cpath%20d%3D%22M44%206%20H356%20V80%20H44Z%22%20fill%3D%22%23f2c14e%22%20stroke%3D%22%233B2E3A%22%20stroke-width%3D%223%22%20vector-effect%3D%22non-scaling-stroke%22%20stroke-linejoin%3D%22round%22/%3E%3Cpath%20d%3D%22M56%2018%20H200%22%20stroke%3D%22%23fff%22%20stroke-width%3D%225%22%20stroke-linecap%3D%22round%22%20opacity%3D%22.5%22%20vector-effect%3D%22non-scaling-stroke%22/%3E%3C/svg%3E"); }
+:root .sh-ru[data-metal="diamond"] .sh-ru-title { background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20400%20100%22%20preserveAspectRatio%3D%22none%22%3E%3Cpath%20d%3D%22M4%2030%20H64%20V92%20H4%20L24%2061Z%22%20fill%3D%22%2384d4f6%22%20stroke%3D%22%233B2E3A%22%20stroke-width%3D%223%22%20vector-effect%3D%22non-scaling-stroke%22%20stroke-linejoin%3D%22round%22%20opacity%3D%22.8%22/%3E%3Cpath%20d%3D%22M396%2030%20H336%20V92%20H396%20L376%2061Z%22%20fill%3D%22%2384d4f6%22%20stroke%3D%22%233B2E3A%22%20stroke-width%3D%223%22%20vector-effect%3D%22non-scaling-stroke%22%20stroke-linejoin%3D%22round%22%20opacity%3D%22.8%22/%3E%3Cpath%20d%3D%22M44%206%20H356%20V80%20H44Z%22%20fill%3D%22%2384d4f6%22%20stroke%3D%22%233B2E3A%22%20stroke-width%3D%223%22%20vector-effect%3D%22non-scaling-stroke%22%20stroke-linejoin%3D%22round%22/%3E%3Cpath%20d%3D%22M56%2018%20H200%22%20stroke%3D%22%23fff%22%20stroke-width%3D%225%22%20stroke-linecap%3D%22round%22%20opacity%3D%22.5%22%20vector-effect%3D%22non-scaling-stroke%22/%3E%3C/svg%3E"); }
+:root .sh-ru[data-metal="dark"] .sh-ru-title { background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20400%20100%22%20preserveAspectRatio%3D%22none%22%3E%3Cpath%20d%3D%22M4%2030%20H64%20V92%20H4%20L24%2061Z%22%20fill%3D%22%23c0a4ff%22%20stroke%3D%22%233B2E3A%22%20stroke-width%3D%223%22%20vector-effect%3D%22non-scaling-stroke%22%20stroke-linejoin%3D%22round%22%20opacity%3D%22.8%22/%3E%3Cpath%20d%3D%22M396%2030%20H336%20V92%20H396%20L376%2061Z%22%20fill%3D%22%23c0a4ff%22%20stroke%3D%22%233B2E3A%22%20stroke-width%3D%223%22%20vector-effect%3D%22non-scaling-stroke%22%20stroke-linejoin%3D%22round%22%20opacity%3D%22.8%22/%3E%3Cpath%20d%3D%22M44%206%20H356%20V80%20H44Z%22%20fill%3D%22%23c0a4ff%22%20stroke%3D%22%233B2E3A%22%20stroke-width%3D%223%22%20vector-effect%3D%22non-scaling-stroke%22%20stroke-linejoin%3D%22round%22/%3E%3Cpath%20d%3D%22M56%2018%20H200%22%20stroke%3D%22%23fff%22%20stroke-width%3D%225%22%20stroke-linecap%3D%22round%22%20opacity%3D%22.5%22%20vector-effect%3D%22non-scaling-stroke%22/%3E%3C/svg%3E"); }
+:root .sh-ru-name { margin-top: 6px; font: 800 48px/1.1 var(--font); letter-spacing: -.015em; }
+:root .sh-ru-mt { background: none; -webkit-background-clip: border-box; background-clip: border-box; color: var(--metal); -webkit-text-fill-color: var(--metal); animation: none; }
+:root .sh-ru-namewrap { filter: none; }
+:root .sh-ru-from { gap: 8px; padding: 4px 14px 4px 6px; font-size: var(--fs-meta); font-weight: 700; color: #f5f2f4; background: rgba(255, 255, 255, .1); border: 0; }
+:root .sh-ru-stat { font-size: var(--fs-label); color: #b8b0b6; }
+:root .sh-ru-unl { max-width: 420px; gap: 8px; }
+:root .sh-ru-unl li { gap: 12px; padding: 10px 14px 10px 10px; border: 2.5px solid #3B2E3A; border-radius: 14px; background: #262426; font-size: var(--fs-label); color: #f5f2f4; box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .08); }
+:root .sh-ru-unl b { font-size: var(--fs-meta); font-weight: 800; letter-spacing: 0; text-transform: none; color: var(--metal); }
+:root .sh-ru-ic { width: 40px; height: 40px; border-radius: 10px; background-color: #3a363a; box-shadow: none; }
+:root .sh-ru-go { font: 800 16px/1 var(--font); letter-spacing: 0; padding: 15px 40px; color: #3B2E3A; background: var(--metal); border: 3px solid #3B2E3A; box-shadow: inset 0 3px 0 rgba(255, 255, 255, .45); }
+@media (max-width: 520px) { :root .sh-ru-title { font-size: 30px; padding: 12px 52px 22px; } :root .sh-ru-name { font-size: 36px; } }
+@media (max-height: 700px) { :root .sh-ru-title { font-size: 28px; } :root .sh-ru-name { font-size: 32px; } }
 
 /* the level, trophy and medal cards: a framed card like the shop's showcase, rays turning behind the medal */
-html.shx .sh-ru-lv { --frame: var(--metal); font-family: var(--font); color: #3B2E3A; width: min(420px, calc(100% - 32px)); padding: 16px 20px 16px 16px; gap: 16px;
+:root .sh-ru-lv { --frame: var(--metal); font-family: var(--font); color: #3B2E3A; width: min(420px, calc(100% - 32px)); padding: 16px 20px 16px 16px; gap: 16px;
   background: #FFF8E6; border: 3px solid #3B2E3A; border-radius: 20px; box-shadow: inset 0 0 0 5px var(--frame), inset 0 0 0 7.5px #3B2E3A, 0 16px 40px rgba(30, 20, 30, .28); }
-html.shx .sh-ru-lv-medal { width: 92px; height: 92px; }
-html.shx .sh-ru-lv-medal::before { content: ""; position: absolute; left: 50%; top: 50%; width: 170px; height: 170px; margin: -85px 0 0 -85px; border-radius: 50%;
+:root .sh-ru-lv-medal { width: 92px; height: 92px; }
+:root .sh-ru-lv-medal::before { content: ""; position: absolute; left: 50%; top: 50%; width: 170px; height: 170px; margin: -85px 0 0 -85px; border-radius: 50%;
   background: repeating-conic-gradient(color-mix(in srgb, var(--metal) 45%, transparent) 0deg 9deg, transparent 9deg 22.5deg);
   -webkit-mask: radial-gradient(closest-side, #000 55%, transparent 100%); mask: radial-gradient(closest-side, #000 55%, transparent 100%); animation: sh-ru-spin 30s linear infinite; }
-html.shx .sh-ru-lv-coin { position: relative; }
-html.shx .sh-ru-lv-coin svg { filter: none; }
-html.shx .sh-ru-lv-ring { border-color: var(--metal); box-shadow: none; }
-html.shx .sh-ru-lv-eye { display: inline-block; padding: 2px 9px 3px; border: 2px solid #3B2E3A; border-radius: 7px; background: var(--metal); font-size: 12px; font-weight: 800; letter-spacing: 0; text-transform: none; color: #3B2E3A; }
-html.shx .sh-ru-lv-name { font: 800 28px/1.1 var(--font); letter-spacing: -.015em; margin-top: 6px; }
-html.shx .sh-ru-lv .sh-ru-mt { color: var(--metal-ink); -webkit-text-fill-color: var(--metal-ink); }
-html.shx .sh-ru-pips { margin: 9px 0 7px; gap: 4px; }
-html.shx .sh-ru-pips i { height: 9px; background: rgba(59, 46, 58, .12); box-shadow: inset 0 0 0 1.5px #3B2E3A; }
-html.shx .sh-ru-pips b { background: var(--metal); box-shadow: inset 0 0 0 1.5px #3B2E3A; }
-html.shx .sh-ru-lv.is-landed .sh-ru-pips .new { box-shadow: inset 0 0 0 1.5px #3B2E3A; }
-html.shx .sh-ru-lv-next { font-size: var(--fs-label); color: inherit; } html.shx .sh-ru-lv-next b, html.shx .sh-ru-tr-rare b { color: inherit; font-weight: 800; }
-html.shx .sh-ru-lv-shine { background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .55), transparent); }
-html.shx .sh-ru-tr .sh-ru-lv-medal { width: 96px; height: 96px; }
-html.shx .sh-ru-tr-name { font: 800 26px/1.1 var(--font); letter-spacing: -.015em; margin-top: 6px; }
-html.shx .sh-ru-tr .sh-ru-mt { color: inherit; -webkit-text-fill-color: currentColor; }
-html.shx .sh-ru-tr-desc { margin-top: 3px; font-size: var(--fs-label); color: inherit; }
-html.shx .sh-ru-tr-rare { margin-top: 7px; font-size: var(--fs-meta); color: inherit; }
-html.shx .sh-ru-lv[data-metal="stone"] { --metal-ink: #6b665e; } html.shx .sh-ru-lv[data-metal="antique"] { --metal-ink: #86602b; } html.shx .sh-ru-lv[data-metal="bronze"] { --metal-ink: #9b4f1d; }
-html.shx .sh-ru-lv[data-metal="silver"] { --metal-ink: #586573; } html.shx .sh-ru-lv[data-metal="gold"] { --metal-ink: #8a5d00; } html.shx .sh-ru-lv[data-metal="diamond"] { --metal-ink: #0f6e9b; }
-html.shx .sh-ru-lv[data-metal="dark"] { --metal-ink: #6b3fb6; }
+:root .sh-ru-lv-coin { position: relative; }
+:root .sh-ru-lv-coin svg { filter: none; }
+:root .sh-ru-lv-ring { border-color: var(--metal); box-shadow: none; }
+:root .sh-ru-lv-eye { display: inline-block; padding: 2px 9px 3px; border: 2px solid #3B2E3A; border-radius: 7px; background: var(--metal); font-size: 12px; font-weight: 800; letter-spacing: 0; text-transform: none; color: #3B2E3A; }
+:root .sh-ru-lv-name { font: 800 28px/1.1 var(--font); letter-spacing: -.015em; margin-top: 6px; }
+:root .sh-ru-lv .sh-ru-mt { color: var(--metal-ink); -webkit-text-fill-color: var(--metal-ink); }
+:root .sh-ru-pips { margin: 9px 0 7px; gap: 4px; }
+:root .sh-ru-pips i { height: 9px; background: rgba(59, 46, 58, .12); box-shadow: inset 0 0 0 1.5px #3B2E3A; }
+:root .sh-ru-pips b { background: var(--metal); box-shadow: inset 0 0 0 1.5px #3B2E3A; }
+:root .sh-ru-lv.is-landed .sh-ru-pips .new { box-shadow: inset 0 0 0 1.5px #3B2E3A; }
+:root .sh-ru-lv-next { font-size: var(--fs-label); color: inherit; } :root .sh-ru-lv-next b, :root .sh-ru-tr-rare b { color: inherit; font-weight: 800; }
+:root .sh-ru-lv-shine { background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .55), transparent); }
+:root .sh-ru-tr .sh-ru-lv-medal { width: 96px; height: 96px; }
+:root .sh-ru-tr-name { font: 800 26px/1.1 var(--font); letter-spacing: -.015em; margin-top: 6px; }
+:root .sh-ru-tr .sh-ru-mt { color: inherit; -webkit-text-fill-color: currentColor; }
+:root .sh-ru-tr-desc { margin-top: 3px; font-size: var(--fs-label); color: inherit; }
+:root .sh-ru-tr-rare { margin-top: 7px; font-size: var(--fs-meta); color: inherit; }
+:root .sh-ru-lv[data-metal="stone"] { --metal-ink: #6b665e; } :root .sh-ru-lv[data-metal="antique"] { --metal-ink: #86602b; } :root .sh-ru-lv[data-metal="bronze"] { --metal-ink: #9b4f1d; }
+:root .sh-ru-lv[data-metal="silver"] { --metal-ink: #586573; } :root .sh-ru-lv[data-metal="gold"] { --metal-ink: #8a5d00; } :root .sh-ru-lv[data-metal="diamond"] { --metal-ink: #0f6e9b; }
+:root .sh-ru-lv[data-metal="dark"] { --metal-ink: #6b3fb6; }
 
 /* the mock exam's results: the same frame, the score's ring in front of rays in its band's color */
-html.shx .sh-mk { font-family: var(--font); color: #3B2E3A; }
-html.shx .sh-mk-bg { background: rgba(30, 22, 29, .55); }
-html.shx .sh-mk[data-band="0"] { --band: #F2C14E; --band-ink: #8a5d00; } html.shx .sh-mk[data-band="1"] { --band: #4cc38a; --band-ink: #1d6a42; }
-html.shx .sh-mk[data-band="2"] { --band: #F0B44A; --band-ink: #8a5300; } html.shx .sh-mk[data-band="3"] { --band: #f0806b; --band-ink: #9c2b1c; }
-html.shx .sh-mk-card { background: #FFF8E6; border: 3px solid #3B2E3A; border-radius: 22px; padding: 22px 24px 22px; overflow: hidden;
+:root .sh-mk { font-family: var(--font); color: #3B2E3A; }
+:root .sh-mk-bg { background: rgba(30, 22, 29, .55); }
+:root .sh-mk[data-band="0"] { --band: #F2C14E; --band-ink: #8a5d00; } :root .sh-mk[data-band="1"] { --band: #4cc38a; --band-ink: #1d6a42; }
+:root .sh-mk[data-band="2"] { --band: #F0B44A; --band-ink: #8a5300; } :root .sh-mk[data-band="3"] { --band: #f0806b; --band-ink: #9c2b1c; }
+:root .sh-mk-card { background: #FFF8E6; border: 3px solid #3B2E3A; border-radius: 22px; padding: 22px 24px 22px; overflow: hidden;
   box-shadow: inset 0 0 0 5px var(--band), inset 0 0 0 7.5px #3B2E3A, 0 24px 64px rgba(30, 20, 30, .32); }
-html.shx .sh-mk-eye { display: inline-block; padding: 3px 10px 4px; border: 2px solid #3B2E3A; border-radius: 7px; background: var(--band); font-size: var(--fs-meta); font-weight: 800; letter-spacing: 0; text-transform: none; color: #3B2E3A; }
-html.shx .sh-mk-ring { width: 160px; height: 160px; margin: 16px auto 8px; }
-html.shx .sh-mk-ring::before { content: ""; position: absolute; left: 50%; top: 50%; width: 330px; height: 330px; margin: -165px 0 0 -165px; border-radius: 50%;
+:root .sh-mk-eye { display: inline-block; padding: 3px 10px 4px; border: 2px solid #3B2E3A; border-radius: 7px; background: var(--band); font-size: var(--fs-meta); font-weight: 800; letter-spacing: 0; text-transform: none; color: #3B2E3A; }
+:root .sh-mk-ring { width: 160px; height: 160px; margin: 16px auto 8px; }
+:root .sh-mk-ring::before { content: ""; position: absolute; left: 50%; top: 50%; width: 330px; height: 330px; margin: -165px 0 0 -165px; border-radius: 50%;
   background: repeating-conic-gradient(color-mix(in srgb, var(--band) 40%, transparent) 0deg 8deg, transparent 8deg 20deg);
   -webkit-mask: radial-gradient(closest-side, #000 45%, transparent 100%); mask: radial-gradient(closest-side, #000 45%, transparent 100%); animation: sh-ru-spin 40s linear infinite; }
-html.shx .sh-mk-ring svg { position: relative; }
-html.shx .sh-mk-ring .bg { fill: #fff; stroke: rgba(59, 46, 58, .12); }
-html.shx .sh-mk-ring .fg { stroke: var(--band); filter: none; }
-html.shx .sh-mk-num { font: 800 46px/1 var(--font); letter-spacing: -.02em; }
-html.shx .sh-mk-num span { color: inherit; opacity: .6; }
-html.shx .sh-mk-frac { font-size: var(--fs-label); font-weight: 700; color: inherit; opacity: .75; }
-html.shx .sh-mk-verdict { margin-top: 8px; font: 800 22px/1.2 var(--font); letter-spacing: -.01em; }
-html.shx .sh-mk-best { padding: 4px 12px; font-size: var(--fs-meta); font-weight: 800; color: inherit; background: rgba(59, 46, 58, .08); border: 0; }
-html.shx .sh-mk-best.is-new { color: #3B2E3A; background: #F6CD55; border: 2px solid #3B2E3A; }
-html.shx .sh-mk-best.is-new::after { background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .7), transparent); }
-html.shx .sh-mk-lecs { margin-top: 18px; padding-top: 14px; border-top: 2px dashed rgba(59, 46, 58, .25); gap: 8px; }
-html.shx .sh-mk-lecs li { font-size: var(--fs-meta); font-weight: 700; color: inherit; }
-html.shx .sh-mk-lecs .b { height: 10px; background: rgba(59, 46, 58, .1); box-shadow: inset 0 0 0 1.5px #3B2E3A; }
-html.shx .sh-mk-lecs .b i { box-shadow: inset 0 0 0 1.5px #3B2E3A; }
-html.shx .sh-mk-lecs li[data-band="0"] .b i { background: #F2C14E; } html.shx .sh-mk-lecs li[data-band="1"] .b i { background: #4cc38a; }
-html.shx .sh-mk-lecs li[data-band="2"] .b i { background: #F0B44A; } html.shx .sh-mk-lecs li[data-band="3"] .b i { background: #f0806b; }
-html.shx .sh-mk-lecs .n { color: inherit; opacity: .7; }
-html.shx .sh-mk-actions { margin-top: 20px; }
-html.shx .sh-mk-actions button { font: 800 var(--fs-label)/1 var(--font); min-height: 44px; padding: 0 22px; color: #3B2E3A; background: #fff; border: 2.5px solid #3B2E3A; }
-html.shx .sh-mk-actions .sh-mk-go { background: var(--band); border-color: #3B2E3A; box-shadow: inset 0 3px 0 rgba(255, 255, 255, .45); }
-html.shx .sh-mk-actions button:focus-visible { outline: 3px solid var(--hub-text); }
+:root .sh-mk-ring svg { position: relative; }
+:root .sh-mk-ring .bg { fill: #fff; stroke: rgba(59, 46, 58, .12); }
+:root .sh-mk-ring .fg { stroke: var(--band); filter: none; }
+:root .sh-mk-num { font: 800 46px/1 var(--font); letter-spacing: -.02em; }
+:root .sh-mk-num span { color: inherit; opacity: .6; }
+:root .sh-mk-frac { font-size: var(--fs-label); font-weight: 700; color: inherit; opacity: .75; }
+:root .sh-mk-verdict { margin-top: 8px; font: 800 22px/1.2 var(--font); letter-spacing: -.01em; }
+:root .sh-mk-best { padding: 4px 12px; font-size: var(--fs-meta); font-weight: 800; color: inherit; background: rgba(59, 46, 58, .08); border: 0; }
+:root .sh-mk-best.is-new { color: #3B2E3A; background: #F6CD55; border: 2px solid #3B2E3A; }
+:root .sh-mk-best.is-new::after { background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .7), transparent); }
+:root .sh-mk-lecs { margin-top: 18px; padding-top: 14px; border-top: 2px dashed rgba(59, 46, 58, .25); gap: 8px; }
+:root .sh-mk-lecs li { font-size: var(--fs-meta); font-weight: 700; color: inherit; }
+:root .sh-mk-lecs .b { height: 10px; background: rgba(59, 46, 58, .1); box-shadow: inset 0 0 0 1.5px #3B2E3A; }
+:root .sh-mk-lecs .b i { box-shadow: inset 0 0 0 1.5px #3B2E3A; }
+:root .sh-mk-lecs li[data-band="0"] .b i { background: #F2C14E; } :root .sh-mk-lecs li[data-band="1"] .b i { background: #4cc38a; }
+:root .sh-mk-lecs li[data-band="2"] .b i { background: #F0B44A; } :root .sh-mk-lecs li[data-band="3"] .b i { background: #f0806b; }
+:root .sh-mk-lecs .n { color: inherit; opacity: .7; }
+:root .sh-mk-actions { margin-top: 20px; }
+:root .sh-mk-actions button { font: 800 var(--fs-label)/1 var(--font); min-height: 44px; padding: 0 22px; color: #3B2E3A; background: #fff; border: 2.5px solid #3B2E3A; }
+:root .sh-mk-actions .sh-mk-go { background: var(--band); border-color: #3B2E3A; box-shadow: inset 0 3px 0 rgba(255, 255, 255, .45); }
+:root .sh-mk-actions button:focus-visible { outline: 3px solid var(--hub-text); }
 
 /* the cards in the dark (the theme picked, or the device's) */
-html.shx[data-theme="dark"] .sh-ru-lv { background: #2a2428; color: #f5f2f4; box-shadow: inset 0 0 0 5px var(--frame), inset 0 0 0 7.5px #3B2E3A, 0 16px 40px rgba(0, 0, 0, .6); }
-html.shx[data-theme="dark"] .sh-ru-pips i { background: rgba(255, 255, 255, .1); box-shadow: inset 0 0 0 1.5px #8a7f88; }
-html.shx[data-theme="dark"] .sh-ru-lv { --metal-ink: var(--metal); }
-html.shx[data-theme="dark"] .sh-mk-bg { background: rgba(0, 0, 0, .7); }
-html.shx[data-theme="dark"] .sh-mk { color: #f5f2f4; }
-html.shx[data-theme="dark"] .sh-mk-card { background: #2a2428; box-shadow: inset 0 0 0 5px var(--band), inset 0 0 0 7.5px #3B2E3A, 0 24px 64px rgba(0, 0, 0, .6); }
-html.shx[data-theme="dark"] .sh-mk-ring .bg { fill: #1c1b1c; stroke: rgba(255, 255, 255, .1); }
-html.shx[data-theme="dark"] .sh-mk-lecs { border-top-color: rgba(255, 255, 255, .15); }
+:root[data-theme="dark"] .sh-ru-lv { background: #2a2428; color: #f5f2f4; box-shadow: inset 0 0 0 5px var(--frame), inset 0 0 0 7.5px #3B2E3A, 0 16px 40px rgba(0, 0, 0, .6); }
+:root[data-theme="dark"] .sh-ru-pips i { background: rgba(255, 255, 255, .1); box-shadow: inset 0 0 0 1.5px #8a7f88; }
+:root[data-theme="dark"] .sh-ru-lv { --metal-ink: var(--metal); }
+:root[data-theme="dark"] .sh-mk-bg { background: rgba(0, 0, 0, .7); }
+:root[data-theme="dark"] .sh-mk { color: #f5f2f4; }
+:root[data-theme="dark"] .sh-mk-card { background: #2a2428; box-shadow: inset 0 0 0 5px var(--band), inset 0 0 0 7.5px #3B2E3A, 0 24px 64px rgba(0, 0, 0, .6); }
+:root[data-theme="dark"] .sh-mk-ring .bg { fill: #1c1b1c; stroke: rgba(255, 255, 255, .1); }
+:root[data-theme="dark"] .sh-mk-lecs { border-top-color: rgba(255, 255, 255, .15); }
 @media (prefers-color-scheme: dark) {
-  html.shx:not([data-theme="light"]) .sh-ru-lv { background: #2a2428; color: #f5f2f4; box-shadow: inset 0 0 0 5px var(--frame), inset 0 0 0 7.5px #3B2E3A, 0 16px 40px rgba(0, 0, 0, .6); }
-  html.shx:not([data-theme="light"]) .sh-ru-pips i { background: rgba(255, 255, 255, .1); box-shadow: inset 0 0 0 1.5px #8a7f88; }
-  html.shx:not([data-theme="light"]) .sh-ru-lv { --metal-ink: var(--metal); }
-  html.shx:not([data-theme="light"]) .sh-mk-bg { background: rgba(0, 0, 0, .7); }
-  html.shx:not([data-theme="light"]) .sh-mk { color: #f5f2f4; }
-  html.shx:not([data-theme="light"]) .sh-mk-card { background: #2a2428; box-shadow: inset 0 0 0 5px var(--band), inset 0 0 0 7.5px #3B2E3A, 0 24px 64px rgba(0, 0, 0, .6); }
-  html.shx:not([data-theme="light"]) .sh-mk-ring .bg { fill: #1c1b1c; stroke: rgba(255, 255, 255, .1); }
-  html.shx:not([data-theme="light"]) .sh-mk-lecs { border-top-color: rgba(255, 255, 255, .15); }
+  :root:not([data-theme="light"]) .sh-ru-lv { background: #2a2428; color: #f5f2f4; box-shadow: inset 0 0 0 5px var(--frame), inset 0 0 0 7.5px #3B2E3A, 0 16px 40px rgba(0, 0, 0, .6); }
+  :root:not([data-theme="light"]) .sh-ru-pips i { background: rgba(255, 255, 255, .1); box-shadow: inset 0 0 0 1.5px #8a7f88; }
+  :root:not([data-theme="light"]) .sh-ru-lv { --metal-ink: var(--metal); }
+  :root:not([data-theme="light"]) .sh-mk-bg { background: rgba(0, 0, 0, .7); }
+  :root:not([data-theme="light"]) .sh-mk { color: #f5f2f4; }
+  :root:not([data-theme="light"]) .sh-mk-card { background: #2a2428; box-shadow: inset 0 0 0 5px var(--band), inset 0 0 0 7.5px #3B2E3A, 0 24px 64px rgba(0, 0, 0, .6); }
+  :root:not([data-theme="light"]) .sh-mk-ring .bg { fill: #1c1b1c; stroke: rgba(255, 255, 255, .1); }
+  :root:not([data-theme="light"]) .sh-mk-lecs { border-top-color: rgba(255, 255, 255, .15); }
 }
 
 /* =================== the rest of More, Stats and trophies on a new hub (widget/hub.js statsEpic) ===================
@@ -355,13 +355,13 @@ html.shx[data-theme="dark"] .sh-mk-lecs { border-top-color: rgba(255, 255, 255, 
   .stx-badge { gap: 8px; } .stx-badge svg { width: 44px; height: 44px; }
 }
 @media (prefers-reduced-motion: reduce) { .stx-gauge::before { animation: none !important; } }
-html.shx[data-theme="dark"] .stx-ach { background: #262426; color: #F5F2F4; box-shadow: inset 0 0 0 6px #C9971C, inset 0 0 0 8.5px #3B2E3A; }
-html.shx[data-theme="dark"] .stx-badge { background: #1c1b1c; border-color: #6E5F6B; }
-html.shx[data-theme="dark"] .stx-badge.is-got { background-color: #3A2E14; border-color: #3B2E3A; background-image: repeating-conic-gradient(from 0deg at 40px 50%, rgba(246, 205, 85, .22) 0deg 9deg, transparent 9deg 22deg); }
-html.shx[data-theme="dark"] .stx-badge:not(.is-got) small { color: #B8ADB5; }
+:root[data-theme="dark"] .stx-ach { background: #262426; color: #F5F2F4; box-shadow: inset 0 0 0 6px #C9971C, inset 0 0 0 8.5px #3B2E3A; }
+:root[data-theme="dark"] .stx-badge { background: #1c1b1c; border-color: #6E5F6B; }
+:root[data-theme="dark"] .stx-badge.is-got { background-color: #3A2E14; border-color: #3B2E3A; background-image: repeating-conic-gradient(from 0deg at 40px 50%, rgba(246, 205, 85, .22) 0deg 9deg, transparent 9deg 22deg); }
+:root[data-theme="dark"] .stx-badge:not(.is-got) small { color: #B8ADB5; }
 @media (prefers-color-scheme: dark) {
-  html.shx:not([data-theme="light"]) .stx-ach { background: #262426; color: #F5F2F4; box-shadow: inset 0 0 0 6px #C9971C, inset 0 0 0 8.5px #3B2E3A; }
-  html.shx:not([data-theme="light"]) .stx-badge { background: #1c1b1c; border-color: #6E5F6B; }
-  html.shx:not([data-theme="light"]) .stx-badge.is-got { background-color: #3A2E14; border-color: #3B2E3A; background-image: repeating-conic-gradient(from 0deg at 40px 50%, rgba(246, 205, 85, .22) 0deg 9deg, transparent 9deg 22deg); }
-  html.shx:not([data-theme="light"]) .stx-badge:not(.is-got) small { color: #B8ADB5; }
+  :root:not([data-theme="light"]) .stx-ach { background: #262426; color: #F5F2F4; box-shadow: inset 0 0 0 6px #C9971C, inset 0 0 0 8.5px #3B2E3A; }
+  :root:not([data-theme="light"]) .stx-badge { background: #1c1b1c; border-color: #6E5F6B; }
+  :root:not([data-theme="light"]) .stx-badge.is-got { background-color: #3A2E14; border-color: #3B2E3A; background-image: repeating-conic-gradient(from 0deg at 40px 50%, rgba(246, 205, 85, .22) 0deg 9deg, transparent 9deg 22deg); }
+  :root:not([data-theme="light"]) .stx-badge:not(.is-got) small { color: #B8ADB5; }
 }
