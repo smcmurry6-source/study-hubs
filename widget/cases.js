@@ -335,7 +335,7 @@
         if(t.furcX > fmax) bad(w + 'the film shows more furcation loss (furcX ' + t.furcX + ') than the probe found (' + fmax + ')');
         if((fcs[0] === 3) !== (fcs[1] === 3) && !t.d.pal) bad(w + 'a Class III furcation is through and through: both surfaces');
       }
-      if(t.endo && !(t.crown || t.amalgam)) bad(w + 'a root-filled tooth needs a restoration (crown or amalgam)');
+      if(t.endo && !(t.crown || t.amalgam || t.resto.length)) bad(w + 'a root-filled tooth needs a restoration (a crown, or a restoration over the access)');
     });
     return P;
   };
