@@ -40,7 +40,18 @@
      thicker, more extensive proximal deposits (Buchanan et al., J Periodontol 1987;58:747: 44% of surfaces; Hyer et al., J
      Periodontol 2021;92:419: about half);
    - the odontogram's bridge: the units joined by a bar, a pontic's crown drawn and its root crossed out (the usual charting
-     convention for a pontic: an X through the missing tooth's roots, the crowns outlined, a line joining the units). */
+     convention for a pontic: an X through the missing tooth's roots, the crowns outlined, a line joining the units).
+   Decay seen from the buccal (Sam, 2026-11-21: the drawn view shows fillings and decay, "Yes"), drawn anew from: Fejerskov, Nyvad
+   and Kidd, Dental Caries: The Disease and its Clinical Management (smooth-surface lesions form along the gingival margin where
+   plaque stays; active lesions chalky and matte, arrested ones shiny and brown); the ICDAS II visual criteria (Ismail et al.,
+   Community Dent Oral Epidemiol 2007;35:170: codes 1-2 a white or brown spot, 3 an enamel break, 5-6 a cavity into dentin); Nyvad
+   and Fejerskov, Int Dent J 1982;32:311 and Fejerskov's root caries chapters, with Banting's root caries index (root caries
+   only on an exposed root, near the CEJ and the margin, spreading along the CEJ more than in depth; active yellowish to light
+   brown and soft, arrested dark brown to black and hard); Sturdevant's Art and Science of Operative Dentistry (Class V lesions and
+   outlines; a Class III lesion seen as a shadow through the labial enamel; a Class II box's buccal wall just clear of the contact,
+   so a sliver of the restoration shows at the crown's outline; most Class III restorations placed from the lingual); Mjor and
+   Toffenetti, Quintessence Int 2000;31:165 (secondary caries mostly at the gingival margin); White and Pharoah (a buccal or
+   lingual lesion is hard to see on a film: sound tooth lies in front of it). See buccalLesion() and viewResto(). */
 (function(){
   'use strict';
   var I = {};
@@ -89,6 +100,15 @@
            sep:root, missed:root, widened:true }   fill:true is v1's filling; sep a separated instrument in that root's apical
            third; missed a canal left unfilled (a root the film shows on its own); widened (with fill:false) a widened apical PDL
        { m:'caries', ..., recurrent:true }      under a restoration's (or a crown's) margin, M or D
+     Decay seen from the buccal (Sam, 2026-11-21: the drawn view should show fillings and decay, "Yes"):
+       { m:'caries', ..., stage:'white-spot' | 'cavitated' }   a smooth-surface lesion's look; by default an enamel lesion is a
+           white spot and a dentin or pulp one cavitated. stage 'white-spot' is enamel only (and a white spot on the facial or
+           lingual, given explicitly, shows on no film)
+       { m:'caries', ..., arrested:true }       an arrested lesion: brown, hard and shiny instead of chalky (a brown spot, a dark
+           cavity, a dark root lesion)
+       { m:'caries', surface:'B', root:true, depth:'dentin' }   root caries on the exposed facial (or lingual) root: needs that
+           surface's recession (at least 1 mm at the middle site); no enamel on a root, so dentin or pulp
+       { m:'caries', surface:'B', recurrent:true }   recurrent caries at a buccal margin: a Class V's, a veneer's or a crown's
        { m:'fracture', tooth, type, ... }       crown (an incisor or canine: depth enamel | dentin | pulp, side m | d), cusp
            (a premolar or molar: cusp B | L, or MB | DB | ML | DL), crack (no film shows it), vrf (a vertical root fracture: side
            m | d of root, a narrow pocket pd mm, default 8, at the middle of surface f | l), hrf (a horizontal root fracture: at
@@ -172,7 +192,8 @@
         else { var it = { s:normSurf(md.tooth, md.surfaces), mat:mat }; ['type', 'overhang', 'open'].forEach(function(k){ if(md[k]) it[k] = md[k]; });
           (r.resto = r.resto || []).push(it); if(mat === 'amalgam' || mat === 'gold') r.amalgam = true; }
       }
-      else if(md.m === 'caries'){ var rc = ensure(t, md.tooth), ci = { s:normSurf(md.tooth, md.surface), depth:md.depth || 'dentin' }; if(md.recurrent) ci.recurrent = true; (rc.caries = rc.caries || []).push(ci); }
+      else if(md.m === 'caries'){ var rc = ensure(t, md.tooth), ci = { s:normSurf(md.tooth, md.surface), depth:md.depth || 'dentin' };
+        ['recurrent', 'root', 'arrested'].forEach(function(k){ if(md[k]) ci[k] = true; }); if(md.stage) ci.stage = md.stage; (rc.caries = rc.caries || []).push(ci); }
       else if(md.m === 'endo'){ var re = ensure(t, md.tooth), eo = {};
         ['post', 'core', 'sep', 'missed'].forEach(function(k){ if(md[k]) eo[k] = md[k]; });
         if(typeof md.fill === 'string') eo.fill = md.fill;
@@ -367,6 +388,24 @@
     if(t.abut){ if(!t.crown) bad(w + 'a bridge abutment carries a crown'); }
     function num(v, lo, hi, what){ if(typeof v !== 'number' || v < lo || v > hi) bad(what + ' = ' + v + ' is outside ' + lo + '-' + hi); }
   }
+  /* decay seen from the buccal: what a lesion's look and place allow (Fejerskov's Dental Caries; ICDAS; Nyvad and Fejerskov's root
+     caries criteria): a white spot is a lesion still in the enamel; root caries is on an exposed root (recession on that surface),
+     with no enamel there, and not at a crown's margin (that is recurrent caries); an arrested lesion is a primary one */
+  var CKEYS = ['s', 'depth', 'recurrent', 'stage', 'root', 'arrested'], STAGES = ['white-spot', 'cavitated'];
+  function cariesCheck(t, c, w, cat, bad){
+    Object.keys(c).forEach(function(k){ if(CKEYS.indexOf(k) < 0) bad(w + 'caries.' + k + ' is not something the kit draws'); });
+    if(c.stage != null && STAGES.indexOf(c.stage) < 0) bad(w + 'caries stage must be ' + STAGES.join(' or '));
+    if(c.stage === 'white-spot' && c.depth !== 'enamel') bad(w + 'a white-spot lesion is still in the enamel: depth enamel (a lesion in the dentin is cavitated or shows as a shadow)');
+    if(c.stage && c.recurrent) bad(w + 'stage is for a primary lesion, not recurrent caries');
+    if(c.arrested && c.recurrent) bad(w + 'arrested is for a primary lesion, not recurrent caries');
+    if(c.root){ var F = cat.surfaces[3], sf = c.s === F ? 'f' : c.s === 'L' ? 'l' : null;
+      if(!sf) bad(w + 'root caries is drawn on the facial (' + F + ') or lingual (L) root');
+      else if((t.rec[sf][1] || 0) < 1) bad(w + 'root caries on ' + c.s + ' needs the root exposed: ' + (sf === 'f' ? 'facial' : 'lingual') + ' recession of at least 1 mm at the middle site (attachment loss in a pocket leaves the root covered)');
+      if(c.depth === 'enamel') bad(w + 'a root has no enamel: root caries is depth dentin or pulp');
+      if(c.stage === 'white-spot') bad(w + 'a white-spot lesion is an enamel lesion, not root caries');
+      if(c.recurrent) bad(w + 'root caries at a crown\'s or restoration\'s margin is recurrent caries: recurrent:true, without root');
+      if(t.crown && !c.recurrent) bad(w + 'a lesion on the root of a crowned tooth starts at the crown\'s margin: recurrent:true, without root'); }
+  }
   /* bridges across the record: every run of pontics has an abutment at each end, every abutment is next to a pontic */
   function bridgeCheck(spec, bad){
     var T = {}; for(var n = 1; n <= 32; n++) T[n] = tooth(spec, String(n));
@@ -424,10 +463,14 @@
         if(!r || !r.s) bad(w + 'a restoration with no surfaces'); });
       t.caries.forEach(function(c){ if(!c || cat.surfaces.indexOf(c.s) < 0) bad(w + 'caries surface ' + (c && c.s) + ' is not one of this tooth\'s (' + cat.surfaces.join('') + ')');
         if(c && DEPTH.indexOf(c.depth) < 0) bad(w + 'caries depth must be ' + DEPTH.join(', '));
-        if(c && t.crown && !c.recurrent) bad(w + 'caries under a full crown can\'t be charted by surface (recurrent caries at its margin can: recurrent:true, M or D)');
-        if(c && c.recurrent){ if(c.s !== 'M' && c.s !== 'D') bad(w + 'recurrent caries is drawn at a proximal margin: M or D');
+        if(c) cariesCheck(t, c, w, cat, bad);
+        if(c && t.crown && !c.recurrent) bad(w + 'caries under a full crown can\'t be charted by surface (recurrent caries at its margin can: recurrent:true, M, D or ' + cat.surfaces[3] + ')');
+        if(c && c.recurrent){ var F = cat.surfaces[3];
+          if(c.s !== 'M' && c.s !== 'D' && c.s !== F) bad(w + 'recurrent caries is drawn at a proximal margin (M or D) or a buccal one (' + F + ')');
+          else if(c.s === F){ if(!t.crown && !t.resto.some(function(r){ return r.s.indexOf(F) >= 0 && (r.type === 'veneer' || !/[OMD]/.test(r.s) || posOf(t.n) <= 3 && !/[MD]/.test(r.s)); }))
+            bad(w + 'recurrent caries on ' + F + ' is at a buccal margin: it needs a Class V (' + F + ' alone), a veneer or a crown'); }
           else if(!t.crown && !t.resto.some(function(r){ return r.type !== 'veneer' && r.s.indexOf(c.s) >= 0; })) bad(w + 'recurrent caries on ' + c.s + ' needs a restoration on that surface (or a crown)'); }
-        else if(c && t.resto.some(function(r){ return r.s.indexOf(c.s) >= 0 && r.type !== 'veneer'; })) bad(w + 'caries on ' + c.s + ', a restored surface: is it recurrent (recurrent:true)?'); });
+        else if(c && t.resto.some(function(r){ return r.s.indexOf(c.s) >= 0; })) bad(w + 'caries on ' + c.s + ', a restored (or veneered) surface: is it recurrent (recurrent:true)?'); });
       if(t.lesion) num(t.lesion, 1, 15, w + 'periapical lesion (mm across)');
       if(t.mob != null) num(t.mob, 0, 3, w + 'mobility');
       ['f', 'l'].forEach(function(s){
@@ -859,6 +902,14 @@
     var cut = C || function(p){ return p; };
     return g.o.caries.map(function(c){
       if(!!c.recurrent !== !!recur) return '';
+      /* decay on the facial or lingual (Patient Box, decay seen from the buccal): sound tooth lies in front of it, so a film shows
+         only a faint round shadow (White and Pharoah), and a white spot given as one, nothing. Recurrent: at the Class V's or
+         veneer's cervical edge; root caries: on the root, just apical to the CEJ */
+      var face = c.s !== 'M' && c.s !== 'D' && c.s !== 'O' && c.s !== 'I';
+      if(face && c.stage === 'white-spot') return '';
+      if(face && (c.recurrent || c.root)){ var big = c.depth === 'pulp' ? 1.3 : c.depth === 'enamel' ? .8 : 1.05, cy = c.root ? -1.1 : .9, e = [];
+        for(var i = 0; i < 18; i++){ var a = i / 18 * Math.PI * 2; e.push([Math.cos(a) * big * 1.2, cy + Math.sin(a) * big * .7]); }
+        return path('xr-car xr-car-f', cut(mmPx(g, e))); }
       if(recur){ var rr = (g.o.resto || []).filter(function(r){ return r.type !== 'veneer' && r.s.indexOf(c.s) >= 0; })[0];
         return TL.recurMM(g.o.t, c.s, c.depth, { inc:!!(rr && /I/.test(rr.s)) }).map(function(p){ return path('xr-car', cut(mmPx(g, p))); }).join(''); }
       return TL.cariesMM(g.o.t, c.s, c.depth).map(function(sh){
@@ -870,6 +921,9 @@
   function recurRootSVG(g){
     var k = g.k, s = '';
     (g.o.caries || []).forEach(function(c){ if(!c.recurrent) return;
+      if(c.s !== 'M' && c.s !== 'D'){ var e = [], b = c.depth === 'pulp' ? 1.3 : c.depth === 'enamel' ? .8 : 1.05;
+        for(var j = 0; j < 18; j++){ var a = j / 18 * Math.PI * 2; e.push([Math.cos(a) * b * 1.2, -1 + Math.sin(a) * b * .7]); }
+        s += path('xr-car xr-car-f', mmPx(g, e)); return; }
       var mm = c.s === 'M' ? -1 : 1, px = mm * g.sg, rs = g.roots, r = rs.length > 1 ? (rs[0].a0 * px > rs[rs.length - 1].a0 * px ? rs[0] : rs[rs.length - 1]) : rs[0];
       var dep = (c.depth === 'enamel' ? .45 : c.depth === 'pulp' ? 1.3 : .85) * k, len = (c.depth === 'enamel' ? 1.0 : 1.6) * k, y0 = g.cej + .02 * k, N = 10, out = [], inn = [];
       for(var i = 0; i <= N; i++){ var u = i / N, y = y0 + len * u, t = Math.max(0, (y - r.y0) / r.len), x = rAx(r, t) + px * rHw(r, t);
@@ -1355,7 +1409,7 @@
       if(t.margin.open) bits.push('open crown margin ' + String(t.margin.open).toUpperCase());
       if(t.margin.overhang) bits.push('overhanging crown margin ' + String(t.margin.overhang).toUpperCase());
       t.resto.forEach(function(r){ bits.push(r.s + ' ' + r.mat + (r.type && r.type !== 'direct' ? ' ' + r.type : '') + (r.overhang ? ', overhang ' + String(r.overhang).toUpperCase() : '') + (r.open ? ', open margin ' + String(r.open).toUpperCase() : '')); });
-      t.caries.forEach(function(r){ bits.push((r.recurrent ? 'recurrent caries ' : 'caries ') + r.s + ' (' + r.depth + ')'); });
+      t.caries.forEach(function(r){ bits.push((r.recurrent ? 'recurrent caries ' : r.root ? (r.arrested ? 'arrested ' : '') + 'root caries ' : r.stage === 'white-spot' ? (r.arrested ? 'brown spot ' : 'white-spot lesion ') : (r.arrested ? 'arrested caries ' : 'caries ')) + r.s + ' (' + r.depth + ')'); });
       if(t.endo){ var e = t.eo || {}; bits.push('root canal filling' + (e.fill && e.fill !== 'adequate' ? ' (' + (e.fill === 'long' ? 'overfilled' : e.fill === 'voids' ? 'with voids' : 'short') + ')' : ''));
         if(e.post) bits.push((e.post === 'cast' ? 'cast post and core' : e.post + ' post') + (e.core && e.core !== 'cast' ? ', ' + e.core + ' core' : ''));
         else if(e.core) bits.push(e.core + ' core');
@@ -1380,6 +1434,122 @@
       s += dot('io-pulp', A[0] + (B[0] - A[0]) * t - nx * o * .45, A[1] + (B[1] - A[1]) * t - ny * o * .45, .55 * k); }
     return s;
   }
+  /* what of a restoration shows from the buccal (Sturdevant's outlines): a Class V; a Class III or IV (a Class III placed from the
+     lingual, as most are, faint through the labial enamel; a lingual surface not at all); an onlay over the buccal cusps; a buccal
+     groove extension (OB); and of a Class II's proximal box only a sliver at the crown's outline, where its buccal wall clears the
+     contact into the buccal embrasure (its gingival floor, an overhang or an open margin lie under the papilla) */
+  function viewResto(t, r, V){
+    var n = t.n, cat = CAT(n), ty = typeOf(n), F = cat.surfaces[3], fs = r.s.indexOf(F) >= 0, o = { per:4, mat:r.mat, type:r.type };
+    var cls = 'io-r' + oneOf(r.mat, RMAT, ' io-r-'), out = '';
+    if(posOf(n) <= 3){
+      var vis = r.s.replace(/L/g, ''); if(!vis) return '';
+      var faint = !fs && !/I/.test(r.s);
+      TL.restoParts(ty, vis, o).shapes.forEach(function(p){ out += path(cls + (faint ? ' io-r-faint' : ''), V(p)); });
+      return out;
+    }
+    var onlay = r.type === 'onlay', hasO = /O/.test(r.s) || (/M/.test(r.s) && /D/.test(r.s)) || onlay;
+    if(onlay) out += path(cls, V(TL.restoParts(ty, 'O', o).shapes[0]));
+    [['M', -1], ['D', 1]].forEach(function(e){ if(r.s.indexOf(e[0]) >= 0){ var b = boxSliver(ty, e[0], e[1], o); if(b) out += path(cls, V(b)); } });
+    if(fs && !onlay){ var sh = TL.restoParts(ty, hasO ? 'O' + F : F, o).shapes; out += path(cls, V(sh[sh.length - 1])); }
+    return out;
+  }
+  function boxSliver(ty, side, sg, o){
+    var slot = TL.restoParts(ty, side, o).shapes[0]; if(!slot) return null;
+    var ys = slot.map(function(p){ return p[1]; }), y0 = Math.min.apply(null, ys), y1 = Math.max.apply(null, ys);
+    var arc = TL.sideArc(TL.crownLoop(XT[ty], 4), sg, y0, y1); if(arc.length < 2) return null;
+    var inner = arc.map(function(p, i){ var u = i / (arc.length - 1); return [p[0] - sg * (.32 + .3 * Math.sin(Math.PI * Math.min(1, u * 1.3))), p[1]]; });
+    return arc.concat(inner.reverse());
+  }
+  /* ---------- decay seen from the buccal ----------
+     Each lesion in the tooth's own mm (mesial at -x, the CEJ at 0, the crown toward +y), placed by the gingival margin the chart
+     gives, from these sources (drawn anew):
+     - a smooth-surface (cervical, Class V) lesion forms where plaque stays, along the gingival margin, so it is a crescent in the
+       gingival third that follows the margin's curve, wider mesiodistally than tall (Fejerskov's Dental Caries; Sturdevant's,
+       Class V lesions). ICDAS's visual codes: an active white spot is opaque, chalky and matte (codes 1-2), an arrested one brown
+       and shiny; a cavity (codes 5-6) shows dentin, light to mid brown and soft when active, dark brown to black and hard when
+       arrested, ringed by chalky demineralized enamel;
+     - root caries (Nyvad and Fejerskov's criteria; Banting's root caries index): only on an exposed root, between the CEJ and the
+       gingival margin, a shallow lesion that spreads along the CEJ more than it deepens; active yellowish to light brown and
+       soft, arrested dark brown to black and hard;
+     - recurrent caries at a buccal margin (Sturdevant's; Mjor's secondary caries studies, mostly at the gingival margin): a
+       brown-gray band in the tooth along a Class V's or a veneer's gingival edge, or on the root just apical to a crown's margin;
+     - a proximal lesion: hidden from the buccal on a premolar or molar (seen from the occlusal as a shadow under the marginal
+       ridge, or on a bitewing); on an incisor or canine one into the dentin shows as a gray shadow through the labial enamel by
+       the contact (Sturdevant's, Class III detection), fainter than the lesion; an occlusal or lingual lesion not at all.
+     Returns { layers:[{ cls, pts }], visible } or null; visible: some of it lies above the gingival margin (answerable() uses it) */
+  function gumMM(t){ var a = t.d.cw * .34, c = t.d.cej || 0, y0 = -t.rec.f[0], y1 = -t.rec.f[1] - c, y2 = -t.rec.f[2];
+    return function(x){ var u = Math.max(-1.15, Math.min(1.15, x / a)); return y1 + u * (y2 - y0) / 2 + u * u * ((y0 + y2) / 2 - y1); }; }
+  function cejMM(t){ var v = t.d.cv / 2, c = t.d.cej || 0; return function(x){ return -c * Math.max(0, 1 - (x / v) * (x / v)); }; }
+  function band(x0, x1, lo, hi, N){ var a = [], b = [];
+    for(var i = 0; i <= N; i++){ var u = i / N, x = x0 + (x1 - x0) * u; a.push([x, lo(x, u)]); b.push([x, hi(x, u)]); }
+    return a.concat(b.reverse()); }
+  function prof(u, e){ return Math.pow(Math.max(0, Math.sin(Math.PI * u)), e); }
+  function buccalLesion(t, c){
+    var cat = CAT(t.n), F = cat.surfaces[3], d = t.d, gm = gumMM(t), cj = cejMM(t), r = rnd(+t.n * 31 + c.s.charCodeAt(0)), L = [];
+    var wob = [r(), r(), r()], W = function(u){ return 1 + .07 * Math.sin(u * 9 + wob[0] * 6) + .03 * Math.sin(u * 19 + wob[1] * 6); };
+    var arr = c.arrested ? ' io-arr' : '', ant = posOf(t.n) <= 3;
+    if(c.s === 'M' || c.s === 'D'){
+      if(!ant || c.recurrent || c.depth === 'enamel' || t.crown) return null;
+      var sg = c.s === 'M' ? -1 : 1, h = d.ch, yc = TL.CONTACT[typeOf(t.n)][sg < 0 ? 0 : 1] * h - .7, deep = c.depth === 'pulp';
+      var rx = deep ? 1.15 : .8, ry = deep ? 1.6 : 1.15, xs = TL.sideAt(TL.crownLoop(d, 4).C, yc, sg) - sg * rx * .8, e = [];
+      for(var i = 0; i < 20; i++){ var a = i / 20 * Math.PI * 2; e.push([xs + Math.cos(a) * rx * W(i / 20), yc + Math.sin(a) * ry]); }
+      L.push({ cls:'io-prox' + (deep ? ' io-prox-deep' : ''), pts:e });
+      return { layers:L, visible:true };
+    }
+    if(c.s !== F) return null;
+    var N = 18;
+    if(c.recurrent){
+      var dep = c.depth === 'enamel' ? .45 : c.depth === 'pulp' ? 1.1 : .8;
+      if(t.crown){ var hw0 = d.cv * .38, len = dep + .5;
+        L.push({ cls:'io-rec', pts:band(-hw0, hw0, function(x){ return cj(x) + .18; }, function(x, u){ return cj(x) + .18 - len * prof(u, .45) * W(u); }, N) }); }
+      else { var vr = t.resto.filter(function(q){ return q.s.indexOf(F) >= 0; })[0]; if(!vr) return null;
+        var sh = TL.restoParts(typeOf(t.n), F, { per:4, type:vr.type === 'veneer' ? 'veneer' : 'direct' }).shapes[0]; if(!sh) return null;
+        L.push({ cls:'io-rec', pts:marginBand(sh, vr.type === 'veneer' ? 1.3 : .62, dep, W) }); }
+    } else if(c.root){
+      var hw = d.cv * .44, deepR = c.depth === 'pulp', H = deepR ? 2.6 : 1.8, xs2 = [];
+      for(var j = 0; j <= 40; j++){ var x = -hw + 2 * hw * j / 40; if(cj(x) - gm(x) > .55) xs2.push(x); }
+      if(xs2.length < 3) return null;
+      var xa = xs2[0], xb = xs2[xs2.length - 1], top = function(x){ return cj(x) - .05; }, bot = function(x, u){ return top(x) - Math.min(cj(x) - gm(x) - .3, H) * prof(u, .35) * W(u); };
+      L.push({ cls:'io-rc' + arr, pts:band(xa, xb, top, bot, N) });
+      if(deepR) L.push({ cls:'io-rc-deep' + arr, pts:band(xa + (xb - xa) * .3, xb - (xb - xa) * .3, function(x){ return top(x) - .25; }, function(x, u){ return top(x) - .25 - Math.min(cj(x) - gm(x) - .8, H * .6) * prof(u, .5); }, 10) });
+    } else {
+      var ws = c.stage ? c.stage === 'white-spot' : c.depth === 'enamel', T = ws ? [.38, 1.4] : c.depth === 'enamel' ? [.24, 1.0] : c.depth === 'pulp' ? [.36, 2.6] : [.32, 1.9];
+      var lo = function(x){ return Math.max(gm(x) - .35, cj(x) + .1); }, hw1 = d.cw * T[0];
+      var cres = function(hw2, H2, lift, e){ return band(-hw2, hw2, function(x){ return lo(x) + lift; }, function(x, u){ return lo(x) + lift + H2 * prof(u, e) * W(u); }, N); };
+      if(ws){ L.push({ cls:'io-ws io-ws-edge' + arr, pts:cres(hw1 + .35, T[1] + .4, -.05, .5) }); L.push({ cls:'io-ws' + arr, pts:cres(hw1, T[1], .05, .45) }); }
+      else {
+        if(!c.arrested) L.push({ cls:'io-cav-rim', pts:cres(hw1 + .4, T[1] + .55, -.05, .5) });
+        L.push({ cls:'io-cav' + arr, pts:cres(hw1, T[1], .1, .55) });
+        if(c.depth === 'pulp') L.push({ cls:'io-cav-deep' + arr, pts:cres(hw1 * .45, T[1] * .5, .3, .7) });
+      }
+    }
+    if(!L.length) return null;
+    var vis = L.some(function(l){ return l.pts.some(function(p){ return p[1] > gm(p[0]) + .25; }); });
+    return { layers:L, visible:vis };
+  }
+  /* a band along the gingival part of a restoration's outline (below yCut mm above its lowest point), just outside it */
+  function marginBand(pts, cut, w, W){
+    var ys = pts.map(function(p){ return p[1]; }), y0 = Math.min.apply(null, ys), yc = y0 + cut, n = pts.length;
+    var cx = pts.reduce(function(a, p){ return a + p[0]; }, 0) / n, cy = ys.reduce(function(a, y){ return a + y; }, 0) / n;
+    var st = -1; for(var i = 0; i < n; i++) if(pts[i][1] >= yc && pts[(i + 1) % n][1] < yc){ st = (i + 1) % n; break; }
+    if(st < 0) st = 0;
+    var run = []; for(var j = 0; j < n; j++){ var p = pts[(st + j) % n]; if(p[1] >= yc && run.length) break; if(p[1] < yc) run.push(p); }
+    if(run.length < 2) run = pts.slice();
+    var out = run.map(function(p, i){ var u = run.length > 1 ? i / (run.length - 1) : .5, dx = p[0] - cx, dy = p[1] - cy, l = Math.hypot(dx, dy) || 1, f = w * prof(u, .4) * W(u);
+      return [p[0] + dx / l * f, p[1] + dy / l * f]; });
+    var inn = run.map(function(p){ var dx = p[0] - cx, dy = p[1] - cy, l = Math.hypot(dx, dy) || 1; return [p[0] - dx / l * .12, p[1] - dy / l * .12]; });
+    return inn.concat(out.reverse());
+  }
+  /* what the view shows of a tooth's decay, in words (its label) */
+  function lesionWords(t, c){
+    var F = CAT(t.n).surfaces[3];
+    if(c.recurrent) return 'recurrent caries at ' + (t.crown ? 'the crown\'s' : 'the restoration\'s') + ' buccal margin';
+    if(c.root) return (c.arrested ? 'arrested ' : '') + 'root caries on the exposed root';
+    if(c.s !== F) return 'a shadow through the labial enamel by the ' + (c.s === 'M' ? 'mesial' : 'distal') + ' contact';
+    var ws = c.stage ? c.stage === 'white-spot' : c.depth === 'enamel';
+    return ws ? (c.arrested ? 'a brown spot' : 'a white-spot lesion') + ' at the cervical third' : (c.arrested ? 'an arrested' : 'a') + ' cavitated lesion at the cervical third';
+  }
+  I.buccalLesion = function(spec, n, c){ spec = prep(spec); return buccalLesion(tooth(spec, String(n)), c); };
   /* ---------- the drawn buccal view ---------- */
   I.view = function(spec, o){
     spec = prep(spec); o = o || {}; var ts = teethOf(spec, o.teeth), up = isUpper(ts[0].n), k = o.k || 8.2, g = spec.gingiva || {};
@@ -1413,13 +1583,9 @@
       var tcls = 'io-tooth' + (c.t.crown || c.t.implant ? ' pfm' : '') + (up ? '' : ' low') + oneOf(c.t.crownMat, CROWNS, ' cr-') + (ven ? ' cr-veneer' : '');
       if(!fx) s += path(tcls, cr);
       else s += viewFx(cr, fx, d, V, tcls);
-      /* what of a restoration shows from the buccal: a Class V, a Class III or IV, an onlay over the buccal cusps, a groove
-         extension (the proximal boxes of a Class II don't show) */
-      c.t.resto.forEach(function(r){ if(r.type === 'veneer') return; var cat = CAT(c.t.n), fs = r.s.indexOf(cat.surfaces[3]) >= 0, ant = posOf(c.t.n) <= 3;
-        if(!(fs || r.type === 'onlay' || (ant && /[MDI]/.test(r.s)))) return;
-        var parts = TL.restoParts(typeOf(c.t.n), r.type === 'onlay' ? 'O' : r.s, { per:4, mat:r.mat, type:r.type }).shapes;
-        if(!fs && r.type !== 'onlay' && !ant) return;
-        parts.forEach(function(p, i){ if(r.type !== 'onlay' && !ant && i === 0 && /O/.test(r.s)) return; s += path('io-r' + oneOf(r.mat, RMAT, ' io-r-') + (ant && !fs && !/I/.test(r.s) ? ' io-r-faint' : ''), V(p)); }); });
+      c.t.resto.forEach(function(r){ if(r.type !== 'veneer') s += viewResto(c.t, r, V); });
+      /* decay seen from the buccal, drawn under the free gingiva (which covers what is subgingival) */
+      c.t.caries.forEach(function(cr){ var L = buccalLesion(c.t, cr); if(L) L.layers.forEach(function(l){ s += path(l.cls, V(l.pts)); }); });
       if(c.t.implant) s += path('io-margin', [[c.cx - d.cv / 2 * k, cej], [c.cx + d.cv / 2 * k, cej]], true);
     });
     /* the free gingiva: its margin follows recession at the three facial sites (negative recession: margin on the crown,
@@ -1467,7 +1633,8 @@
       s += path('dc-calc', low.map(function(p){ return [p[0], p[1] + dir * .4]; }).concat(dense(hi, false, 2).reverse())); });
     function mean(pts){ return pts.reduce(function(a, p){ return a + p[0]; }, 0) / pts.length; }
     cols.forEach(function(c){ s += txt(c.cx, up ? H - 10 : 18, '#' + c.t.n, 'io-lab', 'middle'); });
-    var label = o.aria || ('Drawn ' + (up ? 'upper' : 'lower') + ' buccal view of ' + ts.map(function(t){ return '#' + t.n; }).join(', ') + ': the gingiva ' + (look === 'inflamed' ? 'red and swollen' : look === 'fibrotic' ? 'pale and fibrotic' : 'pink and stippled') + ', drawn from the chart');
+    var seen = []; ts.forEach(function(t){ if(t.missing || t.implant) return; t.caries.forEach(function(cr){ var L = buccalLesion(t, cr); if(L && L.visible) seen.push('#' + t.n + ', ' + lesionWords(t, cr)); }); });
+    var label = o.aria || ('Drawn ' + (up ? 'upper' : 'lower') + ' buccal view of ' + ts.map(function(t){ return '#' + t.n; }).join(', ') + ': the gingiva ' + (look === 'inflamed' ? 'red and swollen' : look === 'fibrotic' ? 'pale and fibrotic' : 'pink and stippled') + ', drawn from the chart' + (seen.length ? '; decay: ' + seen.join('; ') : ''));
     return '<svg class="io dc-view" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + esc(label) + '">' + s + '</svg>';
   };
 
@@ -1547,7 +1714,7 @@
   /* answerable from what's shown: each question says what its key rests on (q.rests: stage, grade, extent, rt, furc, impl,
      kind), and this fails when the figures and rows it shows don't include it. The twin of hide, which stops a picture
      from giving the answer away. */
-  var RESTS = ['stage', 'grade', 'extent', 'rt', 'furc', 'impl', 'kind', 'endo', 'fracture', 'resto'];
+  var RESTS = ['stage', 'grade', 'extent', 'rt', 'furc', 'impl', 'kind', 'endo', 'fracture', 'resto', 'caries'];
   I.RESTS = RESTS;
   I.answerable = function(spec, figs, rows, rests){
     spec = prep(spec); figs = figs || []; rows = rows || []; var P = [], D = I.derive(spec), m = spec.mouth || {};
@@ -1611,9 +1778,25 @@
           if(f.type === 'cusp' && !(xr(n) || odo(n) || (/B/.test(f.cusp) && vw(n)))) P.push('fracture: #' + n + '\'s fractured cusp needs a film or the odontogram' + (/B/.test(f.cusp) ? ', or the view' : '')); }); }); }
       if(k === 'resto'){ var rs = all.filter(function(t){ return t.crown || t.resto.length || t.pontic || t.amalgam; });
         if(!rs.length) P.push('resto: the record has no restoration');
-        rs.forEach(function(t){ var n = t.n, margin = t.margin.open || t.margin.overhang || t.resto.some(function(r){ return r.overhang || r.open; }) || t.caries.some(function(c){ return c.recurrent; });
+        rs.forEach(function(t){ var n = t.n, margin = t.margin.open || t.margin.overhang || t.resto.some(function(r){ return r.overhang || r.open; }) || t.caries.some(function(c){ return c.recurrent && (c.s === 'M' || c.s === 'D'); });
+          var bm = t.caries.filter(function(c){ return c.recurrent && c.s !== 'M' && c.s !== 'D'; });
           if(margin && !xr(n)) P.push('resto: #' + n + '\'s margin (an overhang, an open margin or recurrent caries) needs a film');
-          else if(!margin && !(xr(n) || odo(n) || vw(n))) P.push('resto: #' + n + '\'s restoration needs a film, the odontogram or the view'); }); }
+          else if(!margin && !(xr(n) || odo(n) || vw(n))) P.push('resto: #' + n + '\'s restoration needs a film, the odontogram or the view');
+          bm.forEach(function(c){ var L = buccalLesion(t, c); if(!((vw(n) && L && L.visible) || odo(n))) P.push('resto: #' + n + '\'s recurrent caries at its buccal margin needs the view (with the margin above the gingiva) or the odontogram'); }); }); }
+      /* decay: a buccal lesion (cervical, white spot, root caries, recurrent at a buccal margin) rests on the view where it shows above
+         the gingiva, or the odontogram (a white spot's or root lesion's look only on the view); a proximal lesion on a film or the
+         odontogram (the view only for an incisor's or canine's into the dentin, its shadow through the labial enamel); an occlusal one
+         on a film once in the dentin, or the odontogram; a lingual one on the odontogram; else a row that gives the clinical finding */
+      if(k === 'caries'){ var cs = all.filter(function(t){ return t.caries.length && !t.missing; });
+        if(!cs.length) P.push('caries: the record has no caries');
+        var exam = row(/explor|tactile|soft|leathery|chalky|white spot|cavit|discolor|visual exam|icdas/i);
+        cs.forEach(function(t){ var n = t.n, F = CAT(n).surfaces[3]; t.caries.forEach(function(c){
+          var L = buccalLesion(t, c), onView = vw(n) && L && L.visible, what = '#' + n + '\'s ' + (c.recurrent ? 'recurrent ' : c.root ? 'root ' : '') + 'caries on ' + c.s;
+          if(c.s === F){ var look = c.root || c.stage === 'white-spot' || c.arrested;
+            if(!(onView || (!look && (odo(n) || exam)))) P.push('caries: ' + what + (vw(n) && L && !L.visible ? ' is under the gingiva on the view: give it in a row or the odontogram' : ' needs the view' + (look ? ' (its look is the finding)' : ', the odontogram or a row'))); }
+          else if(c.s === 'M' || c.s === 'D'){ if(c.recurrent ? !xr(n) : !(xr(n) || odo(n) || onView)) P.push('caries: ' + what + ' is a film finding' + (c.recurrent ? '' : ' (or the odontogram)') + ': the buccal view doesn\'t show it'); }
+          else if(c.s === 'O' || c.s === 'I'){ if(!(odo(n) || exam || (c.depth !== 'enamel' && xr(n)))) P.push('caries: ' + what + ' needs ' + (c.depth === 'enamel' ? 'the odontogram or a row (no film shows it)' : 'a film or the odontogram')); }
+          else if(!(odo(n) || exam)) P.push('caries: ' + what + ' (lingual) needs the odontogram or a row'); }); }); }
     });
     return P;
   };

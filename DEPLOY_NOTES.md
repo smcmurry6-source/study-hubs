@@ -32,6 +32,16 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-21 (Patient Box: decay seen from the buccal, Claude Code)** — Sam's "Yes" to the drawn cheek-side view showing
+  fillings and decay ([decisions](vault/decisions.md)). `widget/cases.js` draws a buccal lesion where the chart puts the gingival
+  margin: a cervical crescent (a chalky white spot, or a brown cavity in a chalky rim), arrested lesions brown and rimless, root
+  caries on a root exposed by recession, recurrent caries at a Class V's, veneer's or crown's buccal margin, and an incisor's
+  proximal lesion as a gray shadow through the labial enamel (sources: Fejerskov's Dental Caries, ICDAS II, Nyvad and Fejerskov
+  1982, Banting, Sturdevant's, Mjor 2000). New caries fields `stage`, `arrested`, `root` and buccal `recurrent`, with validate
+  rules (root caries needs recession, a white spot is enamel, nothing primary on a veneered surface); `rests: ["caries"]`; the
+  view's restorations rechecked (a Class II box now shows as a sliver at the outline; a lingual surface no longer draws a
+  labial Class V). Old cases validate and their films draw as before. CI's records in `tools/ci/cases.js`; example
+  `v21-buccal-decay` with `v21-ex-5`; `sw.js` sh-v72. No live hub has dental cases, so students see nothing yet.
 - **2026-11-21 (Patient Box v2.1's clinical calls settled from outside sources, Claude Code)** — Sam: "Use outside sources to
   determine answers" to the questions v2.1's review left. Radiopacity on a film now follows mm-Al studies (Pekkan 2011, Atala
   2019, Erzurumlu 2021, Hitij and Fidler 2013, Balci 2023): zirconia nearly as bright as metal, composite about enamel's or a

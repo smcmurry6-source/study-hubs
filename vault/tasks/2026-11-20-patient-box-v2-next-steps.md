@@ -49,6 +49,15 @@ what v2.0 left, so it isn't lost. Its own track (Sam, 2026-11-06, [decisions](..
 - [x] A root-filled incisor or canine with only a veneer now fails `validate()`: its lingual access needs its own composite
       (`L`, drawn as the access), as a posterior one needs a restoration with O (Ray and Trope 1995; a veneer on a root-filled
       tooth is accepted, Gresnigt 2019, but doesn't seal the access)
+- [x] Decay seen from the buccal (Sam, 2026-11-21, [decisions](../decisions.md): the view shows fillings and decay, "Yes"):
+      cervical (Class V) lesions as a crescent along the gingival margin, a white spot told from a cavity, arrested lesions
+      brown, root caries on a root exposed by recession, recurrent caries at a Class V's, veneer's or crown's buccal margin, an
+      incisor's proximal lesion as a shadow through the labial enamel; the view's restorations checked (a Class II box's sliver
+      at the outline, nothing of a lingual surface); `rests: ["caries"]` and the validate rules (root caries needs recession);
+      example `v21-buccal-decay` with `v21-ex-5` (branch `claude/patient-box-buccal-decay`)
+- [ ] Sam looks at decay seen from the buccal with its first case, the way the first box says
+- [ ] Proximal root caries (a lesion under the contact on a root exposed by interdental attachment loss, a film finding): the
+      kit draws root caries on the facial and lingual only
 - [ ] Sam still looks at v2.1's drawings with their first case (crown materials, posts, fractures, bridges, the redrawn
       fillings and calculus, and the answers above), the way the first box says
 - [ ] Root tips, resorption, sealants and temporary restorations (left out of v2.1; optional in Sam's ask)
@@ -78,6 +87,9 @@ what v2.0 left, so it isn't lost. Its own track (Sam, 2026-11-06, [decisions](..
   the access cavity and the rule that it is restored, the veneer, stainless steel crowns on molars only, an untreated vertical
   root fracture only on a molar marked `vital`, onlay reduction by material, the pontic's chart mark. Ticked the two boxes;
   Sam's look with the first case stays open.
+- 2026-11-21: decay seen from the buccal (branch `claude/patient-box-buccal-decay`, on top of #526): the view's lesions, its
+  restorations rechecked, the `caries` rests and validate rules, example 5. Ticked its box; added Sam's look and proximal root
+  caries.
 
 ## Outcome
 
