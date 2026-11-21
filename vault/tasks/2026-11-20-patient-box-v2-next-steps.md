@@ -41,7 +41,13 @@ what v2.0 left, so it isn't lost. Its own track (Sam, 2026-11-06, [decisions](..
 - [x] Fractures (Sam, 2026-11-21): crown, cusp, crack, vertical and horizontal root fractures, on every view, with the checks
       that keep a question off a picture that can't show one (a crack on no film) (v2.1)
 - [ ] Sam looks at v2.1's drawings with their first case (crown materials, posts, fractures, bridges, the redrawn fillings
-      and calculus), the way the box above says; the screenshots are in v2.1's PR
+      and calculus), the way the box above says; the screenshots are in v2.1's PR. Three calls the review left for Sam: how
+      bright zirconia and lithium disilicate are drawn against enamel and metal, the access cavity's shape on an uncrowned
+      root-filled tooth, and the calculus spur's size on a film; and whether the odontogram's small X on a pontic's root reads
+      as "missing" (the key says "no root")
+- [ ] A root-filled incisor or canine whose only restoration is a veneer passes `validate()`, though its access is lingual
+      and the veneer doesn't cover it (the film draws a composite access anyway): Sam's call whether that should need a
+      restoration of its own
 - [ ] Root tips, resorption, sealants and temporary restorations (left out of v2.1; optional in Sam's ask)
 - [ ] A crack's own row: the kit has no bite-test or transillumination field, so a crack question gives its finding in the
       question's `pbox`; a `tests` field in the record would put it in the case's own rows
@@ -59,6 +65,12 @@ what v2.0 left, so it isn't lost. Its own track (Sam, 2026-11-06, [decisions](..
 - 2026-11-21: Patient Box v2.1 (branch `claude/patient-box-v2-1`): crown materials, inlays, onlays and veneers, endodontics,
   fractures, margins and bridges, the filling and calculus redraw, examples 3 and 4. Ticked steps 2 and 3; added what it
   left.
+- 2026-11-21: v2.1's art and code review (same branch): an uncrowned root-filled tooth's access cavity, gutta-percha wall to
+  wall and in the palatal root, the overhang and open margin redrawn, recurrent caries by depth (and on the root under a
+  crown), cusps over an occlusal restoration enamel to the outline, ceramic's cement line, zirconia and lithium disilicate's
+  radiopacity, calculus smaller and irregular on films and tapered on the view, the horizontal root fracture ending at the
+  root's surface; the bridge materials checked, data-built class names whitelisted and the chart table escaped, the
+  odontogram's key wrapping on a phone and ceramic lighter there. Added two boxes above.
 
 ## Outcome
 

@@ -41,8 +41,13 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   cores, fill quality, a separated instrument, a missed canal, a widened PDL, the `fracture` module (crown, cusp, crack,
   vertical and horizontal root) and the `bridge` module, on the film, bitewing, full-mouth series, chart, view and
   odontogram, with their checks (a VRF on a vital unrestored tooth is an error) and three new `rests` (`endo`, `fracture`,
-  `resto`; a crack never rests on a film). Calculus is redrawn: tapering spurs on films, a tan band on the view. v1 records
-  draw as before except for v1's amalgam (now the O outline) and calculus. Two new examples (`v21-bridge-post`,
+  `resto`; a crack never rests on a film). Calculus is redrawn: a small irregular spur on each proximal root surface on
+  films, a tan band on the view's cervical third that tapers off up the papillae. An art and code review on the same branch:
+  an uncrowned root-filled tooth shows its access cavity (filled with its restoration's material) and gutta-percha wall to wall,
+  the palatal root's too; the overhang, open margin and recurrent caries (by depth, and on the root under a crown) redrawn;
+  the cusps over an occlusal restoration enamel to the outline; a ceramic inlay's cement line; zirconia brighter than enamel
+  and lithium disilicate about enamel's; the bridge materials checked (no SSC bridge), class names built from data
+  whitelisted. v1 records draw as before except for v1's amalgam (now the O outline, its cusps enamel) and calculus. Two new examples (`v21-bridge-post`,
   `v21-trauma`) in `tools/cases/examples.json`; `sw.js` `sh-v70`. No live hub has cases, so students see nothing yet.
   How: [draw-a-patient-box-case](vault/how-to/draw-a-patient-box-case.md); what's left:
   [the next steps](vault/tasks/2026-11-20-patient-box-v2-next-steps.md).

@@ -315,13 +315,14 @@
       out.push([x, Math.min(y, topAt(C, x) - .3)]); }
     return out;
   }
-  /* one restoration's shapes: { shapes, gaps } in mm. o: { per, mat, type ('direct' | 'inlay' | 'onlay' | 'veneer'),
-     overhang ('m' | 'd' | 'md': excess past the proximal contour at the gingival margin), open (the same: a gap between the
+  /* one restoration's shapes: { shapes, gaps, lines } in mm (lines: an inlay's or onlay's inner outline, the walls and floors
+     of its preparation, where its cement shows). o: { per, mat, type ('direct' | 'inlay' | 'onlay' | 'veneer'), overhang
+     ('m' | 'd' | 'md': excess past the proximal contour at the gingival margin), open (the same: a gap between the
      restoration and the gingival floor) } */
   function restoParts(type, surfaces, o){
     o = o || {}; var d = XT[type], h = d.ch, s = String(surfaces || '').toUpperCase(), pos = POS.indexOf(type.slice(3)), ant = pos <= 2;
     var hasM = s.indexOf('M') >= 0, hasD = s.indexOf('D') >= 0, fac = /[BFL]/.test(s), kind = o.type || 'direct';
-    var r = o.mat === 'composite' ? .45 : .3, out = { shapes:[], gaps:[] };
+    var r = o.mat === 'composite' ? .45 : .3, out = { shapes:[], gaps:[], lines:[] };
     var L = crownLoop(d, o.per), C = L.C, v = d.cv / 2, c = d.cej || 0;
     function cervical(){ var hw = d.cv * .36; return filletClosed([[-hw, 3.0], [0, 3.15], [hw, 3.0], [hw + .1, 1.2], [hw * .5, 1.0 - c * .45], [-hw * .5, 1.0 - c * .45], [-hw - .1, 1.2]], .55); }
     if(kind === 'veneer'){
@@ -348,13 +349,16 @@
     var ta = inlay ? .45 : 0, hasO = s.indexOf('O') >= 0 || (hasM && hasD) || kind === 'onlay';
     var oh = String(o.overhang || ''), op = String(o.open || '');
     function gyE(sg){ return G.gy(sg) + (op.indexOf(sg < 0 ? 'm' : 'd') >= 0 ? .4 : 0); }
-    /* the side of a box, from its gingival floor up to yTop, with the overhang's ledge where there is one */
+    /* the side of a box, from its gingival floor up to yTop, with the overhang's ledge where there is one. pre runs from the
+       floor's outer corner to where the box's side starts: an overhang (excess past the proximal contour at the gingival margin,
+       White and Pharoah) is a spur about .5 mm proud of the surface at the floor, hanging about .9 mm over the surface below it
+       and tapering onto it, its outer face rounded (it rests on the tooth, so its inner edge is the surface itself) */
     function boxUp(sg, yTop){
-      var g = gyE(sg), ledge = oh.indexOf(sg < 0 ? 'm' : 'd') >= 0;
-      if(!ledge) return { pts:sideArc(L, sg, g, yTop), pre:[] };
-      var P = onSide(L, sg, g).p, U = g + 1.0;
-      var ledge = dense([[P[0] + sg * .05, g - .05], [P[0] + sg * .7, g - .18], [P[0] + sg * 1.25, g - .4], [P[0] + sg * 1.15, g + .1], [P[0] + sg * .55, g + .6], onSide(L, sg, U).p], false, 4);
-      return { pts:sideArc(L, sg, U, yTop), pre:ledge.slice(0, -1) };
+      var g = gyE(sg), hasLedge = oh.indexOf(sg < 0 ? 'm' : 'd') >= 0;
+      if(!hasLedge) return { pts:sideArc(L, sg, g, yTop), pre:[] };
+      var U = g + .7, lo = Math.max(.05, g - .9), sx = function(y){ return side(y, sg); };
+      var face = dense([[sx(lo), lo], [sx(g - .5) + sg * .24, g - .5], [sx(g - .05) + sg * .5, g - .05], [sx(g + .35) + sg * .3, g + .35], [sx(U), U]], false, 4);
+      return { pts:sideArc(L, sg, U, yTop), pre:sideArc(L, sg, g, lo).concat(face.slice(1, -1)) };
     }
     function floorIn(sg){ var g = gyE(sg); return [[G.axX(sg), g], [G.axX(sg) - sg * ta, pf]]; }
     if(kind === 'onlay'){
@@ -364,7 +368,8 @@
       for(var i = 0; i <= 12; i++){ var x = xb + (xa - xb) * i / 12; red.push([x, topAt(C, x) - 1.8]); }
       red = shrink(red, 0, function(){ return 0; }, 3);
       var inner = (hasD ? [[G.axX(1), gyE(1)]] : []).concat(red, hasM ? [[G.axX(-1), gyE(-1)]] : []);
-      out.shapes.push(top.concat(fillet([top[top.length - 1]].concat(inner, [top[0]]), r).slice(1, -1)));
+      var lin = fillet([top[top.length - 1]].concat(inner, [top[0]]), r);
+      out.shapes.push(top.concat(lin.slice(1, -1))); out.lines.push(lin);
     } else if(hasO){
       var P = [], pre = [];
       if(hasM){ var bm = boxUp(-1, yMR); pre = bm.pre; P = P.concat(bm.pts); }
@@ -377,28 +382,42 @@
       chain = chain.concat(hasM ? floorIn(-1).reverse() : [[G.oX(-1) + .3, pf]]);
       chain.push(hasM ? (pre.length ? pre[0] : P[0]) : P[0]);
       P = pre.concat(P);
-      out.shapes.push(P.concat(fillet(chain, r).slice(1, -1)));
+      var fc = fillet(chain, r);
+      out.shapes.push(P.concat(fc.slice(1, -1))); if(inlay) out.lines.push(fc);
     } else [[-1, hasM], [1, hasD]].forEach(function(e){ var sg = e[0]; if(!e[1]) return;
       /* a proximal box alone (a slot): the box up to the marginal ridge, its occlusal edge turned in along the ridge */
       var bx = boxUp(sg, yMR), top2 = bx.pts[bx.pts.length - 1], g = gyE(sg);
       var ch = [top2, [top2[0] - sg * (G.ax + .3), top2[1] - .2], [G.axX(sg) - sg * ta, g + .4], [G.axX(sg), g], bx.pre.length ? bx.pre[0] : bx.pts[0]];
-      out.shapes.push(bx.pre.concat(bx.pts, fillet(ch, r).slice(1, -1))); });
+      var fs = fillet(ch, r);
+      out.shapes.push(bx.pre.concat(bx.pts, fs.slice(1, -1))); if(inlay) out.lines.push(fs); });
     /* the groove extension (OB, OL) or a Class V alone */
     if(fac) out.shapes.push(hasO ? filletClosed([[-.6, pf + .4], [.6, pf + .4], [.55, h * .4], [-.55, h * .4]], .5) : cervical());
-    /* an open margin: the restoration stands .4 mm off its gingival floor; the gap between is dark */
+    /* an open margin: the restoration stands .4 mm off its gingival floor; the gap between, from the proximal surface to the
+       axial wall, is dark (drawn under the restoration, which covers its top edge) */
     [[-1, 'm'], [1, 'd']].forEach(function(e){ var sg = e[0]; if(op.indexOf(e[1]) < 0 || !(sg < 0 ? hasM : hasD)) return;
-      var g = G.gy(sg), p0 = onSide(L, sg, g).p, p1 = onSide(L, sg, g + .4).p;
-      out.gaps.push([p0, p1, [G.axX(sg) + sg * .2, g + .12]]); });
+      var g = G.gy(sg), ax = G.axX(sg);
+      out.gaps.push(sideArc(L, sg, g, g + .5).concat([[ax - sg * .05, g + .5], [ax - sg * .05, g]])); });
     return out;
   }
   function restoMM(type, surfaces, o){ return restoParts(type, surfaces, o).shapes; }
-  /* recurrent caries at a restoration's (or a crown's) margin on surface M or D, as a film shows it: a radiolucency apical to the
-     gingival floor and along the restoration's axial wall, the tooth's own surface its outer edge */
+  /* recurrent (secondary) caries at a restoration's margin on surface M or D, as a film shows it (White and Pharoah): a
+     radiolucency in the tooth beside the margin, the tooth's own surface its outer edge. Posterior: a rounded shadow under the
+     outer part of the box's gingival floor (enamel: a small notch there; dentin: the whole floor, then a band up the axial
+     wall; pulp: the band wider, heading for the pulp). Incisor or canine (o.inc: the restoration takes the incisal angle):
+     the same at a Class III or IV's cervical edge. Drawn under the restoration, which covers its upper part. (At a crown's
+     margin the lesion is on the root, apical to the crown: the case kit draws it there.) */
   function recurMM(type, surface, depth, o){
-    o = o || {}; var sg = String(surface).toUpperCase() === 'M' ? -1 : 1, d = XT[type], L = crownLoop(d, o.per), deep = depth === 'enamel' ? .7 : depth === 'pulp' ? 1.7 : 1.25;
-    var sd = function(y){ return sideAt(L.C, y, sg); }, g = o.crown ? .15 : postGeom(type, o).gy(sg), inX = o.crown ? sd(g) - sg * (o.crown + .2) : postGeom(type, o).axX(sg);
-    var bot = Math.max(.08, g - 1.6), outer = sideArc(L, sg, bot, g + .1).reverse();
-    return [outer.concat(dense([outer[outer.length - 1], [sd(bot + .1) - sg * .3, bot + .05], [sd(g - .45) - sg * (deep + .2), g - .45], [inX + sg * .15, g - .1], [inX - sg * .12 * deep, g + .45], [inX + sg * .25, g + .75], outer[0]], false, 4).slice(1, -1))];
+    o = o || {}; var sg = String(surface).toUpperCase() === 'M' ? -1 : 1, d = XT[type], L = crownLoop(d, o.per), h = d.ch;
+    var ant = POS.indexOf(type.slice(3)) <= 2, sd = function(y){ return sideAt(L.C, y, sg); }, g, ax;
+    if(ant){ g = h * (o.inc ? .45 : .32); ax = sd(g + .3) - sg * .95; }
+    else { var G = postGeom(type, o); g = G.gy(sg); ax = G.axX(sg); }
+    var w = Math.abs(sd(g) - ax), q = function(y, f){ return sd(y) - sg * f; }, bot, top, inner;
+    if(depth === 'enamel'){ bot = g - .6; top = g + .5; inner = [[q(g - .42, .2), g - .42], [q(g - .1, .42), g - .1], [q(g, w * .4), g + .1], [q(top, w * .4), top]]; }
+    else if(depth === 'pulp'){ bot = g - 1.45; top = g + 1.5; inner = [[q(g - 1.2, .3), g - 1.25], [q(g, w * .6), g - 1.1], [ax - sg * .4, g - .7], [ax - sg * .9, g - .1], [ax - sg, g + .6], [ax - sg * .5, g + 1.2], [ax + sg * .2, top]]; }
+    else { bot = g - 1.15; top = g + .9; inner = [[q(g - .9, .25), g - .95], [q(g, w * .55), g - .8], [ax - sg * .15, g - .5], [ax - sg * .35, g], [ax - sg * .25, g + .5], [ax + sg * .2, top]]; }
+    bot = Math.max(.1, bot);
+    var outer = sideArc(L, sg, bot, top).reverse();
+    return [outer.concat(dense([outer[outer.length - 1]].concat(inner, [outer[0]]), false, 5).slice(1, -1))];
   }
   /* a full crown's preparation (Rosenstiel's reductions): the outline moved in by the axial reduction at the sides and the
      occlusal (incisal) one at the top, a shoulder or chamfer of `margin` mm at the cervical line, smoothed the way a

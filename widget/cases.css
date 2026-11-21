@@ -54,16 +54,17 @@
 .dc-film .xr-dot{fill:#f3f3f3}
 /* Patient Box v2 on a film: composite a little less radiopaque than enamel with a crisp edge; caries and a periapical lesion
    dark but not as dark as soft tissue (the lesion in three soft layers); a root-filled tooth's chamber filled with its core */
-.dc-film .xr-comp{fill:#d8d8d8}.dc-film .xr-comp-edge{fill:none;stroke:#e9e9e9;stroke-width:1.6;stroke-linejoin:round;opacity:.6}.dc-film .xr-core{fill:#dedede}
-/* Patient Box v2.1 on a film: crowns by material (gold and a PFM's coping as bright as metal; porcelain about enamel's; zirconia
-   nearly metal's, the preparation faint under it; lithium disilicate hardly more than dentin, outlined by its cement; a stainless
-   steel shell brightest at its edges), ceramic inlays and veneers, an open margin's gap, calculus, endodontic detail and fractures */
-.dc-film .xr-porc{fill:#d2d2d2}.dc-film .xr-zr{fill:#e6e6e6}.dc-film .xr-zr-in{fill:#d8d8d8;opacity:.9}
-.dc-film .xr-li{fill:#c3c3c3}.dc-film .xr-cement{fill:none;stroke:#e2e2e2;stroke-width:.9;stroke-linejoin:round}
+.dc-film .xr-comp{fill:#d8d8d8}.dc-film .xr-core{fill:#dedede}
+/* Patient Box v2.1 on a film: crowns by material (gold and a PFM's coping as bright as metal; porcelain a little under enamel's;
+   zirconia between enamel and metal, hiding the preparation almost entirely; lithium disilicate about enamel's, the preparation
+   and the pulp seen through it, outlined by its brighter resin cement; a stainless steel shell brightest at its edges), ceramic
+   inlays and veneers, an open margin's gap, calculus, endodontic detail and fractures */
+.dc-film .xr-porc{fill:#d2d2d2}.dc-film .xr-zr{fill:#f3f3f3}.dc-film .xr-zr-in{fill:#e9e9e9;opacity:.95}
+.dc-film .xr-li{fill:#dadada}.dc-film .xr-cement{fill:none;stroke:#f2f2f2;stroke-width:1.1;stroke-linejoin:round;stroke-linecap:round}
 .dc-film .xr-ssc{fill:#f4f4f4;opacity:.55}.dc-film .xr-ssc-rim{fill:none;stroke:#fbfbfb;stroke-width:1.6;stroke-linejoin:round}
-.dc-film .xr-cer{fill:#c9c9c9}.dc-film .xr-cer-edge{fill:none;stroke:#e4e4e4;stroke-width:1.3;stroke-linejoin:round}
+.dc-film .xr-cer{fill:#d2d2d2}
 .dc-film .xr-veneer{fill:#e4e4e4;opacity:.4}.dc-film .xr-gap{fill:#262626}
-.dc-film .xr-calc{fill:#dedede;stroke:#dedede;stroke-width:.3;stroke-linejoin:round}
+.dc-film .xr-calc{fill:#d2d2d2;stroke:#d2d2d2;stroke-width:.4;stroke-linejoin:round}
 .dc-film .xr-sealer{fill:#f2f2f2;opacity:.9}.dc-film .xr-void{fill:#5a5a5a}.dc-film .xr-file{fill:#fff;stroke:#fff;stroke-width:.4}
 .dc-film .xr-fiber{fill:#c2c2c2;stroke:#8e8e8e;stroke-width:.8;stroke-linejoin:round}
 .dc-film .xr-fade{fill:#3a3a3a;opacity:.32}.dc-film .xr-frac{fill:#1f1f1f;opacity:.92}.dc-film .xr-vrf{fill:#232323}
@@ -104,6 +105,7 @@
 .dc-okey .dc-ok{display:inline-flex;align-items:center;gap:4px;white-space:nowrap}
 .dc-okey .dc-oks{width:15px;height:15px;flex:none;display:block;overflow:visible}
 .dc-okey .dc-okey-t{flex-basis:100%}
+.dc-okey .dc-ok-t{white-space:normal}
 .dc-otext{font-size:.74rem;color:var(--ink-soft);margin-top:4px}.dc-otext summary{cursor:pointer;font-weight:600}.dc-otext p{margin:4px 0 0;line-height:1.4}
 /* the chart's drawn restorations by material */
 .dc-amalgam.dc-gold{fill:#d6a22a}.dc-amalgam.dc-comp{fill:#e6d6ae;stroke:#a89263;stroke-width:.7}
@@ -132,9 +134,9 @@
 .dc-view .io-r{stroke-width:.9;stroke-linejoin:round}.dc-view .io-r-amalgam{fill:#868b95;stroke:#5c6068}.dc-view .io-r-gold{fill:#d6a22a;stroke:#93701c}
 .dc-view .io-r-composite{fill:#efe3c3;stroke:#c8b483}.dc-view .io-r-ceramic{fill:#f3ecdb;stroke:#cbbf9f}.dc-view .io-r-faint{opacity:.55}
 .dc-view .dc-calc{fill:#d8c27e;stroke:#a88a3e;stroke-width:.7;stroke-linejoin:round}
-.dc-ow{--o-ceramic:#9d86d6}
-:root[data-theme="dark"] .dc-ow{--o-ceramic:#b9a4f0}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .dc-ow{--o-ceramic:#b9a4f0}}
+.dc-ow{--o-ceramic:#c3b4ef}
+:root[data-theme="dark"] .dc-ow{--o-ceramic:#d4c8fa}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .dc-ow{--o-ceramic:#d4c8fa}}
 .dc-ow .dc-osurf.dc-o-ceramic{fill:var(--o-ceramic)}.dc-ow .dc-osurf.dc-o-ven{stroke:var(--ink);stroke-width:1.6}
 .dc-ow .dc-o-hatch.dc-o-hatch-r{stroke:var(--o-caries);stroke-width:1.3;opacity:1}
 .dc-ow .dc-o-ind{fill:none;stroke:var(--ink);stroke-width:.9}
