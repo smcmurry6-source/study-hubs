@@ -3912,7 +3912,11 @@
       if (h && window.ResizeObserver) new ResizeObserver(fit).observe(h);
       document.addEventListener("sh:pref", function(){ setTimeout(fit, 30); });
     }
-    if (document.body) start(); else document.addEventListener("DOMContentLoaded", start);
+    /* in the next frame, not in the script that loads the widget: fit() measures the bar, and with v3.css just put in
+       that laid the whole page out inside this script (about 65 ms of its 190 on perf.js's slow phone, 2026-11-20); in a
+       frame the browser lays the page out once anyway (a tab opened in the background runs it when it's first shown) */
+    function soon(){ if (window.requestAnimationFrame) requestAnimationFrame(start); else start(); }
+    if (document.body) soon(); else document.addEventListener("DOMContentLoaded", soon);
   })();
   /* click analytics (widget/clicks.js): what people use, for improving each hub */
   /* the clicks and events go with question health's rows in one call (shAnalytics.send, migration_v82): widget/clicks.js

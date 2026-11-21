@@ -39,5 +39,26 @@ try {
   const st = hubStatus();
   for (const h of Object.keys(st).filter(h => st[h] === 'live' && isEngine(h) && !P.HUBS.includes(h))) { failed = true; console.error(`✗ sw.js: ${h} is a live hub on the engine and isn't in HUBS (its page and content wouldn't be kept for offline)`); }
 } catch (e) { failed = true; console.error('✗ sw.js: its lists could not be read: ' + e.message); }
-console.log(failed ? 'Syntax check failed' : `✓ ${pages.length} pages and the widget scripts parse`);
-process.exit(failed ? 1 : 0);
+/* the engine reads its big content files a few lines at a time (parseSteps in widget/hub.js): on every engine hub's files it
+   must build what JSON.parse builds, a line a step (a clock that runs out on every line) */
+const steps = [];
+try {
+  const src = fs.readFileSync(path.join(root, 'widget/hub.js'), 'utf8'), at = src.indexOf('  function parseSteps(text, pace){'), end = src.indexOf('\n  }\n', at);
+  if (at < 0 || end < 0) throw new Error('widget/hub.js has no parseSteps(text, pace)');
+  const STEPPED = (src.match(/var STEPPED = (\{[^}]*\});/) || [])[1];
+  if (!STEPPED) throw new Error('widget/hub.js has no STEPPED list');
+  let t = 0;
+  const parseSteps = new Function('window', src.slice(at, end + 4) + '; return parseSteps;')({ performance: { now: () => (t += 20) } });
+  for (const h of fs.readdirSync(path.join(root, 'hubs'))) for (const f of Object.keys(JSON.parse(STEPPED))) {
+    const file = path.join(root, 'hubs', h, 'content', f); if (!fs.existsSync(file)) continue;
+    const text = fs.readFileSync(file, 'utf8'), want = JSON.stringify(JSON.parse(text));
+    steps.push(parseSteps(text, setImmediate).then(v => { if (JSON.stringify(v) !== want) { failed = true; console.error(`✗ hubs/${h}/content/${f}: parseSteps (widget/hub.js) doesn't build what JSON.parse does`); } },
+      e => { failed = true; console.error(`✗ hubs/${h}/content/${f}: parseSteps failed: ${e.message}`); }));
+  }
+  /* and a file laid out another way falls back to JSON.parse */
+  for (const x of ['{"a": [1, 2], "b": {"c": "d"}}', '{\n "a": {"x":\n 1}\n}', '[\n{"k": 1},\n{"k": 2}\n]', '{\n "a": 1,\n "a": 2\n}']) steps.push(parseSteps(x, setImmediate).then(v => { if (JSON.stringify(v) !== JSON.stringify(JSON.parse(x))) { failed = true; console.error(`✗ parseSteps (widget/hub.js) reads ${JSON.stringify(x)} differently from JSON.parse`); } }));
+} catch (e) { failed = true; console.error('✗ parseSteps: ' + e.message); }
+Promise.all(steps).then(() => {
+  console.log(failed ? 'Syntax check failed' : `✓ ${pages.length} pages and the widget scripts parse; parseSteps reads ${steps.length - 4} content files as JSON.parse does`);
+  process.exit(failed ? 1 : 0);
+});

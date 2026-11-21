@@ -653,18 +653,26 @@ paintMeters();
 if (d.kind === "handoff") HX.say(name ? "The " + name + "! A whole new climb." : "A whole new climb!", "do-hop");
 else if (d.kind === "dark") HX.say("Dark Matter. You earned that one.", "do-hop");
 });
+function put(n, html){ if (n._hxH !== html) { n.innerHTML = html; n._hxH = html; } }
 function paintMeters(){
 if (!HX.shell) return;
 var n = streakDays(), t = todayRec(), g = goal();
-$$("[data-streakm]").forEach(function(m){ m.innerHTML = flame(n) + '<span class="num" aria-hidden="true">' + (n ? n + '<span class="fold"> ' + (n === 1 ? "day" : "days") + "</span>" : '<span class="fold">No streak</span><span class="unfold">0</span>') + '</span><span class="sr">' + (n ? pl(n, "day") + " in a row studied" : "No streak yet") + "</span>"; });
+$$("[data-streakm]").forEach(function(m){ put(m, flame(n) + '<span class="num" aria-hidden="true">' + (n ? n + '<span class="fold"> ' + (n === 1 ? "day" : "days") + "</span>" : '<span class="fold">No streak</span><span class="unfold">0</span>') + '</span><span class="sr">' + (n ? pl(n, "day") + " in a row studied" : "No streak yet") + "</span>"); });
 var dn = doneToday(t), what = t.k ? " questions and flashcards today" : " questions today";
-$$("[data-goalm]").forEach(function(m){ m.innerHTML = ring(dn, g) + '<span class="num" aria-hidden="true">' + Math.min(dn, 999) + '<span class="fold"> of </span><span class="unfold">/</span>' + g + '</span><span class="sr">' + Math.min(dn, 999) + " of " + g + what + "</span>"; });
+$$("[data-goalm]").forEach(function(m){ put(m, ring(dn, g) + '<span class="num" aria-hidden="true">' + Math.min(dn, 999) + '<span class="fold"> of </span><span class="unfold">/</span>' + g + '</span><span class="sr">' + Math.min(dn, 999) + " of " + g + what + "</span>"); });
 var x = rankXp(), rk = $("#hxRank"), chip = boostChip();
 var nm = rankName(), R = window.shRanks, jn = RANK.p && RANK.p.journey > 0 && R && R.JOURNEYS ? (R.JOURNEYS[RANK.p.journey | 0] || "") + " " : "";
 var nameHTML = jn.length > 1 && nm.indexOf(jn) === 0 ? '<span class="jn">' + esc(jn) + "</span>" + esc(nm.slice(jn.length)) : esc(nm);
-if (rk) rk.innerHTML = '<span class="hp" aria-hidden="true">' + rankArt() + '</span><span class="sr">Your rank: </span><b>' + nameHTML + '</b><span class="sr">, </span><span class="xpn num"><span data-xp>' + (x === null ? "+" + fmt(t.xp) : fmt(x)) + "</span> XP" + (x === null ? " today" : "") + '</span><span class="sr">. </span>' + chip + '<span class="sr">Open your stats</span>';
-$$("[data-xpm]").forEach(function(m){ m.innerHTML = artSvg(A.xp || "", "0 0 24 24", "xpi") + '<span class="num"><span data-xp>' + (x === null ? "+" + fmt(t.xp) : fmt(x)) + '</span><span class="fold-xp"> XP</span></span>' + (boostShown ? '<i class="x2" aria-hidden="true">2x</i><span class="sr">Double XP is on</span>' : ""); });
-$$("[data-today]").forEach(function(p){ p.outerHTML = todayPanel(); });
+if (rk) put(rk, '<span class="hp" aria-hidden="true">' + rankArt() + '</span><span class="sr">Your rank: </span><b>' + nameHTML + '</b><span class="sr">, </span><span class="xpn num"><span data-xp>' + (x === null ? "+" + fmt(t.xp) : fmt(x)) + "</span> XP" + (x === null ? " today" : "") + '</span><span class="sr">. </span>' + chip + '<span class="sr">Open your stats</span>');
+$$("[data-xpm]").forEach(function(m){ put(m, artSvg(A.xp || "", "0 0 24 24", "xpi") + '<span class="num"><span data-xp>' + (x === null ? "+" + fmt(t.xp) : fmt(x)) + '</span><span class="fold-xp"> XP</span></span>' + (boostShown ? '<i class="x2" aria-hidden="true">2x</i><span class="sr">Double XP is on</span>' : "")); });
+var tp = null;
+$$("[data-today]").forEach(function(p){
+if (tp === null) tp = todayPanel();
+if (p._hxH === tp) return;
+var t = document.createElement("template"); t.innerHTML = tp; var nw = t.content.firstElementChild;
+if (!nw) { p.outerHTML = tp; return; }
+nw._hxH = tp; p.replaceWith(nw);
+});
 fitSoon();
 $$("[data-rankart]").forEach(function(n){ n.innerHTML = rankArt(+n.getAttribute("data-rankart") || 30); });
 paintLive();
@@ -1997,8 +2005,42 @@ var CORE = null, QS = null, QBY = {}, QBL = {}, LECS = [], LBY = {}, GROUPS = nu
 var EXAM = null, EXAM_LECS = {}, REVIEW = {};
 var memo = {};
 function getJSON(name){
-return memo[name] || (memo[name] = fetch(BASE + name).then(function(r){ if (!r.ok) throw new Error(name + " " + r.status); return r.json(); })
+return memo[name] || (memo[name] = fetch(BASE + name).then(function(r){ if (!r.ok) throw new Error(name + " " + r.status); return STEPPED[name] ? r.text().then(function(t){ return parseSteps(t); }) : r.json(); })
 .catch(function(e){ delete memo[name]; throw e; }));
+}
+var STEPPED = { "notes.json": 1, "questions.json": 1, "variants.json": 1 };
+function parseSteps(text, pace){
+pace = pace || function(f){ setTimeout(f, 0); };
+var P = window.performance, now = P && P.now ? function(){ return P.now(); } : Date.now;
+return new Promise(function(done, fail){
+var at = 0, stack = [], root, have = false, KEY = /^"((?:[^"\\]|\\.)*)"\s*:\s*/;
+function put(v, k){
+var top = stack[stack.length - 1];
+if (!top) { if (have) throw 0; root = v; have = true; return; }
+if (Array.isArray(top.v)) { if (k !== null) throw 0; top.v.push(v); }
+else { if (k === null || k === "__proto__" || Object.prototype.hasOwnProperty.call(top.v, k)) throw 0; top.v[k] = v; }
+}
+function whole(){ try { done(JSON.parse(text)); } catch (e) { fail(e); } }
+function step(){
+var end = now() + 15;
+try {
+for (var first = at; at < text.length;) {
+if (at > first && now() > end) { pace(step); return; }
+var nl = text.indexOf("\n", at); if (nl < 0) nl = text.length;
+var t = text.slice(at, nl).trim(); at = nl + 1; if (!t) continue;
+if (t.charAt(t.length - 1) === ",") t = t.slice(0, -1);
+var k = null, top = stack[stack.length - 1], m = top && !Array.isArray(top.v) && KEY.exec(t);
+if (m) { k = JSON.parse('"' + m[1] + '"'); t = t.slice(m[0].length); }
+if (t === "{" || t === "[") { if (have && !stack.length) throw 0; stack.push({ v: t === "{" ? {} : [], k: k }); continue; }
+if ((t === "}" || t === "]") && k === null) { var c = stack.pop(); if (!c || (t === "]") !== Array.isArray(c.v)) throw 0; put(c.v, c.k); continue; }
+put(JSON.parse(t), k);
+}
+if (stack.length || !have) throw 0;
+} catch (e) { whole(); return; }
+done(root);
+}
+pace(step);
+});
 }
 function loadScript(src){
 return memo[src] || (memo[src] = new Promise(function(res, rej){
@@ -2210,14 +2252,37 @@ var all = {}; try { all = JSON.parse(ls("sh_srs_" + HUB) || "{}") || {}; } catch
 var y = day(-1); return Object.keys(all).filter(function(id){ var r = all[id]; return r && r.t === y && !r.b && QBL[(IDX.filter(function(x){ return x.id === id; })[0] || {}).lec]; });
 }
 var homeTimer = 0;
-function renderHome(el){
-clearInterval(homeTimer);
+function wireHome(root){
+$$("[data-cardsdue]", root).forEach(function(a){ a.addEventListener("click", function(){ HX.bankReset(); HX.bankSearch = ""; STATE.ui.qview = "cards"; saveState(); track("home:cards-due"); }); });
+$$("[data-home-practice]", root).forEach(function(a){ a.addEventListener("click", function(){ var ex = LECS.filter(function(l){ return isExamLec(l.id); }).map(function(l){ return l.id; }); HX.bankReset(); STATE.ui.qlec = ex.length ? HX.lecValue(ex) : "all"; STATE.ui.qstatus = "unseen"; HX.bankSearch = ""; saveState(); }); });
+}
+var HOME_HP = null, HP = null;
+function hp(k, html){ if (HP) HP[k] = html; return html; }
+function refreshHome(el){
+var page = el && el.firstElementChild, was = HOME_HP;
+if (!was || !page || page !== was.page) return route();
+renderHome(el, function(){
+var next = HOME_HP, keys = Object.keys(next.parts), live = {};
+if (keys.join("|") !== Object.keys(was.parts).join("|")) { HOME_HP = null; route(); return; }
+next.page = page;
+var changed = keys.filter(function(k){ return next.parts[k] !== was.parts[k]; });
+if (!changed.length) return;
+var t = document.createElement("template"), made = {};
+t.innerHTML = changed.map(function(k){ return next.parts[k]; }).join("");
+$$("[data-hp]", t.content).forEach(function(n){ made[n.getAttribute("data-hp")] = n; });
+$$("[data-hp]", page).forEach(function(n){ live[n.getAttribute("data-hp")] = n; });
+changed.forEach(function(k){ var o = live[k], n = made[k]; if (!o || !n) return; o.replaceWith(n); wireHome(n); });
+});
+}
+function renderHome(el, redraw){
+if (!redraw) clearInterval(homeTimer);
+HP = {};
 var X = Object.assign({}, C.home || {}, ((C.home || {}).byExam || {})[EXAM && EXAM.id] || {}), rows = LECS.map(lecProgress), fin = rows.filter(function(r){ return isExamLec(r.l.id); });
 var total = fin.reduce(function(n, r){ return n + r.total; }, 0), right = fin.reduce(function(n, r){ return n + r.right; }, 0);
 var left = IDX.filter(function(q){ return !ansOf(q.id) && isExamLec(q.lec); }).length;
 var cont = LBY[STATE.ui.lec] || LECS[0], d = EXAM ? calDays(EXAM.date) : null, M = AH.masthead || { body: "", label: "" };
 var mis = srsMisses().length, examWeek = d !== null && d >= 0 && d <= 7;
-var pod = CORE.podcast;
+var pod = CORE.podcast, today = HX.todayPanel();
 var q = function(href, ic, title, sub, cls){ return '<a class="ql' + (cls ? " " + cls : "") + '" href="' + href + '"' + (cls === "is-primary" ? " data-home-practice" : "") + ">" + icon(ic, 22) + "<span><b>" + esc(title) + "</b><small>" + esc(sub) + "</small></span></a>"; };
 var html = '<div class="hx-page home">' +
 '<div class="home-top">' +
@@ -2229,7 +2294,7 @@ var html = '<div class="hx-page home">' +
 '<p class="live-line" data-liveline></p>' +
 (X.chips ? '<p class="exam-facts">' + X.chips.map(esc).join(" · ") + "</p>" : "") +
 "</div>" +
-'<nav class="quick' + (pod ? " has-pod" : "") + '" aria-label="Start studying">' +
+hp("quick", '<nav class="quick' + (pod ? " has-pod" : "") + '" aria-label="Start studying" data-hp="quick">' +
 q("#questions", "questions", "Practice questions", pl(left, "question") + " for the exam you haven't tried", "is-primary") +
 q("#questions/drill", "drill", "Daily drill", "Misses and high-yield, a few minutes") +
 q("#notes/" + esc(cont.id), "notes", "Notes", lecLabel(cont) + " " + shortTitle(cont)) +
@@ -2237,21 +2302,23 @@ q("#questions/mock", "mock", "Mock exam", pl(HX.mockTotal(), "question") + ", ti
 q("#more/hints", "hints", hintsName(), courses() ? "What each course stressed most" : "What " + (X.prof || "the professor") + " said to know") +
 q("#more/cram", "cram", "Cram sheet", "Every lecture on one page") +
 (pod ? podMiniHTML(pod) : "") +
-"</nav>" +
+"</nav>") +
 (X.links && X.links.length ? '<nav class="quick-more" aria-label="More to do">' + X.links.map(function(l){ return q(l.href, l.icon || "arcade", l.title, l.sub || "", "ql-wide"); }).join("") + "</nav>" : "") +
 "</div>" +
 (X.notice ? '<p class="notice">' + icon("notes", 20) + "<span><b>" + esc(X.notice[0]) + "</b> " + esc(X.notice[1]) + "</span></p>" : "") +
 '<div class="home-grid">' +
-'<section class="panel next" aria-labelledby="hnH"><h2 id="hnH">Where to next</h2>' + nextHTML(rows, mis, examWeek) + "</section>" +
-HX.todayPanel() +
-'<section class="panel lecs" aria-labelledby="hlH"><h2 id="hlH">Your progress by lecture</h2><p class="note">How much of each lecture\'s bank you\'ve tried; the solid part is right on your latest try. ' + right + " of " + total + " for the exam right so far.</p>" + lecsHTML(fin.concat(rows.filter(function(r){ return !isExamLec(r.l.id); }))) + "</section>" +
+hp("next", '<section class="panel next" aria-labelledby="hnH" data-hp="next"><h2 id="hnH">Where to next</h2>' + nextHTML(rows, mis, examWeek) + "</section>") +
+today +
+'<section class="panel lecs" aria-labelledby="hlH"><h2 id="hlH">Your progress by lecture</h2>' + hp("lecs-note", '<p class="note" data-hp="lecs-note">How much of each lecture\'s bank you\'ve tried; the solid part is right on your latest try. ' + right + " of " + total + " for the exam right so far.</p>") + lecsHTML(fin.concat(rows.filter(function(r){ return !isExamLec(r.l.id); }))) + "</section>" +
 '<div class="home-side">' +
 '<section class="panel" aria-labelledby="htH"><h2 id="htH">Course timeline</h2>' + timelineHTML() + "</section>" +
 "</div>" +
 "</div></div>";
-el.innerHTML = html;
-$$("[data-cardsdue]", el).forEach(function(a){ a.addEventListener("click", function(){ HX.bankReset(); HX.bankSearch = ""; STATE.ui.qview = "cards"; saveState(); track("home:cards-due"); }); });
-$$("[data-home-practice]", el).forEach(function(a){ a.addEventListener("click", function(){ var ex = LECS.filter(function(l){ return isExamLec(l.id); }).map(function(l){ return l.id; }); HX.bankReset(); STATE.ui.qlec = ex.length ? HX.lecValue(ex) : "all"; STATE.ui.qstatus = "unseen"; HX.bankSearch = ""; saveState(); }); });
+HOME_HP = { parts: HP, page: null }; HP = null;
+if (redraw) return redraw();
+el.innerHTML = html; HOME_HP.page = el.firstElementChild;
+var tp = $("[data-today]", el); if (tp) tp._hxH = today;
+wireHome(el);
 paintLive();
 homeTimer = setInterval(function(){ var c = $("#hxCount"); if (!c || !c.isConnected || view !== "home") { clearInterval(homeTimer); return; } c.innerHTML = countHTML(); }, 30000);
 tip(el, "home", "Your daily goal is the ring in the bar: " + HX.goal() + " questions a day. The flame counts the days in a row you study. Change the goal in More, Settings.");
@@ -2285,9 +2352,9 @@ if (grp !== last) {
 var gt = GROUPS ? (GROUPS.filter(function(g){ return g.id === grp; })[0] || {}).title || "" : grp === "on" ? (X.onExam || "On the exam") : (X.offExam || "Earlier lectures");
 head = '<li class="grp' + (GROUPS ? " grp-c" : "") + '">' + esc(gt) + "</li>"; last = grp;
 }
-return head + '<li class="' + lc(r.l.id).trim() + '">' + lecBadge(r.l, "lb-s") + '<div class="lr-main"><p><b><span class="sr">' + esc(lecLabel(r.l)) + " · </span>" + esc(shortTitle(r.l)) + "</b>" + (isRead(r.l.id) ? ' <span class="read-tag">' + icon("check", 14) + "Notes done</span>" : "") + '</p><span class="bar" role="img" aria-label="' + r.tried + " of " + r.total + " tried, " + r.right + ' right"><i class="tried" style="width:' + tw + '%"></i><i class="right" style="width:' + rw + '%"></i></span>' +
+return head + hp("lec:" + r.l.id, '<li class="' + lc(r.l.id).trim() + '" data-hp="lec:' + esc(r.l.id) + '">' + lecBadge(r.l, "lb-s") + '<div class="lr-main"><p><b><span class="sr">' + esc(lecLabel(r.l)) + " · </span>" + esc(shortTitle(r.l)) + "</b>" + (isRead(r.l.id) ? ' <span class="read-tag">' + icon("check", 14) + "Notes done</span>" : "") + '</p><span class="bar" role="img" aria-label="' + r.tried + " of " + r.total + " tried, " + r.right + ' right"><i class="tried" style="width:' + tw + '%"></i><i class="right" style="width:' + rw + '%"></i></span>' +
 '<p class="note num">' + r.tried + " of " + r.total + " tried" + (r.pct !== null ? " · " + r.pct + "% of answers right" : "") + "</p></div>" +
-'<span class="lr-acts"><a class="btn btn-text" href="#notes/' + esc(r.l.id) + '" aria-label="Notes for ' + esc(lecLabel(r.l)) + (isRead(r.l.id) ? ", done" : "") + '">Notes</a><a class="btn btn-text" href="#questions" data-lecq="' + esc(r.l.id) + '" aria-label="Questions for ' + esc(lecLabel(r.l)) + '">Questions</a></span></li>';
+'<span class="lr-acts"><a class="btn btn-text" href="#notes/' + esc(r.l.id) + '" aria-label="Notes for ' + esc(lecLabel(r.l)) + (isRead(r.l.id) ? ", done" : "") + '">Notes</a><a class="btn btn-text" href="#questions" data-lecq="' + esc(r.l.id) + '" aria-label="Questions for ' + esc(lecLabel(r.l)) + '">Questions</a></span></li>');
 }).join("") + "</ul>";
 }
 function timelineHTML(){
@@ -3270,7 +3337,8 @@ else if (STATE.days.indexOf(d) === -1) { STATE.days.push(d); changed = true; }
 if (!changed) return;
 if (!ANSWERED) STATE.days.sort(); HX.achievements(true); saveNow(); HX.paintMeters();
 if (added) toast(pl(added, "question") + " from your other devices", "sync");
-if (Date.now() - LOADED < 8000 && (view === "home" || (view === "questions" && !HX.SESSION.n && !parse()[1] && !(document.activeElement && document.activeElement.matches("input, textarea"))))) route();
+if (Date.now() - LOADED < 8000 && view === "home") setTimeout(function(){ if (view === "home") refreshHome($('.hx-view[data-view="home"]')); }, 0);
+else if (Date.now() - LOADED < 8000 && view === "questions" && !HX.SESSION.n && !parse()[1] && !(document.activeElement && document.activeElement.matches("input, textarea"))) route();
 }
 };
 window.SH_DRILL = {
