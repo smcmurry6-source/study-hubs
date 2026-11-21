@@ -1,6 +1,6 @@
 // Browser smoke test + question-bank lint for every hub and the dashboard.
 // Class data (Supabase) is stubbed with empty results; nothing is written anywhere (tools/ci/no-leaks.js answers what a
-// closing page sends, which routing misses).
+// closing page sends, which routing misses, and its proxy refuses whatever still gets past: BUG-197).
 //   npm i --no-save playwright && npx playwright install chromium && node tools/ci/smoke.js
 const http = require('http'), fs = require('fs'), path = require('path'), crypto = require('crypto');
 const { chromium } = require(process.env.PLAYWRIGHT_PATH || 'playwright');
@@ -648,7 +648,8 @@ function lint(hub, A){
 
 (async () => {
   await new Promise(r => server.listening ? r() : server.on('listening', r));
-  const browser = await chromium.launch(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {});
+  /* behind tools/ci/no-leaks.js's refusing proxy: a request still in its route when a page closes goes on to the network (BUG-197) */
+  const browser = await noLeaks.launch(chromium, process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {});
   for (const vp of [{ width: 1366, height: 860 }, { width: 390, height: 844, isMobile: true }].filter(v => !PART || PART === (v.isMobile ? 'phone' : 'desktop'))) {
     const context = await browser.newContext({ viewport: { width: vp.width, height: vp.height }, isMobile: !!vp.isMobile, hasTouch: !!vp.isMobile, serviceWorkers: 'block' }); /* sw.js would bypass the lint hook */
     await stub(context);

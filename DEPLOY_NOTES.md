@@ -43,6 +43,12 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   archived hubs' tint lines left `widget/hub.css` (and Perio's darker ink), and `widget/eggs.js`'s VT323 fetch for pages
   without `shx`. The `shx` class stays (the preview's pill and the figure builds select it). Nothing students see, except the
   random name now following. `tools/release/xp.js` checks the flag; `tools/ci/quiet.js` passed.
+- **2026-11-21 (No test run can reach the class's data, BUG-197, Claude Code)** — `tools/ci/quiet.js`'s mock check still wrote
+  two question-health rows per run into Review of Systems (22 on the evening of 11-20). Found behind a recording proxy: a
+  request still waiting in a Playwright route when its page closes is sent on to the network, and the check closes its page
+  right after acting out a hidden one (whose keepalive `record_qh` flush was sometimes still in its route on a busy runner).
+  `tools/ci/no-leaks.js` now also launches the test browser behind a proxy that refuses everything off 127.0.0.1;
+  `quiet.js` and `smoke.js` use it. Test code only; nothing students see.
 - **2026-11-21 (A name changed on one linked device shows on the other, BUG-196, Claude Code)** — Sam: "When you change
   your name on one device it doesnt change on the other linked device. Its still saying 'welcome count plaqula'". Linked
   devices share one id, so the server already had the new name, but each device kept its own copy (`sh_display_name`) and
