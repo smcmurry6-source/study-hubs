@@ -64,6 +64,10 @@ change would). Run them locally before pushing; the smoke test needs Playwright
   closing flush does: without it every run wrote its clicks, events and question-health rows into the live hub
   (`tools/data-fixes/2026-11-19-test-runs.sql`). A test that leaves `navigator.webdriver` alone needs nothing: the widget
   sends nothing from an automated browser.
+  **And it launches its browser with `noLeaks.launch(chromium, options)`** (2026-11-21, BUG-197): a request still waiting in
+  a route when its page closes goes on to the network, past both the routes and the in-page guard (`quiet.js`'s mock check
+  wrote 22 question-health rows that way), so the browser goes through a proxy of `no-leaks.js`'s own that refuses
+  everything off 127.0.0.1 and prints how many it stopped.
 - **The workflows run on `ubuntu-latest` (Ubuntu 26.04) with Playwright 1.63.0** (2026-11-18). That day GitHub moved
   `ubuntu-latest` to 26.04, where the Playwright pinned then (1.56.1) refused to install a browser ("Playwright does not
   support chromium on ubuntu26.04-x64"), so for a few hours every workflow was pinned to `ubuntu-24.04`. 1.63.0 has all
