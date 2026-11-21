@@ -21,7 +21,7 @@ insert into public.shop_items (id, name, kind, rarity, price, season, gift, rank
   ('rank-modu-silver-yard', 'Silver instrument tray', 'yard', 'epic', 0, null, false, 10, false, 2020),
   ('rank-modu-gold-outfit', 'Gold crown and velvet cape', 'outfit', 'legendary', 0, null, false, 11, false, 2021),
   ('rank-modu-gold-yard', 'Golden dental chair', 'yard', 'legendary', 0, null, false, 11, false, 2022),
-  ('rank-modu-diamond-outfit', 'Crystal face shield and bur bandolier', 'outfit', 'legendary', 0, null, false, 12, false, 2023),
+  ('rank-modu-diamond-outfit', 'Crystal face shield and diamond bur', 'outfit', 'legendary', 0, null, false, 12, false, 2023),
   ('rank-modu-diamond-yard', 'Giant diamond bur', 'yard', 'legendary', 0, null, false, 12, false, 2024),
   ('rank-modu-dark-outfit', 'Nebula cape and ringed planet', 'outfit', 'legendary', 0, null, false, 13, false, 2025),
   ('rank-modu-dark-yard', 'Nebula in a bell jar', 'yard', 'legendary', 0, null, false, 13, false, 2026),

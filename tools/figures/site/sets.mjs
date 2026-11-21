@@ -96,7 +96,7 @@ export const RANKS = [
   { gtier: 9, rank: "ModuPro Bronze", outfit: ["rank-modu-bronze-outfit", "Foundry cap and casting tongs", E], yard: ["rank-modu-bronze-yard", "Bronze casting machine", E] },
   { gtier: 10, rank: "ModuPro Silver", outfit: ["rank-modu-silver-outfit", "Head mirror and scrub cap", E], yard: ["rank-modu-silver-yard", "Silver instrument tray", E] },
   { gtier: 11, rank: "ModuPro Gold", outfit: ["rank-modu-gold-outfit", "Gold crown and velvet cape", L], yard: ["rank-modu-gold-yard", "Golden dental chair", L] },
-  { gtier: 12, rank: "ModuPro Diamond", outfit: ["rank-modu-diamond-outfit", "Crystal face shield and bur bandolier", L], yard: ["rank-modu-diamond-yard", "Giant diamond bur", L] },
+  { gtier: 12, rank: "ModuPro Diamond", outfit: ["rank-modu-diamond-outfit", "Crystal face shield and diamond bur", L], yard: ["rank-modu-diamond-yard", "Giant diamond bur", L] },
   { gtier: 13, rank: "ModuPro Dark Matter", outfit: ["rank-modu-dark-outfit", "Nebula cape and ringed planet", L], yard: ["rank-modu-dark-yard", "Nebula in a bell jar", L] },
   /* the Loupes (gtier 14-20): light and sight. Timmy wears his loupes, so these outfits keep off his face */
   { gtier: 14, rank: "Loupes Stone", outfit: ["rank-loupes-stone-outfit", "Explorer's pith helmet", L], yard: ["rank-loupes-stone-yard", "Stone sundial", L] },

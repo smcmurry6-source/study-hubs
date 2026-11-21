@@ -836,14 +836,13 @@ export function pack(T){
       say: ["ModuPro Gold! A crown on a tooth. The other kind of crown.", "Long live the molars.", "A full gold crown takes less tooth away than most crowns. Royalty is efficient."]
     },
     "rank-modu-diamond-outfit": {
-      note: "A clear crystal face shield on a band, and a bandolier of diamond burs",
-      /* the bandolier is a leather strap across the gums, from his left shoulder down to his right, with five burs in its loops */
-      face: p("M38 124 L50 114 L166 172 L158 186 Z", "#5A3A2A", O3) + line("M44 121 L161 178", "#7A5238", 1.6) +
-        (function(){ var s = "", i, t, x, y; for (i = 0; i < 5; i++){ t = .14 + i * .18; x = 44 + t * 118; y = 119 + t * 59;
-          s += line("M" + f(x) + " " + f(y + 6) + " L" + f(x) + " " + f(y - 12), INK, 5) + line("M" + f(x) + " " + f(y + 6) + " L" + f(x) + " " + f(y - 12), GD.c, 2.6) +
-            p("M" + f(x - 4) + " " + f(y - 12) + " L" + f(x - 3.4) + " " + f(y - 24) + " Q" + f(x) + " " + f(y - 29) + " " + f(x + 3.4) + " " + f(y - 24) + " L" + f(x + 4) + " " + f(y - 12) + " Z", DI.c, O2) +
-            spots([[x - 1.4, y - 21, .9], [x + 1.4, y - 16, .9], [x - 1, y - 14, .7]], WHITE) +
-            p("M" + f(x - 6) + " " + f(y - 2) + " h12 v7 h-12 z", "#7A5238", thin); } return s; })(),
+      note: "A clear crystal face shield on a band, and a big diamond bur held up in his hand",
+      /* the bur stands up from his right hand: a steel shank with its latch notch, a gold ring, and a tapered head of diamond grit */
+      face: line("M172 150 L172 108", INK, 10) + line("M172 150 L172 108", STEEL.c, 6) + line("M170 146 V114", WHITE, 1.6) +
+        p("M167.6 142 h8.8 v6 h-8.8 z", STEEL.s, thin) + p("M165 104 h14 v8 h-14 z", GD.c, O3) + line("M167 106.6 h10", GD.h, 1.4) +
+        p("M164 104 L166 56 Q172 44 178 56 L180 104 Z", DI.c, O3) + '<path d="M172 46 Q178 50 178 56 L180 104 L173 104 Z" fill="' + DI.s + '" opacity=".6"/>' +
+        spots([[169, 98, 1.4], [175, 92, 1.3], [168, 86, 1.4], [174, 80, 1.3], [169, 72, 1.3], [174, 64, 1.2], [171, 92, 1], [176, 100, 1.1], [171, 58, 1]], WHITE) +
+        hi("M168 96 L169 62", 2, .7) + star4(184, 52, 5, WHITE) + star4(160, 70, 3.4, WHITE),
       /* a headband with a diamond, and a clear shield hanging from it in front of his face, its edge and shine showing it's there */
       top: '<path d="M44 58 Q100 42 156 58 L160 104 Q158 120 140 122 L60 122 Q42 120 40 104 Z" fill="#BFE9FF" fill-opacity=".28"/>' +
         '<path d="M44 58 Q100 42 156 58 L160 104 Q158 120 140 122 L60 122 Q42 120 40 104 Z" fill="none" stroke="' + DI.s + '" stroke-width="2.6"/>' +
