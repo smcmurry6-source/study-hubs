@@ -1,12 +1,12 @@
 ---
 type: task
-status: open
+status: done
 hub: boards
 created: 2026-11-03
 requested-by: Sam
 waiting-on: 
-agent: 
-pr: 
+agent: Claude Code
+pr: https://github.com/smcmurry6-source/study-hubs/pull/509 (into claude/boards-hub, merged 2026-11-20 as 468fec5)
 ---
 
 # Bring claude/boards-hub up to date with main
@@ -21,7 +21,7 @@ merge gets bigger.
 
 ## Context
 
-- Hub note: [boards](../hubs/boards.md). Rule: [github-is-the-source-of-truth](../rules/github-is-the-source-of-truth.md):
+- Hub note: [boards](../../hubs/boards.md). Rule: [github-is-the-source-of-truth](../../rules/github-is-the-source-of-truth.md):
   never take one side of a conflict wholesale without checking what the other side had.
 - A trial merge on 2026-11-03 conflicts in six files. Four conflict with or without the vault: `DEPLOY_NOTES.md`,
   `.gitignore`, `tools/ci/smoke.js` and `tools/ci/syntax.js`. Two come from the vault: `AGENTS.md` (both sides added
@@ -34,7 +34,7 @@ merge gets bigger.
 
 ## How to resolve each file
 
-- **`AGENTS.md`:** keep main's. The boards version's rules are in the [boards hub note](../hubs/boards.md) and
+- **`AGENTS.md`:** keep main's. The boards version's rules are in the [boards hub note](../../hubs/boards.md) and
   `vault/rules/`; diff the two once, and put anything still missing in the hub note, not in `AGENTS.md`.
 - **`CLAUDE.md`:** keep main's. The boards side's one change (a sentence about moving old change-log entries to
   `DEPLOY_HISTORY.md`) is moot: main's `CLAUDE.md` no longer loads the change log at all.
@@ -54,11 +54,11 @@ merge gets bigger.
 1. A branch from `claude/boards-hub` (Claude Code cloud sessions: your own `claude/...` branch).
 2. `git merge origin/main`: a merge, not a rebase (the boards branch is shared and other branches build on it).
    Resolve as above and search for conflict markers line-anchored (`^<<<<<<<`, `^=======$`, `^>>>>>>>`).
-3. Main's [High Likelihood rule](../rules/high-likelihood-topics.md) needs `LIKELY_TOPICS` in every hub. Have the
+3. Main's [High Likelihood rule](../../rules/high-likelihood-topics.md) needs `LIKELY_TOPICS` in every hub. Have the
    boards build (`src/boards/`, then `node tools/build-boards.js`) write `LIKELY_TOPICS = []` into the page, before
    `window.SH_EXPORT = {`, while no unit is published. A published unit then needs its topics like any lecture: ask
    Sam what should rank them for a board exam (the INBDE and ADEX content outlines' weights are the obvious evidence)
-   and add that call to [decisions](../decisions.md). Check the other rules main added since 2026-10-10 the same way
+   and add that call to [decisions](../../decisions.md). Check the other rules main added since 2026-10-10 the same way
    (Home page, filter panel, question formats): the smoke test names what's missing.
 4. Run `node tools/build-boards.js --check`, `node tools/ci/boards-plan.test.js`, `node tools/ci/syntax.js`,
    `node tools/ci/vault.js` and `node tools/ci/smoke.js`.
@@ -67,15 +67,42 @@ merge gets bigger.
 
 ## Done when
 
-- [ ] `claude/boards-hub` has main merged in, every conflicted file resolved as above
-- [ ] The boards page has `LIKELY_TOPICS` and the five checks pass
-- [ ] The boards hub note says the branch is up to date (with the date); this note's Outcome written and the note
+- [x] `claude/boards-hub` has main merged in, every conflicted file resolved as above
+- [x] The boards page has `LIKELY_TOPICS` and the five checks pass
+- [x] The boards hub note says the branch is up to date (with the date); this note's Outcome written and the note
   moved to `done/`
 
 ## Log
 
 - 2026-11-03: written with the vault PR, after a trial merge. Waiting on that PR.
 - 2026-11-04: the vault PR merged (Sam: "merge when ready"); ready for an agent.
+- 2026-11-20: done by a Claude Code session (Sam: "Keep the boards branch"). The branch was 649 commits behind.
 
 ## Outcome
+
+Done 2026-11-20 by a Claude Code session, in a PR into `claude/boards-hub` (`claude/boards-hub-catch-up`): `origin/main`
+(at #504) merged in, a merge commit, no rebase. The branch was **649 commits** behind main (the 272 of 2026-11-03 plus
+everything since). Eight files conflicted, each resolved as above:
+
+- `AGENTS.md`, `CLAUDE.md`, `DEPLOY_NOTES.md`: main's. The boards `AGENTS.md`'s rules were all already in the
+  [boards hub note](../../hubs/boards.md) or `vault/rules/`; nothing needed adding. All 32 `DEPLOY_HISTORY.md` entries were
+  in main's change log, so `DEPLOY_HISTORY.md` is deleted.
+- `.gitignore`: both blocks. `tools/retro.sql` (new since the trial): main's (its header no longer points at
+  `DEPLOY_HISTORY.md`).
+- `tools/ci/syntax.js`: main's, with `widget/timmy.js` and `widget/recap.js` added and the boards loop over
+  `hubs/<id>/game/*.js` at the end.
+- `.github/workflows/check.yml` (new since the trial): main's job layout, with the boards steps (`build-boards.js --check`,
+  `boards-plan.test.js`) in the check job.
+- `tools/ci/smoke.js`: **not the one-line merge the trial found.** Main's smoke test now walks only hubs on the engine
+  (the old single-file walk came out 2026-11-19/20), and the boards page is still one page generated by
+  `tools/build-boards.js`. So: main's file, plus the boards lint (`lintBoards`, the `l.audio === false` skip) and a
+  separate walk for a hub without `content/core.json` (every mode and sub-tab, the bank lint through `window.__CI`, which
+  now carries `CASES`, `READINGS_DEEP` and `LIKELY_TOPICS`).
+
+`tools/build-boards.js` writes `var LIKELY_TOPICS = [];` into the page (no unit is published yet). Checks, all passed:
+`build-boards.js --check`, `boards-plan.test.js` (12), `syntax.js`, `vault.js`, `smoke.js --all` (boards walked on
+desktop and phone, 14 screens each), plus the bundle and hub-next `--check` builds and `secrets.js`.
+
+The 16 open PRs into `claude/boards-hub` (#81-#111) were left open (Sam, 2026-11-20); none of their work was on the
+branch. Each now needs `claude/boards-hub` merged in and `node tools/build-boards.js` rerun: the inbox line on that.
 
