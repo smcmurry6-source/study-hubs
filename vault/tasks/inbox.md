@@ -33,9 +33,10 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   After Mock 1 (Thu Dec 3, noon), read its exam check-ins (which courses felt heavy, what surprised people) and, before Mock 2
   (Dec 10), move the blueprint toward that, and add High likelihood topics for what the check-ins say came up
   ([hub note](../hubs/review-of-systems.md)).
-- [ ] **Review of Systems: an arcade with its own skin** (2026-11-19, the hub's build): it shipped without one (More hides
+- [ ] ~~**Review of Systems: an arcade with its own skin** (2026-11-19, the hub's build): it shipped without one (More hides
   the tile). Sam's call whether it wants one; if so, its games, names and lobby art are its own
-  ([arcade-skins](../rules/arcade-skins.md)), and the hub comes out of `TEXT_ONLY` in `sw.js`.
+  ([arcade-skins](../rules/arcade-skins.md)), and the hub comes out of `TEXT_ONLY` in `sw.js`.~~ dropped: Sam, 2026-11-20, "No
+  arcade" ([decisions](../decisions.md)).
 - [x] **The engine's background work after Home in small pieces** (2026-11-20, [#480](https://github.com/smcmurry6-source/study-hubs/pull/480)):
   on the performance suite's slowed phone, Review of Systems blocks the page for about 850 ms after Home has drawn (Heme & Endo
   Exam 3: about 330). A CPU profile put the JavaScript in `exportSections()` in `widget/hub.js` (every part's notes parsed into
@@ -44,7 +45,8 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   cut it on every hub; then lower the hub's `tbt` in `tools/release/budgets.json` (set to 900 from that day's run). Done (#498): the index is built a lecture at a time, `widget/fx.js` measures every bar before animating any (the biggest share, about 370 ms: not in the first profile), `fit()` reads before it writes, the rank pill is fitted once a frame, `fmt()` keeps one formatter. Review of Systems about 920 to 490 ms, `tbt` 900 to 700; Heme & Endo Exam 3 about 430 to 230.
 - [ ] **Review of Systems: Cardio & Respiratory and Renal from their slides** (2026-11-19, the hub's build): their Drive
   folders had the thinnest sources (classmates' guides, no professor slides), so those sections rest most on standard
-  references. If Sam can share their slides or transcripts, check those parts against them.
+  references. If Sam can share their slides or transcripts, check those parts against them. Sam, 2026-11-20: "ill get you the other
+  slides soon": waiting on Sam.
 - [ ] **Run the test-runs data fix once more on 2026-11-21** (2026-11-19, the evening lessons audit): the PR that adds
   `tools/ci/no-leaks.js` runs `tools/data-fixes/2026-11-19-test-runs.sql` after its merge, but a smoke test run locally from a
   branch older than the fix (another session's) still writes its game-layer check into the live hub until that branch takes
@@ -142,7 +144,8 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   he cited R1.3 with "≥10 cigarettes/day", which is in the table, but `quoteIn` wants at least three words or the whole unit, so
   the link was dropped and the eval failed. Either accept a whole table cell (the text between two ` · `) as a quote, or say in
   `RULES` that a table quote takes the row's label with it.
-- [ ] **Review of Systems' a11y screens have no baseline entries** (2026-11-20, seen running a11y.js for #494): `tools/release/a11y.js` lists its five screens (home, notes, questions, more, dark) as "not in the baseline yet", so only a serious or critical issue there fails. All five were at 0 axe nodes: add them to `tools/release/baselines/a11y.json` at 0 (by hand, or `--update --hub review-of-systems`).
+- [x] **Review of Systems' a11y screens have no baseline entries** (2026-11-20, seen running a11y.js for #494): `tools/release/a11y.js` lists its five screens (home, notes, questions, more, dark) as "not in the baseline yet", so only a serious or critical issue there fails. All five were at 0 axe nodes: add them to `tools/release/baselines/a11y.json` at 0 (by hand, or `--update --hub review-of-systems`). Done by #503, which renamed Exam 3's entries to Review of Systems' (home, notes, questions, more, dark, all at 0); found and ticked in #506.
+- [ ] **The a11y baseline still lists Perio's five screens** (2026-11-20, seen in #506): `perio · home`, `notes`, `questions`, `more` and `perio (dark)` in `tools/release/baselines/a11y.json`, and `--hub perio` in `tools/release/a11y.js`'s usage line, though Perio's page came down 2026-11-19. Harmless (a screen not run isn't compared), but take them out and point the usage line at `review-of-systems`.
 - [ ] **A "Delete my data" button, only if Sam asks** (2026-11-04, left unticked in [the retention task](done/2026-11-04-analytics-retention.md),
   moved here 2026-11-20): a button in Settings that deletes every row for this browser's id, and the id shown in Stats so a
   deletion request can be honored ([analytics-retention](../reference/analytics-retention.md)). Not asked for; build it only
