@@ -252,7 +252,9 @@
       stopTimer(); S.view = "board";
       var n = S.cols.length, h = (K.bg ? '<div class="sg-stage" style="background-image:url(&quot;' + esc(K.bg) + '&quot;)">' : "") +
         '<div class="sg-board" style="grid-template-columns:repeat(' + n + ',minmax(0,1fr))">';
-      S.cols.forEach(function(c){ h += '<div class="sg-cat">' + esc(c.name) + "</div>"; });
+      /* a lecture's column reads "L18 · Estrogens": on a small phone only its tag shows (the full name stays as its title) */
+      S.cols.forEach(function(c){ var nm = String(c.name), at = nm.indexOf(" · ");
+        h += '<div class="sg-cat" title="' + esc(nm) + '">' + (at > 0 && at < 8 ? '<span class="sg-cat-tag">' + esc(nm.slice(0, at)) + '</span><span class="sg-cat-rest"> · ' + esc(nm.slice(at + 3)) + "</span>" : esc(nm)) + "</div>"; });
       for (var r = 0; r < 5; r++) for (var ci = 0; ci < n; ci++){
         var t = S.tiles[ci][r];
         h += t.done ? '<div class="sg-tile done ' + (t.ok ? "ok" : "bad") + '" aria-label="answered"><span>' + (t.ok ? "✓" : "✗") + "</span></div>"
