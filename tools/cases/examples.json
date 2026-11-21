@@ -1,5 +1,5 @@
 {
-  "about": "Patient Box v2's example cases: made-up patients assembled from modules, checked by node tools/ci/cases.js like a hub's (every module, view and check runs on them) and drawn for the screenshots in its PR. Not on any page. A new hub copies one into its content/core.json's pcases (vault/how-to/draw-a-patient-box-case.md).",
+  "about": "Patient Box v2's example cases (v2.1 added the bridge-and-post and the trauma cases): made-up patients assembled from modules, checked by node tools/ci/cases.js like a hub's (every module, view and check runs on them) and drawn for the screenshots in its PR. Not on any page. A new hub copies one into its content/core.json's pcases (vault/how-to/draw-a-patient-box-case.md).",
   "pcases": {
     "v2-full-mouth": {
       "title": "Full mouth, first visit",
@@ -44,6 +44,37 @@
       },
       "figs": [{ "kind": "chart" }, { "kind": "film" }, { "kind": "bitewing", "teeth": ["12", "13", "14", "15", "21", "20", "19", "18"] }],
       "expect": { "kind": "periodontitis", "stage": 3, "grade": "B", "extent": "localized" }
+    },
+    "v21-bridge-post": {
+      "title": "Lower right: a bridge and a post",
+      "spec": {
+        "teeth": ["28", "29", "30", "31"], "age": 58, "sex": "man", "smoke": 0, "hba1c": 5.4, "mouth": { "teeth": 26, "involved": 5, "lost": 0 },
+        "cc": "Food gets stuck under my bridge.",
+        "modules": [
+          { "m": "missing", "teeth": ["30"] },
+          { "m": "bridge", "abutments": ["29", "31"], "material": "pfm" },
+          { "m": "endo", "tooth": "29", "fill": "adequate", "post": "cast" },
+          { "m": "restoration", "tooth": "28", "surfaces": "DO", "material": "amalgam", "overhang": "d" },
+          { "m": "bone", "teeth": ["28", "29"], "percent": { "28": 28, "29": 30 }, "rec": 1 },
+          { "m": "bone", "teeth": ["31"], "percent": 22 },
+          { "m": "bop", "rate": 0.3 }
+        ]
+      },
+      "figs": [{ "kind": "chart" }, { "kind": "film" }, { "kind": "view" }],
+      "expect": { "kind": "periodontitis", "stage": 2, "grade": "B", "extent": "localized" }
+    },
+    "v21-trauma": {
+      "title": "Upper front teeth after a fall",
+      "spec": {
+        "teeth": ["7", "8", "9", "10"], "age": 23, "sex": "woman", "smoke": 0,
+        "cc": "I fell off my bike yesterday and chipped my front tooth.",
+        "modules": [
+          { "m": "fracture", "tooth": "8", "type": "crown", "depth": "dentin", "side": "m" },
+          { "m": "fracture", "tooth": "9", "type": "hrf", "at": "middle" }
+        ]
+      },
+      "figs": [{ "kind": "film" }, { "kind": "view" }],
+      "expect": { "kind": "health" }
     }
   },
   "questions": [
@@ -52,6 +83,22 @@
       "choices": ["Generalized Stage 3 Grade C", "Localized Stage 2 Grade B", "Generalized Stage 2 Grade C", "Localized Stage 3 Grade A"], "answer": 0,
       "why": ["Stage 3: the 3 mm vertical defect on #30's mesial raises it; Grade C: he smokes 12 cigarettes a day; generalized: 13 of 27 teeth.", "", "", ""] },
     { "id": "v2-ex-2", "pcase": "v2-molar-furcation", "rests": ["furc", "stage"], "pfig": [{ "kind": "chart", "hide": { "furc": true } }, { "kind": "film" }],
-      "stem": "What does #14's film show between its roots?", "choices": ["Furcation involvement", "Nothing unusual"], "answer": 0, "why": ["", ""] }
+      "stem": "What does #14's film show between its roots?", "choices": ["Furcation involvement", "Nothing unusual"], "answer": 0, "why": ["", ""] },
+    { "id": "v21-ex-3", "pcase": "v21-bridge-post", "rests": ["resto", "endo"], "says": { "maxRBL": 30 }, "pfig": [{ "kind": "film" }],
+      "stem": "#29 is the front abutment of a three-unit bridge. On the film, what holds the core under its crown?", "choices": ["A cast post and core", "A fiber post", "No post: a core buildup alone", "A separated instrument"], "answer": 0,
+      "why": [
+        "Right: a tapered post as bright as the crown's metal runs from the core down the canal, one piece with the core, inside a root canal filling that ends about 1 mm short of the apex. That is a cast post and core. (The bone at #29 is down about 30% of the root: the periodontal side of the case.)",
+        "A fiber post is only a little more radiopaque than dentin, so it shows as a faint gray band in the canal, not a post as bright as metal.",
+        "A core buildup alone stays in the chamber and the coronal dentin; here something radiopaque reaches well into the root.",
+        "A separated instrument is a short, thin bright line in the apical third of a canal, not a wide post that starts at the core."
+      ] },
+    { "id": "v21-ex-4", "pcase": "v21-trauma", "rests": ["fracture"], "says": { "kind": "health" },
+      "stem": "A 23-year-old fell off her bike yesterday. What does #9's film show?", "choices": ["A horizontal root fracture", "A vertical root fracture", "A crown fracture into dentin", "No injury"], "answer": 0,
+      "why": [
+        "Right: a thin dark line crosses #9's root at about its middle, with the root intact on either side of it. Her gums and bone are in health, so the injury is the whole finding.",
+        "A vertical root fracture runs along the root's length (often a J-shaped radiolucency beside a treated root) and is rare in an untreated young tooth; this line runs across the root.",
+        "The crown fracture into dentin is #8's: its mesioincisal corner is gone. #9's crown is whole.",
+        "The dark line across #9's root is a fracture; it is not part of normal anatomy."
+      ] }
   ]
 }

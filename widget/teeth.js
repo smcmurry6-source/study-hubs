@@ -23,7 +23,14 @@
    8 mm from the CEJ; the crest about 1.5-2 mm below the CEJ in health); White and Pharoah's Oral Radiology (which films
    show which teeth: bitewings for the posterior teeth, a maxillary premolar's furcation rarely seen on a film; how caries and
    restorations look on a film); Sturdevant's Art and Science of Operative Dentistry (preparation outlines by
-   class: the proximal box's gingival floor and axial wall, the Class III, IV and V outlines).
+   class: the proximal box's gingival floor and axial wall, the Class III, IV and V outlines, rounded internal line angles,
+   inlay and onlay walls and cusp reduction). Patient Box v2.1 (2026-11-21) adds restoParts (a restoration's outline, with an
+   overhang or an open margin), recurMM (recurrent caries under a margin), prepMM and PREP (a crown's preparation by material:
+   margin width, axial and occlusal reduction, for gold, PFM, zirconia, lithium disilicate and stainless steel crowns),
+   ponticMM (a pontic's outline, ridge lap) and the curve helpers (crownLoop, onSide, sideArc, overArc, fillet, shrink):
+   restorations follow the crown's own outer surface, so a filling meets it exactly. Its sources: Rosenstiel, Land and
+   Fujimoto's Contemporary Fixed Prosthodontics (reduction and margins by crown material, posts and cores, pontic design);
+   Cohen's Pathways of the Pulp (fill length and quality, post space, separated instruments, cracked teeth and root fractures).
    Everything drawn from it is original SVG. CI: node tools/ci/cases.js. */
 (function(){
   'use strict';
@@ -208,12 +215,22 @@
   }
 
   /* ---------- restorations and caries on a tooth, by surface (mm: mesial at -x, the cervix at y = 0, the crown toward +y) ----------
-     What a film shows of them (White and Pharoah; preparation outlines after Sturdevant's): an occlusal (Class I) restoration
-     sits in the middle of the crown under the cusps, short of both marginal ridges; a proximal (Class II) one adds a box that
-     restores the marginal ridge and the contact and stops at a gingival floor about 2.4 mm cervical to the contact, its axial
-     wall about 1.7 mm in; MOD has both boxes; an occlusal-facial one a narrow extension down the buccal groove; a facial or
-     lingual (Class V) one an oval over the cervical third; on an incisor or canine a proximal (Class III) one sits at the
-     contact, and with the incisal edge (Class IV) it takes the incisal angle. */
+     What a film shows of them (White and Pharoah; preparation outlines after Sturdevant's). Patient Box v2.1 (Sam, 2026-11-21:
+     "when theres a filling, the lines dont look clean and accurate") draws each one from the crown's own dense outline, so a
+     restoration meets the tooth's surface exactly, with no gap and no overshoot:
+     - occlusal (Class I): in the middle of the crown, its walls about 2 mm in from the proximal surfaces (the marginal ridges
+       kept), slightly divergent toward the occlusal, a flat pulpal floor about 1.9 mm under the marginal ridges, its top the
+       central fossa running under the cusp tips (the cusps of both sides still project over it);
+     - proximal (Class II): a box whose outer edge is the proximal surface itself, from a flat gingival floor about 2.8 mm under
+       the contact up to the marginal ridge, its axial wall about 1.5 mm (molar) or 1.3 mm (premolar) in; MOD has both;
+     - occlusal-facial or -lingual: a narrow extension down the groove; facial or lingual alone (Class V): a rounded band over
+       the cervical third whose lower edge follows the cervical line;
+     - incisor or canine: proximal (Class III) a rounded shape at the contact, its outer edge the proximal surface; with the
+       incisal edge (Class IV) it takes the incisal angle, its inner edge an oblique bevel; incisal alone a band;
+     - inlay (gold or ceramic): Class II's outline with walls that diverge occlusally (it is drawn out of its preparation);
+       onlay: the boxes plus every cusp, reduced about 1.8 mm along their own inclines; veneer: a shell over the labial face,
+       short of the cervical line, to the incisal edge.
+     Internal line angles are rounded (r 0.3 mm; composite 0.45, a rounder, more conservative preparation). */
   function sideAt(pts, y, sg){
     var best = null;
     for(var i = 0; i < pts.length; i++){ var a = pts[i], b = pts[(i + 1) % pts.length];
@@ -231,62 +248,201 @@
     return best == null ? 0 : best;
   }
   function ellipseMM(cx, cy, rx, ry){ var p = []; for(var i = 0; i < 18; i++){ var a = i / 18 * Math.PI * 2; p.push([cx + Math.cos(a) * rx, cy + Math.sin(a) * ry]); } return p; }
-  function crownLoop(d){ var C = dense(crownMM(d), true, 6), v = d.cv / 2, iv = 0;
+  /* the crown's outline as the films draw it (per points a span) and iv, the index of its distal cervical corner: C[0..iv] is
+     the outer surface from the mesial cervical corner over the crown to the distal one; the rest is the cervical line */
+  function crownLoop(d, per){ var C = dense(crownMM(d), true, per || 6), v = d.cv / 2, iv = 0;
     C.forEach(function(p, i){ if(Math.abs(p[0] - v) + Math.abs(p[1]) < Math.abs(C[iv][0] - v) + Math.abs(C[iv][1])) iv = i; });
-    return { C:C, iv:iv }; }
-  /* the outline of one side (sg -1 mesial, +1 distal), walking up from height y0, each point moved o.inset mm into the
-     tooth; it stops once it has turned o.inward mm in from the contact's bulge, above o.yMax, or at the crown's top (unless
-     o.pastTop: a Class IV runs on along the incisal edge) */
-  function sideWalk(L, d, sg, y0, o){
-    var C = L.C, n = C.length, i = sg < 0 ? 0 : L.iv, step = sg < 0 ? 1 : -1, xc = null, out = [], seen = 0, inset = o.inset || 0;
-    C.forEach(function(p){ if(p[1] > y0 && p[1] < d.ch * .9 && sg * p[0] > 0 && (xc == null || sg * (p[0] - xc) > 0)) xc = p[0]; });
-    for(var m = 0; m < n; m++, i = (i + step + n) % n){
-      var p = C[i]; if(p[1] <= y0) continue;
-      if(o.yMax != null && p[1] > o.yMax) break;
-      out.push([p[0] - sg * inset, p[1] - inset * .6]); seen++;
-      if((!o.pastTop && p[1] > d.ch * .97) || (o.inward != null && xc != null && seen > 2 && sg * (xc - p[0]) >= o.inward)) break;
-    }
+    return { C:C, iv:iv, d:d }; }
+  /* the point on the outer surface at height y on side sg (-1 mesial, +1 distal), found walking up from the cervical corner, and
+     the index of the first outline point past it toward the top */
+  function onSide(L, sg, y){
+    var C = L.C, i, a, b, t;
+    if(sg < 0){ for(i = 0; i < L.iv; i++){ a = C[i]; b = C[i + 1]; if(a[1] <= y && b[1] > y){ t = (y - a[1]) / (b[1] - a[1]); return { p:[a[0] + (b[0] - a[0]) * t, y], i:i + 1 }; } } return { p:C[L.iv >> 1].slice(), i:(L.iv >> 1) + 1 }; }
+    for(i = L.iv; i > 0; i--){ a = C[i]; b = C[i - 1]; if(a[1] <= y && b[1] > y){ t = (y - a[1]) / (b[1] - a[1]); return { p:[a[0] + (b[0] - a[0]) * t, y], i:i - 1 }; } }
+    return { p:C[L.iv >> 1].slice(), i:(L.iv >> 1) - 1 };
+  }
+  /* the outer surface, exactly: up one side from y0 to y1 (sideArc), or from the mesial side at ym over the crown and down to
+     the distal side at yd (overArc) */
+  function sideArc(L, sg, y0, y1){
+    var a = onSide(L, sg, y0), b = onSide(L, sg, y1), out = [a.p], j;
+    if(sg < 0) for(j = a.i; j < b.i; j++) out.push(L.C[j]); else for(j = a.i; j > b.i; j--) out.push(L.C[j]);
+    out.push(b.p); return out;
+  }
+  function overArc(L, ym, yd){ var a = onSide(L, -1, ym), b = onSide(L, 1, yd); return [a.p].concat(L.C.slice(a.i, b.i + 1), [b.p]); }
+  /* from the side point at height y0 on side sg, along the surface over the top until x reaches xEnd (a Class IV's incisal
+     reach), exactly on the outline */
+  function arcTo(L, sg, y0, xEnd){
+    var C = L.C, a = onSide(L, sg, y0), out = [a.p], j = a.i, n = C.length, prev = a.p;
+    for(var m = 0; m < n; m++, j += sg < 0 ? 1 : -1){ var p = C[(j + n) % n];
+      if((sg < 0 && p[0] >= xEnd) || (sg > 0 && p[0] <= xEnd)){ var t = (xEnd - prev[0]) / ((p[0] - prev[0]) || 1); out.push([xEnd, prev[1] + (p[1] - prev[1]) * t]); return out; }
+      out.push(p); prev = p; }
     return out;
   }
-  function restoMM(type, surfaces){
-    var d = XT[type], L = crownLoop(d), C = L.C, h = d.ch, s = String(surfaces || '').toUpperCase(), out = [];
-    var pos = POS.indexOf(type.slice(3)), ant = pos <= 2, molar = pos >= 5, ct = CONTACT[type];
-    var hasM = s.indexOf('M') >= 0, hasD = s.indexOf('D') >= 0, fac = /[BFL]/.test(s), side = function(y, sg){ return sideAt(C, y, sg); };
+  /* round the inside corners of an open chain (its two ends are kept, they sit on the outline): each corner becomes a
+     quadratic curve r mm long on either side */
+  function fillet(pts, r, n){
+    n = n || 5; var out = [pts[0]];
+    for(var i = 1; i < pts.length - 1; i++){ var p = pts[i], a = pts[i - 1], b = pts[i + 1];
+      var la = Math.hypot(a[0] - p[0], a[1] - p[1]), lb = Math.hypot(b[0] - p[0], b[1] - p[1]), rr = Math.min(r, la / 2, lb / 2);
+      if(rr < .01){ out.push(p); continue; }
+      var s = [p[0] + (a[0] - p[0]) / la * rr, p[1] + (a[1] - p[1]) / la * rr], e = [p[0] + (b[0] - p[0]) / lb * rr, p[1] + (b[1] - p[1]) / lb * rr];
+      for(var j = 0; j <= n; j++){ var t = j / n, u = 1 - t; out.push([u * u * s[0] + 2 * u * t * p[0] + t * t * e[0], u * u * s[1] + 2 * u * t * p[1] + t * t * e[1]]); } }
+    out.push(pts[pts.length - 1]); return out;
+  }
+  function filletClosed(pts, r){ var n = pts.length, ext = [pts[n - 1]].concat(pts, [pts[0]]); return fillet(ext, r).slice(1, -1); }
+  /* a closed chain's points moved toward (0, cy) by th(p) mm each, then smoothed (a preparation or a coping inside a crown) */
+  function shrink(pts, cy, th, passes){
+    var out = pts.map(function(p){ var dx = -p[0], dy = cy - p[1], l = Math.hypot(dx, dy) || 1, t = th(p); return [p[0] + dx / l * t, p[1] + dy / l * t]; });
+    for(var k = 0; k < (passes == null ? 3 : passes); k++) out = out.map(function(p, i){ if(i === 0 || i === out.length - 1) return p; var a = out[i - 1], b = out[i + 1]; return [(a[0] + 2 * p[0] + b[0]) / 4, (a[1] + 2 * p[1] + b[1]) / 4]; });
+    return out;
+  }
+  /* the geometry a posterior restoration and the lesions beside it share */
+  function postGeom(type, o){
+    var d = XT[type], L = crownLoop(d, o && o.per), C = L.C, h = d.ch, molar = POS.indexOf(type.slice(3)) >= 5, ct = CONTACT[type];
+    var mr = molar ? 1.2 : 1.3, G = { d:d, L:L, C:C, h:h, molar:molar, yMR:h - mr };
+    G.pf = G.yMR - (molar ? 1.9 : 1.8);
+    G.ax = molar ? 1.5 : 1.3;
+    G.side = function(y, sg){ return sideAt(C, y, sg); };
+    G.gy = function(sg){ return Math.max(.9, ct[sg < 0 ? 0 : 1] * h - 2.8); };
+    G.axX = function(sg, y){ return G.side(G.gy(sg), sg) - sg * G.ax; };
+    G.oX = function(sg){ return G.side(G.yMR, sg) - sg * (molar ? 2.1 : 1.9); };
+    return G;
+  }
+  /* the central fossa from (x0, y0) to (x1, y1): a shallow curve a little deeper at its middle, kept under the outline */
+  function fossa(C, x0, y0, x1, y1, dip){
+    var out = [];
+    for(var i = 1; i < 10; i++){ var t = i / 10, x = x0 + (x1 - x0) * t, y = y0 + (y1 - y0) * t - (dip == null ? .35 : dip) * Math.sin(Math.PI * t);
+      out.push([x, Math.min(y, topAt(C, x) - .3)]); }
+    return out;
+  }
+  /* one restoration's shapes: { shapes, gaps, lines } in mm (lines: an inlay's or onlay's inner outline, the walls and floors
+     of its preparation, where its cement shows). o: { per, mat, type ('direct' | 'inlay' | 'onlay' | 'veneer'), overhang
+     ('m' | 'd' | 'md': excess past the proximal contour at the gingival margin), open (the same: a gap between the
+     restoration and the gingival floor) } */
+  function restoParts(type, surfaces, o){
+    o = o || {}; var d = XT[type], h = d.ch, s = String(surfaces || '').toUpperCase(), pos = POS.indexOf(type.slice(3)), ant = pos <= 2;
+    var hasM = s.indexOf('M') >= 0, hasD = s.indexOf('D') >= 0, fac = /[BFL]/.test(s), kind = o.type || 'direct';
+    var r = o.mat === 'composite' ? .45 : .3, out = { shapes:[], gaps:[], lines:[] };
+    var L = crownLoop(d, o.per), C = L.C, v = d.cv / 2, c = d.cej || 0;
+    function cervical(){ var hw = d.cv * .36; return filletClosed([[-hw, 3.0], [0, 3.15], [hw, 3.0], [hw + .1, 1.2], [hw * .5, 1.0 - c * .45], [-hw * .5, 1.0 - c * .45], [-hw - .1, 1.2]], .55); }
+    if(kind === 'veneer'){
+      /* a labial shell: the crown's own outline from just above the cervical line to the incisal edge, drawn in a little at the
+         proximal surfaces (it stops short of the contacts' lingual half), the lower margin following the cervical line */
+      var a = overArc(L, .7, .7).map(function(p){ var f = Math.min(1, Math.max(0, (Math.abs(p[0]) - d.cw * .25) / (d.cw * .25))); return [p[0] - Math.sign(p[0]) * .3 * f, p[1]]; });
+      out.shapes.push(a.concat(dense([[v - .3, .7], [v * .5, .55 - c * .6], [-v * .5, .55 - c * .6], [-v + .3, .7]], false, 4).slice(1, -1)));
+      return out;
+    }
     if(ant){
       var inc = s.indexOf('I') >= 0;
       [[-1, hasM], [1, hasD]].forEach(function(e){ var sg = e[0]; if(!e[1]) return;
-        var lo = h * (inc ? .4 : .3), hi = h * .74;
-        if(inc){ var w4 = sideWalk(L, d, sg, lo, { inward:d.cw * .42, inset:.1, pastTop:true }), last = w4[w4.length - 1];
-          out.push(w4.concat([[last[0], h - 1.9], [side(h * .62, sg) - sg * 1.7, h * .62], [side(lo, sg) - sg * 1.1, lo + .2]])); }
-        else { var w3 = sideWalk(L, d, sg, lo, { yMax:hi, inset:.1 });
-          out.push(w3.concat([[side(hi, sg) - sg * 1.1, hi - .3], [side((lo + hi) / 2, sg) - sg * 1.8, (lo + hi) / 2], [side(lo, sg) - sg * 1.1, lo + .3]])); }
+        var lo = h * (inc ? .45 : .32), hi = h * .74, sd = function(y){ return sideAt(C, y, sg); };
+        if(inc){ var xEnd = sg * (d.cw / 2) - sg * d.cw * .45, w4 = arcTo(L, sg, lo, xEnd), last = w4[w4.length - 1];
+          out.shapes.push(w4.concat(dense([last, [last[0] + sg * .15, h - 1.4], [sd(h * .62) - sg * 1.7, h * .62], [sd(lo) - sg * .9, lo + .35], [sd(lo), lo]], false, 5).slice(1, -1))); }
+        else { var w3 = sideArc(L, sg, lo, hi), mid = (lo + hi) / 2;
+          out.shapes.push(w3.concat(dense([w3[w3.length - 1], [sd(hi) - sg * .95, hi - .3], [sd(mid) - sg * 1.75, mid], [sd(lo) - sg * .95, lo + .3], w3[0]], false, 5).slice(1, -1))); }
       });
-      if(s.indexOf('I') >= 0 && !hasM && !hasD){ var top = C.filter(function(p){ return p[1] > h - 1.2; }).map(function(p){ return [p[0], p[1] - .1]; });
-        if(top.length > 1) out.push(top.concat(top.slice().reverse().map(function(p){ return [p[0], p[1] - 1.1]; }))); }
-      if(fac) out.push(ellipseMM(0, .95, d.cw * .3, 1.15));
+      if(inc && !hasM && !hasD){ var band = overArc(L, h - 1.1, h - 1.1); out.shapes.push(band.concat(dense([band[band.length - 1], [d.cw * .2, h - 1.25], [-d.cw * .2, h - 1.25], band[0]], false, 4).slice(1, -1))); }
+      if(fac) out.shapes.push(cervical());
       return out;
     }
-    var groove = h - (molar ? 1.7 : 2.0), floor = groove - 1.8, ax = molar ? 1.8 : 1.6, mid = function(gy){ return (gy + floor) / 2; };
-    var hasO = s.indexOf('O') >= 0 || (hasM && hasD);
-    function gy(sg){ return Math.max(1.1, ct[sg < 0 ? 0 : 1] * h - 2.4); }
-    /* the box's outer edge follows the proximal surface from the gingival floor up to the marginal ridge (about 1.1 mm below
-       the cusp tips in this view), then turns in along the ridge */
-    function box(sg){ var w = sideWalk(L, d, sg, gy(sg), { inward:ax * .9, inset:.15, yMax:h - 1.1 }), l = w[w.length - 1]; return w.concat([[l[0] - sg * .9, h - 1.25]]); }
-    function wall(sg){ var g = gy(sg); return [[side(floor, sg) - sg * ax, floor], [side(mid(g), sg) - sg * ax, mid(g)], [side(g, sg) - sg * ax, g]]; }
-    function oEnd(sg){ var xs = side(groove, sg) - sg * 1.9; return [[xs - sg * .35, floor + .1], [xs, (floor + groove) / 2], [xs - sg * .25, groove + .1]]; }
-    var P;
-    if(hasO){
-      var left = hasM ? [[side(gy(-1), -1) + .15, gy(-1)]].concat(box(-1)) : oEnd(-1);
-      var right = hasD ? box(1).reverse().concat([[side(gy(1), 1) - .15, gy(1)]], wall(1).reverse()) : oEnd(1).reverse();
-      var a = left[left.length - 1][0], b = right[0][0];
-      var topLine = [[a + (b - a) * .25, groove + .3], [a + (b - a) * .5, groove + .1], [a + (b - a) * .75, groove + .3]];
-      P = left.concat(topLine, right, hasM ? wall(-1) : []);
-      out.push(P);
+    var G = postGeom(type, o), side = G.side, yMR = G.yMR, pf = G.pf, inlay = kind === 'inlay' || kind === 'onlay';
+    var ta = inlay ? .45 : 0, hasO = s.indexOf('O') >= 0 || (hasM && hasD) || kind === 'onlay';
+    var oh = String(o.overhang || ''), op = String(o.open || '');
+    function gyE(sg){ return G.gy(sg) + (op.indexOf(sg < 0 ? 'm' : 'd') >= 0 ? .4 : 0); }
+    /* the side of a box, from its gingival floor up to yTop, with the overhang's ledge where there is one. pre runs from the
+       floor's outer corner to where the box's side starts: an overhang (excess past the proximal contour at the gingival margin,
+       White and Pharoah) is a spur about .5 mm proud of the surface at the floor, hanging about .9 mm over the surface below it
+       and tapering onto it, its outer face rounded (it rests on the tooth, so its inner edge is the surface itself) */
+    function boxUp(sg, yTop){
+      var g = gyE(sg), hasLedge = oh.indexOf(sg < 0 ? 'm' : 'd') >= 0;
+      if(!hasLedge) return { pts:sideArc(L, sg, g, yTop), pre:[] };
+      var U = g + .7, lo = Math.max(.05, g - .9), sx = function(y){ return side(y, sg); };
+      var face = dense([[sx(lo), lo], [sx(g - .5) + sg * .24, g - .5], [sx(g - .05) + sg * .5, g - .05], [sx(g + .35) + sg * .3, g + .35], [sx(U), U]], false, 4);
+      return { pts:sideArc(L, sg, U, yTop), pre:sideArc(L, sg, g, lo).concat(face.slice(1, -1)) };
+    }
+    function floorIn(sg){ var g = gyE(sg); return [[G.axX(sg), g], [G.axX(sg) - sg * ta, pf]]; }
+    if(kind === 'onlay'){
+      /* the cusps reduced along their inclines (about 1.8 mm), the boxes as an inlay's */
+      var ym = hasM ? gyE(-1) : h - 2.3, yd = hasD ? gyE(1) : h - 2.3, top = overArc(L, ym, yd);
+      var xa = hasM ? G.axX(-1) + ta : top[0][0] + .15, xb = hasD ? G.axX(1) - ta : top[top.length - 1][0] - .15, red = [];
+      for(var i = 0; i <= 12; i++){ var x = xb + (xa - xb) * i / 12; red.push([x, topAt(C, x) - 1.8]); }
+      red = shrink(red, 0, function(){ return 0; }, 3);
+      var inner = (hasD ? [[G.axX(1), gyE(1)]] : []).concat(red, hasM ? [[G.axX(-1), gyE(-1)]] : []);
+      var lin = fillet([top[top.length - 1]].concat(inner, [top[0]]), r);
+      out.shapes.push(top.concat(lin.slice(1, -1))); out.lines.push(lin);
+    } else if(hasO){
+      var P = [], pre = [];
+      if(hasM){ var bm = boxUp(-1, yMR); pre = bm.pre; P = P.concat(bm.pts); }
+      else P.push([G.oX(-1), yMR - .15]);
+      var a0 = P[P.length - 1], dEnd = hasD ? onSide(L, 1, yMR).p : [G.oX(1), yMR - .15];
+      P = P.concat(fossa(C, a0[0], a0[1], dEnd[0], dEnd[1]));
+      var chain;
+      if(hasD){ var bd = boxUp(1, yMR), dp = bd.pts.slice().reverse(); P = P.concat(dp, bd.pre.slice().reverse()); chain = [P[P.length - 1]].concat(floorIn(1)); }
+      else { P.push(dEnd); chain = [dEnd, [G.oX(1) - .3, pf]]; }
+      chain = chain.concat(hasM ? floorIn(-1).reverse() : [[G.oX(-1) + .3, pf]]);
+      chain.push(hasM ? (pre.length ? pre[0] : P[0]) : P[0]);
+      P = pre.concat(P);
+      var fc = fillet(chain, r);
+      out.shapes.push(P.concat(fc.slice(1, -1))); if(inlay) out.lines.push(fc);
     } else [[-1, hasM], [1, hasD]].forEach(function(e){ var sg = e[0]; if(!e[1]) return;
-      var bx = [[side(gy(sg), sg) - sg * .15, gy(sg)]].concat(box(sg)), last = bx[bx.length - 1];
-      out.push(bx.concat([[last[0] - sg * .2, floor + .3]], wall(sg))); });
-    if(fac) out.push(hasO ? [[-.65, floor + .3], [.65, floor + .3], [.65, h * .44], [-.65, h * .44]] : ellipseMM(0, .95, d.cw * .3, 1.15));
+      /* a proximal box alone (a slot): the box up to the marginal ridge, its occlusal edge turned in along the ridge */
+      var bx = boxUp(sg, yMR), top2 = bx.pts[bx.pts.length - 1], g = gyE(sg);
+      var ch = [top2, [top2[0] - sg * (G.ax + .3), top2[1] - .2], [G.axX(sg) - sg * ta, g + .4], [G.axX(sg), g], bx.pre.length ? bx.pre[0] : bx.pts[0]];
+      var fs = fillet(ch, r);
+      out.shapes.push(bx.pre.concat(bx.pts, fs.slice(1, -1))); if(inlay) out.lines.push(fs); });
+    /* the groove extension (OB, OL) or a Class V alone */
+    if(fac) out.shapes.push(hasO ? filletClosed([[-.6, pf + .4], [.6, pf + .4], [.55, h * .4], [-.55, h * .4]], .5) : cervical());
+    /* an open margin: the restoration stands .4 mm off its gingival floor; the gap between, from the proximal surface to the
+       axial wall, is dark (drawn under the restoration, which covers its top edge) */
+    [[-1, 'm'], [1, 'd']].forEach(function(e){ var sg = e[0]; if(op.indexOf(e[1]) < 0 || !(sg < 0 ? hasM : hasD)) return;
+      var g = G.gy(sg), ax = G.axX(sg);
+      out.gaps.push(sideArc(L, sg, g, g + .5).concat([[ax - sg * .05, g + .5], [ax - sg * .05, g]])); });
     return out;
+  }
+  function restoMM(type, surfaces, o){ return restoParts(type, surfaces, o).shapes; }
+  /* recurrent (secondary) caries at a restoration's margin on surface M or D, as a film shows it (White and Pharoah): a
+     radiolucency in the tooth beside the margin, the tooth's own surface its outer edge. Posterior: a rounded shadow under the
+     outer part of the box's gingival floor (enamel: a small notch there; dentin: the whole floor, then a band up the axial
+     wall; pulp: the band wider, heading for the pulp). Incisor or canine (o.inc: the restoration takes the incisal angle):
+     the same at a Class III or IV's cervical edge. Drawn under the restoration, which covers its upper part. (At a crown's
+     margin the lesion is on the root, apical to the crown: the case kit draws it there.) */
+  function recurMM(type, surface, depth, o){
+    o = o || {}; var sg = String(surface).toUpperCase() === 'M' ? -1 : 1, d = XT[type], L = crownLoop(d, o.per), h = d.ch;
+    var ant = POS.indexOf(type.slice(3)) <= 2, sd = function(y){ return sideAt(L.C, y, sg); }, g, ax;
+    if(ant){ g = h * (o.inc ? .45 : .32); ax = sd(g + .3) - sg * .95; }
+    else { var G = postGeom(type, o); g = G.gy(sg); ax = G.axX(sg); }
+    var w = Math.abs(sd(g) - ax), q = function(y, f){ return sd(y) - sg * f; }, bot, top, inner;
+    if(depth === 'enamel'){ bot = g - .6; top = g + .5; inner = [[q(g - .42, .2), g - .42], [q(g - .1, .42), g - .1], [q(g, w * .4), g + .1], [q(top, w * .4), top]]; }
+    else if(depth === 'pulp'){ bot = g - 1.45; top = g + 1.5; inner = [[q(g - 1.2, .3), g - 1.25], [q(g, w * .6), g - 1.1], [ax - sg * .4, g - .7], [ax - sg * .9, g - .1], [ax - sg, g + .6], [ax - sg * .5, g + 1.2], [ax + sg * .2, top]]; }
+    else { bot = g - 1.15; top = g + .9; inner = [[q(g - .9, .25), g - .95], [q(g, w * .55), g - .8], [ax - sg * .15, g - .5], [ax - sg * .35, g], [ax - sg * .25, g + .5], [ax + sg * .2, top]]; }
+    bot = Math.max(.1, bot);
+    var outer = sideArc(L, sg, bot, top).reverse();
+    return [outer.concat(dense([outer[outer.length - 1]].concat(inner, [outer[0]]), false, 5).slice(1, -1))];
+  }
+  /* a full crown's preparation (Rosenstiel's reductions): the outline moved in by the axial reduction at the sides and the
+     occlusal (incisal) one at the top, a shoulder or chamfer of `margin` mm at the cervical line, smoothed the way a
+     preparation's cusps are flattened. Returns { arc, poly }: arc from the mesial margin over the top to the distal margin,
+     poly closed along the cervical line. */
+  var PREP = { gold:{ m:.5, ax:1.0, occ:1.5 }, pfm:{ m:1.0, ax:1.4, occ:2.0 }, zirconia:{ m:.6, ax:1.0, occ:1.0 }, lithium:{ m:1.0, ax:1.1, occ:1.6 }, ssc:{ m:.1, ax:.5, occ:1.2 } };
+  function prepMM(type, kind, o){
+    o = o || {}; var d = XT[type], L = crownLoop(d, o.per), C = L.C, h = d.ch, P = PREP[kind] || PREP.gold, v = d.cv / 2, c = d.cej || 0;
+    var ext = o.extra || 0, col = o.collar;
+    /* o.extra: that much less reduction (a coping o.extra mm outside the preparation); o.collar: none below that height (a
+       metal collar reaching the surface at the margin) */
+    function th(p){ var y = p[1], a = Math.min(1, Math.max(0, y / 2.2)), b = Math.min(1, Math.max(0, (y - (h - 2.6)) / 1.8)); a = a * a * (3 - 2 * a); b = b * b * (3 - 2 * b);
+      var c2 = col == null ? 1 : Math.min(1, Math.max(0, (y - col + .4) / .7));
+      return Math.max(0, P.m + (P.ax - P.m) * a + (P.occ - P.ax) * b - ext) * c2; }
+    var arc = shrink(C.slice(0, L.iv + 1), h * .42, th, 4);
+    var m = col != null ? 0 : Math.max(0, P.m - ext);
+    arc[0] = [-v + m, 0]; arc[arc.length - 1] = [v - m, 0];
+    var bottom = dense([[v - m, 0], [(v - m) * .55, -c * .8], [0, -c], [-(v - m) * .55, -c * .8], [-v + m, 0]], false, 3).slice(1, -1);
+    return { arc:arc, poly:arc.concat(bottom), L:L };
+  }
+  /* a pontic (a fixed bridge's replacement tooth): the crown's outline with its cervical end a convex ridge-lap resting on the
+     ridge about 1 mm past the neighbors' CEJ, narrower there than a tooth's cervix */
+  function ponticMM(type, o){
+    var d = XT[type], L = crownLoop(d, o && o.per), v = d.cv / 2, arc = L.C.slice(0, L.iv + 1);
+    return arc.concat(dense([[v, 0], [v * .7, -.75], [0, -1.05], [-v * .7, -.75], [-v, 0]], false, 4).slice(1, -1));
   }
   /* caries as a film shows it (White and Pharoah): a proximal lesion starts just cervical to the contact as a triangle in the
      enamel, its base on the surface and its point toward the DEJ (enamel); once in the dentin it spreads along the DEJ and a
@@ -401,7 +557,8 @@
   T.isPosterior = isPosterior; T.isAnterior = isAnterior; T.quadOf = quadOf; T.viewOrder = viewOrder; T.siteOrder = siteOrder;
   T.tooth = catalogue; T.outlineMM = outlineMM;
   T.enamelMM = enamelMM; T.dejPts = dejPts; T.hornsMM = hornsMM; T.pulpPts = pulpPts; T.CONTACT = CONTACT;
-  T.sideAt = sideAt; T.topAt = topAt; T.restoMM = restoMM; T.cariesMM = cariesMM; T.archMM = archMM;
+  T.sideAt = sideAt; T.topAt = topAt; T.restoMM = restoMM; T.restoParts = restoParts; T.recurMM = recurMM; T.prepMM = prepMM; T.ponticMM = ponticMM; T.PREP = PREP;
+  T.crownLoop = crownLoop; T.onSide = onSide; T.sideArc = sideArc; T.overArc = overArc; T.fillet = fillet; T.filletClosed = filletClosed; T.shrink = shrink; T.cariesMM = cariesMM; T.archMM = archMM;
   T.all = function(){ var a = []; for(var i = 1; i <= 32; i++) a.push(catalogue(i)); return a; };
   if(typeof module === 'object' && module.exports) module.exports = T;
   if(typeof window !== 'undefined') window.SH_TEETH = T;

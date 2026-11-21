@@ -6,7 +6,7 @@
 // give), every question that names a case (pcase:'id') must name one that exists when the hub has any cases, and
 // every picture kind must be one the kit draws. Patient Box v2 (2026-11-20) adds: the tooth library (widget/teeth.js) has all 32
 // teeth and draws each; every case's pictures pass checkFigs() (no bitewing of an incisor, a full-mouth view that agrees
-// with the box's counts); a question with `rests` (what its key rests on: stage, grade, extent, rt, furc, impl, kind) is
+// with the box's counts); a question with `rests` (what its key rests on: stage, grade, extent, rt, furc, impl, kind; since v2.1 also endo, fracture, resto) is
 // answerable from the pictures and rows it shows; a question with `says` quotes numbers the record gives, in its text.
 // The example cases in tools/cases/examples.json are checked the same way. Run by CI (check.yml).
 'use strict';

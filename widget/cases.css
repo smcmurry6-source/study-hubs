@@ -54,7 +54,20 @@
 .dc-film .xr-dot{fill:#f3f3f3}
 /* Patient Box v2 on a film: composite a little less radiopaque than enamel with a crisp edge; caries and a periapical lesion
    dark but not as dark as soft tissue (the lesion in three soft layers); a root-filled tooth's chamber filled with its core */
-.dc-film .xr-comp{fill:#dcdcdc;stroke:#f2f2f2;stroke-width:.7}.dc-film .xr-core{fill:#dedede}
+.dc-film .xr-comp{fill:#d8d8d8}.dc-film .xr-core{fill:#dedede}
+/* Patient Box v2.1 on a film: crowns by material (gold and a PFM's coping as bright as metal; porcelain a little under enamel's;
+   zirconia between enamel and metal, hiding the preparation almost entirely; lithium disilicate about enamel's, the preparation
+   and the pulp seen through it, outlined by its brighter resin cement; a stainless steel shell brightest at its edges), ceramic
+   inlays and veneers, an open margin's gap, calculus, endodontic detail and fractures */
+.dc-film .xr-porc{fill:#d2d2d2}.dc-film .xr-zr{fill:#f3f3f3}.dc-film .xr-zr-in{fill:#e9e9e9;opacity:.95}
+.dc-film .xr-li{fill:#dadada}.dc-film .xr-cement{fill:none;stroke:#f2f2f2;stroke-width:1.1;stroke-linejoin:round;stroke-linecap:round}
+.dc-film .xr-ssc{fill:#f4f4f4;opacity:.55}.dc-film .xr-ssc-rim{fill:none;stroke:#fbfbfb;stroke-width:1.6;stroke-linejoin:round}
+.dc-film .xr-cer{fill:#d2d2d2}
+.dc-film .xr-veneer{fill:#e4e4e4;opacity:.4}.dc-film .xr-gap{fill:#262626}
+.dc-film .xr-calc{fill:#d2d2d2;stroke:#d2d2d2;stroke-width:.4;stroke-linejoin:round}
+.dc-film .xr-sealer{fill:#f2f2f2;opacity:.9}.dc-film .xr-void{fill:#5a5a5a}.dc-film .xr-file{fill:#fff;stroke:#fff;stroke-width:.4}
+.dc-film .xr-fiber{fill:#c2c2c2;stroke:#8e8e8e;stroke-width:.8;stroke-linejoin:round}
+.dc-film .xr-fade{fill:#3a3a3a;opacity:.32}.dc-film .xr-frac{fill:#1f1f1f;opacity:.92}.dc-film .xr-vrf{fill:#232323}
 .dc-film .xr-car{fill:#2e2e2e;opacity:.86}.dc-film .xr-car.xr-car-f{opacity:.42}
 .dc-film .xr-lesion{fill:#262626;opacity:.24}.dc-film .xr-apdl{opacity:.85}
 /* the full-mouth series: the mount, its orientation marks; it scrolls sideways where it would be too small to read */
@@ -92,6 +105,7 @@
 .dc-okey .dc-ok{display:inline-flex;align-items:center;gap:4px;white-space:nowrap}
 .dc-okey .dc-oks{width:15px;height:15px;flex:none;display:block;overflow:visible}
 .dc-okey .dc-okey-t{flex-basis:100%}
+.dc-okey .dc-ok-t{white-space:normal}
 .dc-otext{font-size:.74rem;color:var(--ink-soft);margin-top:4px}.dc-otext summary{cursor:pointer;font-weight:600}.dc-otext p{margin:4px 0 0;line-height:1.4}
 /* the chart's drawn restorations by material */
 .dc-amalgam.dc-gold{fill:#d6a22a}.dc-amalgam.dc-comp{fill:#e6d6ae;stroke:#a89263;stroke-width:.7}
@@ -112,3 +126,24 @@
 .qx-ref-lab{font-size:.78rem;font-weight:700;color:var(--ink-soft)}
 .qx-ref-btn{border:1px solid var(--line-strong);border-radius:999px;background:var(--surface);color:var(--ink);font:500 .78rem var(--font-body);padding:4px 10px;cursor:pointer;min-height:32px;text-align:left}
 .qx-ref-btn:hover{border-color:var(--accent)}.qx-ref-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+/* Patient Box v2.1 on the chart, the drawn view and the odontogram */
+.dc-amalgam.dc-cer{fill:#ece4d0;stroke:#a89263;stroke-width:.7}.dc-crown.dc-goldcrown{fill:#e2b84a;stroke:#9a7420}
+.dc-view .io-tooth.cr-gold{fill:#dcae3c;stroke:#8f6c1c}.dc-view .io-tooth.cr-zirconia{fill:#f8f7f3}.dc-view .io-tooth.cr-lithium{fill:#f0e6cf}
+.dc-view .io-tooth.cr-ssc{fill:#c9cdd4;stroke:#6f7580}.dc-view .io-tooth.cr-veneer{fill:#f6f0e2}
+.dc-view .io-tooth.io-fxd{fill:#e2c98f;stroke:#9a8562}.dc-view .io-pulp{fill:#c0283a}
+.dc-view .io-r{stroke-width:.9;stroke-linejoin:round}.dc-view .io-r-amalgam{fill:#868b95;stroke:#5c6068}.dc-view .io-r-gold{fill:#d6a22a;stroke:#93701c}
+.dc-view .io-r-composite{fill:#efe3c3;stroke:#c8b483}.dc-view .io-r-ceramic{fill:#f3ecdb;stroke:#cbbf9f}.dc-view .io-r-faint{opacity:.55}
+.dc-view .dc-calc{fill:#d8c27e;stroke:#a88a3e;stroke-width:.7;stroke-linejoin:round}
+.dc-ow{--o-ceramic:#c3b4ef}
+:root[data-theme="dark"] .dc-ow{--o-ceramic:#d4c8fa}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .dc-ow{--o-ceramic:#d4c8fa}}
+.dc-ow .dc-osurf.dc-o-ceramic{fill:var(--o-ceramic)}.dc-ow .dc-osurf.dc-o-ven{stroke:var(--ink);stroke-width:1.6}
+.dc-ow .dc-o-hatch.dc-o-hatch-r{stroke:var(--o-caries);stroke-width:1.3;opacity:1}
+.dc-ow .dc-o-ind{fill:none;stroke:var(--ink);stroke-width:.9}
+.dc-ow .dc-olet{fill:var(--ink);font:800 7px var(--font-mono)}
+.dc-ow .dc-o-bar{stroke:var(--ink);stroke-width:2.2;stroke-linecap:round;fill:none}
+.dc-ow .dc-o-nroot{stroke-width:1.4}
+.dc-ow .dc-o-post{fill:none;stroke:var(--ink);stroke-width:4.4;stroke-linecap:round}
+.dc-ow .dc-o-sep{fill:none;stroke:var(--o-caries);stroke-width:1.8;stroke-linecap:round}
+.dc-ow .dc-o-fx{fill:none;stroke:var(--o-caries);stroke-width:1.4;stroke-linejoin:round;stroke-linecap:round}
+.dc-ow .dc-o-crack{fill:none;stroke:var(--o-caries);stroke-width:1.3;stroke-dasharray:2 1.6;stroke-linecap:round}
