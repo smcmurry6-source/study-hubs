@@ -55,6 +55,11 @@ p = plan({ ...base, changes: [], added: ['# a comment', '', 'occlusion | Four qu
 eq('changelog', p.changelog, [{ hub: 'occlusion', message: 'Four questions fixed.' }, { hub: 'all', message: 'The bank shows more at a time.' }]);
 eq('changelog warnings', p.warnings.length, 2);
 
+// a hub's page coming down deletes its "Good question?" thumbs (Sam, 2026-11-21); an edit or another deleted file doesn't
+eq('down when a hub page is deleted', plan({ ...base, changes: ch('D hubs/perio/index.html', 'D hubs/perio/content/notes.json', 'D hubs/occlusion/audio/x.mp3') }).down, ['perio']);
+eq('no down for an edited page', plan({ ...base, changes: ch('M hubs/perio/index.html') }).down, []);
+eq('no down for a page not directly in a hub', plan({ ...base, changes: ch('D hubs/perio/old/index.html') }).down, []);
+
 // the closed check-ins follow hubs.js whenever it changes (migration_v86); its every closed exam, live hubs and archived
 eq('checkins when hubs.js changes', plan({ ...base, changes: ch('M hubs.js') }).checkins, true);
 eq('no checkins otherwise', plan({ ...base, changes: ch('M widget/dash.js') }).checkins, false);

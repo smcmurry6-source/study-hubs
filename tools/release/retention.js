@@ -122,11 +122,36 @@ try {
   expect('seeded hours (pings/rows)', hours().split('/')[0], 600);
   const h0 = hours(), v0 = visits(), r0 = recap();
 
+  /* v93: rows older than the school year (365 Central days) on their own hub and visitors, so the checks above don't move:
+     yr-C used two sections in one hour past the 144-ping cap, another old hour and a recent one; yr-D one old hour */
+  sql(`
+    insert into activity_hourly (h, hub, section, visitor_id, n) values
+      (date_trunc('hour', now() - interval '400 days'), 'ret-old', 'compendium/notes', 'yr-C', 100),
+      (date_trunc('hour', now() - interval '400 days'), 'ret-old', 'compendium/bank', 'yr-C', 80),
+      (date_trunc('hour', now() - interval '400 days') + interval '1 hour', 'ret-old', 'compendium/bank', 'yr-C', 30),
+      (date_trunc('hour', now() - interval '10 days'), 'ret-old', 'compendium/bank', 'yr-C', 50),
+      (date_trunc('hour', now() - interval '400 days'), 'ret-old', 'compendium/notes', 'yr-D', 20);
+    insert into activity_visits (visit_id, visitor_id, first_at, last_at) values
+      ('yr-v1', 'yr-C', now() - interval '400 days', now() - interval '400 days' + interval '2 hours'),
+      ('yr-v2', 'yr-D', now() - interval '400 days', now() - interval '400 days' + interval '20 minutes'),
+      ('yr-v3', 'yr-C', now() - interval '10 days', now() - interval '10 days' + interval '50 minutes');
+    insert into question_events (at, hub, qid, v, visitor_id, visit_id, kind, try, correct, choice, ms, expl_ms) values
+      (date_trunc('day', now() - interval '400 days') + interval '18 hours', 'ret-old', 'q1', 'v1', 'yr-C', 'yr-v1', 'answer', 1, true, 2, 4000, 1000),
+      (date_trunc('day', now() - interval '400 days') + interval '18 hours', 'ret-old', 'q1', 'v1', 'yr-C', 'yr-v1', 'answer', 2, true, 2, 2000, 3000),
+      (date_trunc('day', now() - interval '400 days') + interval '18 hours', 'ret-old', 'q1', 'v1', 'yr-D', 'yr-v2', 'answer', 1, false, 0, 6000, 5000),
+      (date_trunc('day', now() - interval '400 days') + interval '18 hours', 'ret-old', 'q1', 'v1', 'yr-D', 'yr-v2', 'view', null, null, null, 3500, null),
+      (now() - interval '10 days', 'ret-old', 'q1', 'v1', 'yr-C', 'yr-v3', 'answer', 3, true, 2, 1500, 500);
+  `);
+  const crowns = () => one(`select sh_time_crowns('yr-C') || '/' || sh_time_crowns('yr-D')`);
+  const crowns0 = crowns();
+  expect('time crowns before the collapse (yr-C 144+30+50 capped pings, yr-D 20; rounded)', crowns0, '156/14');
+
   /* dry run: counts only */
   const dry = JSON.parse(one(`select sh_retention_run()::text`));
   const testHours = Number(one(`select count(*) from activity_hourly where hub = 'zz-test'`));   /* 1 or 2: the 10 pings may cross an hour */
   const want = { activity_pings: 430, ui_click_reach: 2, feature_events: 3, activity_hourly_test: testHours, ui_clicks_test: 0, question_flags_ids: 1,
-    hub_suggestions_ids: 1, exam_debriefs_ids: 1, survey_declines: 1, survey_answer_ids: 1, ideas_hidden: 1, link_attempts: 1 };
+    hub_suggestions_ids: 1, exam_debriefs_ids: 1, survey_declines: 1, survey_answer_ids: 1, ideas_hidden: 1, link_attempts: 1,
+    activity_hourly_year: 4, activity_visits_year: 2, question_events_year: 4 };
   for (const k of Object.keys(want)) expect(`dry run counts ${k}`, dry.counts[k], want[k]);
   expect('dry run left the raw pings', one(`select count(*) from activity_pings`), 610);
   expect('dry run logged nothing', one(`select count(*) from retention_runs`), 0);
@@ -162,6 +187,22 @@ try {
   expect('run logged', one(`select count(*) from retention_runs`), 1);
   notes.push(`removed ${done.counts.activity_pings} raw pings with every hour kept (${h0.split('/')[0]} pings in activity_hourly before and after); recap identical`);
 
+  /* v93: the school year's collapse */
+  expect('time crowns unchanged by the collapse', crowns(), crowns0);
+  expect('kept capped pings', one(`select string_agg(visitor_id || ':' || n, ',' order by visitor_id) from activity_time_kept`), 'yr-C:174,yr-D:20');
+  expect('old hours gone, the recent one kept', one(`select count(*) || '/' || sum(n) from activity_hourly where hub = 'ret-old'`), '1/50');
+  expect('activity_daily keeps the pings, no ids', one(`select sum(n) from activity_daily where hub = 'ret-old'`), 230);
+  expect('activity_daily people (notes: C and D)', one(`select sum(people) from activity_daily where hub = 'ret-old' and section = 'compendium/notes'`), 2);
+  expect('old visits gone, the recent one kept', one(`select string_agg(visit_id, ',') from activity_visits where visitor_id like 'yr-%'`), 'yr-v3');
+  expect('activity_visits_daily', one(`select sum(visits) || '/' || sum(people) from activity_visits_daily`), '2/2');
+  expect('old question events gone, the recent one kept', one(`select count(*) from question_events where hub = 'ret-old'`), 1);
+  expect('question_events_daily totals', one(`select people || '/' || answers || '/' || correct || '/' || firsts || '/' || firsts_correct || '/' || retries || '/' || retries_correct || '/' || views || '/' || med_ms || '/' || med_expl_ms || '/' || choices::text from question_events_daily where hub = 'ret-old' and qid = 'q1' and v = 'v1'`), '2/3/2/2/1/1/1/1/4000/3000/{"0": 1, "2": 2}');
+  for (const t of ['activity_daily', 'activity_visits_daily', 'question_events_daily', 'activity_time_kept']) {
+    expect(`${t} has row-level security`, one(`select relrowsecurity from pg_class where oid = 'public.${t}'::regclass`), 't');
+    expect(`anon can't read ${t}`, one(`select has_table_privilege('anon', 'public.${t}', 'select')`), 'f');
+  }
+  notes.push(`the school year's collapse: ${done.counts.activity_hourly_year} hours, ${done.counts.activity_visits_year} visits, ${done.counts.question_events_year} question events into totals; time crowns ${crowns0} before and after`);
+
   /* a second run removes nothing */
   const again = JSON.parse(one(`select sh_retention_run(true)::text`));
   const left = Object.keys(want).filter(k => Number(again.counts[k]) !== 0);
@@ -176,6 +217,12 @@ try {
   expect('B\'s old visit moved to A', one(`select count(*) from activity_visits where visit_id = 'visit-B-old' and visitor_id = 'ret-A'`), 1);
   expect('B\'s raw pings moved to A', one(`select count(*) from activity_pings where visitor_id = 'ret-B'`), 0);
   notes.push('linking devices after a trim kept every hour (moved, not rebuilt)');
+
+  /* v93: linking moves the kept crowns too */
+  const code2 = one(`select create_link_code('yr-C')`);
+  expect('old devices linked', one(`select redeem_link_code('${code2}', 'yr-D')`), 'yr-C');
+  expect('kept pings moved with the link', one(`select string_agg(visitor_id || ':' || n, ',') from activity_time_kept`), 'yr-C:194');
+  expect('time crowns after linking (194 kept + 50)', one(`select sh_time_crowns('yr-C')`), 169);
 
   /* a delete that isn't a retention run still rebuilds the rollups from raw pings (the old behavior) */
   sql(`delete from activity_pings where visit_id = 'visit-A-new'`);
