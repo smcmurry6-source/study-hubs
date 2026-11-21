@@ -66,18 +66,10 @@
     --float-shadow: 0 4px 14px rgba(0, 0, 0, .4);
   }
 }
-:root[data-hx-hub="occlusion"], .hx[data-hub="occlusion"]            { --hub: #2747a3; --hub-mid: #6f86cf; --hub-light: #dce3f6; --hub-dark: #8fa6ec; }
-:root[data-hx-hub="perio"], .hx[data-hub="perio"]                { --hub: #b4466f; --hub-mid: #d97fa0; --hub-light: #f6dde6; --hub-dark: #ec93b5; }
-:root[data-hx-hub="pcd-implants-exam1"], .hx[data-hub="pcd-implants-exam1"]   { --hub: #2f6f84; --hub-mid: #6fa9bb; --hub-light: #d7e9ef; --hub-dark: #7cc0d6; }
-:root[data-hx-hub="heme-endo-exam2"], .hx[data-hub="heme-endo-exam2"]      { --hub: #a83232; --hub-mid: #d86f6f; --hub-light: #f5dada; --hub-dark: #ee8a8a; }
-:root[data-hx-hub="special-patient-care"], .hx[data-hub="special-patient-care"] { --hub: #2e7d4f; --hub-mid: #6db58a; --hub-light: #d7eedf; --hub-dark: #76cb98; }
 /* the tint is on the page root too (hub.js sets data-hx-hub), so the shared widget's tokens below (--accent and the rest,
    declared on :root) resolve to this hub's color, not the default, in its panels and in the player (BUG-056) */
 :root { --hub-text: var(--hub); --hub-soft: var(--hub-light); }
 .hx { --hub-text: var(--hub); --hub-soft: var(--hub-light); }
-/* Perio's ink is 4.05:1 on its light pink, under AA for text: its words take a deeper pink (5.1:1, as Heme & Endo's);
-   the art keeps the ink. Before the dark rules, so dark mode still takes --hub-dark. */
-:root[data-hx-hub="perio"], .hx[data-hub="perio"] { --hub-text: #9e3a60; }
 :root[data-theme="dark"], :root[data-theme="dark"] .hx { --hub-text: var(--hub-dark); --hub-soft: color-mix(in srgb, var(--hub) 34%, #1c1b1c); }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]), :root:not([data-theme="light"]) .hx { --hub-text: var(--hub-dark); --hub-soft: color-mix(in srgb, var(--hub) 34%, #1c1b1c); } }
 

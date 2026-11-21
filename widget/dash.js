@@ -20,8 +20,8 @@
    The check-in, survey, name, luck and archive logic is the live dashboard's own, moved here unchanged.
 
    Its data is hubs.js (window.SH_DASH_DATA), where a hub is added, dated or archived.
-   The game layer's functions (migration_v54) are called as <name>_v2 with the older function as the fallback, so the
-   page still works on a database without them (a preview answers both from fixtures). */
+   The game layer's functions (migration_v54) are called as <name>_v2, with no fallback to the functions from before it
+   (they came out 2026-11-19 and 2026-11-21). */
 (function(){
   "use strict";
   if (window.shDash) return;
@@ -1376,13 +1376,16 @@
     dashPrize(nameSb, "set_display_name_v2", { p_visitor: VISITOR, p_name: v }, "name").then(function(r){ if (!r || r.missing) old(); else answered(); });
   }
   /* the bootstrap's display_name, asked with this device's name `asked`: take it when this device has a name of its own
-     that differs, unless this device's rename is still unsaved (sent again) or newer than the ask */
-  function nameFromServer(server, asked){
+     that differs, unless this device's rename is still unsaved (sent again) or newer than the ask. When it is the random
+     one (`custom` false, the bootstrap's name_custom, migration_v94: the linked device went back to a random name), drop
+     this device's copy and show the random one. */
+  function nameFromServer(server, asked, custom){
     server = String(server || "").trim().slice(0, 24);
     if (!server || !localName || localName !== (asked || "")) return;
     var unsaved = ls(NAME_UNSAVED);
     if (unsaved === localName && server !== localName) { sendName(localName); return; }
     if (unsaved !== null) lsSet(NAME_UNSAVED, null);
+    if (custom === false) { localName = ""; randomName = server; lsSet("sh_display_name", null); paintName(); nameChanged(); return; }
     if (server === localName) return;
     localName = server; lsSet("sh_display_name", server); paintName(); nameChanged();
   }
@@ -1906,7 +1909,7 @@
         if (!r || r.error || !r.data || typeof r.data !== "object") return null;
         boot.data = r.data;
         /* first, so Timmy's hello and the "you" card already have a name changed on a linked device */
-        try { nameFromServer(r.data.display_name, boot.linkName); } catch (e) {}
+        try { nameFromServer(r.data.display_name, boot.linkName, r.data.name_custom); } catch (e) {}
         return boot.data;
       }, function(){ return null; });
     } catch (e) {}

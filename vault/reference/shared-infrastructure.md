@@ -23,11 +23,12 @@ tags: [widget, supabase]
   file from the page's bundle (`window.SH_BUNDLE`) when there is one and adds the file's own `<script>` otherwise, which
   is what an old single-file hub's page does. **After changing a widget file that is in `tools/bundle/bundles.json`, rebuild and
   commit the bundles** (CI fails on a stale one).
-- **The game layer's switch** (the redesign, live since its release): a page whose `v3.js` tag has
-  `data-game="v2"` (the engine writes it; no old single-file hub has it) uses migration_v54's functions:
-  the v2 bootstrap, one `record_answer_v2` per answer in place of today's four or five calls, mock sessions, and
-  `window.shGame` for the engine. Without the attribute v3.js works exactly as it did before the release, which
-  is what the old hub pages get. `widget/ranks.js` and `widget/rankup.js` draw a rank past the Handpiece only for a v2 profile (`journey`
+- **The game layer** (the redesign, live since its release): every page uses migration_v54's functions: the v2 bootstrap,
+  one `record_answer_v2` per answer in place of the four or five calls from before, mock sessions, and `window.shGame` for
+  the engine. Since 2026-11-21 (#523) nothing falls back to the functions from before it (`get_widget_bootstrap`,
+  `get_rank_profile`, `get_trophy_stats`, `submit_survey`, `submit_exam_debrief`): a missing `_v2` call fails instead.
+  `widget/hub.js` still writes `data-game="v2"` on the tag; `widget/v3.js` no longer reads it. The old functions stay in
+  the database (`tools/release/xp.js` tests them). `widget/ranks.js` and `widget/rankup.js` draw a rank past the Handpiece only for a v2 profile (`journey`
   set); `shRanks.art()` without a shape is byte for byte what it was. How it fits together:
   [game-server](game-server.md) and [the journeys](../tasks/done/2026-11-06-redesign-progression-journeys.md).
 - **The trophy case and the cards on the redesign** (phase 4 session 6): `widget/ranks.js` and `widget/rankup.js` hold
@@ -37,7 +38,7 @@ tags: [widget, supabase]
   came out, and on 2026-11-20 the stylesheets' `html.shx` prefix became `:root`. **Keep that prefix:** it gives the
   design system's rules the weight to win over the shared widget's own styles (`widget/v3.css`, the CSS `pet.js`,
   `ranks.js` and `replies.js` write); stripped bare, the rank name lost its metal, Timmy's bubble and the pin buttons
-  restyled. Pages still set the `shx` class (`widget/eggs.js` reads it). **Full Arch is retired on every
+  restyled. Pages still set the `shx` class: the preview's pill (`tools/preview/runtime/preview.js`) and the figure builds' styles select `html.shx` (until 2026-11-21 `widget/eggs.js` read it too, for a font only an old single-file page lacked). **Full Arch is retired on every
   page** (the release): the chart and its switch are gone from `widget/eggs.js`, and someone who won it keeps it as a
   retired trophy. ([the task](../tasks/done/2026-11-12-redesign-trophy-case-and-cards.md))
 - **Everyone has Timmy** (the release): `widget/pet.js` has no adoption, introduction or holiday outfits any more. He is

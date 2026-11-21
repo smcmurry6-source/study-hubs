@@ -330,13 +330,17 @@
     });
     return Object.keys(by).sort().map(function(k){ return by[k]; });
   }
+  /* the rank profile from before the game layer, the base the v2 profile (profile2) is worked out from; no page asks
+     for it any more (get_rank_profile's fallback came out 2026-11-21), so it isn't answered under that name */
+  function rankProfile(v){ return rpc("get_rank_profile_fixture", { p_visitor: v }).data; }
   function widgetBootstrap(a, t){
     var v = a.p_visitor, hub = a.p_hub, ep = a.p_episode || a.p_ep || a.p_podcast;
     var dashboard = !!a.p_dashboard;
-    if (v !== db.visitor) return { display_name: null, answers: [], pins: [], inbox: [], survey: [], overrides: [], pet_days: [], cavity: [], podcast: null, dashboard_week: [], survey_popup: [], exam_luck: null, recaps: [], golden: [], name_shared: false, rank: null, mastery: [] };
+    if (v !== db.visitor) return { display_name: null, answers: [], pins: [], inbox: [], survey: [], overrides: [], pet_days: [], cavity: [], podcast: null, dashboard_week: [], survey_popup: [], exam_luck: null, recaps: [], golden: [], name_shared: false, name_custom: false, rank: null, mastery: [] };
     var answers = answersFor(hub);
     return {
       display_name: db.name,
+      name_custom: !!db.name,
       answers: answers,
       pins: a.p_include_pins ? bootstrapPins(v, hub) : [],
       inbox: bootstrapInbox(v),
@@ -352,7 +356,7 @@
       golden: [],
       name_shared: false,
       /* your own rank and mastery ride in the bootstrap too (Sam, 2026-11-06); same fixtures as the single calls */
-      rank: rpc("get_rank_profile", { p_visitor: v }).data,
+      rank: rankProfile(v),
       mastery: hub ? rpc("get_hub_mastery", { p_visitor: v }).data : []
     };
   }
@@ -408,7 +412,7 @@
     return Object.keys(N).map(function(k){ return { kind: k, n: N[k], total: 212 }; });
   }
   function profile2(v){
-    var p = rpc("get_rank_profile", { p_visitor: v }).data, r = rank2(p.xp || 0), k;
+    var p = rankProfile(v), r = rank2(p.xp || 0), k;
     for (k in r) p[k] = r[k];
     p.badges = (p.badges || []).slice();
     for (var j = 0; j < 3; j++) if ((p.xp || 0) >= 125000 * (j + 1)) p.badges.push("journey-" + j);
@@ -470,7 +474,7 @@
      missed about 80 so a purchase is refused for its balance, high-XP about 20,000); answers here add 5 for every 10 XP (migration_v68) */
   var WALLET_START = { "new": 0, returning: 300, missed: 80, "high-xp": 20000, archived: 1500, admin: 5000 };
   function placeOwned(v){
-    var own = {}, g = rank2(rpc("get_rank_profile", { p_visitor: v }).data.xp || 0).gtier;
+    var own = {}, g = rank2(rankProfile(v).xp || 0).gtier;
     Object.keys(PLACE_CAT).forEach(function(k){ var c = PLACE_CAT[k]; if (c.gift) own[k] = "gift"; else if (c.rank && c.rank <= g) own[k] = "rank"; });
     if (v === db.visitor) {
       (PLACE_BOUGHT[db.persona] || []).forEach(function(k){ own[k] = "bought"; });
@@ -1514,7 +1518,7 @@
        up here; the real one is a digest only the server can make, the same for a person on every board). */
     if (/^get_(widget_bootstrap|rank_profile|rank_board|leaderboard|arcade_leaderboard)_v2$/.test(fn)) {
       if (fn === "get_rank_profile_v2") return { data: profile2(v) };
-      var d2 = rpc(fn.slice(0, -3), a).data;
+      var d2 = fn === "get_widget_bootstrap_v2" ? widgetBootstrap(a, t) : rpc(fn.slice(0, -3), a).data;
       var vkey = visitKeyOf;
       if (Array.isArray(d2)) d2 = d2.map(function(r){
         var o2 = {}; Object.keys(r).forEach(function(k){ o2[k] = r[k]; }); o2.journey = 0; o2.visit = vkey(r.display_name);
@@ -1620,7 +1624,6 @@
     if (ideaAns) return ideaAns;
     switch (fn) {
       case "get_hub_overrides": return { data: ovrStore().rows.filter(function(r){ return ovrActive(r, t); }).map(function(r){ return { hub: r.hub, state: r.state, until: r.until }; }) };
-      case "get_widget_bootstrap": return { data: widgetBootstrap(a, t) };
       case "get_display_name": return { data: v === db.visitor ? db.name : null };
       case "set_display_name": if (v === db.visitor) { db.name = a.p_name; save(); } return { write: true, data: null };
       case "clear_display_name": if (v === db.visitor) { db.name = null; save(); } return { write: true, data: null };
@@ -1640,7 +1643,7 @@
           var ks = Object.keys(last); hubs[h] = { hub: h, seen: ks.length, latest_correct: ks.filter(function(q){ return last[q]; }).length }; });
         return { data: Object.keys(hubs).map(function(h){ return hubs[h]; }) };
       }
-      case "get_rank_profile": {
+      case "get_rank_profile_fixture": {
         if (v !== db.visitor) return { data: { xp: 0, tier: 0, level: 1, step: 0, step_at: 0, next_at: 100, answers: 0, correct: 0, days: 0, badges: [] } };
         var xp = myXp(), st = stepOf(xp), tr = tierOf(xp), all = allAnswers(), days = {}; all.forEach(function(r){ days[day(r[2] * 1000)] = 1; });
         return { data: { xp: xp, tier: tr, level: st - tr * 3 + 1, step: st, step_at: stepAt(st), next_at: st < 20 ? stepAt(st + 1) : null, tier_at: TIER_AT[tr],
@@ -1673,9 +1676,6 @@
       case "mark_reply_seen": db.inbox.forEach(function(m){ if (m.id === a.p_id) m.seen = true; }); save(); return { write: true, data: null };
       case "get_active_survey": return { data: bootstrapSurvey(t, true) };
       case "get_my_survey": return { data: bootstrapSurvey(t) };
-      case "submit_survey": if (!db.surveys.answered || !db.surveys.answered.p_answers) db.surveys.answered = a; save(); return { write: true, data: null };
-      /* the exam check-in shows "Thank you" only on true, as the live function returns */
-      case "submit_exam_debrief": (db.debriefs = db.debriefs || []).push(a); save(); return { write: true, data: true };
       /* the reward (migration_v60, v61): the first answer to each survey and the first check-in for each hub's exam pay
          1,000 XP and 1,000 crowns (formReward); a second one pays nothing. The dashboard's window shows what was paid. */
       case "submit_survey_v2": {
@@ -1707,7 +1707,7 @@
       case "get_published_recaps": return { data: recapFixtures() };
       /* the trophy case's shares on the redesign (phase 4, session 6): made up, out of 212, every one held by at least 5 */
       case "get_trophy_stats_v2": return { data: trophyShares() };
-      case "get_golden_today": case "get_correct_streak_stats": case "get_trophy_stats": case "get_fairy_board": case "get_cavity_week": return { data: [] };
+      case "get_golden_today": case "get_correct_streak_stats": case "get_fairy_board": case "get_cavity_week": return { data: [] };
     }
     if (/^get_/.test(fn)) return { data: [] };
     return { write: true, data: null };
