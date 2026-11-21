@@ -12,6 +12,8 @@
 //   checkins   hubs.js changed → the server's closed check-ins (exam_checkins_closed, migration_v86) set to every exam with
 //              checkinClosed in hubs.js, so a closed check-in can't be sent and a reopened one can (Sam, 2026-11-19: "no
 //              one should be able to submit for any older exams")
+//   down       a hub's page came down (hubs/<hub>/index.html deleted) → its "Good question?" thumbs are deleted
+//              (question_feedback; Sam, 2026-11-21: "Delete with the hub", vault/reference/analytics-retention.md)
 //   live       wait until GitHub Pages serves the push (up to 15 minutes), so what follows meets the new pages
 //   fixes      a data fix added under tools/data-fixes/ → run it once on the live database (Supabase's management API)
 //   changelog  a line added to tools/after-merge/changelog.txt → log_changelog for its hub (the hub's "Updated" label)
@@ -27,7 +29,7 @@
 //                                                               run's push is covered (needs GITHUB_TOKEN; coverFrom below)
 //
 // Secrets come from the environment and are never printed (vault/rules/secrets.md): SB_KEY and ADMIN_SECRET for keys,
-// podcast and changelog; SUPABASE_ACCESS_TOKEN for timmy, checkins and fixes. A step whose secret is missing is "blocked", and the
+// podcast and changelog; SUPABASE_ACCESS_TOKEN for timmy, checkins, down and fixes. A step whose secret is missing is "blocked", and the
 // run fails so it shows on main's checks. The workflow's logs are public: nothing here prints a row of the class's data
 // (a data fix's result is never printed) or anything about a person (vault/rules/learner-data-privacy.md).
 'use strict';
@@ -36,7 +38,7 @@ const fs = require('fs'), path = require('path'), crypto = require('crypto'), vm
 const ROOT = path.resolve(__dirname, '../..');
 const REF = 'thytmzsgymydbzcqdnix', API = `https://${REF}.supabase.co`, LIVE = 'https://smcmurry6-source.github.io/study-hubs/';
 const ORIGIN = 'https://smcmurry6-source.github.io';
-const STEPS = ['keys', 'timmy', 'podcast', 'checkins', 'live', 'fixes', 'changelog', 'postcheck'];
+const STEPS = ['keys', 'timmy', 'podcast', 'checkins', 'down', 'live', 'fixes', 'changelog', 'postcheck'];
 const CHANGELOG = 'tools/after-merge/changelog.txt';
 const SITE = ['index.html', 'hubs.js', 'about', 'review', 'hubs', 'widget', 'assets', 'manifest.webmanifest', 'sw.js'];   // tools/preview/transform.js SITE_ENTRIES
 const HUB_RE = /^[a-z0-9][a-z0-9-]{0,39}$/;
@@ -53,7 +55,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
    to the changelog file. Exported for tools/after-merge/test.js. */
 function plan({ changes, podcast, added, extraFixes, engineHubs }){
   const files = changes.map(c => c.path), touched = p => files.some(f => f === p || f.startsWith(p));
-  const out = { keys: [], timmy: false, timmyCode: false, podcast: [], checkins: false, site: [], fixes: [], changelog: [], warnings: [] };
+  const out = { keys: [], timmy: false, timmyCode: false, podcast: [], checkins: false, down: [], site: [], fixes: [], changelog: [], warnings: [] };
   for (const hub of engineHubs) {
     const qf = `hubs/${hub}/content/questions.json`;
     /* a change to how keys are built (tools/xp/keys.js) reloads every engine hub's */
@@ -67,6 +69,8 @@ function plan({ changes, podcast, added, extraFixes, engineHubs }){
   /* the function's code, not only its site help (site.json changes with every About page edit, several times a day) */
   out.timmyCode = files.some(f => f.startsWith('supabase/functions/timmy/') && f !== 'supabase/functions/timmy/site.json');
   out.checkins = files.includes('hubs.js');
+  /* a hub's page came down: its question-health thumbs go with it (question_feedback, read only while the hub is live) */
+  out.down = changes.map(c => c.status === 'D' && (/^hubs\/([^/]+)\/index\.html$/.exec(c.path) || [])[1]).filter(h => h && HUB_RE.test(h)).sort();
   out.site = changes.filter(c => c.status !== 'D' && isSite(c.path)).map(c => c.path);
   out.fixes = changes.filter(c => c.status === 'A' && /^tools\/data-fixes\/[^/]+\.sql$/.test(c.path)).map(c => c.path).sort();
   for (const f of extraFixes || []) if (!out.fixes.includes(f)) out.fixes.push(f);
@@ -281,6 +285,11 @@ async function main(){
     const list = closedCheckins(dashData(to));
     await sql(closedCheckinsSql(list));
     return `${list.length} closed (hubs.js's checkinClosed): ${list.map(c => c.hub + ' ' + c.date).join(', ') || 'none'}`;
+  });
+
+  for (const hub of P.down) await step('down', `delete ${hub}'s "Good question?" thumbs (its page came down)`, ['SUPABASE_ACCESS_TOKEN'], async () => {
+    await sql(`delete from question_feedback where hub = '${hub}'`);   // hub: HUB_RE, so no quote can reach the SQL
+    return `${hub}: its question_feedback rows deleted`;
   });
 
   let live = !P.site.length;
