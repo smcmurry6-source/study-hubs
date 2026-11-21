@@ -3926,9 +3926,7 @@
   } };
   if (!EXPORT_ONLY && supabase) widgetFile("clicks.js", function(){ if (window.shClicks) window.shClicks.start({ sb: clicksSb, hub: HUB, visitor: VISITOR_ID, section: currentSection }); });
   /* replies (widget/replies.js): tells someone once when their report or suggestion has been dealt with, plus notices to everyone */
-  if (!EXPORT_ONLY && supabase) widgetFile("replies.js", function(){ if (window.shReplies) window.shReplies.start({ sb: supabase, visitor: VISITOR_ID, hub: HUB, bootstrap: bootstrap.ready,
-    /* the game layer's Inbox (the idea board's notes) on a page that wants it, whether or not its bootstrap answered */
-    v2: function(){ return GAME.want && GAME.on !== false; } }); });
+  if (!EXPORT_ONLY && supabase) widgetFile("replies.js", function(){ if (window.shReplies) window.shReplies.start({ sb: supabase, visitor: VISITOR_ID, hub: HUB, bootstrap: bootstrap.ready }); });
   /* "Is this your other device?" (widget/linkask.js): offers to link devices that use the same name */
   if (!EXPORT_ONLY && supabase) widgetFile("linkask.js", function(){ if (window.shLinkAsk) window.shLinkAsk.start({ sb: supabase, hub: HUB, section: currentSection, bootstrap: bootstrap.ready, bootstrapName: bootstrap.linkName }); });
 })();

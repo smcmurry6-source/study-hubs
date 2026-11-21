@@ -2,7 +2,7 @@
    corner of every hub. Loaded by widget/v3.js (hubs) and widget/dash.js (the dashboard).
 
    Health (0-100 HP) is worked out from your answers, one row per Central-time day across every hub
-   (get_pet_days, migration_v31), merged with this device's own tally (sh_pet_log) so it updates live and offline:
+   (get_pet_days_v2, migration_v54), merged with this device's own tally (sh_pet_log) so it updates live and offline:
      - a study day heals: 0.8 HP per right answer (up to 30 a day) plus a streak bonus of 2 per day in a row (up to 10),
        minus a little for misses
      - a day with no answers hurts, more the longer you're away: 8, 12, 16, then 20 a day
@@ -373,8 +373,7 @@
   }
   /* server rows + this device's tally -> HP. Deterministic for the same history, so phone and laptop agree. */
   /* On the game layer (the redesign) a server row also carries `hp`: what the shop's snacks gave Timmy that day
-     (get_pet_days_v2, migration_v54). It is added on that day, after the day's own change, and he never goes past 100.
-     Today's rows (get_pet_days) have no `hp`, so the live pages work out exactly what they always have. */
+     (get_pet_days_v2, migration_v54). It is added on that day, after the day's own change, and he never goes past 100. */
   function simulate(serverRows){
     var today = centralDay(), born = ls("sh_pet_born") || today, log = readLog(), by = {}, fed = {};
     (serverRows || []).forEach(function(r){ var k = String(r.d).slice(0, 10); by[k] = [r.attempts | 0, r.correct | 0]; if (r.hp > 0) fed[k] = r.hp | 0; });
@@ -1237,8 +1236,7 @@
       name: opt.name || (H ? H.name : function(){ return ls("sh_display_name") || ""; }), home: opt.home || null,
       el: null, btn: null, say: null, st: simulate(null), rows: null, sayT: null, run: 0, wrongRun: 0, lastSection: "", lastInput: Date.now(),
       sessionStart: Date.now(), longNudges: 0, idleSaid: false, taps: 0, tapT: 0, lastHp: null, lastTalk: 0,
-      bootstrap: opt.bootstrap || (H && H.bootstrap) || (window.shBootstrap && window.shBootstrap.ready) || null, loaded: false,
-      live: typeof opt.live === "function" ? opt.live : H && typeof H.live === "function" ? H.live : null
+      bootstrap: opt.bootstrap || (H && H.bootstrap) || (window.shBootstrap && window.shBootstrap.ready) || null, loaded: false
     };
     if (firstMeet) { ls("sh_pet_adopt_sent", "1"); award("pet-adopt", ls("sh_pet_born")); }   /* once: syncBadges won't send it again */
     load();
@@ -1275,19 +1273,12 @@
     }
     loadRemote();
   }
-  function missingFn(r){ var e = r && r.error; return !!e && (e.code === "PGRST202" || e.code === "42883" || r.status === 404 || /could not find the function|does not exist/i.test(e.message || "")); }
   function loadRemote(){
     if (!M || !M.sb || !M.visitor) return;
-    /* a page on the game layer asks for the days with the snacks' HP (migration_v54): a new hub says so through
-       shGame.v2(), the new dashboard by its v2 bootstrap (only that one carries `shop`); every other page as before */
-    /* since 2026-11-19 a page also says so by M.live (a hub's shEggHooks.live, the dashboard's own): the game layer is
-       wanted and hasn't been found missing. Until then this waited for v2() or the bootstrap, so with the bootstrap timed
-       out in a busy minute his HP left out the snacks'. A database without the v2 call gets today's. */
-    var v2 = false; try { var bd = window.shBootstrap && window.shBootstrap.data; v2 = !!((M.live && M.live()) || (window.shGame && window.shGame.v2 && window.shGame.v2()) || (bd && bd.shop && bd.rank && bd.rank.journey != null)); } catch (e) {}
-    function got(r){ if (r && !r.error && Array.isArray(r.data)) { M.rows = r.data; update(true); } }
-    M.sb.rpc(v2 ? "get_pet_days_v2" : "get_pet_days", { p_visitor: M.visitor }).then(function(r){
-      if (v2 && missingFn(r)) return M.sb.rpc("get_pet_days", { p_visitor: M.visitor }).then(got);
-      got(r);
+    /* his days with the snacks' HP (get_pet_days_v2, migration_v54): every page is on the game layer since the old
+       single-file pages came down (2026-11-19), so there is no get_pet_days fallback any more (2026-11-20) */
+    M.sb.rpc("get_pet_days_v2", { p_visitor: M.visitor }).then(function(r){
+      if (r && !r.error && Array.isArray(r.data)) { M.rows = r.data; update(true); }
     }).then(null, function(){});
   }
   function update(quiet){

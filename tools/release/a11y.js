@@ -119,19 +119,8 @@ async function openVisit(page, check){
       } else problems.push('dashboard · visited place: a row on the boards didn\'t open a classmate\'s place');
     }
   }
-  /* an old single-file hub that is still live: every mode */
-  for (const hub of live.filter(h => !L.isEngine(h))) {
-    await page.goto(srv.url + `hubs/${hub}/`); await L.settle(page);
-    const modes = await page.$$eval('#modeSwitch [data-mode]', bs => bs.map(b => b.getAttribute('data-mode')));
-    let first = true;
-    for (const m of modes) {
-      await page.click(`#modeSwitch [data-mode="${m}"]`).catch(() => {}); await page.waitForTimeout(300);
-      await check(`${hub} · ${m}`, null);
-      if (first) { results[`${hub} · ${m}`].focus = await keyboard(page); results[`${hub} · ${m}`].motion = await motion(page); first = false; }
-    }
-  }
-  /* a hub on the engine (widget/hub.js): the four views */
-  const next = live.filter(h => L.isEngine(h));
+  /* every hub is on the engine (widget/hub.js) since the old single-file pages came down: the four views */
+  const next = live;
   for (const hub of next) {
     await page.goto(srv.url + `hubs/${hub}/`); await L.settle(page);
     let first = true;
