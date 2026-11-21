@@ -9,7 +9,7 @@
 // The site has known issues, so results are compared with tools/release/baselines/a11y.json: anything new or worse
 // fails; anything better is reported so the baseline can come down (--update writes it). A page with no baseline
 // (a new hub) fails on any serious or critical axe violation: new pages start clean.
-//   npm i --no-save playwright axe-core && node tools/release/a11y.js [--update] [--hub perio]
+//   npm i --no-save playwright axe-core && node tools/release/a11y.js [--update] [--hub review-of-systems]
 'use strict';
 const fs = require('fs'), path = require('path');
 const L = require('./lib');

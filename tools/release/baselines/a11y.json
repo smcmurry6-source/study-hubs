@@ -142,42 +142,12 @@
    "focus": null,
    "motion": 0
   },
-  "perio · home": {
-   "axe": {},
-   "focus": {
-    "invisible": 0,
-    "stuck": 0,
-    "where": [],
-    "why": []
-   },
-   "motion": 0
-  },
-  "perio · notes": {
-   "axe": {},
-   "focus": null,
-   "motion": 0
-  },
-  "perio · questions": {
-   "axe": {},
-   "focus": null,
-   "motion": 0
-  },
-  "perio · more": {
-   "axe": {},
-   "focus": null,
-   "motion": 0
-  },
   "dashboard (dark)": {
    "axe": {},
    "focus": null,
    "motion": 0
   },
   "review-of-systems (dark)": {
-   "axe": {},
-   "focus": null,
-   "motion": 0
-  },
-  "perio (dark)": {
    "axe": {},
    "focus": null,
    "motion": 0
