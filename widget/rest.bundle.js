@@ -338,9 +338,7 @@ send.addEventListener("click", function(){
 if (send.disabled) return;
 send.disabled = true; note.textContent = "Sending…";
 var args = { p_survey: r.id, p_visitor: visitor, p_answers: answers };
-function missing(res){ var e = res && res.error; return !!e && (e.code === "PGRST202" || e.code === "42883" || res.status === 404 || /could not find the function|does not exist/i.test(e.message || "")); }
 sb.rpc("submit_survey_v2", args).then(function(res){
-if (missing(res)) return sb.rpc("submit_survey", args).then(function(o){ return { ok: !!o && !o.error && o.data !== false, xp: 0, crowns: 0 }; });
 var d = res && !res.error && res.data && typeof res.data === "object" ? res.data : null;
 return { ok: !!(d && d.ok), xp: d && d.xp | 0, crowns: d && d.crowns | 0 };
 }).then(function(res){
@@ -1342,7 +1340,7 @@ function call(name){
 try { return Promise.resolve(sb.rpc(name, {})).then(function(r){ return r && !r.error && r.data && r.data.length ? r.data : null; }, function(){ return null; }); }
 catch (e) { return Promise.resolve(null); }
 }
-call("get_trophy_stats_v2").then(function(rows){ return rows || call("get_trophy_stats"); }).then(function(rows){
+call("get_trophy_stats_v2").then(function(rows){
 if (rows) { var m = {}; rows.forEach(function(r){ if (r && r.kind) m[r.kind] = { n: r.n | 0, total: r.total | 0 }; }); TS.data = m; TS.at = Date.now(); }
 var q = TS.q; TS.q = null; q.forEach(function(f){ try { f(TS.data); } catch (e) {} });
 });

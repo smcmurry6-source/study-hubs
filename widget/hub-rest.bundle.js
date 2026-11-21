@@ -249,8 +249,7 @@ badgeIcon(profile.tier || 0); render(); drawAccents(); applyAccent(ls("sh_pref_a
 }
 function loadOwn(){
 if (loading) return; loading = true;
-var v2 = H.live ? H.live() : H.v2 && H.v2();
-Promise.all([rpc(v2 ? "get_rank_profile_v2" : "get_rank_profile", { p_visitor: H.visitor }), rpc("get_hub_mastery", { p_visitor: H.visitor })]).then(function(r){
+Promise.all([rpc("get_rank_profile_v2", { p_visitor: H.visitor }), rpc("get_hub_mastery", { p_visitor: H.visitor })]).then(function(r){
 loading = false;
 if (!r[0]) { if (!profile) sec.innerHTML = '<div class="shstat-empty">Ranks load when you are online.</div>'; return; }
 applyOwn(r[0], r[1]);
@@ -1101,12 +1100,6 @@ if (swipes.join(" ") === SWIPE_CODE) { swipes = []; toggle8bit(); }
 }, { passive: true });
 function toggle8bit(){
 sh8bit = !sh8bit;
-if (sh8bit && !document.getElementById("sh-egg-8bit-font") && !document.documentElement.classList.contains("shx")) {
-var l = document.createElement("link");
-l.id = "sh-egg-8bit-font"; l.rel = "stylesheet";
-l.href = "https://fonts.googleapis.com/css2?family=VT323&display=swap";
-document.head.appendChild(l);
-}
 document.documentElement.classList.toggle("sh-8bit", sh8bit);
 if (sh8bit) rpc("record_achievement", { p_visitor: VISITOR, p_kind: "konami", p_hub: HUB });
 toast(row(IC.tooth, sh8bit ? "8-bit mode" : "Back to 2026", sh8bit ? "Correct answers go blip. Do the code again to leave." : ""), 3200);
@@ -2946,7 +2939,7 @@ var ANSWERED_EVENT = ds.answeredEvent || (HUB + ":answered");
 var DEFAULT_MODE = ds.defaultMode || "compendium";
 var AUDIO_OFF = ds.audio === "off";
 if (AUDIO_OFF) try { document.documentElement.classList.add("sh-audio-off"); } catch (e) {}
-var GAME = { want: ds.game === "v2", on: null, boost: null };
+var GAME = { on: null, boost: null };
 function rpcMissing(r){ var e = r && r.error; return !!e && (e.code === "PGRST202" || e.code === "42883" || r.status === 404 || /could not find the function|does not exist/i.test(e.message || "")); }
 var SB_URL = "https://thytmzsgymydbzcqdnix.supabase.co";
 var SB_KEY = "sb_publishable_6s_2KEdBVkEfEZH3qn8ouw_w7b8WcMS";
@@ -3850,8 +3843,7 @@ function old(){
 if (!supabase) return;
 try { supabase.rpc("set_display_name", { p_visitor: VISITOR_ID, p_name: name }).then(function(res){ if (dbFailed(res)) dbFail(); else answered(); }, function(){ dbFail(); }); } catch (e) {}
 }
-if (GAME.want && GAME.on !== false) claimPrize("set_display_name_v2", { p_visitor: VISITOR_ID, p_name: name }, "name").then(function(r){ if (!r || r.missing) old(); else answered(); });
-else old();
+claimPrize("set_display_name_v2", { p_visitor: VISITOR_ID, p_name: name }, "name").then(function(r){ if (!r || r.missing) old(); else answered(); });
 }
 function saveName(name){
 name = String(name || "").trim().slice(0, 24);
@@ -4118,24 +4110,19 @@ p_episode: !AUDIO_OFF && window.SH_PODCAST && window.SH_PODCAST.id ? window.SH_P
 p_include_pins: !!window.SH_PINS,
 p_link_name: bootstrap.linkName || null
 };
-var ansSent = GAME.want ? ansLoad() : null, v2Args = bootArgs;
+var ansSent = ansLoad(), v2Args = bootArgs;
 if (ansSent) v2Args = Object.assign({ p_answers_after: ansSent.id, p_answers_n: ansSent.n }, bootArgs);
 function bootV2(args){
 return supabase.rpc("get_widget_bootstrap_v2", args).then(function(res){
 if (rpcMissing(res) && args !== bootArgs) { ansSent = null; ansOff = true; ansDrop(); return bootV2(bootArgs); }
-if (rpcMissing(res)) { GAME.on = false; return supabase.rpc("get_widget_bootstrap", bootArgs); }
 return res;
 });
 }
-var bootCall = !GAME.want ? supabase.rpc("get_widget_bootstrap", bootArgs) : bootV2(v2Args);
-bootstrap.ready = bootCall.then(function(res){
+bootstrap.ready = bootV2(v2Args).then(function(res){
 if (!res || res.error || !res.data || typeof res.data !== "object") return null;
 bootstrap.data = ansAbsorb(res.data, ansSent);
-if (GAME.want && GAME.on === null) {
 var rk = res.data.rank;
-GAME.on = !!(rk && rk.journey != null);
-if (GAME.on) GAME.boost = rk.boost || null;
-}
+if (GAME.on === null && rk && rk.journey != null) { GAME.on = true; GAME.boost = rk.boost || null; }
 return bootstrap.data;
 }, function(){ return null; });
 } catch (e) { bootstrap.ready = Promise.resolve(null); }
@@ -4213,20 +4200,21 @@ document.addEventListener("visibilitychange", function(){ if (document.visibilit
 window.addEventListener("pagehide", function(){ run(true, true); });
 })();
 var resolvedAnonName = "";
-function nameFromServer(server, asked){
+function nameFromServer(server, asked, custom){
 server = String(server || "").trim().slice(0, 24);
 var mine = currentName(), unsaved = null;
-if (!server || !mine || mine !== (asked || "")) return "";
+if (!server || !mine || mine !== (asked || "")) return null;
 try { unsaved = localStorage.getItem(SH_NAME_UNSAVED); } catch (e) {}
-if (unsaved === mine && server !== mine) { sendName(mine); return ""; }
+if (unsaved === mine && server !== mine) { sendName(mine); return null; }
 if (unsaved !== null) try { localStorage.removeItem(SH_NAME_UNSAVED); } catch (e) {}
-if (server === mine) return "";
+if (custom === false) { try { localStorage.removeItem(SH_NAME_KEY); } catch (e) {} return ""; }
+if (server === mine) return null;
 try { localStorage.setItem(SH_NAME_KEY, server); } catch (e) {}
 return server;
 }
 bootstrap.ready.then(function(data){
-var took = data ? nameFromServer(data.display_name, bootstrap.linkName) : "";
-if (data && data.display_name) { resolvedAnonName = data.display_name; renderNameBadge(); syncNameInputs(); try { document.dispatchEvent(new CustomEvent("sh:name", { detail: took ? { name: took } : {} })); } catch (e) {} return; }
+var took = data ? nameFromServer(data.display_name, bootstrap.linkName, data.name_custom) : null;
+if (data && data.display_name) { resolvedAnonName = data.display_name; renderNameBadge(); syncNameInputs(); try { document.dispatchEvent(new CustomEvent("sh:name", { detail: took !== null ? { name: took } : {} })); } catch (e) {} return; }
 if (supabase) try { supabase.rpc("get_display_name", { p_visitor: VISITOR_ID }).then(function(res){
 if (res && !res.error && res.data) { resolvedAnonName = res.data; renderNameBadge(); syncNameInputs(); try { document.dispatchEvent(new CustomEvent("sh:name", { detail: {} })); } catch (e) {} }
 }, function(){}); } catch (e) {}
@@ -4560,7 +4548,6 @@ if (job.f) return sendFinish(job);
 var call;
 try { call = supabase.rpc("record_answer_v2", job.args); } catch (e) { return Promise.resolve(false); }
 return call.then(function(res){
-if (rpcMissing(res)) { GAME.on = false; answerToday(job.d, job.c); return false; }
 if (res && res.error) {
 if (dbFailed(res)) { dbFail(); return true; }
 return false;
@@ -4598,7 +4585,7 @@ lineOn = false; lineNext();
 }, function(){ lineSent = null; answerLine.shift(); lineOn = false; lineNext(); });
 }
 var KEEP_KEY = "sh_answers_kept:" + HUB, KEEP_MS = 3 * 864e5, KEEP_TRIES = 24, KEEP_MAX = 300;
-function keepOn(){ return !!supabase && !AUTOMATED && GAME.want && GAME.on !== false && !!HUB; }
+function keepOn(){ return !!supabase && !AUTOMATED && !!HUB; }
 function keepRead(){
 var a = null;
 try { a = JSON.parse(localStorage.getItem(KEEP_KEY) || "null"); } catch (e) {}
@@ -4659,7 +4646,7 @@ lineNext();
 document.addEventListener("visibilitychange", function(){ if (document.visibilityState === "hidden") keepLine(); else keepClaim(); });
 window.addEventListener("pagehide", keepLine);
 window.addEventListener("pageshow", function(e){ if (e && e.persisted) keepClaim(); });
-if (supabase && !AUTOMATED && GAME.want && HUB) bootstrap.ready.then(function(){ setTimeout(keepClaim, 2500); }, function(){ setTimeout(keepClaim, 2500); });
+if (supabase && !AUTOMATED && HUB) bootstrap.ready.then(function(){ setTimeout(keepClaim, 2500); }, function(){ setTimeout(keepClaim, 2500); });
 function sendBowlTrophy(){
 try { if (!supabase || !localStorage.getItem("sh_bowl_trophy") || localStorage.getItem("sh_bowl_trophy_sent")) return; } catch (e) { return; }
 try {
@@ -4697,7 +4684,7 @@ if (!(xp > 0)) return;
 try { document.dispatchEvent(new CustomEvent("sh:prize", { detail: { src: src, xp: xp, text: prizeText(src, xp, d), res: d || null } })); } catch (e) {}
 }
 function claimPrize(fn, args, src, delay){
-if (!supabase || AUTOMATED || !GAME.want || GAME.on === false) return Promise.resolve(null);
+if (!supabase || AUTOMATED) return Promise.resolve(null);
 var call; try { call = supabase.rpc(fn, args); } catch (e) { return Promise.resolve(null); }
 return call.then(function(res){
 if (rpcMissing(res)) return { missing: true };
@@ -4710,20 +4697,19 @@ return r;
 }
 window.shGame = {
 prizes: PRIZES, prizeText: prizeText, prizeName: prizeName, claim: claimPrize, setCrowns: setCrowns, crowns: function(){ return CROWNS; },
-live: function(){ return GAME.want && GAME.on !== false; },
+live: function(){ return true; },
 ask: function(fn, args){
-if (!supabase || AUTOMATED || !GAME.want || GAME.on === false) return Promise.resolve(null);
+if (!supabase || AUTOMATED) return Promise.resolve(null);
 try { return supabase.rpc(fn, args).then(function(res){ return res && !res.error ? res.data : null; }, function(){ return null; }); } catch (e) { return Promise.resolve(null); }
 },
-want: GAME.want,
+want: true,
 v2: function(){ return GAME.on === true; },
 boost: function(){ var b = GAME.boost; return b && b.until && new Date(b.until).getTime() > Date.now() ? b : null; },
 setBoost: function(b){ GAME.boost = b || null; },
 startSession: function(kind, game){
-if (!supabase || AUTOMATED || !GAME.want || GAME.on === false) return Promise.resolve(null);
+if (!supabase || AUTOMATED) return Promise.resolve(null);
 try {
 return supabase.rpc("xp_session_start", { p_visitor: VISITOR_ID, p_hub: HUB, p_kind: kind, p_game: game || null }).then(function(res){
-if (rpcMissing(res)) { GAME.on = false; return null; }
 var id = res && !res.error && typeof res.data === "string" ? res.data : null;
 if (id) sessionInfo[id] = { kind: kind, game: game || null };
 return id;
@@ -4777,7 +4763,7 @@ document.addEventListener(ANSWERED_EVENT, function(e){
 var d = (e && e.detail) || {};
 var isCorrect = !!d.correct;
 srsRecord(String(d.qid || ""), isCorrect);
-if (GAME.want && GAME.on !== false) answerV2(d, isCorrect); else answerToday(d, isCorrect);
+answerV2(d, isCorrect);
 var prevStreak = sessionCorrectStreak;
 if (isCorrect) {
 sessionCorrectStreak++;
@@ -4954,7 +4940,7 @@ shNukeSfx.preload("countdown");
 nukeBadgeEl = document.createElement("button");
 nukeBadgeEl.type = "button";
 nukeBadgeEl.id = "sh-nuke-badge";
-var prize = GAME.want && GAME.on !== false ? fmtN(PRIZES.nuke) : "";
+var prize = fmtN(PRIZES.nuke);
 nukeBadgeEl.innerHTML = '<span class="sh-nuke-icon sh-nuke-icon-md" aria-hidden="true"></span><span class="sh-nuke-badge-label">Tactical Nuke Ready</span>' +
 (prize ? '<span class="sh-nuke-badge-prize" aria-hidden="true">+' + prize + "<i> XP and crowns</i></span>" : "");
 nukeBadgeEl.setAttribute("aria-label", "Tactical nuke ready" + (prize ? ", worth " + prize + " XP and " + prize + " crowns" : "") + " -- tap to call it in");
@@ -5963,7 +5949,7 @@ return [q, (rows || []).filter(function(r){ return r.hub !== HUB; }).concat([{ h
 window.shEggHooks = {
 hub: HUB, answeredEvent: ANSWERED_EVENT, visitor: VISITOR_ID, supabase: supabase, bootstrap: bootstrap.ready,
 v2: function(){ return GAME.on === true; },
-live: function(){ return GAME.want && GAME.on !== false; },
+live: function(){ return true; },
 send: function(payload){ try { if (channel) channel.send({ type: "broadcast", event: "egg", payload: payload }); } catch (e) {} },
 name: displayName, section: currentSection, online: function(){ return onlineCount; },
 toast: showStreakToast, confetti: fireConfetti, prefGet: prefGet, prefSet: prefSet, esc: esc,

@@ -33,6 +33,17 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 ## Recent major changes (newest first — add a line when you ship something)
 
 - **2026-11-21 (A hub's restyle when the widget's stylesheet goes in, about 40 ms shorter, Claude Code, #525)** — The hub bundle puts `widget/v3.css` in as a `<style>` once the page is drawn, and the browser restyled every element for it: one rule set the class-picks fill color (`--sh-cp-fill`) on `:root`, and a custom property new to the root changes what every element inherits. It is set on `.sh-cp` now, the one element that reads it. On `perf.js`'s slow phone putting the sheet in went from about 58 to about 21 ms; Review of Systems' blocking time, about 237 to about 156 ms (medians of 10 alternating runs; budgets unchanged). Nothing looks different (every element's computed style compared, light and dark). `tools/release/perf.js` no longer has Chromium keep a copy of every response for DevTools (`Network.enable` with no buffers; Sam: "Yes if you think so"); it moved no page's numbers past their run-to-run spread, so the budgets stay. Also: Perio's five screens out of the a11y baseline, and `a11y.js`'s usage line names `review-of-systems`. Left: the inbox line "Cut `widget/v3.css` to the rules a hub on the engine draws".
+- **2026-11-21 (Back to a random name on a linked device; the game layer's last fallbacks out, #523, Claude Code)** —
+  BUG-196's follow-up: `migration_v94` (applied live 2026-11-21, 8:09 am Central, md5-checked) adds `name_custom` to
+  `get_widget_bootstrap_v2` (true when `visitor_names` has the id's row), and `nameFromServer` in `widget/v3.js` and `widget/dash.js` drops the device's copy when it's false, so "Go
+  back to a random name" on one linked device reaches the other (before, the other kept the random name as one it had
+  picked). The fallbacks for a database without the game layer came out: `widget/v3.js` always asks for
+  `get_widget_bootstrap_v2` and never switches to the old answer calls (`GAME.want` is gone, `GAME.on` is never false);
+  `widget/ranks-hub.js` reads only `get_rank_profile_v2`, `widget/ranks.js` only `get_trophy_stats_v2`, `widget/replies.js`
+  only `submit_survey_v2`; the preview (`tools/preview/runtime/preview.js`) no longer answers the old names. The five
+  archived hubs' tint lines left `widget/hub.css` (and Perio's darker ink), and `widget/eggs.js`'s VT323 fetch for pages
+  without `shx`. The `shx` class stays (the preview's pill and the figure builds select it). Nothing students see, except the
+  random name now following. `tools/release/xp.js` checks the flag; `tools/ci/quiet.js` passed.
 - **2026-11-21 (Patient Box v2.1's clinical calls settled from outside sources, Claude Code)** — Sam: "Use outside sources to
   determine answers" to the questions v2.1's review left. Radiopacity on a film now follows mm-Al studies (Pekkan 2011, Atala
   2019, Erzurumlu 2021, Hitij and Fidler 2013, Balci 2023): zirconia nearly as bright as metal, composite about enamel's or a

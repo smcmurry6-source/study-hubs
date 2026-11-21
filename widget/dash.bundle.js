@@ -1336,12 +1336,13 @@ function answered(){ if (ls(NAME_UNSAVED) === v) lsSet(NAME_UNSAVED, null); }
 function old(){ nameSb.rpc("set_display_name", { p_visitor: VISITOR, p_name: v }).then(function(r){ if (r && (!r.error || (r.status >= 400 && r.status < 500))) answered(); }, function(){}); }
 dashPrize(nameSb, "set_display_name_v2", { p_visitor: VISITOR, p_name: v }, "name").then(function(r){ if (!r || r.missing) old(); else answered(); });
 }
-function nameFromServer(server, asked){
+function nameFromServer(server, asked, custom){
 server = String(server || "").trim().slice(0, 24);
 if (!server || !localName || localName !== (asked || "")) return;
 var unsaved = ls(NAME_UNSAVED);
 if (unsaved === localName && server !== localName) { sendName(localName); return; }
 if (unsaved !== null) lsSet(NAME_UNSAVED, null);
+if (custom === false) { localName = ""; randomName = server; lsSet("sh_display_name", null); paintName(); nameChanged(); return; }
 if (server === localName) return;
 localName = server; lsSet("sh_display_name", server); paintName(); nameChanged();
 }
@@ -1786,7 +1787,7 @@ p_luck_hub: luckFor ? luckFor.hub : null, p_luck_date: luckFor ? luckFor.date : 
 }).then(function(r){
 if (!r || r.error || !r.data || typeof r.data !== "object") return null;
 boot.data = r.data;
-try { nameFromServer(r.data.display_name, boot.linkName); } catch (e) {}
+try { nameFromServer(r.data.display_name, boot.linkName, r.data.name_custom); } catch (e) {}
 return boot.data;
 }, function(){ return null; });
 } catch (e) {}
