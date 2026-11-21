@@ -6,7 +6,7 @@
    Any [data-sh-inbox] element opens it; .sh-inbox-badge elements show the unread count. Data: get_my_inbox_v2 (the replies, notices and the idea board's status notes, kind "idea"); reading a reply calls mark_reply_seen.
    The live survey (get_my_survey) also waits at the top of the Inbox until it's answered, so "Later" on the dashboard's
    survey pop-up (or never seeing it) still leaves it one tap away; it counts as unread until the Inbox is opened
-   (sh_survey_seen) and is answered right there (submit_survey). shReplies.refresh() reloads after the pop-up is used.
+   (sh_survey_seen) and is answered right there (submit_survey_v2). shReplies.refresh() reloads after the pop-up is used.
    Used by widget/v3.js (hubs) and the dashboard:
      shReplies.start({ sb: supabaseClient, visitor: "..." or null, hub: "perio" | "dashboard" }) */
 (function(){
@@ -223,11 +223,9 @@
         if (send.disabled) return;
         send.disabled = true; note.textContent = "Sending…";
         /* submit_survey_v2 (migration_v60) answers { ok, xp, crowns }: the first answer to each survey pays 1,000 XP (migration_v61) and 1,000
-           crowns. Without it, the old call's true or false. */
+           crowns */
         var args = { p_survey: r.id, p_visitor: visitor, p_answers: answers };
-        function missing(res){ var e = res && res.error; return !!e && (e.code === "PGRST202" || e.code === "42883" || res.status === 404 || /could not find the function|does not exist/i.test(e.message || "")); }
         sb.rpc("submit_survey_v2", args).then(function(res){
-          if (missing(res)) return sb.rpc("submit_survey", args).then(function(o){ return { ok: !!o && !o.error && o.data !== false, xp: 0, crowns: 0 }; });
           var d = res && !res.error && res.data && typeof res.data === "object" ? res.data : null;
           return { ok: !!(d && d.ok), xp: d && d.xp | 0, crowns: d && d.crowns | 0 };
         }).then(function(res){

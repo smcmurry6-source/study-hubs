@@ -864,13 +864,8 @@
   }, { passive: true });
   function toggle8bit(){
     sh8bit = !sh8bit;
-    /* the pixel face: a redesigned page (shx) has its own copy (widget/hub.css) */
-    if (sh8bit && !document.getElementById("sh-egg-8bit-font") && !document.documentElement.classList.contains("shx")) {
-      var l = document.createElement("link");
-      l.id = "sh-egg-8bit-font"; l.rel = "stylesheet";
-      l.href = "https://fonts.googleapis.com/css2?family=VT323&display=swap";
-      document.head.appendChild(l);
-    }
+    /* the pixel face comes with the page's stylesheet (widget/hub.css); until 2026-11-21 an old single-file hub's page
+       (no shx class) fetched it from Google Fonts here */
     document.documentElement.classList.toggle("sh-8bit", sh8bit);
     if (sh8bit) rpc("record_achievement", { p_visitor: VISITOR, p_kind: "konami", p_hub: HUB });
     toast(row(IC.tooth, sh8bit ? "8-bit mode" : "Back to 2026", sh8bit ? "Correct answers go blip. Do the code again to leave." : ""), 3200);

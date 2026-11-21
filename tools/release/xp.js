@@ -1725,11 +1725,19 @@ try {
     const drop = (o, ks) => { const c = Object.assign({}, o); ks.forEach(k => delete c[k]); return c; };
     for (const [v, h] of [['xp-B', 'xh'], ['xp-L1', 'xm'], ['xp-none', 'xh']]) {
       const b1 = json(`get_widget_bootstrap(${q(v)}, ${q(h)})`), b2 = json(`get_widget_bootstrap_v2(${q(v)}, ${q(h)})`);
-      eq(Object.keys(b2).sort(), Object.keys(b1).concat(['shop', 'answers_id', 'answers_n', 'answers_part']).filter((k, i, a) => a.indexOf(k) === i).sort(), `the bootstrap v2 for ${v} has v1's keys and the shop`);
-      eq(JSON.stringify(drop(b2, ['rank', 'pet_days', 'inbox', 'shop', 'answers_id', 'answers_n', 'answers_part'])), JSON.stringify(drop(b1, ['rank', 'pet_days', 'inbox'])), `the bootstrap v2 for ${v}: v1's parts, the same values`);
+      eq(Object.keys(b2).sort(), Object.keys(b1).concat(['shop', 'answers_id', 'answers_n', 'answers_part', 'name_custom']).filter((k, i, a) => a.indexOf(k) === i).sort(), `the bootstrap v2 for ${v} has v1's keys and the shop`);
+      eq(JSON.stringify(drop(b2, ['rank', 'pet_days', 'inbox', 'shop', 'answers_id', 'answers_n', 'answers_part', 'name_custom'])), JSON.stringify(drop(b1, ['rank', 'pet_days', 'inbox'])), `the bootstrap v2 for ${v}: v1's parts, the same values`);
+      // migration_v94: whether the name is one someone picked (visitor_names), so a linked device can drop its copy
+      eq(b2.name_custom, num(`select count(*) from visitor_names where visitor_id = ${q(v)}`) > 0, `the bootstrap v2 for ${v} says whether its name was picked`);
       eq([b2.rank, b2.pet_days, b2.inbox], [json(`get_rank_profile_v2(${q(v)})`), json(`coalesce((select jsonb_agg(to_jsonb(pd) order by pd.d) from get_pet_days_v2(${q(v)}) pd), '[]'::jsonb)`),
         json(`coalesce((select jsonb_agg(to_jsonb(i) order by i.at desc) from get_my_inbox_v2(${q(v)}) i), '[]'::jsonb)`)], `the bootstrap v2 for ${v}: the v2 rank, Timmy's days and Inbox`);
     }
+    // v94: a name picked, then "Go back to a random name": the linked device reads name_custom false and the random name
+    anon(`select set_display_name('xp-NC', 'Count Plaqula')`);
+    eq(json(`get_widget_bootstrap_v2('xp-NC', 'xh')->'name_custom'`), true, 'a picked name: name_custom true');
+    anon(`select clear_display_name('xp-NC')`);
+    const nc = json(`get_widget_bootstrap_v2('xp-NC', 'xh')`);
+    eq([nc.name_custom, nc.display_name], [false, json(`to_jsonb(anon_name('xp-NC'))`)], 'back to a random name: name_custom false, with the random name');
     // v84: the answers after the device's newest, and the bootstrap with the device's cursor
     {
       const all = json(`get_my_answers_since('xp-B', 'xh')`), cut = Math.max(0, all.answers.length - 3);

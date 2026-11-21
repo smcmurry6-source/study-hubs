@@ -686,7 +686,7 @@
     loadTrophyArt(go, go);
   }
   /* the class's share of each trophy, for the redesign's case and cards: get_trophy_stats_v2 (migration_v54, with the
-     journeys) or, until that is applied, get_trophy_stats (migration_v32). kind -> { n, total }, kept 10 minutes. The
+     journeys). kind -> { n, total }, kept 10 minutes. The
      client is the hub widget's (mount), the one passed in (the dashboard's) or window.shSupabase. */
   var TS = { data: null, at: 0, q: null, sb: null };
   function trophyStats(cb, sb){
@@ -699,7 +699,7 @@
       try { return Promise.resolve(sb.rpc(name, {})).then(function(r){ return r && !r.error && r.data && r.data.length ? r.data : null; }, function(){ return null; }); }
       catch (e) { return Promise.resolve(null); }
     }
-    call("get_trophy_stats_v2").then(function(rows){ return rows || call("get_trophy_stats"); }).then(function(rows){
+    call("get_trophy_stats_v2").then(function(rows){
       if (rows) { var m = {}; rows.forEach(function(r){ if (r && r.kind) m[r.kind] = { n: r.n | 0, total: r.total | 0 }; }); TS.data = m; TS.at = Date.now(); }
       var q = TS.q; TS.q = null; q.forEach(function(f){ try { f(TS.data); } catch (e) {} });
     });
