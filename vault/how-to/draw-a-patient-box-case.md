@@ -14,7 +14,9 @@ case. Since Patient Box v2 (2026-11-20, [the task](../tasks/done/2026-11-06-pati
   sites, landmarks such as the CEJ, the contacts and the crest 1.5 mm below the CEJ, and the films that show it). **Figures
   pull from it too** (Sam, 2026-11-06): a figure build imports it (`createRequire(import.meta.url)("../../../widget/teeth.js")`)
   and draws its tooth with `outlineMM(n)` or the same `crownMM`, `mkRoots`, `rootOutline` and `trunkPts` the cases use,
-  so the two can't disagree. The first: the arcade's Stage & Grade tile (`stageMolar()` in `tools/figures/site/arcade.mjs`).
+  with the enamel over its dentin (`dejPts`: thinning to nothing at the CEJ), the pulp (`pulpPts`), a restoration or a
+  lesion by surface (`restoMM`, `cariesMM`) and a tooth's place along the arch (`archMM`), so the two can't disagree. The
+  first: the arcade's Stage & Grade tile (`stageMolar()` in `tools/figures/site/arcade.mjs`).
 - **`widget/cases.js` + `widget/cases.css`, the case kit** (`window.shCases`), which reads the library. One record per case
   draws every picture, the Patient Box rows and the key (`derive()`), and `validate()` rejects numbers outside clinical
   ranges, numbers that disagree with each other and impossible combinations. CI runs it on every hub and on
@@ -64,9 +66,9 @@ over the result field by field, for the one number you want by hand.
 | Module | What it writes |
 |---|---|
 | `missing` `{ teeth }` | the teeth are gone (X on the odontogram, a gap on a film) |
-| `restoration` `{ tooth, surfaces, material }` | `amalgam`, `composite`, `gold` by surface (`MOD`; `B`/`F` and `O`/`I` are taken for the tooth's own), or `crown` |
-| `caries` `{ tooth, surface, depth }` | `enamel`, `dentin` or `pulp`: a notch at the contact on a film, red on the odontogram |
-| `endo` `{ tooth, fill, lesion }` | a root canal filling (`fill: false` for none) and a periapical radiolucency `lesion` mm across |
+| `restoration` `{ tooth, surfaces, material }` | `amalgam`, `composite`, `gold` by surface (`MOD`; `B`/`F` and `O`/`I` are taken for the tooth's own), or `crown`. A film draws the preparation's outline: O in the middle of the crown under the cusps, a box per proximal surface down to a floor about 2.4 mm under the contact, a buccal-groove extension for OB, a cervical oval for a B or L alone (Class V), Class III and IV on an incisor or canine; metal bright white, composite a shade under enamel with a crisp edge; the chart and the odontogram fill the same surfaces |
+| `caries` `{ tooth, surface, depth }` | `enamel`, `dentin` or `pulp`. On a film a proximal one is a triangle in the enamel just cervical to the contact, and from `dentin` a second one spreading along the DEJ toward the pulp horn; an occlusal one shows only in the dentin; a B or L one is a faint round shadow. Red, hatched, on the odontogram |
+| `endo` `{ tooth, fill, lesion }` | a root canal filling (`fill: false` for none; with one the chamber is filled too) and a periapical `lesion` mm across: the PDL space widening toward the apex, the lamina dura gone there, into a soft-edged radiolucency |
 | `bone` `{ teeth, percent, pattern, defect, side, rec, swell, furc, mob }` | bone loss (% of the root; a number or `{ tooth: % }`), horizontal or `vertical` with `defect` mm on `side` `m` or `d`; then CAL at all six sites so the pocket base sits about 1 mm coronal to the crest, recession (`rec` facial mm, the lingual 1 less), probing depth (at least 2 mm; `swell` adds a pseudopocket), furcations that follow the bone past the trunk (Class I within 1.5 mm, II from 1.5 mm past, III from 4 mm) and mobility that follows the bone (1 from 55%, 2 from 70%) |
 | `bop`, `pus`, `plaque` `{ rate, teeth }` | that share of the sites, the deepest first |
 | `recession` `{ teeth, mm }` | facial recession at the middle site |
@@ -85,9 +87,15 @@ Defaults are a healthy site: `pd 2, rec -2` (CAL 0).
 ## The pictures (`figs`, or a question's `pfig`)
 
 `chart` (the probing chart and its numbers), `film` (a periapical), `view` (the drawn buccal view), each of one arch and of
-the case's `teeth` or the figure's own `teeth`; `bitewing` (`teeth`: the premolars and molars of one side, both arches);
-`fmx` (the full-mouth series: 14 periapicals and 4 bitewings, mounted); `odontogram` (the whole mouth, five surfaces a tooth,
-with the chart as text under it). `hide: { cal, furc, mob }` takes a row off a chart that would give the answer away.
+the case's `teeth` or the figure's own `teeth`; `bitewing` (`teeth`: the premolars and molars of one side, both arches, in
+Class I occlusion, each tooth at its place along the arch: on a `full` case the neighbors in the film's 31 mm width show
+too, cut off at its edges); `fmx` (the full-mouth series, mounted as a real one: 14 periapicals, the anterior films upright
+at 23 x 37 mm and the posterior ones across at 36 x 30.5 mm, each showing its stretch of the arch with the apices in, upper
+films above and lower below, the 4 bitewings between them under their posterior films, R and L on the mount; on a phone it
+scrolls sideways); `odontogram` (the whole mouth, five surfaces a tooth: one row an arch on a wide screen, one row a quadrant
+on a phone; materials in colors told apart without color too (caries is hatched, a crown is ringed), the root canal filling
+and the periapical lesion drawn past the tooth toward its apex, a key under it, and the chart as text).
+`hide: { cal, furc, mob }` takes a row off a chart that would give the answer away.
 
 ## The checks (`node tools/ci/cases.js`)
 
@@ -118,8 +126,9 @@ the way a figure does ([diagram-review](../rules/diagram-review.md)).
 
 Wheeler's Dental Anatomy, Physiology and Occlusion (crown and root sizes, outlines, contacts, roots and trunks); Newman and
 Carranza's Clinical Periodontology (furcation entrances, the crest's height in health, the pocket base against the crest);
-White and Pharoah's Oral Radiology (what a periapical and a bitewing show, how bone loss, furcations, caries and periapical
-lesions look); the 2017 AAP/EFP classification (staging, grading, extent) and the peri-implant case definitions, as the hubs
+White and Pharoah's Oral Radiology (what a periapical, a bitewing and a full-mouth series show, the film sizes, how bone
+loss, furcations, caries, restorations and periapical lesions look); Sturdevant's Art and Science of Operative Dentistry (the
+preparation outlines a restoration's shape follows); the 2017 AAP/EFP classification (staging, grading, extent) and the peri-implant case definitions, as the hubs
 teach them. Their text and images are never copied; what is labeled and keyed follows the lecture
 ([outside-sources-for-figures](../rules/outside-sources-for-figures.md)). Every patient is made up; everything is original SVG.
 

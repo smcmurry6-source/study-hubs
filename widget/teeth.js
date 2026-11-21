@@ -11,14 +11,19 @@
      probed from), the root trunk, the six probing sites, landmarks (the CEJ, the contacts, the crest 1.5 mm below the
      CEJ in health, as the kit draws it) and the films that show it (periapical; bitewing for premolars and molars);
    - outlineMM(n): one tooth's crown, roots and back root as point lists in mm (mesial at -x, the CEJ at y = 0, the crown
-     toward +y), for a figure that draws a tooth at its own scale.
+     toward +y), for a figure that draws a tooth at its own scale;
+   - inside the crown: enamelMM / dejPts (the enamel thinning to the CEJ), hornsMM / pulpPts (the pulp chamber, its horns and
+     canals); restoMM / cariesMM (a restoration or a carious lesion by surface, as a film shows it); archMM (where each tooth
+     sits along the unrolled arch, for the bitewings and the full-mouth series).
 
    Sources (they make the shapes and numbers right; no text or image is copied): Nelson SJ, Wheeler's Dental Anatomy,
    Physiology and Occlusion (crown and root lengths, widths at the contacts and the cervix, cusp count and position,
    contact heights, root number, names and curvature, root trunks); Newman and Carranza's Clinical Periodontology
    (furcation entrances and where each is probed from; the maxillary first premolar's mesial and distal entrances about
    8 mm from the CEJ; the crest about 1.5-2 mm below the CEJ in health); White and Pharoah's Oral Radiology (which films
-   show which teeth: bitewings for the posterior teeth, a maxillary premolar's furcation rarely seen on a film).
+   show which teeth: bitewings for the posterior teeth, a maxillary premolar's furcation rarely seen on a film; how caries and
+   restorations look on a film); Sturdevant's Art and Science of Operative Dentistry (preparation outlines by
+   class: the proximal box's gingival floor and axial wall, the Class III, IV and V outlines).
    Everything drawn from it is original SVG. CI: node tools/ci/cases.js. */
 (function(){
   'use strict';
@@ -162,6 +167,169 @@
     return pts;
   }
 
+  /* ---------- inside the crown: the enamel, the pulp (px, crowns up: the CEJ at cej, the cusps above it) ----------
+     Enamel (Wheeler): thickest over the cusps (about 2.5 mm on a molar, 2 on a premolar, 1 on an incisor's labial face; drawn a
+     little thinner, as a film's projection shows it) and thinning to nothing at the CEJ. The pulp: on a molar a chamber with two
+     horns under the cusps, its roof about 2 mm and its horns about 3 mm above the CEJ, its floor just above the furcation, one
+     canal a root; on a single-rooted tooth one chamber and canal, the horn a share of the crown height (canine .5, premolar
+     .42, incisor .38) above the CEJ. The case kit's films and the figures (the arcade's Stage & Grade molar) both draw these. */
+  function enamelMM(d){ return (d.s === 'maxM' || d.s === 'manM1' || d.s === 'manM2') ? 1.5 : (d.s === 'maxP1' || d.s === 'maxP2' || d.s === 'manP1' || d.s === 'manP2') ? 1.3 : 1.0; }
+  /* the dentinoenamel junction: the crown outline (px) moved inward by the enamel's thickness at each height */
+  function dejPts(crown, d, x, top, cej, k){
+    var E = enamelMM(d), cy = top + d.ch * .72 * k;
+    return crown.map(function(p){ var f = Math.max(0, Math.min(1, (cej - p[1]) / (d.ch * k))), th = E * k * Math.pow(f, .55), dx = x - p[0], dy = cy - p[1], L = Math.sqrt(dx * dx + dy * dy) || 1; return [p[0] + dx / L * th, p[1] + dy / L * th]; });
+  }
+  /* the pulp horns (mm: mesial at -x, height above the CEJ), where a deep lesion heads */
+  function hornsMM(d){
+    if(d.tr){ var w = d.cv * .3; return d.s === 'manM1' ? [[-w * .8, 3.1], [w * .4, 2.9]] : [[-w * .7, 3.0], [w * .7, 2.8]]; }
+    var h = ((d.s === 'maxC' || d.s === 'manC') ? .5 : (d.s.indexOf('P') > 0) ? .42 : .38) * d.ch;
+    return [[-.45, h - .3], [.45, h - .3]];
+  }
+  /* the pulp as closed point lists (px): X maps mm to px across, k px a mm, c the CEJ's y, roots from mkRoots */
+  function pulpPts(d, X, k, c, roots){
+    var out = [];
+    if(d.tr){
+      var w = d.cv * .3, horns = hornsMM(d);
+      out.push(dense([[X(-w), c + 1.4 * k], [X(-w - .25), c - .6 * k], [X(horns[0][0]), c - horns[0][1] * k], [X(0), c - 2.1 * k], [X(horns[1][0]), c - horns[1][1] * k], [X(w + .25), c - .6 * k], [X(w), c + 1.4 * k]], true, 6));
+      roots.forEach(function(r){ var L = [], R = [], N = 10;
+        for(var i = 0; i <= N; i++){ var t = .06 + .86 * i / N, x = rAx(r, t), y = r.y0 + t * r.len, hw = (.55 - .4 * t) * k; L.push([x - hw, y]); R.unshift([x + hw, y]); }
+        out.push(L.concat(R)); });
+      return out;
+    }
+    var r = roots[0], horn = (d.s === 'maxC' || d.s === 'manC') ? .5 : (d.s.indexOf('P') > 0) ? .42 : .38, L2 = [], R2 = [], N2 = 14;
+    for(var j = 0; j <= N2; j++){
+      var tt = -horn * d.ch * k / r.len + (horn * d.ch * k / r.len + .93) * j / N2, yy = r.y0 + tt * r.len;
+      var xx = tt < 0 ? r.a0 : rAx(r, tt);
+      var hw2 = tt < 0 ? (1 - Math.pow(-tt / (horn * d.ch * k / r.len), 2)) * 1.05 * k : (.95 - .8 * Math.pow(tt, .7)) * k * .85;
+      L2.push([xx - Math.max(.45, hw2), yy]); R2.unshift([xx + Math.max(.45, hw2), yy]);
+    }
+    out.push(dense(L2.concat(R2), true, 3));
+    return out;
+  }
+
+  /* ---------- restorations and caries on a tooth, by surface (mm: mesial at -x, the cervix at y = 0, the crown toward +y) ----------
+     What a film shows of them (White and Pharoah; preparation outlines after Sturdevant's): an occlusal (Class I) restoration
+     sits in the middle of the crown under the cusps, short of both marginal ridges; a proximal (Class II) one adds a box that
+     restores the marginal ridge and the contact and stops at a gingival floor about 2.4 mm cervical to the contact, its axial
+     wall about 1.7 mm in; MOD has both boxes; an occlusal-facial one a narrow extension down the buccal groove; a facial or
+     lingual (Class V) one an oval over the cervical third; on an incisor or canine a proximal (Class III) one sits at the
+     contact, and with the incisal edge (Class IV) it takes the incisal angle. */
+  function sideAt(pts, y, sg){
+    var best = null;
+    for(var i = 0; i < pts.length; i++){ var a = pts[i], b = pts[(i + 1) % pts.length];
+      if(a[1] === b[1] || (a[1] - y) * (b[1] - y) > 0) continue;
+      var x = a[0] + (b[0] - a[0]) * (y - a[1]) / (b[1] - a[1]);
+      if(best == null || (sg < 0 ? x < best : x > best)) best = x; }
+    return best == null ? 0 : best;
+  }
+  function topAt(pts, x){
+    var best = null;
+    for(var i = 0; i < pts.length; i++){ var a = pts[i], b = pts[(i + 1) % pts.length];
+      if(a[0] === b[0] || (a[0] - x) * (b[0] - x) > 0) continue;
+      var y = a[1] + (b[1] - a[1]) * (x - a[0]) / (b[0] - a[0]);
+      if(best == null || y > best) best = y; }
+    return best == null ? 0 : best;
+  }
+  function ellipseMM(cx, cy, rx, ry){ var p = []; for(var i = 0; i < 18; i++){ var a = i / 18 * Math.PI * 2; p.push([cx + Math.cos(a) * rx, cy + Math.sin(a) * ry]); } return p; }
+  function crownLoop(d){ var C = dense(crownMM(d), true, 6), v = d.cv / 2, iv = 0;
+    C.forEach(function(p, i){ if(Math.abs(p[0] - v) + Math.abs(p[1]) < Math.abs(C[iv][0] - v) + Math.abs(C[iv][1])) iv = i; });
+    return { C:C, iv:iv }; }
+  /* the outline of one side (sg -1 mesial, +1 distal), walking up from height y0, each point moved o.inset mm into the
+     tooth; it stops once it has turned o.inward mm in from the contact's bulge, above o.yMax, or at the crown's top (unless
+     o.pastTop: a Class IV runs on along the incisal edge) */
+  function sideWalk(L, d, sg, y0, o){
+    var C = L.C, n = C.length, i = sg < 0 ? 0 : L.iv, step = sg < 0 ? 1 : -1, xc = null, out = [], seen = 0, inset = o.inset || 0;
+    C.forEach(function(p){ if(p[1] > y0 && p[1] < d.ch * .9 && sg * p[0] > 0 && (xc == null || sg * (p[0] - xc) > 0)) xc = p[0]; });
+    for(var m = 0; m < n; m++, i = (i + step + n) % n){
+      var p = C[i]; if(p[1] <= y0) continue;
+      if(o.yMax != null && p[1] > o.yMax) break;
+      out.push([p[0] - sg * inset, p[1] - inset * .6]); seen++;
+      if((!o.pastTop && p[1] > d.ch * .97) || (o.inward != null && xc != null && seen > 2 && sg * (xc - p[0]) >= o.inward)) break;
+    }
+    return out;
+  }
+  function restoMM(type, surfaces){
+    var d = XT[type], L = crownLoop(d), C = L.C, h = d.ch, s = String(surfaces || '').toUpperCase(), out = [];
+    var pos = POS.indexOf(type.slice(3)), ant = pos <= 2, molar = pos >= 5, ct = CONTACT[type];
+    var hasM = s.indexOf('M') >= 0, hasD = s.indexOf('D') >= 0, fac = /[BFL]/.test(s), side = function(y, sg){ return sideAt(C, y, sg); };
+    if(ant){
+      var inc = s.indexOf('I') >= 0;
+      [[-1, hasM], [1, hasD]].forEach(function(e){ var sg = e[0]; if(!e[1]) return;
+        var lo = h * (inc ? .4 : .3), hi = h * .74;
+        if(inc){ var w4 = sideWalk(L, d, sg, lo, { inward:d.cw * .42, inset:.1, pastTop:true }), last = w4[w4.length - 1];
+          out.push(w4.concat([[last[0], h - 1.9], [side(h * .62, sg) - sg * 1.7, h * .62], [side(lo, sg) - sg * 1.1, lo + .2]])); }
+        else { var w3 = sideWalk(L, d, sg, lo, { yMax:hi, inset:.1 });
+          out.push(w3.concat([[side(hi, sg) - sg * 1.1, hi - .3], [side((lo + hi) / 2, sg) - sg * 1.8, (lo + hi) / 2], [side(lo, sg) - sg * 1.1, lo + .3]])); }
+      });
+      if(s.indexOf('I') >= 0 && !hasM && !hasD){ var top = C.filter(function(p){ return p[1] > h - 1.2; }).map(function(p){ return [p[0], p[1] - .1]; });
+        if(top.length > 1) out.push(top.concat(top.slice().reverse().map(function(p){ return [p[0], p[1] - 1.1]; }))); }
+      if(fac) out.push(ellipseMM(0, .95, d.cw * .3, 1.15));
+      return out;
+    }
+    var groove = h - (molar ? 1.7 : 2.0), floor = groove - 1.8, ax = molar ? 1.8 : 1.6, mid = function(gy){ return (gy + floor) / 2; };
+    var hasO = s.indexOf('O') >= 0 || (hasM && hasD);
+    function gy(sg){ return Math.max(1.1, ct[sg < 0 ? 0 : 1] * h - 2.4); }
+    /* the box's outer edge follows the proximal surface from the gingival floor up to the marginal ridge (about 1.1 mm below
+       the cusp tips in this view), then turns in along the ridge */
+    function box(sg){ var w = sideWalk(L, d, sg, gy(sg), { inward:ax * .9, inset:.15, yMax:h - 1.1 }), l = w[w.length - 1]; return w.concat([[l[0] - sg * .9, h - 1.25]]); }
+    function wall(sg){ var g = gy(sg); return [[side(floor, sg) - sg * ax, floor], [side(mid(g), sg) - sg * ax, mid(g)], [side(g, sg) - sg * ax, g]]; }
+    function oEnd(sg){ var xs = side(groove, sg) - sg * 1.9; return [[xs - sg * .35, floor + .1], [xs, (floor + groove) / 2], [xs - sg * .25, groove + .1]]; }
+    var P;
+    if(hasO){
+      var left = hasM ? [[side(gy(-1), -1) + .15, gy(-1)]].concat(box(-1)) : oEnd(-1);
+      var right = hasD ? box(1).reverse().concat([[side(gy(1), 1) - .15, gy(1)]], wall(1).reverse()) : oEnd(1).reverse();
+      var a = left[left.length - 1][0], b = right[0][0];
+      var topLine = [[a + (b - a) * .25, groove + .3], [a + (b - a) * .5, groove + .1], [a + (b - a) * .75, groove + .3]];
+      P = left.concat(topLine, right, hasM ? wall(-1) : []);
+      out.push(P);
+    } else [[-1, hasM], [1, hasD]].forEach(function(e){ var sg = e[0]; if(!e[1]) return;
+      var bx = [[side(gy(sg), sg) - sg * .15, gy(sg)]].concat(box(sg)), last = bx[bx.length - 1];
+      out.push(bx.concat([[last[0] - sg * .2, floor + .3]], wall(sg))); });
+    if(fac) out.push(hasO ? [[-.65, floor + .3], [.65, floor + .3], [.65, h * .44], [-.65, h * .44]] : ellipseMM(0, .95, d.cw * .3, 1.15));
+    return out;
+  }
+  /* caries as a film shows it (White and Pharoah): a proximal lesion starts just cervical to the contact as a triangle in the
+     enamel, its base on the surface and its point toward the DEJ (enamel); once in the dentin it spreads along the DEJ and a
+     second, broader triangle points toward the pulp (dentin: into its outer half; pulp: reaching the horn). Occlusal caries
+     shows only once it is in the dentin, a band under the enamel of the central fossa; a facial or lingual lesion is a round
+     shadow over the cervical third, fainter because sound tooth lies in front of it. Returns [{ pts, face }] in mm. */
+  function cariesMM(type, surface, depth){
+    var d = XT[type], L = crownLoop(d), C = L.C, h = d.ch, E = enamelMM(d), out = [], s = String(surface || '').toUpperCase();
+    var pos = POS.indexOf(type.slice(3)), horns = hornsMM(d);
+    function th(y){ return E * Math.pow(Math.max(0, Math.min(1, y / h)), .55); }
+    function side(y, sg){ return sideAt(C, y, sg); }
+    if(s === 'M' || s === 'D'){
+      var sg = s === 'M' ? -1 : 1, yc = CONTACT[type][sg < 0 ? 0 : 1] * h - .7, xs = side(yc, sg), t0 = th(yc);
+      var top = [side(yc + .75, sg) + sg * .05, yc + .75], bot = [side(yc - .75, sg) + sg * .05, yc - .75];
+      if(depth === 'enamel'){ out.push({ pts:[top, [xs - sg * .7 * t0, yc + .08], [xs - sg * .72 * t0, yc - .08], bot] }); return out; }
+      var dej = function(y){ return side(y, sg) - sg * th(y); }, hn = horns[sg < 0 ? 0 : 1];
+      var mx = dej(yc), tx = hn[0] + sg * (pos >= 5 ? .1 : .25), ty = hn[1] + .15, f = depth === 'pulp' ? 1 : .42;
+      var apex = [mx + (tx - mx) * f, yc + (ty - yc) * f];
+      out.push({ pts:[top, [dej(yc + .2), yc + .2], [dej(yc + 1.25), yc + 1.25], [mx + (apex[0] - mx) * .55, yc + (apex[1] - yc) * .55 + .45], apex,
+        [mx + (apex[0] - mx) * .55, yc + (apex[1] - yc) * .55 - .45], [dej(yc - 1.25), yc - 1.25], [dej(yc - .2), yc - .2], bot] });
+    } else if(s === 'O' || s === 'I'){
+      if(depth === 'enamel') return out;
+      var g = topAt(C, 0), yd = g - E * .95, hw = d.cw * (pos >= 5 ? .2 : .17), bottom = depth === 'pulp' ? Math.min(horns[0][1], horns[1][1]) + .1 : yd - 1.4;
+      out.push({ pts:[[-hw, yd + .05], [-hw * .4, yd + .25], [hw * .4, yd + .25], [hw, yd + .05], [hw * .7, (yd + bottom) / 2 + .2], [hw * .25, bottom], [-hw * .25, bottom], [-hw * .7, (yd + bottom) / 2 + .2]] });
+    } else {
+      var r = depth === 'enamel' ? [.8, .55] : depth === 'dentin' ? [1.25, .95] : [1.6, 1.25];
+      out.push({ pts:ellipseMM(0, h * .24, r[0], r[1]), face:true });
+    }
+    return out;
+  }
+  /* where each tooth sits along its arch, unrolled, in mm (Wheeler's widths at the contacts, the contacts overlapping .15 mm
+     as the films draw them): [left, right] as you face the patient, the midline at 0 and the patient's right at -x. occl:
+     move the upper canine and the teeth behind it 1.5 mm toward the midline, so on a bitewing each upper tooth meets its namesake and the tooth distal
+     to it, as in a Class I occlusion (the upper canine's tip in the embrasure between the lower canine and first premolar,
+     the upper first molar's mesiobuccal cusp over the lower first molar's buccal groove). */
+  function archMM(n, occl){
+    n = +n; var up = isUpper(n), p = posOf(n), a = 0;
+    for(var q = 1; q < p; q++) a += XT[(up ? 'max' : 'man') + POS[q - 1]].cw - .15;
+    if(occl && up && p >= 3) a -= 1.5;
+    var w = XT[typeOf(n)].cw;
+    return mesialRight(n) ? [-(a + w), -a] : [a, a + w];
+  }
+
 
   /* ---------- the catalogue: one entry per tooth ---------- */
   var SIDE_WORD = { 1:'right', 2:'left', 3:'left', 4:'right' };
@@ -232,6 +400,8 @@
   T.isUpper = isUpper; T.posOf = posOf; T.typeOf = typeOf; T.dims = dims; T.mesialRight = mesialRight; T.isMolar = isMolar;
   T.isPosterior = isPosterior; T.isAnterior = isAnterior; T.quadOf = quadOf; T.viewOrder = viewOrder; T.siteOrder = siteOrder;
   T.tooth = catalogue; T.outlineMM = outlineMM;
+  T.enamelMM = enamelMM; T.dejPts = dejPts; T.hornsMM = hornsMM; T.pulpPts = pulpPts; T.CONTACT = CONTACT;
+  T.sideAt = sideAt; T.topAt = topAt; T.restoMM = restoMM; T.cariesMM = cariesMM; T.archMM = archMM;
   T.all = function(){ var a = []; for(var i = 1; i <= 32; i++) a.push(catalogue(i)); return a; };
   if(typeof module === 'object' && module.exports) module.exports = T;
   if(typeof window !== 'undefined') window.SH_TEETH = T;

@@ -672,19 +672,18 @@ function pCrusher(T){
 }
 
 /* a mandibular first molar on a periapical film, from the tooth library: its crown outline, its mesial and distal roots and
-   the trunk between them at their real sizes (Wheeler's, 4.4 px a millimeter, the CEJ at y 59), the bone crest lowered to
-   the root's middle third, a vertical defect down the mesial root, and the furcation open where the crest has dropped
-   past the root trunk (3 mm on this tooth, the library's). */
+   the trunk between them at their real sizes (Wheeler's, 4.4 px a millimeter, the CEJ at y 59), the enamel thinning to
+   nothing at the CEJ over dentin (TEETH.dejPts), the pulp chamber with its horns under the cusps and a canal down each root
+   (TEETH.pulpPts, the cases' own), the bone crest lowered to the root's middle third, a vertical defect down the mesial
+   root, and the furcation open where the crest has dropped past the root trunk (3 mm on this tooth, the library's). */
 function stageMolar(){
   const k = 4.4, cx = 87, cej = 59, d = TEETH.XT.manM1, X = (x) => cx + x * k;
   const P = (pts) => "M" + pts.map((p) => p[0].toFixed(1) + " " + p[1].toFixed(1)).join("L") + "Z";
   const roots = TEETH.mkRoots(d, X, k, cej);
   const crown = TEETH.dense(TEETH.crownMM(d), true, 6).map((p) => [X(p[0]), cej - p[1] * k]);
-  const core = crown.map((p) => { const dx = cx - p[0], dy = (cej - d.ch * .45 * k) - p[1], L = Math.hypot(dx, dy) || 1; return [p[0] + dx / L * 1.3 * k, p[1] + dy / L * 1.3 * k]; });
+  const dentin = TEETH.dejPts(crown, d, cx, cej - d.ch * k, cej, k);
+  const pulp = TEETH.pulpPts(d, X, k, cej, roots);
   const trunk = TEETH.trunkPts(roots, 1, 0, cej - 1, cej + d.tr * k, k);
-  const canal = (r) => { const L = [], R = []; for (let i = 0; i <= 8; i++) { const t = .05 + .87 * i / 8, x = TEETH.rAx(r, t), y = r.y0 + t * r.len, hw = (.5 - .34 * t) * k; L.push([x - hw, y]); R.unshift([x + hw, y]); } return P(L.concat(R)); };
-  const w = d.cv * .3;
-  const chamber = P(TEETH.dense([[X(-w), cej + 1.3 * k], [X(-w - .25), cej - .6 * k], [X(-w * .7), cej - 3 * k], [X(0), cej - 2.1 * k], [X(w * .7), cej - 2.8 * k], [X(w + .25), cej - .6 * k], [X(w), cej + 1.3 * k]], true, 5));
   /* the bone: the crest at y 88, dropping into a vertical defect along the mesial root to y 106 (its far side hidden under
      the root), level again between the roots, where the dark gap below the furcation is the open furcation */
   const mx = TEETH.rAx(roots[0], (106 - cej) / roots[0].len) - TEETH.rHw(roots[0], (106 - cej) / roots[0].len);
@@ -693,8 +692,8 @@ function stageMolar(){
     [46, 62, 78, 94, 110, 126].map((x, i) => `<path d="M${x} 128 Q${x + 6} ${108 + (i % 2) * 8} ${x + 2} ${90 + (i % 3) * 3}" fill="none" stroke="#6C7076" stroke-width="1.4"/>`).join("") +
     roots.map((r) => `<path d="${P(TEETH.rootOutline(r, 0, cej, cej))}" fill="#D4D6D9"/>`).join("") +
     (trunk ? `<path d="${P(trunk)}" fill="#D4D6D9"/>` : "") +
-    `<path d="${P(crown)}" fill="#F3F4F5"/><path d="${P(core)}" fill="#D4D6D9"/>` +
-    `<path d="${chamber}" fill="#5B5F64"/>` + roots.map((r) => `<path d="${canal(r)}" fill="#5B5F64"/>`).join("") +
+    `<path d="${P(crown)}" fill="#F3F4F5"/><path d="${P(dentin)}" fill="#D4D6D9"/>` +
+    pulp.map((q) => `<path d="${P(q)}" fill="#5B5F64"/>`).join("") +
     line("M38 88 L134 88", 2.2, C.blue) +
     line(`M126 ${cej} L126 ${tick(1)}`, 2, C.gold) + [0, 1 / 3, 2 / 3, 1].map((t) => line(`M122 ${tick(t)} L130 ${tick(t)}`, 2, C.gold)).join("");
 }
