@@ -27,5 +27,9 @@ style, drawn from the hub's own world in `tools/figures/site/arcade.mjs` and bui
 aren't used. The hub's games list is `SH_HUB.arcade.games` in its page, and its skin is `content/arcade.js` and
 `content/arcade.css` beside it. The skin rules above are unchanged.
 
+**No sound** (Sam, 2026-11-21: "No beeps"): a game on the engine makes no sound. The old single-file hubs' skins had a `beep()`
+that obeyed `STATE.arcade.muted`, which only their own lobby could set, and the engine never shows that lobby. So a skin
+adapted from an old hub (in git) drops `beep()` and its calls instead of getting a sound switch.
+
 A new hub builds its skin from its own material before it ships; reuse the mechanics, never another hub's art or wording. Game
 ideas Sam wants considered for future hubs: quiz games, typing games, point-and-click and escape rooms.
