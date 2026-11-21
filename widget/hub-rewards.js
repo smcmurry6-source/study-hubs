@@ -429,21 +429,31 @@
   });
   /* the meters on the bar and the strip: the streak, today's goal, the rank and its XP (the bar itself is the core's
      buildShell), and every Today panel on the page */
+  /* a meter's markup, written only when it changed: a page load with synced answers paints the meters four or five times
+     in one go (the bootstrap, the rank, the merge, Timmy), and each write made the browser draw them again (2026-11-20) */
+  function put(n, html){ if (n._hxH !== html) { n.innerHTML = html; n._hxH = html; } }
   function paintMeters(){
     if (!HX.shell) return;
     var n = streakDays(), t = todayRec(), g = goal();
-    $$("[data-streakm]").forEach(function(m){ m.innerHTML = flame(n) + '<span class="num" aria-hidden="true">' + (n ? n + '<span class="fold"> ' + (n === 1 ? "day" : "days") + "</span>" : '<span class="fold">No streak</span><span class="unfold">0</span>') + '</span><span class="sr">' + (n ? pl(n, "day") + " in a row studied" : "No streak yet") + "</span>"; });
+    $$("[data-streakm]").forEach(function(m){ put(m, flame(n) + '<span class="num" aria-hidden="true">' + (n ? n + '<span class="fold"> ' + (n === 1 ? "day" : "days") + "</span>" : '<span class="fold">No streak</span><span class="unfold">0</span>') + '</span><span class="sr">' + (n ? pl(n, "day") + " in a row studied" : "No streak yet") + "</span>"); });
     var dn = doneToday(t), what = t.k ? " questions and flashcards today" : " questions today";
-    $$("[data-goalm]").forEach(function(m){ m.innerHTML = ring(dn, g) + '<span class="num" aria-hidden="true">' + Math.min(dn, 999) + '<span class="fold"> of </span><span class="unfold">/</span>' + g + '</span><span class="sr">' + Math.min(dn, 999) + " of " + g + what + "</span>"; });
+    $$("[data-goalm]").forEach(function(m){ put(m, ring(dn, g) + '<span class="num" aria-hidden="true">' + Math.min(dn, 999) + '<span class="fold"> of </span><span class="unfold">/</span>' + g + '</span><span class="sr">' + Math.min(dn, 999) + " of " + g + what + "</span>"); });
     var x = rankXp(), rk = $("#hxRank"), chip = boostChip();
     /* past the Handpiece the name starts with the journey ("ModuPro Gold II"); a tight bar shows the medallion and
        "Gold II" and keeps the journey for screen readers (hub.css) */
     var nm = rankName(), R = window.shRanks, jn = RANK.p && RANK.p.journey > 0 && R && R.JOURNEYS ? (R.JOURNEYS[RANK.p.journey | 0] || "") + " " : "";
     var nameHTML = jn.length > 1 && nm.indexOf(jn) === 0 ? '<span class="jn">' + esc(jn) + "</span>" + esc(nm.slice(jn.length)) : esc(nm);
     /* its spoken name is its visible text with a few hidden words around it (axe: the label must contain what's shown) */
-    if (rk) rk.innerHTML = '<span class="hp" aria-hidden="true">' + rankArt() + '</span><span class="sr">Your rank: </span><b>' + nameHTML + '</b><span class="sr">, </span><span class="xpn num"><span data-xp>' + (x === null ? "+" + fmt(t.xp) : fmt(x)) + "</span> XP" + (x === null ? " today" : "") + '</span><span class="sr">. </span>' + chip + '<span class="sr">Open your stats</span>';
-    $$("[data-xpm]").forEach(function(m){ m.innerHTML = artSvg(A.xp || "", "0 0 24 24", "xpi") + '<span class="num"><span data-xp>' + (x === null ? "+" + fmt(t.xp) : fmt(x)) + '</span><span class="fold-xp"> XP</span></span>' + (boostShown ? '<i class="x2" aria-hidden="true">2x</i><span class="sr">Double XP is on</span>' : ""); });
-    $$("[data-today]").forEach(function(p){ p.outerHTML = todayPanel(); });
+    if (rk) put(rk, '<span class="hp" aria-hidden="true">' + rankArt() + '</span><span class="sr">Your rank: </span><b>' + nameHTML + '</b><span class="sr">, </span><span class="xpn num"><span data-xp>' + (x === null ? "+" + fmt(t.xp) : fmt(x)) + "</span> XP" + (x === null ? " today" : "") + '</span><span class="sr">. </span>' + chip + '<span class="sr">Open your stats</span>');
+    $$("[data-xpm]").forEach(function(m){ put(m, artSvg(A.xp || "", "0 0 24 24", "xpi") + '<span class="num"><span data-xp>' + (x === null ? "+" + fmt(t.xp) : fmt(x)) + '</span><span class="fold-xp"> XP</span></span>' + (boostShown ? '<i class="x2" aria-hidden="true">2x</i><span class="sr">Double XP is on</span>' : "")); });
+    var tp = null;
+    $$("[data-today]").forEach(function(p){
+      if (tp === null) tp = todayPanel();
+      if (p._hxH === tp) return;
+      var t = document.createElement("template"); t.innerHTML = tp; var nw = t.content.firstElementChild;
+      if (!nw) { p.outerHTML = tp; return; }
+      nw._hxH = tp; p.replaceWith(nw);
+    });
     fitSoon();   /* measured before the next frame, once however many paints come first (each one laid the page out, 2026-11-20) */
     /* any other medallion of your rank on the page (More, Stats), at its own size */
     $$("[data-rankart]").forEach(function(n){ n.innerHTML = rankArt(+n.getAttribute("data-rankart") || 30); });
