@@ -1239,6 +1239,10 @@
       bootstrap: opt.bootstrap || (H && H.bootstrap) || (window.shBootstrap && window.shBootstrap.ready) || null, loaded: false
     };
     if (firstMeet) { ls("sh_pet_adopt_sent", "1"); award("pet-adopt", ls("sh_pet_born")); }   /* once: syncBadges won't send it again */
+    /* his hello waits for the page's bootstrap (at most 3 s): it brings a name changed on a linked device */
+    var boot = M.bootstrap;
+    M.ready = boot && typeof boot.then === "function"
+      ? new Promise(function(done){ boot.then(done, done); setTimeout(done, 3000); }) : Promise.resolve();
     load();
     render();
     if (where === "hub") wireHub();
@@ -1328,7 +1332,7 @@
       if (e.target.closest(".shpet-more")) { hush(); checkup(); }
     });
     draw();
-    setTimeout(hello, 900);
+    setTimeout(function(){ M.ready.then(function(){ if (M) hello(); }); }, 900);
   }
   function homeClick(e){
     if (e.target.closest("[data-ask]")) { if (window.shAsk) window.shAsk.open({ from: "house" }); return; }

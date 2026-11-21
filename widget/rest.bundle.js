@@ -3315,6 +3315,9 @@ sessionStart: Date.now(), longNudges: 0, idleSaid: false, taps: 0, tapT: 0, last
 bootstrap: opt.bootstrap || (H && H.bootstrap) || (window.shBootstrap && window.shBootstrap.ready) || null, loaded: false
 };
 if (firstMeet) { ls("sh_pet_adopt_sent", "1"); award("pet-adopt", ls("sh_pet_born")); }
+var boot = M.bootstrap;
+M.ready = boot && typeof boot.then === "function"
+? new Promise(function(done){ boot.then(done, done); setTimeout(done, 3000); }) : Promise.resolve();
 load();
 render();
 if (where === "hub") wireHub();
@@ -3398,7 +3401,7 @@ if (e.target.closest(".shpet-ask")) { hush(); if (askOn()) window.shAsk.open({ f
 if (e.target.closest(".shpet-more")) { hush(); checkup(); }
 });
 draw();
-setTimeout(hello, 900);
+setTimeout(function(){ M.ready.then(function(){ if (M) hello(); }); }, 900);
 }
 function homeClick(e){
 if (e.target.closest("[data-ask]")) { if (window.shAsk) window.shAsk.open({ from: "house" }); return; }

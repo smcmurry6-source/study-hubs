@@ -32,6 +32,18 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-21 (A name changed on one linked device shows on the other, BUG-196, Claude Code)** — Sam: "When you change
+  your name on one device it doesnt change on the other linked device. Its still saying 'welcome count plaqula'". Linked
+  devices share one id, so the server already had the new name, but each device kept its own copy (`sh_display_name`) and
+  showed that first, forever. Now the dashboard (`widget/dash.js`) and a hub (`widget/v3.js`) take the bootstrap's
+  `display_name` when the device has a name of its own that differs (`nameFromServer`), except when that device's own rename
+  hasn't reached the server: a name saved there is marked `sh_name_unsaved` until the server answers, and a page that loads
+  with the mark set sends it again instead of taking the server's older one; nor when the rename was made after the bootstrap
+  was asked. A device with no name of its own keeps showing the server's as before. The hub's "Good to see you" and Timmy's
+  hello (`widget/pet.js`) wait for the bootstrap, at most 3 s, so they say the new name. No migration. Checked with a scripted
+  browser on stubbed data: on `main` the second device still said "Good to see you, Count Plaqula."; with the fix, the new
+  name, and an unsaved rename is sent again rather than lost. About page (Link my devices), `site.json`, bundles. Left on the
+  inbox: going back to a random name on one device shows that random name on the other, which then treats it as picked.
 - **2026-11-21 (Patient Box v2.1: crown materials, endodontics, fractures, bridges; cleaner fillings and calculus, Claude Code)** —
   Sam: "more possibilities like endodontically treated teeth, fractured teeth, and different crown materials... when theres a
   filling, the lines dont look clean and accurate. Also calculus looks bad." `widget/teeth.js` draws restorations from the

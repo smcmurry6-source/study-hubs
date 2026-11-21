@@ -1130,12 +1130,25 @@
       if (resolvedAnonName) el.placeholder = "Right now you're " + resolvedAnonName;
     });
   }
+  /* The server keeps one name for linked devices (they share an id), and each device keeps a copy (sh_display_name).
+     A name picked here is marked unsaved (sh_name_unsaved) until the server has answered, so a page that loads while it
+     isn't saved sends it again, instead of taking the server's older one (nameFromServer, below). */
+  var SH_NAME_UNSAVED = "sh_name_unsaved";
+  function sendName(name){
+    try { localStorage.setItem(SH_NAME_UNSAVED, name); } catch (e) {}
+    function answered(){ try { if (localStorage.getItem(SH_NAME_UNSAVED) === name) localStorage.removeItem(SH_NAME_UNSAVED); } catch (e) {} }
+    function old(){
+      if (!supabase) return;
+      try { supabase.rpc("set_display_name", { p_visitor: VISITOR_ID, p_name: name }).then(function(res){ if (dbFailed(res)) dbFail(); else answered(); }, function(){ dbFail(); }); } catch (e) {}
+    }
+    /* the first name chosen pays 500 XP and crowns (set_display_name_v2, migration_v68); the old call otherwise */
+    if (GAME.want && GAME.on !== false) claimPrize("set_display_name_v2", { p_visitor: VISITOR_ID, p_name: name }, "name").then(function(r){ if (!r || r.missing) old(); else answered(); });
+    else old();
+  }
   function saveName(name){
     name = String(name || "").trim().slice(0, 24);
     if (!name) return false;
-    /* the first name chosen pays 500 XP and crowns (set_display_name_v2, migration_v68); the old call otherwise */
-    if (GAME.want && GAME.on !== false) claimPrize("set_display_name_v2", { p_visitor: VISITOR_ID, p_name: name }, "name").then(function(r){ if (!r || r.missing) safeRpc("set_display_name", { p_visitor: VISITOR_ID, p_name: name }); });
-    else safeRpc("set_display_name", { p_visitor: VISITOR_ID, p_name: name });
+    sendName(name);
     shTrackSafe("name:set");
     prefSet(SH_NAME_KEY, name);
     renderNameBadge(); syncNameInputs();
@@ -1145,7 +1158,7 @@
     return true;
   }
   function resetName(){
-    try { localStorage.removeItem(SH_NAME_KEY); } catch (e) {}
+    try { localStorage.removeItem(SH_NAME_KEY); localStorage.removeItem(SH_NAME_UNSAVED); } catch (e) {}
     shTrackSafe("name:reset");
     if (supabase) try {
       supabase.rpc("clear_display_name", { p_visitor: VISITOR_ID }).then(function(res){
@@ -1212,13 +1225,21 @@
 
   // Welcome-back toast for a returning, named visitor — once per page load,
   // a beat after load so it doesn't collide with anything else appearing.
+  // It waits for the bootstrap (at most 3 s), which brings a name changed on a linked device.
   (function(){
     var visits = (parseInt(prefGet(SH_VISITS_KEY, "0"), 10) || 0) + 1;
     prefSet(SH_VISITS_KEY, String(visits));
-    var n = currentName();
-    if (visits > 1 && n) {
-      setTimeout(function(){ if (window.shToast) showStreakToast("Good to see you, " + n + ".", null, { kind: "hi", ms: 3400 }); else showStreakToast("Welcome back, " + n); }, 900);
+    if (visits < 2 || !currentName()) return;
+    var t0 = Date.now(), said = false;
+    function say(){
+      if (said) return; said = true;
+      setTimeout(function(){
+        var n = currentName(); if (!n) return;
+        if (window.shToast) showStreakToast("Good to see you, " + n + ".", null, { kind: "hi", ms: 3400 }); else showStreakToast("Welcome back, " + n);
+      }, Math.max(0, 900 - (Date.now() - t0)));
     }
+    /* the bootstrap is asked for further down this file: wait a tick, so nameFromServer runs first */
+    setTimeout(function(){ if (bootstrap && bootstrap.ready) bootstrap.ready.then(say, say); setTimeout(say, 3000); }, 0);
   })();
 
   /* ---------- background music (procedural — no external audio files, so
@@ -1573,8 +1594,25 @@
      instead of the generic word "Someone". Always resolves well before
      NUKE_STREAK_THRESHOLD correct answers could realistically happen. ---------- */
   var resolvedAnonName = "";
+  /* A name changed on a linked device (Sam, 2026-11-21: "it's still saying welcome Count Plaqula"): linked devices share
+     an id, so the server's name (the bootstrap's display_name) is theirs, and a device that has a name of its own takes
+     the server's when they differ. Not when this device's own rename hasn't reached the server (sh_name_unsaved: it is
+     sent again) or was made after the bootstrap was asked. A device with no name of its own keeps showing the server's
+     as it always has. Returns the name taken, or "". */
+  function nameFromServer(server, asked){
+    server = String(server || "").trim().slice(0, 24);
+    var mine = currentName(), unsaved = null;
+    if (!server || !mine || mine !== (asked || "")) return "";
+    try { unsaved = localStorage.getItem(SH_NAME_UNSAVED); } catch (e) {}
+    if (unsaved === mine && server !== mine) { sendName(mine); return ""; }
+    if (unsaved !== null) try { localStorage.removeItem(SH_NAME_UNSAVED); } catch (e) {}
+    if (server === mine) return "";
+    try { localStorage.setItem(SH_NAME_KEY, server); } catch (e) {}
+    return server;
+  }
   bootstrap.ready.then(function(data){
-    if (data && data.display_name) { resolvedAnonName = data.display_name; renderNameBadge(); syncNameInputs(); try { document.dispatchEvent(new CustomEvent("sh:name", { detail: {} })); } catch (e) {} return; }
+    var took = data ? nameFromServer(data.display_name, bootstrap.linkName) : "";
+    if (data && data.display_name) { resolvedAnonName = data.display_name; renderNameBadge(); syncNameInputs(); try { document.dispatchEvent(new CustomEvent("sh:name", { detail: took ? { name: took } : {} })); } catch (e) {} return; }
     /* Compatibility while the migration is being deployed; current schemas use
        the bootstrap field above and make no second eager read. */
     if (supabase) try { supabase.rpc("get_display_name", { p_visitor: VISITOR_ID }).then(function(res){
