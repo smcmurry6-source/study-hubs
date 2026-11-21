@@ -1151,8 +1151,11 @@ mark.sh-hl.sh-hl-c-o{background:rgba(255,140,30,.38);} [data-theme="dark"] mark.
    After a question is answered, each choice shows the share of the class that picked it: a light fill behind the
    choice (its width, set inline so it layers over the hub's right/wrong colors) and the percentage at the right,
    clear of fx.js's check/X badge on the edge. The class's most common pick is bold. */
-:root{--sh-cp-fill:rgba(90,100,130,.14);}
-@supports (background:color-mix(in srgb, red 10%, transparent)){ :root{--sh-cp-fill:color-mix(in srgb, var(--ink, #3a4050) 11%, transparent);} }
+/* The fill's color is set on the choice itself, not on :root: a custom property new to the root changes what every
+   element inherits, so putting this sheet in (the hub bundle adds it once the page is drawn) restyled the whole page,
+   about 40 ms on perf.js's slow phone. --ink is only set on :root, so the color is the same. */
+.sh-cp{--sh-cp-fill:rgba(90,100,130,.14);}
+@supports (background:color-mix(in srgb, red 10%, transparent)){ .sh-cp{--sh-cp-fill:color-mix(in srgb, var(--ink, #3a4050) 11%, transparent);} }
 .qcard .qcard-choice.sh-cp, .qcard-choice.sh-cp{position:relative; padding-right:60px;}
 .sh-cp-pct{position:absolute; right:18px; top:50%; transform:translateY(-50%); pointer-events:none;
   font-family:var(--font-mono, ui-monospace, monospace); font-size:.78rem; font-weight:500; line-height:1; color:var(--ink-soft, #5b6270); font-variant-numeric:tabular-nums;}
