@@ -82,14 +82,30 @@ export const SEASONS = [
 
 /* The rank sets (Sam: "timmy outfit and a decoration only. Do rank only"): one per full rank-up, in the rank's material.
    gtier is the server's global tier (sh_rank: 1 Antique ... 6 Dark Matter of the Handpiece; 7-13 the ModuPro; 14-20 the
-   Loupes). The Handpiece's six are drawn; the later journeys' sets come before anyone reaches them. */
+   Loupes). All twenty are drawn (the later two journeys' fourteen on 2026-11-20, migration_v91). */
 export const RANKS = [
   { gtier: 1, rank: "Antique", outfit: ["rank-antique-outfit", "Brass monocle and bowler", R], yard: ["rank-antique-yard", "Treadle dental engine", R] },
   { gtier: 2, rank: "Bronze", outfit: ["rank-bronze-outfit", "Bronze gladiator helmet", R], yard: ["rank-bronze-yard", "Bronze bell", R] },
   { gtier: 3, rank: "Silver", outfit: ["rank-silver-outfit", "Silver knight's helm", E], yard: ["rank-silver-yard", "Silver trophy cup", E] },
   { gtier: 4, rank: "Gold", outfit: ["rank-gold-outfit", "Golden laurels and toga", E], yard: ["rank-gold-yard", "Golden tooth statue", E] },
   { gtier: 5, rank: "Diamond", outfit: ["rank-diamond-outfit", "Diamond shades and ice cape", L], yard: ["rank-diamond-yard", "Diamond geode", L] },
-  { gtier: 6, rank: "Dark Matter", outfit: ["rank-dark-outfit", "Dark Matter cloak", L], yard: ["rank-dark-yard", "Dark Matter orb", L] }
+  { gtier: 6, rank: "Dark Matter", outfit: ["rank-dark-outfit", "Dark Matter cloak", L], yard: ["rank-dark-yard", "Dark Matter orb", L] },
+  /* the ModuPro (gtier 7-13: Stone to Dark Matter again): the sim lab, a dental material or tool in each rank's material */
+  { gtier: 7, rank: "ModuPro Stone", outfit: ["rank-modu-stone-outfit", "Sculptor's beret and smock", E], yard: ["rank-modu-stone-yard", "Half-carved stone molar", E] },
+  { gtier: 8, rank: "ModuPro Antique", outfit: ["rank-modu-antique-outfit", "Lab visor and brass-buttoned coat", E], yard: ["rank-modu-antique-yard", "Brass articulator", E] },
+  { gtier: 9, rank: "ModuPro Bronze", outfit: ["rank-modu-bronze-outfit", "Foundry cap and casting tongs", E], yard: ["rank-modu-bronze-yard", "Bronze casting machine", E] },
+  { gtier: 10, rank: "ModuPro Silver", outfit: ["rank-modu-silver-outfit", "Head mirror and scrub cap", E], yard: ["rank-modu-silver-yard", "Silver instrument tray", E] },
+  { gtier: 11, rank: "ModuPro Gold", outfit: ["rank-modu-gold-outfit", "Gold crown and velvet cape", L], yard: ["rank-modu-gold-yard", "Golden dental chair", L] },
+  { gtier: 12, rank: "ModuPro Diamond", outfit: ["rank-modu-diamond-outfit", "Crystal face shield and diamond bur", L], yard: ["rank-modu-diamond-yard", "Giant diamond bur", L] },
+  { gtier: 13, rank: "ModuPro Dark Matter", outfit: ["rank-modu-dark-outfit", "Nebula cape and ringed planet", L], yard: ["rank-modu-dark-yard", "Nebula in a bell jar", L] },
+  /* the Loupes (gtier 14-20): light and sight. Timmy wears his loupes, so these outfits keep off his face */
+  { gtier: 14, rank: "Loupes Stone", outfit: ["rank-loupes-stone-outfit", "Explorer's pith helmet", L], yard: ["rank-loupes-stone-yard", "Stone sundial", L] },
+  { gtier: 15, rank: "Loupes Antique", outfit: ["rank-loupes-antique-outfit", "Navigator's tricorn and spyglass", L], yard: ["rank-loupes-antique-yard", "Brass telescope", L] },
+  { gtier: 16, rank: "Loupes Bronze", outfit: ["rank-loupes-bronze-outfit", "Lamplighter's cap and lantern", L], yard: ["rank-loupes-bronze-yard", "Bronze armillary sphere", L] },
+  { gtier: 17, rank: "Loupes Silver", outfit: ["rank-loupes-silver-outfit", "Bobble hat and binoculars", L], yard: ["rank-loupes-silver-yard", "Silver microscope", L] },
+  { gtier: 18, rank: "Loupes Gold", outfit: ["rank-loupes-gold-outfit", "Sun crown and golden sash", L], yard: ["rank-loupes-gold-yard", "Golden lighthouse", L] },
+  { gtier: 19, rank: "Loupes Diamond", outfit: ["rank-loupes-diamond-outfit", "Prism cape", L], yard: ["rank-loupes-diamond-yard", "Crystal prism", L] },
+  { gtier: 20, rank: "Loupes Dark Matter", outfit: ["rank-loupes-dark-outfit", "Constellation robe and crescent moon", L], yard: ["rank-loupes-dark-yard", "Dark Matter observatory", L] }
 ];
 
 /* The year-round collections (Sam, 2026-11-18: "Lets work on timmy outfits and place cosmetics. Go crazy"): eight pieces

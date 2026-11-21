@@ -256,7 +256,7 @@ and land at the release; BUG-083 is left alone unless the bar is opened.
   - **The preview** answers `get_my_shop`, `equip_item` and `get_pet_days_v2` from made-up data per test account
     (`shop2`, `equip2`, `PLACE_BOUGHT`, `PLACE_START` in `tools/preview/runtime/preview.js`): `high-xp` owns
     everything, `new` has no Timmy, `?xp=180000` and `?xp=300000` show the later journeys.
-  - **Left, each written down:** the later journeys' rank sets ([task](../2026-11-12-redesign-later-journeys-rank-sets.md));
+  - **Left, each written down:** the later journeys' rank sets ([task](2026-11-12-redesign-later-journeys-rank-sets.md));
     the five outfits (above); Timmy on the bar wearing his place's outfit, snack HP, `sw.js`, the About page's and
     `LORE.md`'s lines, drafted ([the release](2026-11-06-redesign-release.md), "From phase 4, part C"); visiting
     (`shPlace.open({ place })` is ready for `get_place`).
@@ -280,7 +280,7 @@ and land at the release; BUG-083 is left alone unless the bar is opened.
   - **Visiting** has its own note and session: [visiting](2026-11-12-redesign-visiting.md).
   - **The shop's link** in the customizer and snack HP: [the shop](2026-11-06-redesign-timmy-shop.md), session 2.
   - **The later journeys' rank sets**: after the release, in a new migration
-    ([their note](../2026-11-12-redesign-later-journeys-rank-sets.md)).
+    ([their note](2026-11-12-redesign-later-journeys-rank-sets.md)).
 - 2026-11-17 (Claude Code, closed after the release; the inbox's "the redesign's other task notes are still open", #401): the place shipped with the release; nothing left here.
 
 ## Outcome
@@ -289,7 +289,7 @@ and land at the release; BUG-083 is left alone unless the bar is opened.
 place is live on the dashboard and in each hub's More: the homes and seasonal sets, the five yard spots kept on the server
 (`equip_item`) and the same on every linked device, the customizer, visiting from the boards, and the bowling lane; the
 About page and `LORE.md` describe it. BUG-095 (a tall piece by the path in front of Timmy at the door) was accepted as it is
-(Sam, 2026-11-12). What's next is its own task: [the later journeys' rank sets](../2026-11-12-redesign-later-journeys-rank-sets.md).
+(Sam, 2026-11-12). What's next is its own task: [the later journeys' rank sets](2026-11-12-redesign-later-journeys-rank-sets.md).
 
 Related: [round 3](2026-11-10-redesign-timmys-place-round-3.md) · [Timmy's shop](2026-11-06-redesign-timmy-shop.md) · [the bowling egg](2026-11-06-redesign-bowling-egg.md) ·
 [phase 4](2026-11-05-redesign-phase-4-game-layer.md) · [diagrams-anima](../../rules/diagrams-anima.md)
