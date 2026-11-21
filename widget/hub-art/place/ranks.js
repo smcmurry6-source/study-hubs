@@ -825,11 +825,19 @@ window.SH_PLACE && window.SH_PLACE.addPack(function pack(T){
     },
     "rank-modu-diamond-outfit": {
       note: "A clear crystal face shield on a band, and a bandolier of diamond burs",
-      /* the bandolier crosses his front below the mouth */
-      face: p("M44 126 L152 148 L150 158 L42 136 Z", "#7FCDEB", O3) + (function(){ var s = "", i, x, y; for (i = 0; i < 6; i++){ x = 56 + i * 17; y = 128.4 + i * 3.46;
-          s += line("M" + x + " " + (y + 8) + " L" + x + " " + (y - 2), INK, 4) + line("M" + x + " " + (y + 8) + " L" + x + " " + (y - 2), STEEL.c, 2) + '<path d="M' + (x - 3) + " " + (y - 2) + " L" + x + " " + (y - 10) + " L" + (x + 3) + " " + (y - 2) + ' Z" fill="' + DI.c + '" ' + thin + "/>"; } return s; })(),
-      top: p("M40 50 Q100 32 160 50 L160 58 Q100 40 40 58 Z", DI.s, O3) +
-        '<path d="M42 56 Q100 40 158 56 L160 124 Q100 140 40 124 Z" fill="#CFF1FF" fill-opacity=".22" ' + O3 + "/>" + hi("M54 70 L52 112", 3, .8) + hi("M62 66 L60 84", 2.2, .6) + star4(146, 70, 4.4, WHITE) + star4(60, 120, 3, WHITE) + gem(100, 47, 10, 10, [DI.c, DI.s]),
+      /* the bandolier is a leather strap across the gums, from his left shoulder down to his right, with five burs in its loops */
+      face: p("M38 124 L50 114 L166 172 L158 186 Z", "#5A3A2A", O3) + line("M44 121 L161 178", "#7A5238", 1.6) +
+        (function(){ var s = "", i, t, x, y; for (i = 0; i < 5; i++){ t = .14 + i * .18; x = 44 + t * 118; y = 119 + t * 59;
+          s += line("M" + f(x) + " " + f(y + 6) + " L" + f(x) + " " + f(y - 12), INK, 5) + line("M" + f(x) + " " + f(y + 6) + " L" + f(x) + " " + f(y - 12), GD.c, 2.6) +
+            p("M" + f(x - 4) + " " + f(y - 12) + " L" + f(x - 3.4) + " " + f(y - 24) + " Q" + f(x) + " " + f(y - 29) + " " + f(x + 3.4) + " " + f(y - 24) + " L" + f(x + 4) + " " + f(y - 12) + " Z", DI.c, O2) +
+            spots([[x - 1.4, y - 21, .9], [x + 1.4, y - 16, .9], [x - 1, y - 14, .7]], WHITE) +
+            p("M" + f(x - 6) + " " + f(y - 2) + " h12 v7 h-12 z", "#7A5238", thin); } return s; })(),
+      /* a headband with a diamond, and a clear shield hanging from it in front of his face, its edge and shine showing it's there */
+      top: '<path d="M44 58 Q100 42 156 58 L160 104 Q158 120 140 122 L60 122 Q42 120 40 104 Z" fill="#BFE9FF" fill-opacity=".28"/>' +
+        '<path d="M44 58 Q100 42 156 58 L160 104 Q158 120 140 122 L60 122 Q42 120 40 104 Z" fill="none" stroke="' + DI.s + '" stroke-width="2.6"/>' +
+        hi("M50 70 L46 110", 3.4, .85) + hi("M58 66 L56 82", 2.4, .7) + hi("M146 92 L148 110", 2.6, .6) +
+        p("M40 50 Q100 32 160 50 L160 60 Q100 42 40 60 Z", "#3A4658", O3) + line("M44 52 Q100 35 156 52", DI.c, 1.6) +
+        dot(40, 55, 3.4, SV.s) + dot(160, 55, 3.4, SV.s) + gem(100, 44, 13, 12, [DI.c, DI.s]) + star4(124, 40, 3.6, WHITE) + star4(150, 76, 4.4, WHITE),
       say: ["ModuPro Diamond! Shield down, burs ready.", "Diamond burs: the sparkliest way to prep a tooth.", "Face shield on. Aerosols, not today."]
     },
     "rank-modu-dark-outfit": {
@@ -875,9 +883,14 @@ window.SH_PLACE && window.SH_PLACE.addPack(function pack(T){
     },
     "rank-loupes-silver-outfit": {
       note: "A silver-striped bobble hat and silver binoculars on a strap",
-      face: line("M58 108 Q80 124 90 130 M142 108 Q120 124 110 130", INK, 3.4) + line("M58 108 Q80 124 90 130 M142 108 Q120 124 110 130", "#3A4047", 1.6) +
-        p("M82 126 h14 v18 a4 4 0 0 1 -4 4 h-6 a4 4 0 0 1 -4 -4 z M104 126 h14 v18 a4 4 0 0 1 -4 4 h-6 a4 4 0 0 1 -4 -4 z", SV.c, O3) + p("M96 132 h8 v8 h-8 z", SV.s, O2) +
-        '<circle cx="89" cy="146" r="3.4" fill="#9FD8F0" ' + O2 + '/><circle cx="111" cy="146" r="3.4" fill="#9FD8F0" ' + O2 + "/>",
+      /* the strap runs from behind his neck to binoculars resting on the gums, well below the mouth */
+      face: line("M50 118 Q66 146 80 152 M150 118 Q134 146 120 152", INK, 4) + line("M50 118 Q66 146 80 152 M150 118 Q134 146 120 152", "#3F7EB8", 2.2) +
+        p("M72 144 Q72 138 80 138 L94 138 Q98 138 98 144 L98 168 Q98 174 90 174 L78 174 Q70 174 70 168 Z", SV.c, O3) +
+        p("M102 144 Q102 138 106 138 L120 138 Q128 138 128 144 L130 168 Q130 174 122 174 L110 174 Q102 174 102 168 Z", SV.c, O3) +
+        '<path d="M118 140 L120 138 Q128 138 128 144 L130 168 Q130 174 122 174 L120 174 Z" fill="' + SV.s + '"/>' +
+        p("M96 148 h8 v14 h-8 z", "#3A4047", O2) + dot(100, 145, 3, SV.h) +
+        p("M71 160 h28 v14 h-28 z M101 160 h29 v14 h-29 z", "#3A4047", O2) +
+        '<circle cx="85" cy="167" r="5" fill="#9FD8F0" ' + O2 + '/><circle cx="115.5" cy="167" r="5" fill="#9FD8F0" ' + O2 + "/>" + hi("M83 165 l2 -1.4", 1.6, .95) + hi("M113.5 165 l2 -1.4", 1.6, .95) + hi("M76 144 v10", 2, .8),
       top: p("M42 50 C38 14 68 -4 100 -4 C132 -4 162 14 158 50 Q100 40 42 50 Z", SV.c) + '<path d="M126 0 C150 10 162 28 158 50 Q150 47 140 46 C144 30 138 12 126 0 Z" fill="' + SV.s + '"/>' +
         line("M48 30 Q100 14 152 30", "#3F7EB8", 5) + line("M44 42 Q100 28 156 42", "#3F7EB8", 5) + p("M42 50 Q100 40 158 50 L158 60 Q100 48 42 60 Z", "#E4E9EE", O3) +
         line("M54 52 v6 M70 49 v6 M86 47 v6 M102 46 v6 M118 47 v6 M134 49 v6 M150 52 v6", SV.s, 1.4) + '<circle cx="100" cy="-10" r="11" fill="#FFFFFF" ' + O3 + "/>" + spots([[96, -14], [104, -8], [98, -4], [106, -14]], SV.s, 1.4),
@@ -885,11 +898,16 @@ window.SH_PLACE && window.SH_PLACE.addPack(function pack(T){
     },
     "rank-loupes-gold-outfit": {
       note: "A crown of golden sun rays, and a gold sash with a sun on it",
-      /* the sash runs below the mouth */
-      face: p("M46 118 L58 112 L154 142 L150 152 Z", GD.c, O3) + line("M57 117 L151 146", GD.h, 1.6) + '<circle cx="101" cy="131" r="8.6" fill="' + GD.c + '" ' + O3 + '/><circle cx="101" cy="131" r="4.2" fill="#F28C28"/>',
-      top: (function(){ var s = "", i, a, x, y; for (i = 0; i < 11; i++){ a = (-165 + i * 15) * Math.PI / 180; x = 100 + Math.cos(a) * 54; y = 46 + Math.sin(a) * 40;
-          s += p("M" + f(100 + Math.cos(a - .09) * 40) + " " + f(46 + Math.sin(a - .09) * 30) + " L" + f(x) + " " + f(y) + " L" + f(100 + Math.cos(a + .09) * 40) + " " + f(46 + Math.sin(a + .09) * 30) + " Z", i % 2 ? GD.c : GD.h, O2); }
-        return s; })() + p("M58 40 Q100 24 142 40 L142 50 Q100 34 58 50 Z", GD.c, O3) + line("M62 42 Q100 28 138 42", GD.h, 1.6) + '<circle cx="100" cy="36" r="6" fill="#F28C28" ' + O2 + "/>",
+      /* a wide pageant sash across the gums, from his left shoulder to his right hip, with a sun medallion */
+      face: p("M40 122 L54 112 L164 168 L156 186 Z", GD.c, O3) + '<path d="M116 150 L164 168 L156 186 L110 162 Z" fill="' + GD.s + '"/>' + p("M40 122 L54 112 L164 168 L156 186 Z", "none", O3) +
+        line("M48 120 L160 176", GD.h, 1.8) +
+        (function(){ var s = "", i, a; for (i = 0; i < 12; i++){ a = i * 30 * Math.PI / 180; s += p("M" + f(104 + Math.cos(a - .2) * 9) + " " + f(152 + Math.sin(a - .2) * 9) + " L" + f(104 + Math.cos(a) * 16) + " " + f(152 + Math.sin(a) * 16) + " L" + f(104 + Math.cos(a + .2) * 9) + " " + f(152 + Math.sin(a + .2) * 9) + " Z", "#F28C28", thin); } return s; })() +
+        '<circle cx="104" cy="152" r="10" fill="' + GD.c + '" ' + O3 + '/><circle cx="104" cy="152" r="5" fill="#F28C28"/>' + hi("M99 147 l3 -2", 1.8, .9),
+      /* long and short rays fanning from behind a gold band, all above the loupes' headlight */
+      top: (function(){ var s = "", i, a, L; for (i = 0; i < 11; i++){ a = (-155 + i * 13) * Math.PI / 180; L = i % 2 ? 60 : 74;
+          s += p("M" + f(100 + Math.cos(a - .075) * 44) + " " + f(52 + Math.sin(a - .075) * 44) + " L" + f(100 + Math.cos(a) * L) + " " + f(52 + Math.sin(a) * L) + " L" + f(100 + Math.cos(a + .075) * 44) + " " + f(52 + Math.sin(a + .075) * 44) + " Z", i % 2 ? GD.h : GD.c, O2); }
+        return s; })() + p("M44 42 Q100 22 156 42 L156 54 Q100 34 44 54 Z", GD.c, O3) + '<path d="M128 30 Q144 34 156 42 L156 54 Q146 48 130 44 Z" fill="' + GD.s + '"/>' + p("M44 42 Q100 22 156 42 L156 54 Q100 34 44 54 Z", "none", O3) +
+        line("M50 44 Q100 26 150 44", GD.h, 1.6) + '<circle cx="100" cy="36" r="7.4" fill="#F28C28" ' + O2 + "/>" + hi("M96 33 l3 -2", 1.6, .9),
       say: ["Loupes Gold! I'm practically a light source now.", "Good light, good loupes, good margins.", "Sun's out, loupes on."]
     },
     "rank-loupes-diamond-outfit": {
