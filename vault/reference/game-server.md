@@ -464,7 +464,7 @@ as many crowns as XP (`sh_is_prize`), never boosted; the amounts are in `sh_priz
 
 - The Tooth Fairy is caught on the page, so only the first catch pays: a catch every minute can't be farmed.
 - **Back pay** (in the migration, section 4, to a linked device's primary id): the first fairy catch of everyone who caught
-  one, every Golden Probe ever won, each hub's first perfect mock in `mock_scores`. Not the Golden Tooth Fairy (no record of
+  one, every Golden Probe ever won, each hub's first perfect mock in `mock_scores` (applied 2026-11-20: 42 fairies, 58 probes from 29 people, 8 perfect mocks from 7 people). Not the Golden Tooth Fairy (no record of
   which catches were golden before v92), a day back, yesterday's misses or ideas (none shipped had a student author).
 - `widget/eggs.js` asks the new calls through `shGame.claim` (the reward card and the balance), and the old calls when
   the game layer or the new call isn't there. `tools/release/xp.js` section 14e checks all of it.
