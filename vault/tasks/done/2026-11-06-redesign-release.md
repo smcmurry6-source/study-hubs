@@ -468,7 +468,7 @@ redesign's pages, on the game layer (`get_my_shop`, `equip_item`), so it goes li
 - [x] **Five everyday outfits have no drawing** ([task](2026-11-12-five-outfits-without-a-drawing.md), Sam's call:
       draw them or take them out of the catalog) and the five rare costumes are part B's art. Until then the place
       draws Timmy as himself in any of them. (Drawn, all ten, and approved by Sam: [#339](https://github.com/smcmurry6-source/study-hubs/pull/339), 2026-11-12.)
-- (its own task, not part of the release) **The later journeys' rank sets** ([task](../2026-11-12-redesign-later-journeys-rank-sets.md)): 28 drawings and 28
+- (its own task, not part of the release) **The later journeys' rank sets** ([task](2026-11-12-redesign-later-journeys-rank-sets.md)): 28 drawings and 28
       catalog rows, cut from part C with Sam's yes. Not needed for the release (nobody is near 125,000 XP).
 - [x] **Timmy on a hub's bar doesn't wear his place's outfit yet**: `widget/pet.js` wasn't touched in part C. It
       belongs to "everyone has Timmy" ([Ask Timmy](2026-11-12-redesign-ask-timmy.md), part 4), which changes pet.js
@@ -585,7 +585,7 @@ engine's answer path and Timmy's place), needs nothing on the server, and goes l
       in the device's storage, then one first-try right answer; `?persona=high-xp` has the lane at Timmy's place).
       **2026-11-13, on the release's preview: a clip on a phone and one on a laptop with reduced motion; the run, the strike at 50 and the turkey are played by the smoke test.**
 - (moved to [the inbox](../inbox.md), 2026-11-13: the first migration after the release) **The Bowling trophy is on the device only** until the first migration after the release adds `bowling` to
-      `record_achievement`'s kinds ([the later journeys' rank sets](../2026-11-12-redesign-later-journeys-rank-sets.md));
+      `record_achievement`'s kinds ([the later journeys' rank sets](2026-11-12-redesign-later-journeys-rank-sets.md));
       until then its row on the About page shows no share of the class.
 
 **About page** (`about/index.html`, in a spoiler; a new entry in Part 7, Easter eggs, tagged new and with the trophy's

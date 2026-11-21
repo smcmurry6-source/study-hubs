@@ -72,7 +72,7 @@ Each has a still version for reduced motion: the last frame and the word ("Strik
   the database's `record_achievement` takes only the trophy kinds it lists, `bowling` isn't one, and neither pending
   migration changes that. So at the release the Bowling trophy shows in the case from this device's sightings, earns
   no gold crowns and has no "share of the class" line. The first migration after the release adds the kind (a box in
-  [the later journeys' rank sets](../2026-11-12-redesign-later-journeys-rank-sets.md), which needs a migration anyway),
+  [the later journeys' rank sets](2026-11-12-redesign-later-journeys-rank-sets.md), which needs a migration anyway),
   and the client then records it for everyone who has it.
 - **Only on the redesign's pages** (the engine's answer path), so no live hub changes before the release.
 - **The lane** at Timmy's place plays a random clip; its small "Strike! Well, close." stays as what it does when the

@@ -1,13 +1,13 @@
 ---
 type: task
-status: open
+status: done
 hub: widget
 created: 2026-11-12
 requested-by: Sam
 due: after the redesign's release
 waiting-on: 
-agent: 
-pr: 
+agent: Claude Code
+pr: https://github.com/smcmurry6-source/study-hubs/pull/510
 ---
 
 # The ModuPro's and the Loupes' rank sets for Timmy's place
@@ -19,8 +19,8 @@ never sold. Fourteen ranks (seven in the ModuPro, seven in the Loupes), 28 drawi
 
 ## Context
 
-- Cut from part C of [phase 4](done/2026-11-05-redesign-phase-4-game-layer.md) with Sam's yes (2026-11-12, to the open
-  calls in [the place's note](done/2026-11-06-redesign-timmys-place.md): "okay thats fine"): the place as a real client was
+- Cut from part C of [phase 4](2026-11-05-redesign-phase-4-game-layer.md) with Sam's yes (2026-11-12, to the open
+  calls in [the place's note](2026-11-06-redesign-timmys-place.md): "okay thats fine"): the place as a real client was
   one session's work already, and nobody is within reach of 125,000 XP.
 - What exists: the Handpiece's six rank sets (`tools/figures/site/packs/ranks.mjs`, listed in `sets.mjs` `RANKS`, gtier
   1 to 6), their twelve catalog rows in `migration_v54.sql` (`rank_tier` 1 to 6), and the client. `widget/place.js`
@@ -28,28 +28,28 @@ never sold. Fourteen ranks (seven in the ModuPro, seven in the Loupes), 28 drawi
   **the client needs only its names for ranks past 6** (`RANKS` in `widget/place.js` stops at Dark Matter; a locked
   piece of gtier 7 to 20 should read "Reach ModuPro Gold").
 - The server already owns the rule: `sh_owns` gives a rank item to everyone whose `gtier` has reached its `rank_tier`
-  (1 to 6 the Handpiece, 7 to 13 the ModuPro, 14 to 20 the Loupes: [game-server](../reference/game-server.md)).
+  (1 to 6 the Handpiece, 7 to 13 the ModuPro, 14 to 20 the Loupes: [game-server](../../reference/game-server.md)).
 - **This changes the pending migration**: 28 new rows in `shop_items`, and `tools/release/xp.js` requires the
   catalog's rank rows to be exactly `sets.mjs`. Sam's instruction on 2026-11-12 was to tell him instead of changing
   the migration, so ask before adding the rows. If the migration has been applied by then, it is a new migration.
-- How to draw a set: [draw-a-seasonal-set](../how-to/draw-a-seasonal-set.md) (`pack-preview.mjs` makes a contact
-  sheet of one set). Rules: [every-hub-gets-its-own-art](../rules/every-hub-gets-its-own-art.md), the lore rules in
-  [podcast-reactions](../rules/podcast-reactions.md). In the loupes journey Timmy wears his loupes, so those seven
+- How to draw a set: [draw-a-seasonal-set](../../how-to/draw-a-seasonal-set.md) (`pack-preview.mjs` makes a contact
+  sheet of one set). Rules: [every-hub-gets-its-own-art](../../rules/every-hub-gets-its-own-art.md), the lore rules in
+  [podcast-reactions](../../rules/podcast-reactions.md). In the loupes journey Timmy wears his loupes, so those seven
   outfits either leave room for them or go on the kit's `NO_LOUPES` list.
 
-## Sam's calls (2026-11-12, [decisions](../decisions.md))
+## Sam's calls (2026-11-12, [decisions](../../decisions.md))
 
 - **After the release**, in its own session, with its rows in **a new migration** (the next free number then), not
   in `migration_v54.sql`. Nobody is near 125,000 XP, and it is the one piece of the redesign that needs catalog rows.
 - The same migration adds **`bowling` to the trophy kinds `record_achievement` takes**
-  ([the bowling egg](done/2026-11-06-redesign-bowling-egg.md): until then that trophy is kept on the device), and the
+  ([the bowling egg](2026-11-06-redesign-bowling-egg.md): until then that trophy is kept on the device), and the
   client then records it for everyone whose device has it.
 
 ## Build spec
 
-Not one of the sessions before the release ([phase 4](done/2026-11-05-redesign-phase-4-game-layer.md), "From here to the
+Not one of the sessions before the release ([phase 4](2026-11-05-redesign-phase-4-game-layer.md), "From here to the
 release"); "For every session above" there still holds, except that the redesign is live by then, so this is an
-ordinary change to the live site ([RELEASE_TEST_PLAN.md](../../RELEASE_TEST_PLAN.md)).
+ordinary change to the live site ([RELEASE_TEST_PLAN.md](../../../RELEASE_TEST_PLAN.md)).
 
 **Files to touch**: `tools/figures/site/sets.mjs` (`RANKS`: tiers 7 to 20), a pack file beside
 `tools/figures/site/packs/ranks.mjs` (or that file), the generated kit files (`node tools/figures/site/build.mjs`:
@@ -64,7 +64,7 @@ Bowling trophy when the device has it and the server takes it), the About page (
 
 **What it calls**: the server already owns the rule (`sh_owns` gives a rank item to everyone whose `gtier` has
 reached its `rank_tier`; `get_my_shop`'s `locked` lists the ones not reached with their tier), and `widget/place.js`
-draws any rank piece the catalog names. How to draw a set: [draw-a-seasonal-set](../how-to/draw-a-seasonal-set.md)
+draws any rank piece the catalog names. How to draw a set: [draw-a-seasonal-set](../../how-to/draw-a-seasonal-set.md)
 (`node tools/figures/site/pack-preview.mjs ranks <out.png>`). In the Loupes journey Timmy wears loupes: each of those
 seven outfits leaves room for them or goes on the kit's `NO_LOUPES` list.
 
@@ -83,11 +83,12 @@ owns that tier's set and not the next), `node tools/release/rls.js`, the smoke t
 ## Done when
 
 - [x] Sam's yes to adding the 28 rows to the catalog (2026-11-12: after the release, in a new migration)
-- [ ] The 28 pieces drawn (a contact sheet per journey, light and dark) and approved by Sam
-- [ ] In `sets.mjs`, a pack file, the generated kit files (`node tools/figures/site/build.mjs`) and the catalog
-- [ ] `widget/place.js` names the later ranks on a locked card
+- [x] The 28 pieces drawn (a contact sheet per journey, light and dark) and approved by Sam (2026-11-20: "Looks good merge")
+- [x] In `sets.mjs`, a pack file, the generated kit files (`node tools/figures/site/build.mjs`) and the catalog (`migration_v91.sql`)
+- [x] `widget/place.js` names the later ranks on a locked card
 - [x] `bowling` added to the trophy kinds, and the client records the trophy (done on its own, ahead of the rank sets: `migration_v63.sql`, `widget/v3.js`, #395)
-- [ ] `node tools/release/xp.js` and the smoke test pass
+- [x] `node tools/release/xp.js` and the smoke test pass
+- [x] `migration_v91.sql` applied through the connector after Sam's "merge" (then appended to `supabase/schema.sql` and taken off `supabase/pending-migrations.txt`)
 
 ## Log
 
@@ -96,11 +97,34 @@ owns that tier's set and not the next), `node tools/release/rls.js`, the smoke t
   Bowling trophy's server kind rides in the same migration.
 - 2026-11-17 (Claude Code): the Bowling trophy went in on its own (`migration_v63.sql`, #395), from the inbox's line; the
   rank sets' migration no longer needs to carry it.
+- 2026-11-20 (Claude Code): drawn and wired. Each later journey runs the seven materials again (`sh_rank`: gtier 7 is
+  ModuPro Stone, 14 Loupes Stone), so each has seven sets, Stone included. The ModuPro's are the sim lab, a dental
+  material or tool in the rank's material; the Loupes' are things to see by, every outfit clear of the loupes and their
+  headlight (none on `NO_LOUPES`). Rarity: the ModuPro Epic to Silver, Legendary from Gold; the Loupes all Legendary. The
+  rows are `migration_v91.sql` (the number reserved for it). The later outfits are their own file,
+  `widget/hub-art/outfits/journeys.js` (in `outfits.js` they made it 81 KB from 50 KB). `pack-preview.mjs` takes
+  `ranks:modupro` / `ranks:loupes` for one journey's sheet, with the loupes on. Contact sheets sent to Sam; then, at Sam's
+  ask, a second Opus 5.5 agent reviewed and redrew 13 pieces and nine outfits (side-on articulator, chair and prism; a
+  bench casting machine; a library telescope; a bigger sundial; outfits kept off the mouth and the headlight) and fixed
+  five lines (e.g. "a gypsum product", wax carving before casting). Revised sheets sent.
+- 2026-11-20, later (Claude Code): Sam: the ModuPro Diamond, Loupes Silver and Loupes Gold outfits "look off". Redrawn: the face
+  shield has a clear edge and stops at the chin, the binoculars rest on the gums below the mouth, the sun crown has long
+  rays and the sash is a wide pageant sash. Then "the bandoliers dont translate well": the Diamond outfit holds one big
+  diamond bur instead, renamed "Crystal face shield and diamond bur" (its row wasn't applied yet). Sam: "Looks good
+  merge". `migration_v91.sql` applied through the connector (`v91_later_rank_sets`, one call; 28 rows, 40 rank rows in
+  all, 268 items), appended to `supabase/schema.sql`, off the pending list.
 
 ## Outcome
 
-Related: [Timmy's place](done/2026-11-06-redesign-timmys-place.md) · [the journeys](done/2026-11-06-redesign-progression-journeys.md) ·
-[game-server](../reference/game-server.md) · [the release](done/2026-11-06-redesign-release.md)
+Done (#510, 2026-11-20). Every full rank-up of the ModuPro and the Loupes gives an outfit and a yard piece, as the
+Handpiece's six do: 28 earned, never-sold items in `migration_v91.sql` (applied), drawn in
+`tools/figures/site/packs/ranks.mjs` (the later outfits load from `widget/hub-art/outfits/journeys.js`), checked by
+`tools/release/xp.js` (each gtier 7-20 owns its set and the earlier ones, not the next) and the smoke test's locked card
+("Reach ModuPro Gold"). Nothing left over. The second review's two notes (the prism's slab can read as a frame; the yard
+with every piece out is crowded) went to Sam with the sheets, and Sam approved them as they are.
+
+Related: [Timmy's place](2026-11-06-redesign-timmys-place.md) · [the journeys](2026-11-06-redesign-progression-journeys.md) ·
+[game-server](../../reference/game-server.md) · [the release](2026-11-06-redesign-release.md)
 
 ## Opening prompt
 

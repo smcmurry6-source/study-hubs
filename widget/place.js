@@ -986,7 +986,10 @@
   /* ---------- the panel beside the stage: Visit (his health, the medals) or Customize (the dock and the drawer) ---------- */
   var DOCK_N = { right: "Back", side: "Side", left: "Path, left", front: "Path, right", corner: "Front" };
   var DRAWER = { home: ["Homes", "The cottage is every Timmy’s first home."], scene: ["Scenes", "Where the whole place stands."], timmy: ["Timmy’s wardrobe", "Pick an outfit off the rail."] };
-  var RANKS = ["", "Antique", "Bronze", "Silver", "Gold", "Diamond", "Dark Matter"];
+  /* what a locked rank piece says it needs, by the server's gtier: the Handpiece's names alone, the later journeys' with
+     the journey first ("Reach ModuPro Gold"), as widget/ranks.js nameOf() names them */
+  var RANKS = (function(){ var m = ["Stone", "Antique", "Bronze", "Silver", "Gold", "Diamond", "Dark Matter"], out = [""].concat(m.slice(1));
+    ["ModuPro", "Loupes"].forEach(function(j){ m.forEach(function(n){ out.push(j + " " + n); }); }); return out; })();
   var THUMBS = {};
   function thumb(kind, k, o){
     var id = kind + ":" + k + ":" + JSON.stringify(o || {});

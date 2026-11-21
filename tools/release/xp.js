@@ -784,7 +784,7 @@ try {
   const wantSets = byId(SETS.items.map(i => ({ id: i.id, name: i.n, kind: i.kind, rarity: i.rarity, price: i.price, season: i.season || null, gift: !!i.gift, rank_tier: i.rank == null ? null : i.rank })));
   const gotSets = byId(rows(`select id, name, kind, rarity, price, season, gift, rank_tier from shop_items where season is not null or gift or rank_tier is not null`));
   const setDiff = [...new Set([...Object.keys(wantSets), ...Object.keys(gotSets)])].filter(id => wantSets[id] !== gotSets[id]).sort();
-  ok(setDiff.length === 0 && SETS.items.length === 124, `the catalog's seasonal and rank rows are exactly allSetItems() of tools/figures/site/sets.mjs (${SETS.items.length} items; ${setDiff.length} differ${setDiff.length ? ': ' + setDiff.slice(0, 5).map(id => `${id} ${gotSets[id] || 'missing'} vs ${wantSets[id] || 'not in sets.mjs'}`).join('; ') : ''})`);
+  ok(setDiff.length === 0 && SETS.items.length === 152, `the catalog's seasonal and rank rows are exactly allSetItems() of tools/figures/site/sets.mjs (${SETS.items.length} items; ${setDiff.length} differ${setDiff.length ? ': ' + setDiff.slice(0, 5).map(id => `${id} ${gotSets[id] || 'missing'} vs ${wantSets[id] || 'not in sets.mjs'}`).join('; ') : ''})`);
   // the year-round collections (migration_v65; Sam, 2026-11-18: "Go crazy"): exactly allCollectionItems(), every one in
   // the everyday rotation (season null, rotates), none a gift or a rank piece; and the ten rare costumes, as COSTUMES says
   const wantColl = byId(SETS.coll.map(i => ({ id: i.id, name: i.n, kind: i.kind, rarity: i.rarity, price: i.price, season: null, gift: false, rank_tier: null, rotates: true, shelf: false })));
@@ -834,8 +834,8 @@ try {
   eq(rows(`select distinct rarity from shop_items order by rarity`).map(r => r.rarity).filter(k => !SHOPART.frame(k)), [], 'every rarity in the catalog has a card frame');
   ok(/<svg/.test(SHOPART.coin(16)) && /<svg/.test(SHOPART.coin(48)) && SHOPART.coinBody(true) !== SHOPART.coinBody(false), 'the Shiny Gold Crown is drawn, with its own cut for small sizes');
   const rankRows = rows(`select id, kind, price, rank_tier, rotates, shelf from shop_items where rank_tier is not null order by rank_tier, kind`);
-  ok(rankRows.length === 12 && rankRows.every(r => r.price === 0 && !r.rotates && !r.shelf && ['outfit', 'yard'].includes(r.kind)) && JSON.stringify([...new Set(rankRows.map(r => r.rank_tier))]) === JSON.stringify(SETS.ranks),
-    'twelve rank items: an outfit and a yard thing for each of the Handpiece\'s six full rank-ups, price 0, on no shelf');
+  ok(rankRows.length === 40 && rankRows.every(r => r.price === 0 && !r.rotates && !r.shelf && ['outfit', 'yard'].includes(r.kind)) && JSON.stringify([...new Set(rankRows.map(r => r.rank_tier))]) === JSON.stringify(SETS.ranks),
+    'forty rank items: an outfit and a yard thing for each full rank-up of the three journeys (the Handpiece\'s six, the ModuPro\'s and the Loupes\' seven each), price 0, on no shelf');
   raises(() => sql(`insert into shop_items (id, name, kind, rarity, price, rank_tier, rotates) values ('t-rank-priced', 'X', 'outfit', 'rare', 700, 3, false)`), '23514', 'a rank item with a price');
   raises(() => sql(`insert into shop_items (id, name, kind, rarity, price) values ('t-free', 'X', 'outfit', 'rare', 0)`), '23514', 'a price of 0 without a rank');
   raises(() => sql(`insert into shop_items (id, name, kind, rarity, price, rank_tier, rotates) values ('t-rank-home', 'X', 'home', 'rare', 0, 3, false)`), '23514', 'a rank item that isn\'t an outfit or a yard thing');
@@ -961,7 +961,7 @@ try {
   // rank sets: earned by rank, never sold
   const shopOf = v => anonJson(`get_my_shop(${q(v)})`);
   const rk0 = shopOf('xp-RK');
-  ok(rk0.locked.length === 12 && rk0.locked[0].rank_tier === 1 && rk0.locked[0].name && !rk0.inventory.some(i => i.how === 'rank'), 'before any rank-up: the twelve rank items are listed as locked, each with its tier');
+  ok(rk0.locked.length === 40 && rk0.locked[0].rank_tier === 1 && rk0.locked[0].name && !rk0.inventory.some(i => i.how === 'rank'), 'before any rank-up: the forty rank items are listed as locked, each with its tier');
   eq(anonJson(`equip_item('xp-RK', 'outfit', 'rank-antique-outfit')`).error, 'not-owned', 'a rank item can\'t be put on below its rank');
   const rkBuy = anonJson(`buy_item('xp-RK', 'rank-antique-outfit', 'buy-rk-000001')`);
   ok(rkBuy.error === 'rank' && rkBuy.rank_tier === 1, `a rank item can't be bought (${JSON.stringify(rkBuy)})`);
@@ -972,7 +972,7 @@ try {
   eq(anonJson(`equip_item('xp-RK', 'outfit', 'rank-bronze-outfit')`).error, 'not-owned', 'the next rank\'s outfit is still locked');
   const rk1 = shopOf('xp-RK');
   eq(rk1.inventory.filter(i => i.how === 'rank').map(i => i.id).sort(), ['rank-antique-outfit', 'rank-antique-yard'], 'get_my_shop lists them as owned by rank');
-  ok(rk1.locked.length === 10 && rk1.locked.every(i => i.rank_tier >= 2) && rk1.inventory.filter(i => i.how === 'gift').length === 8, 'and the ten still locked');
+  ok(rk1.locked.length === 38 && rk1.locked.every(i => i.rank_tier >= 2) && rk1.inventory.filter(i => i.how === 'gift').length === 8, 'and the thirty-eight still locked');
   eq([anonJson(`buy_item('xp-RK', 'rank-antique-outfit', 'buy-rk-000002')`).error, anonJson(`buy_item('xp-RK', 'rank-bronze-outfit', 'buy-rk-000003')`).error], ['owned', 'rank'], 'owned once reached; the next one still can\'t be bought');
   award('xp-RK', 'rep:flag:9012', 4700);
   eq(shopOf('xp-RK').inventory.filter(i => i.how === 'rank').length, 6, 'at Silver (5,000 XP): the sets of every rank passed, three in all');
@@ -981,7 +981,22 @@ try {
   sql(`delete from xp_awards where visitor_id = 'xp-RK'; select sh_xp_rebuild(array['xp-RK'])`);
   ok(xpOf('xp-RK') === 0 && one(`select item_id from pet_equipped where visitor_id = 'xp-RK' and slot = 'outfit'`) === 'rank-silver-outfit' && anonJson(`equip_item('xp-RK', 'outfit', 'rank-silver-outfit')`).error === 'not-owned',
     'if XP ever drops below the rank, what is on stays on; it can\'t be put on again');
-  ok(shopOf('xp-T').locked.length === 0 && shopOf('xp-T').inventory.filter(i => i.how === 'rank').length === 12 && shopOf('xp-T').inventory.some(i => i.how === 'bought' && i.id === 'clover-patch' && i.at), 'past Dark Matter: all twelve, beside what was bought');
+  ok(shopOf('xp-T').locked.length === 28 && shopOf('xp-T').locked.every(i => i.rank_tier >= 7) && shopOf('xp-T').inventory.filter(i => i.how === 'rank').length === 12 && shopOf('xp-T').inventory.some(i => i.how === 'bought' && i.id === 'clover-patch' && i.at), 'at the Handpiece\'s Dark Matter: all twelve of its sets, beside what was bought, and the later journeys\' 28 still locked');
+  // the later journeys' sets (migration_v91): at each later tier an account owns that tier's set and not the next one's
+  {
+    const floor = g => num(`select min(x) from generate_series(0, 400000, 500) x where (select gtier from sh_rank(x)) >= ${g}`);
+    let had = 0, bad = [];
+    for (let g = 7; g <= 20; g++){
+      const v = 'xp-RL' + g, need = floor(g);
+      award(v, 'rep:flag:' + (9100 + g), need);
+      const sh = shopOf(v), mine = new Set(sh.inventory.filter(i => i.how === 'rank').map(i => i.id)), r = SETS.items.filter(i => i.rank != null);
+      const own = r.filter(i => i.rank === g).every(i => mine.has(i.id)), next = r.filter(i => i.rank === g + 1).some(i => mine.has(i.id));
+      if (num(`select gtier from sh_rank(${xpOf(v)})`) !== g || !own || next || mine.size !== g * 2 || sh.locked.length !== 40 - g * 2) bad.push(g + ': ' + mine.size + ' owned, ' + sh.locked.length + ' locked');
+      if (g === 7) had = anonJson(`equip_item(${q(v)}, 'outfit', 'rank-modu-stone-outfit')`).equipped.outfit === 'rank-modu-stone-outfit' && anonJson(`equip_item(${q(v)}, 'outfit', 'rank-modu-antique-outfit')`).error === 'not-owned';
+    }
+    eq(bad, [], 'at each tier of the ModuPro and the Loupes (7 to 20) an account owns that tier\'s set and every earlier one, and not the next');
+    ok(had, 'at ModuPro Stone its outfit goes on, and ModuPro Antique\'s is still locked');
+  }
   notes.push(`seasonal sets: the catalog matches sets.mjs (${SETS.items.length} rows), ${SALE.length} sample days of sh_shop_seasons, three years of shelves, throwback days, the gift set, the rank sets`);
 
   /* ---------- 13b. the shop's client (phase 4, part B): the preview's purchases, and the rare costume of the day ---------- */

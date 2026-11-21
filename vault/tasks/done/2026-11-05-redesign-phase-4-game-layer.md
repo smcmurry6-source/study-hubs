@@ -62,7 +62,7 @@ spec ends with the prompt that starts it. One session each, in this order ([run-
 Beside any of them, because they touch other files: **Ask Timmy, part 3** (the admin page's Timmy tab, `review/`) and
 **[Learn and Flashcards](2026-11-06-redesign-learn-and-flashcards.md)** (`widget/hub-bank.js`; its note wants a server
 part in the pending migration, which is Sam's call at the start of that session). After the release:
-[the later journeys' rank sets](../2026-11-12-redesign-later-journeys-rank-sets.md).
+[the later journeys' rank sets](2026-11-12-redesign-later-journeys-rank-sets.md).
 
 **Which model** (Sam, 2026-11-12, [decisions](../../decisions.md)): every session above, and the two beside them, on Opus 5.5
 at Extra effort; sessions 9 (phase 5, part 2) and 10 (the release) on Fable 5.2 at High effort. Sam picks it when
@@ -549,7 +549,7 @@ ten sessions in "From here to the release" all merged: the shop's art and client
 egg, the trophy case and the cards (Full Arch retired), Ask Timmy's chat, the wiring, phase 5 part 2, then the release,
 with Ask Timmy's admin tab and Learn and Flashcards beside them. `migration_v54` to `v58` are applied and the game layer
 is what the dashboard, Occlusion and Perio run on. Nothing is left in this note; what came after is its own task:
-[the later journeys' rank sets](../2026-11-12-redesign-later-journeys-rank-sets.md).
+[the later journeys' rank sets](2026-11-12-redesign-later-journeys-rank-sets.md).
 
 ## Opening prompts
 
