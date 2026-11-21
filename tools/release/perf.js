@@ -33,7 +33,10 @@ async function measure(browser, url){
   });
   const page = await ctx.newPage();
   const cdp = await ctx.newCDPSession(page);
-  await cdp.send('Network.enable');
+  /* no buffers: without them Chromium keeps a copy of every response for DevTools, work a student's browser never does,
+     and for a hub's two 1.2 MB content files that was about half of each one's "read" task, counted as blocking time
+     (2026-11-21). The byte counts come from loadingFinished's encodedDataLength, which doesn't need the copy. */
+  await cdp.send('Network.enable', { maxTotalBufferSize: 0, maxResourceBufferSize: 0 });
   await cdp.send('Network.emulateNetworkConditions', NET);
   await cdp.send('Emulation.setCPUThrottlingRate', { rate: 4 });
   let bytes = 0, requests = 0, html = 0, quietSince = Date.now(); const types = {}, previewOnly = {}, inFlight = new Set();
