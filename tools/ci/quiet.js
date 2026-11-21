@@ -8,7 +8,7 @@
 // And the answer history kept on the device (phase 3, migration_v84): history() below.
 // And a mock's answers in a busy minute, and the game layer's reads with the bootstrap timed out (2026-11-19): mock(), timedOut().
 // Nothing reaches the real database: every request off 127.0.0.1 is answered here (and what a closing page sends, which
-// routing misses, by tools/ci/no-leaks.js), and every WebSocket is closed (the
+// routing misses, by tools/ci/no-leaks.js, whose proxy refuses whatever still gets past: BUG-197), and every WebSocket is closed (the
 // pages aren't marked automated, so a live realtime connection would put them in the class's "studying now" count).
 'use strict';
 const http = require('http'), fs = require('fs'), path = require('path');
@@ -508,7 +508,9 @@ async function timedOut(browser){
 }
 
 (async () => {
-  const browser = await chromium.launch();
+  /* behind tools/ci/no-leaks.js's refusing proxy: a request still in its route when a page closes goes on to the network
+     (BUG-197: the mock check's question-health flush, 22 rows in Review of Systems on 2026-11-20) */
+  const browser = await noLeaks.launch(chromium);
   /* every context: a closing page's last requests skip routing, so tools/ci/no-leaks.js answers them in the page */
   const newContext = browser.newContext.bind(browser);
   browser.newContext = async o => { const c = await newContext(o); await noLeaks(c); return c; };

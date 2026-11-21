@@ -30,7 +30,7 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   folders had the thinnest sources (classmates' guides, no professor slides), so those sections rest most on standard
   references. If Sam can share their slides or transcripts, check those parts against them. Sam, 2026-11-20: "ill get you the other
   slides soon": waiting on Sam.
-- [ ] **Run the test-runs data fix once more on 2026-11-21** (2026-11-19, the evening lessons audit): the PR that adds
+- [x] **Run the test-runs data fix once more on 2026-11-21** (2026-11-19, the evening lessons audit): the PR that adds
   `tools/ci/no-leaks.js` runs `tools/data-fixes/2026-11-19-test-runs.sql` after its merge, but a smoke test run locally from a
   branch older than the fix (another session's) still writes its game-layer check into the live hub until that branch takes
   `main`. Two days later, run it again (`node tools/after-merge/run.js ... --fix tools/data-fixes/2026-11-19-test-runs.sql`, or
@@ -38,7 +38,7 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   count(*)`), and tick BUG-192's retest. Until then, a Heme & Endo Exam 3 retrospective reads that hub's arcade and Timmy Time
   clicks of 11-19 as test runs. **Run `tools/data-fixes/2026-11-20-quiet-test-rows.sql` again with it** (2026-11-20, the Exam 3
   retrospective): `tools/ci/quiet.js`'s mock checks, run from those same older branches, wrote two `pq-` rows each into question
-  health (13 made-up visitors to 6:37 am on 11-20); today's `quiet.js` sends nothing past its routes (checked behind a refusing proxy). **2026-11-21, counted** (the data-fixes PR): the test-runs fix selects 1 visitor, the quiet fix 22 `pq-` rows in Review of Systems (today's `quiet.js` still leaks: [BUG-197](../release/bug-log.md)); the deletes run after the merge of #521, as `tools/data-fixes/2026-11-21-test-rows-again.sql` (both files' bodies, by the After merge workflow, since this session's connector couldn't answer its "are you sure?": the hook line below). Tick this once its result shows on `main` and a count finds no test visitors and no `pq-` rows left past BUG-197's.
+  health (13 made-up visitors to 6:37 am on 11-20); today's `quiet.js` sends nothing past its routes (checked behind a refusing proxy). **2026-11-21, counted** (the data-fixes PR): the test-runs fix selects 1 visitor, the quiet fix 22 `pq-` rows in Review of Systems (today's `quiet.js` still leaks: [BUG-197](../release/bug-log.md)); the deletes run after the merge of #521, as `tools/data-fixes/2026-11-21-test-rows-again.sql` (both files' bodies, by the After merge workflow, since this session's connector couldn't answer its "are you sure?": the hook line below). Tick this once its result shows on `main` and a count finds no test visitors and no `pq-` rows left past BUG-197's. **Done** (#PR): #521's After merge green on `main`; counted 2026-11-21, 0 test visitors and 0 `pq-` rows; BUG-197's leak closed by `tools/ci/no-leaks.js`'s guard proxy.
 - [ ] **The smoke test's game-layer wiring check runs again on the next hub with an arcade** (2026-11-20, Exam 3's page down):
   `tools/ci/smoke.js`'s `wiringCheck` (Million-Dollar Smile's sessions and answers, Timmy Time's minutes) needs a live engine hub
   with Smile in its `content/arcade.js`, and Review of Systems has no arcade, so it is skipped until one is built. When the next
