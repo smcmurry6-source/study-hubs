@@ -34,7 +34,10 @@ tags: [widget, supabase]
   27 trophies (the journeys and Bowling in), the cards' look and `shRanks.trophyCase()`, which fetches
   `widget/trophies.js` + `.css` and `widget/hub-art/trophies.js` on first use. Until 2026-11-20 this was gated on the `shx`
   class (`NEW`) so the old single-file hub pages kept the old cards and 23 trophies; with those pages down, the gates
-  came out (CSS selectors that start `html.shx` still match, since every page sets it). **Full Arch is retired on every
+  came out, and on 2026-11-20 the stylesheets' `html.shx` prefix became `:root`. **Keep that prefix:** it gives the
+  design system's rules the weight to win over the shared widget's own styles (`widget/v3.css`, the CSS `pet.js`,
+  `ranks.js` and `replies.js` write); stripped bare, the rank name lost its metal, Timmy's bubble and the pin buttons
+  restyled. Pages still set the `shx` class (`widget/eggs.js` reads it). **Full Arch is retired on every
   page** (the release): the chart and its switch are gone from `widget/eggs.js`, and someone who won it keeps it as a
   retired trophy. ([the task](../tasks/done/2026-11-12-redesign-trophy-case-and-cards.md))
 - **Everyone has Timmy** (the release): `widget/pet.js` has no adoption, introduction or holiday outfits any more. He is

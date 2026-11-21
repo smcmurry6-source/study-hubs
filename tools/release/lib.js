@@ -13,6 +13,8 @@ function chromium(){
 async function launch(){
   return chromium().launch(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {});
 }
+/* every hub with a page is on the engine (widget/hub.js), its content beside its page, since the old single-file pages
+   came down (2026-11-19) */
 function hubs(){
   return fs.readdirSync(path.join(ROOT, 'hubs')).filter(h => fs.existsSync(path.join(ROOT, 'hubs', h, 'index.html'))).sort();
 }
@@ -24,8 +26,6 @@ function hubData(){
   if (!w.SH_DASH_DATA || !Array.isArray(w.SH_DASH_DATA.hubs)) throw new Error('hubs.js: no window.SH_DASH_DATA.hubs');
   return w.SH_DASH_DATA;
 }
-/* a hub on the engine (widget/hub.js) keeps its content beside its page; the others are old single-file hubs */
-function isEngine(hub){ return fs.existsSync(path.join(ROOT, 'hubs', hub, 'content', 'core.json')); }
 /* A hub is "live" until 10 pm on its last exam day (or its archiveOn), the same rule the dashboard uses
    (widget/archive.js, with no admin override). */
 function hubStatus(when){
@@ -73,4 +73,4 @@ function outDir(name){
   return path.join(d, name);
 }
 
-module.exports = { ROOT, SUPABASE, launch, hubs, hubData, isEngine, hubStatus, guard, settle, report, outDir };
+module.exports = { ROOT, SUPABASE, launch, hubs, hubData, hubStatus, guard, settle, report, outDir };

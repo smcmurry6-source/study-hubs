@@ -3,7 +3,7 @@
    question report, what was fixed). Notices to everyone (site_notices, posted from the admin Inbox's "Tell everyone")
    pop up once per device (sh_notice_seen) while they're live, on whichever page is opened first. Everything also stays
    in one Inbox (replies 90 days, notices 60), the same on every hub and the dashboard; a notice's hub only labels it.
-   Any [data-sh-inbox] element opens it; .sh-inbox-badge elements show the unread count. Data: get_my_inbox (get_my_inbox_v2 once the game layer is there, which adds the idea board's status notes, kind "idea"); reading a reply calls mark_reply_seen.
+   Any [data-sh-inbox] element opens it; .sh-inbox-badge elements show the unread count. Data: get_my_inbox_v2 (the replies, notices and the idea board's status notes, kind "idea"); reading a reply calls mark_reply_seen.
    The live survey (get_my_survey) also waits at the top of the Inbox until it's answered, so "Later" on the dashboard's
    survey pop-up (or never seeing it) still leaves it one tap away; it counts as unread until the Inbox is opened
    (sh_survey_seen) and is answered right there (submit_survey). shReplies.refresh() reloads after the pop-up is used.
@@ -144,16 +144,11 @@
     }
     function loadRemote(){
       function rowsOf(res){ return res && !res.error && Array.isArray(res.data) ? res.data : []; }
-      function missingFn(res){ var e = res && res.error; return !!e && (e.code === "PGRST202" || e.code === "42883" || res.status === 404 || /could not find the function|does not exist/i.test(e.message || "")); }
       var none = Promise.resolve(null);
       return Promise.all([
-        /* o.v2() says the game layer's Inbox is wanted (migration_v54: the idea board's status notes ride in it). Since
-           2026-11-19 it's true on a page that wants the game layer and hasn't found it missing (it was true only once a
-           reply had confirmed it, so with the bootstrap timed out the Inbox left out the idea board's notes; a hub didn't
-           pass it at all); a database without the v2 call gets today's */
-        (typeof o.v2 === "function" && o.v2() ? sb.rpc("get_my_inbox_v2", { p_visitor: visitor }).then(function(res){
-          return missingFn(res) ? sb.rpc("get_my_inbox", { p_visitor: visitor }) : res;
-        }) : sb.rpc("get_my_inbox", { p_visitor: visitor })).then(rowsOf, function(){ return null; }),
+        /* the game layer's Inbox (migration_v54: the idea board's status notes ride in it), on every page since the old
+           single-file pages came down; the get_my_inbox fallback came out 2026-11-20 */
+        sb.rpc("get_my_inbox_v2", { p_visitor: visitor }).then(rowsOf, function(){ return null; }),
         visitor ? sb.rpc("get_my_survey", { p_visitor: visitor }).then(rowsOf, function(){ return []; }) : none
       ]).then(function(r){
         if (!r[0]) return items;
