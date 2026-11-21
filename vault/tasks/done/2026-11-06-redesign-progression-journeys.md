@@ -299,7 +299,7 @@ Dark Matter unlock, double XP on the rank pill, the journey trophies in the case
 needed" are live. Since then: the boost prices retuned ([#394](https://github.com/smcmurry6-source/study-hubs/pull/394)),
 a medal over a boost and the Bowling trophy counted on the server (migration_v63), and the scenes fit the screen at the
 large text sizes ([#397](https://github.com/smcmurry6-source/study-hubs/pull/397)). What's next is its own task:
-[the later journeys' rank sets](../2026-11-12-redesign-later-journeys-rank-sets.md).
+[the later journeys' rank sets](2026-11-12-redesign-later-journeys-rank-sets.md).
 
 Related: [phase 4](2026-11-05-redesign-phase-4-game-layer.md) · [phase 5](2026-11-05-redesign-phase-5-backend.md) ·
 [Timmy's shop](2026-11-06-redesign-timmy-shop.md) · [the audit and plan](2026-11-05-redesign-audit-and-plan.md)
