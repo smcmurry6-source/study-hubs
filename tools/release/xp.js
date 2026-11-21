@@ -494,7 +494,7 @@ try {
   eq([dw.medals, dw.trophies], [4, 0], 'four medals since the switch');
   eq([dw.prizes, dw.earned], [2525, dw.from_xp + dw.from_time + 2525 + 4 * 50 + 20 * dw.rankups], 'earned = 5 crowns per 10 study XP + hub time + a prize\'s XP in crowns (migration_v68) + 50 a medal + 20 a rank-up');
   const lw = json(`sh_wallet('xp-L1')`);
-  ok(lw.from_xp === Math.floor(xpOf('xp-L1') / 2) && lw.medals === 0 && lw.trophies === 0 && lw.rankups === 0, `back pay: L1's XP from before the switch counts, its old medal and trophy don't (${JSON.stringify(lw)})`);
+  ok(lw.from_xp === Math.floor((xpOf('xp-L1') - lw.prizes) / 2) && lw.prizes === (rows(`select coalesce(sum(base), 0)::int s from xp_awards where visitor_id = 'xp-L1' and sh_is_prize(src)`)[0] || {}).s && lw.medals === 0 && lw.trophies === 0 && lw.rankups === 0, `back pay: L1's XP from before the switch counts, its old medal and trophy don't (${JSON.stringify(lw)})`);
   award('xp-U', 'rep:flag:9002', 1300);
   anon(`select record_achievement('xp-U', 'owl', '')`);
   const uw = json(`sh_wallet('xp-U')`);
@@ -1579,6 +1579,86 @@ try {
     for (const f of [`sh_collections('xp-CL')`, `sh_collections_json('xp-CL')`]) raises(() => anon(`select ${f}`), '42501', `anon runs ${f.split('(')[0]}`);
     ok(!/xp-/.test(JSON.stringify(C('xp-CL'))) && !/xp-/.test(JSON.stringify(claim('xp-CL'))), 'neither reply carries a visitor id');
     notes.push('collections (migration_v75): 21 (14 sets, 6 year-round, the costumes), a finished one 1,000 XP and crowns once, Halloween\'s gift never, two at once, the rebuild and Link my devices');
+  }
+
+  /* ---------- 14e. more ways to earn crowns (migration_v92; Sam, 2026-11-20: "Yes and backpay"): the first Tooth Fairy
+     250, the first Golden one 500, a Golden Probe won 300, a perfect mock 750, yesterday's misses all right 100, an idea
+     shipped 500, the first day back after a week away 200; each one key, as many crowns as XP, never boosted ---------- */
+  if (one(`select to_regprocedure('claim_misses_v2(text,text)') is not null`) === 't') {
+    const P = json(`sh_prizes()`);
+    eq([P.fairy, P.goldfairy, P.probe, P.perfect, P.misses, P.idea, P.back], [250, 500, 300, 750, 100, 500, 200], 'sh_prizes() has the seven new prizes');
+    ok(['fairy', 'goldfairy', 'probe', 'perfect', 'misses', 'idea', 'back'].every(k => one(`select sh_is_prize(${q(k)})`) === 't'), 'each pays as many crowns as XP');
+    // the Tooth Fairy: the first catch pays, a catch within the minute isn't one, a Golden one later pays its own once
+    const fw0 = json(`sh_wallet('xp-TF')`), f1 = anonJson(`claim_fairy_v2('xh', 'xp-TF', false)`), fw1 = json(`sh_wallet('xp-TF')`);
+    eq([f1.ok, f1.xp, f1.n, f1.src, fw1.prizes - fw0.prizes, f1.crowns], [true, 250, 1, 'fairy', 250, fw1.balance], 'the first Tooth Fairy: 250 XP and 250 crowns, and the reply carries the balance');
+    eq([anonJson(`claim_fairy_v2('xh', 'xp-TF', true)`).xp, num(`select count(*) from egg_events where visitor_id = 'xp-TF'`)], [0, 1], 'a second catch within the minute isn\'t one');
+    sql(`update egg_events set created_at = now() - interval '2 minutes' where visitor_id = 'xp-TF'`);
+    const f2 = anonJson(`claim_fairy_v2('xh', 'xp-TF', true)`);
+    eq([f2.xp, f2.n, f2.src, num(`select count(*) from egg_events where visitor_id = 'xp-TF' and qid = 'gold'`)], [500, 2, 'goldfairy', 1], 'the first Golden Tooth Fairy: 500, kept as gold');
+    sql(`update egg_events set created_at = now() - interval '2 minutes' where visitor_id = 'xp-TF'`);
+    eq([anonJson(`claim_fairy_v2('xh', 'xp-TF', true)`).xp, anon(`select record_fairy('xh', 'xp-TF')`)[0][0]], [0, '3'], 'a third catch, Golden or not, pays nothing; the old call still counts (a minute apart)');
+    eq(Number(anon(`select record_fairy('xh', 'xp-TF2')`)[0][0]), 1, 'the old call (a cached page) counts the catch');
+    eq(num(`select sum(base) from xp_awards where visitor_id = 'xp-TF2' and key = 'fairy' and src = 'fairy' and xp = base`), 250, 'and pays the first one too, never boosted');
+    // the Golden Probe: the day's first claim on a hub pays, the second person nothing; the old call pays too
+    const g1 = anonJson(`claim_golden_probe_v2('xh', 'xp-GP', 'x3')`), g2 = anonJson(`claim_golden_probe_v2('xh', 'xp-GP2', 'x3')`);
+    eq([g1.first, g1.xp, g1.src, g2.first, g2.xp], [true, 300, 'probe', false, 0], 'the Golden Probe: the first in the class wins 300, the next nothing');
+    eq([anon(`select claim_golden_probe('xm', 'xp-GP2', 'old1')`)[0][0], num(`select count(*) from xp_awards where visitor_id = 'xp-GP2' and key like 'probe:xm:%' and base = 300`)], ['t', 1], 'the old call (a cached page) wins and pays');
+    eq(anonJson(`claim_golden_probe_v2('Bad Hub', 'xp-GP', 'x3')`).error, 'bad', 'a bad hub is refused');
+    // a perfect mock: 20 questions, every one right, pays 750 once per hub; one with a miss, or cut short, doesn't
+    anon(`select admin_load_question_keys(${S}, 'xq', ${q(JSON.stringify(Array.from({ length: 24 }, (_, i) => ({ id: 'y' + (i + 1), kind: 'one', answer: [1] }))))}::jsonb)`);
+    const pm = one(`select sh_session_start(${T(0)}, 'xp-PM', 'xq', 'mock', null)`);
+    for (let i = 0; i < 20; i++) ans('xp-PM', 'y' + (i + 1), { hub: 'xq', choice: 1, ctx: 'mock', session: pm, at: 60 + i * 0.1 });
+    const pf = json(`sh_session_finish(${T(70)}, 'xp-PM', ${q(pm)}::uuid, null, 20)`);
+    eq([pf.answers, pf.correct, pf.perfect], [20, 20, 750], 'twenty right of twenty: a perfect mock, 750');
+    const pm2 = one(`select sh_session_start(${T(DAY)}, 'xp-PM', 'xq', 'mock', null)`);
+    for (let i = 0; i < 20; i++) ans('xp-PM', 'y' + (i + 1), { hub: 'xq', choice: 1, ctx: 'mock', session: pm2, at: DAY + 60 + i * 0.1 });
+    eq(json(`sh_session_finish(${T(DAY + 70)}, 'xp-PM', ${q(pm2)}::uuid, null, 20)`).perfect, 0, 'a second perfect mock in the same hub pays nothing');
+    const pm3 = one(`select sh_session_start(${T(0)}, 'xp-PM3', 'xq', 'mock', null)`);
+    for (let i = 0; i < 20; i++) ans('xp-PM3', 'y' + (i + 1), { hub: 'xq', choice: 1, ctx: 'mock', session: pm3, at: 60 + i * 0.1 });
+    eq(json(`sh_session_finish(${T(70)}, 'xp-PM3', ${q(pm3)}::uuid, null, 40)`).perfect, 0, 'twenty right of a forty-question mock left unfinished: not perfect');
+    const pm4 = one(`select sh_session_start(${T(0)}, 'xp-PM4', 'xq', 'mock', null)`);
+    for (let i = 0; i < 20; i++) ans('xp-PM4', 'y' + (i + 1), { hub: 'xq', choice: i === 7 ? 0 : 1, ctx: 'mock', session: pm4, at: 60 + i * 0.1 });
+    eq(json(`sh_session_finish(${T(70)}, 'xp-PM4', ${q(pm4)}::uuid, null, 20)`).perfect, 0, 'one miss: not perfect');
+    eq(num(`select count(*) from xp_awards where key = 'perfect:xq' and xp = 750`), 1, 'one perfect-mock prize, never boosted');
+    // the first day back after 7 or more days without studying: 200, once that day; 6 days away isn't a week
+    ans('xp-BK', 'x1', { choice: 1, at: 0 });
+    const bk6 = ans('xp-BK', 'x2', { choice: 1, at: 7 * DAY });
+    ok(!bk6.bonus.some(b => b.src === 'back'), 'back after 6 days away: no prize');
+    const bk = ans('xp-BK', 'x3', { choice: 1, at: 15 * DAY }), bk2 = ans('xp-BK', 'x4', { choice: 1, at: 15 * DAY + 60 });
+    ok(bk.bonus.some(b => b.src === 'back' && b.xp === 200 && b.n === 7) && !bk2.bonus.some(b => b.src === 'back'), `back after 7 days away: 200 on the day's first answer, not the second (${JSON.stringify(bk.bonus)})`);
+    ok(!ans('xp-BK2', 'x1', { choice: 1, at: 0 }).bonus.some(b => b.src === 'back'), 'a first day ever isn\'t a day back');
+    // yesterday's misses all right (claim_misses_v2 reads the real clock): 3 missed yesterday, all right today
+    const yday = `((date_trunc('day', now() at time zone 'America/Chicago') - interval '12 hours') at time zone 'America/Chicago')`;
+    sql(`insert into personal_answers (visitor_id, hub, qid, correct, answered_at) values
+           ('xp-YM', 'xh', 'x1', false, ${yday}), ('xp-YM', 'xh', 'x2', false, ${yday}), ('xp-YM', 'xh', 'x3', false, ${yday}), ('xp-YM', 'xh', 'x4', true, ${yday}),
+           ('xp-YM', 'xh', 'x1', true, now()), ('xp-YM', 'xh', 'x2', true, now());
+         insert into personal_answers (visitor_id, hub, qid, correct, answered_at) values ('xp-YM2', 'xh', 'x1', false, ${yday}), ('xp-YM2', 'xh', 'x2', false, ${yday}), ('xp-YM2', 'xh', 'x1', true, now()), ('xp-YM2', 'xh', 'x2', true, now());`);
+    const ym = anonJson(`claim_misses_v2('xp-YM', 'xh')`);
+    eq([ym.ok, ym.n, ym.left, ym.xp], [true, 3, 1, 0], 'one of yesterday\'s three misses still to do: nothing yet');
+    sql(`insert into personal_answers (visitor_id, hub, qid, correct, answered_at) values ('xp-YM', 'xh', 'x3', false, now()), ('xp-YM', 'xh', 'x3', true, now())`);
+    const ym2 = anonJson(`claim_misses_v2('xp-YM', 'xh')`);
+    eq([ym2.left, ym2.xp, ym2.src, anonJson(`claim_misses_v2('xp-YM', 'xh')`).xp], [0, 100, 'misses', 0], 'all three right today (one after a miss): 100, once');
+    eq(anonJson(`claim_misses_v2('xp-YM2', 'xh')`).xp, 0, 'two misses yesterday: too few for the prize');
+    eq(anonJson(`claim_misses_v2('xp-YM', 'Bad Hub')`).error, 'bad', 'a bad hub is refused');
+    // an idea shipped pays its author (section 8 shipped 'Study rooms', posted by idea-vis-1); again pays nothing
+    const iid = num(`select id from ideas where title = 'Study rooms'`);
+    eq(num(`select count(*) from xp_awards where visitor_id = 'idea-vis-1' and key = 'idea:' || ${iid} and src = 'idea' and base = 500`), 1, 'the author of a shipped idea: 500');
+    eq(anonJson(`admin_set_idea(${S}, ${iid}, 'status', 'shipped', 'Live now, really')`).paid, 0, 'shipped again: nothing more');
+    // the back pay (section 4 of the migration), run twice: the first fairy, every probe won, each hub's first perfect mock,
+    // to the primary id of a linked device; nothing twice
+    sql(`insert into egg_events (kind, hub, visitor_id, created_at) values ('fairy', 'xh', 'xp-BF', now() - interval '9 days'), ('fairy', 'xh', 'xp-BF', now() - interval '8 days');
+         insert into visitor_links (alias_id, primary_id) values ('xp-BFa', 'xp-BFp');
+         insert into egg_events (kind, hub, visitor_id, qid, day, created_at) values ('golden', 'xz', 'xp-BFa', 'q1', current_date - 5, now() - interval '5 days'), ('golden', 'xz', 'xp-BFa', 'q1', current_date - 4, now() - interval '4 days');
+         insert into mock_scores (visitor_id, hub, correct, total) values ('xp-BM', 'xh', 25, 25), ('xp-BM', 'xh', 30, 30), ('xp-BM', 'xm', 19, 19), ('xp-BM', 'xv', 24, 25);`);
+    const back = fs.readFileSync(path.join(ROOT, 'migration_v92.sql'), 'utf8').split('4. back pay')[1];
+    ok(back && back.includes('sh_award'), 'the migration has its back pay section');
+    sql(back.slice(back.indexOf('\n'))); sql(back.slice(back.indexOf('\n')));
+    eq([num(`select count(*) from xp_awards where visitor_id = 'xp-BF' and src = 'fairy'`), num(`select count(*) from xp_awards where visitor_id = 'xp-BFp' and src = 'probe'`),
+        num(`select count(*) from xp_awards where visitor_id = 'xp-BFa'`), num(`select count(*) from xp_awards where visitor_id = 'xp-BM' and src = 'perfect'`),
+        num(`select count(*) from xp_awards where visitor_id = 'xp-TF' and src = 'fairy'`)], [1, 2, 0, 1, 1],
+      'back pay: one fairy, both probes (to the primary id), one perfect mock (20+, all right), nothing twice or again for someone paid live');
+    eq(num(`select xp from xp_visitors where visitor_id = 'xp-BF'`), 250, 'the back pay is XP too');
+    notes.push('more ways to earn crowns (migration_v92): the first Tooth Fairy and the first Golden one, a Golden Probe won, a perfect mock, yesterday\'s misses all right, an idea shipped, a day back after a week away, and the back pay, each once');
   }
 
   /* ---------- 14b. the awards' running totals (migration_v79): after everything above (answers, mocks, medals, cards,

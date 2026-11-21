@@ -1647,6 +1647,15 @@ track("bank:retry-shown");
 }
 }
 if (cardEl.classList.contains("is-retry")) track("bank:retry-" + (right ? "right" : "missed"));
+if (L.ctx === "misses" && right) {
+L.right = L.right || {}; L.right[q.id] = 1;
+var G = window.shGame;
+if (!L.claimed && L.items.length >= 3 && L.items.every(function(x){ return L.right[x.id]; }) && G && G.live && G.live()) {
+L.claimed = true;
+var ask = function(again){ G.claim("claim_misses_v2", { p_visitor: ls("sh_visitor_id"), p_hub: HUB }, "misses").then(function(r){ if (again && r && r.ok && r.left > 0) setTimeout(function(){ ask(false); }, 8000); }); };
+setTimeout(function(){ ask(true); }, 2500);
+}
+}
 if (L.ctx === "drill") {
 setTimeout(function(){
 var D = window.shDrill; if (!D || !D.set) return;
