@@ -87,11 +87,13 @@
     return '<p class="qc-stem">' + esc(s) + "</p>";
   }
   function pboxHTML(q){
-    if (!q.pbox) return "";
+    /* a drawn case's rows come from its record (shCases.boxRows: the case's box, or its age, smoking, HbA1c and teeth), then the question's own */
+    var rows = q.pcase && HX.CORE.pcases && window.shCases && window.shCases.boxRows ? window.shCases.boxRows(q, HX.CORE.pcases) : q.pbox;
+    if (!rows || !rows.length) return "";
     var set = q.pcase ? HX.IDX.filter(function(r){ return QBY[r.id] && QBY[r.id].pcase === q.pcase; }) : [];
     var at = set.map(function(r){ return r.id; }).indexOf(q.id);
     return '<div class="pbox"><p class="pbox-head">' + icon("notes", 18) + "<span>Patient box</span>" + (set.length > 1 ? '<span class="note">Same patient · ' + (at + 1) + " of " + set.length + "</span>" : "") + "</p><dl>" +
-      q.pbox.map(function(r){ return "<div><dt>" + esc(r[0]) + "</dt><dd>" + esc(r[1]) + "</dd></div>"; }).join("") + "</dl>" + (HX.FIG && q.pimg ? '<div class="pbox-img">' + HX.FIG.caseImgHTML(q) + "</div>" : "") +
+      rows.map(function(r){ return "<div><dt>" + esc(r[0]) + "</dt><dd>" + esc(r[1]) + "</dd></div>"; }).join("") + "</dl>" + (HX.FIG && q.pimg ? '<div class="pbox-img">' + HX.FIG.caseImgHTML(q) + "</div>" : "") +
       (q.pcase && HX.CORE.pcases && window.shCases ? window.shCases.pboxFigures(q, HX.CORE.pcases) : "") + "</div>";
   }
   function figHTML(q){ var f = HX.FIG && q.img && !q.imgAfter && HX.FIG.FIGS[q.img]; return f ? '<figure class="qfig" aria-label="' + esc(f.title) + '">' + f.svg + "</figure>" : ""; }

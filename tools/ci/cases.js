@@ -4,13 +4,17 @@
 // engine since the old single-file pages came down, 2026-11-19), every case must validate (realistic, consistent numbers), its
 // `expect` must agree with derive() (the stage, grade, extent, recession types, peri-implant states the numbers
 // give), every question that names a case (pcase:'id') must name one that exists when the hub has any cases, and
-// every picture kind must be one the kit draws. Run by CI (check.yml) and by tools/figures/perio/build.mjs.
+// every picture kind must be one the kit draws. Patient Box v2 (2026-11-20) adds: the tooth library (widget/teeth.js) has all 32
+// teeth and draws each; every case's pictures pass checkFigs() (no bitewing of an incisor, a full-mouth view that agrees
+// with the box's counts); a question with `rests` (what its key rests on: stage, grade, extent, rt, furc, impl, kind) is
+// answerable from the pictures and rows it shows; a question with `says` quotes numbers the record gives, in its text.
+// The example cases in tools/cases/examples.json are checked the same way. Run by CI (check.yml).
 'use strict';
 const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
 const root = path.join(__dirname, '..', '..');
-const kit = fs.readFileSync(path.join(root, 'widget', 'cases.js'), 'utf8');
+const kit = fs.readFileSync(path.join(root, 'widget', 'teeth.js'), 'utf8') + '\n' + fs.readFileSync(path.join(root, 'widget', 'cases.js'), 'utf8');
 let bad = 0, hubsWithCases = 0, cases = 0;
 
 function load(block){
@@ -19,7 +23,17 @@ function load(block){
   vm.runInContext(kit + '\n' + block + '\nthis.PCASES = PCASES;', ctx);
   return { K: ctx.window.shCases, PCASES: ctx.PCASES };
 }
-const KINDS = ['chart', 'film', 'view'];
+const KINDS = load('var PCASES = {};').K.KINDS;
+/* the tooth library: all 32 teeth, each with its roots, sites and films, and an outline that draws */
+{
+  const T = require(path.join(root, 'widget', 'teeth.js'));
+  for (let n = 1; n <= 32; n++) {
+    const c = T.tooth(n), o = c && T.outlineMM(n);
+    const ok = c && c.roots.length && c.sites.length === 6 && c.films.length && o.crown.length > 10 && o.roots.every((r) => r.every((p) => p.every(Number.isFinite)));
+    if (!ok) { bad++; console.error(`widget/teeth.js: tooth #${n} is incomplete`); }
+    if (c && c.furcations.length && !c.trunk) { bad++; console.error(`widget/teeth.js: #${n} has furcations but no root trunk`); }
+  }
+}
 function same(want, have){
   if (want && typeof want === 'object') return Object.keys(want).every((k) => same(want[k], have && have[k]));
   return want === have;
@@ -37,13 +51,22 @@ for (const hub of fs.readdirSync(path.join(root, 'hubs')).sort()) {
   if (!core.pcases) { for (const kinds of pfigs) for (const k of kinds) if (KINDS.indexOf(k) < 0) { bad++; console.error(`${hub}: a question's pfig has an unknown picture kind "${k}"`); } continue; }
   try { ({ K, PCASES } = load('var PCASES = ' + JSON.stringify(core.pcases) + ';')); }
   catch (e) { console.error(`${hub}: core.json's pcases do not load: ${e.message}`); bad++; continue; }
-  hubsWithCases++;
+  checkSet(hub, K, PCASES, named, pfigs, qs);
+}
+/* the example cases (not on any page), checked like a hub's */
+{
+  const ex = JSON.parse(fs.readFileSync(path.join(root, 'tools', 'cases', 'examples.json'), 'utf8'));
+  const { K } = load('var PCASES = {};');
+  const qs = ex.questions || [];
+  checkSet('tools/cases/examples.json', K, ex.pcases, qs.filter((q) => q.pcase).map((q) => q.pcase), qs.filter((q) => Array.isArray(q.pfig)).map((q) => q.pfig.map((f) => f && f.kind)), qs);
+}
+function checkSet(hub, K, PCASES, named, pfigs, qlist){
   const ids = Object.keys(PCASES);
+  if (ids.length) hubsWithCases++;
   for (const id of ids) {
     const c = PCASES[id];
     cases++;
-    const problems = K.validate(c.spec);
-    (c.figs || []).forEach((f) => { if (KINDS.indexOf(f.kind) < 0) problems.push(`figs: unknown picture kind "${f.kind}"`); });
+    const problems = K.validate(c.spec).concat(K.checkFigs(c.spec, c.figs || []));
     let d;
     try { d = K.derive(c.spec); } catch (e) { problems.push('derive failed: ' + e.message); }
     if (d && c.expect) {
@@ -61,6 +84,15 @@ for (const hub of fs.readdirSync(path.join(root, 'hubs')).sort()) {
   if (missing.size) { bad++; console.error(`${hub}: questions name cases that are not in PCASES: ${[...missing].join(', ')}`); }
   // each question's own pictures (pfig) use known kinds
   for (const kinds of pfigs) for (const k of kinds) if (KINDS.indexOf(k) < 0) { bad++; console.error(`${hub}: a question's pfig has an unknown picture kind "${k}"`); }
+  // each question on a drawn case: its own pictures, answerable from what it shows, and the numbers its text quotes
+  for (const q of qlist || []) {
+    const c = q.pcase && PCASES[q.pcase]; if (!c) continue;
+    const figs = q.pfig || c.figs || [], rows = K.caseRows(c).concat(q.pbox || []), probs = [];
+    if (q.pfig) probs.push(...K.checkFigs(c.spec, q.pfig));
+    if (q.rests) probs.push(...K.answerable(c.spec, figs, rows, q.rests));
+    if (q.says) probs.push(...K.checkSays(c.spec, q));
+    if (probs.length) { bad++; console.error(`✗ ${hub}/${q.id}:\n    ` + probs.join('\n    ')); }
+  }
 }
 if (bad) { console.error(`✗ ${bad} problem(s) in the drawn Patient Box cases`); process.exit(1); }
-console.log(`✓ ${cases} drawn Patient Box case(s) in ${hubsWithCases} hub(s) are realistic and agree with their keys`);
+console.log(`✓ ${cases} drawn Patient Box case(s) in ${hubsWithCases} set(s) (the hubs' and tools/cases/examples.json) are realistic and agree with their keys`);

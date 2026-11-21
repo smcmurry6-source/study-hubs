@@ -74,8 +74,9 @@ Hub building
 - [Preview a change](how-to/preview-a-change.md): the site from a branch, on made-up data, with test accounts and time
   travel · [Roll back a release](how-to/roll-back-a-release.md)
 - [Build a hub, or add a lecture to one](how-to/build-a-hub.md): the checklist, and every file a new hub touches.
-- [Draw a Patient Box case from its numbers](how-to/draw-a-patient-box-case.md): the shared case kit (chart, radiograph,
-  drawn view and the diagnosis from one set of numbers) every hub's Patient Box questions use.
+- [Draw a Patient Box case from its numbers](how-to/draw-a-patient-box-case.md): the shared case kit (chart, radiographs,
+  bitewings, odontogram, drawn view and the diagnosis from one record built from modules) every hub's Patient Box questions
+  use, and the tooth library (`widget/teeth.js`) it shares with the figure builds.
 - [Draw a seasonal set or a rank set for Timmy's place](how-to/draw-a-seasonal-set.md): one list (`sets.mjs`), a pack per
   set, the catalog and the build that checks them.
 - [Narrate with Kokoro](how-to/narrate-with-kokoro.md)

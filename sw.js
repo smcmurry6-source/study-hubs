@@ -13,7 +13,7 @@
    single-file hubs' pages and the separate widget files they load by name are cached as they are used.
    Not here on purpose: widget/hub-art/outfits.js and the set files in widget/hub-art/place/ (fetched
    only when that outfit or set is drawn). */
-var VERSION = 'sh-v68';
+var VERSION = 'sh-v69';
 var HUBS = ['review-of-systems'];
 /* the hubs above with no drawn figures and no arcade (Review of Systems, Sam, 2026-11-19): no figures.js/css or arcade.js/css to keep */
 var TEXT_ONLY = ['review-of-systems'];
@@ -24,7 +24,7 @@ var PRECACHE = ['./', 'index.html', 'hubs.js', 'manifest.webmanifest', 'assets/i
   'widget/study-modes.js', 'widget/study-modes.css', 'widget/guide.js', 'widget/guide.css', 'widget/journeys.js', 'widget/hub-art/journeys.js',
   'widget/place.js', 'widget/place.css', 'widget/hub-art/place.js', 'widget/shop.js', 'widget/shop.css', 'widget/hub-art/shop.js',
   'widget/bowling.js', 'widget/hub-art/bowling.js', 'widget/trophies.js', 'widget/trophies.css', 'widget/hub-art/trophies.js',
-  'widget/rankup.js', 'widget/prize.js', 'widget/tour.js', 'widget/games.js', 'widget/games.css', 'widget/cases.js', 'widget/cases.css', 'widget/recap.js'];
+  'widget/rankup.js', 'widget/prize.js', 'widget/tour.js', 'widget/games.js', 'widget/games.css', 'widget/teeth.js', 'widget/cases.js', 'widget/cases.css', 'widget/recap.js'];
 HUBS.forEach(function(h){
   PRECACHE.push('hubs/' + h + '/', 'widget/hub-art/' + h + '.js');
   ['core.json', 'questions.json', 'notes.json', 'study.json'].concat(TEXT_ONLY.indexOf(h) > -1 ? [] : ['figures.js', 'figures.css', 'arcade.js', 'arcade.css']).forEach(function(f){ PRECACHE.push('hubs/' + h + '/content/' + f); });

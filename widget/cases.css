@@ -1,5 +1,5 @@
 /* study-hubs: styles for the dental case kit (widget/cases.js): the chart strip, the numbers table, the periapical
-   film and the drawn buccal view. Scoped to .dc-figs so a hub's own .pimg rules are left alone. Loaded by every hub
+   film, the bitewing, the full-mouth series, the odontogram and the drawn buccal view. Scoped to .dc-figs so a hub's own .pimg rules are left alone. Loaded by every hub
    that draws Patient Box cases, after widget/v3.css. */
 .dc-figs{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:10px;margin:10px 0 4px}
 .dc-figs .pimg{margin:0;border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:8px}
@@ -52,6 +52,49 @@
 .dc-film .xr-lam{fill:#cfcfcf}.dc-film .xr-pdl{fill:#2a2a2a}.dc-film .xr-dentin{fill:#b2b2b2}.dc-film .xr-enamel{fill:#ececec}.dc-film .xr-pulp{fill:#4f4f4f}
 .dc-film .xr-metal{fill:#fbfbfb}.dc-film .xr-crown{fill:#e4e4e4;stroke:#fff;stroke-width:1.2}.dc-film .xr-bore{fill:#3c3c3c}
 .dc-film .xr-dot{fill:#f3f3f3}
+/* Patient Box v2 on a film: composite a little less radiopaque than enamel with a crisp edge; caries and a periapical lesion
+   dark but not as dark as soft tissue (the lesion in three soft layers); a root-filled tooth's chamber filled with its core */
+.dc-film .xr-comp{fill:#dcdcdc;stroke:#f2f2f2;stroke-width:.7}.dc-film .xr-core{fill:#dedede}
+.dc-film .xr-car{fill:#2e2e2e;opacity:.86}.dc-film .xr-car.xr-car-f{opacity:.42}
+.dc-film .xr-lesion{fill:#262626;opacity:.24}.dc-film .xr-apdl{opacity:.85}
+/* the full-mouth series: the mount, its orientation marks; it scrolls sideways where it would be too small to read */
+.dc-fmx .dc-mount{fill:#1c1c1c}
+.dc-fmx .dc-mlab{fill:#9a9a9a;font:800 34px var(--font-body)}.dc-fmx .dc-mnote{fill:#8a8a8a;font:600 15px var(--font-body)}
+.dc-figs svg.dc-fmx{max-width:1000px}
+.dc-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:12px}
+.dc-scroll svg.dc-fmx{min-width:640px}
+.dc-scroll-hint{display:none;font-size:.72rem;color:var(--ink-faint);margin:4px 0 0}
+@media (max-width:700px){.dc-scroll-hint{display:block}}
+/* the odontogram: five surfaces a tooth, the record's marks on them. Two layouts, an arch to a row or a quadrant to a row:
+   the quadrants where the chart is narrower than 520 px (a phone), so a tooth is never drawn under about 25 px */
+.dc-ow{container-type:inline-size}
+.dc-figs svg.dc-odo{max-width:760px}
+.dc-ow .dc-odo-n{display:none}
+@container (max-width:519px){.dc-ow .dc-odo-w{display:none}.dc-ow .dc-odo-n{display:block;max-width:480px}}
+.dc-ow{--o-amalgam:#4f5562;--o-comp:#3d9be0;--o-gold:#e2a521;--o-caries:#d7303a;--o-crowned:#d5dae2;--o-lesion:#c4232f}
+.dc-ow .dc-osurf{fill:var(--surface);stroke:var(--ink-soft);stroke-width:.75;stroke-linejoin:round}
+.dc-ow .dc-o-gone{fill:var(--surface-3,var(--surface-2));stroke:var(--line)}
+.dc-ow .dc-osurf.dc-o-crowned{fill:var(--o-crowned)}
+.dc-ow .dc-osurf.dc-o-amalgam{fill:var(--o-amalgam)}.dc-ow .dc-osurf.dc-o-composite{fill:var(--o-comp)}.dc-ow .dc-osurf.dc-o-gold{fill:var(--o-gold)}.dc-ow .dc-osurf.dc-o-caries{fill:var(--o-caries)}
+.dc-ow .dc-o-hatch{stroke:#fff;stroke-width:1;stroke-linecap:round;fill:none;opacity:.9}
+.dc-ow .dc-ox{stroke:var(--ink-soft);stroke-width:2;stroke-linecap:round;fill:none}
+.dc-ow .dc-o-crown{fill:none;stroke:var(--ink);stroke-width:1.8}
+.dc-ow .dc-o-impl,.dc-ow .dc-o-endo{fill:none;stroke:var(--ink);stroke-width:2.2;stroke-linecap:round}.dc-ow .dc-o-thread{stroke-width:1.5}
+.dc-ow .dc-o-root{fill:none;stroke:var(--ink-faint);stroke-width:1.2;stroke-dasharray:2 2}
+.dc-ow .dc-o-lesion{fill:var(--surface);stroke:var(--o-lesion);stroke-width:1.8}
+.dc-ow .dc-onum{fill:var(--ink-soft);font:700 9.5px var(--font-mono)}
+.dc-ow .dc-oside{fill:var(--ink-soft);font:800 9px var(--font-body)}
+.dc-ow .dc-oq{fill:var(--ink);font:700 9px var(--font-body)}.dc-ow .dc-oqm{fill:var(--ink-faint);font:600 7.5px var(--font-body)}
+.dc-ow .dc-mid{stroke:var(--line-strong,var(--line));stroke-width:.8;stroke-dasharray:3 2;fill:none}
+:root[data-theme="dark"] .dc-ow{--o-amalgam:#9aa1ad;--o-comp:#5bb3ee;--o-gold:#e9b23a;--o-caries:#ef4b55;--o-crowned:#4c525d;--o-lesion:#ff6b74}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .dc-ow{--o-amalgam:#9aa1ad;--o-comp:#5bb3ee;--o-gold:#e9b23a;--o-caries:#ef4b55;--o-crowned:#4c525d;--o-lesion:#ff6b74}}
+.dc-okey{display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px}
+.dc-okey .dc-ok{display:inline-flex;align-items:center;gap:4px;white-space:nowrap}
+.dc-okey .dc-oks{width:15px;height:15px;flex:none;display:block;overflow:visible}
+.dc-okey .dc-okey-t{flex-basis:100%}
+.dc-otext{font-size:.74rem;color:var(--ink-soft);margin-top:4px}.dc-otext summary{cursor:pointer;font-weight:600}.dc-otext p{margin:4px 0 0;line-height:1.4}
+/* the chart's drawn restorations by material */
+.dc-amalgam.dc-gold{fill:#d6a22a}.dc-amalgam.dc-comp{fill:#e6d6ae;stroke:#a89263;stroke-width:.7}
 /* the drawn view */
 .dc-view .io-bg{fill:#3a1f24}.dc-view .io-gum{fill:#e3959b}.dc-view .io-mucosa{fill:#c9636d}
 .dc-attached{fill:#eba3a8}.dc-attached.dc-inflamed{fill:#d9646c}.dc-attached.dc-fibrotic{fill:#e8b4b4}

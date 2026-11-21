@@ -353,7 +353,8 @@
   function needFigures(){
     loadCss(BASE + "figures.css");
     if (CORE.pcases) loadCss(WIDGET + "cases.css");
-    return Promise.all([loadScript(BASE + "figures.js"), CORE.pcases ? loadScript(WIDGET + "cases.js") : null]).then(function(){
+    /* the case kit reads the tooth library (widget/teeth.js), so the library loads first */
+    return Promise.all([loadScript(BASE + "figures.js"), CORE.pcases ? loadScript(WIDGET + "teeth.js").then(function(){ return loadScript(WIDGET + "cases.js"); }) : null]).then(function(){
       if (!FIG && window.SH_FIGURES) { FIG = window.SH_FIGURES({ esc: esc, shuffled: shuffled, save: saveState, state: STATE }); figZoomWrap(FIG); }
       return FIG;
     });
