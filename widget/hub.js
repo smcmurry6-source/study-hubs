@@ -313,9 +313,95 @@
     loadCss(BASE + "figures.css");
     if (CORE.pcases) loadCss(WIDGET + "cases.css");
     return Promise.all([loadScript(BASE + "figures.js"), CORE.pcases ? loadScript(WIDGET + "cases.js") : null]).then(function(){
-      if (!FIG && window.SH_FIGURES) FIG = window.SH_FIGURES({ esc: esc, shuffled: shuffled, save: saveState, state: STATE });
+      if (!FIG && window.SH_FIGURES) { FIG = window.SH_FIGURES({ esc: esc, shuffled: shuffled, save: saveState, state: STATE }); figZoomWrap(FIG); }
       return FIG;
     });
+  }
+  /* Zoom for the anima figures on a phone (2026-11-20). A drawing laid out for about 660 px shrinks to fit a 390 px
+     screen, and its in-drawing labels with it (6-8 px). Under every drawing shown at less than 85% of its own size, a
+     Zoom button opens the figure full-screen at its drawn size (the labels as drawn, 10-15 px), with + and -, and Fit;
+     the drawing scrolls sideways, the figure's own controls stay on screen. The figure itself (its .anima element) is
+     moved into the view and back, so it keeps working while zoomed: its hover labels, steps and sliders are the same
+     ones. Every figure gets it with no change to its build: the kit's mount() is wrapped once, here. */
+  var FZ = null, fzT = 0;
+  function figZoomWrap(F){
+    if (!F || !F.ANIMA || F.ANIMA._fz) return;
+    var m = F.ANIMA.mount; F.ANIMA._fz = 1;
+    F.ANIMA.mount = function(root){ var r = m.apply(this, arguments); try { figZoomAdd(root); } catch (e) {} return r; };
+    window.addEventListener("resize", function(){ clearTimeout(fzT); fzT = setTimeout(function(){ $$(".anima[data-fz]").forEach(figZoomFit); }, 200); });
+  }
+  function figZoomW(an){ var s = $(".am-svg svg", an), vb = s && s.viewBox && s.viewBox.baseVal; return vb && vb.width ? vb.width : 0; }
+  function figZoomFit(an){
+    var b = $(".hx-fz-btn", an), s = $(".am-svg svg", an), w = figZoomW(an);
+    if (!b || !s || an.closest(".hx-figzoom")) return;
+    var shown = s.getBoundingClientRect().width;
+    b.hidden = !(w && shown && shown < w * 0.85);
+  }
+  function figZoomAdd(root){
+    $$(".anima", root || document).forEach(function(an){
+      var svg = $(".am-svg", an);
+      if (!svg || an.hasAttribute("data-fz")) return;
+      an.setAttribute("data-fz", "");
+      var b = document.createElement("button"), t = $('[data-corner="title"]', an);
+      b.type = "button"; b.className = "hx-fz-btn"; b.hidden = true;
+      b.innerHTML = '<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5"/><path d="M12.6 12.6 17 17M8.5 6v5M6 8.5h5"/></svg>Zoom';
+      b.setAttribute("aria-label", "Zoom in on the figure" + (t ? ": " + t.textContent.trim() : ""));
+      b.addEventListener("click", function(){ figZoomOpen(an, b); });
+      svg.parentNode.insertBefore(b, svg.nextSibling);
+      figZoomFit(an);
+    });
+  }
+  function figZoomOpen(an, btn){
+    if (FZ) figZoomClose();
+    var w = figZoomW(an); if (!w) return;
+    var t = $('[data-corner="title"]', an), ph = document.createComment("fz"), dlg = document.createElement("div");
+    an.parentNode.insertBefore(ph, an);
+    dlg.className = "hx-figzoom"; dlg.setAttribute("role", "dialog"); dlg.setAttribute("aria-modal", "true");
+    dlg.setAttribute("aria-label", (t ? t.textContent.trim() : "Figure") + ", zoomed in");
+    dlg.innerHTML = '<div class="hx-fz-bar"><span class="hx-fz-t"></span>' +
+      '<button type="button" data-fz="out" aria-label="Zoom out">−</button><button type="button" data-fz="fit">Fit</button>' +
+      '<button type="button" data-fz="in" aria-label="Zoom in">+</button><button type="button" data-fz="close" class="hx-fz-x">Close</button></div>' +
+      '<div class="hx-fz-body"><p class="hx-fz-tip">Scroll the drawing sideways, or turn your phone.</p></div>';
+    $(".hx-fz-t", dlg).textContent = t ? t.textContent.trim() : "";
+    $(".hx-fz-body", dlg).appendChild(an);
+    document.body.appendChild(dlg);
+    document.documentElement.classList.add("hx-fz-open");
+    var steps = [0, 1, 1.5, 2], i = 1;
+    function set(k){
+      i = Math.max(0, Math.min(steps.length - 1, k));
+      an.style.setProperty("--fz-w", steps[i] ? Math.round(w * steps[i]) + "px" : "100%");
+      $('[data-fz="out"]', dlg).disabled = i === 0; $('[data-fz="in"]', dlg).disabled = i === steps.length - 1;
+      $('[data-fz="fit"]', dlg).setAttribute("aria-pressed", i === 0 ? "true" : "false");
+    }
+    set(1);
+    function key(e){
+      if (e.key === "Escape") { e.preventDefault(); figZoomClose(); return; }
+      if (e.key !== "Tab") return;
+      var f = $$('button:not([disabled]), input, select, a[href], [tabindex]:not([tabindex="-1"])', dlg).filter(function(x){ return x.offsetParent !== null; });
+      if (!f.length) return;
+      if (e.shiftKey && document.activeElement === f[0]) { e.preventDefault(); f[f.length - 1].focus(); }
+      else if (!e.shiftKey && document.activeElement === f[f.length - 1]) { e.preventDefault(); f[0].focus(); }
+    }
+    dlg.addEventListener("click", function(e){
+      var c = e.target.closest && e.target.closest("[data-fz]"); if (!c || !dlg.contains(c)) return;
+      var k = c.getAttribute("data-fz");
+      if (k === "close") figZoomClose(); else if (k === "in") set(i + 1); else if (k === "out") set(i - 1); else if (k === "fit") set(0);
+    });
+    document.addEventListener("keydown", key, true);
+    FZ = { an: an, ph: ph, dlg: dlg, btn: btn, key: key };
+    $('[data-fz="close"]', dlg).focus();
+    track("fig-zoom:" + (an.getAttribute("data-anima") || "figure"));
+  }
+  function figZoomClose(){
+    if (!FZ) return;
+    var z = FZ; FZ = null;
+    document.removeEventListener("keydown", z.key, true);
+    z.an.style.removeProperty("--fz-w");
+    var p = $(".iso-plate", z.an); if (p) p.scrollLeft = 0;
+    if (z.ph.parentNode) z.ph.parentNode.replaceChild(z.an, z.ph);
+    if (z.dlg.parentNode) z.dlg.parentNode.removeChild(z.dlg);
+    document.documentElement.classList.remove("hx-fz-open");
+    if (z.btn && z.btn.isConnected) z.btn.focus({ preventScroll: true });
   }
   function needsFig(q){ return !!(q && (q.img || q.pimg || q.pcase)); }
 
