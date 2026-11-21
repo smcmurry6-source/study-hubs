@@ -1,5 +1,5 @@
 /* Timmy's place (widget/place.js): the card and the full view. Loaded by place.js on first use, on the redesign's pages
-   only, and drawn on the design system's tokens (widget/hub.css: html.shx). The scene itself is the kit's drawing
+   only, and drawn on the design system's tokens (widget/hub.css). The scene itself is the kit's drawing
    (widget/hub-art/place.js) and keeps its own colors in light and dark. */
 
 /* ---------- the card ---------- */

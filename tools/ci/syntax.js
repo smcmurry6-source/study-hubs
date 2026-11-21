@@ -35,9 +35,9 @@ check(path.join(root, 'sw.js'), 'sw.js');
 try {
   const P = new Function('self', 'caches', fs.readFileSync(path.join(root, 'sw.js'), 'utf8') + ';return { PRECACHE: PRECACHE, HUBS: HUBS };')({ addEventListener(){}, location: {} }, {});
   for (const u of P.PRECACHE) { const f = u === './' ? 'index.html' : /\/$/.test(u) ? u + 'index.html' : u; if (!fs.existsSync(path.join(root, f))) { failed = true; console.error(`✗ sw.js: PRECACHE names ${u}, which isn't in the repo`); } }
-  const { hubStatus, isEngine } = require('../release/lib.js');
+  const { hubStatus } = require('../release/lib.js');
   const st = hubStatus();
-  for (const h of Object.keys(st).filter(h => st[h] === 'live' && isEngine(h) && !P.HUBS.includes(h))) { failed = true; console.error(`✗ sw.js: ${h} is a live hub on the engine and isn't in HUBS (its page and content wouldn't be kept for offline)`); }
+  for (const h of Object.keys(st).filter(h => st[h] === 'live' && !P.HUBS.includes(h))) { failed = true; console.error(`✗ sw.js: ${h} is a live hub and isn't in HUBS (its page and content wouldn't be kept for offline)`); }
 } catch (e) { failed = true; console.error('✗ sw.js: its lists could not be read: ' + e.message); }
 /* the engine reads its big content files a few lines at a time (parseSteps in widget/hub.js): on every engine hub's files it
    must build what JSON.parse builds, a line a step (a clock that runs out on every line) */

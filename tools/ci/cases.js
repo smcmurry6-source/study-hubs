@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Checks every hub's drawn Patient Box cases (widget/cases.js) against their own numbers: for each hub on the engine
-// with `pcases` in hubs/<hub>/content/core.json (its questions name them: `pcase` in questions.json), and each old
-// single-file hub with a /* pcases begin */ ... /* pcases end */ block, every case must validate (realistic, consistent numbers), its
+// with `pcases` in hubs/<hub>/content/core.json (its questions name them: `pcase` in questions.json; every hub is on the
+// engine since the old single-file pages came down, 2026-11-19), every case must validate (realistic, consistent numbers), its
 // `expect` must agree with derive() (the stage, grade, extent, recession types, peri-implant states the numbers
 // give), every question that names a case (pcase:'id') must name one that exists when the hub has any cases, and
 // every picture kind must be one the kit draws. Run by CI (check.yml) and by tools/figures/perio/build.mjs.
@@ -11,7 +11,6 @@ const path = require('path');
 const vm = require('vm');
 const root = path.join(__dirname, '..', '..');
 const kit = fs.readFileSync(path.join(root, 'widget', 'cases.js'), 'utf8');
-const PB = '/* pcases begin */\n', PE = '/* pcases end */\n';
 let bad = 0, hubsWithCases = 0, cases = 0;
 
 function load(block){
@@ -26,30 +25,18 @@ function same(want, have){
   return want === have;
 }
 for (const hub of fs.readdirSync(path.join(root, 'hubs')).sort()) {
-  const file = path.join(root, 'hubs', hub, 'index.html');
-  if (!fs.existsSync(file)) continue;
+  if (!fs.existsSync(path.join(root, 'hubs', hub, 'index.html'))) continue;
   const coreFile = path.join(root, 'hubs', hub, 'content', 'core.json');
-  let K, PCASES, src = '', named = [], pfigs = [];
-  if (fs.existsSync(coreFile)) {
-    /* a hub on the engine: the cases are data in core.json (widget/hub.js loads the kit when it has any) */
-    const core = JSON.parse(fs.readFileSync(coreFile, 'utf8'));
-    const qs = JSON.parse(fs.readFileSync(path.join(root, 'hubs', hub, 'content', 'questions.json'), 'utf8'));
-    qs.forEach((q) => { if (q.pcase) named.push(q.pcase); if (Array.isArray(q.pfig)) pfigs.push(q.pfig.map((f) => f && f.kind)); });
-    if (!core.pcases) { for (const kinds of pfigs) for (const k of kinds) if (KINDS.indexOf(k) < 0) { bad++; console.error(`${hub}: a question's pfig has an unknown picture kind "${k}"`); } continue; }
-    try { ({ K, PCASES } = load('var PCASES = ' + JSON.stringify(core.pcases) + ';')); }
-    catch (e) { console.error(`${hub}: core.json's pcases do not load: ${e.message}`); bad++; continue; }
-  } else {
-    src = fs.readFileSync(file, 'utf8');
-    const i = src.indexOf(PB), j = src.indexOf(PE);
-    if (i < 0) continue;
-    if (j < i) { console.error(`${hub}: pcases markers out of order`); bad++; continue; }
-    if (!/widget\/cases\.js/.test(src)) { console.error(`${hub}: has a pcases block but does not load widget/cases.js`); bad++; }
-    if (!/widget\/cases\.css/.test(src)) { console.error(`${hub}: has a pcases block but does not load widget/cases.css`); bad++; }
-    try { ({ K, PCASES } = load(src.slice(i + PB.length, j))); }
-    catch (e) { console.error(`${hub}: the pcases block does not run: ${e.message}`); bad++; continue; }
-    const re0 = /pcase:\s*'([^']+)'/g; let m0; while ((m0 = re0.exec(src))) named.push(m0[1]);
-    const re2 = /pfig:\s*\[([^\]]*)\]/g; while ((m0 = re2.exec(src))) pfigs.push([...m0[1].matchAll(/kind:\s*'([^']+)'/g)].map((x) => x[1]));
-  }
+  if (!fs.existsSync(coreFile)) { bad++; console.error(`${hub}: a hub page with no content/core.json (every hub is on the engine)`); continue; }
+  let K, PCASES;
+  const named = [], pfigs = [];
+  /* the cases are data in core.json (widget/hub.js loads the kit when it has any) */
+  const core = JSON.parse(fs.readFileSync(coreFile, 'utf8'));
+  const qs = JSON.parse(fs.readFileSync(path.join(root, 'hubs', hub, 'content', 'questions.json'), 'utf8'));
+  qs.forEach((q) => { if (q.pcase) named.push(q.pcase); if (Array.isArray(q.pfig)) pfigs.push(q.pfig.map((f) => f && f.kind)); });
+  if (!core.pcases) { for (const kinds of pfigs) for (const k of kinds) if (KINDS.indexOf(k) < 0) { bad++; console.error(`${hub}: a question's pfig has an unknown picture kind "${k}"`); } continue; }
+  try { ({ K, PCASES } = load('var PCASES = ' + JSON.stringify(core.pcases) + ';')); }
+  catch (e) { console.error(`${hub}: core.json's pcases do not load: ${e.message}`); bad++; continue; }
   hubsWithCases++;
   const ids = Object.keys(PCASES);
   for (const id of ids) {

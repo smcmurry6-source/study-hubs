@@ -248,8 +248,8 @@ var PRIZE_CSS =
 ".hxp-burst i{position:absolute;left:-4px;top:-6px;width:8px;height:12px;border-radius:2px;background:var(--c);opacity:0;animation:hxp-bit var(--t) var(--d) cubic-bezier(.2,.7,.4,1) both}" +
 ".hxp-burst i.is-art{left:-9px;top:-9px;width:18px;height:18px;background:none}.hxp-burst i svg{display:block;width:100%;height:100%}" +
 ".hxp-fly{position:fixed;z-index:60;left:0;top:0;width:24px;height:24px;pointer-events:none}.hxp-fly svg{display:block;width:100%;height:100%}" +
-"html.shx[data-theme=dark] .hxp-card{box-shadow:0 4px 0 #120d12,0 0 0 1px rgba(242,193,78,.5),0 16px 44px rgba(242,193,78,.28)}" +
-"@media (prefers-color-scheme:dark){html.shx:not([data-theme=light]) .hxp-card{box-shadow:0 4px 0 #120d12,0 0 0 1px rgba(242,193,78,.5),0 16px 44px rgba(242,193,78,.28)}}" +
+":root[data-theme=dark] .hxp-card{box-shadow:0 4px 0 #120d12,0 0 0 1px rgba(242,193,78,.5),0 16px 44px rgba(242,193,78,.28)}" +
+"@media (prefers-color-scheme:dark){:root:not([data-theme=light]) .hxp-card{box-shadow:0 4px 0 #120d12,0 0 0 1px rgba(242,193,78,.5),0 16px 44px rgba(242,193,78,.28)}}" +
 "@keyframes hxp-in{0%{opacity:0;transform:translateY(var(--hxp-y)) scale(.86) rotate(-2deg)}100%{opacity:1;transform:none}}" +
 "@keyframes hxp-out{to{opacity:0;transform:translateY(calc(var(--hxp-y) * .4)) scale(.95)}}" +
 "@keyframes hxp-shine{to{left:130%}}" +

@@ -46,7 +46,8 @@ Since the redesign's release (2026-11) every hub runs on the shared engine (`wid
 - **Its own drawn art** ([every-hub-gets-its-own-art](../rules/every-hub-gets-its-own-art.md)): an emblem, a masthead
   scene, a mastery medal set and the arcade lobby's drawings unique to the hub, plus its tint (the hub's color: there is
   no palette or type trio to pick any more), drawn in SVG in Timmy's ink in `tools/figures/site/` (then
-  `node tools/figures/site/build.mjs`, which writes `widget/hub-art/<hub-id>.js`). Never another hub's art, a recolored
+  `node tools/figures/site/build.mjs`, which writes `widget/hub-art/<hub-id>.js` once `hubs/<hub-id>/index.html` exists,
+  and deletes it when the page comes down). Never another hub's art, a recolored
   copy or the generic placeholder; Sam sees it in screenshots (and the hub's preview, if Sam asks for one).
 - **Questions:** every choice with its why ([every-choice-gets-a-why](../rules/every-choice-gets-a-why.md)),
   `likelyTopics` ([high-likelihood-topics](../rules/high-likelihood-topics.md)), and per taught lecture about 5
