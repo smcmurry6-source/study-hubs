@@ -48,9 +48,34 @@
            or mob is given.
        { m:'bop', rate:.3, teeth }, { m:'pus', ... }, { m:'plaque', ... }   that share of the sites, the deepest first
        { m:'recession', teeth:[...], mm }                           facial recession at the middle site, the pocket 1 mm
+     Patient Box v2.1 (Sam, 2026-11-21: "more possibilities like endodontically treated teeth, fractured teeth, and different
+     crown materials"):
+       restoration: material:'crown' takes crown:'gold' | 'pfm' | 'zirconia' | 'lithium' (lithium disilicate) | 'ssc' (crown:true,
+           or no crown option, is v1's crown, drawn as before); a restoration by surface takes type:'inlay' | 'onlay' (gold or
+           ceramic) or 'veneer' (ceramic or composite, the labial surface of an incisor, canine or premolar); any of them takes
+           overhang and open ('m', 'd' or 'md': excess past the proximal contour at the gingival margin, or a gap there)
+       { m:'endo', tooth, fill:'adequate'|'short'|'long'|'voids', post:'cast'|'metal'|'fiber', core:'amalgam'|'composite'|'cast',
+           sep:root, missed:root, widened:true }   fill:true is v1's filling; sep a separated instrument in that root's apical
+           third; missed a canal left unfilled (a root the film shows on its own); widened (with fill:false) a widened apical PDL
+       { m:'caries', ..., recurrent:true }      under a restoration's (or a crown's) margin, M or D
+       { m:'fracture', tooth, type, ... }       crown (an incisor or canine: depth enamel | dentin | pulp, side m | d), cusp
+           (a premolar or molar: cusp B | L, or MB | DB | ML | DL), crack (no film shows it), vrf (a vertical root fracture: side
+           m | d of root, a narrow pocket pd mm, default 8, at the middle of surface f | l), hrf (a horizontal root fracture: at
+           cervical | middle | apical, a single-rooted tooth)
+       { m:'bridge', abutments:[a, b], material }   a fixed bridge: crowns on the two abutments, a pontic (material pfm | gold |
+           zirconia | lithium) at every tooth between them, each of which must be missing (the missing module)
      The record keeps everything else (age, smoke, hba1c, cc, mouth, gingiva), and the box rows, every view and the key
      are drawn from it. */
   var MAT = ['amalgam', 'composite', 'gold', 'crown'], DEPTH = ['enamel', 'dentin', 'pulp'];
+  var RMAT = ['amalgam', 'composite', 'gold', 'ceramic'], RTYPE = ['direct', 'inlay', 'onlay', 'veneer'], CROWNS = ['gold', 'pfm', 'zirconia', 'lithium', 'ssc'];
+  var CROWN_NAME = { gold:'full gold crown', pfm:'porcelain-fused-to-metal crown', zirconia:'zirconia crown', lithium:'lithium disilicate crown', ssc:'stainless steel crown' };
+  var FILLS = ['adequate', 'short', 'long', 'voids'], POSTS = ['cast', 'metal', 'fiber'], CORES = ['amalgam', 'composite', 'cast'];
+  var FX = ['crown', 'cusp', 'crack', 'vrf', 'hrf'], HRF_AT = ['cervical', 'middle', 'apical'];
+  /* the roots a film shows one by one (the canals it can judge): a molar's mesial and distal (buccal) roots, else the one in front */
+  function filmRoots(n){ var c = CAT(n); return c ? (c.pos >= 6 ? c.roots.slice(0, 2) : [c.roots[0]]) : []; }
+  function cuspsOf(n){ var c = CAT(n); return !c || c.pos < 4 ? [] : c.pos >= 6 ? ['MB', 'DB', 'ML', 'DL'] : ['B', 'L']; }
+  function adjacent(a, b){ a = +a; b = +b; return Math.abs(a - b) === 1 && isUpper(a) === isUpper(b); }
+  function bridgeSpan(a, b){ a = +a; b = +b; if(isUpper(a) !== isUpper(b)) return null; var o = [], lo = Math.min(a, b), hi = Math.max(a, b); for(var i = lo + 1; i < hi; i++) o.push(String(i)); return o; }
   function toothKeys(t){ return Object.keys(t || {}).filter(function(k){ return /^\d+$/.test(k) && +k >= 1 && +k <= 32; }); }
   function ensure(t, n){ n = String(n); if(!t[n]) t[n] = {}; return t[n]; }
   function list(v){ return Array.isArray(v) ? v.map(String) : v == null ? [] : [String(v)]; }
@@ -109,12 +134,29 @@
       if(md.m === 'missing') list(md.teeth).forEach(function(n){ ensure(t, n).missing = true; });
       else if(md.m === 'restoration'){
         var r = ensure(t, md.tooth), mat = md.material || 'amalgam';
-        if(MAT.indexOf(mat) < 0) probs.push(w + 'material must be ' + MAT.join(', '));
-        if(mat === 'crown') r.crown = true;
-        else { (r.resto = r.resto || []).push({ s:normSurf(md.tooth, md.surfaces), mat:mat }); if(mat === 'amalgam' || mat === 'gold') r.amalgam = true; }
+        if(MAT.indexOf(mat) < 0 && mat !== 'ceramic') probs.push(w + 'material must be ' + MAT.concat('ceramic').join(', '));
+        if(mat === 'crown'){ r.crown = md.crown || true; if(md.open || md.overhang){ r.margin = {}; if(md.open) r.margin.open = md.open; if(md.overhang) r.margin.overhang = md.overhang; } }
+        else { var it = { s:normSurf(md.tooth, md.surfaces), mat:mat }; ['type', 'overhang', 'open'].forEach(function(k){ if(md[k]) it[k] = md[k]; });
+          (r.resto = r.resto || []).push(it); if(mat === 'amalgam' || mat === 'gold') r.amalgam = true; }
       }
-      else if(md.m === 'caries'){ var rc = ensure(t, md.tooth); (rc.caries = rc.caries || []).push({ s:normSurf(md.tooth, md.surface), depth:md.depth || 'dentin' }); }
-      else if(md.m === 'endo'){ var re = ensure(t, md.tooth); if(md.fill !== false) re.endo = true; if(md.lesion) re.lesion = md.lesion; }
+      else if(md.m === 'caries'){ var rc = ensure(t, md.tooth), ci = { s:normSurf(md.tooth, md.surface), depth:md.depth || 'dentin' }; if(md.recurrent) ci.recurrent = true; (rc.caries = rc.caries || []).push(ci); }
+      else if(md.m === 'endo'){ var re = ensure(t, md.tooth), eo = {};
+        ['post', 'core', 'sep', 'missed'].forEach(function(k){ if(md[k]) eo[k] = md[k]; });
+        if(typeof md.fill === 'string') eo.fill = md.fill;
+        if(md.fill !== false) re.endo = Object.keys(eo).length ? eo : true;
+        if(md.widened) re.apdl = true;
+        if(md.lesion) re.lesion = md.lesion; }
+      else if(md.m === 'fracture'){ var rf = ensure(t, md.tooth), fx = { type:md.type };
+        ['depth', 'side', 'cusp', 'at', 'root', 'surface', 'pd'].forEach(function(k){ if(md[k] != null) fx[k] = md[k]; });
+        if(md.type === 'vrf'){ var sf = md.surface === 'l' ? 'l' : 'f', dep = md.pd || 8; fx.surface = sf; fx.pd = dep;
+          rf.pd = rf.pd || {}; rf.pd[sf] = (rf.pd[sf] || [2, 2, 2]).slice(); rf.pd[sf][1] = dep;
+          rf.bop = rf.bop || {}; rf.bop[sf] = (rf.bop[sf] || [0, 0, 0]).slice(); rf.bop[sf][1] = 1; }
+        (rf.fx = rf.fx || []).push(fx); }
+      else if(md.m === 'bridge'){ var ab = list(md.abutments), bm = md.material || 'pfm';
+        if(ab.length !== 2) probs.push(w + 'a bridge names its two abutments');
+        else { var span = bridgeSpan(ab[0], ab[1]);
+          if(!span || !span.length) probs.push(w + 'the abutments must be in one arch with at least one tooth between them');
+          else { ab.forEach(function(n){ var ra = ensure(t, n); ra.crown = bm; ra.abut = true; }); span.forEach(function(n){ ensure(t, n).pontic = bm; }); } } }
       else if(md.m === 'bone') boneModule(t, md, probs);
       else if(md.m === 'bop' || md.m === 'pus' || md.m === 'plaque') siteModule(t, md, spec, md.m);
       else if(md.m === 'recession') list(md.teeth).forEach(function(n){ var r = ensure(t, n), mm = md.mm || 0; r.rec = r.rec || {}; r.pd = r.pd || {};
@@ -148,7 +190,9 @@
       pd:{ f:arr(pd, 'f', [2, 2, 2]), l:arr(pd, 'l', [2, 2, 2]) }, rec:{ f:arr(rec, 'f', [-2, -2, -2]), l:arr(rec, 'l', [-2, -2, -2]) },
       bop:{ f:arr(bop, 'f', z), l:arr(bop, 'l', z) }, pus:{ f:arr(pus, 'f', z), l:arr(pus, 'l', z) }, plaque:{ f:arr(pl, 'f', z), l:arr(pl, 'l', z) },
       bone:t.bone || { m:0, d:0 }, vdef:t.vdef || {}, furcX:t.furcX || 0, calc:!!t.calc, crown:!!t.crown, endo:!!t.endo, amalgam:!!t.amalgam, halo:!!t.halo,
-      resto:t.resto || [], caries:t.caries || [], lesion:t.lesion || 0, raw:t };
+      resto:t.resto || [], caries:t.caries || [], lesion:t.lesion || 0, raw:t,
+      crownMat:typeof t.crown === 'string' ? t.crown : null, margin:t.margin || {}, eo:t.endo && typeof t.endo === 'object' ? t.endo : null,
+      apdl:!!t.apdl, fx:t.fx || [], pontic:t.pontic || null, abut:!!t.abut };
     r.cal = { f:r.pd.f.map(function(p, i){ return p + r.rec.f[i]; }), l:r.pd.l.map(function(p, i){ return p + r.rec.l[i]; }) };
     return r;
   }
@@ -180,9 +224,12 @@
         out.impl[t.n] = { dx:dx, meffert: t.mob || t.halo ? 'failed' : progressing && infl ? 'failing' : beyond > 0 ? 'ailing' : 'healthy', lossBeyondRemodeling:+Math.max(0, beyond).toFixed(1), baseline:!!base };
         return;
       }
+      var vrf = t.fx.filter(function(f){ return f.type === 'vrf'; });
       ['f', 'l'].forEach(function(s){
         t.pd[s].forEach(function(p, i){
           out.sites++; if(t.bop[s][i]) out.bop++; if(t.pus[s][i]) out.pus++;
+          /* a vertical root fracture's narrow pocket is the fracture's, not periodontitis: it stays on the chart and out of the staging */
+          if(i === 1 && vrf.some(function(f){ return (f.surface || 'f') === s; })){ out.vrfSites = (out.vrfSites || 0) + 1; return; }
           if(p > out.maxPD.v) out.maxPD = { v:p, tooth:t.n, site:SITE_NAME[i], surface:s };
           var c = t.cal[s][i];
           if(c > out.maxCAL.v) out.maxCAL = { v:c, tooth:t.n, site:SITE_NAME[i], surface:s };
@@ -234,6 +281,67 @@
      implant's length and never above its baseline, ages, cigarettes and HbA1c in human ranges. The pocket base and
      the bone crest must agree: in a suprabony pocket the crest sits 0-3 mm apical to the pocket base, and a pocket
      base more than 1.5 mm apical to the crest needs a declared vertical defect that reaches it. */
+  /* Patient Box v2.1's rules for one present tooth: crown materials and margins, indirect restorations, endodontic detail,
+     fractures and bridges. Every one is an error (validate() has no warnings): a vertical root fracture on a vital, unrestored
+     tooth is one too, because it is rare enough that a teaching case should not show it (Cohen's: most follow root canal
+     treatment, a post or a large restoration). */
+  function v21(t, w, cat, bad){
+    var post = cat.pos >= 4, molar = cat.pos >= 6, fr = filmRoots(t.n), sides = function(v){ return /^(m|d|md|dm)$/.test(String(v)); };
+    if(t.crownMat && CROWNS.indexOf(t.crownMat) < 0) bad(w + 'crown must be true or one of ' + CROWNS.join(', '));
+    if(t.crownMat === 'ssc' && !post) bad(w + 'a stainless steel crown is for a molar or premolar');
+    if(t.crownMat === 'lithium' && molar && t.abut) bad(w + 'a lithium disilicate bridge is for the front of the mouth or premolars, not a molar abutment');
+    Object.keys(t.margin).forEach(function(k){ if(['open', 'overhang'].indexOf(k) < 0) bad(w + 'margin.' + k + ' is not open or overhang'); else if(!sides(t.margin[k])) bad(w + 'margin.' + k + ' must be m, d or md'); });
+    if((t.margin.open || t.margin.overhang) && !t.crown) bad(w + 'a crown margin (open, overhang) on a tooth with no crown');
+    if(t.crown && t.resto.length) bad(w + 'a restoration by surface on a crowned tooth: the crown covers every surface');
+    t.resto.forEach(function(r){ var ty = r.type || 'direct';
+      if(RTYPE.indexOf(ty) < 0){ bad(w + 'restoration type must be ' + RTYPE.join(', ')); return; }
+      if(r.mat === 'ceramic' && ty === 'direct') bad(w + 'a ceramic restoration is indirect: type inlay, onlay or veneer');
+      if(r.mat === 'amalgam' && ty !== 'direct') bad(w + 'amalgam is placed directly: no amalgam ' + ty);
+      if((ty === 'inlay' || ty === 'onlay') && !post) bad(w + 'an ' + ty + ' is for a premolar or molar');
+      if((ty === 'inlay' || ty === 'onlay') && r.mat === 'composite') bad(w + 'an ' + ty + ' here is gold or ceramic');
+      if(ty === 'onlay' && r.s.indexOf('O') < 0) bad(w + 'an onlay covers the occlusal surface: include O');
+      if(ty === 'veneer'){ if(molar) bad(w + 'a veneer is for an incisor, canine or premolar'); if(r.s !== cat.surfaces[3]) bad(w + 'a veneer covers the labial (facial) surface only: surfaces "' + cat.surfaces[3] + '"'); if(r.mat !== 'ceramic' && r.mat !== 'composite') bad(w + 'a veneer is ceramic or composite'); }
+      ['overhang', 'open'].forEach(function(k){ if(!r[k]) return; if(!sides(r[k])) bad(w + k + ' must be m, d or md');
+        else String(r[k]).toUpperCase().split('').forEach(function(x){ if(r.s.indexOf(x) < 0) bad(w + 'an ' + k + ' on ' + x + ', a surface the restoration does not cover'); });
+        if(ty === 'onlay' || ty === 'veneer') bad(w + 'an ' + k + ' is drawn on a direct restoration or an inlay'); if(!post) bad(w + 'an ' + k + ' is drawn on a premolar or molar box'); }); });
+    var eo = t.eo;
+    if(eo){
+      Object.keys(eo).forEach(function(k){ if(['fill', 'post', 'core', 'sep', 'missed'].indexOf(k) < 0) bad(w + 'endo.' + k + ' is not something the kit draws'); });
+      if(eo.fill && FILLS.indexOf(eo.fill) < 0) bad(w + 'endo fill must be ' + FILLS.join(', '));
+      if(eo.post && POSTS.indexOf(eo.post) < 0) bad(w + 'endo post must be ' + POSTS.join(', '));
+      if(eo.core && CORES.indexOf(eo.core) < 0) bad(w + 'endo core must be ' + CORES.join(', '));
+      if(eo.post === 'cast' && eo.core && eo.core !== 'cast') bad(w + 'a cast post and core are one casting: core cast');
+      if(eo.core === 'cast' && eo.post !== 'cast') bad(w + 'a cast core comes with a cast post');
+      if(eo.post && !eo.core && eo.post !== 'cast') bad(w + 'a ' + eo.post + ' post holds a core: give core amalgam or composite');
+      if((eo.post || eo.core) && !t.crown) bad(w + 'a post or core build-up is drawn under a crown: add the crown');
+      if(eo.post && eo.fill === 'short') bad(w + 'a post over a short filling: the apical seal is the reason a post leaves 4-5 mm of gutta-percha');
+      ['sep', 'missed'].forEach(function(k){ if(eo[k] && fr.indexOf(eo[k]) < 0) bad(w + 'endo.' + k + ' names a root the film shows on its own (' + fr.join(', ') + ')'); });
+      if(eo.missed && fr.length < 2) bad(w + 'a missed canal is drawn on a molar, whose film shows two roots apart');
+      if(eo.missed && eo.missed === eo.sep) bad(w + 'a separated instrument and a missed canal in one root');
+    }
+    if(t.apdl && t.lesion) bad(w + 'a widened PDL and a periapical lesion: the lesion already widens it');
+    t.fx.forEach(function(f){ var ty = f && f.type;
+      if(FX.indexOf(ty) < 0){ bad(w + 'fracture type must be ' + FX.join(', ')); return; }
+      if(ty === 'crown'){ if(post) bad(w + 'a crown fracture is drawn on an incisor or canine (a premolar or molar: type cusp)'); if(DEPTH.indexOf(f.depth) < 0) bad(w + 'crown fracture depth must be ' + DEPTH.join(', ')); if(f.side && f.side !== 'm' && f.side !== 'd') bad(w + 'crown fracture side must be m or d'); if(t.crown) bad(w + 'a crown fracture on a crowned tooth (a fractured crown is the restoration\'s)'); }
+      if(ty === 'cusp'){ if(cuspsOf(t.n).indexOf(f.cusp) < 0) bad(w + 'cusp must be one of ' + (cuspsOf(t.n).join(', ') || 'a premolar\'s or molar\'s')); if(t.crown) bad(w + 'a fractured cusp under a full crown'); }
+      if(ty === 'crack' && t.crown) bad(w + 'a cracked tooth under a full crown');
+      if(ty === 'vrf'){ if(f.root && fr.indexOf(f.root) < 0) bad(w + 'vrf root must be one the film shows (' + fr.join(', ') + ')'); if(f.side && f.side !== 'm' && f.side !== 'd') bad(w + 'vrf side must be m or d');
+        if(!t.endo && !t.resto.length && !t.crown && !t.amalgam) bad(w + 'a vertical root fracture on a vital, unrestored tooth: it follows root canal treatment, a post or a large restoration');
+        if(f.pd != null){ num(f.pd, 5, 12, w + 'vrf pocket'); } }
+      if(ty === 'hrf'){ if(cat.roots.length > 1) bad(w + 'a horizontal root fracture is drawn on a single-rooted tooth'); if(HRF_AT.indexOf(f.at) < 0) bad(w + 'hrf at must be ' + HRF_AT.join(', ')); }
+    });
+    if(t.abut){ if(!t.crown) bad(w + 'a bridge abutment carries a crown'); }
+    function num(v, lo, hi, what){ if(typeof v !== 'number' || v < lo || v > hi) bad(what + ' = ' + v + ' is outside ' + lo + '-' + hi); }
+  }
+  /* bridges across the record: every run of pontics has an abutment at each end, every abutment is next to a pontic */
+  function bridgeCheck(spec, bad){
+    var T = {}; for(var n = 1; n <= 32; n++) T[n] = tooth(spec, String(n));
+    for(var a = 1; a <= 32; a++){ var t = T[a];
+      if(t.pontic){ [a - 1, a + 1].forEach(function(b){ if(b < 1 || b > 32 || !adjacent(a, b)) { bad('#' + a + ': a pontic at the end of the arch has no abutment past it'); return; } var u = T[b]; if(!u.pontic && !u.abut) bad('#' + a + ': a pontic next to #' + b + ', which is neither a pontic nor an abutment'); if(u.abut && u.missing) bad('#' + b + ': an abutment that is missing'); if(u.abut && u.implant) bad('#' + b + ': an implant abutment (a tooth-and-implant bridge is not drawn)'); if(u.pontic && u.pontic !== t.pontic) bad('#' + a + ': one bridge, two materials'); }); }
+      if(t.abut && !t.missing && ![a - 1, a + 1].some(function(b){ return b >= 1 && b <= 32 && adjacent(a, b) && T[b].pontic; })) bad('#' + a + ': an abutment with no pontic beside it');
+      if(t.abut && t.crownMat && [a - 1, a + 1].some(function(b){ return b >= 1 && b <= 32 && adjacent(a, b) && T[b].pontic && T[b].pontic !== t.crownMat; })) bad('#' + a + ': the abutment crown and its pontic are different materials');
+    }
+  }
   I.validate = function(spec){
     spec = prep(spec);
     var P = (spec && spec._moduleProblems || []).slice(), ts;
@@ -267,19 +375,24 @@
     if(g.look && ['healthy', 'inflamed', 'fibrotic'].indexOf(g.look) < 0) bad('gingiva.look must be healthy, inflamed or fibrotic');
     ts.forEach(function(t){
       var w = '#' + t.n + ' ', raw = t.raw;
-      Object.keys(raw).forEach(function(k){ if(['pd', 'rec', 'bop', 'pus', 'plaque', 'mob', 'furc', 'bone', 'vdef', 'furcX', 'calc', 'crown', 'endo', 'amalgam', 'implant', 'missing', 'halo', 'lift', 'resto', 'caries', 'lesion'].indexOf(k) < 0) bad(w + 'unknown field ' + k); });
+      Object.keys(raw).forEach(function(k){ if(['pd', 'rec', 'bop', 'pus', 'plaque', 'mob', 'furc', 'bone', 'vdef', 'furcX', 'calc', 'crown', 'endo', 'amalgam', 'implant', 'missing', 'halo', 'lift', 'resto', 'caries', 'lesion', 'margin', 'apdl', 'fx', 'pontic', 'abut'].indexOf(k) < 0) bad(w + 'unknown field ' + k); });
       /* impossible combinations: nothing on a missing tooth; nothing of a tooth's own on an implant */
+      if(t.pontic && !t.missing) bad(w + 'a pontic replaces a missing tooth: add #' + t.n + ' to the missing module');
       if(t.missing){
-        [['resto', t.resto.length], ['crown', t.crown], ['amalgam', t.amalgam], ['caries', t.caries.length], ['endo', t.endo], ['periapical lesion', t.lesion], ['furcation', t.furc.f || t.furc.l || t.furcX], ['implant', t.implant], ['calculus', t.calc]].forEach(function(e){ if(e[1]) bad(w + 'a missing tooth has ' + (e[0] === 'resto' ? 'a restoration' : e[0] === 'caries' ? 'caries' : 'a ' + e[0])); });
+        [['margin', t.margin.open || t.margin.overhang], ['fracture', t.fx.length], ['widened PDL', t.apdl], ['abutment', t.abut], ['resto', t.resto.length], ['crown', t.crown], ['amalgam', t.amalgam], ['caries', t.caries.length], ['endo', t.endo], ['periapical lesion', t.lesion], ['furcation', t.furc.f || t.furc.l || t.furcX], ['implant', t.implant], ['calculus', t.calc]].forEach(function(e){ if(e[1]) bad(w + 'a missing tooth has ' + (e[0] === 'resto' ? 'a restoration' : e[0] === 'caries' ? 'caries' : 'a ' + e[0])); });
         return;
       }
       var cat = CAT(t.n);
-      t.resto.forEach(function(r){ if(!r || MAT.indexOf(r.mat) < 0 || r.mat === 'crown') bad(w + 'a restoration\'s material must be amalgam, composite or gold (a crown is crown:true)');
+      v21(t, w, cat, bad);
+      t.resto.forEach(function(r){ if(!r || RMAT.indexOf(r.mat) < 0) bad(w + 'a restoration\'s material must be ' + RMAT.join(', ') + ' (a crown is crown:true, or the crown\'s material)');
         String(r && r.s || '').split('').forEach(function(x){ if(cat.surfaces.indexOf(x) < 0) bad(w + 'restoration surface ' + x + ' is not one of this tooth\'s (' + cat.surfaces.join('') + ')'); });
         if(!r || !r.s) bad(w + 'a restoration with no surfaces'); });
       t.caries.forEach(function(c){ if(!c || cat.surfaces.indexOf(c.s) < 0) bad(w + 'caries surface ' + (c && c.s) + ' is not one of this tooth\'s (' + cat.surfaces.join('') + ')');
         if(c && DEPTH.indexOf(c.depth) < 0) bad(w + 'caries depth must be ' + DEPTH.join(', '));
-        if(c && t.crown) bad(w + 'caries under a full crown can\'t be charted by surface'); });
+        if(c && t.crown && !c.recurrent) bad(w + 'caries under a full crown can\'t be charted by surface (recurrent caries at its margin can: recurrent:true, M or D)');
+        if(c && c.recurrent){ if(c.s !== 'M' && c.s !== 'D') bad(w + 'recurrent caries is drawn at a proximal margin: M or D');
+          else if(!t.crown && !t.resto.some(function(r){ return r.type !== 'veneer' && r.s.indexOf(c.s) >= 0; })) bad(w + 'recurrent caries on ' + c.s + ' needs a restoration on that surface (or a crown)'); }
+        else if(c && t.resto.some(function(r){ return r.s.indexOf(c.s) >= 0 && r.type !== 'veneer'; })) bad(w + 'caries on ' + c.s + ', a restored surface: is it recurrent (recurrent:true)?'); });
       if(t.lesion) num(t.lesion, 1, 15, w + 'periapical lesion (mm across)');
       if(t.mob != null) num(t.mob, 0, 3, w + 'mobility');
       ['f', 'l'].forEach(function(s){
@@ -303,7 +416,7 @@
         ['m', 'd'].forEach(function(sd){ var b = t.bone[sd] || 0; num(b, 0, im.len - 1, w + 'implant bone loss ' + sd);
           if(im.baseline){ num(im.baseline[sd] || 0, 0, im.len - 1, w + 'baseline bone ' + sd); if(b < (im.baseline[sd] || 0)) bad(w + 'bone at ' + sd + ' is higher than at the baseline'); } });
         if(t.furc.f || t.furc.l || t.furcX) bad(w + 'an implant has no furcation');
-        if(t.endo || t.amalgam || t.calc || t.resto.length || t.caries.length || t.lesion) bad(w + 'an implant and a root in one site: an implant has no root filling, restoration, caries, periapical lesion or root calculus');
+        if(t.endo || t.amalgam || t.calc || t.resto.length || t.caries.length || t.lesion || t.fx.length || t.apdl || t.abut) bad(w + 'an implant and a root in one site: an implant has no root filling, restoration, caries, periapical lesion or root calculus');
         if(t.mob && !t.halo) bad(w + 'a mobile implant has lost osseointegration: set halo:true so the film shows it');
         return;
       }
@@ -337,6 +450,7 @@
       }
       if(t.endo && !(t.crown || t.amalgam || t.resto.length)) bad(w + 'a root-filled tooth needs a restoration (a crown, or a restoration over the access)');
     });
+    if(ts.some(function(t){ return t.pontic || t.abut; }) || toothKeys(spec.t).some(function(n){ return spec.t[n].pontic || spec.t[n].abut; })) bridgeCheck(spec, bad);
     return P;
   };
 
@@ -361,10 +475,12 @@
     if(back) s += path('dc-root dc-back', rootOutline(back, 0, y0, y0));
     roots.forEach(function(r){ s += path('dc-root', rootOutline(r, 0, y0, y0)); });
     if(d.tr){ var tp = trunkPts(roots, sg, 0, y0 - 1, y0 + d.tr * k, k); if(tp) s += path('dc-root dc-trunk', tp); }
-    s += path('dc-crown' + (t.crown ? ' dc-restored' : ''), dense(crownMM(d), true, 4).map(function(p){ return [X(p[0]), y0 - p[1] * k]; }));
+    s += path('dc-crown' + (t.crown ? ' dc-restored' : '') + (t.crownMat === 'gold' ? ' dc-goldcrown' : ''), dense(crownMM(d), true, 4).map(function(p){ return [X(p[0]), y0 - p[1] * k]; }));
     /* restorations by surface (Patient Box v2's resto, the library's outline); a v1 tooth with only amalgam:true keeps its box */
-    if(t.resto.length) t.resto.forEach(function(r){ var cls = 'dc-amalgam' + (r.mat === 'composite' ? ' dc-comp' : r.mat === 'gold' ? ' dc-gold' : '');
-      TL.restoMM(typeOf(t.n), r.s).forEach(function(p){ s += path(cls, p.map(function(q){ return [X(q[0]), y0 - q[1] * k]; })); }); });
+    if(t.resto.length) t.resto.forEach(function(r){ var cls = 'dc-amalgam' + (r.mat === 'composite' ? ' dc-comp' : r.mat === 'gold' ? ' dc-gold' : r.mat === 'ceramic' ? ' dc-cer' : '');
+      if(r.type === 'veneer') return;
+      TL.restoMM(typeOf(t.n), r.s, { per:4, mat:r.mat, type:r.type, overhang:r.overhang }).forEach(function(p){ s += path(cls, p.map(function(q){ return [X(q[0]), y0 - q[1] * k]; })); }); });
+    else if(t.amalgam && posOf(t.n) >= 4) s += path('dc-amalgam', TL.restoMM(typeOf(t.n), 'O', { per:4 })[0].map(function(q){ return [X(q[0]), y0 - q[1] * k]; }));
     else if(t.amalgam) s += path('dc-amalgam', [[cx - d.cw * .32 * k, y0 - d.ch * k + .3 * k], [cx + d.cw * .32 * k, y0 - d.ch * k + .3 * k], [cx + d.cw * .22 * k, y0 - d.ch * .62 * k], [cx - d.cw * .22 * k, y0 - d.ch * .62 * k]]);
     return s;
   }
@@ -386,6 +502,7 @@
     var inner = '';
     ts.forEach(function(t, i){
       var cx = CPAD_L + i * CW + CW / 2, mr = mesialRight(t.n), so = siteOrder(t.n), sx = [cx - 14, cx, cx + 14];
+      if(t.missing && t.pontic){ var dp = t.d, sgp = mr ? -1 : 1; inner += path('dc-crown dc-restored' + (t.pontic === 'gold' ? ' dc-goldcrown' : ''), TL.ponticMM(typeOf(t.n), { per:4 }).map(function(p){ return [cx + sgp * p[0] * k, y0 - p[1] * k]; })); return; }
       if(t.missing){ inner += '<path class="dc-x" d="M' + f1(cx - 10) + ' ' + f1(y0 - 24) + 'l20 20m0 -20l-20 20"/>'; return; }
       inner += chartTooth(t, cx, y0, k, mr);
       if(hasFurc(t.n) && !hide.furc && (t.furc[sf] || 0) > 0) inner += furcMark(t.furc[sf], cx, y0 + CAT(t.n).trunk * k + 2, 5);
@@ -408,7 +525,7 @@
   }
   function chartTable(spec, ts, sf, o){
     var hide = o.hide || {};
-    function cells(fn){ return ts.map(function(t){ if(t.missing) return '<td class="pc-miss">X</td>'; return '<td>' + fn(t) + '</td>'; }).join(''); }
+    function cells(fn){ return ts.map(function(t){ if(t.missing) return '<td class="pc-miss">' + (t.pontic ? 'pontic' : 'X') + '</td>'; return '<td>' + fn(t) + '</td>'; }).join(''); }
     function sites(t, arr, mark){ return '<span class="pc-sites">' + siteOrder(t.n).map(function(si){ return '<span class="' + (mark && mark[si] ? 'bop' : '') + '">' + arr[si] + '</span>'; }).join('') + '</span>'; }
     var h = '<table class="pchart dc-table"><caption class="dc-cap">' + (sf === 'f' ? 'Facial' : 'Lingual') + ' surfaces: three sites per tooth, left to right as you look at the patient</caption><thead><tr><th scope="row">Tooth</th>' +
       ts.map(function(t){ return '<th scope="col">#' + t.n + (t.implant ? '<br><small>implant</small>' : '') + '</th>'; }).join('') + '</tr></thead><tbody>';
@@ -449,14 +566,14 @@
     var g = { o:o, d:d, k:k, x:o.x, cej:cej, top:top, sg:sg, X:X, crown:cr, roots:[] };
     var crestY = cej + 1.5 * k, bm = (o.bone && o.bone[0]) || 0, bd = (o.bone && o.bone[1]) || 0;
     g.crestM = crestY + bm * k; g.crestD = crestY + bd * k;
-    if(o.implant) return g;
+    if(o.implant || o.pontic) return g;
     g.roots = mkRoots(d, X, k, cej);
     g.back = mkBack(d, X, k, cej);
     return g;
   }
   function crestLR(g){ return g.sg > 0 ? [g.crestM, g.crestD] : [g.crestD, g.crestM]; }
   function socketSVG(g, dd, cls){
-    if(g.o.implant) return '';
+    if(g.o.implant || g.o.pontic) return '';
     var c = crestLR(g), s = '', fun = (g.o.funnel || 0) * g.k;
     g.roots.forEach(function(r){ s += path(cls, rootOutline(r, dd * g.k, c[0], c[1], fun)); });
     if(g.d.tr){ var y0 = Math.min(c[0], c[1]), tf = trunkPts(g.roots, g.sg, dd * g.k, y0, g.cej + g.d.tr * g.k, g.k); if(tf) s += path(cls, tf); }
@@ -465,6 +582,9 @@
   function toothSVG(g){
     var s = '', o = g.o, k = g.k, d = g.d;
     if(o.implant) return implantSVG(g);
+    if(o.pontic) return ponticSVG(g);
+    var cut = fxCut(g);
+    function C(pts){ return cut ? cut(pts) : pts; }
     if(g.back) s += path('xr-dentin', rootOutline(g.back, 0, g.cej, g.cej), false, 'opacity:.5');
     s += path('xr-dentin', [[g.X(-d.cv / 2 + .15), g.cej - 1.6 * k], [g.X(d.cv / 2 - .15), g.cej - 1.6 * k], [g.X(d.cv / 2 - .1), g.cej + 2], [g.X(-d.cv / 2 + .1), g.cej + 2]]);
     g.roots.forEach(function(r){ s += path('xr-dentin', rootOutline(r, 0, g.cej, g.cej)); });
@@ -472,39 +592,148 @@
     /* the enamel cap thins to nothing at the CEJ; dentin inside it (the library's DEJ). Under a full crown the tooth was
        prepared: no enamel is left, only the dentin core inside the crown's shell */
     if(o.crown) s += path('xr-dentin', g.crown);
-    else { s += path('xr-enamel', g.crown); s += path('xr-dentin', TL.dejPts(g.crown, d, g.x, g.top, g.cej, k)); }
-    s += pulpSVG(g);
+    else { s += path('xr-enamel', C(g.crown)); s += path('xr-dentin', C(TL.dejPts(g.crown, d, g.x, g.top, g.cej, k))); }
+    s += pulpSVG(g, C);
     if(o.endo) s += endoSVG(g);
-    /* restorations by surface (Patient Box v2's resto); a v1 tooth with only amalgam:true keeps its occlusal box */
-    if(o.resto && o.resto.length) s += o.resto.map(function(r){ return restoSVG(g, r); }).join('');
+    if(o.eo && o.eo.core) s += coreSVG(g);
+    if(o.caries) s += cariesSVG(g, true);
+    /* restorations by surface (Patient Box v2's resto); a v1 tooth with only amalgam:true keeps its occlusal restoration */
+    if(o.resto && o.resto.length) s += o.resto.map(function(r){ return restoSVG(g, r, C); }).join('');
     else if(o.amalgam) s += amalgamSVG(g);
-    if(o.caries) s += cariesSVG(g);
-    if(o.crown) s += crownSVG(g);
+    if(o.caries) s += cariesSVG(g, false, C);
+    if(o.crownMat) s += crownMatSVG(g);
+    else if(o.crown) s += crownSVG(g);
+    if(o.crown && o.margin) s += marginSVG(g);
+    (o.fx || []).forEach(function(f){ if(f.type === 'hrf') s += hrfSVG(g, f); if(f.type === 'cusp' && /L/.test(f.cusp)) s += cuspFadeSVG(g, f); });
     if(o.calc) s += calcSVG(g);
     return s;
   }
+  /* px from the library's mm (mesial at -x, the cervix at 0, the crown up) */
+  function mmPx(g, pts){ return pts.map(function(q){ return [g.X(q[0]), g.cej - q[1] * g.k]; }); }
+  /* a half-plane clip (Sutherland-Hodgman, one edge: fine for any polygon), the cut edge made a little irregular the same way
+     for every layer it crosses, so the enamel, dentin and pulp end on one fracture line */
+  function sideOf(A, B, p){ return (B[0] - A[0]) * (p[1] - A[1]) - (B[1] - A[1]) * (p[0] - A[0]); }
+  function clipHalf(poly, A, B, keep, jag){
+    var sk = sideOf(A, B, keep) > 0 ? 1 : -1, out = [], n = poly.length, i;
+    for(i = 0; i < n; i++){ var p = poly[i], q = poly[(i + 1) % n], sp = sk * sideOf(A, B, p), sq = sk * sideOf(A, B, q);
+      if(sp >= 0) out.push(p);
+      if((sp >= 0) !== (sq >= 0)){ var tt = sp / (sp - sq); out.push([p[0] + (q[0] - p[0]) * tt, p[1] + (q[1] - p[1]) * tt, 1]); } }
+    if(!jag || out.length < 3) return out;
+    var L = Math.hypot(B[0] - A[0], B[1] - A[1]) || 1, ux = (B[0] - A[0]) / L, uy = (B[1] - A[1]) / L, res = [];
+    for(i = 0; i < out.length; i++){ var a = out[i], b = out[(i + 1) % out.length]; res.push(a);
+      if(a[2] && b[2]){ var sa = (a[0] - A[0]) * ux + (a[1] - A[1]) * uy, sb = (b[0] - A[0]) * ux + (b[1] - A[1]) * uy, step = jag * 1.6, m = Math.max(1, Math.round(Math.abs(sb - sa) / step));
+        for(var j = 1; j < m; j++){ var sj = sa + (sb - sa) * j / m, u = sj / (jag * 7), off = jag * (Math.sin(u * 2.3) + .5 * Math.sin(u * 5.9 + 1.3)) * sk;
+          res.push([A[0] + ux * sj - uy * off, A[1] + uy * sj + ux * off]); } } }
+    return res;
+  }
+  /* where a crown fracture or a fractured buccal cusp cuts the crown (mm, then px): enamel only a corner chip, into the dentin a
+     larger piece, into the pulp an oblique loss through the horn (Andreasen's classes, as Cohen's draws them) */
+  function fxLine(d, f){
+    var w = d.cw / 2, h = d.ch, sg = f.side === 'd' ? 1 : -1, hy = TL.hornsMM(d)[0][1];
+    if(f.type === 'crown'){
+      if(f.depth === 'enamel') return [[sg * (w + .3), h - 1.7], [sg * (w - 1.9), h + .4]];
+      if(f.depth === 'dentin') return [[sg * (w + .3), h - 3.3], [sg * (w - 3.6), h + .4]];
+      return [[sg * (w + .5), hy - 2.0], [-sg * (w + .5), hy + 1.6]];
+    }
+    if(f.cusp === 'B') return [[-(w + .5), h - 2.6], [w + .5, h - 1.5]];
+    var c = f.cusp.charAt(0) === 'M' ? -1 : 1;
+    return [[c * (w + .5), h - 2.7], [-c * .4, h + .4]];
+  }
+  function fxCut(g){
+    var f = (g.o.fx || []).filter(function(x){ return x.type === 'crown' || (x.type === 'cusp' && /B/.test(x.cusp)); })[0];
+    if(!f) return null;
+    var Lm = fxLine(g.d, f), A = mmPx(g, [Lm[0]])[0], B = mmPx(g, [Lm[1]])[0], keep = mmPx(g, [[0, .5]])[0];
+    return function(pts){ return clipHalf(pts, A, B, keep, .14 * g.k); };
+  }
+  /* a fractured lingual cusp: the buccal cusp still projects over its place, so the film shows one layer less there, not a gap */
+  function cuspFadeSVG(g, f){
+    var Lm = fxLine(g.d, { type:'cusp', cusp:f.cusp.replace('L', 'B') }), A = mmPx(g, [Lm[0]])[0], B = mmPx(g, [Lm[1]])[0], away = mmPx(g, [[0, g.d.ch + 3]])[0];
+    return path('xr-fade', clipHalf(g.crown, A, B, away, .14 * g.k));
+  }
+  /* a horizontal root fracture: a thin, slightly oblique, irregular radiolucent line across the root (and its filling) */
+  function hrfSVG(g, f){
+    var r = g.roots[0], k = g.k, tt = f.at === 'cervical' ? .24 : f.at === 'apical' ? .78 : .5, y = r.y0 + tt * r.len, x = rAx(r, tt), hw = rHw(r, tt) + .25 * k, top = [], bot = [];
+    for(var i = 0; i <= 8; i++){ var u = i / 8, xx = x - hw + 2 * hw * u, yy = y + (u - .5) * .9 * k + Math.sin(u * 9.1) * .12 * k, th = (.16 + .08 * Math.sin(u * 5.3 + 1)) * k; top.push([xx, yy - th]); bot.unshift([xx, yy + th]); }
+    return path('xr-frac', top.concat(bot));
+  }
   /* the pulp (the library's outline); in a root-filled tooth the chamber and canals are filled: a core in the chamber,
-     gutta-percha down the canals (endoSVG draws it over), so no dark pulp space is left */
-  function pulpSVG(g){
-    var cls = g.o.endo ? 'xr-core' : 'xr-pulp';
-    return TL.pulpPts(g.d, g.X, g.k, g.cej, g.roots).map(function(p){ return path(cls, p); }).join('');
+     gutta-percha down the canals (endoSVG draws it over), so no dark pulp space is left. With v2.1's detail (an endo object)
+     the canals are drawn dark and the gutta-percha goes over them, so a short filling or a missed canal leaves its canal
+     showing, and the chamber holds the core's material */
+  function pulpSVG(g, C){
+    var o = g.o, parts = TL.pulpPts(g.d, g.X, g.k, g.cej, g.roots), cut = C || function(p){ return p; };
+    if(!o.endo) return parts.map(function(p){ return path('xr-pulp', cut(p)); }).join('');
+    if(!o.eo) return parts.map(function(p){ return path('xr-core', p); }).join('');
+    var core = o.eo.core === 'composite' ? 'xr-comp' : o.eo.core ? 'xr-metal' : 'xr-core', yc = g.cej + .3 * g.k, s = '';
+    parts.forEach(function(p, i){
+      if(g.d.tr){ s += path(i === 0 ? core : 'xr-pulp', p); return; }
+      s += path('xr-pulp', p) + path(core, clipHalf(p, [0, yc], [1, yc], [g.x, g.cej - 6 * g.k]));
+    });
+    return s;
   }
-  /* a restoration's outline by its surfaces (the library's restoMM): metal for amalgam and gold, a lower radiopacity close to
-     enamel's, with a crisp edge, for composite */
-  function restoSVG(g, r){
-    var cls = r.mat === 'composite' ? 'xr-comp' : 'xr-metal';
-    return TL.restoMM(g.o.t, r.s).map(function(p){ return path(cls, p.map(function(q){ return [g.X(q[0]), g.cej - q[1] * g.k]; })); }).join('');
-  }
-  /* a root canal filling: radiopaque gutta-percha down each canal to just short of the apex */
+  function rootName(g, i){ var c = CAT(g.o.n); return c ? (c.pos >= 6 ? c.roots[i] : c.roots[0]) : ''; }
+  /* a root canal filling: radiopaque gutta-percha down each canal to just short of the apex (v1: endo:true). The detail
+     (Cohen's Pathways of the Pulp; White and Pharoah): adequate ends 0.5-2 mm short of the radiographic apex; short more than
+     2 mm short, the canal dark beyond it; long past the apex with a puff of sealer; voids dark gaps in a poorly condensed
+     filling; a separated instrument a thin, brighter fragment in the apical third with the filling stopping on it; a missed
+     canal no filling at all; a post down the coronal two thirds, leaving 4-5 mm of gutta-percha: cast (as bright as metal,
+     tapered, one piece with its core), prefabricated metal (parallel, serrated) or fiber (barely more radiopaque than dentin,
+     outlined by its cement). */
   function endoSVG(g){
-    var s = '', k = g.k;
+    var s = '', k = g.k, eo = g.o.eo;
+    if(eo) return endoDetailSVG(g, eo);
     g.roots.forEach(function(r){ var L = [], R = [], N = 10;
       for(var i = 0; i <= N; i++){ var t = .02 + .9 * i / N, x = rAx(r, t), y = r.y0 + t * r.len, hw = (.5 - .36 * t) * k; L.push([x - hw, y]); R.unshift([x + hw, y]); }
       s += path('xr-metal', L.concat(R)); });
     if(g.d.tr) s += path('xr-metal', [[g.X(-g.d.cv * .3), g.cej + 1.2 * k], [g.X(g.d.cv * .3), g.cej + 1.2 * k], [g.X(g.d.cv * .3), g.cej - .4 * k], [g.X(-g.d.cv * .3), g.cej - .4 * k]]);
     return s;
   }
+  function gpPts(r, k, t0, t1, f){ var L = [], R = [], N = 10; f = f || 1;
+    for(var i = 0; i <= N; i++){ var t = t0 + (t1 - t0) * i / N, x = rAx(r, t), y = r.y0 + t * r.len, hw = (.5 - .36 * t) * k * f; L.push([x - hw, y]); R.unshift([x + hw, y]); }
+    return L.concat(R); }
+  function postRoot(g){ var c = CAT(g.o.n); if(c && c.pos >= 6) return isUpper(g.o.n) && g.back ? g.back : g.roots[1]; return g.roots[0]; }
+  function endoDetailSVG(g, eo){
+    var s = '', k = g.k, fill = eo.fill || 'adequate';
+    g.roots.forEach(function(r, i){
+      var name = rootName(g, i); if(eo.missed && eo.missed === name) return;
+      var sep = eo.sep && eo.sep === name, t1 = sep ? .68 : fill === 'short' ? Math.max(.45, 1 - 3.8 * k / r.len) : fill === 'long' ? 1 : .92;
+      s += path('xr-metal', gpPts(r, k, .02, t1, fill === 'voids' ? .82 : 1));
+      if(fill === 'long'){ var ax = rAx(r, 1), ay = r.y0 + r.len, dx = rAx(r, 1) - rAx(r, .9), dy = .1 * r.len, l = Math.hypot(dx, dy) || 1, ux = dx / l, uy = dy / l, e = 1.3 * k;
+        s += path('xr-metal', [[ax - .2 * k, ay - .2 * k], [ax + ux * e - .08 * k, ay + uy * e], [ax + ux * e + .08 * k, ay + uy * e], [ax + .2 * k, ay - .2 * k]]);
+        [[.2, 1.25, .5, .32], [-.55, 1.0, .34, .26], [.75, .7, .3, .22]].forEach(function(b){ s += '<ellipse class="xr-sealer" cx="' + f1(ax + ux * e + b[0] * k) + '" cy="' + f1(ay + b[1] * k) + '" rx="' + f1(b[2] * k) + '" ry="' + f1(b[3] * k) + '"/>'; }); }
+      if(fill === 'voids') [.3, .52, .7].forEach(function(t, j){ s += '<ellipse class="xr-void" cx="' + f1(rAx(r, t) + (j % 2 ? .08 : -.08) * k) + '" cy="' + f1(r.y0 + t * r.len) + '" rx="' + f1(.13 * k) + '" ry="' + f1(.55 * k) + '"/>'; });
+      if(sep) s += path('xr-file', gpPts(r, k, .71, .9, .34));
+    });
+    if(g.d.tr && !eo.core) s += path('xr-metal', [[g.X(-g.d.cv * .3), g.cej + 1.2 * k], [g.X(g.d.cv * .3), g.cej + 1.2 * k], [g.X(g.d.cv * .3), g.cej - .4 * k], [g.X(-g.d.cv * .3), g.cej - .4 * k]]);
+    if(eo.post){ var r = postRoot(g), te = Math.min(.62, 1 - 4.8 * k / r.len), L = [], R = [], N = 8;
+      for(var i = 0; i <= N; i++){ var t = te * i / N, x = rAx(r, t), y = r.y0 + t * r.len, hw = (eo.post === 'cast' ? .72 - .3 * t / te : .52) * k;
+        if(eo.post === 'metal' && i % 2) hw += .09 * k;
+        L.push([x - hw, y]); R.unshift([x + hw, y]); }
+      var top = r.y0 - 1.6 * k, pts = [[L[0][0], top]].concat(L, R, [[R[R.length - 1][0], top]]);
+      s += eo.post === 'fiber' ? path('xr-fiber', pts) : path('xr-metal', dense(pts, true, 2)); }
+    return s;
+  }
+  /* a core build-up (or a cast core) inside a crown: the preparation's stump above a 1.8 mm ferrule of the tooth's own dentin */
+  function coreSVG(g){
+    var eo = g.o.eo, cls = eo.core === 'composite' ? 'xr-comp' : 'xr-metal', P = TL.prepMM(g.o.t, g.o.crownMat || 'pfm'), y = g.cej - 1.8 * g.k;
+    return path(cls, clipHalf(mmPx(g, P.poly), [0, y], [1, y], [g.x, g.top]));
+  }
+  /* a restoration's outline by its surfaces (the library's restoParts): metal for amalgam and gold, crisp and bright; composite a
+     little less radiopaque than enamel, its edge softer (a faint halo drawn under it, which also hides the seam where its parts
+     overlap); a ceramic inlay or onlay less radiopaque still, outlined by its radiopaque resin cement; a veneer a faint shell over
+     the labial face. An open margin's gap is dark. */
+  function restoSVG(g, r, C){
+    var cut = C || function(p){ return p; }, P = TL.restoParts(g.o.t, r.s, { mat:r.mat, type:r.type, overhang:r.overhang, open:r.open });
+    var shapes = P.shapes.map(function(p){ return cut(mmPx(g, p)); }), s = '';
+    if(r.type === 'veneer') return shapes.map(function(p){ return path('xr-veneer', p); }).join('');
+    var cls = r.mat === 'composite' ? 'xr-comp' : r.mat === 'ceramic' ? 'xr-cer' : 'xr-metal';
+    if(cls !== 'xr-metal') s += shapes.map(function(p){ return path(cls + '-edge', p); }).join('');
+    s += shapes.map(function(p){ return path(cls, p); }).join('');
+    return s + P.gaps.map(function(p){ return path('xr-gap', mmPx(g, p)); }).join('');
+  }
+  /* v1's amalgam:true: an occlusal amalgam, drawn as the library's Class I (v2.1's cleaner outline) */
   function amalgamSVG(g){
+    if(posOf(g.o.n || 4) >= 4) return path('xr-metal', mmPx(g, TL.restoMM(g.o.t, 'O')[0]));
     var k = g.k, d = g.d;
     var occ = g.crown.filter(function(p){ return p[1] < g.top + d.ch * .42 * k; });
     var floor = g.top + d.ch * .5 * k, box = g.top + d.ch * .66 * k;
@@ -515,23 +744,80 @@
   }
   /* caries on a film (White and Pharoah), the library's cariesMM: a proximal lesion just cervical to the contact, a triangle
      in the enamel pointing at the DEJ, then (dentin, pulp) spreading along the DEJ with a second triangle toward the pulp;
-     an occlusal lesion only once it is in the dentin; a facial or lingual one a fainter round shadow at the cervical third */
-  function cariesSVG(g){
-    return g.o.caries.map(function(c){ return TL.cariesMM(g.o.t, c.s, c.depth).map(function(sh){
-      return path('xr-car' + (sh.face ? ' xr-car-f' : ''), sh.pts.map(function(q){ return [g.X(q[0]), g.cej - q[1] * g.k]; })); }).join(''); }).join('');
+     an occlusal lesion only once it is in the dentin; a facial or lingual one a fainter round shadow at the cervical third.
+     Recurrent caries (recurrent:true) is drawn first, under the restoration: a radiolucency apical to its gingival floor and
+     along its axial wall (or under a crown's margin) */
+  function cariesSVG(g, recur, C){
+    var cut = C || function(p){ return p; };
+    return g.o.caries.map(function(c){
+      if(!!c.recurrent !== !!recur) return '';
+      if(recur) return TL.recurMM(g.o.t, c.s, c.depth, { crown:g.o.crown ? (TL.PREP[g.o.crownMat] || TL.PREP.pfm).m : 0 }).map(function(p){ return path('xr-car', mmPx(g, p)); }).join('');
+      return TL.cariesMM(g.o.t, c.s, c.depth).map(function(sh){
+      return path('xr-car' + (sh.face ? ' xr-car-f' : ''), cut(sh.pts.map(function(q){ return [g.X(q[0]), g.cej - q[1] * g.k]; }))); }).join(''); }).join('');
   }
   /* a full-coverage crown: a metal (or metal-ceramic) cap that follows the crown outline down to a margin at the CEJ */
   function crownSVG(g){
     var k = g.k, inner = g.crown.map(function(p){ var dx = g.x - p[0], dy = (g.top + g.d.ch * .7 * k) - p[1], L = Math.sqrt(dx * dx + dy * dy) || 1; return [p[0] + dx / L * .9 * k, p[1] + dy / L * .9 * k]; });
     return path('xr-metal', g.crown.concat(inner.slice().reverse()), false, 'opacity:.92');
   }
-  /* calculus: bright spurs on the proximal root surfaces just below the CEJ, on the outer side of the leftmost and the
-     rightmost root (a mirrored tooth, mesial on the right, lists its mesial root first: the spurs go on the proximal
-     surfaces, never into the furcation) */
+  /* a crown by its material (v2.1; White and Pharoah, Rosenstiel's preparations). Full gold: the whole crown as bright as metal,
+     nothing of the tooth showing through. Porcelain-fused-to-metal: the metal coping as bright as metal over the whole
+     preparation, a metal collar at the margin, and the porcelain over it a layer less radiopaque, about enamel's. Zirconia:
+     nearly as radiopaque as metal, the preparation faintly seen through it. Lithium disilicate: hardly more radiopaque than
+     dentin, the preparation and the pulp seen through it, outlined by the radiopaque resin cement. Stainless steel: a thin
+     metal shell, brightest at its edges where the beam meets it side on, its margin crimped in just below the cervical line. */
+  function crownMatSVG(g){
+    var m = g.o.crownMat, P = TL.prepMM(g.o.t, m), L = P.L, all = mmPx(g, L.C), s = '';
+    var ring = mmPx(g, L.C.slice(0, L.iv + 1)).concat(mmPx(g, P.arc).reverse());
+    if(m === 'gold') return path('xr-metal', all);
+    if(m === 'pfm') return path('xr-porc', all) + path('xr-metal', mmPx(g, TL.prepMM(g.o.t, 'pfm', { extra:.5, collar:1.0 }).poly));
+    if(m === 'zirconia') return path('xr-zr', ring) + path('xr-zr-in', mmPx(g, P.poly));
+    if(m === 'lithium') return path('xr-li', ring) + path('xr-cement', mmPx(g, P.arc), true);
+    var v = g.d.cv / 2, arc = L.C.slice(0, L.iv + 1), sh = [[-v + .4, -.75], [-v + .05, -.3]].concat(arc, [[v - .05, -.3], [v - .4, -.75]]);
+    return path('xr-ssc', mmPx(g, sh)) + path('xr-ssc-rim', mmPx(g, sh), true);
+  }
+  function crownCls(m){ return m === 'pfm' ? 'xr-porc' : m === 'zirconia' ? 'xr-zr' : m === 'lithium' ? 'xr-li' : 'xr-metal'; }
+  /* a crown's margin: open (the crown stands off its finish line, a dark gap where crown should be) or overhanging (a ledge
+     past the root's contour) */
+  function marginSVG(g){
+    var mg = g.o.margin, d = g.d, v = d.cv / 2, s = '', m = g.o.crownMat || 'gold', P = TL.prepMM(g.o.t, m), pm = (TL.PREP[m] || TL.PREP.gold).m;
+    [[-1, 'm'], [1, 'd']].forEach(function(e){ var sg = e[0];
+      if(String(mg.open || '').indexOf(e[1]) >= 0) s += path('xr-gap', mmPx(g, [[sg * v, 0], [TL.sideAt(P.L.C, .7, sg), .7], [TL.sideAt(P.poly, .7, sg), .7], [sg * (v - pm), 0]]));
+      if(String(mg.overhang || '').indexOf(e[1]) >= 0) s += path(crownCls(m), mmPx(g, dense([[TL.sideAt(P.L.C, 1.0, sg) - sg * .1, 1.0], [sg * (v + .5), .35], [sg * (v + .85), -.2], [sg * (v + .45), -.45], [sg * (v - .1), -.15]], false, 4)));
+    });
+    return s;
+  }
+  /* calculus on a film (White and Pharoah, Newman and Carranza): radiopaque spurs on the proximal root surfaces just apical to the
+     CEJ, thickest near the CEJ and tapering apically, never below the bone crest (it sits in the pocket), its outer edge a little
+     irregular; on the outer side of the leftmost and the rightmost root, so it never sits in a furcation. Seen tangentially,
+     the deposit that rings the root interproximally makes a spur on each side. */
   function calcSVG(g){
-    var k = g.k, s = '', a = g.roots[0], b = g.roots[g.roots.length - 1], r0 = a.a0 <= b.a0 ? a : b, rN = r0 === a ? b : a;
-    [[r0, -1], [rN, 1]].forEach(function(e){ var r = e[0], sg = e[1]; for(var i = 0; i < 3; i++){ var t = .08 + i * .09, x = rAx(r, t) + sg * rHw(r, t), y = r.y0 + t * r.len;
-      s += path('xr-lam', [[x, y - .5 * k], [x + sg * (.7 + (i % 2) * .3) * k, y + .1 * k], [x, y + .7 * k]]); } });
+    var k = g.k, s = '', a = g.roots[0], b = g.roots[g.roots.length - 1], r0 = a.a0 <= b.a0 ? a : b, rN = r0 === a ? b : a, c = crestLR(g);
+    [[r0, -1, c[0]], [rN, 1, c[1]]].forEach(function(e, j){
+      var r = e[0], sg = e[1], y0 = g.cej + .15 * k, y1 = Math.min(g.cej + 3.4 * k, Math.max(g.cej + 1.3 * k, e[2] - .6 * k)), inner = [], outer = [], N = 12, seed = (+g.o.n || 3) * 1.7 + j * 2.3;
+      for(var i = 0; i <= N; i++){ var u = i / N, y = y0 + (y1 - y0) * u, tt = Math.max(0, (y - r.y0) / r.len), x = rAx(r, tt) + sg * rHw(r, tt);
+        var th = (u < .2 ? .2 + 2.6 * u : .72 * Math.pow(1 - (u - .2) / .8, 1.3)) * k * (1 + .2 * Math.sin(u * 13 + seed)) + .02 * k;
+        inner.push([x - sg * .05 * k, y]); outer.push([x + sg * th, y]); }
+      s += path('xr-calc', dense(outer, false, 3).concat(inner.reverse())); });
+    return s;
+  }
+  /* a pontic over the ridge: no root; gold all metal, porcelain-fused-to-metal a metal framework inside its porcelain */
+  function ponticSVG(g){
+    var m = g.o.pontic, P = TL.ponticMM(g.o.t), body = mmPx(g, P);
+    if(m === 'pfm') return path('xr-porc', body) + path('xr-metal', mmPx(g, TL.shrink(P, g.d.ch * .4, function(p){ return p[1] < 0 ? .9 : 1.3; }, 3)));
+    return path(crownCls(m), body);
+  }
+  /* a bridge's connectors: the joints at the contacts between a pontic and its neighbors in the bridge */
+  function connectorsSVG(gs){
+    var s = '';
+    for(var i = 0; i + 1 < gs.length; i++){ var A = gs[i], B = gs[i + 1];
+      if(!((A.o.pontic && (B.o.pontic || B.o.abut)) || (B.o.pontic && A.o.abut))) continue;
+      var m = A.o.pontic || B.o.pontic, k = A.k, xa = A.x + A.d.cw * k / 2, xb = B.x - B.d.cw * k / 2, x = (xa + xb) / 2;
+      var hc = (TL.CONTACT[A.o.t][1] * A.d.ch + TL.CONTACT[B.o.t][0] * B.d.ch) / 2, y = (A.cej + B.cej) / 2 - (hc - .6) * k;
+      var bx = function(hw, hh){ return TL.filletClosed([[x - hw * k, y - hh * k], [x + hw * k, y - hh * k], [x + hw * k, y + hh * k], [x - hw * k, y + hh * k]], Math.min(hw, hh) * .8 * k); };
+      /* a metal-ceramic connector is metal inside its porcelain */
+      if(m === 'pfm') s += path('xr-porc', bx(1.0, 1.5)) + path('xr-metal', bx(.6, 1.05));
+      else s += path(crownCls(m), bx(.9, 1.4)); }
     return s;
   }
   function implantSVG(g){
@@ -616,17 +902,38 @@
        down the apical third and opens into a round radiolucency around the apex, the lamina dura gone there; darker at
        its middle and fading into the bone at its edge (the cortical plates still lie over it, so it is not as dark as soft
        tissue). The apex sits inside it. */
-    gs.forEach(function(g){ if(!g.o.lesion || g.o.implant) return; var rr = g.o.lesion / 2 * g.k, pdl = g.o.pdl || .2;
-      g.roots.forEach(function(r){
+    gs.forEach(function(g){ if(!(g.o.lesion || g.o.apdl) || g.o.implant) return; var rr = (g.o.lesion || 0) / 2 * g.k, pdl = g.o.pdl || .2;
+      /* a missed canal's lesion sits at its own root's apex */
+      var mi = g.o.eo && g.o.eo.missed ? g.roots.map(function(r, i){ return rootName(g, i); }).indexOf(g.o.eo.missed) : -1;
+      g.roots.forEach(function(r, ri){ if(mi >= 0 && ri !== mi) return;
         /* the PDL space, normal at the root's middle, widening smoothly to about .9 mm at the apex */
         var L = [], R = [], N = 12, i, t, wd;
         for(i = 0; i <= N; i++){ t = .5 + .5 * i / N; wd = (pdl + .7 * Math.pow((t - .5) / .5, 1.6)) * g.k; L.push([rAx(r, t) - rHw(r, t) - wd, r.y0 + t * r.len]); R.unshift([rAx(r, t) + rHw(r, t) + wd, r.y0 + t * r.len]); }
         var ax = rAx(r, 1), ay = r.y0 + r.len, ar = r.wa + (pdl + .7) * g.k;
         for(i = 1; i < 8; i++){ var th = Math.PI - i * Math.PI / 8; L.push([ax + Math.cos(th) * ar, ay + Math.sin(th) * ar]); }
         s += path('xr-pdl xr-apdl', L.concat(R));
+        if(!g.o.lesion) return;
         var cy = ay + rr * .22;
         [1.25, 1.1, .95, .8, .65].forEach(function(f){ s += '<ellipse class="xr-lesion" cx="' + f1(ax) + '" cy="' + f1(cy) + '" rx="' + f1(rr * f) + '" ry="' + f1(rr * .86 * f) + '"/>'; });
       }); });
+    gs.forEach(function(g){ (g.o.fx || []).forEach(function(f){ if(f.type === 'vrf') s += vrfSVG(g, f); }); });
+    return s;
+  }
+  /* a vertical root fracture (Cohen's; White and Pharoah): a "J-shaped" radiolucency, bone lost in a narrow band down one side
+     of the fractured root from the crest, joining a radiolucency round its apex and turning a little way up the other side;
+     soft-edged, in three layers like a lesion */
+  function vrfSVG(g, f){
+    var k = g.k, ri = f.root ? Math.max(0, g.roots.map(function(r, i){ return rootName(g, i); }).indexOf(f.root)) : (CAT(g.o.n).pos >= 6 ? 0 : 0), r = g.roots[ri];
+    if(!r) return '';
+    var sgT = f.side === 'd' ? 1 : -1, sg = g.sg * sgT, c = crestLR(g), crest = sg < 0 ? c[0] : c[1], t0 = Math.max(.05, (crest - r.y0) / r.len + .02), s = '';
+    [[1.35, .45], [1, .7], [.7, .9]].forEach(function(L){ var wsc = L[0], A = [], B = [], i, t;
+      for(i = 0; i <= 12; i++){ t = t0 + (1 - t0) * i / 12; var wd = (.35 + .55 * Math.pow((t - t0) / (1 - t0), .8)) * k * wsc, x = rAx(r, t) + sg * rHw(r, t);
+        A.push([x + sg * (wd + .15 * k), r.y0 + t * r.len]); B.unshift([x + sg * .1 * k, r.y0 + t * r.len]); }
+      var ax = rAx(r, 1), ay = r.y0 + r.len, rr = r.wa + .75 * k * wsc;
+      for(i = 0; i <= 8; i++){ var th = (sg > 0 ? 0 : Math.PI) + sg * i * Math.PI / 8 * -1; A.push([ax + Math.cos(th) * rr, ay + Math.abs(Math.sin(th)) * rr]); }
+      for(i = 10; i >= 7; i--){ t = i / 10; A.push([rAx(r, t) - sg * (rHw(r, t) + (.12 + .5 * (t - .7)) * k * wsc), r.y0 + t * r.len]); }
+      for(i = 7; i <= 10; i++){ t = i / 10; A.push([rAx(r, t) - sg * (rHw(r, t) + .05 * k), r.y0 + t * r.len]); }
+      s += path('xr-vrf', dense(A, false, 2).concat(B), false, 'opacity:' + L[1]); });
     return s;
   }
   /* a periapical film of the case's teeth: bone levels, defects, furcations, restorations and implants from the model */
@@ -642,6 +949,8 @@
       seed += +t.n * (i + 3);
       width += d.cw;
       if(o.at) x.at = o.at(t.n);
+      /* a pontic stands in its missing tooth's place: drawn like a tooth with no root */
+      if(t.missing && t.pontic){ x.pontic = t.pontic; x.bone = [0, 0]; list.push(x); return; }
       if(t.missing){ if(o.at) return; if(list.length) list[list.length - 1].gapAfter = (list[list.length - 1].gapAfter || 0) + d.cw; else gapFirst += d.cw; return; }
       /* bone loss % of root length -> mm below the normal crest (1.5 mm below the CEJ); an implant's bone is in mm
          below its platform, which sits at that crest line */
@@ -649,6 +958,8 @@
       x.bone = [bm, bd]; x.vdef = [t.vdef.m || 0, t.vdef.d || 0]; x.furcX = t.furcX;
       x.crown = t.crown; x.endo = t.endo; x.amalgam = t.amalgam; x.calc = t.calc; x.lift = t.raw.lift || 0; x.halo = t.halo;
       if(t.resto.length) x.resto = t.resto; if(t.caries.length) x.caries = t.caries; if(t.lesion) x.lesion = t.lesion;
+      if(t.crownMat) x.crownMat = t.crownMat; if(t.margin.open || t.margin.overhang) x.margin = t.margin; if(t.eo) x.eo = t.eo;
+      if(t.apdl) x.apdl = true; if(t.fx.length) x.fx = t.fx; if(t.abut) x.abut = true;
       if(t.mob >= 2) x.pdl = .34;
       if(t.implant){ x.implant = t.implant; x.cover = !!t.implant.cover; }
       list.push(x);
@@ -657,7 +968,7 @@
     var w = o.w || Math.round(width * k + 48);
     if(!list.length){ var empty = '<rect class="xr-soft" x="0" y="0" width="' + w + '" height="' + h + '"/><rect class="xr-bone" x="0" y="' + f1(occ + 9 * k) + '" width="' + w + '" height="' + h + '"/>';
       return { inner:empty, bg:empty, teeth:'', w:w, h:h, up:up, ts:ts }; }
-    var gs = rowXR(list, 20, occ, k), bg = filmBG(gs, w, h, seed, o.tb), teethSVG = gs.map(toothSVG).join('');
+    var gs = rowXR(list, 20, occ, k), bg = filmBG(gs.filter(function(g){ return !g.o.pontic; }), w, h, seed, o.tb), teethSVG = gs.map(toothSVG).join('') + connectorsSVG(gs);
     /* bg and teeth apart too: a bitewing lays both rows' backgrounds down before either row's teeth, so the cusps meet */
     return { inner:bg + teethSVG, bg:bg, teeth:teethSVG, w:w, h:h, up:up, ts:ts };
   }
@@ -798,22 +1109,42 @@
       M:[[cx + mx * r, cy - r], [cx + mx * r, cy + r], [cx + mx * q, cy + q], [cx + mx * q, cy - q]],
       D:[[cx - mx * r, cy - r], [cx - mx * r, cy + r], [cx - mx * q, cy + q], [cx - mx * q, cy - q]] };
     function key(x){ return x === 'B' ? 'F' : x === 'I' ? 'O' : x; }
-    var fill = {}, car = {};
-    t.resto.forEach(function(rs){ rs.s.split('').forEach(function(x){ fill[key(x)] = 'dc-o-' + rs.mat; }); });
-    t.caries.forEach(function(cr){ car[key(cr.s)] = cr.depth; });
+    var fill = {}, car = {}, rec = {}, ind = false;
+    t.resto.forEach(function(rs){ rs.s.split('').forEach(function(x){ fill[key(x)] = 'dc-o-' + rs.mat + (rs.type === 'veneer' ? ' dc-o-ven' : ''); }); if(rs.type === 'inlay' || rs.type === 'onlay') ind = true; });
+    t.caries.forEach(function(cr){ if(cr.recurrent) rec[key(cr.s)] = 1; else car[key(cr.s)] = cr.depth; });
+    var cm = t.crownMat || t.pontic, LET = { gold:'G', pfm:'P', zirconia:'Z', lithium:'L', ssc:'S' };
+    if(t.abut || t.pontic){ var rn = up ? +n + 1 : +n - 1, ln = up ? +n - 1 : +n + 1, by = up ? cy + r + 3.5 : cy - r - 3.5;
+      [[rn, 1], [ln, -1]].forEach(function(e){ var m = e[0]; if(m < 1 || m > 32 || !adjacent(n, m)) return; var u = tooth(spec, String(m)); if(!((u.pontic || u.abut) && (u.pontic || t.pontic))) return;
+        out += '<path class="dc-o-bar" d="M' + f1(cx) + ' ' + f1(by) + 'h' + f1(e[1] * OD.cw / 2) + '"/>'; }); }
+    if(t.missing && t.pontic){
+      ['O', 'F', 'L', 'M', 'D'].forEach(function(x){ out += path('dc-osurf dc-o-crowned' + (cm === 'gold' ? ' dc-o-gold' : ''), P[x]); });
+      out += '<rect class="dc-o-crown" x="' + f1(cx - r - 2) + '" y="' + f1(cy - r - 2) + '" width="' + (2 * r + 4) + '" height="' + (2 * r + 4) + '" rx="3.5"/>' + txt(cx, cy + 2.6, LET[cm] || '', 'dc-olet', 'middle');
+      var py = edge + dir * 6;
+      return out + '<path class="dc-ox dc-o-nroot" d="M' + f1(cx - 3) + ' ' + f1(py - 3) + 'l6 6m0 -6l-6 6"/>';
+    }
     if(t.missing){
       ['O', 'F', 'L', 'M', 'D'].forEach(function(x){ out += path('dc-osurf dc-o-gone', P[x]); });
       return out + '<path class="dc-ox" d="M' + f1(cx - r - 1) + ' ' + f1(cy - r - 1) + 'l' + (2 * r + 2) + ' ' + (2 * r + 2) + 'm0 ' + (-2 * r - 2) + 'l' + (-2 * r - 2) + ' ' + (2 * r + 2) + '"/>';
     }
     var crowned = t.crown || t.implant;
     ['O', 'F', 'L', 'M', 'D'].forEach(function(x){
-      out += path('dc-osurf' + (crowned ? ' dc-o-crowned' : '') + (fill[x] ? ' ' + fill[x] : '') + (car[x] ? ' dc-o-caries' : ''), P[x]);
-      if(car[x]) out += hatch(P[x], 2.8); });
+      out += path('dc-osurf' + (crowned ? ' dc-o-crowned' : '') + (t.crownMat === 'gold' ? ' dc-o-gold' : '') + (fill[x] ? ' ' + fill[x] : '') + (car[x] ? ' dc-o-caries' : ''), P[x]);
+      if(car[x]) out += hatch(P[x], 2.8);
+      if(rec[x]) out += hatch(P[x], 2.8).replace('dc-o-hatch', 'dc-o-hatch dc-o-hatch-r'); });
+    if(ind) out += '<rect class="dc-o-ind" x="' + f1(cx - q - 1.6) + '" y="' + f1(cy - q - 1.6) + '" width="' + f1(2 * q + 3.2) + '" height="' + f1(2 * q + 3.2) + '" rx="1"/>';
+    if(t.crownMat) out += txt(cx, cy + 2.6, LET[t.crownMat], 'dc-olet', 'middle');
+    t.fx.forEach(function(f){
+      if(f.type === 'crown' || f.type === 'cusp') out += '<path class="dc-o-fx" d="M' + f1(cx - r + 1.5) + ' ' + f1(cy - 2) + 'l3.4 -3l3 4l3.2 -3.6l3.2 4l3 -3.2"/>';
+      if(f.type === 'crack') out += '<path class="dc-o-crack" d="M' + f1(cx - r + 1) + ' ' + f1(cy) + 'H' + f1(cx + r - 1) + '"/>';
+      if(f.type === 'vrf') out += '<path class="dc-o-fx" d="M' + f1(cx + 2.5) + ' ' + f1(edge + dir * 1.5) + 'l-2.4 ' + f1(dir * 2.6) + 'l2.4 ' + f1(dir * 2.6) + 'l-2.4 ' + f1(dir * 2.6) + 'l2.4 ' + f1(dir * 2.6) + '"/>';
+      if(f.type === 'hrf') out += '<path class="dc-o-fx" d="M' + f1(cx - 4.5) + ' ' + f1(edge + dir * 8) + 'l3 -1.6l3 3.2l3 -3.2"/>'; });
     if(crowned) out += '<rect class="dc-o-crown" x="' + f1(cx - r - 2) + '" y="' + f1(cy - r - 2) + '" width="' + (2 * r + 4) + '" height="' + (2 * r + 4) + '" rx="3.5"/>';
     if(t.implant){ var sy = edge + dir * 3;
       out += '<path class="dc-o-impl" d="M' + f1(cx) + ' ' + f1(sy) + 'v' + f1(dir * 11) + '"/><path class="dc-o-impl dc-o-thread" d="' +
         [0, 3.5, 7, 10.5].map(function(dy, i){ var hw = 4.2 - i * .7; return 'M' + f1(cx - hw) + ' ' + f1(sy + dir * dy) + 'h' + f1(2 * hw); }).join('') + '"/>'; }
     if(t.endo) out += '<path class="dc-o-endo" d="M' + f1(cx) + ' ' + f1(edge + dir * 2) + 'v' + f1(dir * 11) + '"/>';
+    if(t.eo && t.eo.post) out += '<path class="dc-o-post" d="M' + f1(cx) + ' ' + f1(edge + dir * 1.5) + 'v' + f1(dir * 5.5) + '"/>';
+    if(t.eo && t.eo.sep) out += '<path class="dc-o-sep" d="M' + f1(cx - 3) + ' ' + f1(edge + dir * 10.5) + 'h6"/>';
     if(t.lesion){
       if(!t.endo) out += '<path class="dc-o-root" d="M' + f1(cx) + ' ' + f1(edge + dir * 2) + 'v' + f1(dir * 11) + '"/>';
       out += dot('dc-o-lesion', cx, edge + dir * 15.6, 3.1);
@@ -847,10 +1178,21 @@
     var Hn = y - 3, occl = (ys[1] + R + ys[2] - lab) / 2;
     var narrow = '<svg class="dc-odo dc-odo-n" viewBox="0 0 ' + Wn + ' ' + Hn + '" role="img" aria-label="' + esc(label + ', one quadrant to a row') + '">' +
       '<rect class="dc-paper" x="0" y="0" width="' + Wn + '" height="' + Hn + '" rx="10"/><path class="dc-mid" d="M' + pad + ' ' + f1(occl) + 'H' + (Wn - pad) + '"/>' + n + '</svg>';
-    return '<div class="dc-ow">' + wide + narrow + odoKey() + odoText(spec) + '</div>';
+    return '<div class="dc-ow">' + wide + narrow + odoKey(odoHas(spec)) + odoText(spec) + '</div>';
   };
   /* the key, drawn with the chart's own marks */
-  function odoKey(){
+  /* which of v2.1's marks the record has (the key shows those only) */
+  function odoHas(spec){
+    var h = {};
+    for(var n = 1; n <= 32; n++){ var t = tooth(spec, String(n));
+      if(t.crownMat) h.letters = 1; if(t.pontic || t.abut) h.bridge = 1; if(t.eo && t.eo.post) h.post = 1; if(t.eo && t.eo.sep) h.sep = 1;
+      t.resto.forEach(function(r){ if(r.mat === 'ceramic') h.ceramic = 1; if(r.type === 'inlay' || r.type === 'onlay') h.ind = 1; if(r.type === 'veneer') h.ven = 1; });
+      t.caries.forEach(function(c){ if(c.recurrent) h.rec = 1; });
+      t.fx.forEach(function(f){ h[f.type === 'crack' ? 'crack' : 'fx'] = 1; }); }
+    return h;
+  }
+  function odoKey(has){
+    has = has || {};
     var sq = [[2, 2], [14, 2], [14, 14], [2, 14]];
     function k(inner, label){ return '<span class="dc-ok"><svg class="dc-oks" viewBox="0 0 16 16" aria-hidden="true">' + inner + '</svg>' + label + '</span>'; }
     return '<div class="pchart-key dc-okey">' +
@@ -861,24 +1203,53 @@
       k('<path class="dc-o-root" d="M8 1V8"/>' + dot('dc-o-lesion', 8, 11.5, 3.1), 'periapical lesion') +
       k('<path class="dc-o-impl" d="M8 1.5V14.5"/><path class="dc-o-impl dc-o-thread" d="M3.5 3h9M4.3 6.5h7.4M5 10h6M5.8 13.5h4.4"/>', 'implant') +
       k('<path class="dc-ox" d="M2.5 2.5L13.5 13.5M13.5 2.5L2.5 13.5"/>', 'missing') +
+      (has.ceramic ? k(path('dc-osurf dc-o-ceramic', sq), 'ceramic') : '') +
+      (has.ind ? k(path('dc-osurf', sq) + '<rect class="dc-o-ind" x="4" y="4" width="8" height="8" rx="1"/>', 'inlay or onlay') : '') +
+      (has.ven ? k(path('dc-osurf dc-o-ceramic dc-o-ven', sq), 'veneer') : '') +
+      (has.rec ? k(path('dc-osurf dc-o-amalgam', sq) + hatch(sq, 3.2).replace('dc-o-hatch', 'dc-o-hatch dc-o-hatch-r'), 'recurrent caries') : '') +
+      (has.letters ? '<span class="dc-ok">crown letters: G gold, P porcelain-fused-to-metal, Z zirconia, L lithium disilicate, S stainless steel</span>' : '') +
+      (has.bridge ? k('<path class="dc-o-bar" d="M1 8H15"/>', 'bridge (pontic: crowned box, no root)') : '') +
+      (has.post ? k('<path class="dc-o-endo" d="M8 1.5V14.5"/><path class="dc-o-post" d="M8 1.5V7"/>', 'post') : '') +
+      (has.sep ? k('<path class="dc-o-endo" d="M8 1.5V14.5"/><path class="dc-o-sep" d="M5 11H11"/>', 'separated instrument') : '') +
+      (has.fx ? k('<path class="dc-o-fx" d="M1.5 9l3 -3l3 4l3 -4l3.5 3.5"/>', 'fracture') : '') +
+      (has.crack ? k('<path class="dc-o-crack" d="M1.5 8H14.5"/>', 'crack') : '') +
       '<span class="dc-okey-t">Upper teeth on top. Each tooth\'s facial side faces out and its mesial the midline; the marks beyond a tooth sit on its root, toward the apex. The patient\'s right is on your left.</span></div>';
   }
   /* the same record as text, for a screen reader and for anyone who can't read the small squares */
   function odoText(spec){
     var miss = [], notes = [];
     for(var n = 1; n <= 32; n++){ var t = tooth(spec, String(n)), c = CAT(n), bits = [];
-      if(t.missing){ miss.push('#' + n); continue; }
+      if(t.missing){ miss.push('#' + n); if(t.pontic) notes.push('#' + n + ': pontic (' + CROWN_NAME[t.pontic].replace(' crown', '') + ')'); continue; }
       if(t.implant) bits.push('implant');
-      if(t.crown) bits.push('crown');
-      t.resto.forEach(function(r){ bits.push(r.s + ' ' + r.mat); });
-      t.caries.forEach(function(r){ bits.push('caries ' + r.s + ' (' + r.depth + ')'); });
-      if(t.endo) bits.push('root canal filling');
+      if(t.crown) bits.push((t.abut ? 'bridge abutment, ' : '') + (t.crownMat ? CROWN_NAME[t.crownMat] : 'crown'));
+      if(t.margin.open) bits.push('open crown margin ' + t.margin.open.toUpperCase());
+      if(t.margin.overhang) bits.push('overhanging crown margin ' + t.margin.overhang.toUpperCase());
+      t.resto.forEach(function(r){ bits.push(r.s + ' ' + r.mat + (r.type && r.type !== 'direct' ? ' ' + r.type : '') + (r.overhang ? ', overhang ' + r.overhang.toUpperCase() : '') + (r.open ? ', open margin ' + r.open.toUpperCase() : '')); });
+      t.caries.forEach(function(r){ bits.push((r.recurrent ? 'recurrent caries ' : 'caries ') + r.s + ' (' + r.depth + ')'); });
+      if(t.endo){ var e = t.eo || {}; bits.push('root canal filling' + (e.fill && e.fill !== 'adequate' ? ' (' + (e.fill === 'long' ? 'overfilled' : e.fill === 'voids' ? 'with voids' : 'short') + ')' : ''));
+        if(e.post) bits.push((e.post === 'cast' ? 'cast post and core' : e.post + ' post') + (e.core && e.core !== 'cast' ? ', ' + e.core + ' core' : ''));
+        else if(e.core) bits.push(e.core + ' core');
+        if(e.sep) bits.push('separated instrument in the ' + e.sep + ' root'); if(e.missed) bits.push('the ' + e.missed + ' canal not filled'); }
+      if(t.apdl) bits.push('widened apical PDL');
       if(t.lesion) bits.push('periapical lesion');
+      t.fx.forEach(function(f){ bits.push(f.type === 'crown' ? 'crown fracture (' + f.depth + ')' : f.type === 'cusp' ? 'fractured ' + f.cusp + ' cusp' : f.type === 'crack' ? 'cracked tooth' : f.type === 'vrf' ? 'vertical root fracture' : 'horizontal root fracture (' + f.at + ' third)'); });
       if(bits.length) notes.push('#' + n + ': ' + bits.join(', '));
     }
     return '<details class="dc-otext"><summary>The chart as text</summary><p>' + (miss.length ? 'Missing: ' + miss.join(', ') + '. ' : 'No teeth missing. ') + esc(notes.join('; ')) + (notes.length ? '.' : '') + '</p></details>';
   }
 
+  /* a fractured crown or buccal cusp on the drawn view: the piece gone, the fracture face's dentin showing (deeper than the
+     enamel), and the pulp a red point where it is exposed */
+  function viewFx(cr, f, d, V, tcls){
+    var Lm = fxLine(d, f), A = V([Lm[0]])[0], B = V([Lm[1]])[0], keep = V([[0, .5]])[0], k = Math.hypot(B[0] - A[0], B[1] - A[1]) / Math.hypot(Lm[1][0] - Lm[0][0], Lm[1][1] - Lm[0][1]);
+    var cut = clipHalf(cr, A, B, keep, .14 * k), s = '';
+    if(f.type === 'crown' && f.depth === 'enamel') return path(tcls, cut);
+    var L = Math.hypot(B[0] - A[0], B[1] - A[1]), nx = -(B[1] - A[1]) / L, ny = (B[0] - A[0]) / L, sk = sideOf(A, B, keep) > 0 ? 1 : -1, o = -1.1 * k * sk;
+    s += path(tcls + ' io-fxd', cut) + path(tcls, clipHalf(cr, [A[0] - nx * o, A[1] - ny * o], [B[0] - nx * o, B[1] - ny * o], keep, .14 * k));
+    if(f.depth === 'pulp'){ var hp = V([TL.hornsMM(d)[f.side === 'd' ? 1 : 0]])[0], t = ((hp[0] - A[0]) * (B[0] - A[0]) + (hp[1] - A[1]) * (B[1] - A[1])) / (L * L);
+      s += dot('io-pulp', A[0] + (B[0] - A[0]) * t - nx * o * .45, A[1] + (B[1] - A[1]) * t - ny * o * .45, .55 * k); }
+    return s;
+  }
   /* ---------- the drawn buccal view ---------- */
   I.view = function(spec, o){
     spec = prep(spec); o = o || {}; var ts = teethOf(spec, o.teeth), up = isUpper(ts[0].n), k = o.k || 8.2, g = spec.gingiva || {};
@@ -898,15 +1269,27 @@
     /* teeth: the labial crown outline, roots behind the gum (seen where there is recession) */
     cols.forEach(function(c){
       var d = c.d, sg = c.mr ? -1 : 1, cej = occ + dir * d.ch * k;
-      if(c.t.missing || (c.t.implant && c.t.implant.cover)) return;
       function X(px){ return c.cx + sg * px * k; }
+      function V(pts){ return pts.map(function(p){ return [X(p[0]), cej - dir * p[1] * k]; }); }
+      if(c.t.missing && c.t.pontic){ s += path('io-tooth pfm cr-' + c.t.pontic + (up ? '' : ' low'), V(TL.ponticMM(typeOf(c.t.n), { per:4 }))); return; }
+      if(c.t.missing || (c.t.implant && c.t.implant.cover)) return;
       if(!c.t.implant){
         var roots = mkRoots(d, X, k, cej).map(function(r){ return { a0:r.a0, a1:r.a1, w0:r.w0, wa:r.wa, y0:cej, len:dir * r.len }; });
         roots.forEach(function(r){ var pts = rootOutline({ a0:r.a0, a1:r.a1, w0:r.w0, wa:r.wa, y0:0, len:Math.abs(r.len) }, 0, 0, 0).map(function(p){ return [p[0], cej + dir * p[1]]; }); s += path('io-root', pts); });
         if(d.tr){ var tp = trunkPts(roots.map(function(r){ return { a0:r.a0, a1:r.a1, w0:r.w0, wa:r.wa, y0:0, len:Math.abs(r.len) }; }), sg, 0, -1, d.tr * k, k); if(tp) s += path('io-root', tp.map(function(p){ return [p[0], cej + dir * p[1]]; })); }
       }
       var cr = dense(crownMM(d), true, 4).map(function(p){ return [X(p[0]), cej - dir * p[1] * k]; });
-      s += path('io-tooth' + (c.t.crown || c.t.implant ? ' pfm' : '') + (up ? '' : ' low'), cr);
+      var ven = c.t.resto.some(function(r){ return r.type === 'veneer'; }), fx = c.t.fx.filter(function(f){ return f.type === 'crown' || (f.type === 'cusp' && /B/.test(f.cusp)); })[0];
+      var tcls = 'io-tooth' + (c.t.crown || c.t.implant ? ' pfm' : '') + (up ? '' : ' low') + (c.t.crownMat ? ' cr-' + c.t.crownMat : '') + (ven ? ' cr-veneer' : '');
+      if(!fx) s += path(tcls, cr);
+      else s += viewFx(cr, fx, d, V, tcls);
+      /* what of a restoration shows from the buccal: a Class V, a Class III or IV, an onlay over the buccal cusps, a groove
+         extension (the proximal boxes of a Class II don't show) */
+      c.t.resto.forEach(function(r){ if(r.type === 'veneer') return; var cat = CAT(c.t.n), fs = r.s.indexOf(cat.surfaces[3]) >= 0, ant = posOf(c.t.n) <= 3;
+        if(!(fs || r.type === 'onlay' || (ant && /[MDI]/.test(r.s)))) return;
+        var parts = TL.restoParts(typeOf(c.t.n), r.type === 'onlay' ? 'O' : r.s, { per:4, mat:r.mat, type:r.type }).shapes;
+        if(!fs && r.type !== 'onlay' && !ant) return;
+        parts.forEach(function(p, i){ if(r.type !== 'onlay' && !ant && i === 0 && /O/.test(r.s)) return; s += path('io-r io-r-' + r.mat + (ant && !fs && !/I/.test(r.s) ? ' io-r-faint' : ''), V(p)); }); });
       if(c.t.implant) s += path('io-margin', [[c.cx - d.cv / 2 * k, cej], [c.cx + d.cv / 2 * k, cej]], true);
     });
     /* the free gingiva: its margin follows recession at the three facial sites (negative recession: margin on the crown,
@@ -915,6 +1298,7 @@
     cols.forEach(function(c, i){
       var d = c.d, cej = occ + dir * d.ch * k, so = siteOrder(c.t.n), sx = [c.cx - d.cw * .34 * k, c.cx, c.cx + d.cw * .34 * k];
       var left = c.cx - d.cw / 2 * k, right = c.cx + d.cw / 2 * k, pap = (edema ? 1.6 : 2.6) * k;
+      if(c.t.missing && c.t.pontic){ edge.push([left, cej - dir * .3 * k], [c.cx, cej - dir * .45 * k], [right, cej - dir * .3 * k]); return; }
       if(c.t.missing || (c.t.implant && c.t.implant.cover)){ edge.push([left, cej + dir * 1.2 * k], [c.cx, cej + dir * 1.8 * k], [right, cej + dir * 1.2 * k]); return; }
       if(i === 0) edge.push([-6, cej - dir * pap * .35], [left - 6, cej - dir * pap * .5], [left, cej - dir * pap]);
       so.forEach(function(si, j){ var rec = c.t.rec.f[si], my = cej + dir * rec * k + (j === 1 ? dir * (c.d.cej || 0) * k : 0);
@@ -925,7 +1309,6 @@
         if(c.t.bop.f[si]) marks += dot('dc-blood', sx[j], my + dir * 2.2, 2.4);
         if(c.t.pus.f[si]) marks += dot('dc-pusdrop', sx[j] + 4, my + dir * 5, 2.8);
         if(c.t.plaque.f[si]) marks += path('dc-plaque', [[sx[j] - 4, my - dir * .2 * k], [sx[j] + 4, my - dir * .2 * k], [sx[j] + 3, my - dir * 1.1 * k], [sx[j] - 3, my - dir * 1.0 * k]]); });
-      if(c.t.calc) marks += path('dc-calc', [[left + 2, cej - dir * .3 * k], [left + 6, cej - dir * 1.4 * k], [left + 11, cej - dir * .4 * k]]) + path('dc-calc', [[right - 2, cej - dir * .3 * k], [right - 6, cej - dir * 1.5 * k], [right - 11, cej - dir * .5 * k]]);
       var nx = cols[i + 1];
       edge.push([right, cej - dir * pap]);
       if(nx && !nx.t.missing) edge.push([(right + nx.cx - nx.d.cw / 2 * k) / 2, cej - dir * pap * 1.1]);
@@ -936,6 +1319,14 @@
     if(look !== 'inflamed' && g.stippling !== false){ var r = rnd(7 + n), cejM = 0; cols.forEach(function(c){ cejM += (occ + dir * c.d.ch * k) / n; });
       for(var i = 0; i < 70; i++){ var px = 20 + r() * (W - 40), py = cejM + dir * (.6 * k + r() * (kt - .8 * k)); s += dot('dc-stipple', px, py, .9); } }
     s += marks;
+    /* supragingival calculus (Newman and Carranza): a yellow-tan deposit along the gingival third, hugging the margin, thickest
+       interproximally, its crown-side edge irregular */
+    cols.forEach(function(c, ci){ if(!c.t.calc || c.t.missing || c.t.implant) return;
+      var l = c.cx - c.d.cw / 2 * k + 2, r2 = c.cx + c.d.cw / 2 * k - 2, low = e.filter(function(p){ return p[0] >= l && p[0] <= r2; });
+      if(low.length < 3) return;
+      var hi = low.map(function(p, i){ var u = (p[0] - l) / (r2 - l), th = k * (.45 + .9 * Math.pow(Math.abs(u - .5) * 2, 2.2)) * (1 + .22 * Math.sin(u * 17 + ci * 2.1) + .12 * Math.sin(u * 41 + ci));
+        return [p[0], p[1] - dir * th]; });
+      s += path('dc-calc', low.map(function(p){ return [p[0], p[1] + dir * .4]; }).concat(dense(hi, false, 2).reverse())); });
     cols.forEach(function(c){ s += txt(c.cx, up ? H - 10 : 18, '#' + c.t.n, 'io-lab', 'middle'); });
     var label = o.aria || ('Drawn ' + (up ? 'upper' : 'lower') + ' buccal view of ' + ts.map(function(t){ return '#' + t.n; }).join(', ') + ': the gingiva ' + (look === 'inflamed' ? 'red and swollen' : look === 'fibrotic' ? 'pale and fibrotic' : 'pink and stippled') + ', drawn from the chart');
     return '<svg class="io dc-view" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + esc(label) + '">' + s + '</svg>';
@@ -1017,7 +1408,7 @@
   /* answerable from what's shown: each question says what its key rests on (q.rests: stage, grade, extent, rt, furc, impl,
      kind), and this fails when the figures and rows it shows don't include it. The twin of hide, which stops a picture
      from giving the answer away. */
-  var RESTS = ['stage', 'grade', 'extent', 'rt', 'furc', 'impl', 'kind'];
+  var RESTS = ['stage', 'grade', 'extent', 'rt', 'furc', 'impl', 'kind', 'endo', 'fracture', 'resto'];
   I.RESTS = RESTS;
   I.answerable = function(spec, figs, rows, rests){
     spec = prep(spec); figs = figs || []; rows = rows || []; var P = [], D = I.derive(spec), m = spec.mouth || {};
@@ -1058,6 +1449,32 @@
       if(k === 'rt') Object.keys(D.rt).forEach(function(n){ if(!chart(n)) P.push('rt: the recession type of #' + n + ' needs its chart (facial recession and interdental CAL)'); });
       if(k === 'furc' && D.furc && !(chart(D.furcTooth, function(f){ return !(f.hide && f.hide.furc); }) || (film(D.furcTooth) && tooth(spec, D.furcTooth).furcX))) P.push('furc: the furcation of #' + D.furcTooth + ' is not shown');
       if(k === 'impl') Object.keys(D.impl).forEach(function(n){ if(!film(n)) P.push('impl: the implant at #' + n + ' needs its film'); });
+      /* v2.1: endodontic findings need a periapical (film or full-mouth series: a bitewing stops short of the apices); fractures
+         each by what shows them (a crack on no film at all: a row with the bite test or transillumination, or the odontogram; a
+         vertical root fracture on a periapical or as its narrow pocket on the chart; a horizontal one on a periapical; a crown
+         or cusp fracture on any film, the drawn view or the odontogram); restorations, crowns and bridges on a film or the
+         odontogram (or the view for what shows from the buccal), and a margin's overhang, gap or recurrent caries on a film */
+      var all = allOf(spec).filter(function(t){ return !t.missing || t.pontic; });
+      function pa(n){ return inFig(['film', 'fmx'], n); }
+      function xr(n){ return inFig(['film', 'bitewing', 'fmx'], n); }
+      function odo(n){ return inFig(['odontogram'], n); }
+      function vw(n){ return inFig(['view'], n); }
+      if(k === 'endo'){ var en = all.filter(function(t){ return t.endo || t.lesion || t.apdl; });
+        if(!en.length) P.push('endo: the record has no endodontic finding');
+        en.forEach(function(t){ if(!pa(t.n)) P.push('endo: #' + t.n + '\'s root canal filling, lesion or PDL needs a periapical (film or fmx)'); }); }
+      if(k === 'fracture'){ var fxs = all.filter(function(t){ return t.fx.length; });
+        if(!fxs.length) P.push('fracture: the record has no fracture');
+        fxs.forEach(function(t){ t.fx.forEach(function(f){ var n = t.n;
+          if(f.type === 'crack' && !(odo(n) || row(/bite|biting|release|crack|transillum|wedg|chew/i))) P.push('fracture: a cracked tooth (#' + n + ') shows on no film; give the bite test or transillumination in a row, or the odontogram');
+          if(f.type === 'vrf' && !(pa(n) || chart(n))) P.push('fracture: #' + n + '\'s vertical root fracture needs its periapical or its chart (the narrow pocket)');
+          if(f.type === 'hrf' && !pa(n)) P.push('fracture: #' + n + '\'s horizontal root fracture needs its periapical');
+          if(f.type === 'crown' && !(xr(n) || vw(n) || odo(n))) P.push('fracture: #' + n + '\'s crown fracture needs a film, the view or the odontogram');
+          if(f.type === 'cusp' && !(xr(n) || odo(n) || (/B/.test(f.cusp) && vw(n)))) P.push('fracture: #' + n + '\'s fractured cusp needs a film or the odontogram' + (/B/.test(f.cusp) ? ', or the view' : '')); }); }); }
+      if(k === 'resto'){ var rs = all.filter(function(t){ return t.crown || t.resto.length || t.pontic || t.amalgam; });
+        if(!rs.length) P.push('resto: the record has no restoration');
+        rs.forEach(function(t){ var n = t.n, margin = t.margin.open || t.margin.overhang || t.resto.some(function(r){ return r.overhang || r.open; }) || t.caries.some(function(c){ return c.recurrent; });
+          if(margin && !xr(n)) P.push('resto: #' + n + '\'s margin (an overhang, an open margin or recurrent caries) needs a film');
+          else if(!margin && !(xr(n) || odo(n) || vw(n))) P.push('resto: #' + n + '\'s restoration needs a film, the odontogram or the view'); }); }
     });
     return P;
   };
