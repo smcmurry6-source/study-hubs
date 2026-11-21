@@ -228,7 +228,7 @@
      - incisor or canine: proximal (Class III) a rounded shape at the contact, its outer edge the proximal surface; with the
        incisal edge (Class IV) it takes the incisal angle, its inner edge an oblique bevel; incisal alone a band;
      - inlay (gold or ceramic): Class II's outline with walls that diverge occlusally (it is drawn out of its preparation);
-       onlay: the boxes plus every cusp, reduced about 1.8 mm along their own inclines; veneer: a shell over the labial face,
+       onlay: the boxes plus every cusp, reduced along their own inclines (gold 1.5 mm, ceramic 1.8 mm); veneer: a shell over the labial face,
        short of the cervical line, to the incisal edge.
      Internal line angles are rounded (r 0.3 mm; composite 0.45, a rounder, more conservative preparation). */
   function sideAt(pts, y, sg){
@@ -362,10 +362,12 @@
     }
     function floorIn(sg){ var g = gyE(sg); return [[G.axX(sg), g], [G.axX(sg) - sg * ta, pf]]; }
     if(kind === 'onlay'){
-      /* the cusps reduced along their inclines (about 1.8 mm), the boxes as an inlay's */
+      /* the cusps reduced along their inclines, the boxes as an inlay's: gold 1.5 mm (Sturdevant's: 1.5 mm over the functional
+         cusps, 1.0 over the others; a film shows the deeper), ceramic 1.8 mm (lithium disilicate's 1.5-2.0 mm occlusal reduction) */
+      var rd = o.mat === 'gold' ? 1.5 : 1.8;
       var ym = hasM ? gyE(-1) : h - 2.3, yd = hasD ? gyE(1) : h - 2.3, top = overArc(L, ym, yd);
       var xa = hasM ? G.axX(-1) + ta : top[0][0] + .15, xb = hasD ? G.axX(1) - ta : top[top.length - 1][0] - .15, red = [];
-      for(var i = 0; i <= 12; i++){ var x = xb + (xa - xb) * i / 12; red.push([x, topAt(C, x) - 1.8]); }
+      for(var i = 0; i <= 12; i++){ var x = xb + (xa - xb) * i / 12; red.push([x, topAt(C, x) - rd]); }
       red = shrink(red, 0, function(){ return 0; }, 3);
       var inner = (hasD ? [[G.axX(1), gyE(1)]] : []).concat(red, hasM ? [[G.axX(-1), gyE(-1)]] : []);
       var lin = fillet([top[top.length - 1]].concat(inner, [top[0]]), r);

@@ -43,6 +43,20 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   archived hubs' tint lines left `widget/hub.css` (and Perio's darker ink), and `widget/eggs.js`'s VT323 fetch for pages
   without `shx`. The `shx` class stays (the preview's pill and the figure builds select it). Nothing students see, except the
   random name now following. `tools/release/xp.js` checks the flag; `tools/ci/quiet.js` passed.
+- **2026-11-21 (Patient Box v2.1's clinical calls settled from outside sources, Claude Code)** — Sam: "Use outside sources to
+  determine answers" to the questions v2.1's review left. Radiopacity on a film now follows mm-Al studies (Pekkan 2011, Atala
+  2019, Erzurumlu 2021, Hitij and Fidler 2013, Balci 2023): zirconia nearly as bright as metal, composite about enamel's or a
+  little more, lithium disilicate between dentin and enamel (nearer dentin), feldspathic porcelain (a PFM's, a ceramic inlay's)
+  about dentin's, a veneer a faint extra layer (`widget/cases.css`). A molar's access cavity flares to the occlusal instead of
+  narrowing, and an incisor's `L` composite on a root-filled tooth is drawn as its access, not a Class V. `validate()`: a
+  root-filled tooth needs its access restored (a crown, or a restoration with O on a posterior tooth or L on an anterior one; a
+  veneer alone fails: Ray and Trope 1995); a stainless steel crown only on a molar (AAPD 2026); a vertical root fracture on an
+  untreated, unrestored tooth only on a molar marked `vital: true` (Liao 2017, 2021). A gold onlay's cusps are reduced 1.5 mm,
+  a ceramic one's 1.8 (`widget/teeth.js`). The odontogram's pontic: its root crossed out with a full-length X, and a key entry
+  for it (and, on a phone, room between a lower quadrant's name and a bridge's bar). Kept, with sources: short fill > 2 mm, 4-5 mm of gutta-percha under a post, calculus's size, the box floor, no
+  horizontal root fracture on the view. `tools/ci/cases.js` checks the new rules; the four examples and Perio's eleven old cases
+  still pass. Sources in `widget/cases.js`'s header and [draw-a-patient-box-case](vault/how-to/draw-a-patient-box-case.md).
+  `sw.js` VERSION sh-v71.
 - **2026-11-21 (No test run can reach the class's data, BUG-197, Claude Code)** — `tools/ci/quiet.js`'s mock check still wrote
   two question-health rows per run into Review of Systems (22 on the evening of 11-20). Found behind a recording proxy: a
   request still waiting in a Playwright route when its page closes is sent on to the network, and the check closes its page

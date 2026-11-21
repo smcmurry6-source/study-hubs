@@ -40,14 +40,17 @@ what v2.0 left, so it isn't lost. Its own track (Sam, 2026-11-06, [decisions](..
       fills, posts and cores, a separated instrument, a missed canal (v2.1)
 - [x] Fractures (Sam, 2026-11-21): crown, cusp, crack, vertical and horizontal root fractures, on every view, with the checks
       that keep a question off a picture that can't show one (a crack on no film) (v2.1)
-- [ ] Sam looks at v2.1's drawings with their first case (crown materials, posts, fractures, bridges, the redrawn fillings
-      and calculus), the way the box above says; the screenshots are in v2.1's PR. Three calls the review left for Sam: how
-      bright zirconia and lithium disilicate are drawn against enamel and metal, the access cavity's shape on an uncrowned
-      root-filled tooth, and the calculus spur's size on a film; and whether the odontogram's small X on a pontic's root reads
-      as "missing" (the key says "no root")
-- [ ] A root-filled incisor or canine whose only restoration is a veneer passes `validate()`, though its access is lingual
-      and the veneer doesn't cover it (the film draws a composite access anyway): Sam's call whether that should need a
-      restoration of its own
+- [x] The four calls v2.1's review left, settled from outside sources (Sam, 2026-11-21: "Use outside sources to determine
+      answers"; citations in `widget/cases.js`'s header): zirconia drawn nearly as bright as metal and lithium disilicate between
+      dentin and enamel, nearer dentin, feldspathic porcelain about dentin's and composite about enamel's (Pekkan 2011, Atala
+      2019, Erzurumlu 2021, Hitij and Fidler 2013); the access cavity as wide as the chamber with walls flaring to the occlusal,
+      lingual on an anterior (Cohen's, ADEX); the calculus spur kept (films show only thick deposits: Buchanan 1987, Hyer 2021);
+      the pontic's root crossed out with a full X and a key entry (the charting convention)
+- [x] A root-filled incisor or canine with only a veneer now fails `validate()`: its lingual access needs its own composite
+      (`L`, drawn as the access), as a posterior one needs a restoration with O (Ray and Trope 1995; a veneer on a root-filled
+      tooth is accepted, Gresnigt 2019, but doesn't seal the access)
+- [ ] Sam still looks at v2.1's drawings with their first case (crown materials, posts, fractures, bridges, the redrawn
+      fillings and calculus, and the answers above), the way the first box says
 - [ ] Root tips, resorption, sealants and temporary restorations (left out of v2.1; optional in Sam's ask)
 - [ ] A crack's own row: the kit has no bite-test or transillumination field, so a crack question gives its finding in the
       question's `pbox`; a `tests` field in the record would put it in the case's own rows
@@ -71,6 +74,10 @@ what v2.0 left, so it isn't lost. Its own track (Sam, 2026-11-06, [decisions](..
   radiopacity, calculus smaller and irregular on films and tapered on the view, the horizontal root fracture ending at the
   root's surface; the bridge materials checked, data-built class names whitelisted and the chart table escaped, the
   odontogram's key wrapping on a phone and ceramic lighter there. Added two boxes above.
+- 2026-11-21: v2.1's open questions answered from outside sources (branch `claude/patient-box-v2-1-answers`): radiopacity,
+  the access cavity and the rule that it is restored, the veneer, stainless steel crowns on molars only, an untreated vertical
+  root fracture only on a molar marked `vital`, onlay reduction by material, the pontic's chart mark. Ticked the two boxes;
+  Sam's look with the first case stays open.
 
 ## Outcome
 
