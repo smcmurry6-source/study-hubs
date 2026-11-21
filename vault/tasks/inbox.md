@@ -17,6 +17,16 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   Read it again a busy evening after `migration_v84.sql` (live 2026-11-20) with the bootstrap; if it's still slow, time it on
   a throwaway copy first-of-page against warmed, and against the body before `migration_v76.sql`, before changing anything
   ([the pass](done/2026-11-18-database-optimization-pass.md), its Log).
+  **Read 2026-11-21 (Claude Code, read-only): no busy evening yet, so nothing changed.** Friday night (Nov 20, 6-10 pm Central,
+  the edge logs) had 398 requests, 5 answer saves and **no** mastery reads: Heme & Endo Exam 3 was over that morning and
+  Review of Systems is the only live hub, its Mock 1 on Thu Dec 3. Since v84 (Nov 20, 2:45 am to Nov 21, 2:45 am Central)
+  all 33 mastery reads came on exam morning (3 am to 9 am Central), median 433 ms, 95th percentile 1.2 s at the edge, beside
+  209 bootstraps (median 439 ms, 1.7 s). `pg_stat_statements` (still no reset since 2026-11-18 20:57 UTC): 2,240 calls,
+  613 s, so 21 calls and about 13 s since the 2:30 am readout of Nov 20 (about 620 ms each, too few to read). A lead for the
+  copy: about 5,600 buffer pages touched a call on average (12.6 million over 2,240, 44 MB read from memory each), where
+  `get_rank_profile_v2` touches 73. **Read it next on Thu Dec 3, 1-5 am Central**, for Wed Dec 2's evening (the eve of Mock
+  1): the edge logs for Dec 3 00:00-04:00 UTC, `pg_stat_statements` less the totals above; if a few people or more opened
+  the hub and the median is still over about 250 ms, time it on the copy as above.
 - [ ] **Review of Systems: weigh the mock by what Mock 1 asked** (2026-11-19, the hub's build): the hub's 200-question mock
   spreads its questions by the size of each course (`core.json` `mock.blueprint`), a guess: the course announced no counts.
   After Mock 1 (Thu Dec 3, noon), read its exam check-ins (which courses felt heavy, what surprised people) and, before Mock 2
@@ -30,7 +40,7 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   folders had the thinnest sources (classmates' guides, no professor slides), so those sections rest most on standard
   references. If Sam can share their slides or transcripts, check those parts against them. Sam, 2026-11-20: "ill get you the other
   slides soon": waiting on Sam.
-- [ ] **Run the test-runs data fix once more on 2026-11-21** (2026-11-19, the evening lessons audit): the PR that adds
+- [x] **Run the test-runs data fix once more on 2026-11-21** (2026-11-19, the evening lessons audit): the PR that adds
   `tools/ci/no-leaks.js` runs `tools/data-fixes/2026-11-19-test-runs.sql` after its merge, but a smoke test run locally from a
   branch older than the fix (another session's) still writes its game-layer check into the live hub until that branch takes
   `main`. Two days later, run it again (`node tools/after-merge/run.js ... --fix tools/data-fixes/2026-11-19-test-runs.sql`, or
@@ -38,7 +48,8 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   count(*)`), and tick BUG-192's retest. Until then, a Heme & Endo Exam 3 retrospective reads that hub's arcade and Timmy Time
   clicks of 11-19 as test runs. **Run `tools/data-fixes/2026-11-20-quiet-test-rows.sql` again with it** (2026-11-20, the Exam 3
   retrospective): `tools/ci/quiet.js`'s mock checks, run from those same older branches, wrote two `pq-` rows each into question
-  health (13 made-up visitors to 6:37 am on 11-20); today's `quiet.js` sends nothing past its routes (checked behind a refusing proxy). **2026-11-21, counted** (the data-fixes PR): the test-runs fix selects 1 visitor, the quiet fix 22 `pq-` rows in Review of Systems (today's `quiet.js` still leaks: [BUG-197](../release/bug-log.md)); the deletes run after the merge of #521, as `tools/data-fixes/2026-11-21-test-rows-again.sql` (both files' bodies, by the After merge workflow, since this session's connector couldn't answer its "are you sure?": the hook line below). Tick this once its result shows on `main` and a count finds no test visitors and no `pq-` rows left past BUG-197's.
+  health (13 made-up visitors to 6:37 am on 11-20); today's `quiet.js` sends nothing past its routes (checked behind a refusing proxy). **2026-11-21, counted** (the data-fixes PR): the test-runs fix selects 1 visitor, the quiet fix 22 `pq-` rows in Review of Systems (today's `quiet.js` still leaks: [BUG-197](../release/bug-log.md)); the deletes run after the merge of #521, as `tools/data-fixes/2026-11-21-test-rows-again.sql` (both files' bodies, by the After merge workflow, since this session's connector couldn't answer its "are you sure?": the hook line below). Tick this once its result shows on `main` and a count finds no test visitors and no `pq-` rows left past BUG-197's. **Done** (#521; checked in #524): #521's After merge run on `main` green, so `2026-11-21-test-rows-again.sql` ran; counted 2026-11-21 (read-only, each query alone): 0 test visitors in the test-runs selection and 0 `qid like 'pq-%'` rows in question events. BUG-192 retested; BUG-197's leak closed by `tools/ci/no-leaks.js`'s guard proxy (#524).
+- [ ] **Retest BUG-197 a day after #524 merges** (2026-11-21): count `select count(*) from question_events where qid like 'pq-%'` (read-only, under `statement_timeout = '5s'`); 0 means the guard proxy holds: set BUG-197 to retested. Any rows: add a data fix like `tools/data-fixes/2026-11-20-quiet-test-rows.sql` and look for the path the guard missed.
 - [ ] **The smoke test's game-layer wiring check runs again on the next hub with an arcade** (2026-11-20, Exam 3's page down):
   `tools/ci/smoke.js`'s `wiringCheck` (Million-Dollar Smile's sessions and answers, Timmy Time's minutes) needs a live engine hub
   with Smile in its `content/arcade.js`, and Review of Systems has no arcade, so it is skipped until one is built. When the next

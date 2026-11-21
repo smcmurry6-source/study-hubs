@@ -14,9 +14,21 @@
 // never a test's dispatched one, which tools/ci/quiet.js uses to act out a hidden page and wants to see), a request off
 // 127.0.0.1 is answered here, inside the page, and never sent. Everything the page sends while it is open still goes
 // through the test's own routes, as before.
+//
+// And the browser itself goes through a proxy that refuses everything (2026-11-21, BUG-197; launch() below). A request still
+// waiting in a route when its page closes is sent on to the network: Playwright drops the route with the page, and the
+// browser finishes the request (checked behind a recording proxy: a fetch, keepalive or not, whose route was still
+// waiting at page.close(); none when the route had already answered, or when only the context was closed). The in-page
+// guard above can't see it, because the page sent it while open. tools/ci/quiet.js's mock check does exactly that: it
+// acts out a hidden page (the widget flushes question health with keepalive), then closes it, and on a busy CI runner
+// the flush was sometimes still in its route: 22 `pq-` rows (ctx mock) in Review of Systems' question events on the
+// evening of 2026-11-20. With the proxy, nothing the browser sends off 127.0.0.1 can leave the machine, whatever the
+// routes do; it also overrides HTTPS_PROXY, which would otherwise take a cloud session's requests to the real project.
 'use strict';
+const http = require('http');
 
-module.exports = async function noLeaks(context){
+module.exports = noLeaks;
+async function noLeaks(context){
   await context.addInitScript(() => {
     let leaving = false;
     const mark = e => {
@@ -36,4 +48,24 @@ module.exports = async function noLeaks(context){
     XMLHttpRequest.prototype.open = function(m, u){ this.__shUrl = u; return open0.apply(this, arguments); };
     XMLHttpRequest.prototype.send = function(){ if (leaving && off(this.__shUrl)) return; return send0.apply(this, arguments); };
   });
+}
+
+/* chromium.launch() behind the refusing proxy. Loopback is named in bypass, or Playwright would send 127.0.0.1 through
+   the proxy too. Every request that reaches the proxy is refused and counted; the count is printed when the browser
+   closes (it means a route missed something, which is worth knowing, but nothing left the machine). */
+noLeaks.launch = async function launch(chromium, options){
+  const stopped = [];
+  const guard = http.createServer((req, res) => { stopped.push(req.url); res.writeHead(403); res.end(); });
+  guard.on('connect', (req, sock) => { stopped.push(req.url); sock.on('error', () => {}); sock.end('HTTP/1.1 403 Forbidden\r\n\r\n'); });
+  guard.on('clientError', (e, sock) => { try { sock.destroy(); } catch (x) {} });
+  await new Promise(r => guard.listen(0, '127.0.0.1', r));
+  let browser;
+  try { browser = await chromium.launch(Object.assign({}, options, { proxy: { server: `http://127.0.0.1:${guard.address().port}`, bypass: '127.0.0.1,localhost' } })); }
+  catch (e) { guard.close(); throw e; }
+  browser.on('disconnected', () => {
+    guard.close();
+    if (stopped.length) console.log(`no-leaks: ${stopped.length} request(s) the routes missed were stopped at the guard proxy (${[...new Set(stopped)].join(', ')})`);
+  });
+  noLeaks.stopped = stopped;
+  return browser;
 };

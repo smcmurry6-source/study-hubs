@@ -33,6 +33,26 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 ## Recent major changes (newest first — add a line when you ship something)
 
 - **2026-11-21 (A hub's restyle when the widget's stylesheet goes in, about 40 ms shorter, Claude Code, #525)** — The hub bundle puts `widget/v3.css` in as a `<style>` once the page is drawn, and the browser restyled every element for it: one rule set the class-picks fill color (`--sh-cp-fill`) on `:root`, and a custom property new to the root changes what every element inherits. It is set on `.sh-cp` now, the one element that reads it. On `perf.js`'s slow phone putting the sheet in went from about 58 to about 21 ms; Review of Systems' blocking time, about 237 to about 156 ms (medians of 10 alternating runs; budgets unchanged). Nothing looks different (every element's computed style compared, light and dark). `tools/release/perf.js` no longer has Chromium keep a copy of every response for DevTools (`Network.enable` with no buffers; Sam: "Yes if you think so"); it moved no page's numbers past their run-to-run spread, so the budgets stay. Also: Perio's five screens out of the a11y baseline, and `a11y.js`'s usage line names `review-of-systems`. Left: the inbox line "Cut `widget/v3.css` to the rules a hub on the engine draws".
+- **2026-11-21 (Patient Box v2.1's clinical calls settled from outside sources, Claude Code)** — Sam: "Use outside sources to
+  determine answers" to the questions v2.1's review left. Radiopacity on a film now follows mm-Al studies (Pekkan 2011, Atala
+  2019, Erzurumlu 2021, Hitij and Fidler 2013, Balci 2023): zirconia nearly as bright as metal, composite about enamel's or a
+  little more, lithium disilicate between dentin and enamel (nearer dentin), feldspathic porcelain (a PFM's, a ceramic inlay's)
+  about dentin's, a veneer a faint extra layer (`widget/cases.css`). A molar's access cavity flares to the occlusal instead of
+  narrowing, and an incisor's `L` composite on a root-filled tooth is drawn as its access, not a Class V. `validate()`: a
+  root-filled tooth needs its access restored (a crown, or a restoration with O on a posterior tooth or L on an anterior one; a
+  veneer alone fails: Ray and Trope 1995); a stainless steel crown only on a molar (AAPD 2026); a vertical root fracture on an
+  untreated, unrestored tooth only on a molar marked `vital: true` (Liao 2017, 2021). A gold onlay's cusps are reduced 1.5 mm,
+  a ceramic one's 1.8 (`widget/teeth.js`). The odontogram's pontic: its root crossed out with a full-length X, and a key entry
+  for it (and, on a phone, room between a lower quadrant's name and a bridge's bar). Kept, with sources: short fill > 2 mm, 4-5 mm of gutta-percha under a post, calculus's size, the box floor, no
+  horizontal root fracture on the view. `tools/ci/cases.js` checks the new rules; the four examples and Perio's eleven old cases
+  still pass. Sources in `widget/cases.js`'s header and [draw-a-patient-box-case](vault/how-to/draw-a-patient-box-case.md).
+  `sw.js` VERSION sh-v71.
+- **2026-11-21 (No test run can reach the class's data, BUG-197, Claude Code)** — `tools/ci/quiet.js`'s mock check still wrote
+  two question-health rows per run into Review of Systems (22 on the evening of 11-20). Found behind a recording proxy: a
+  request still waiting in a Playwright route when its page closes is sent on to the network, and the check closes its page
+  right after acting out a hidden one (whose keepalive `record_qh` flush was sometimes still in its route on a busy runner).
+  `tools/ci/no-leaks.js` now also launches the test browser behind a proxy that refuses everything off 127.0.0.1;
+  `quiet.js` and `smoke.js` use it. Test code only; nothing students see.
 - **2026-11-21 (A name changed on one linked device shows on the other, BUG-196, Claude Code)** — Sam: "When you change
   your name on one device it doesnt change on the other linked device. Its still saying 'welcome count plaqula'". Linked
   devices share one id, so the server already had the new name, but each device kept its own copy (`sh_display_name`) and
