@@ -42,7 +42,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   veneer alone fails: Ray and Trope 1995); a stainless steel crown only on a molar (AAPD 2026); a vertical root fracture on an
   untreated, unrestored tooth only on a molar marked `vital: true` (Liao 2017, 2021). A gold onlay's cusps are reduced 1.5 mm,
   a ceramic one's 1.8 (`widget/teeth.js`). The odontogram's pontic: its root crossed out with a full-length X, and a key entry
-  for it. Kept, with sources: short fill > 2 mm, 4-5 mm of gutta-percha under a post, calculus's size, the box floor, no
+  for it (and, on a phone, room between a lower quadrant's name and a bridge's bar). Kept, with sources: short fill > 2 mm, 4-5 mm of gutta-percha under a post, calculus's size, the box floor, no
   horizontal root fracture on the view. `tools/ci/cases.js` checks the new rules; the four examples and Perio's eleven old cases
   still pass. Sources in `widget/cases.js`'s header and [draw-a-patient-box-case](vault/how-to/draw-a-patient-box-case.md).
   `sw.js` VERSION sh-v71.

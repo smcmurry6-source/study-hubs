@@ -1294,7 +1294,7 @@
     w += odoRow(spec, range(1, 16), pad, 3, true) + odoRow(spec, range(32, 17), pad, 3 + R + gapY, false);
     var wide = '<svg class="dc-odo dc-odo-w" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + esc(label) + '">' + w + '</svg>';
     /* narrow: a row a quadrant, each named at its outer end, the midline marked at its inner end */
-    var Wn = 8 * cw + 2 * pad, lab = 12, rows = [['Upper right', range(1, 8), true, 'r'], ['Upper left', range(9, 16), true, 'l'], ['Lower right', range(32, 25), false, 'r'], ['Lower left', range(24, 17), false, 'l']];
+    var Wn = 8 * cw + 2 * pad, lab = 16, rows = [['Upper right', range(1, 8), true, 'r'], ['Upper left', range(9, 16), true, 'l'], ['Lower right', range(32, 25), false, 'r'], ['Lower left', range(24, 17), false, 'l']];
     var y = 2, n = '', ys = [];
     rows.forEach(function(rw, i){
       if(i === 2) y += 8;
