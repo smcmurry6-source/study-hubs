@@ -77,8 +77,8 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   other device now shows the server's name, but the bootstrap's `display_name` doesn't say whether it is a random one, so
   that device keeps it as its own (its name window offers "Go back to a random name"; the idea board asks for a name when it
   refuses one). Small: a `name_custom` flag in `get_widget_bootstrap_v2` (a migration copied from `main`'s newest copy), and
-  `nameFromServer` in `widget/v3.js` and `widget/dash.js` clears the device's copy when it's false. (#523: `migration_v94`, waiting
-  in `supabase/pending-migrations.txt` until it's applied; retested with BUG-196 after the merge.)
+  `nameFromServer` in `widget/v3.js` and `widget/dash.js` clears the device's copy when it's false. (#523: `migration_v94`, applied
+  2026-11-21 at 8:09 am Central; retested with BUG-196 after the merge.)
 - [ ] **Before the first collapse (about 2027-09-13), point the year-spanning readers at the totals** (2026-11-21, migration_v93):
   `sh_insights` (the admin page's Insights, every hub side by side), `get_hub_recap`, `tools/retro.sql` and `tools/lessons-daily.sql` read
   `activity_hourly` only, so a hub older than a year would show no time. Read `activity_daily` / `activity_visits_daily` (people per day,

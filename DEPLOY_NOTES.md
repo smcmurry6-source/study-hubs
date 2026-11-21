@@ -33,8 +33,8 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 ## Recent major changes (newest first — add a line when you ship something)
 
 - **2026-11-21 (Back to a random name on a linked device; the game layer's last fallbacks out, #523, Claude Code)** —
-  BUG-196's follow-up: `migration_v94` adds `name_custom` to `get_widget_bootstrap_v2` (true when `visitor_names` has the
-  id's row), and `nameFromServer` in `widget/v3.js` and `widget/dash.js` drops the device's copy when it's false, so "Go
+  BUG-196's follow-up: `migration_v94` (applied live 2026-11-21, 8:09 am Central, md5-checked) adds `name_custom` to
+  `get_widget_bootstrap_v2` (true when `visitor_names` has the id's row), and `nameFromServer` in `widget/v3.js` and `widget/dash.js` drops the device's copy when it's false, so "Go
   back to a random name" on one linked device reaches the other (before, the other kept the random name as one it had
   picked). The fallbacks for a database without the game layer came out: `widget/v3.js` always asks for
   `get_widget_bootstrap_v2` and never switches to the old answer calls (`GAME.want` is gone, `GAME.on` is never false);
