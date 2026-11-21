@@ -1,0 +1,1374 @@
+/* The three journeys' scenes (redesign phase 4, part A; vault/tasks/2026-11-06-redesign-progression-journeys.md).
+   Fetched by widget/ranks.js the first time one is needed, never with the page, and only on the redesign's pages
+   (a v2 rank profile, migration_v54). Nothing here runs on a live hub.
+
+     shJourneys.handoff(d, done)   a journey's Dark Matter III is done and the next object is handed over, once:
+                                   d = { from, to } (journeys 0-2). "The ModuPro is yours." Each has its own scene: the
+                                   ModuPro the typodont that eats the Handpiece; the Loupes the headlight's
+                                   sunbeam that burns the ModuPro away. Each shows the crowns it pays: 20,000 for the
+                                   ModuPro, 30,000 for the Loupes.
+     shJourneys.dark(d, done)      a journey's Dark Matter is reached, once per journey ever: d = { journey, position, of }
+                                   (where the student stands in the class, if known). It shows the 5,000 crowns it pays.
+     shJourneys.road(p)            the road ahead for the "you" panels, as markup: p is a v2 rank profile
+     shJourneys.css()              adds the stylesheet (the scenes and the road share it)
+
+   Both scenes are a dialog over the page: Esc closes them, Skip takes them to their last frame (what they give stays on
+   screen), the last button closes them,
+   focus goes back where it was. Reduced motion gets the last frame, faded in, with nothing moving. They move transform
+   and opacity only, but for the Dark Matter title's one sheen; the Dark Matter unlock's dust, burst, ring of light and
+   coins, and the hand-offs' typodont, the dust it pulls in, the Handpiece's shards, the beam's dust, embers, ash and coins, are each drawn on
+   one canvas.
+   No sound yet: the site has no sound setting, and these stay silent until it has one (a to-do in the journeys note).
+   The medallions are shRanks.artOf (the handpiece by ranks.js, the ModuPro and the loupes by widget/hub-art/journeys.js,
+   which is fetched first). When a scene reaches its peak it sends "sh:journey-scene", and "sh:journey-scene-end" when it
+   closes, so Timmy can say something on a hub's bar once the page is back. */
+(function(){
+  "use strict";
+  if (window.shJourneys || !window.shRanks) return;
+  var R = window.shRanks, T = R.TIERS, JN = R.JOURNEYS, ROMAN = ["I", "II", "III"];
+  function esc(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){ return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  function fmt(n){ return Number(n || 0).toLocaleString("en-US"); }
+  function reduced(){ try { return window.matchMedia("(prefers-reduced-motion: reduce)").matches; } catch (e) { return false; } }
+  function floorOf(j, t){ var K = window.SH_JOURNEY_ART; return K ? K.floor(j, t) : j ? Math.floor(125000 * j + t * 125000 / 7) : T[t].at; }
+  function stars(seed, n, w, h){
+    var s = "", x = seed;
+    for (var i = 0; i < n; i++){
+      x = (x * 9301 + 49297) % 233280; var cx = x / 233280 * w; x = (x * 9301 + 49297) % 233280; var cy = x / 233280 * h;
+      s += '<circle cx="' + cx.toFixed(1) + '" cy="' + cy.toFixed(1) + '" r="' + (i % 7 === 0 ? 1.6 : i % 3 === 0 ? 1 : .6) + '" fill="#fff" opacity="' + (i % 4 ? .7 : 1) + '"' + (i % 5 === 0 ? ' class="shj-tw" style="--tw:' + (i % 4) + '"' : "") + "/>";
+    }
+    return s;
+  }
+  var LOCK = '<svg class="shj-lock" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2.5" fill="currentColor"/><path d="M8.4 10.5V8a3.6 3.6 0 0 1 7.2 0v2.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>';
+  var CHECK = '<svg class="shj-check" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="currentColor"/><path d="M7.4 12.4l3 3 6.2-6.6" fill="none" stroke="#150B2E" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+  /* the Diamond medallion's tremble as the pull builds: a shake that grows to a rattle */
+  var TREMBLE = (function(){
+    var k = "@keyframes shj-tremble{0%{transform:none}";
+    for (var i = 1; i < 40; i++){
+      var p = i / 40, a = .4 + 7 * p * p, sx = i % 2 ? 1 : -1, sy = i % 3 ? -1 : 1;
+      k += (p * 100).toFixed(1) + "%{transform:translate(" + (sx * a).toFixed(1) + "px," + (sy * a * .7).toFixed(1) + "px) rotate(" + (sx * p * 3).toFixed(1) + "deg) scale(" + (1 + p * .08).toFixed(3) + ")}";
+    }
+    return k + "100%{transform:scale(1.08)}}";
+  })();
+
+  /* ---------- the stylesheet ---------- */
+  var CSS = [
+    ".shj{position:fixed;inset:0;z-index:2147483000;display:grid;place-items:center;overflow:hidden auto;padding:14px 16px;color:#F5F2F4;text-align:center;opacity:0;transition:opacity .4s ease;",
+    "background:radial-gradient(120% 90% at 50% 8%,#2A1456 0%,#130A2B 52%,#05020C 100%);font-family:var(--font,system-ui,sans-serif);-webkit-tap-highlight-color:transparent}",
+    ".shj.is-on{opacity:1}.shj.is-out{opacity:0;transition-duration:.28s}",
+    /* sized by the scene, not the viewport: the large text sizes zoom the page, and vw and vh don't follow the zoom (a 320px
+       phone at XX-Large has 221px for the scene, where 72vw is 230px). The design page's stills have no container, and
+       there cqw and cqh are the viewport's. */
+    ".shj:not(.shj-inline){container:shj / size}",
+    ".shj *{box-sizing:border-box}",
+    ".shj-sky{position:absolute;inset:0;width:100%;height:100%;opacity:.75;pointer-events:none}",
+    ".shj-tw{animation:shj-tw 3.4s ease-in-out infinite;animation-delay:calc(var(--tw) * -.9s)}",
+    "@keyframes shj-tw{0%,100%{opacity:1}50%{opacity:.25}}",
+    ".shj-in{position:relative;display:grid;justify-items:center;gap:6px;width:min(720px,100%);margin:auto}",
+    ".shj-stage{position:relative;display:grid;place-items:center;width:min(300px,100%,72cqw,34cqh);aspect-ratio:1;margin:2px 0 0}",
+    ".shj-stage>*{grid-area:1/1}",
+    ".shj-med{display:block;width:78%;aspect-ratio:1}.shj-med svg{display:block;width:100%;height:100%}",
+    ".shj-eyebrow{margin:6px 0 0;font-size:13px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#C9B6F5}.shj-nw{white-space:nowrap}",
+    ".shj-title{margin:0;font-size:clamp(28px,min(6.6cqw,7.4cqh),56px);line-height:1.06;font-weight:800;letter-spacing:-.01em;text-wrap:balance}",
+    ".shj-line{margin:2px 0 0;max-width:44ch;font-size:16px;line-height:1.5;color:#D9D0E6;text-wrap:pretty}",
+    ".shj-go{margin-top:10px;min-height:48px;padding:0 26px;border:0;border-radius:999px;background:#F5F2F4;color:#1B1220;font:inherit;font-size:16px;font-weight:800;cursor:pointer}",
+    ".shj-go:focus-visible,.shj-skip:focus-visible{outline:3px solid #fff;outline-offset:3px}",
+    ".shj-skip{position:fixed;top:14px;right:14px;min-height:40px;padding:0 16px;border:1px solid rgba(255,255,255,.35);border-radius:999px;background:rgba(10,5,20,.5);color:#F5F2F4;font:inherit;font-size:14px;font-weight:700;cursor:pointer}",
+    /* what a scene reveals in turn: each piece waits for its --at, then rises */
+    ".shj [data-at]{opacity:0;transform:translateY(14px)}",
+    ".shj.is-on [data-at]{animation:shj-rise .7s cubic-bezier(.16,1,.3,1) both;animation-delay:var(--at)}",
+    "@keyframes shj-rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}",
+    ".shj-ring{position:absolute;left:11%;top:11%;width:78%;height:78%;border-radius:50%;border:2px solid rgba(255,255,255,.8);opacity:0;pointer-events:none}",
+    ".shj.is-on .shj-ring{animation:shj-ring 1.3s cubic-bezier(.16,1,.3,1) forwards;animation-delay:var(--at)}",
+    "@keyframes shj-ring{0%{opacity:.9;transform:scale(.6)}100%{opacity:0;transform:scale(2.6)}}",
+    ".shj-flash{position:fixed;inset:0;background:#fff;opacity:0;pointer-events:none}",
+    ".shj.is-on .shj-flash{animation:shj-flash .9s ease-out both;animation-delay:var(--at)}",
+    "@keyframes shj-flash{0%{opacity:0}12%{opacity:.85}100%{opacity:0}}",
+
+    /* ----- the hand-off ----- */
+    ".shj-track{display:flex;align-items:flex-start;justify-content:center;gap:0;margin:0 0 2px;padding:0;list-style:none}",
+    ".shj-track li{position:relative;display:grid;justify-items:center;gap:5px;width:104px;font-size:13px;font-weight:700;color:#B9ADCB}",
+    ".shj-track li+li::before{content:'';position:absolute;top:22px;right:calc(50% + 28px);width:calc(100% - 56px);border-top:2px dashed rgba(255,255,255,.3)}",
+    ".shj-track li.is-done+li::before{border-top:2px solid #C9B6F5}",
+    ".shj-sock{position:relative;display:grid;place-items:center;width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,.07);box-shadow:inset 0 0 0 2px rgba(255,255,255,.22)}",
+    ".shj-sock svg.sh-rank-art{width:40px;height:40px}",
+    ".shj-track .is-done{color:#fff}.shj-track .is-now{color:#fff}",
+    ".shj-track .is-now .shj-sock{box-shadow:inset 0 0 0 2px #fff,0 0 22px rgba(255,255,255,.5)}",
+    ".shj-track .is-lock .shj-sock{color:#8E81A3}",
+    ".shj-track .shj-lock{width:20px;height:20px}",
+    ".shj-track .shj-check{position:absolute;right:-5px;bottom:-4px;width:18px;height:18px;color:#C9F5D6}",
+    ".shj-hand .shj-stage{width:min(320px,100%,74cqw,31cqh)}",
+    ".shj-hand.is-on .shj-sky{animation:shj-warp 8s cubic-bezier(.16,1,.3,1) both}",
+    "@keyframes shj-warp{from{transform:scale(1)}to{transform:scale(1.18)}}",
+    ".shj-rays{position:absolute;left:-65%;top:-65%;width:230%;height:230%;border-radius:50%;opacity:0;pointer-events:none;",
+    "background:repeating-conic-gradient(from 0deg,rgba(255,236,170,.34) 0deg 7deg,rgba(255,236,170,0) 7deg 20deg);",
+    "-webkit-mask:radial-gradient(circle,#000 0%,rgba(0,0,0,.55) 30%,transparent 62%);mask:radial-gradient(circle,#000 0%,rgba(0,0,0,.55) 30%,transparent 62%)}",
+    ".shj.is-on .shj-rays{animation:shj-rayin 1.2s ease-out both,shj-spin 38s linear infinite;animation-delay:var(--at),var(--at)}",
+    "@keyframes shj-rayin{from{opacity:0}to{opacity:1}}@keyframes shj-spin{to{transform:rotate(360deg)}}",
+    ".shj-halo{position:absolute;left:-10%;top:-10%;width:120%;height:120%;border-radius:50%;background:radial-gradient(circle,rgba(255,244,200,.6),rgba(255,214,120,.18) 42%,rgba(255,214,120,0) 68%);opacity:0;pointer-events:none}",
+    ".shj.is-on .shj-halo{animation:shj-rayin 1s ease-out both;animation-delay:var(--at)}",
+    "@keyframes shj-oldin{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:none}}",
+    ".shj-pre{position:absolute;left:-60%;right:-60%;bottom:-30px;margin:0;font-size:17px;font-weight:700;color:#D9D0E6;opacity:0;white-space:nowrap}",
+    ".shj.is-on .shj-pre{animation:shj-pre 2.4s ease both .5s}",
+    "@keyframes shj-pre{0%{opacity:0}18%,80%{opacity:1}100%{opacity:0}}",
+    ".shj-new{opacity:0;filter:drop-shadow(0 0 26px rgba(255,236,170,.5))}",
+    ".shj.is-on .shj-new{animation:shj-slam .9s cubic-bezier(.16,1,.3,1) both,shj-float 5s ease-in-out infinite;animation-delay:var(--at),calc(var(--at) + .9s)}",
+    "@keyframes shj-slam{0%{opacity:0;transform:scale(2.6)}55%{opacity:1}100%{opacity:1;transform:scale(1)}}",
+    "@keyframes shj-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}",
+    ".shj-new .shj-med{width:86%}",
+    ".shj-spark{position:absolute;left:50%;top:50%;margin:-3px 0 0 -3px;width:7px;height:7px;border-radius:50%;background:#FFE9A8;opacity:0;pointer-events:none}",
+    ".shj-spark:nth-child(3n){width:4px;height:4px;background:#fff}.shj-spark:nth-child(4n){background:#C9B6F5}",
+    ".shj.is-on .shj-spark{animation:shj-spark 1.5s cubic-bezier(.16,1,.3,1) forwards;animation-delay:calc(var(--at) + var(--d))}",
+    "@keyframes shj-spark{0%{opacity:1;transform:translate(0,0) scale(1)}100%{opacity:0;transform:translate(var(--sx),var(--sy)) scale(.3)}}",
+    ".shj-socknow svg{opacity:0}.shj.is-on .shj-socknow svg{animation:shj-rayin .5s ease both;animation-delay:var(--at)}",
+    ".shj-sockdone>*{opacity:0}.shj.is-on .shj-sockdone>*{animation:shj-pop .6s cubic-bezier(.16,1,.3,1) both;animation-delay:var(--land)}",
+    "@keyframes shj-pop{0%{opacity:0;transform:scale(.3)}60%{opacity:1;transform:scale(1.25)}100%{opacity:1;transform:none}}",
+    ".shj-ahead{display:flex;justify-content:center;gap:8px;margin:8px 0 0;padding:0;list-style:none}",
+    ".shj-ahead li{display:grid;justify-items:center;gap:4px;font-size:11px;font-weight:700;color:#B9ADCB}",
+    ".shj-ahead svg{width:38px;height:38px}",
+    ".shj-ahead li{opacity:0}.shj.is-on .shj-ahead li{animation:shj-pop .55s cubic-bezier(.16,1,.3,1) both;animation-delay:calc(var(--at) + var(--i) * .09s)}",
+    ".shj-ahead .is-now{color:#fff}",
+
+    /* ----- the Dark Matter unlock: gravity pulls everything into the Diamond medallion, it collapses to a point, a beat
+       of dark, and it detonates: shock waves, the sky, the Dark Matter medallion, its name letter by letter, the crowns.
+       --bang is the detonation; everything after it is timed from it. ----- */
+    ".shj-dark{background:#05020C;--jc:#7A3CFF;--jl:#C9B6F5;--jg:rgba(122,60,255,.62);--jr:rgba(190,160,255,.3)}",
+    ".shj-d1{--jc:#D63CAA;--jl:#F5B6E3;--jg:rgba(230,90,200,.58);--jr:rgba(255,170,230,.28)}.shj-d2{--jc:#2FC9A8;--jl:#9FF3E0;--jg:rgba(70,220,190,.5);--jr:rgba(160,255,230,.26)}",
+    ".shj-dark .shj-sky,.shj-dark .shj-neb{opacity:0;transform:scale(1.5)}",
+    ".shj-dark.is-on .shj-sky{animation:shj-open 2.4s cubic-bezier(.16,1,.3,1) both;animation-delay:var(--bang)}",
+    ".shj-neb{position:absolute;inset:0;pointer-events:none}",
+    ".shj-dark.is-on .shj-neb{animation:shj-open 3s cubic-bezier(.16,1,.3,1) both;animation-delay:var(--bang)}",
+    "@keyframes shj-open{from{opacity:0;transform:scale(1.5)}to{opacity:var(--sky,.8);transform:none}}",
+    ".shj-d0 .shj-neb{background:radial-gradient(120% 90% at 50% 8%,#2A1456 0%,rgba(19,10,43,.6) 52%,rgba(5,2,12,0) 100%)}",
+    ".shj-d1 .shj-neb{background:radial-gradient(70% 60% at 18% 30%,rgba(214,60,170,.55) 0%,rgba(214,60,170,0) 62%),radial-gradient(80% 70% at 86% 72%,rgba(50,110,255,.55) 0%,rgba(50,110,255,0) 64%)}",
+    ".shj-d2 .shj-neb{background:linear-gradient(200deg,rgba(40,200,170,.36) 0%,rgba(40,200,170,0) 46%),radial-gradient(100% 80% at 50% 110%,rgba(60,90,220,.5) 0%,rgba(60,90,220,0) 60%)}",
+    ".shj-cv{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}",
+    ".shj-dark .shj-stage{width:min(270px,100%,64cqw,29cqh)}",
+    ".shj-dark.is-on .shj-stage{animation:shj-up 1s cubic-bezier(.65,0,.35,1) both;animation-delay:calc(var(--bang) + .3s)}",
+    "@keyframes shj-up{from{transform:translateY(var(--dy,0px))}to{transform:none}}",
+    ".shj-dark .shj-eyebrow{color:var(--jl)}",
+    /* before: the pull */
+    ".shj-pull{position:absolute;left:-30%;top:-30%;width:160%;height:160%;border-radius:50%;background:radial-gradient(circle,rgba(47,159,214,.6),rgba(47,159,214,0) 62%);opacity:0;pointer-events:none}",
+    ".shj-dark.is-on .shj-pull{animation:shj-pull 2.9s ease-in .5s both}",
+    "@keyframes shj-pull{0%{opacity:0;transform:scale(.7)}70%{opacity:1;transform:scale(1.3)}90%{opacity:1;transform:scale(.6)}100%{opacity:0;transform:scale(.1)}}",
+    ".shj-lens{position:absolute;left:11%;top:11%;width:78%;height:78%;border-radius:50%;border:1.5px solid rgba(160,210,255,.75);opacity:0;pointer-events:none}",
+    ".shj-dark.is-on .shj-lens{animation:shj-lens 1s cubic-bezier(.5,0,.75,0) 2 both;animation-delay:var(--at)}",
+    "@keyframes shj-lens{0%{opacity:0;transform:scale(3.4)}35%{opacity:.6}100%{opacity:0;transform:scale(1)}}",
+    ".shj-was{opacity:0}",
+    ".shj-dark.is-on .shj-was{animation:shj-oldin .7s ease-out .2s both,shj-tremble 2.5s linear .9s,shj-implode .5s cubic-bezier(.7,0,.84,0) 3.3s forwards}",
+    TREMBLE,
+    "@keyframes shj-implode{0%{opacity:1;transform:scale(1.08)}100%{opacity:0;transform:scale(0) rotate(160deg)}}",
+    ".shj-dark .shj-pre{bottom:-36px}.shj-dark.is-on .shj-pre{animation:shj-pre 2.7s ease both .5s}",
+    ".shj-core{position:absolute;left:50%;top:50%;width:12px;height:12px;margin:-6px 0 0 -6px;border-radius:50%;background:#fff;box-shadow:0 0 16px 6px #fff,0 0 54px 18px var(--jc);opacity:0;pointer-events:none}",
+    ".shj-dark.is-on .shj-core{animation:shj-core .75s ease-in-out forwards;animation-delay:calc(var(--bang) - .7s)}",
+    "@keyframes shj-core{0%{opacity:0;transform:scale(.2)}30%{opacity:1;transform:scale(1)}55%{transform:scale(.55)}80%{opacity:1;transform:scale(1.5)}100%{opacity:0;transform:scale(4)}}",
+    /* the detonation */
+    ".shj-dark.is-on .shj-flash{animation:shj-flash2 1s ease-out both;animation-delay:var(--at)}",
+    "@keyframes shj-flash2{0%{opacity:0}5%{opacity:1}28%{opacity:.3}100%{opacity:0}}",
+    ".shj-wave{position:absolute;left:30%;top:30%;width:40%;height:40%;border-radius:50%;border:3px solid rgba(255,255,255,.92);opacity:0;pointer-events:none}",
+    ".shj-wave.is-c{border:6px solid var(--jl)}.shj-wave.is-t{border-width:1.5px}",
+    ".shj-dark.is-on .shj-wave{animation:shj-wave 1.6s cubic-bezier(.16,1,.3,1) forwards;animation-delay:var(--at)}",
+    "@keyframes shj-wave{0%{opacity:1;transform:scale(.2)}100%{opacity:0;transform:scale(9)}}",
+    ".shj-dark.is-on .shj-in{animation:shj-quake .9s linear;animation-delay:var(--bang)}",
+    "@keyframes shj-quake{0%,100%{transform:none}8%{transform:translate(-12px,8px)}16%{transform:translate(11px,-9px)}26%{transform:translate(-9px,-6px)}36%{transform:translate(8px,7px)}48%{transform:translate(-6px,3px)}60%{transform:translate(4px,-4px)}74%{transform:translate(-2px,2px)}86%{transform:translate(1px,-1px)}}",
+    ".shj-dark .shj-rays{background:repeating-conic-gradient(from 0deg,var(--jr) 0deg 6deg,rgba(0,0,0,0) 6deg 18deg)}",
+    ".shj-glow{position:absolute;left:-40%;top:-40%;width:180%;height:180%;border-radius:50%;background:radial-gradient(circle,var(--jg),rgba(0,0,0,0) 64%);opacity:0;pointer-events:none}",
+    ".shj-dark.is-on .shj-glow{animation:shj-rayin 1s ease-out both,shj-breathe 3.6s ease-in-out infinite;animation-delay:var(--bang),calc(var(--bang) + 1s)}",
+    "@keyframes shj-breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}",
+    ".shj-is{opacity:0}",
+    ".shj-dark.is-on .shj-is{animation:shj-slam2 1.1s cubic-bezier(.16,1,.3,1) both,shj-float 6s ease-in-out infinite;animation-delay:calc(var(--bang) + .05s),calc(var(--bang) + 1.15s)}",
+    "@keyframes shj-slam2{0%{opacity:0;transform:scale(3.2) rotate(-24deg)}40%{opacity:1}70%{transform:scale(.94) rotate(2deg)}100%{opacity:1;transform:none}}",
+    ".shj-dark .shj-med{width:84%}",
+    /* positioned, so the rays and the glow stay behind it in the still frame too (an animated transform did that by itself) */
+    ".shj-dark .shj-was,.shj-dark .shj-is{position:relative}",
+    ".shj-const{opacity:0}.shj-dark.is-on .shj-const{animation:shj-rayin 2s ease both;animation-delay:calc(var(--bang) + .8s)}",
+    /* its name: each letter lands, then one sheen across it */
+    ".shj-dmt{position:relative;isolation:isolate;font-size:clamp(40px,min(11cqw,9.4cqh),92px);letter-spacing:-.015em;color:#F6F1FF}",
+    ".shj-dmt .shj-lt{display:inline-block;opacity:0}",
+    ".shj-dark.is-on .shj-dmt .shj-lt{animation:shj-letter .9s cubic-bezier(.16,1,.3,1) both;animation-delay:calc(var(--at) + var(--i) * .06s)}",
+    "@keyframes shj-letter{0%{opacity:0;transform:translateY(-.45em) scale(2.2)}55%{opacity:1}100%{opacity:1;transform:none}}",
+    ".shj-tglow{position:absolute;left:-14%;right:-14%;top:-35%;bottom:-35%;z-index:-1;border-radius:50%;background:radial-gradient(closest-side,var(--jg),rgba(0,0,0,0));opacity:0;pointer-events:none}",
+    ".shj-dark.is-on .shj-tglow{animation:shj-rayin 1.2s ease-out both;animation-delay:var(--at)}",
+    ".shj-sheen{position:absolute;inset:0;color:transparent;background:linear-gradient(105deg,rgba(255,255,255,0) 40%,rgba(255,255,255,.95) 50%,rgba(255,255,255,0) 60%) no-repeat;background-size:300% 100%;background-position:100% 0;-webkit-background-clip:text;background-clip:text;pointer-events:none}",
+    ".shj-dark.is-on .shj-sheen{animation:shj-sheen 1.3s ease-in-out both;animation-delay:var(--sh)}",
+    "@keyframes shj-sheen{from{background-position:100% 0}to{background-position:0 0}}",
+    /* the reward */
+    ".shj-loot{display:grid;width:min(420px,100%);margin:12px 0 0;border-radius:20px;text-align:left;background:linear-gradient(180deg,rgba(255,214,120,.16),rgba(255,214,120,.05));box-shadow:inset 0 0 0 1.5px rgba(255,214,120,.6),0 18px 50px rgba(242,201,76,.16)}",
+    ".shj-lrow{display:flex;align-items:center;gap:14px;padding:12px 18px;min-width:0}",
+    ".shj-lrow+.shj-lrow{border-top:1px solid rgba(255,214,120,.22)}",
+    ".shj-coin{flex:none;width:60px;height:60px;opacity:0}.shj-coin svg{display:block;width:100%;height:100%;overflow:visible}",
+    ".shj.is-on .shj-coin{animation:shj-coinin 1s cubic-bezier(.16,1,.3,1) both,shj-flip 4s ease-in-out infinite;animation-delay:var(--cn),calc(var(--cn) + 2.2s)}",
+    "@keyframes shj-coinin{0%{opacity:0;transform:scale(.1) rotate(-220deg)}60%{opacity:1;transform:scale(1.3) rotate(12deg)}100%{opacity:1;transform:none}}",
+    "@keyframes shj-flip{0%,72%,100%{transform:none}78%{transform:scaleX(.06)}84%{transform:scaleX(1)}90%{transform:scaleX(.06)}96%{transform:none}}",
+    ".shj.is-collect .shj-coin{animation:shj-collect .55s cubic-bezier(.5,0,.75,0) forwards}",
+    "@keyframes shj-collect{to{opacity:0;transform:translateY(-55vh) scale(.5) rotate(40deg)}}",
+    ".shj-amt{display:grid;gap:3px;min-width:0}",
+    ".shj-num{font-size:clamp(30px,8cqw,40px);line-height:1;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.01em;color:#FFD866;background:linear-gradient(180deg,#FFF6D1 0%,#FFD866 45%,#E0A92A 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}",
+    ".shj-amt small{font-size:13px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#F5DFA0}",
+    ".shj-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}",
+    ".shj-lplace{font-size:14px;line-height:1.4;color:#E6DDF0}.shj-lplace b{display:block;font-size:14px;color:#fff}",
+    ".shj-hic{flex:none;display:grid;place-items:center;width:44px;height:44px;margin:0 8px;border-radius:12px;background:rgba(255,255,255,.08);color:var(--jl)}.shj-hic svg{width:26px;height:26px}",
+    ".shj-tag{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:999px;background:rgba(255,184,77,.18);color:#FFC86B;font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;vertical-align:1px}",
+    ".shj-dark .shj-go,.shj-go.shj-gold{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(180deg,#FFF1C2,#F2C94C);color:#2A1A00;box-shadow:0 10px 30px rgba(242,201,76,.35)}",
+    ".shj-dark .shj-go svg,.shj-go.shj-gold svg{width:24px;height:24px}",
+    ".shj-hic.shj-tro{background:none}.shj-tro svg{width:38px;height:38px;background:#FBF7F4;border-radius:50%;padding:2px}",
+    ".shj-hand .shj-loot{width:min(400px,100%);margin-top:10px}",
+    "@container shj (max-height:700px){.shj-loot .shj-lrow{padding:9px 14px}.shj-loot .shj-coin{width:48px;height:48px}.shj-dark .shj-loot{margin-top:8px}}",
+    /* a hand-off that pays: the ranks' caption makes room for the reward on a short screen */
+    "@container shj (max-height:860px){.shj-hand .shj-ahead{margin-top:4px}.shj-hand .shj-loot .shj-lrow{padding:8px 14px}.shj-hand .shj-loot .shj-coin{width:46px;height:46px}.shj-hand .shj-num{font-size:30px}}",
+    "@container shj (max-height:760px){.shj-hand .shj-line{font-size:14px;line-height:1.4}.shj-hand .shj-lplace{font-size:13px}.shj-hand .shj-go{margin-top:6px;min-height:44px}.shj-hand .shj-loot{margin-top:6px}}",
+    /* a short phone (320 by 568): the line and the trophy's row make room, and the seven ranks fit one row, unlabeled */
+    "@container shj (max-height:620px){.shj-hand .shj-line,.shj-hand .shj-loot .shj-lplace{display:none}.shj-hand .shj-stage{width:min(320px,100%,74cqw,24cqh)}.shj-hand .shj-ahead{flex-wrap:nowrap;gap:5px}.shj-hand .shj-ahead svg{width:30px;height:30px}.shj-hand .shj-ahead li{font-size:0;gap:0}}",
+    "@container shj (max-width:360px){.shj-loot .shj-lrow{gap:10px;padding:10px 12px}.shj-hic{margin:0 2px}}",
+    "@container shj (max-height:600px){.shj-dark .shj-line{font-size:14px;line-height:1.4}.shj-dark .shj-lplace{font-size:13px}.shj-dark .shj-num{font-size:28px}.shj-dark .shj-go{margin-top:8px;min-height:44px}.shj-dark .shj-eyebrow{margin-top:2px}}",
+
+    /* the last frame, at once: reduced motion, and the design page's stills */
+    ".shj.is-still,.shj.is-still *{animation:none!important}",
+    ".shj.is-still [data-at],.shj.is-still .shj-new,.shj.is-still .shj-is,.shj.is-still .shj-ahead li,.shj.is-still .shj-socknow svg,.shj.is-still .shj-sockdone>*,.shj.is-still .shj-lt,.shj.is-still .shj-coin{opacity:1;transform:none}",
+    ".shj.is-still .shj-rays,.shj.is-still .shj-halo,.shj.is-still .shj-glow,.shj.is-still .shj-tglow{opacity:1}",
+    ".shj.is-still .shj-sky,.shj.is-still .shj-neb{opacity:.8;transform:none}.shj.is-still .shj-const{opacity:1}",
+    ".shj.is-still .shj-was,.shj.is-still .shj-pull,.shj.is-still .shj-lens,.shj.is-still .shj-core,.shj.is-still .shj-wave,.shj.is-still .shj-cv,.shj.is-still .shj-sheen,.shj.is-still .shj-pre,.shj.is-still .shj-ring,.shj.is-still .shj-spark,.shj.is-still .shj-flash{display:none}",
+    ".shj.shj-inline{position:relative;inset:auto;z-index:0;opacity:1;border-radius:16px;overflow:hidden;padding:26px 16px}",
+    ".shj.shj-inline .shj-skip{display:none}.shj.shj-inline .shj-go{pointer-events:none}",
+    "@media (max-width:520px){.shj-track li{width:86px;font-size:12px}.shj-ahead{gap:4px}.shj-ahead svg{width:32px;height:32px}.shj-ahead li{font-size:10px}.shj-line{font-size:15px}}",
+    "@media (max-height:700px){.shj-line{font-size:15px}.shj-track li{font-size:12px}.shj-sock{width:40px;height:40px}.shj-sock svg.sh-rank-art{width:34px;height:34px}.shj-track li+li::before{top:19px}}",
+    /* the same at the large text sizes, which zoom the page: the scene is narrower or shorter than the screen */
+    "@container shj (max-width:520px){.shj-track li{width:86px;font-size:12px}.shj-ahead{gap:4px}.shj-ahead svg{width:32px;height:32px}.shj-ahead li{font-size:10px}.shj-line{font-size:15px}}",
+    "@container shj (max-height:700px){.shj-line{font-size:15px}.shj-track li{font-size:12px}.shj-sock{width:40px;height:40px}.shj-sock svg.sh-rank-art{width:34px;height:34px}.shj-track li+li::before{top:19px}}",
+    /* a phone: Skip sits over the right end of the hand-off's track, so the track starts below it; a phone at the large
+       text sizes: the track shares the width, and the seven ranks wrap to a second row */
+    "@container shj (max-width:420px){.shj-hand .shj-in{padding-top:46px}}",
+    "@container shj (max-width:300px){.shj-track{justify-self:stretch}.shj-track li{flex:1 1 0;width:auto;min-width:0;font-size:11px}.shj-ahead{flex-wrap:wrap;row-gap:6px}}",
+
+    /* ----- the hand-off to the ModuPro: the ModuPro eats the Handpiece. The Dark Matter Handpiece floats in its purple
+       space; the screen darkens and rumbles (--rum), the typodont comes in from above and below with its jaws wide open
+       around it, dark and glowing inside, and the Handpiece shivers (--shiv) and is pulled in (--suck); the jaws snap shut
+       on it (--chomp), chew twice and swallow, and the typodont folds into the ModuPro medallion (--slam) as the sim lab's
+       light comes on; it rises (--rise), then the reward. The typodont and the Handpiece inside it are on the canvas. ----- */
+    ".shj-mp{background:#05020C;--mpk:#9BE7EE}",
+    ".shj-lab{position:absolute;inset:0;pointer-events:none;background:radial-gradient(70% 55% at 50% 0%,rgba(255,246,222,.26),rgba(255,246,222,0) 70%),linear-gradient(180deg,#17485C 0%,#0C2A38 50%,#061118 100%);opacity:0}",
+    ".shj-cone{position:absolute;left:-30%;right:-30%;top:0;bottom:0;background:linear-gradient(180deg,rgba(255,244,214,.3),rgba(255,244,214,.07) 70%,rgba(255,244,214,0));clip-path:polygon(44% 0,56% 0,82% 100%,18% 100%);opacity:0;pointer-events:none}",
+    ".shj-lamp{position:absolute;left:50%;top:-70px;width:380px;height:140px;margin-left:-190px;border-radius:50%;background:radial-gradient(closest-side,#FFFDF4,rgba(255,246,222,.65) 45%,rgba(255,246,222,0));opacity:0;pointer-events:none}",
+    ".shj-mp.is-on .shj-lab{animation:shj-rayin .9s ease-out both;animation-delay:var(--slam)}",
+    ".shj-mp.is-on .shj-cone,.shj-mp.is-on .shj-lamp{animation:shj-rayin 1.2s ease-out both;animation-delay:calc(var(--slam) + .2s)}",
+    ".shj-space{position:absolute;inset:0;overflow:hidden;pointer-events:none;background:radial-gradient(120% 90% at 50% 8%,#2A1456 0%,#130A2B 52%,#05020C 100%)}",
+    ".shj-mp.is-on .shj-space{animation:shj-gone .9s ease-in forwards;animation-delay:var(--slam)}",
+    ".shj-mp.is-on .shj-dim{animation:shj-rayin .9s ease-out both,shj-gone .6s ease-out forwards;animation-delay:var(--rum),var(--slam)}",
+    ".shj-mp.is-on .shj-in{animation:shj-rumble .7s linear var(--rum)}",
+    "@keyframes shj-rumble{0%,100%{transform:none}20%{transform:translate(-3px,2px)}40%{transform:translate(3px,-2px)}60%{transform:translate(-2px,-1px)}80%{transform:translate(2px,1px)}}",
+    ".shj-mp.is-on .shj-cv{animation:shj-quake .6s linear var(--chomp)}",   // the bite shakes the typodont, which is on the canvas
+    ".shj-mp:not(.is-told):not(.is-still){overflow:hidden}",
+    ".shj-mp.is-on .shj-stage{animation:shj-up .9s cubic-bezier(.65,0,.35,1) both;animation-delay:var(--rise)}",
+    ".shj-mp .shj-eyebrow{color:var(--mpk)}",
+    ".shj-mp .shj-pre{top:-46px;bottom:auto}.shj-mp.is-on .shj-pre{animation:shj-pre 1.5s ease both .4s}",
+    ".shj-hp{position:relative;opacity:0}.shj-hp .shj-med{width:100%}",
+    ".shj-mp.is-on .shj-hp{animation:shj-oldin .6s ease-out .2s both,shj-dread .3s linear var(--shiv) 4,shj-suck .5s cubic-bezier(.55,0,.8,.4) var(--suck) forwards}",
+    "@keyframes shj-dread{0%,100%{transform:none}25%{transform:translate(-3px,1px) rotate(-3deg)}75%{transform:translate(3px,-1px) rotate(3deg)}}",
+    "@keyframes shj-suck{to{transform:scale(.55) rotate(-25deg)}}",
+    ".shj-mp.is-gulp .shj-hp{visibility:hidden}",   // the canvas draws it from here, inside the mouth
+    ".shj-flash.is-jump{background:#E9FCFF}.shj-flash.is-soft{background:radial-gradient(55% 40% at 50% 50%,rgba(241,232,255,.95),rgba(201,182,245,.4) 45%,rgba(201,182,245,0) 100%)}",
+    ".shj-mp.is-on .shj-flash{animation:shj-flash3 .55s ease-out both;animation-delay:var(--at)}",
+    "@keyframes shj-flash3{0%{opacity:0}8%{opacity:.42}100%{opacity:0}}",
+    ".shj-mp .shj-new .shj-med{width:86%}",
+    ".shj-mpt .shj-wd{display:inline-block;opacity:0}",
+    ".shj-mp.is-on .shj-mpt .shj-wd,.shj-lp.is-on .shj-mpt .shj-wd{animation:shj-word .75s cubic-bezier(.16,1,.3,1) both;animation-delay:calc(var(--at) + var(--i) * .13s)}",
+    "@keyframes shj-word{0%{opacity:0;transform:scale(2.6) translateY(-.2em)}60%{opacity:1}100%{opacity:1;transform:none}}",
+    ".shj-mpn{background:linear-gradient(180deg,#FFFFFF 15%,#9BE7EE 90%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}",
+    ".shj.is-still .shj-wd{opacity:1;transform:none}.shj.is-still .shj-cone,.shj.is-still .shj-lamp,.shj.is-still .shj-lab{opacity:1}",
+    ".shj.is-still .shj-hp,.shj.is-still .shj-space{display:none}",
+
+    /* ----- the hand-off to the Loupes: the Dark Matter ModuPro under the ModuPro's nebula; the loupes come down over it,
+       their headlight clicks on, and its beam grows into a sunbeam that heats the ModuPro white-hot, cracks it and burns
+       it away into embers; then the loupes come down through the light into its place and become the Loupes medallion.
+       The times are --lin (the loupes come in), --click (the headlight), --beam, --sun (the beam grows; --heat long),
+       --crk (the cracks), --burn, --drop (the loupes come down), --set (the medallion) and --rise. ----- */
+    ".shj-lp{background:#05020C;--lpk:#9FF3E0}",
+    ".shj-lp .shj-cv{z-index:1}.shj-lp.is-told .shj-cv{z-index:auto}",   // the embers in front of the scene; the coins behind the words, as elsewhere
+    /* the sky's slow zoom stays inside the screen, and nothing scrolls while the waves and the beam reach past it */
+    ".shj-bg{position:absolute;inset:0;overflow:hidden;pointer-events:none}",
+    ".shj-lp:not(.is-told):not(.is-still){overflow:hidden}",
+    ".shj-nmp{background:radial-gradient(70% 60% at 18% 30%,rgba(214,60,170,.5) 0%,rgba(214,60,170,0) 62%),radial-gradient(80% 70% at 86% 72%,rgba(50,110,255,.5) 0%,rgba(50,110,255,0) 64%)}",
+    ".shj-nlp{opacity:0;background:linear-gradient(200deg,rgba(40,200,170,.36) 0%,rgba(40,200,170,0) 46%),radial-gradient(100% 80% at 50% 110%,rgba(60,90,220,.5) 0%,rgba(60,90,220,0) 60%)}",
+    ".shj-lp.is-on .shj-nmp{animation:shj-gone .9s ease-in forwards;animation-delay:var(--burn)}",
+    ".shj-lp.is-on .shj-nlp{animation:shj-rayin 2.2s ease-out both;animation-delay:var(--drop)}",
+    "@keyframes shj-gone{to{opacity:0}}",
+    ".shj-dim{position:absolute;inset:0;pointer-events:none;background:radial-gradient(55% 60% at 50% var(--my,50%),rgba(3,1,8,0) 30%,rgba(3,1,8,.82) 100%);opacity:0}",
+    ".shj-lp.is-on .shj-dim{animation:shj-rayin .8s ease-out both,shj-gone .8s ease-out forwards;animation-delay:var(--beam),var(--drop)}",
+    ".shj-bloom{position:absolute;inset:0;pointer-events:none;background:radial-gradient(42% 38% at 50% var(--my,50%),rgba(255,248,222,.7),rgba(255,226,150,.22) 45%,rgba(255,226,150,0) 75%);opacity:0}",
+    ".shj-lp.is-on .shj-bloom{animation:shj-bloom 2.4s ease-in both;animation-delay:var(--sun)}",
+    "@keyframes shj-bloom{0%{opacity:0}66%,80%{opacity:1}100%{opacity:0}}",
+    /* until --rise the stage holds the middle of the screen, scaled up (--zoom) so the loupes over the ModuPro fill it */
+    ".shj-lp.is-on .shj-stage{animation:shj-lpup .9s cubic-bezier(.65,0,.35,1) both;animation-delay:var(--rise)}",
+    "@keyframes shj-lpup{from{transform:translateY(var(--dy,0px)) scale(var(--zoom,1))}to{transform:none}}",
+    ".shj-lp.is-on .shj-in{animation:shj-quake .8s linear var(--burn)}",
+    ".shj-lp .shj-eyebrow{color:var(--lpk)}",
+    ".shj-lp .shj-pre{top:calc(100% + 10px);bottom:auto;white-space:normal;text-wrap:balance;transform-origin:50% 0;transform:scale(calc(1 / var(--zoom,1)))}",   // its own size while the stage is scaled up
+    ".shj-lp .shj-mpn{background-image:linear-gradient(180deg,#FFF6D6 12%,#9FF3E0 92%)}",
+    ".shj-flash.is-sun{background:radial-gradient(60% 55% at 50% var(--my,50%),#FFFBEA 0%,rgba(255,240,200,.75) 40%,rgba(255,226,150,0) 100%)}.shj-lp.is-on .shj-flash{animation:shj-flash2 .9s ease-out both;animation-delay:var(--at)}",
+    ".shj-lp.is-on .shj-wave{animation:shj-wave 1.6s cubic-bezier(.16,1,.3,1) forwards;animation-delay:var(--at)}",
+    /* the ModuPro: lit, trembling harder and harder, white-hot, cracking, gone */
+    ".shj-mpo{position:relative;width:86%;opacity:0}.shj-mpo .shj-med{width:100%}",
+    ".shj-lp.is-on .shj-mpo{animation:shj-oldin .6s ease-out .2s both,shj-tremble var(--heat) linear var(--sun),shj-vapor .38s ease-in var(--burn) forwards}",
+    "@keyframes shj-vapor{0%{opacity:1;transform:scale(1.08)}100%{opacity:0;transform:scale(1.22)}}",
+    ".shj-heat{position:absolute;inset:3%;border-radius:50%;pointer-events:none;background:radial-gradient(circle,#FFFFFF 0%,#FFF6D6 38%,rgba(255,214,120,.85) 66%,rgba(255,160,60,0) 100%);opacity:0}",
+    ".shj-lp.is-on .shj-heat{animation:shj-heat var(--heat) cubic-bezier(.55,0,.9,.5) var(--sun) forwards}",
+    "@keyframes shj-heat{from{opacity:0}to{opacity:.97}}",
+    ".shj-crk{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none;filter:drop-shadow(0 0 3px #FFD36B) drop-shadow(0 0 9px rgba(255,190,80,.85))}",
+    ".shj-crk path{opacity:0}.shj-lp.is-on .shj-crk path{animation:shj-rayin .16s ease-out both;animation-delay:calc(var(--crk) + var(--i) * .11s)}",
+    ".shj-spot{position:absolute;left:-12%;top:-12%;width:124%;height:124%;border-radius:50%;pointer-events:none;background:radial-gradient(closest-side,rgba(255,250,230,.55),rgba(255,236,170,.22) 55%,rgba(255,236,170,0));opacity:0}",
+    ".shj-lp.is-on .shj-spot{animation:shj-rayin .5s ease-out both,shj-gone .5s ease-in forwards;animation-delay:var(--beam),var(--burn)}",
+    /* the loupes: drawn big, they come down over the ModuPro and hang there; at --drop they come down into its place,
+       turned and sized as the medallion draws them, and the medallion takes over */
+    ".shj-lpo{position:absolute;left:-10%;top:50%;width:120%;margin-top:-33.6%;opacity:0;pointer-events:none}",
+    ".shj-lpo svg{position:relative;display:block;width:100%;height:auto;overflow:visible}",
+    ".shj-lp.is-on .shj-lpo{animation:shj-lpin 1.1s cubic-bezier(.16,1,.3,1) both,shj-lpbob 2.6s ease-in-out infinite,shj-lpland .8s cubic-bezier(.65,0,.35,1) forwards;animation-delay:var(--lin),calc(var(--lin) + 1.1s),var(--drop)}",
+    "@keyframes shj-lpin{0%{opacity:0;transform:translateY(-330%) rotate(-9deg) scale(1.2)}55%{opacity:1}100%{opacity:1;transform:translateY(-150%)}}",
+    "@keyframes shj-lpbob{0%,100%{transform:translateY(-150%)}50%{transform:translateY(-155%) rotate(.8deg)}}",
+    "@keyframes shj-lpland{0%{opacity:1;transform:translateY(-150%)}70%{opacity:1}100%{opacity:0;transform:translateY(-2%) rotate(-8deg) scale(.59)}}",
+    ".shj-lmp,.shj-lgl{opacity:0}",
+    ".shj-lp.is-on .shj-lmp{animation:shj-click .55s linear both;animation-delay:var(--click)}",
+    ".shj-lp.is-on .shj-lgl{animation:shj-rayin .5s ease-out both;animation-delay:calc(var(--click) + .3s)}",
+    "@keyframes shj-click{0%{opacity:0}12%{opacity:1}24%{opacity:.1}38%{opacity:.9}50%{opacity:.25}64%,100%{opacity:1}}",
+    /* the headlight's flare, and its beam: thin at first, then a sunbeam with rays in it */
+    ".shj-flare{position:absolute;left:50%;top:17.6%;width:170%;margin:-11% 0 0 -85%;aspect-ratio:7.7/1;pointer-events:none;opacity:0;",
+    "background:radial-gradient(closest-side,#FFFFFF,rgba(255,250,228,.75) 14%,rgba(255,236,170,0) 46%),linear-gradient(90deg,rgba(160,255,230,0) 8%,rgba(210,255,244,.75) 50%,rgba(160,255,230,0) 92%) center/100% 7% no-repeat}",
+    ".shj-lp.is-on .shj-flare{animation:shj-click .55s linear both,shj-flareup var(--heat) ease-in forwards,shj-gone .4s ease-in forwards;animation-delay:var(--click),var(--sun),var(--drop)}",
+    "@keyframes shj-flareup{from{transform:none}to{transform:scale(1.7,1.4)}}",
+    ".shj-sun{position:absolute;left:50%;top:17.6%;width:84%;margin-left:-42%;height:250%;transform-origin:50% 0;pointer-events:none;opacity:0;",
+    "clip-path:polygon(46.5% 0,53.5% 0,100% 100%,0 100%);background:linear-gradient(180deg,rgba(255,253,240,.95) 0%,rgba(255,240,190,.7) 45%,rgba(255,226,150,.38) 78%,rgba(255,226,150,0) 100%)}",
+    ".shj-sun::before{content:'';position:absolute;inset:0;clip-path:polygon(48.5% 0,51.5% 0,70% 100%,30% 100%);background:linear-gradient(180deg,#fff 0%,rgba(255,255,255,.75) 55%,rgba(255,255,255,0) 100%)}",
+    ".shj-sun::after{content:'';position:absolute;inset:0;opacity:.55;background:repeating-conic-gradient(from 150deg at 50% 0,rgba(255,255,255,0) 0deg 2.2deg,rgba(255,255,255,.5) 3deg,rgba(255,255,255,0) 3.8deg 6.5deg)}",
+    ".shj-lp.is-on .shj-sun{animation:shj-sunon .45s ease-out both,shj-sunup var(--heat) cubic-bezier(.5,0,.8,.6) forwards,shj-sunout .5s ease-in forwards;animation-delay:var(--beam),var(--sun),var(--drop)}",
+    "@keyframes shj-sunon{from{opacity:0;transform:scaleX(.05)}to{opacity:.6;transform:scaleX(.3)}}",
+    "@keyframes shj-sunup{from{opacity:.6;transform:scaleX(.3)}to{opacity:1;transform:scaleX(1.12)}}",
+    "@keyframes shj-sunout{to{opacity:0;transform:scaleX(1.5)}}",
+    /* a glint across a lens */
+    ".shj-glint{position:absolute;width:24%;aspect-ratio:1;margin:-12% 0 0 -12%;pointer-events:none;opacity:0;",
+    "background:radial-gradient(closest-side,#fff,rgba(255,255,255,.6) 12%,rgba(255,255,255,0) 34%),linear-gradient(90deg,rgba(255,255,255,0),#fff 50%,rgba(255,255,255,0)) center/100% 5% no-repeat,linear-gradient(0deg,rgba(255,255,255,0),#fff 50%,rgba(255,255,255,0)) center/5% 100% no-repeat}",
+    ".shj-lpo .shj-glint{width:16%;margin:-8% 0 0 -8%}",
+    ".shj-lp.is-on .shj-glint{animation:shj-glint .8s ease-out both;animation-delay:var(--g)}",
+    "@keyframes shj-glint{0%{opacity:0;transform:scale(.2) rotate(-30deg)}35%{opacity:1;transform:scale(1.1) rotate(10deg)}100%{opacity:0;transform:scale(.5) rotate(45deg)}}",
+    /* the Loupes medallion appears around the loupes as they settle */
+    ".shj-lp.is-on .shj-new{animation:shj-settle .8s cubic-bezier(.16,1,.3,1) both,shj-float 5s ease-in-out infinite;animation-delay:var(--at),calc(var(--at) + .8s)}",
+    "@keyframes shj-settle{0%{opacity:0;transform:scale(1.25)}100%{opacity:1;transform:none}}",
+    ".shj.is-still .shj-lpo,.shj.is-still .shj-mpo,.shj.is-still .shj-spot,.shj.is-still .shj-dim,.shj.is-still .shj-bloom,.shj.is-still .shj-nmp,.shj.is-still .shj-glint{display:none}",
+
+    /* ----- the road ahead (the 'you' panels) ----- */
+    ".shj-road{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:14px 0 0;padding:0;list-style:none}",
+    ".shj-road li{display:grid;justify-items:center;align-content:start;gap:3px;padding:14px 8px 12px;border-radius:var(--r-row,14px);background:var(--row,#fff);text-align:center;min-width:0}",
+    ".shj-road .shj-rmed{position:relative;display:grid;place-items:center;width:64px;height:64px}",
+    ".shj-road .shj-rmed svg.sh-rank-art{width:64px;height:64px}",
+    ".shj-road b{font-weight:var(--w-head,800)}",
+    ".shj-road span{font-size:var(--fs-meta,13px);color:var(--muted,#685c66);overflow-wrap:anywhere}",
+    ".shj-road .is-now{box-shadow:inset 0 0 0 2px var(--text,#3b2e3a)}",
+    ".shj-road .is-lock svg.sh-rank-art{filter:grayscale(1) brightness(.62) contrast(.9);opacity:.5}",
+    ".shj-road .shj-lock{position:absolute;right:-8px;bottom:-4px;width:26px;height:26px;padding:5px;border-radius:50%;background:var(--row,#fff);color:var(--text,#3b2e3a);box-shadow:0 0 0 1px var(--border,#e8e0e6)}",
+    ".shj-road .shj-rtro{position:absolute;right:-10px;bottom:-6px;width:30px;height:30px;border-radius:50%;background:#FBF7F4;box-shadow:0 0 0 1px var(--border,#e8e0e6);padding:2px}",
+    ".shj-road .shj-bar{display:block;width:min(160px,100%);height:6px;margin:4px 0 2px;border-radius:3px;background:var(--track,#e9e1e7);overflow:hidden}",
+    ".shj-road .shj-bar i{display:block;height:100%;border-radius:3px;background:var(--gold,#e2a72e)}",
+    "@media (max-width:520px){.shj-road{grid-template-columns:1fr}.shj-road li{grid-template-columns:64px 1fr;justify-items:start;text-align:left;column-gap:14px}.shj-road .shj-rmed{grid-row:1 / span 4}}"
+  ].join("");
+  function css(){
+    if (document.getElementById("shj-css")) return;
+    var st = document.createElement("style"); st.id = "shj-css"; st.textContent = CSS; document.head.appendChild(st);
+  }
+
+  /* ---------- a scene's frame: the dialog, its keys, its close ---------- */
+  function trophySvg(k){ var K = window.SH_JOURNEY_ART, t = K && K.trophies && K.trophies[k]; return t ? '<svg viewBox="0 0 64 64" aria-hidden="true">' + t.body + "</svg>" : ""; }
+  function med(j, t, px, opt, cls){ return '<span class="shj-med ' + (cls || "") + '">' + R.artOf(j, t, px, opt) + "</span>"; }
+  function open(el, opt, done){
+    css();
+    var still = !!opt.still || reduced(), prev = document.activeElement, closed = false, timers = [];
+    if (still) el.classList.add("is-still");
+    document.body.appendChild(el);
+    function close(){
+      if (closed) return; closed = true;
+      timers.forEach(clearTimeout); document.removeEventListener("keydown", key, true);
+      if (opt.end) opt.end();
+      el.classList.add("is-out");
+      setTimeout(function(){
+        el.remove(); try { if (prev && prev.focus) prev.focus({ preventScroll: true }); } catch (e) {}
+        try { document.dispatchEvent(new CustomEvent("sh:journey-scene-end", { detail: opt.detail })); } catch (e) {}
+        if (done) done();
+      }, 300);
+    }
+    function key(e){
+      if (e.key === "Escape") { e.preventDefault(); e.stopPropagation(); close(); }
+      else if (e.key === "Tab") {   // two buttons: keep the focus inside the dialog
+        var f = el.querySelectorAll("button"), a = f[0], b = f[f.length - 1];
+        if (e.shiftKey && document.activeElement === a) { e.preventDefault(); b.focus(); }
+        else if (!e.shiftKey && document.activeElement === b) { e.preventDefault(); a.focus(); }
+      }
+    }
+    document.addEventListener("keydown", key, true);
+    /* opt.skip(): the scene jumps to its last frame instead (true when it did); opt.go(close): the last button's flourish */
+    el.addEventListener("click", function(e){
+      if (e.target.closest(".shj-skip")) { if (!(opt.skip && !still && opt.skip())) close(); }
+      else if (e.target.closest(".shj-go")) { if (opt.go && !still) opt.go(close); else close(); }
+    });
+    requestAnimationFrame(function(){ el.classList.add("is-on"); });
+    var go = el.querySelector(".shj-go");
+    try { (still ? go : el).focus({ preventScroll: true }); } catch (e) {}
+    if (!still && opt.focusAt) timers.push(setTimeout(function(){ try { if (!closed) go.focus({ preventScroll: true }); } catch (e) {} }, opt.focusAt));
+    if (opt.peakAt != null) timers.push(setTimeout(function(){ try { document.dispatchEvent(new CustomEvent("sh:journey-scene", { detail: opt.detail })); } catch (e) {} }, still ? 200 : opt.peakAt));
+    return close;
+  }
+  function shell(cls, label, inner){
+    var el = document.createElement("div");
+    el.className = "shj " + cls; el.setAttribute("role", "dialog"); el.setAttribute("aria-modal", "true"); el.setAttribute("aria-label", label); el.tabIndex = -1;
+    el.innerHTML = inner + '<button type="button" class="shj-skip" data-shj="skip">Skip</button>';
+    return el;
+  }
+
+  /* ---------- the hand-off to the ModuPro (Sam, 2026-11-20: "something absolutely bananas when you rank up to modupro.
+     completely unique and epic"; then "I think instead I want the modupro to basically eat the handpiece and then replace
+     it"). About 9.5 seconds to the button:
+       0.2-1.9 s  the Dark Matter III Handpiece in its purple space ("The Handpiece is finished.");
+       1.1 s      the screen darkens and rumbles (--rum);
+       1.5-2 s    the typodont comes in from above and below, its jaws wide open around the Handpiece (--jaw), the mouth
+                  dark and glowing inside; the Handpiece shivers (--shiv) and dust and stars stream into the mouth (--pull);
+       2.7-3.4 s  the Handpiece is pulled in (--suck), and from inside the mouth the canvas draws it, behind the teeth (--swap);
+       3.41 s     the jaws snap shut on it (--chomp): a flash along the bite, the typodont shakes, shards of the Handpiece and
+                  Dark Matter sparks spray from the corners of the mouth;
+       3.8-4.7 s  it chews twice, crumbs falling, and swallows (--gulp);
+       5.2 s      the typodont folds into the ModuPro medallion (--slam) as the sim lab's light comes on; it rises (--rise);
+       6.6-9 s    the road, the title word by word, the seven new ranks, then the reward: 20,000 Shiny Gold Crowns counted up
+                  with a fountain and a rain of coins (migration_v89 pays them), and the Handpiece's trophy.
+     Skip jumps to the last frame (the reward stays), Esc closes. The Loupes have their own scene, below. ---------- */
+  var MP = { rum: 1.1, jaw: 1.5, shiv: 1.5, pull: 2, suck: 2.7, swap: 3.22, close: 3.25, chomp: 3.41, chew: 3.8, chew2: 4.3, gulp: 4.85, morph: 5.2, slam: 5.35, rise: 5.95 };
+  var MP_R = MP.rise + .6;   // the words and the reward start here
+  function sec(x){ return (+x).toFixed(2) + "s"; }
+  /* what reaching a journey pays (sh_prizes()'s modupro and loupes, which widget/v3.js's PRIZES copies) */
+  function prizeOf(k, dflt){ var P = window.shGame && window.shGame.prizes; return P && P[k] > 0 ? P[k] : dflt; }
+  function journeyCrowns(to){ return to === 2 ? prizeOf("loupes", 30000) : prizeOf("modupro", 20000); }
+  /* the reward box of a hand-off: the crowns, then the trophy for the journey just finished */
+  function lootHTML(pays, from, t0){
+    var tro = trophySvg("journey-" + from);
+    return '<div class="shj-loot" data-at style="--at:' + sec(t0) + ";--cn:" + sec(t0 + .2) + '">' +
+      '<div class="shj-lrow"><span class="shj-coin">' + COIN + '</span><span class="shj-amt"><b class="shj-num" aria-hidden="true">+' + fmt(pays) + '</b><span class="shj-sr">' + fmt(pays) + " </span><small>Shiny Gold Crowns</small></span></div>" +
+      (tro ? '<div class="shj-lrow shj-lplace" data-at style="--at:' + sec(t0 + .6) + '"><span class="shj-hic shj-tro">' + tro + "</span><span><b>Trophy won</b>" + esc(JN[from]) + " finished</span></div>" : "") +
+      "</div>";
+  }
+  /* a count from 0 to n over ms, while live() */
+  function countUp(num, n, ms, live){
+    var t0 = 0;
+    (function f(now){
+      if (!live()) return;
+      if (!t0) t0 = now;
+      var u = Math.min(1, (now - t0) / ms);
+      num.textContent = "+" + fmt(Math.round(n * (1 - Math.pow(1 - u, 3))));
+      if (u < 1) requestAnimationFrame(f);
+    })(performance.now());
+  }
+  function mpHTML(d){
+    var T0 = MP.slam, R0 = MP_R, s = sec, pays = journeyCrowns(1);
+    var track = [0, 1, 2].map(function(j){
+      var st = j < 1 ? "is-done" : j === 1 ? "is-now" : "is-lock";
+      return '<li class="' + st + '"><span class="shj-sock' + (j === 0 ? " shj-sockdone" : j === 1 ? " shj-socknow" : "") + '"' + (j === 1 ? ' style="--at:' + s(R0 + .5) + '"' : "") + ">" +
+        (j > 1 ? LOCK : R.artOf(j, j < 1 ? 6 : 0, 36) + (j < 1 ? CHECK : "")) + "</span>" + esc(JN[j]) + "</li>";
+    }).join("");
+    var sparks = sparksHTML(23);
+    var ahead = T.map(function(t, i){ return '<li style="--i:' + i + '"' + (i ? "" : ' class="is-now"') + ">" + R.artOf(1, i, 36) + esc(t.name) + "</li>"; }).join("");
+    var words = ["The", "ModuPro", "is", "yours."].map(function(w, i){ return '<span class="shj-wd' + (i === 1 ? " shj-mpn" : "") + '" style="--i:' + i + '">' + w + "</span>"; }).join(" ");
+    return '<span class="shj-lab"></span><span class="shj-cone"></span><span class="shj-lamp"></span>' +
+      '<span class="shj-space"><svg class="shj-sky" viewBox="0 0 800 600" preserveAspectRatio="xMidYMid slice" aria-hidden="true">' + stars(5, 120, 800, 600) + "</svg></span>" +
+      '<span class="shj-dim"></span><canvas class="shj-cv" aria-hidden="true"></canvas>' +
+      '<span class="shj-flash is-soft" style="--at:' + s(MP.chomp) + '"></span><span class="shj-flash is-jump" style="--at:' + s(MP.slam) + '"></span>' +
+      '<div class="shj-in">' +
+      '<ol class="shj-track" aria-label="The three journeys" data-at style="--at:' + s(R0) + ";--land:" + s(R0 + .4) + '">' + track + "</ol>" +
+      '<div class="shj-stage" style="--at:' + s(T0) + '">' +
+        '<span class="shj-rays" style="--at:' + s(T0 + .2) + '"></span><span class="shj-halo"></span>' +
+        '<span class="shj-ring"></span><span class="shj-ring" style="--at:' + s(T0 + .25) + '"></span>' +
+        '<span class="shj-hp" aria-hidden="true">' + med(0, 6, 200, { animate: true, level: 3 }) + "</span>" +
+        '<p class="shj-pre" aria-hidden="true">Dark Matter III. The Handpiece is finished.</p>' +
+        '<span class="shj-new">' + med(1, 0, 240, { animate: true, level: 1 }) + "</span>" + sparks +
+      "</div>" +
+      '<p class="shj-eyebrow" data-at style="--at:' + s(R0 + .1) + '"><span class="shj-nw">Journey 2 of 3</span> · <span class="shj-nw">' + fmt(125000) + " XP</span></p>" +
+      '<h2 class="shj-title shj-mpt" aria-label="The ModuPro is yours." style="--at:' + s(R0 + .25) + '"><span aria-hidden="true">' + words + "</span></h2>" +
+      '<p class="shj-line" data-at style="--at:' + s(R0 + .7) + '">You finished the Handpiece. Your XP, your trophies and everything you earned come with you.</p>' +
+      '<ol class="shj-ahead" aria-label="Seven new ranks, Stone to Dark Matter" style="--at:' + s(R0 + .95) + '">' + ahead + "</ol>" +
+      lootHTML(pays, 0, R0 + 1.45) +
+      '<button type="button" class="shj-go shj-gold" data-shj="go" data-at style="--at:' + s(R0 + 2.4) + '">' + COIN + "Collect " + fmt(pays) + " crowns</button></div>";
+  }
+  /* the burst of sparks a medallion lands with */
+  function sparksHTML(seed){
+    var out = "";
+    for (var i = 0, x = seed; i < 34; i++){
+      x = (x * 9301 + 49297) % 233280; var a = x / 233280 * Math.PI * 2; x = (x * 9301 + 49297) % 233280; var r = 120 + x / 233280 * 190;
+      out += '<i class="shj-spark" style="--sx:' + Math.round(Math.cos(a) * r) + "px;--sy:" + Math.round(Math.sin(a) * r) + "px;--d:" + (i % 6 * .04).toFixed(2) + 's"></i>';
+    }
+    return out;
+  }
+
+  /* ---------- the hand-off to the Loupes (Sam, 2026-11-20: "turning on the light of the loupes acts like some kind of
+     sunbeam and like destroys the ModuPro, and then the loupes take its place"). About 9 seconds to the button:
+       0.2-0.9 s  the Dark Matter III ModuPro under the ModuPro's nebula ("The ModuPro is finished.");
+       0.9-2 s    the loupes come down out of the dark and hang over it (--lin);
+       2.05 s     their headlight clicks on, flickers, and their lenses catch it (--click);
+       2.3-3 s    a thin beam onto the ModuPro, the screen dims around it, dust turning in the light (--beam);
+       3-4.6 s    the beam grows into a sunbeam (--sun): the ModuPro trembles, goes white-hot, cracks (--crk), throws embers;
+       4.6 s      it burns away (--burn): a flash, embers and ash pulled up into the light, shock waves, the screen shakes,
+                  and the ModuPro's nebula gives way to the Loupes' sky;
+       5-5.8 s    the loupes come down through the light into its place (--drop) and the Loupes medallion forms around
+                  them (--set), a glint across each lens; it rises to its place (--rise);
+       6.6-9 s    the road, the title word by word, the seven new ranks, then the reward: 30,000 Shiny Gold Crowns counted
+                  up with coins (migration_v89 pays them), and the ModuPro's trophy.
+     Skip jumps to the last frame (the reward stays), Esc closes. ---------- */
+  var LP = { lin: .9, click: 2.05, beam: 2.3, sun: 3, crk: 3.7, burn: 4.6, drop: 5, set: 5.45, rise: 6 };
+  var LP_R = LP.rise + .6;   // the words and the reward start here
+  var lpUid = 0;
+  /* the loupes alone, big: the kit's drawing (widget/hub-art/journeys.js) in polished metal, with the headlight's glow
+     and the lenses' (both hidden until it clicks on) */
+  function lpSvg(){
+    var K = window.SH_JOURNEY_ART, S = K && K.shape(2);
+    if (!S) return "";
+    var p = "shjlp" + (++lpUid) + "-";
+    function cyl(id, cs){ return '<linearGradient id="' + id + '" x1="0" y1="0" x2="0" y2="1">' + cs.map(function(c, i){ return '<stop offset="' + (i / (cs.length - 1)).toFixed(3) + '" stop-color="' + c + '"/>'; }).join("") + "</linearGradient>"; }
+    var defs = cyl(p + "g", ["#2A2F37", "#5E6673", "#B9C1CC", "#F1F4F8", "#939CA9", "#4D545F", "#23272E", "#717A88"]) +
+      cyl(p + "gd", ["#1C2026", "#41474F", "#878F9A", "#B8BFC8", "#6B737E", "#363B43", "#16191E", "#535A64"]) +
+      '<radialGradient id="' + p + 'lamp"><stop offset="0" stop-color="#fff"/><stop offset=".25" stop-color="#FFF6D6" stop-opacity=".9"/><stop offset="1" stop-color="#FFE7A0" stop-opacity="0"/></radialGradient>' +
+      '<radialGradient id="' + p + 'lens"><stop offset="0" stop-color="#D5FFF6" stop-opacity=".85"/><stop offset=".6" stop-color="#46DCBE" stop-opacity=".35"/><stop offset="1" stop-color="#46DCBE" stop-opacity="0"/></radialGradient>';
+    return '<svg viewBox="-6 -12 132 74" aria-hidden="true"><defs>' + defs + "</defs>" + S.modern(p, true) + (S.top ? S.top(p, true, false) : "") +
+      '<g class="shj-lgl"><circle cx="37" cy="38.5" r="9.8" fill="url(#' + p + 'lens)"/><circle cx="83" cy="38.5" r="9.8" fill="url(#' + p + 'lens)"/></g>' +
+      '<g class="shj-lmp"><circle cx="60" cy="1" r="15" fill="url(#' + p + 'lamp)"/><circle cx="60" cy="1" r="3.6" fill="#fff"/></g></svg>';
+  }
+  /* the cracks that open across the ModuPro as it heats, from the middle out (on the medallion's 128 grid) */
+  function crackSvg(){
+    var x = 31, out = "", order = [0, 4, 2, 6, 1, 5, 3, 7];
+    function r(){ x = (x * 9301 + 49297) % 233280; return x / 233280; }
+    function pt(a, rr){ return (64 + Math.cos(a) * rr).toFixed(1) + " " + (64 + Math.sin(a) * rr).toFixed(1); }
+    for (var i = 0; i < 8; i++){
+      var a = i / 8 * 6.2832 + r() * .5, d = "M" + pt(a, 6);
+      for (var k = 1; k <= 5; k++){
+        var rr = 6 + k * 10.4, aa = a + (r() - .5) * .5, here = pt(aa, rr);
+        d += " L" + here;
+        if (k === 3 && r() > .4) d += " L" + pt(aa + (r() > .5 ? .6 : -.6), rr + 14) + " M" + here;
+      }
+      out += '<path d="' + d + '" style="--i:' + order[i] + '"/>';
+    }
+    return '<svg class="shj-crk" viewBox="0 0 128 128" aria-hidden="true"><g fill="none" stroke="#FFF8E2" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' + out + "</g></svg>";
+  }
+  function lpHTML(d){
+    var R0 = LP_R, s = sec, pays = journeyCrowns(2);
+    var track = [0, 1, 2].map(function(j){
+      return '<li class="' + (j < 2 ? "is-done" : "is-now") + '"><span class="shj-sock' + (j === 1 ? " shj-sockdone" : j === 2 ? " shj-socknow" : "") + '"' + (j === 2 ? ' style="--at:' + s(R0 + .5) + '"' : "") + ">" +
+        R.artOf(j, j < 2 ? 6 : 0, 36) + (j < 2 ? CHECK : "") + "</span>" + esc(JN[j]) + "</li>";
+    }).join("");
+    var ahead = T.map(function(t, i){ return '<li style="--i:' + i + '"' + (i ? "" : ' class="is-now"') + ">" + R.artOf(2, i, 36) + esc(t.name) + "</li>"; }).join("");
+    var words = ["The", "Loupes", "are", "yours."].map(function(w, i){ return '<span class="shj-wd' + (i === 1 ? " shj-mpn" : "") + '" style="--i:' + i + '">' + w + "</span>"; }).join(" ");
+    function glint(x, y, t){ return '<i class="shj-glint" style="left:' + x + "%;top:" + y + "%;--g:" + s(t) + '"></i>'; }
+    return '<span class="shj-bg"><svg class="shj-sky" viewBox="0 0 800 600" preserveAspectRatio="xMidYMid slice" aria-hidden="true">' + stars(9, 120, 800, 600) + "</svg>" +
+      '<span class="shj-neb shj-nmp"></span><span class="shj-neb shj-nlp"></span></span><span class="shj-dim"></span><span class="shj-bloom"></span>' +
+      '<canvas class="shj-cv" aria-hidden="true"></canvas>' +
+      '<span class="shj-flash is-sun" style="--at:' + s(LP.burn) + '"></span>' +
+      '<div class="shj-in">' +
+      '<ol class="shj-track" aria-label="The three journeys" data-at style="--at:' + s(R0) + ";--land:" + s(R0 + .4) + '">' + track + "</ol>" +
+      '<div class="shj-stage" style="--at:' + s(LP.set) + '">' +
+        '<span class="shj-rays" style="--at:' + s(LP.set + .1) + '"></span><span class="shj-halo"></span>' +
+        '<span class="shj-wave" style="--at:' + s(LP.burn) + '"></span><span class="shj-wave is-t" style="--at:' + s(LP.burn + .12) + '"></span>' +
+        '<span class="shj-ring"></span><span class="shj-ring" style="--at:' + s(LP.set + .25) + '"></span>' +
+        '<span class="shj-mpo" aria-hidden="true">' + med(1, 6, 200, { animate: true, level: 3 }) + '<span class="shj-heat"></span>' + crackSvg() + "</span>" +
+        '<span class="shj-spot"></span>' +
+        '<p class="shj-pre" aria-hidden="true">Dark Matter III. The ModuPro is finished.</p>' +
+        '<span class="shj-new">' + med(2, 0, 240, { animate: true, level: 1 }) + "</span>" +
+        glint(38.8, 57.6, LP.set + .55) + glint(63.2, 54.1, LP.set + .8) + sparksHTML(41) +
+        '<span class="shj-lpo" aria-hidden="true"><span class="shj-sun"></span>' + lpSvg() + '<span class="shj-flare"></span>' +
+          glint(32.6, 68.2, LP.click + .3) + glint(67.4, 68.2, LP.click + .45) + "</span>" +
+      "</div>" +
+      '<p class="shj-eyebrow" data-at style="--at:' + s(R0 + .1) + '"><span class="shj-nw">Journey 3 of 3</span> · <span class="shj-nw">' + fmt(250000) + " XP</span></p>" +
+      '<h2 class="shj-title shj-mpt" aria-label="The Loupes are yours." style="--at:' + s(R0 + .25) + '"><span aria-hidden="true">' + words + "</span></h2>" +
+      '<p class="shj-line" data-at style="--at:' + s(R0 + .7) + '">You finished the ModuPro. Your XP, your trophies and everything you earned come with you.</p>' +
+      '<ol class="shj-ahead" aria-label="Seven new ranks, Stone to Dark Matter" style="--at:' + s(R0 + .95) + '">' + ahead + "</ol>" +
+      lootHTML(pays, 1, R0 + 1.45) +
+      '<button type="button" class="shj-go shj-gold" data-shj="go" data-at style="--at:' + s(R0 + 2.4) + '">' + COIN + "Collect " + fmt(pays) + " crowns</button></div>";
+  }
+
+  /* ---------- the typodont, from the front, in mm: x across, y down, the occlusal plane at y = 0. Drawn anew from what
+     these sources say. The crowns' sizes and facial outlines are Wheeler's (Dental Anatomy, Physiology and Occlusion;
+     widget/cases.js has the same table and outlines for the Patient Box cases): the central incisor's sharp mesioincisal
+     and rounded distoincisal angles, the canine's cusp tip and short mesial ridge, the premolars' buccal cusps, the
+     molars' two (the mandibular first, three) rounded buccal cusps with a buccal groove between them. The arches are
+     average adult ones (the maxillary wider and longer, the mandibular behind it by about 2.5 mm of overjet), each tooth
+     set between its contact points on them, so the back teeth turn away and narrow as in a frontal photograph, and a
+     tooth turned away shows its cusps edge-on. The occlusion is Class I (the maxillary canine over the embrasure between
+     the mandibular canine and first premolar), with about 2.5 mm of overbite in front and the curve of Spee. The gum
+     follows every cervical line, with a papilla in each embrasure and the roots' bulges over the front teeth, the canine's
+     the strongest, on the typodont's two soft-gum bases and their plates (Acadental's ModuPRO One, the brochure
+     tools/figures/site/journeys.mjs names: 32 teeth). Illustrative beyond that. ---------- */
+  var TYPO = (function(){
+    /* Catmull-Rom smoothing (widget/cases.js's dense): a point listed twice keeps a sharp corner */
+    function dense(pts, per){
+      var n = pts.length, out = [];
+      for (var i = 0; i < n; i++) {
+        var p0 = pts[(i - 1 + n) % n], p1 = pts[i], p2 = pts[(i + 1) % n], p3 = pts[(i + 2) % n];
+        var c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6], c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
+        for (var j = 0; j < per; j++) { var t = j / per, u = 1 - t;
+          out.push([u * u * u * p1[0] + 3 * u * u * t * c1[0] + 3 * u * t * t * c2[0] + t * t * t * p2[0], u * u * u * p1[1] + 3 * u * u * t * c1[1] + 3 * u * t * t * c2[1] + t * t * t * p2[1]]); }
+      }
+      return out;
+    }
+    /* Wheeler's averages, mm: cw the width at the contacts, cv at the cervix, ch the crown's length, cej how far the
+       cervical line dips at the middle of the facial surface */
+    var XT = {
+      maxI1: { cw: 8.5, cv: 7, ch: 10.5, s: "maxI1", cej: .7 }, maxI2: { cw: 6.5, cv: 5, ch: 9, s: "maxI2", cej: .6 }, maxC: { cw: 7.5, cv: 5.5, ch: 10, s: "maxC", cej: .6 },
+      maxP1: { cw: 7, cv: 5, ch: 8.5, s: "maxP1", cej: .4 }, maxP2: { cw: 6.5, cv: 5, ch: 8.5, s: "maxP2", cej: .4 }, maxM1: { cw: 10, cv: 8, ch: 7.5, s: "maxM", cej: .3 },
+      maxM2: { cw: 9, cv: 7, ch: 7, s: "maxM", cej: .3 }, maxM3: { cw: 8.5, cv: 6.5, ch: 6.5, s: "maxM", cej: .3 },
+      manI1: { cw: 5, cv: 3.5, ch: 9, s: "manI1", cej: .5 }, manI2: { cw: 5.5, cv: 4, ch: 9.5, s: "manI2", cej: .5 }, manC: { cw: 7, cv: 5.5, ch: 11, s: "manC", cej: .6 },
+      manP1: { cw: 7, cv: 5, ch: 8.5, s: "manP1", cej: .4 }, manP2: { cw: 7, cv: 5, ch: 8, s: "manP2", cej: .4 }, manM1: { cw: 11, cv: 9, ch: 7.5, s: "manM1", cej: .3 },
+      manM2: { cw: 10.5, cv: 8, ch: 7, s: "manM2", cej: .3 }, manM3: { cw: 10, cv: 7.5, ch: 7, s: "manM2", cej: .3 }
+    };
+    /* a crown's facial outline (widget/cases.js's crownMM): mesial at -x, the cervix at y = 0, the edge at y = ch */
+    function crown(d){
+      var w = d.cw / 2, v = d.cv / 2, h = d.ch, s = d.s, p;
+      if (s === "maxI1") p = [[-v, 0], [-v - .15, h * .12], [-w + .35, h * .45], [-w, h * .78], [-w + .1, h * .96], [-w + .1, h * .96], [-w + .6, h], [w - 1.4, h * .985], [w - .35, h * .9], [w, h * .68], [w - .3, h * .42], [v + .1, h * .1], [v, 0]];
+      else if (s === "maxI2") p = [[-v, 0], [-v - .1, h * .12], [-w + .3, h * .5], [-w, h * .78], [-w + .25, h * .95], [-w + .9, h], [w - 1.7, h * .97], [w - .5, h * .86], [w, h * .62], [w - .3, h * .4], [v + .1, h * .1], [v, 0]];
+      else if (s === "maxC") p = [[-v, 0], [-v - .2, h * .15], [-w + .3, h * .45], [-w, h * .67], [-w + .3, h * .84], [-.35, h], [w - .45, h * .74], [w, h * .55], [w - .3, h * .35], [v + .1, h * .1], [v, 0]];
+      else if (s === "maxP1") p = [[-v, 0], [-v - .25, h * .2], [-w + .2, h * .45], [-w, h * .62], [-w + .4, h * .82], [.3, h], [w - .4, h * .8], [w, h * .62], [w - .2, h * .45], [v + .25, h * .2], [v, 0]];
+      else if (s === "maxP2") p = [[-v, 0], [-v - .25, h * .2], [-w + .2, h * .45], [-w, h * .62], [-w + .5, h * .86], [0, h * .97], [w - .5, h * .86], [w, h * .62], [w - .2, h * .45], [v + .25, h * .2], [v, 0]];
+      else if (s === "maxM") p = [[-v, 0], [-v - .4, h * .2], [-w + .2, h * .45], [-w, h * .62], [-w + .3, h * .84], [-w * .5, h], [-.05, h * .87], [-.05, h * .87], [w * .45, h * .96], [w - .3, h * .82], [w, h * .6], [w - .2, h * .42], [v + .4, h * .2], [v, 0]];
+      else if (s === "manM1") p = [[-v, 0], [-v - .4, h * .2], [-w + .2, h * .45], [-w, h * .62], [-w + .3, h * .84], [-w * .58, h], [-w * .27, h * .87], [-w * .27, h * .87], [w * .05, h * .97], [w * .33, h * .85], [w * .33, h * .85], [w * .6, h * .9], [w - .25, h * .78], [w, h * .58], [w - .2, h * .42], [v + .4, h * .2], [v, 0]];
+      else if (s === "manM2") p = [[-v, 0], [-v - .4, h * .2], [-w + .2, h * .45], [-w, h * .62], [-w + .3, h * .84], [-w * .48, h], [0, h * .87], [0, h * .87], [w * .46, h * .98], [w - .3, h * .82], [w, h * .6], [w - .2, h * .42], [v + .4, h * .2], [v, 0]];
+      else if (s === "manI1") p = [[-v, 0], [-v - .1, h * .15], [-w + .2, h * .55], [-w, h * .88], [-w + .1, h], [-w + .1, h], [w - .1, h], [w - .1, h], [w, h * .88], [w - .2, h * .55], [v + .1, h * .15], [v, 0]];
+      else if (s === "manI2") p = [[-v, 0], [-v - .1, h * .15], [-w + .2, h * .55], [-w, h * .88], [-w + .1, h], [-w + .1, h], [w - .25, h * .97], [w, h * .84], [w - .2, h * .55], [v + .1, h * .15], [v, 0]];
+      else if (s === "manC") p = [[-v, 0], [-v - .15, h * .3], [-w + .1, h * .62], [-w, h * .75], [-w + .3, h * .9], [-.3, h], [w - .5, h * .8], [w, h * .55], [w - .3, h * .3], [v + .1, h * .1], [v, 0]];
+      else if (s === "manP1") p = [[-v, 0], [-v - .3, h * .2], [-w + .2, h * .45], [-w, h * .6], [-w + .4, h * .8], [-.2, h], [w - .4, h * .8], [w, h * .6], [w - .2, h * .45], [v + .3, h * .2], [v, 0]];
+      else p = [[-v, 0], [-v - .3, h * .2], [-w + .2, h * .45], [-w, h * .6], [-w + .6, h * .86], [0, h * .95], [w - .6, h * .86], [w, h * .6], [w - .2, h * .45], [v + .3, h * .2], [v, 0]];
+      var c = d.cej || 0;
+      return p.concat([[v * .55, -c * .8], [0, -c], [-v * .55, -c * .8]]);
+    }
+    /* the molars' buccal grooves, from the notch between two cusps toward the cervix */
+    function grooves(d){
+      var w = d.cw / 2, h = d.ch;
+      if (d.s === "maxM") return [[[-.05, h * .87], [.05, h * .45]]];
+      if (d.s === "manM1") return [[[-w * .27, h * .87], [-w * .2, h * .5]], [[w * .33, h * .85], [w * .36, h * .58]]];
+      if (d.s === "manM2") return [[[0, h * .87], [.08, h * .48]]];
+      return [];
+    }
+    var POS = ["I1", "I2", "C", "P1", "P2", "M1", "M2", "M3"];
+    /* half of each arch's facial outline, as its contact points from the midline back (x across, z back, mm) */
+    var AF = {
+      u: [[0, 0], [8, 1.8], [13.8, 5.4], [18.6, 11.2], [21, 18], [23.6, 24.2], [26.8, 34], [28.6, 43], [29.6, 51]],
+      l: [[0, 2.5], [4.8, 3.6], [10, 5.8], [14.6, 10.8], [17.8, 17.3], [20.4, 23.8], [23.4, 34.4], [25.6, 44.6], [27.2, 54.5]]
+    };
+    var OFF = [0, .75, 0, .2, .2, 0, .2, .5];           // a maxillary edge's height above the occlusal plane
+    var OB = [2.5, 2.5, 2.2, 1.6, 1.5, 1.4, 1.4, 1.4];  // the vertical overlap: a mandibular edge behind the maxillary
+    var PH = [.42, .42, .4, .32, .3, .26, .25, .24];    // a papilla's tip, as a part of the crown's length
+    function fz(z){ return 260 / (260 + z); }           // the camera 26 cm in front
+    function spee(z){ return -.0009 * z * z; }          // the curve of Spee: the back teeth sit higher
+    function mid(a, b){ return [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2]; }
+    function build(){
+      var teeth = [], gum = {};
+      ["u", "l"].forEach(function(a){
+        var up = a === "u", A = AF[a], row = [];
+        [-1, 1].forEach(function(sd){
+          for (var k = 0; k < 8; k++) (function(k){
+            var d = XT[(up ? "max" : "man") + POS[k]], p0 = A[k], p1 = A[k + 1], w = d.cw / 2, h = d.ch, hc = h * .8;
+            var dx = p1[0] - p0[0], dz = p1[1] - p0[1], face = Math.abs(dx) / Math.sqrt(dx * dx + dz * dz);
+            function P(x, y){
+              if (k > 2 && y > hc) y = hc + (y - hc) * (.15 + .85 * face * face);
+              var t = (x + w) / (2 * w), z = p0[1] + dz * t, f = fz(z), X = (p0[0] + dx * t) * f * sd;
+              return [X, up ? (spee(z) - OFF[k] - (h - y)) * f : (spee(z) - OB[k] + (h - y)) * f];
+            }
+            var c = P(0, h * .5);
+            function rel(p){ var r = P(p[0], p[1]); return [r[0] - c[0], r[1] - c[1]]; }
+            var q = { arch: a, sd: sd, k: k, z: (p0[1] + p1[1]) / 2, face: face, cx: c[0], cy: c[1],
+              pts: dense(crown(d), 6).map(rel), gr: face > .45 ? grooves(d).map(function(l){ return l.map(rel); }) : [],
+              zen: P(0, -d.cej), cm: P(-d.cv / 2, 0), cd: P(d.cv / 2, 0), tipD: P(w, PH[k] * h), tipM: P(-w, PH[k] * h), top: P(0, -9.5),
+              edge: P(0, h)[1] - c[1], w2: Math.abs(P(w, h * .6)[0] - P(-w, h * .6)[0]) };
+            teeth.push(q); row.push(q);
+          })(k);
+        });
+        /* the gum's edge, tooth by tooth across the screen: down into each papilla, up to each tooth's zenith */
+        row.sort(function(m, n){ return m.cx - n.cx; });
+        var e = [];
+        for (var i = 0; i < row.length; i++) {
+          var q = row[i], near = q.sd < 0 ? q.cd : q.cm, far = q.sd < 0 ? q.cm : q.cd, mine = q.sd < 0 ? q.tipD : q.tipM;
+          e.push({ tip: i ? mid(mine, row[i - 1].sd < 0 ? row[i - 1].tipM : row[i - 1].tipD) : mine, c: near, z: q.zen, c2: far });
+        }
+        var lastQ = row[row.length - 1];
+        e.push({ tip: lastQ.sd < 0 ? lastQ.tipM : lastQ.tipD });
+        gum[a] = { row: row, edge: e };
+      });
+      teeth.sort(function(m, n){ return n.z - m.z; });   // the back teeth first: the front ones overlap them at the contacts
+      return { teeth: teeth, gum: gum };
+    }
+    /* the gum's outline: the edge above, then out and around its ends and back across the top */
+    function gumPath(G, up){
+      var e = G.edge, p = new Path2D(), sg = up ? -1 : 1, lo = Infinity, i;
+      G.row.forEach(function(q){ lo = Math.min(lo, sg * q.top[1]); });
+      var top = sg * lo + sg * 1.5, L = e[0].tip[0] - .6, Rr = e[e.length - 1].tip[0] + .6, o = 1.4;
+      p.moveTo(L + o * .6, top); p.quadraticCurveTo(L - o, (top + e[0].tip[1]) / 2, L, e[0].tip[1]);
+      for (i = 0; i < e.length - 1; i++) {
+        if (i) p.quadraticCurveTo(e[i - 1].c2[0], e[i - 1].c2[1], e[i].tip[0], e[i].tip[1]);
+        p.quadraticCurveTo(e[i].c[0], e[i].c[1], e[i].z[0], e[i].z[1]);
+      }
+      var last = e[e.length - 1].tip;
+      p.quadraticCurveTo(e[i - 1].c2[0], e[i - 1].c2[1], last[0], last[1]);
+      p.lineTo(Rr, last[1]); p.quadraticCurveTo(Rr + o, (top + last[1]) / 2, Rr - o * .6, top);
+      p.quadraticCurveTo(0, top + sg * 1.2, L + o * .6, top); p.closePath();
+      return { p: p, top: top, L: L, R: Rr };
+    }
+    return { build: build, gum: gumPath };
+  })();
+
+  /* the moving light of the ModuPro's hand-off: the typodont (its open jaws, the mouth and the Handpiece in it, the bite,
+     the chews, the fold into the medallion), the dust it pulls in, the Handpiece's shards and the coins; the Loupes' hand-off uses it for its
+     coins. null without a canvas. */
+  function labFx(el){
+    var cv = el.querySelector(".shj-cv"), g = cv && cv.getContext ? cv.getContext("2d") : null;
+    if (!g || !window.Path2D) return null;
+    var dpr = Math.min(2, window.devicePixelRatio || 1), W = 0, H = 0, ps = [], ems = [], raf = 0, last = 0, dead = false;
+    var stage = el.querySelector(".shj-stage"), C = { x: 0, y: 0, r: 90 }, jaw = null, M = null, crownP = null;
+    try { crownP = new Path2D(CROWN_D); } catch (e) {}
+    /* positions are taken against the scene, not the canvas, so a shake on the canvas (the bite) shakes what it draws */
+    function at(){ var st = stage.getBoundingClientRect(), c = el.getBoundingClientRect(); C.x = st.left + st.width / 2 - c.left; C.y = st.top + st.height / 2 - c.top; C.r = st.width * .39; }
+    function fit(){ W = cv.clientWidth; H = cv.clientHeight; cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); at(); if (jaw) jaw.k = jawK(jaw.m); }
+    fit(); window.addEventListener("resize", fit);
+    function rnd(a, b){ return a + Math.random() * (b - a); }
+    function pick(a){ return a[Math.random() * a.length | 0]; }
+    function go(){ if (!raf && !dead) raf = requestAnimationFrame(tick); }
+    function tick(now){
+      raf = 0; if (dead) return;
+      var dt = last ? Math.min(.05, (now - last) / 1000) : 1 / 60; last = now;
+      at();
+      ems = ems.filter(function(e){ return e(dt) !== false; });
+      g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
+      if (jaw) drawJaw(dt);
+      for (var i = ps.length - 1; i >= 0; i--) {
+        var p = ps[i]; p.age += dt;
+        var u = p.age / p.life;
+        if (u >= 1 || (p.to && (p.to.x - p.x) * (p.to.x - p.x) + (p.to.y - p.y) * (p.to.y - p.y) < 150)) { ps.splice(i, 1); continue; }
+        var d = Math.pow(p.drag || 1, dt * 60);
+        if (p.acc) d *= 1 + p.acc * dt;
+        p.vx *= d; p.vy = p.vy * d + (p.g || 0) * dt; p.x += p.vx * dt; p.y += p.vy * dt; if (p.vr) p.rot += p.vr * dt;
+        draw(p, u);
+      }
+      g.globalAlpha = 1; g.globalCompositeOperation = "source-over";
+      if (ps.length || ems.length || jaw) go(); else last = 0;
+    }
+    function draw(p, u){
+      if (p.t === "coin") { g.globalCompositeOperation = "source-over"; g.globalAlpha = u > .85 ? (1 - u) / .15 : 1; drawCoin(g, p, crownP); return; }
+      if (p.t === "ring") {
+        g.globalCompositeOperation = "lighter"; g.globalAlpha = (1 - u) * .9; g.strokeStyle = p.c; g.lineWidth = 2 * (1 - u) + .5;
+        g.beginPath(); g.arc(p.x, p.y, p.s * (.2 + u), 0, 6.2832); g.stroke(); return;
+      }
+      if (p.t === "shard") {   // a bit of the chewed Handpiece: metal, its edge catching the light
+        g.globalCompositeOperation = "source-over"; g.globalAlpha = u > .7 ? (1 - u) / .3 : 1;
+        g.save(); g.translate(p.x, p.y); g.rotate(p.rot); g.beginPath(); g.moveTo(-p.s * .6, -p.s * .3); g.lineTo(p.s * .5, -p.s * .45); g.lineTo(p.s * .2, p.s * .4); g.closePath();
+        g.fillStyle = p.c; g.fill(); g.lineWidth = .8; g.strokeStyle = "rgba(255,255,255,.7)"; g.stroke(); g.restore(); return;
+      }
+      if (p.t === "ash") {   // a flake of the burnt ModuPro, dark, its edge still glowing
+        g.globalCompositeOperation = "source-over"; g.globalAlpha = (1 - u) * Math.min(1, u * 10) * .9;
+        g.save(); g.translate(p.x, p.y); g.rotate(p.rot); g.fillStyle = p.c; g.fillRect(-p.s / 2, -p.s * .3, p.s, p.s * .6);
+        g.globalCompositeOperation = "lighter"; g.strokeStyle = "rgba(255,170,80," + (.9 * (1 - u)).toFixed(2) + ")"; g.lineWidth = .9; g.strokeRect(-p.s / 2, -p.s * .3, p.s, p.s * .6); g.restore(); return;
+      }
+      if (p.t === "ember" && p.vx * p.vx + p.vy * p.vy > 3600) {   // a fast ember is a spark, drawn along its path
+        g.globalCompositeOperation = "lighter"; g.globalAlpha = (1 - u) * (.6 + .4 * Math.sin(p.fl + p.age * 26));
+        g.strokeStyle = p.c; g.lineWidth = p.s * .8; g.lineCap = "round";
+        g.beginPath(); g.moveTo(p.x - p.vx * .03, p.y - p.vy * .03); g.lineTo(p.x, p.y); g.stroke(); return;
+      }
+      g.globalCompositeOperation = "lighter";
+      g.globalAlpha = (p.t === "rush" ? Math.min(1, u * 6) * (1 - u) : p.t === "mote" ? Math.sin(3.1416 * u) : p.t === "ember" ? (1 - u) * (.6 + .4 * Math.sin(p.fl + p.age * 26)) : 1 - u * u) * (p.al || 1);
+      if (p.t === "streak" || p.t === "rush") {
+        var tl = p.t === "rush" ? .07 : .035;
+        g.strokeStyle = p.c; g.lineWidth = p.s; g.lineCap = "round";
+        g.beginPath(); g.moveTo(p.x - p.vx * tl, p.y - p.vy * tl); g.lineTo(p.x, p.y); g.stroke();
+      } else {
+        g.fillStyle = p.c; g.beginPath(); g.arc(p.x, p.y, Math.max(.4, p.s * (1 - u * .5)), 0, 6.2832); g.fill();
+        g.globalAlpha *= .25; g.beginPath(); g.arc(p.x, p.y, p.s * (p.t === "ember" ? 2 : 3), 0, 6.2832); g.fill();
+      }
+    }
+    /* ----- the typodont ----- */
+    /* px a mm for the typodont that eats the Handpiece: big, so its open mouth is wider than a medallion m px across (on a
+       phone its back teeth go off the sides), and with its jaws that far open (48 mm of arches and plates plus the gap)
+       it still fits 92% of the height */
+    function jawK(m){ return Math.max(1, Math.min(W * 1.08 / 64, (H * .92 - (m || 0) * 1.15) / 48)); }
+    function mix(a, b, t){ var A = parseInt(a.slice(1), 16), B = parseInt(b.slice(1), 16); function c(s){ return Math.round(((A >> s) & 255) * (1 - t) + ((B >> s) & 255) * t); } return "rgb(" + c(16) + "," + c(8) + "," + c(0) + ")"; }
+    /* each tooth's path and paints, once: the enamel lighter toward the edge, darker on a tooth turned away (out of the
+       lamp), the incisors' translucent edge, a highlight on a tooth that faces you, the molars' buccal grooves */
+    function prepare(){
+      M = TYPO.build();
+      M.teeth.forEach(function(q){
+        var p = new Path2D(), top = Infinity, bot = -Infinity, up = q.arch === "u", dk = Math.pow(1 - q.face, .7) * .85;
+        q.pts.forEach(function(r, i){ if (i) p.lineTo(r[0], r[1]); else p.moveTo(r[0], r[1]); top = Math.min(top, r[1]); bot = Math.max(bot, r[1]); });
+        p.closePath(); q.p = p;
+        var cerv = mix("#EADCC2", "#8F8676", dk), inc = mix("#FFFDF7", "#B3AB9C", dk), f = g.createLinearGradient(0, top, 0, bot);
+        f.addColorStop(0, up ? cerv : inc); f.addColorStop(.55, mix("#FAF6EC", "#A39A8A", dk)); f.addColorStop(1, up ? inc : cerv);
+        q.fill = f; q.ink = q.face > .5 ? "#4A3D47" : "rgba(74,61,71," + (.35 + .5 * q.face).toFixed(2) + ")";
+        if (q.k < 2) { var e = q.edge, t = g.createLinearGradient(0, e - (up ? 2.2 : -2.2), 0, e); t.addColorStop(0, "rgba(214,226,236,0)"); t.addColorStop(1, "rgba(200,216,230,.55)"); q.edgeFill = t; q.ey = [Math.min(e, e - (up ? 2.2 : -2.2)), 2.2]; }
+        if (q.face > .5) { var hx = -q.sd * q.w2 * .12, hy = (up ? 1 : -1) * 1.2, hg = g.createRadialGradient(hx, hy, 0, hx, hy, q.w2 * .45); hg.addColorStop(0, "rgba(255,255,255," + (.45 * q.face).toFixed(2) + ")"); hg.addColorStop(1, "rgba(255,255,255,0)"); q.hl = hg; }
+        if (q.gr.length) { var gp = new Path2D(); q.gr.forEach(function(l){ gp.moveTo(l[0][0], l[0][1]); gp.lineTo(l[1][0], l[1][1]); }); q.gp = gp; }
+      });
+      ["u", "l"].forEach(function(a){
+        var G = M.gum[a], up = a === "u", o = TYPO.gum(G, up), lo = Infinity;
+        G.row.forEach(function(q){ lo = Math.min(lo, up ? q.zen[1] : -q.zen[1]); });
+        var f = g.createLinearGradient(0, o.top, 0, up ? lo : -lo); f.addColorStop(0, "#B65F6C"); f.addColorStop(.6, "#D98A90"); f.addColorStop(1, "#ECA9A8");
+        var sh = g.createLinearGradient(o.L, 0, o.R, 0); sh.addColorStop(0, "rgba(60,10,25,.35)"); sh.addColorStop(.14, "rgba(60,10,25,0)"); sh.addColorStop(.86, "rgba(60,10,25,0)"); sh.addColorStop(1, "rgba(60,10,25,.35)");
+        var bulge = g.createRadialGradient(0, .15, 0, 0, .15, 1); bulge.addColorStop(0, "rgba(255,232,230,1)"); bulge.addColorStop(1, "rgba(255,232,230,0)");
+        var y0 = up ? o.top - 6 : o.top - 1.5, x0 = o.L - 3, x1 = o.R + 3, r = 2.5, pl = new Path2D();
+        pl.moveTo(x0 + r, y0); pl.lineTo(x1 - r, y0); pl.quadraticCurveTo(x1, y0, x1, y0 + r); pl.lineTo(x1, y0 + 7.5 - r); pl.quadraticCurveTo(x1, y0 + 7.5, x1 - r, y0 + 7.5);
+        pl.lineTo(x0 + r, y0 + 7.5); pl.quadraticCurveTo(x0, y0 + 7.5, x0, y0 + 7.5 - r); pl.lineTo(x0, y0 + r); pl.quadraticCurveTo(x0, y0, x0 + r, y0); pl.closePath();
+        var pf = g.createLinearGradient(0, y0, 0, y0 + 7.5); pf.addColorStop(0, "#8D99A6"); pf.addColorStop(1, "#5E6875");
+        G.o = o; G.fill = f; G.shade = sh; G.bulge = bulge; G.plate = pl; G.pf = pf;
+      });
+    }
+    function tooth(q, x, y, rot, sc, px){
+      g.save(); g.translate(x, y); if (rot) g.rotate(rot); if (sc !== 1) g.scale(sc, sc);
+      g.fillStyle = q.fill; g.fill(q.p);
+      if (q.edgeFill || q.hl) {
+        g.save(); g.clip(q.p);
+        if (q.edgeFill) { g.fillStyle = q.edgeFill; g.fillRect(-q.w2, q.ey[0], q.w2 * 2, q.ey[1]); }
+        if (q.hl) { g.fillStyle = q.hl; g.fillRect(-q.w2, -12, q.w2 * 2, 24); }
+        g.restore();
+      }
+      g.lineJoin = "round"; g.lineWidth = 1.1 * px / sc; g.strokeStyle = q.ink; g.stroke(q.p);
+      if (q.gp) { g.lineWidth = .9 * px / sc; g.strokeStyle = "rgba(74,61,71,.7)"; g.stroke(q.gp); }
+      g.restore();
+    }
+    function gum(G, up, px){
+      var o = G.o;
+      g.fillStyle = G.fill; g.fill(o.p);
+      g.save(); g.clip(o.p);
+      /* the roots under the gum: a soft bulge over each front tooth, the canine's the strongest */
+      G.row.forEach(function(q){
+        if (q.k > 3) return;
+        var wd = q.w2 * (q.k === 2 ? .7 : .55), y0 = q.zen[1];
+        g.save(); g.translate(q.zen[0], y0); g.scale(wd / 2, o.top - y0); g.globalAlpha = q.k === 2 ? .2 : q.k === 3 ? .08 : .11;
+        g.fillStyle = G.bulge; g.fillRect(-1, -.2, 2, 1.4); g.restore();
+      });
+      g.fillStyle = G.shade; g.fillRect(o.L, -40, o.R - o.L, 80);
+      g.restore();
+      g.lineWidth = 1.1 * px; g.strokeStyle = "#8E4452"; g.stroke(o.p);
+    }
+    function plate(G, px){ g.fillStyle = G.pf; g.fill(G.plate); g.lineWidth = 1.2 * px; g.strokeStyle = "#252A33"; g.stroke(G.plate); }
+    /* the typodont eats the Handpiece. jaw.gap0 is how wide its jaws open (mm), breathing a little; close() snaps them
+       shut (the bite), chew() opens and closes them once more, gulp() swallows, morph() folds it into the medallion. */
+    function drawJaw(dt){
+      var J = jaw; J.t += dt;
+      var k = J.k, slide = Math.min(1, J.t / .5), se = 1 - Math.pow(1 - slide, 3), gap = J.gap0 + Math.sin(J.t * 3.4) * .9 * se, bob = 0, sq = 1;
+      if (J.close != null) {
+        J.close += dt; var cu = Math.min(1, J.close / .16);
+        gap = J.gap0 * (1 - cu * cu * cu);
+        if (cu >= 1) { if (!J.bit) { J.bit = true; bite(); } gap = -Math.sin(Math.min(1, (J.close - .16) / .2) * Math.PI) * .7; }
+      }
+      J.chews.forEach(function(c){
+        var u = (J.t - c.t0) / .42;
+        if (u > 0 && u < 1) { gap = Math.max(0, gap) + 5.5 * Math.sin(u * Math.PI); bob = -Math.sin(u * Math.PI) * 1.4; }
+        else if (u >= 1 && !c.done) { c.done = true; crumbs(); }
+      });
+      if (J.gulp != null) { J.gulp += dt; var gu = Math.min(1, J.gulp / .5); sq = 1 - .07 * Math.sin(gu * Math.PI * 2) * (1 - gu); }
+      var S = 1, A = 1;
+      if (J.morph != null) { J.morph += dt; var mu = Math.min(1, J.morph / .4); S = 1 - .8 * mu * mu; A = 1 - mu; if (mu >= 1) { jaw = null; return; } }
+      if (J.glow != null) J.glow = Math.min(1, J.glow + dt * .9);
+      if (J.hp) J.hp.t += dt;
+      var off = (1 - se) * H / k, dy = { u: -gap / 2 - off, l: gap / 2 + off }, px = 1 / (k * S);
+      g.save(); g.globalCompositeOperation = "source-over"; g.globalAlpha = A;
+      g.translate(C.x, C.y + (J.cy + bob) * k); g.scale(k * S, k * S * sq);
+      if (gap > .3) mouth(J, dy, se);
+      ["l", "u"].forEach(function(a){
+        var G = M.gum[a];
+        g.save(); g.translate(0, dy[a]); plate(G, px);
+        M.teeth.forEach(function(q){ if (q.arch === a) tooth(q, q.cx, q.cy, 0, 1, px); });
+        gum(G, a === "u", px); g.restore();
+      });
+      if (J.flare != null) {
+        J.flare += dt; var fu = Math.min(1, J.flare / .6);
+        if (fu < 1) { var gr = g.createLinearGradient(-34, 0, 34, 0); gr.addColorStop(0, "rgba(241,232,255,0)"); gr.addColorStop(.5, "rgba(241,232,255,.95)"); gr.addColorStop(1, "rgba(241,232,255,0)");
+          g.globalCompositeOperation = "lighter"; g.globalAlpha = A * (1 - fu); g.fillStyle = gr; g.fillRect(-34, -1.2 - .8 * (1 - fu), 68, 1.6 * (1 - fu) + .6); }
+      }
+      if (J.morph != null) { g.globalCompositeOperation = "lighter"; g.globalAlpha = Math.min(1, J.morph / .2) * .8; var rg = g.createRadialGradient(0, 0, 0, 0, 0, 40); rg.addColorStop(0, "rgba(255,255,255,1)"); rg.addColorStop(1, "rgba(255,255,255,0)"); g.fillStyle = rg; g.fillRect(-40, -40, 80, 80); }
+      g.restore();
+    }
+    /* the inside of the open mouth, dark, glowing purple as it pulls, and the Handpiece in it once it has been pulled in
+       (drawn here, before the teeth, so they close over it) */
+    function mouth(J, dy, se){
+      var ry = (dy.l - dy.u) / 2 + 5, cy = (dy.u + dy.l) / 2;
+      g.save(); g.globalAlpha *= se * se; g.translate(0, cy); g.scale(23 / 26, ry / 26);   // inside the arches, its edge soft
+      var rg = g.createRadialGradient(0, 0, 0, 0, 0, 26); rg.addColorStop(0, "#2A0B24"); rg.addColorStop(.62, "#12040F"); rg.addColorStop(.9, "rgba(6,1,6,.85)"); rg.addColorStop(1, "rgba(6,1,6,0)");
+      g.fillStyle = rg; g.beginPath(); g.arc(0, 0, 26, 0, 6.2832); g.fill();
+      if (J.glow) {
+        var pg = g.createRadialGradient(0, 0, 0, 0, 0, 22); pg.addColorStop(0, "rgba(155,107,255," + (.6 * J.glow).toFixed(2) + ")"); pg.addColorStop(1, "rgba(122,60,255,0)");
+        g.globalCompositeOperation = "lighter"; g.fillStyle = pg; g.fill();
+      }
+      g.restore();
+      var hp = J.hp;
+      if (hp && !J.bit) {
+        var u = Math.min(1, hp.t / .3), mx = C.x, my = C.y + J.cy * J.k, sz = hp.s * (1 - .55 * u);
+        g.save(); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.globalAlpha = 1 - .35 * u;
+        g.translate(hp.x + (mx - hp.x) * u, hp.y + (my - hp.y) * u); g.rotate(-.44 - 2.2 * u);
+        g.drawImage(hp.img, -sz / 2, -sz / 2, sz, sz); g.restore();
+      }
+    }
+    /* the bite: a flash along it, and the Handpiece in pieces: shards of metal and Dark Matter sparks out of the corners of
+       the mouth and the front, falling */
+    function bite(){
+      jaw.flare = 0;
+      var y = C.y + jaw.cy * jaw.k, k = jaw.k, i, side, x;
+      for (i = 0; i < 90; i++) {
+        side = i % 3 === 0 ? 0 : i % 3 === 1 ? -1 : 1; x = C.x + (side ? side * rnd(18, 27) : rnd(-12, 12)) * k;
+        ps.push({ t: "shard", x: x, y: y + rnd(-2, 2) * k, vx: side ? side * rnd(220, 640) : rnd(-160, 160), vy: rnd(-520, side ? 80 : -120), g: 1300, drag: .985, life: rnd(.8, 1.5), age: 0,
+          s: rnd(4, 10), rot: rnd(0, 6.28), vr: rnd(-12, 12), c: pick(["#8E98A3", "#C9D1DA", "#5E6673", "#3B2E3A", "#7A3CFF", "#C9B6F5"]) });
+      }
+      for (i = 0; i < 70; i++) {
+        side = Math.random() < .5 ? -1 : 1; x = C.x + side * rnd(10, 27) * k;
+        ps.push({ t: i % 2 ? "dot" : "streak", x: x, y: y, vx: side * rnd(120, 700), vy: rnd(-600, 200), g: 900, drag: .96, life: rnd(.5, 1.2), age: 0, s: rnd(1, 2.6), c: pick(["#FFFFFF", "#C9B6F5", "#9B6BFF", "#E9DDFF", "#7FA0FF"]) });
+      }
+      ps.push({ t: "ring", x: C.x, y: y, vx: 0, vy: 0, life: .8, age: 0, s: 34 * k, c: "#E9DDFF" });
+    }
+    /* what falls out of the corners of the mouth at each chew */
+    function crumbs(){
+      var y = C.y + jaw.cy * jaw.k, k = jaw.k;
+      for (var i = 0; i < 22; i++) {
+        var side = Math.random() < .5 ? -1 : 1;
+        ps.push({ t: i % 3 ? "shard" : "dot", x: C.x + side * rnd(16, 26) * k, y: y, vx: side * rnd(40, 240), vy: rnd(-260, -40), g: 1200, drag: .99, life: rnd(.7, 1.2), age: 0,
+          s: i % 3 ? rnd(3, 6) : rnd(1, 2), rot: rnd(0, 6.28), vr: rnd(-10, 10), c: pick(["#8E98A3", "#C9D1DA", "#5E6673", "#9B6BFF", "#C9B6F5"]) });
+      }
+    }
+    function centerOf(n){ var b = n.getBoundingClientRect(), c = el.getBoundingClientRect(); return { x: b.left + b.width / 2 - c.left, y: b.top + b.height / 2 - c.top }; }
+    return {
+      /* the ModuPro's scene: dust and stars streaming into the open mouth, faster and faster */
+      suck: function(sec){
+        var t = 0;
+        ems.push(function(dt){
+          t += dt; if (t > sec || !jaw) return false;
+          var to = { x: C.x, y: C.y + jaw.cy * jaw.k }, n = (60 + 380 * Math.min(1, t / sec)) * dt;
+          while (n > 0) {
+            if (n < 1 && Math.random() > n) break; n--;
+            var a = rnd(0, 6.2832), r = rnd(C.r * 1.3, C.r * 3.4), v = rnd(40, 110);
+            ps.push({ t: "rush", x: to.x + Math.cos(a) * r, y: to.y + Math.sin(a) * r, vx: -Math.cos(a) * v, vy: -Math.sin(a) * v, acc: 2.4, life: 1.6, age: 0, to: to,
+              s: rnd(.8, 2.2), al: rnd(.5, 1), c: pick(["#FFFFFF", "#E9DDFF", "#C9B6F5", "#9B6BFF", "#7FA0FF"]) });
+          }
+        });
+        go();
+      },
+      /* the Loupes' scene: dust turning in the headlight's beam, from the lamp down past the ModuPro */
+      motes: function(sec, lamp){
+        var t = 0;
+        ems.push(function(dt){
+          t += dt; if (t > sec) return false;
+          var a = centerOf(lamp), bx = C.x, by = C.y + C.r * 1.1, n = 80 * dt;
+          while (n > 0) {
+            if (n < 1 && Math.random() > n) break; n--;
+            var u = Math.sqrt(Math.random()), hw = 3 + (by - a.y) * u * .26;
+            ps.push({ t: "mote", x: a.x + (bx - a.x) * u + rnd(-1, 1) * hw, y: a.y + (by - a.y) * u, vx: rnd(-10, 10), vy: rnd(-22, 6), life: rnd(1.1, 2.2), age: 0,
+              s: rnd(.7, 2), al: rnd(.4, 1), c: pick(["#FFFFFF", "#FFF4C2", "#FFE7A0"]) });
+          }
+        });
+        go();
+      },
+      /* embers lifting off the ModuPro as it heats, more and more */
+      embers: function(sec){
+        var t = 0;
+        ems.push(function(dt){
+          t += dt; if (t > sec) return false;
+          var n = (25 + 320 * Math.pow(t / sec, 1.6)) * dt;
+          while (n > 0) {
+            if (n < 1 && Math.random() > n) break; n--;
+            var a = rnd(0, 6.2832), r = C.r * Math.sqrt(Math.random()) * .95;
+            ps.push({ t: "ember", x: C.x + Math.cos(a) * r, y: C.y + Math.sin(a) * r, vx: rnd(-30, 30), vy: rnd(-150, -30), g: -320, drag: .985, life: rnd(.6, 1.3), age: 0,
+              s: rnd(.9, 2.6), fl: rnd(0, 6.28), c: pick(["#FFF4C2", "#FFD36B", "#FF9A3C", "#FFFFFF", "#FFB86B"]) });
+          }
+        });
+        go();
+      },
+      /* it burns away: embers and the ModuPro's ash thrown out, then drawn up into the light, and rings */
+      burn: function(){
+        var i, a, v, r;
+        for (i = 0; i < 240; i++) { a = rnd(0, 6.2832); v = rnd(120, 720); r = C.r * Math.sqrt(Math.random()) * .8;
+          ps.push({ t: "ember", x: C.x + Math.cos(a) * r, y: C.y + Math.sin(a) * r, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 120, g: -420, drag: .93, life: rnd(.9, 2.1), age: 0,
+            s: rnd(1, 3.2), fl: rnd(0, 6.28), c: pick(["#FFFFFF", "#FFF4C2", "#FFD36B", "#FF9A3C"]) }); }
+        for (i = 0; i < 150; i++) { a = rnd(0, 6.2832); v = rnd(80, 520); r = C.r * Math.sqrt(Math.random());
+          ps.push({ t: "ash", x: C.x + Math.cos(a) * r, y: C.y + Math.sin(a) * r, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 80, g: -260, drag: .94, life: rnd(1.1, 2.4), age: 0,
+            s: rnd(2, 6.5), rot: rnd(0, 6.28), vr: rnd(-8, 8), c: pick(["#2A1456", "#3B1E6E", "#1E2A5E", "#5A2A86", "#14102A"]) }); }
+        [1, 1.6, 2.3].forEach(function(k, i){ ps.push({ t: "ring", x: C.x, y: C.y, vx: 0, vy: 0, life: .9 + i * .25, age: 0, s: C.r * k * 1.8, c: i ? "#FFE7A0" : "#FFFFFF" }); });
+        go();
+      },
+      /* the Loupes medallion forms: a ring and glitter off its rim */
+      glitter: function(){
+        for (var i = 0; i < 70; i++) { var a = rnd(0, 6.2832), v = rnd(60, 340);
+          ps.push({ t: "streak", x: C.x + Math.cos(a) * C.r * .9, y: C.y + Math.sin(a) * C.r * .9, vx: Math.cos(a) * v, vy: Math.sin(a) * v, drag: .94, life: rnd(.6, 1.2), age: 0,
+            s: rnd(1, 2.2), c: pick(["#FFFFFF", "#9FF3E0", "#D5FFF6", "#FFE7A0"]) }); }
+        ps.push({ t: "ring", x: C.x, y: C.y, vx: 0, vy: 0, life: 1, age: 0, s: C.r * 2.2, c: "#9FF3E0" });
+        go();
+      },
+      /* the typodont comes in with its jaws open wide enough to swallow a medallion m px across */
+      jaw: function(m){ if (!M) prepare(); jaw = { t: 0, cy: 2, m: m, chews: [], glow: null }; jaw.k = jawK(m); jaw.gap0 = Math.max(14, m * 1.15 / jaw.k); go(); },
+      /* the mouth starts to glow and pull */
+      pull: function(){ if (jaw) jaw.glow = 0; },
+      /* the Handpiece, from here drawn in the mouth: img at x, y (page px), size px across */
+      swallow: function(img, x, y, size){ if (jaw) { var c = el.getBoundingClientRect(); jaw.hp = { img: img, x: x - c.left, y: y - c.top, s: size, t: 0 }; } },
+      close: function(){ if (jaw) jaw.close = 0; },
+      chew: function(){ if (jaw) jaw.chews.push({ t0: jaw.t }); },
+      gulp: function(){ if (jaw) jaw.gulp = 0; },
+      morph: function(){ if (jaw) jaw.morph = 0; },
+      coins: function(from, n, up){
+        var o = centerOf(from);
+        for (var i = 0; i < n; i++) ps.push({ t: "coin", x: o.x, y: o.y, vx: rnd(-1, 1) * (up ? 140 : 380), vy: up ? rnd(-1900, -1400) : rnd(-1150, -560), g: up ? 0 : 1500, drag: .995,
+          life: up ? rnd(.5, .7) : rnd(1.6, 2.4), age: 0, s: rnd(18, 30), rot: rnd(-.4, .4), vr: rnd(-3, 3), flip: rnd(0, 6.28), vf: rnd(4, 9) });
+        go();
+      },
+      rain: function(n){
+        for (var i = 0; i < n; i++) ps.push({ t: "coin", x: rnd(0, W), y: rnd(-260, -30), vx: rnd(-40, 40), vy: rnd(80, 260), g: 900, drag: .99,
+          life: rnd(1.8, 2.8), age: 0, s: rnd(16, 28), rot: rnd(-.5, .5), vr: rnd(-2, 2), flip: rnd(0, 6.28), vf: rnd(3, 8) });
+        go();
+      },
+      stop: function(){ dead = true; if (raf) cancelAnimationFrame(raf); raf = 0; window.removeEventListener("resize", fit); }
+    };
+  }
+  /* a hand-off that pays: Skip to its last frame (the reward stays), the crowns counted up with coins, Collect */
+  function paying(el, pays, opt, done, o){
+    var timers = [], fx = null, settled = false, alive = true, collecting = false;
+    var num = el.querySelector(".shj-num"), coinEl = el.querySelector(".shj-coin");
+    function at(t, f){ timers.push(setTimeout(f, t * 1000)); }
+    function stopAll(){ timers.forEach(clearTimeout); timers = []; alive = false; if (o.stop) o.stop(); if (fx) { fx.stop(); fx = null; } }
+    open(el, { still: opt.still, focusAt: o.focusAt, peakAt: o.peakAt, detail: o.detail,
+      skip: function(){
+        if (settled) return false;
+        settled = true; stopAll(); el.classList.add("is-still"); if (o.still) o.still();
+        if (num) num.textContent = "+" + fmt(pays);
+        var sk = el.querySelector(".shj-skip"); if (sk) sk.remove();
+        try { el.querySelector(".shj-go").focus({ preventScroll: true }); } catch (e) {}
+        return true;
+      },
+      go: function(close){
+        if (collecting) return; collecting = true;
+        if (!fx || el.classList.contains("is-still") || !coinEl) { close(); return; }
+        el.classList.add("is-collect"); fx.coins(coinEl, 14, true); setTimeout(close, 520);
+      },
+      end: stopAll }, done);
+    if (el.classList.contains("is-still")) { if (o.still) o.still(); return null; }
+    fx = labFx(el);
+    if (num) num.textContent = "+0";
+    var t = o.reward;
+    at(t, function(){ if (num) countUp(num, pays, 1400, function(){ return alive; }); if (fx && coinEl) { fx.coins(coinEl, 26); fx.rain(40); } });
+    at(t + 1.4, function(){ if (fx && coinEl) fx.coins(coinEl, 16); });
+    at(o.end, function(){ settled = true; });
+    return { fx: function(){ return fx; }, at: at };
+  }
+  function modupro(d, done, opt){
+    var pays = journeyCrowns(1), el = shell("shj-hand shj-mp", "A new journey: the ModuPro", mpHTML(d));
+    ["rum", "shiv", "suck", "chomp", "slam", "rise"].forEach(function(k){ el.style.setProperty("--" + k, MP[k] + "s"); });
+    var run = paying(el, pays, opt, done, { focusAt: (MP_R + 2.4) * 1000 + 100, peakAt: MP.chomp * 1000, detail: { kind: "handoff", journey: 1 },
+      reward: MP_R + 1.75, end: MP_R + 2.4 });
+    if (!run) return;
+    var st = el.querySelector(".shj-stage").getBoundingClientRect(), hp = el.querySelector(".shj-hp .shj-med");
+    el.style.setProperty("--dy", Math.round(innerHeight / 2 - (st.top + st.height / 2)) + "px");
+    /* the Handpiece as a picture the canvas can draw inside the mouth, behind the teeth (without it, it just goes at the bite) */
+    var img = null;
+    try { var im = new Image(); im.onload = function(){ img = im; }; im.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(R.artOf(0, 6, 400, { animate: true, level: 3 }).replace("<svg ", '<svg xmlns="http://www.w3.org/2000/svg" ')); } catch (e) {}
+    function fx(f){ return function(){ var x = run.fx(); if (x) f(x); }; }
+    run.at(MP.jaw, fx(function(x){ x.jaw(hp ? hp.offsetWidth || 200 : 200); }));
+    run.at(MP.pull, fx(function(x){ x.pull(); x.suck(MP.chomp - MP.pull); }));
+    run.at(MP.swap, function(){
+      var x = run.fx(); if (!x || !img || !hp) return;
+      var b = hp.getBoundingClientRect();
+      x.swallow(img, b.left + b.width / 2, b.top + b.height / 2, hp.offsetWidth * .55); el.classList.add("is-gulp");
+    });
+    run.at(MP.close, fx(function(x){ x.close(); }));
+    run.at(MP.chomp, function(){ el.classList.add("is-gulp"); });
+    run.at(MP.chew, fx(function(x){ x.chew(); }));
+    run.at(MP.chew2, fx(function(x){ x.chew(); }));
+    run.at(MP.gulp, fx(function(x){ x.gulp(); }));
+    run.at(MP.morph, fx(function(x){ x.morph(); }));
+    run.at(MP_R, function(){ el.classList.add("is-told"); });
+  }
+  function loupes(d, done, opt){
+    var pays = journeyCrowns(2), el = shell("shj-hand shj-lp", "A new journey: the Loupes", lpHTML(d));
+    Object.keys(LP).forEach(function(k){ el.style.setProperty("--" + k, LP[k] + "s"); });
+    el.style.setProperty("--heat", (LP.burn - LP.sun) + "s");
+    var run = paying(el, pays, opt, done, { focusAt: (LP_R + 2.4) * 1000 + 100, peakAt: LP.burn * 1000, detail: { kind: "handoff", journey: 2 },
+      reward: LP_R + 1.75, end: LP_R + 2.4 });
+    if (!run) return;
+    /* the loupes hang 1.35 stages above the ModuPro's middle, and it and its caption reach .43 stages and 58px below: that,
+       scaled up as far as the screen allows (at most 1.6 times), in the middle of the screen */
+    var st = el.querySelector(".shj-stage").getBoundingClientRect(), lamp = el.querySelector(".shj-flare"), w = st.width || 1;
+    var a = 1.345 * w, b = .43 * w + 58;   // above the ModuPro's middle, and below it with the caption
+    var z = Math.max(1, Math.min(1.6, (innerHeight - 70) / (a + b), (innerWidth - 24) / (1.25 * w))), yc = innerHeight / 2 + (a - b) * z / 2;
+    el.style.setProperty("--dy", Math.round(yc - (st.top + st.height / 2)) + "px");
+    el.style.setProperty("--zoom", z.toFixed(3)); el.style.setProperty("--my", Math.round(yc) + "px");
+    function fx(f){ return function(){ var x = run.fx(); if (x) f(x); }; }
+    run.at(LP.beam, fx(function(x){ x.motes(LP.drop - LP.beam + .3, lamp); }));
+    run.at(LP.sun, fx(function(x){ x.embers(LP.burn - LP.sun); }));
+    run.at(LP.burn, fx(function(x){ x.burn(); }));
+    run.at(LP.set + .05, fx(function(x){ x.glitter(); }));
+    run.at(LP_R, function(){ el.classList.add("is-told"); });
+  }
+  function handoff(d, done, opt){
+    d = d || {}; opt = opt || {};
+    R.needJourneyArt(function(){
+      if ((d.to | 0) >= 2) loupes(d, done, opt); else modupro(d, done, opt);
+    });
+  }
+
+  /* ---------- the Dark Matter unlock (Sam, 2026-11-20: "make it significantly more epic and rewarding feeling"; it had
+     looked like any other rank). About 8.5 seconds to the button:
+       0.5-3.3 s  gravity: dust streams into the Diamond III medallion, a disk forms and spins up, rings close in on it, it
+                  trembles harder and harder;
+       3.3-4.3 s  it collapses into a point, and a beat of dark;
+       4.3 s      the detonation (--bang): a flash, shock waves, the screen shakes, the journey's sky opens, the Dark Matter
+                  medallion slams in with rays and a slow ring of light around it;
+       4.6-5.6 s  the medallion rises from the middle of the screen to its place;
+       5.5-7.6 s  "Dark Matter" letter by letter and a sheen across it, the line, then the reward: 5,000 Shiny Gold Crowns
+                  counted up with a fountain of coins and a rain of them (migration_v89 pays them), and on the Handpiece the
+                  rank's two Legendary pieces for Timmy's place;
+       8.5 s      "Collect 5,000 crowns" (the coin flies up as it closes).
+     Skip jumps to the last frame (the reward stays), Esc closes. Each journey has its own sky and colors. ---------- */
+  var DARK_LINE = ["The casing goes dark and the stars come out.", "A nebula drifts between the teeth.", "A constellation, seen through both lenses."];
+  var DM_PAL = [["#C9B6F5", "#9B6BFF", "#7A3CFF", "#E9DDFF", "#7FA0FF"], ["#F5B6E3", "#E65AC8", "#8FB0FF", "#3F74FF", "#FFD3F1"], ["#9FF3E0", "#46DCBE", "#7F98FF", "#D5FFF6", "#5BC0FF"]];
+  /* the Shiny Gold Crown coin (widget/hub-art/shop.js draws it for the shop; the same outline here) */
+  var CROWN_D = "M6.2 17.4 C4.5 14.3 3.5 10.9 4.3 8.1 C4.9 5.9 6.5 4.4 8.4 4.5 C10 4.6 10.8 6.1 12 6.1 C13.2 6.1 14 4.6 15.6 4.5 C17.5 4.4 19.1 5.9 19.7 8.1 C20.5 10.9 19.5 14.3 17.8 17.4 Z";
+  var COIN = '<svg viewBox="0 0 24 24" aria-hidden="true" stroke-linejoin="round" stroke-linecap="round"><path d="' + CROWN_D + '" fill="#F2C94C" stroke="#3B2E3A" stroke-width="1.4"/>' +
+    '<path d="M15.7 5.3 C17.4 5.5 18.6 6.7 19 8.4 C19.6 11 18.8 14.2 17.4 16.8 L14.9 16.4 C16.6 12.6 17.1 8.8 15.7 5.3 Z" fill="#C9971C"/><path d="M12 6.4 V9.6 M9.4 9 Q12 10.5 14.6 9" fill="none" stroke="#9C7414" stroke-width="1"/>' +
+    '<ellipse cx="12" cy="17.5" rx="5.8" ry="2.3" fill="#8A6410" stroke="#3B2E3A" stroke-width="1.4"/><path d="M7.4 18.3 Q12 20.3 16.6 18.3 Q12 21 7.4 18.3 Z" fill="#C9971C"/>' +
+    '<path d="M6.3 9.4 C6.5 7.8 7.2 6.8 8.1 6.3" stroke="#fff" stroke-width="1.2" fill="none" opacity=".7"/><path d="M8.6 9.6 Q9 11.2 10.6 11.6 Q9 12 8.6 13.6 Q8.2 12 6.6 11.6 Q8.2 11.2 8.6 9.6 Z" fill="#fff"/></svg>';
+  var HOUSE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/></svg>';
+  /* a coin in flight on a scene's canvas: a Shiny Gold Crown, turning */
+  function drawCoin(g, p, crown){
+    var sx = Math.cos(p.flip + p.age * p.vf), s = p.s / 24;
+    g.save(); g.translate(p.x, p.y); g.rotate(p.rot); g.scale(s * (.3 + .7 * Math.abs(sx)), s); g.translate(-12, -12);
+    if (crown) {
+      g.fillStyle = sx > 0 ? "#F2C94C" : "#D9A21F"; g.fill(crown); g.lineWidth = 1.6; g.strokeStyle = "#3B2E3A"; g.stroke(crown);
+      g.fillStyle = "#8A6410"; g.beginPath(); g.ellipse(12, 17.5, 5.8, 2.3, 0, 0, 6.2832); g.fill(); g.stroke();
+    } else { g.fillStyle = "#F2C94C"; g.beginPath(); g.arc(12, 12, 9, 0, 6.2832); g.fill(); }
+    g.restore();
+  }
+  /* what reaching it pays (sh_prizes()'s dark, which widget/v3.js's PRIZES copies) */
+  function darkCrowns(){ var P = window.shGame && window.shGame.prizes; return P && P.dark > 0 ? P.dark : 5000; }
+  function darkHTML(d){
+    var j = Math.max(0, Math.min(2, d.journey | 0)), B = 4.3, pays = darkCrowns();
+    function at(x){ return (B + x).toFixed(2) + "s"; }
+    var cons = j === 2 ? '<path class="shj-const" d="M120 150 L210 110 L300 170 L390 128 L470 200 M300 170 L282 268 M560 96 L640 150 L700 120" fill="none" stroke="#9FF3E0" stroke-opacity=".55" stroke-width="1.2"/>' : "";
+    var i = 0, title = "Dark Matter".split(" ").map(function(w){
+      return '<span class="shj-nw">' + w.split("").map(function(c){ return '<span class="shj-lt" style="--i:' + (i++) + '">' + c + "</span>"; }).join("") + "</span>";
+    }).join(" ");
+    var line = fmt(floorOf(j, 6)) + " XP. " + DARK_LINE[j] + (d.position && d.of ? " You’re #" + fmt(d.position) + " of " + fmt(d.of) + " in the class." : "");
+    return '<span class="shj-neb"></span><svg class="shj-sky" viewBox="0 0 800 600" preserveAspectRatio="xMidYMid slice" aria-hidden="true">' + cons + stars(11 + j * 6, 150, 800, 600) + "</svg>" +
+      '<canvas class="shj-cv" aria-hidden="true"></canvas>' +
+      '<span class="shj-flash" style="--at:' + at(0) + '"></span>' +
+      '<div class="shj-in"><div class="shj-stage">' +
+        '<span class="shj-rays" style="--at:' + at(.1) + '"></span><span class="shj-glow"></span><span class="shj-pull"></span>' +
+        '<span class="shj-lens" style="--at:.9s"></span><span class="shj-lens" style="--at:1.2s"></span><span class="shj-lens" style="--at:1.5s"></span>' +
+        '<span class="shj-wave" style="--at:' + at(0) + '"></span><span class="shj-wave is-c" style="--at:' + at(.12) + '"></span><span class="shj-wave is-t" style="--at:' + at(.3) + '"></span>' +
+        '<span class="shj-was" aria-hidden="true">' + med(j, 5, 200, { animate: true, level: 3 }) + "</span>" +
+        '<p class="shj-pre" aria-hidden="true">Something is pulling at the ' + esc(JN[j]) + "…</p>" +
+        '<span class="shj-core"></span>' +
+        '<span class="shj-is">' + med(j, 6, 240, { animate: true, level: 1 }) + "</span></div>" +
+      '<p class="shj-eyebrow" data-at style="--at:' + at(1.15) + '"><span class="shj-nw">' + esc(JN[j]) + '</span> · <span class="shj-nw">rank 7 of 7</span></p>' +
+      '<h2 class="shj-title shj-dmt" aria-label="Dark Matter" style="--at:' + at(1.25) + ";--sh:" + at(2.4) + '"><span class="shj-tglow"></span><span aria-hidden="true">' + title + '</span><span class="shj-sheen" aria-hidden="true">Dark Matter</span></h2>' +
+      '<p class="shj-line" data-at style="--at:' + at(1.9) + '">' + esc(line) + "</p>" +
+      '<div class="shj-loot" data-at style="--at:' + at(2.4) + ";--cn:" + at(2.6) + '">' +
+        '<div class="shj-lrow"><span class="shj-coin">' + COIN + '</span><span class="shj-amt"><b class="shj-num" aria-hidden="true">+' + fmt(pays) + '</b><span class="shj-sr">' + fmt(pays) + " </span><small>Shiny Gold Crowns</small></span></div>" +
+        (j === 0 ? '<div class="shj-lrow shj-lplace" data-at style="--at:' + at(3.3) + '"><span class="shj-hic">' + HOUSE + "</span><span><b>For Timmy’s place<span class=\"shj-tag\">2 Legendary</span></b>The Dark Matter cloak and the Dark Matter orb.</span></div>" : "") +
+      "</div>" +
+      '<button type="button" class="shj-go" data-shj="go" data-at style="--at:' + at(4.2) + '">' + COIN + "Collect " + fmt(pays) + " crowns</button></div>";
+  }
+  /* the moving light: dust pulled in, the disk, the burst, the ring around the new medallion, shooting stars and the coins,
+     all on one canvas (hundreds of moving points as page elements would each be a layer). null without a canvas. */
+  function cosmos(el, j){
+    var cv = el.querySelector(".shj-cv"), g = cv && cv.getContext ? cv.getContext("2d") : null;
+    if (!g) return null;
+    var pal = DM_PAL[j], dpr = Math.min(2, window.devicePixelRatio || 1), W = 0, H = 0, ps = [], ems = [], raf = 0, last = 0, dead = false;
+    var C = { x: 0, y: 0, r: 90 }, disk = null, crown = null;
+    try { crown = new Path2D(CROWN_D); } catch (e) {}
+    var stage = el.querySelector(".shj-stage");
+    /* where the medallion is now: the stage moves (it rises into place, the screen shakes), and the light follows it */
+    function at(){ var st = stage.getBoundingClientRect(), c = cv.getBoundingClientRect(); C.x = st.left + st.width / 2 - c.left; C.y = st.top + st.height / 2 - c.top; C.r = st.width * .36; }
+    function fit(){ W = cv.clientWidth; H = cv.clientHeight; cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); at(); }
+    fit(); window.addEventListener("resize", fit);
+    function rnd(a, b){ return a + Math.random() * (b - a); }
+    function pick(a){ return a[Math.random() * a.length | 0]; }
+    function go(){ if (!raf && !dead) raf = requestAnimationFrame(tick); }
+    function tick(now){
+      raf = 0; if (dead) return;
+      var dt = last ? Math.min(.05, (now - last) / 1000) : 1 / 60; last = now;
+      ems = ems.filter(function(e){ return e(dt) !== false; });
+      g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
+      at();
+      if (disk) drawDisk(dt);
+      for (var i = ps.length - 1; i >= 0; i--) {
+        var p = ps[i]; p.age += dt;
+        var u = p.age / p.life;
+        if (u >= 1) { ps.splice(i, 1); continue; }
+        move(p, u, dt); draw(p, u);
+      }
+      g.globalAlpha = 1; g.globalCompositeOperation = "source-over";
+      if (ps.length || ems.length || disk) go(); else last = 0;
+    }
+    function move(p, u, dt){
+      if (p.t === "pull") {
+        var k = Math.pow(u, 1.6), r = p.r1 + (p.r0 - p.r1) * (1 - k), th = p.th + p.spin * k;
+        p.px = p.x; p.py = p.y; p.x = C.x + Math.cos(th) * r; p.y = C.y + Math.sin(th) * r;
+        if (p.px == null) { p.px = p.x; p.py = p.y; }
+        return;
+      }
+      var d = Math.pow(p.drag || 1, dt * 60);
+      p.vx *= d; p.vy = p.vy * d + (p.g || 0) * dt; p.x += p.vx * dt; p.y += p.vy * dt; if (p.vr) p.rot += p.vr * dt;
+    }
+    function draw(p, u){
+      var a = p.t === "pull" ? Math.min(1, u * 5) * (u > .92 ? (1 - u) / .08 : 1) : p.t === "coin" ? (u > .85 ? (1 - u) / .15 : 1) : p.t === "shoot" ? Math.sin(Math.PI * u) : 1 - u * u;
+      g.globalAlpha = a * (p.al || 1);
+      if (p.t === "coin") { coin(p); return; }
+      g.globalCompositeOperation = "lighter";
+      if (p.t === "pull" || p.t === "streak" || p.t === "shoot") {
+        var tx, ty, tl = p.t === "shoot" ? .1 : .045;
+        if (p.t === "pull") { tx = p.x + (p.px - p.x) * 5; ty = p.y + (p.py - p.y) * 5; } else { tx = p.x - p.vx * tl; ty = p.y - p.vy * tl; }
+        g.strokeStyle = p.c; g.lineWidth = p.s; g.lineCap = "round"; g.beginPath(); g.moveTo(tx, ty); g.lineTo(p.x, p.y); g.stroke();
+      } else if (p.t === "star") {
+        var s = p.s * (1 - u * .6);
+        g.save(); g.translate(p.x, p.y); g.rotate(p.rot); g.fillStyle = p.c; g.beginPath();
+        g.moveTo(0, -s); g.quadraticCurveTo(0, 0, s, 0); g.quadraticCurveTo(0, 0, 0, s); g.quadraticCurveTo(0, 0, -s, 0); g.quadraticCurveTo(0, 0, 0, -s);
+        g.fill(); g.restore();
+      } else {
+        g.fillStyle = p.c; g.beginPath(); g.arc(p.x, p.y, Math.max(.4, p.s * (1 - u * .5)), 0, 6.2832); g.fill();
+        g.globalAlpha *= .25; g.beginPath(); g.arc(p.x, p.y, p.s * 3, 0, 6.2832); g.fill();
+      }
+    }
+    function coin(p){ g.globalCompositeOperation = "source-over"; drawCoin(g, p, crown); }
+    function makeDisk(n, r0, r1, w, sq, tilt){
+      var parts = [];
+      for (var i = 0; i < n; i++) parts.push({ a: rnd(0, 6.2832), rr: rnd(r0, r1), s: rnd(.6, 2.2), c: pick(pal), al: rnd(.35, 1) });
+      return { parts: parts, w: w, sq: sq, tilt: tilt, k: .5, kTo: 1, al: 0, alTo: 1, rate: 1, spd: 1 };
+    }
+    function drawDisk(dt){
+      var D = disk, e = Math.min(1, dt * D.rate * 3);
+      D.k += (D.kTo - D.k) * e; D.al += (D.alTo - D.al) * Math.min(1, dt * D.rate * 2);
+      var ct = Math.cos(D.tilt), st = Math.sin(D.tilt), R = C.r * D.k;
+      g.globalCompositeOperation = "lighter"; g.lineCap = "round";
+      for (var i = 0; i < D.parts.length; i++) {
+        var q = D.parts[i], w = D.w / Math.pow(q.rr, 1.5) * D.spd; q.a += w * dt;
+        var r = q.rr * R, a0 = q.a - Math.min(.6, w * .08);
+        var x0 = Math.cos(a0) * r, y0 = Math.sin(a0) * r * D.sq, x1 = Math.cos(q.a) * r, y1 = Math.sin(q.a) * r * D.sq;
+        g.globalAlpha = Math.min(1, D.al * q.al); g.strokeStyle = q.c; g.lineWidth = q.s;
+        g.beginPath(); g.moveTo(C.x + x0 * ct - y0 * st, C.y + x0 * st + y0 * ct); g.lineTo(C.x + x1 * ct - y1 * st, C.y + x1 * st + y1 * ct); g.stroke();
+      }
+    }
+    function centerOf(n){ var b = n.getBoundingClientRect(), c = cv.getBoundingClientRect(); return { x: b.left + b.width / 2 - c.left, y: b.top + b.height / 2 - c.top }; }
+    return {
+      /* the dust: thicker and thicker for `sec` seconds, every grain in before the collapse */
+      pull: function(sec){
+        var t = 0;
+        ems.push(function(dt){
+          t += dt; if (t > sec) return false;
+          var n = (60 + 280 * (t / sec) * (t / sec)) * dt, left = sec + .3 - t;
+          while (n > 0) {
+            if (n < 1 && Math.random() > n) break; n--;
+            ps.push({ t: "pull", th: rnd(0, 6.2832), r0: Math.max(W, H) * rnd(.45, .8), r1: C.r * .25, spin: rnd(1.4, 2.8), life: Math.max(.3, Math.min(rnd(.9, 1.6), left)), age: 0, s: rnd(.7, 2.2), c: pick(pal), al: rnd(.5, 1) });
+          }
+        });
+        go();
+      },
+      disk: function(){ disk = makeDisk(150, 1.15, 2.2, 2.4, .3, -.2); go(); },
+      collapse: function(){ if (disk) { disk.kTo = 0; disk.rate = 3; disk.spd = 4; disk.alTo = 1.4; } },
+      dark: function(){ ps.length = 0; disk = null; },
+      burst: function(){
+        for (var i = 0; i < 300; i++) {
+          var a = rnd(0, 6.2832), v = rnd(220, 1500), r = Math.random(), t = r < .55 ? "streak" : r < .85 ? "dot" : "star";
+          ps.push({ t: t, x: C.x, y: C.y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, drag: t === "streak" ? .93 : .95, life: rnd(.9, 2.2), age: 0,
+            s: t === "star" ? rnd(4, 9) : t === "dot" ? rnd(1, 3.2) : rnd(1.2, 3), rot: rnd(0, 3), vr: rnd(-4, 4), c: i % 6 ? pick(pal) : "#FFFFFF" });
+        }
+        go();
+      },
+      ring: function(){ disk = makeDisk(120, 1.2, 2.3, .8, .28, -.22); disk.k = .3; disk.alTo = .85; go(); },
+      shoot: function(){
+        var left = Math.random() < .5, a = rnd(.25, .55), v = rnd(800, 1100);
+        ps.push({ t: "shoot", x: left ? rnd(-40, W * .4) : rnd(W * .6, W + 40), y: rnd(-20, H * .3), vx: (left ? 1 : -1) * Math.cos(a) * v, vy: Math.sin(a) * v, life: rnd(.7, 1), age: 0, s: 1.6, c: "#FFFFFF", al: .9 });
+        go();
+      },
+      coins: function(from, n, up){
+        var o = centerOf(from);
+        for (var i = 0; i < n; i++) ps.push({ t: "coin", x: o.x, y: o.y, vx: rnd(-1, 1) * (up ? 140 : 380), vy: up ? rnd(-1900, -1400) : rnd(-1150, -560), g: up ? 0 : 1500, drag: .995,
+          life: up ? rnd(.5, .7) : rnd(1.6, 2.4), age: 0, s: rnd(18, 30), rot: rnd(-.4, .4), vr: rnd(-3, 3), flip: rnd(0, 6.28), vf: rnd(4, 9) });
+        go();
+      },
+      /* crowns falling from the top of the screen, all across it */
+      rain: function(n){
+        for (var i = 0; i < n; i++) ps.push({ t: "coin", x: rnd(0, W), y: rnd(-260, -30), vx: rnd(-40, 40), vy: rnd(80, 260), g: 900, drag: .99,
+          life: rnd(1.8, 2.8), age: 0, s: rnd(16, 28), rot: rnd(-.5, .5), vr: rnd(-2, 2), flip: rnd(0, 6.28), vf: rnd(3, 8) });
+        go();
+      },
+      stop: function(){ dead = true; if (raf) cancelAnimationFrame(raf); raf = 0; window.removeEventListener("resize", fit); }
+    };
+  }
+  function dark(d, done, opt){
+    d = d || {}; opt = opt || {};
+    var j = Math.max(0, Math.min(2, d.journey | 0));
+    function run(){
+      var B = 4.3, pays = darkCrowns(), el = shell("shj-dark shj-d" + j, "Dark Matter unlocked", darkHTML(d));
+      var timers = [], fx = null, settled = false, ticket = 0, collecting = false;
+      var num = el.querySelector(".shj-num"), coinEl = el.querySelector(".shj-coin");
+      el.style.setProperty("--bang", B + "s");
+      function at(sec, f){ timers.push(setTimeout(f, sec * 1000)); }
+      function stopAll(){ timers.forEach(clearTimeout); timers = []; ticket++; if (fx) { fx.stop(); fx = null; } }
+      function count(ms){
+        var mine = ++ticket, t0 = 0;
+        (function f(now){
+          if (mine !== ticket) return;
+          if (!t0) t0 = now;
+          var u = Math.min(1, (now - t0) / ms);
+          num.textContent = "+" + fmt(Math.round(pays * (1 - Math.pow(1 - u, 3))));
+          if (u < 1) requestAnimationFrame(f);
+        })(performance.now());
+      }
+      open(el, { still: opt.still, focusAt: 8600, peakAt: B * 1000, detail: { kind: "dark", journey: j },
+        /* Skip: straight to the last frame, so the reward is still seen; once it's there, Skip closes */
+        skip: function(){
+          if (settled) return false;
+          settled = true; stopAll(); el.classList.add("is-still"); num.textContent = "+" + fmt(pays);
+          var sk = el.querySelector(".shj-skip"); if (sk) sk.remove();
+          try { el.querySelector(".shj-go").focus({ preventScroll: true }); } catch (e) {}
+          return true;
+        },
+        go: function(close){
+          if (collecting) return; collecting = true;
+          if (!fx || el.classList.contains("is-still")) { close(); return; }
+          el.classList.add("is-collect"); fx.coins(coinEl, 14, true); setTimeout(close, 520);
+        },
+        end: stopAll }, done);
+      if (el.classList.contains("is-still")) return;   // reduced motion: the last frame, faded in
+      var st = el.querySelector(".shj-stage").getBoundingClientRect();
+      el.style.setProperty("--dy", Math.round(innerHeight / 2 - (st.top + st.height / 2)) + "px");
+      fx = cosmos(el, j);
+      num.textContent = "+0";
+      if (fx) {
+        at(.6, function(){ fx.pull(2.6); });
+        at(1, function(){ fx.disk(); });
+        at(3.3, function(){ fx.collapse(); });
+        at(B - .55, function(){ fx.dark(); });
+        at(B, function(){ fx.burst(); });
+        at(B + .35, function(){ fx.ring(); });
+        [1.6, 4.4, 7.1, 9.9, 13.2, 16.4].forEach(function(x){ at(B + x, function(){ fx.shoot(); }); });
+        at(B + 2.7, function(){ fx.coins(coinEl, 26); fx.rain(40); });
+        at(B + 4.1, function(){ fx.coins(coinEl, 16); });
+      }
+      at(B + 2.7, function(){ count(1400); });
+      at(B + 4.2, function(){ settled = true; });
+    }
+    if (j > 0) R.needJourneyArt(run); else run();
+  }
+
+  /* ---------- the road ahead: where you are on the three journeys, the next object shown locked ---------- */
+  function road(p){
+    css();
+    var j = p && p.journey > 0 ? Math.min(2, p.journey | 0) : 0, xp = p ? p.xp || 0 : 0, t = p ? Math.max(0, Math.min(6, p.tier | 0)) : 0, lv = p ? p.level || 1 : 1;
+    return '<ol class="shj-road" aria-label="The three journeys">' + [0, 1, 2].map(function(k){
+      var st = k < j ? "is-done" : k === j ? "is-now" : "is-lock", lo = 125000 * k, end = 125000 * (k + 1), tro = k < j ? trophySvg("journey-" + k) : "";
+      var body = k < j ? "<span>Finished</span>"
+        : k === j ? "<span>" + esc(T[t].name + " " + ROMAN[lv - 1]) + " · " + fmt(xp) + ' XP</span><span class="shj-bar"><i style="width:' + Math.max(2, Math.min(100, (xp - lo) / 1250)).toFixed(1) + '%"></i></span><span>' +
+            (xp >= end ? "Finished" : fmt(end - xp) + " XP to " + (k < 2 ? "the " + JN[k + 1] : "the end")) + "</span>"
+        : "<span>Starts at " + fmt(lo) + " XP</span>";
+      return '<li class="' + st + '"><span class="shj-rmed">' + R.artOf(k, k < j ? 6 : k === j ? t : 0, 64, k === j ? { level: lv } : null) + (k > j ? LOCK : tro ? '<span class="shj-rtro">' + tro + "</span>" : "") + "</span><b>" + esc(JN[k]) + "</b>" + body + "</li>";
+    }).join("") + "</ol>";
+  }
+
+  /* the last frame of a scene as a node that sits in a page (the design page's contact sheet) */
+  function still(kind, d){
+    css();
+    var el = document.createElement("div");
+    var lp = kind !== "dark" && (d && d.to | 0) >= 2;
+    el.className = "shj shj-inline is-still is-on " + (kind === "dark" ? "shj-dark shj-d" + Math.max(0, Math.min(2, (d && d.journey) | 0)) : lp ? "shj-hand shj-lp" : "shj-hand shj-mp");
+    el.innerHTML = kind === "dark" ? darkHTML(d || {}) : lp ? lpHTML(d) : mpHTML(d);
+    return el;
+  }
+
+  window.shJourneys = { handoff: handoff, dark: dark, road: road, still: still, css: css };
+})();

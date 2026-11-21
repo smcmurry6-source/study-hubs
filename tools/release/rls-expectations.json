@@ -1,0 +1,51 @@
+{
+  "about": "What the anonymous role (every visitor, using the public publishable key) may do to each table directly, without going through a function. Everything else goes through security-definer functions that check their own inputs. tools/release/rls.js fails if the schema allows more than this, or less. Change this file only together with the migration that changes the policy, and say why in the PR. anonNone lists tables that must be closed to anon altogether (no privilege and no policy, tried by hand), and anonNoRun the helper functions anon must never run: what's behind the visit keys of migration_v54 (the secret, and the function that turns a visitor id into a key), and Timmy's chats and the two calls only the timmy Edge Function makes with the service role (migration_v55), and Learn and Flashcards' log of ratings with its helper and Link my devices' trigger (migration_v56), and the class's picks of earlier versions of a question's choices with the two helpers that move them (migration_v66), and the awards' running totals (migration_v79), and the shop's picks of the day stored once for everyone (shop_days) with the three helpers that work them out, store them and clear them (migration_v82), and the admin page's reads worked out ahead (migration_v83: the table, which holds per-person check-ins, and the helpers that fill and read it; only the admin functions, behind the secret, reach it), and the closed check-ins (migration_v86: only sh_submit_exam_debrief reads them, and the After merge workflow writes them). The prizes' tables (migration_v68: the runs of right answers, the class's records, lecture reads and the trophies seen at the switch) are closed too; their functions are tested in xp.js.",
+  "anonSelect": [
+    "changelog",
+    "mode_stats",
+    "presence_hourly",
+    "question_choices",
+    "question_stats"
+  ],
+  "anonInsert": [
+    "hub_suggestions",
+    "question_flags"
+  ],
+  "anonUpdate": [],
+  "anonDelete": [],
+  "anonNone": [
+    "visit_secret",
+    "timmy_chats",
+    "timmy_config",
+    "timmy_messages",
+    "card_reviews",
+    "xp_runs",
+    "game_records",
+    "notes_reads",
+    "prize_seen",
+    "question_choices_past",
+    "xp_award_totals",
+    "shop_days",
+    "admin_cache",
+    "exam_checkins_closed"
+  ],
+  "anonNoRun": [
+    "sh_visit_key(text)",
+    "timmy_begin(text, text, uuid, text, jsonb, text, text)",
+    "timmy_finish(bigint, text, text, text, jsonb, text, integer, integer, jsonb, text, text, integer, integer, integer, integer, numeric, integer)",
+    "sh_timmy_on_link()",
+    "sh_card(timestamptz, text, text, text, text, boolean, text, bigint)",
+    "sh_cards_on_link()",
+    "sh_choice_version(text, text)",
+    "sh_choices_to(text, text, text)",
+    "sh_shop_day_make(date)",
+    "sh_shop_days_fill()",
+    "sh_shop_days_clear()",
+    "sh_admin_compute(text, jsonb)",
+    "sh_admin_cached(text, jsonb)",
+    "sh_admin_cache_tick()",
+    "sh_qh_overlay(text, jsonb)",
+    "sh_exam_debriefs()",
+    "sh_visitor_summary(integer)"
+  ]
+}

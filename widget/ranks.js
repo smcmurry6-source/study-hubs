@@ -22,6 +22,23 @@
   var ROMAN = ["I", "II", "III"];
   function rankName(t, level){ return TIERS[t].name + (level ? " " + ROMAN[Math.max(1, Math.min(3, level)) - 1] : ""); }
 
+  /* ---------- the three journeys (the redesign; migration_v54's get_rank_profile_v2) ----------
+     The ladder is three journeys of the same seven ranks: the Handpiece (today's), then the ModuPro, then the Loupes.
+     A v2 profile carries journey (0, 1, 2), tier and level inside that journey, step of 63 and gtier of 21, the double-XP
+     boost and which Dark Matter unlocks were seen. Only the redesign's pages ask for one, so on a live page none of
+     this runs. The Handpiece keeps today's names ("Gold II"); a later journey's name leads ("ModuPro Gold II"). */
+  var JOURNEYS = ["Handpiece", "ModuPro", "Loupes"];
+  function isV2(p){ return !!p && p.journey != null; }
+  /* what the handpiece-only parts of this file read from a v2 profile: from the ModuPro on, the rank the Handpiece
+     ended at (Dark Matter III), so accents, Timmy's house and the old cards never go back to Stone */
+  function legacy(p){
+    if (!isV2(p) || !(p.journey > 0)) return p;
+    var q = {}, k; for (k in p) q[k] = p[k];
+    q.tier = 6; q.level = 3; q.step = 20; q.tier_at = 50000; q.step_at = 100000; q.next_at = null;
+    return q;
+  }
+  function nameOf(p){ return !p ? TIERS[0].name : (p.journey > 0 && JOURNEYS[p.journey] ? JOURNEYS[p.journey] + " " : "") + rankName(Math.max(0, Math.min(6, p.tier | 0)), p.level || 0); }
+
   var uid = 0;
 
   /* cylinder shading stops, top edge -> bottom edge, per material */
@@ -191,6 +208,10 @@
     opt = opt || {};
     tier = Math.max(0, Math.min(6, tier | 0));
     var t = TIERS[tier].key, p = "shr" + (++uid) + "-";
+    /* opt.shape: another journey's object in place of the handpiece (the redesign's ModuPro and loupes,
+       tools/figures/site/journeys.mjs says what a shape is). Only the new pages pass one; without it nothing changes. */
+    var S = opt.shape || null, old = t === "antique", B = S ? S.box : null;
+    var MASK = S ? (old ? S.antiqueMask() : S.mask()) : (old ? antiqueMask() : modernMask());
     var rich = px >= 40 ? (opt.animate ? "anim" : true) : false;
     var anim = rich === "anim";
     var mat = t === "antique" ? METAL.brass : METAL[t];
@@ -201,39 +222,46 @@
         cyl(p + "wood", ["#2A1406", "#5C2F12", "#8A4B22", "#B4713C", "#7A4019", "#4E260C", "#231003", "#6A3816"]);
     }
     if (t === "diamond") defs += facets(p);
+    if (S && S.defs) defs += S.defs(p, t, cyl);
     defs += filters(p, t, rich);
-    defs += '<clipPath id="' + p + 'clip">' + (t === "antique" ? antiqueMask() : modernMask()) + '</clipPath>';
+    defs += '<clipPath id="' + p + 'clip">' + MASK + '</clipPath>';
     defs += '<linearGradient id="' + p + 'sheen" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/>' +
       '<stop offset=".5" stop-color="#fff" stop-opacity="' + (t === "diamond" ? ".95" : ".75") + '"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>';
 
-    var parts = t === "antique" ? antiqueParts(p, rich) : modernParts(p, rich);
+    var parts = S ? (old ? S.antique(p, rich) : S.modern(p, rich)) : old ? antiqueParts(p, rich) : modernParts(p, rich);
+    var all = B ? ' x="' + B[0] + '" y="' + B[1] + '" width="' + B[2] + '" height="' + B[3] + '"' : ' x="-10" y="-20" width="170" height="50"';
     var body = '<g' + (rich ? ' filter="url(#' + p + 'tex)"' : '') + '>' + parts + '</g>';
     var over = '';
     if (t === "diamond") {
-      over += '<g clip-path="url(#' + p + 'clip)"><rect x="-10" y="-20" width="170" height="50" fill="url(#' + p + 'fac)"/>' +
-        '<rect x="-10" y="-20" width="170" height="50" fill="url(#' + p + 'rb)" opacity=".22" style="mix-blend-mode:color"/></g>';
+      over += '<g clip-path="url(#' + p + 'clip)"><rect' + all + ' fill="url(#' + p + 'fac)"/>' +
+        '<rect' + all + ' fill="url(#' + p + 'rb)" opacity=".22" style="mix-blend-mode:color"/></g>';
     }
     if (t === "dark" && rich) {
       var stars = "", seed = 7;
-      for (var i = 0; i < 26; i++){ seed = (seed * 9301 + 49297) % 233280; var sx = (seed / 233280) * 150 - 4; seed = (seed * 9301 + 49297) % 233280; var sy = (seed / 233280) * 34 - 15;
+      for (var i = 0; i < (B ? 44 : 26); i++){ seed = (seed * 9301 + 49297) % 233280; var sx = B ? B[0] + (seed / 233280) * B[2] : (seed / 233280) * 150 - 4; seed = (seed * 9301 + 49297) % 233280; var sy = B ? B[1] + (seed / 233280) * B[3] : (seed / 233280) * 34 - 15;
         stars += '<circle cx="' + sx.toFixed(1) + '" cy="' + sy.toFixed(1) + '" r="' + (i % 5 === 0 ? .9 : .45) + '" fill="#fff" opacity="' + (i % 3 ? .75 : 1) + '">' +
           (anim && i % 4 === 0 ? '<animate attributeName="opacity" values="1;.2;1" dur="' + (2 + i % 3) + 's" repeatCount="indefinite"/>' : '') + '</circle>'; }
       over += '<g clip-path="url(#' + p + 'clip)">' + stars + '</g>';
     }
     // rim light: a thin bright line along the top of the body
-    if (rich && t !== "antique" && t !== "stone") over += '<path d="M50 -1.6 H122" stroke="#fff" stroke-opacity="' + (t === "dark" ? ".35" : ".55") + '" stroke-width=".8" stroke-linecap="round"/>';
+    if (rich && t !== "antique" && t !== "stone" && (!S || S.rim)) over += '<path d="' + (S ? S.rim + '" fill="none' : "M50 -1.6 H122") + '" stroke="#fff" stroke-opacity="' + (t === "dark" ? ".35" : ".55") + '" stroke-width=".8" stroke-linecap="round"/>';
     // moving glint (metals, diamond, dark matter)
     if (anim && tier >= 2) {
-      over += '<g clip-path="url(#' + p + 'clip)"><rect x="-40" y="-30" width="26" height="70" fill="url(#' + p + 'sheen)" transform="skewX(-22)" opacity="' + (t === "dark" ? ".5" : ".9") + '">' +
-        '<animate attributeName="x" values="-60;190;190" keyTimes="0;.35;1" dur="' + (t === "diamond" || t === "dark" ? "3.6" : "4.6") + 's" repeatCount="indefinite"/></rect></g>';
+      over += '<g clip-path="url(#' + p + 'clip)"><rect x="-40" y="' + (B ? B[1] - 10 : -30) + '" width="26" height="' + (B ? B[3] + 20 : 70) + '" fill="url(#' + p + 'sheen)" transform="skewX(-22)" opacity="' + (t === "dark" ? ".5" : ".9") + '">' +
+        '<animate attributeName="x" values="' + (B ? (B[0] - 50) + ";" + (B[0] + B[2] + 60) + ";" + (B[0] + B[2] + 60) : "-60;190;190") + '" keyTimes="0;.35;1" dur="' + (t === "diamond" || t === "dark" ? "3.6" : "4.6") + 's" repeatCount="indefinite"/></rect></g>';
     }
-    if (t === "diamond" && rich) over += sparkle(18, -12, 5, 0, anim) + sparkle(98, -2, 4, 1.1, anim) + sparkle(64, 13, 3.2, 2.2, anim);
-    if (t === "dark" && rich) over += sparkle(20, -12, 4, .4, anim) + sparkle(110, 10, 3, 1.7, anim);
+    if (S && S.top) over += S.top(p, rich, old);
+    var K = S && S.sparks ? S.sparks : null;
+    if (t === "diamond" && rich) over += K ? sparkle(K[0][0], K[0][1], K[0][2], 0, anim) + sparkle(K[1][0], K[1][1], K[1][2], 1.1, anim) + sparkle(K[2][0], K[2][1], K[2][2], 2.2, anim)
+      : sparkle(18, -12, 5, 0, anim) + sparkle(98, -2, 4, 1.1, anim) + sparkle(64, 13, 3.2, 2.2, anim);
+    if (t === "dark" && rich) over += K ? sparkle(K[0][0], K[0][1], K[0][2] * .85, .4, anim) + sparkle(K[1][0], K[1][1], K[1][2] * .85, 1.7, anim)
+      : sparkle(20, -12, 4, .4, anim) + sparkle(110, 10, 3, 1.7, anim);
 
-    var under = t === "dark" && rich ? '<g filter="url(#' + p + 'glow)" opacity=".85">' + (t === "antique" ? antiqueMask() : modernMask()) +
+    var under = t === "dark" && rich ? '<g filter="url(#' + p + 'glow)" opacity=".85">' + MASK +
       (anim ? '<animate attributeName="opacity" values=".55;.95;.55" dur="3s" repeatCount="indefinite"/>' : '') + '</g>' : '';
     // shadow under the tool
-    var shadow = rich ? '<ellipse cx="72" cy="27" rx="64" ry="5" fill="#000" opacity=".35"/>' : '';
+    var shadow = !rich ? '' : S ? (S.shadow ? '<ellipse cx="' + S.shadow[0] + '" cy="' + S.shadow[1] + '" rx="' + S.shadow[2] + '" ry="' + S.shadow[3] + '" fill="#000" opacity=".35"/>' : '')
+      : '<ellipse cx="72" cy="27" rx="64" ry="5" fill="#000" opacity=".35"/>';
 
     var D = DISC[t], ring = t === "antique" ? METAL.brass : mat;
     defs += cyl(p + "ring", ring.map(function(c){ return shade(c, t === "dark" ? .08 : 0); }));
@@ -262,10 +290,10 @@
           '<text x="0" y="5.2" text-anchor="middle" font-family="Georgia,serif" font-weight="700" font-size="15" letter-spacing="1" fill="' + D[3] + '" stroke="rgba(0,0,0,.35)" stroke-width=".4">' + num + '</text></g>';
       }
     }
-    var g = '<g clip-path="url(#' + p + 'dclip2)"><g transform="translate(' + (t === "antique" ? 22 : 19) + ' 84) rotate(-30) scale(' + (t === "antique" ? .66 : .7) + ')">' + shadow + under + body + over + '</g></g>';
+    var g = '<g clip-path="url(#' + p + 'dclip2)"><g transform="' + (S ? S.place[old ? 1 : 0] : 'translate(' + (t === "antique" ? 22 : 19) + ' 84) rotate(-30) scale(' + (t === "antique" ? .66 : .7) + ')') + '">' + shadow + under + body + over + '</g></g>';
     defs += '<clipPath id="' + p + 'dclip2"><circle cx="64" cy="64" r="' + (rich ? 60 : 58) + '"/></clipPath>';
     return '<svg class="sh-rank-art sh-rank-' + t + '" width="' + px + '" height="' + px + '" viewBox="0 0 128 128" role="img" aria-label="' +
-      TIERS[tier].name + ' handpiece' + (opt.level ? ' ' + ROMAN[Math.max(1, Math.min(3, opt.level)) - 1] : '') + '"><defs>' + defs + '</defs>' + disc + g + over2 + '</svg>';
+      TIERS[tier].name + ' ' + (S ? S.name : 'handpiece') + (opt.level ? ' ' + ROMAN[Math.max(1, Math.min(3, opt.level)) - 1] : '') + '"><defs>' + defs + '</defs>' + disc + g + over2 + '</svg>';
   }
 
   /* medallion interior: center, mid, edge, spotlight color */
@@ -313,51 +341,117 @@
     { k: "prof",         n: "Office Hours",         d: "Get a professor to quote themselves",  ic: "M4 5h16v11H9l-5 4zM8 10h8", secret: true, clue: "Professors repeat themselves. Tap one's name, a few times, quickly." },
     { k: "rootcanal",    n: "Through the Root Canal", d: "10 misses, then 10 right in a row",  ic: "M9 4v6l-3 10M15 4v6l3 10M9 10h6", secret: true, clue: "Go all the way down, then all the way back up. Ten each way." },
     { k: "mirror",       n: "Indirect Vision",      d: "See the hub the way you see a maxillary molar", ic: "M12 4a5 5 0 1 0 0 10 5 5 0 1 0 0-10zM12 14v7M9 21h6", secret: true, clue: "Your most-used instrument shows everything backwards. Type its name." },
-    { k: "fullarch",     n: "Full Arch",            d: "Fill all 32 teeth of the arch",        ic: "M4 16c0-7 3.6-11 8-11s8 4 8 11M7 15.5v-2M10 14v-2.5M14 14v-2.5M17 15.5v-2", secret: true, clue: "Every right answer grows a tooth; every miss knocks one out. Adults have how many?" },
     { k: "flosschain",   n: "Floss Chain",          d: "Floss with two classmates at once",    ic: "M3 14c3-4 6-4 9 0s6 4 9 0M6 9v2M12 7v2M18 9v2", secret: true, clue: "The magic word works better with friends. Three of you, in the same hub, within a minute." },
     { k: "cavity",       n: "Restorative",          d: "Find the week's hidden cavity",        ic: "M7 5c-2 0-3 1.5-3 3.5 0 2.5 1.2 3.5 1.6 5.5.4 2.5.8 5 2 5s1.5-2.4 1.8-4c.2-.8.5-1.2 1.6-1.2s1.4.4 1.6 1.2c.3 1.6.6 4 1.8 4s1.6-2.5 2-5c.4-2 1.6-3 1.6-5.5C20 6.5 19 5 17 5c-1.6 0-2.4.8-5 .8S8.6 5 7 5zM12 9.5h.01", secret: true, clue: "Each week a tiny dark spot hides somewhere in one hub's Lecture Notes. Only five people get to fill it." },
     { k: "holiday",      n: "Holiday Spirit",       d: "Say the season's magic word",          ic: "M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5L18 18M6 18l2.5-2.5M15.5 8.5L18 6", secret: true, clue: "Around a holiday the hubs dress up. Each holiday has its own magic word: type it." },
     { k: "pet-perfect",  n: "Pearly Whites",        d: "Keep your tooth buddy at full health", ic: "M12 3l1.8 4.2 4.6.4-3.5 3 1 4.4L12 12.8 8.1 15l1-4.4-3.5-3 4.6-.4z", secret: true, clue: "Got a tooth buddy on the dashboard? Get them to 100 HP." },
     { k: "pet-revive",   n: "Full Recovery",        d: "Nurse your tooth buddy from 0 HP back to 100", ic: "M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10zM9 11h6M12 8v6", secret: true, clue: "Even a tooth at rock bottom can come back. It takes a real treatment plan." }
   ];
+  /* hub trophies (2026-10-20): earned once in each hub and shown in that hub's own section of the trophy case.
+     They are the per-hub achievements the server already keeps (kind:hub badges) plus two new ones (migration_v38). */
+  var HUB_TROPHIES = [
+    { k: "mastery-bronze", n: "Bronze Mastery", d: "Get 50% of this hub's questions right on your latest try", ic: "M12 4a6 6 0 1 0 0 12 6 6 0 1 0 0-12zM9 15l-2 6 5-2 5 2-2-6", c: "#B0672B" },
+    { k: "mastery-silver", n: "Silver Mastery", d: "Get 75% right on your latest try", ic: "M12 4a6 6 0 1 0 0 12 6 6 0 1 0 0-12zM9 15l-2 6 5-2 5 2-2-6", c: "#8E98A3" },
+    { k: "mastery-gold",   n: "Gold Mastery",   d: "Get 90% right on your latest try", ic: "M12 4a6 6 0 1 0 0 12 6 6 0 1 0 0-12zM9 15l-2 6 5-2 5 2-2-6", c: "#C9971C" },
+    { k: "mastery-crown",  n: "Crown",          d: "Get every question in the hub right on your latest try", ic: "M3 18l1-11 5 4 3-7 3 7 5-4 1 11z", c: "#E0A800" },
+    { k: "seen-all",       n: "Seen It All",    d: "Answer every question in the hub at least once", ic: "M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12zM12 9a3 3 0 1 0 0 6 3 3 0 1 0 0-6z" },
+    { k: "mock90",         n: "Mock Ace",       d: "90%+ on a mock exam of 20+ questions here", ic: "M12 4a8 8 0 1 0 0 16 8 8 0 1 0 0-16zM12 8v4l3 2" },
+    { k: "mock-perfect",   n: "Perfect Mock",   d: "Every question right on a mock exam of 20+ questions here", ic: "M12 3l2.6 5.5 6 .8-4.4 4.2 1 6-5.2-2.9-5.2 2.9 1-6L3.4 9.3l6-.8z", c: "#E0A800" },
+    { k: "boss",           n: "Final Blow",     d: "Land the last hit on a boss in this hub", ic: "M12 3c4 0 7 2.5 7 7 0 3-2 4-2 6H7c0-2-2-3-2-6 0-4.5 3-7 7-7zM9 11h.01M15 11h.01M9 20h6", secret: true, clue: "Wait until five or more classmates are online at once, then answer fast." }
+  ];
+  /* Full Arch is retired (Sam, 2026-11-12: the 32-tooth chart came out at the redesign's release): it is in neither
+     list, and RETIRED keeps its row for those who earned it (shown as "Full Arch (retired)").
+     The redesign's trophy case (phase 4, session 6): the three journey trophies and the bowling
+     egg's join, so the case holds 27, 16 of them secret. A journey has its own scene (the hand-off), so trackTrophies
+     doesn't announce it again (scene); Bowling is earned on the device (sh_bowl_trophy, widget/bowling.js), which counts it
+     at once, and widget/v3.js sends it to the server (migration_v63), which gives it its class share. (The old single-file hub pages, which kept 23, came down 2026-11-19.) */
+  var RETIRED = [
+    { k: "fullarch",     n: "Full Arch",            d: "Fill all 32 teeth of the arch",        ic: "M4 16c0-7 3.6-11 8-11s8 4 8 11M7 15.5v-2M10 14v-2.5M14 14v-2.5M17 15.5v-2", secret: true, clue: "Every right answer grows a tooth; every miss knocks one out. Adults have how many?" }
+  ];
+  TROPHIES = TROPHIES.filter(function(t){ return !t.secret; }).concat([
+    { k: "journey-0", n: "Handpiece finished", d: "Reach 125,000 XP: Dark Matter III on the Handpiece", ic: "M3 21l6-6M9 15l8.5-8.5 2.5 2.5L11.5 17.5zM15 5l1.5-1.5 4 4L19 9", scene: true },
+    { k: "journey-1", n: "ModuPro finished", d: "Reach 250,000 XP: Dark Matter III on the ModuPro", ic: "M4 5h16v15H4zM4 10h16M4 15h16M10 7.5h4M10 12.5h4M10 17.5h4", scene: true },
+    { k: "journey-2", n: "Loupes finished", d: "Reach 375,000 XP: Dark Matter III on the Loupes", ic: "M3 15a3.5 3.5 0 1 0 7 0 3.5 3.5 0 1 0-7 0zM14 15a3.5 3.5 0 1 0 7 0 3.5 3.5 0 1 0-7 0zM10 15h4M4.5 12L7 5h10l2.5 7", scene: true }
+  ], TROPHIES.filter(function(t){ return t.secret; }), [
+    { k: "bowling", n: "Lane Legend", d: "Saw all eight bowling clips", ic: "M12 3c-1.7 0-2.5 1.6-2 3.5.4 1.4-1.5 3-1.5 6.5 0 3.5 1.6 6 3.5 8 1.9-2 3.5-4.5 3.5-8 0-3.5-1.9-5.1-1.5-6.5C14.5 4.6 13.7 3 12 3zM10.2 8.5h3.6", secret: true, device: "sh_bowl_trophy",
+      clue: "The alley\u2019s screen plays something odd after a strike. There are eight." }
+  ]);
+  /* how many of the case's trophies a profile's badges (and this device, for Bowling) have won */
+  function caseCount(badges){
+    var got = {}; (badges || []).forEach(function(b){ got[String(b).split(":")[0]] = 1; });
+    return { won: TROPHIES.filter(function(t){ return got[t.k] || (t.device && ls(t.device)); }).length, of: TROPHIES.length };
+  }
   var MASTERY = [
     { k: "mastery-bronze", n: "Bronze", pct: .5 }, { k: "mastery-silver", n: "Silver", pct: .75 },
     { k: "mastery-gold", n: "Gold", pct: .9 }, { k: "mastery-crown", n: "Crown", pct: 1 }
   ];
 
-  /* ---------- mastery flair: a medal per hub mastered, next to your name on every leaderboard ----------
-     The leaderboards return `flair` as "perio:3,msk-exam3:1" (1 bronze, 2 silver, 3 gold, 4 crown; migration_v31). */
+  /* ---------- mastery flair: one medal per hub mastered, shown with your name on every leaderboard ----------
+     The leaderboards return `flair` as "perio:3,msk-exam3:1" (1 bronze, 2 silver, 3 gold, 4 crown; migration_v31).
+     The metal is the tier; the emblem in the middle and the ribbon colors are the hub's (HUB_MEDAL), so a Gold in
+     Perio and a Gold in Occlusion look different. A board row shows one medal (this hub's, else your best) and "+N";
+     tapping it opens the full set. */
   var HUB_NAMES = { "perio": "Perio", "msk-exam3": "MSK Exam 3", "gi-exam1": "GI Exam 1", "gi-exam2": "GI Exam 2",
-    "hepatobiliary": "Hepatobiliary", "genetics": "Genetics", "fixed-pros": "Fixed Pros" };
+    "hepatobiliary": "Hepatobiliary", "genetics": "Genetics", "fixed-pros": "Fixed Pros",
+    "msk-exam4": "MSK Exam 4", "occlusion": "Occlusion", "pcd-exam3": "PCD Exam 3", "heme-endo-exam1": "Heme & Endo 1", "heme-endo-exam2": "Heme & Endo 2", "heme-endo-exam3": "Heme & Endo 3", "review-of-systems": "Review of Systems", "special-patient-care": "Special Patient Care", "pcd-implants-exam1": "PCD Implants 1" };
   function hubName(h){ return (window.SH_HUB_NAMES && window.SH_HUB_NAMES[h]) || HUB_NAMES[h] || String(h).replace(/-/g, " ").replace(/\b\w/g, function(c){ return c.toUpperCase(); }); }
   var MEDAL = {
     1: ["#5A2A0E", "#B0672B", "#F2B884", "#FFE6CC"],
     2: ["#3E4650", "#8E98A3", "#E4E9EE", "#FFFFFF"],
-    3: ["#5A3905", "#B58309", "#F6CD55", "#FFF6CF"]
+    3: ["#5A3905", "#B58309", "#F6CD55", "#FFF6CF"],
+    4: ["#6B4A05", "#C99A12", "#FFD84A", "#FFFBE0"]
   };
+  /* per hub: ribbon colors [left, right] and an emblem drawn on a 24-unit grid ("f" = filled shape, "s" = stroke,
+     "l" = a dark detail line on top). Hubs without an entry get the tooth. */
+  var TOOTH = [["f", "M7.2 4.6c-1.8 0-3 1.4-3 3.4 0 2.2 1.2 3.2 1.6 5 .4 2.2.8 4.6 1.8 4.6s1.4-2.2 1.6-3.6c.2-.8.6-1.2 1.8-1.2s1.6.4 1.8 1.2c.2 1.4.6 3.6 1.6 3.6s1.4-2.4 1.8-4.6c.4-1.8 1.6-2.8 1.6-5 0-2-1.2-3.4-3-3.4-1.6 0-2.4.8-4.8.8s-3-.8-4.8-.8z"]];
+  var HUB_MEDAL = {
+    "pcd-implants-exam1": { rib: ["#2D5F92", "#AAB6C4"], g: [["f", "M7.5 3.5h9v3.2h-9z"], ["f", "M8.6 7.4h6.8l-.5 2-5.8 1.6 5.8 1.6-5.8 1.6 5.8 1.6-5.8 1.6L12 21l2.4-4.2z"]] },
+    "special-patient-care": { rib: ["#1D6B66", "#FF8A6B"], g: TOOTH },
+    "heme-endo-exam2": { rib: ["#8C2F5A", "#E2A82B"], g: [["s", "M12 3.6a8.4 8.4 0 1 0 .01 0z"], ["f", "M14.4 6.4a3.6 3.6 0 1 1-.01 0z"], ["l", "M6.6 13.2h.01M8.4 17.2h.01M12.6 19h.01M16.8 16.6h.01"]] },
+    "heme-endo-exam3": { rib: ["#8C2F5A", "#E2A82B"], g: [["s", "M12 3.6a8.4 8.4 0 1 0 .01 0z"], ["f", "M14.4 6.4a3.6 3.6 0 1 1-.01 0z"], ["l", "M6.6 13.2h.01M8.4 17.2h.01M12.6 19h.01M16.8 16.6h.01"]] },   /* Exam 2's medal, reused (Sam, 2026-11-15) */
+    "heme-endo-exam1": { rib: ["#6B3FA0", "#E86A9E"], g: [["f", "M11.2 13.6C10.8 8.6 9.4 4.4 7.2 4.4 4.6 4.4 4 9 4.9 12.7c.9 3.5 3.6 5.2 5.9 3.9z"], ["f", "M12.8 13.6c.4-5 1.8-9.2 4-9.2 2.6 0 3.2 4.6 2.3 8.3-.9 3.5-3.6 5.2-5.9 3.9z"], ["f", "M10 12.4h4v3.4h-4z"]] },
+    "perio":        { rib: ["#B23A5B", "#E98AA4"], g: [["s", "M4.5 19.5 13 11l2.6-2.6"], ["s", "M15.6 8.4c1.4-1.4 3-1 3.6.4l.6 2.6"], ["l", "M8.4 14.2l1.4 1.4M10.6 12l1.4 1.4"]] },
+    "occlusion":    { rib: ["#2F5FA8", "#C2414B"], g: [["f", "M4 3.5h16v5.5l-2.7 3.2-2.6-3.2-2.7 3.2-2.7-3.2-2.6 3.2L4 9z"], ["f", "M4 20.5h16V15l-2.7-3.2-2.6 3.2-2.7-3.2-2.7 3.2-2.6-3.2L4 15z"]] },
+    "msk-exam3":    { rib: ["#6B5B95", "#D9C79A"], g: [["s", "M8 16 16 8"], ["f", "M5.2 14.9a2.1 2.1 0 1 1 3.9 3.9 2.1 2.1 0 1 1-3.9-3.9z"], ["f", "M14.9 5.2a2.1 2.1 0 1 1 3.9 3.9 2.1 2.1 0 1 1-3.9-3.9z"]] },
+    "msk-exam4":    { rib: ["#A3453A", "#E2A07E"], g: [["f", "M3.5 21v-5.6c0-3.2 2-5.4 4.6-5.6l1.8-5.6c.4-1.2 1.8-1.6 2.7-.8l1.6 1.4c.7.6.4 1.8-.5 2l-1.6.4-.7 2.8c2-1 4.8-1 6.8.4 2.4 1.7 2.8 4.8 1.5 7.2-1.2 2.2-3.8 3.4-6.6 3.4z"], ["l", "M10.2 15.2c1.2-1.4 3.6-1.8 5.4-.8"]] },
+    "pcd-exam3":    { rib: ["#2D7F8C", "#E8DCC3"], g: [["f", "M8.6 15.4h6.8l-1.3 5.6H9.9z"], ["f", "M4.6 13.6V9.8c0-3.4 1.6-6.2 3.9-6.2 1.5 0 2.3 1.1 3.5 1.1s2-1.1 3.5-1.1c2.3 0 3.9 2.8 3.9 6.2v3.8z"]] },
+    "fixed-pros":   { rib: ["#2D7F8C", "#E8DCC3"], g: [["f", "M2.5 7.5h19v4.6c0 1.3-.9 1.9-1.3 3.3l-.9 4c-.3 1-1.4 1-1.7 0l-.7-3.3h-9.8l-.7 3.3c-.3 1-1.4 1-1.7 0l-.9-4c-.4-1.4-1.3-2-1.3-3.3z"], ["l", "M8.8 7.8v4.6M15.2 7.8v4.6"]] },
+    "gi-exam1":     { rib: ["#C46A1E", "#E8B04B"], g: [["f", "M9 2.5h3.4v4.6c0 2 1.4 2.8 3 2.4 2.4-.6 5.1.4 5.1 3.4 0 4.6-4.4 8.6-9.6 8.6-4.2 0-7.4-2.8-7.4-6.6 0-4.2 4.5-4.6 5.5-7.4z"]] },
+    "gi-exam2":     { rib: ["#7A3B1F", "#6E9A3A"], g: [["f", "M2.6 9.4c0-2.6 2.4-3.6 5.4-3.6h11c2.4 0 3.1 2.2 1.8 4.2-2.6 4.2-7.8 8.8-12.6 9.2-3.6.3-5.6-5-5.6-9.8z"]] },
+    "hepatobiliary":{ rib: ["#7A3B1F", "#6E9A3A"], g: [["f", "M2.6 9.4c0-2.6 2.4-3.6 5.4-3.6h11c2.4 0 3.1 2.2 1.8 4.2-2.6 4.2-7.8 8.8-12.6 9.2-3.6.3-5.6-5-5.6-9.8z"]] },
+    /* Review of Systems (2026-11-19): a clipboard with two checked rows */
+    "review-of-systems": { rib: ["#6B46A8", "#4FB3A9"], g: [["f", "M6.4 4.8h11.2q1.6 0 1.6 1.6v14q0 1.6-1.6 1.6H6.4q-1.6 0-1.6-1.6v-14q0-1.6 1.6-1.6z"], ["f", "M9 2.4h6q1 0 1 1V7H8V3.4q0-1 1-1z"], ["l", "M7.6 11.4l1.4 1.4 2.4-2.6M13.4 11.6h3.4M7.6 17l1.4 1.4 2.4-2.6M13.4 17.2h3.4"]] },
+    "genetics":     { rib: ["#3A6FD8", "#E05A9C"], g: [["s", "M7 3c0 6 10 6 10 12v6"], ["s", "M17 3c0 6-10 6-10 12v6"], ["l", "M8.4 5.8h7.2M8.4 18h7.2"]] }
+  };
+  function hubMedal(h){ return HUB_MEDAL[h] || { rib: ["#C2414B", "#2F5FA8"], g: TOOTH }; }
+  function emblem(g, ink, cx, cy, s){
+    var t = 'transform="translate(' + cx + ' ' + cy + ') scale(' + s + ') translate(-12 -12)"', back = "", front = "", line = "";
+    g.forEach(function(p){
+      if (p[0] === "f") { back += '<path d="' + p[1] + '" fill="' + ink + '" stroke="' + ink + '" stroke-width="2.4" stroke-linejoin="round"/>'; front += '<path d="' + p[1] + '" fill="#fff"/>'; }
+      else if (p[0] === "s") { back += '<path d="' + p[1] + '" fill="none" stroke="' + ink + '" stroke-width="5.2" stroke-linecap="round" stroke-linejoin="round"/>'; front += '<path d="' + p[1] + '" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>'; }
+      else line += '<path d="' + p[1] + '" fill="none" stroke="' + ink + '" stroke-width="1.3" stroke-linecap="round" opacity=".8"/>';
+    });
+    return '<g ' + t + ' opacity=".96">' + back + front + line + '</g>';
+  }
   var fuid = 0;
-  function medalSvg(lvl, px){
-    var p = "shfl" + (++fuid) + "-";
-    if (lvl >= 4) {
-      return '<svg width="' + px + '" height="' + px + '" viewBox="0 0 20 20" aria-hidden="true"><defs>' +
-        '<linearGradient id="' + p + 'c" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFF3B8"/><stop offset=".45" stop-color="#F2C230"/><stop offset="1" stop-color="#A6740A"/></linearGradient></defs>' +
-        '<path d="M2.6 15.4 L3.4 6.2 L7.4 9.8 L10 3.6 L12.6 9.8 L16.6 6.2 L17.4 15.4 Z" fill="url(#' + p + 'c)" stroke="#6B4A05" stroke-width="1" stroke-linejoin="round"/>' +
-        '<rect x="2.6" y="14.2" width="14.8" height="3" rx="1" fill="url(#' + p + 'c)" stroke="#6B4A05" stroke-width="1"/>' +
-        '<circle cx="10" cy="3.4" r="1.2" fill="#FFF3B8" stroke="#6B4A05" stroke-width=".7"/><circle cx="3.3" cy="6" r="1" fill="#FFF3B8" stroke="#6B4A05" stroke-width=".6"/><circle cx="16.7" cy="6" r="1" fill="#FFF3B8" stroke="#6B4A05" stroke-width=".6"/>' +
-        '<circle cx="10" cy="15.7" r="1" fill="#E0457B"/><circle cx="6.2" cy="15.7" r=".8" fill="#3FA7E0"/><circle cx="13.8" cy="15.7" r=".8" fill="#3FA7E0"/>' +
-        '<path d="M5 8.6 L6.6 13" stroke="#FFFBE6" stroke-width=".8" stroke-linecap="round" opacity=".8"/></svg>';
-    }
-    var m = MEDAL[lvl] || MEDAL[1];
+  /* medalSvg(lvl, px, hub): the tier's metal with the hub's emblem and ribbons; the Crown tier wears a crown on top */
+  function medalSvg(lvl, px, hub){
+    var p = "shfl" + (++fuid) + "-", m = MEDAL[lvl] || MEDAL[1], H = hubMedal(hub), crown = lvl >= 4;
+    var cy = crown ? 10 : 8.4, r = crown ? 6.4 : 7;
     return '<svg width="' + px + '" height="' + px + '" viewBox="0 0 20 20" aria-hidden="true"><defs>' +
       '<radialGradient id="' + p + 'm" cx=".38" cy=".32" r=".8"><stop offset="0" stop-color="' + m[3] + '"/><stop offset=".45" stop-color="' + m[2] + '"/><stop offset="1" stop-color="' + m[1] + '"/></radialGradient></defs>' +
-      '<path d="M6 12.5 L4.6 19 L7.2 17.6 L8.6 19.6 L9.6 13.4 Z" fill="#C2414B"/><path d="M14 12.5 L15.4 19 L12.8 17.6 L11.4 19.6 L10.4 13.4 Z" fill="#2F5FA8"/>' +
-      '<circle cx="10" cy="8.4" r="7" fill="url(#' + p + 'm)" stroke="' + m[0] + '" stroke-width="1"/>' +
-      '<circle cx="10" cy="8.4" r="5.1" fill="none" stroke="' + m[0] + '" stroke-opacity=".45" stroke-width=".7"/>' +
-      '<path d="M7.6 5.6c-.9 0-1.5.7-1.5 1.7 0 1.1.6 1.6.8 2.5.2 1.1.4 2.3.9 2.3s.7-1.1.8-1.8c.1-.4.3-.6.9-.6s.8.2.9.6c.1.7.3 1.8.8 1.8s.7-1.2.9-2.3c.2-.9.8-1.4.8-2.5 0-1-.6-1.7-1.5-1.7-.8 0-1.2.4-2.4.4s-1.5-.4-2.4-.4z" fill="#fff" fill-opacity=".92" stroke="' + m[0] + '" stroke-width=".55" stroke-linejoin="round"/></svg>';
+      '<path d="M6 13 L4.6 19.4 L7.2 18 L8.6 19.9 L9.6 13.8 Z" fill="' + H.rib[0] + '" stroke="rgba(0,0,0,.25)" stroke-width=".4"/>' +
+      '<path d="M14 13 L15.4 19.4 L12.8 18 L11.4 19.9 L10.4 13.8 Z" fill="' + H.rib[1] + '" stroke="rgba(0,0,0,.25)" stroke-width=".4"/>' +
+      '<circle cx="10" cy="' + cy + '" r="' + r + '" fill="url(#' + p + 'm)" stroke="' + m[0] + '" stroke-width="1"/>' +
+      '<circle cx="10" cy="' + cy + '" r="' + (r - 1.9) + '" fill="none" stroke="' + m[0] + '" stroke-opacity=".45" stroke-width=".7"/>' +
+      emblem(H.g, m[0], 10, cy, crown ? .4 : .44) +
+      (crown ? '<path d="M5.6 4.6 L5.9 .9 L8 2.6 L10 .3 L12 2.6 L14.1 .9 L14.4 4.6 Z" fill="url(#' + p + 'm)" stroke="' + m[0] + '" stroke-width=".8" stroke-linejoin="round"/>' +
+        '<circle cx="10" cy="3.4" r=".75" fill="#E0457B"/>' : '') + '</svg>';
   }
   function parseFlair(s){
     return String(s || "").split(",").map(function(x){ var i = x.lastIndexOf(":"); return { hub: x.slice(0, i), lvl: +x.slice(i + 1) }; })
-      .filter(function(x){ return x.hub && x.lvl >= 1 && x.lvl <= 4; });
+      .filter(function(x){ return x.hub && x.lvl >= 1 && x.lvl <= 4; })
+      .sort(function(a, b){ return b.lvl - a.lvl || (a.hub < b.hub ? -1 : 1); });
   }
   /* the badges list from get_rank_profile ("mastery-gold:perio", ...) -> the same flair string the boards return */
   function flairFromBadges(badges){
@@ -369,28 +463,87 @@
     });
     return Object.keys(best).sort(function(a, b){ return best[b] - best[a] || (a < b ? -1 : 1); }).map(function(h){ return h + ":" + best[h]; }).join(",");
   }
+  /* the hub this page belongs to (the widget's data-hub), so its own medal leads on its boards */
+  function pageHub(){ var s = document.querySelector("script[data-hub]"); return s ? s.getAttribute("data-hub") : ""; }
+  function flairLabel(x){ return hubName(x.hub) + ": " + MASTERY[x.lvl - 1].n + " mastery"; }
   function flairCss(){
     if (document.getElementById("sh-flair-css")) return;
     var st = document.createElement("style"); st.id = "sh-flair-css";
-    st.textContent = '.sh-flair{display:inline-flex;align-items:center;gap:1px;vertical-align:-3px;margin:0 3px;white-space:nowrap}' +
-      '.sh-flair-m{display:inline-flex;width:16px;height:16px;filter:drop-shadow(0 1px .5px rgba(0,0,0,.25))}' +
-      '.sh-flair-m.is-crown{animation:sh-flair-glint 3.2s ease-in-out infinite}' +
-      '.sh-flair-more{font-size:10.5px;font-weight:700;opacity:.65;margin-left:1px}' +
-      '.sh-flair.is-big{gap:4px}.sh-flair.is-big .sh-flair-m{width:24px;height:24px}' +
-      '@keyframes sh-flair-glint{0%,80%,100%{filter:drop-shadow(0 1px .5px rgba(0,0,0,.25))}88%{filter:drop-shadow(0 0 4px #FFE27A) brightness(1.15)}}' +
-      '@media (prefers-reduced-motion: reduce){.sh-flair-m.is-crown{animation:none}}';
+    st.textContent = '.sh-flair{display:inline-flex;align-items:center;gap:1px;vertical-align:-4px;margin:0 3px;white-space:nowrap;flex:none}' +
+      /* at least 24x24, the WCAG 2.2 target size (BUG-009: the 18px medal made it 22x20 on the dashboard's boards); the
+         negative margins keep the row as tall as before */
+      'button.sh-flair{appearance:none;-webkit-appearance:none;background:none;border:0;padding:1px 2px;min-width:24px;min-height:24px;justify-content:center;margin:-2px 1px;border-radius:999px;font:inherit;color:inherit;cursor:pointer;line-height:1}' +
+      'button.sh-flair:hover,button.sh-flair:focus-visible{background:rgba(127,127,127,.16)}' +
+      'button.sh-flair:focus-visible{outline:2px solid currentColor;outline-offset:1px}' +
+      '.sh-flair-m{display:inline-flex;width:18px;height:18px;filter:drop-shadow(0 1px .5px rgba(0,0,0,.25))}' +
+      /* the crown's glint is a glow that fades in and out over the medal: only its opacity moves, which the browser
+         does without redrawing anything (it was an animated filter, which redrew the page's layers on every frame,
+         wherever the medal was: 2026-11-14) */
+      '.sh-flair-m.is-crown{position:relative}' +
+      '.sh-flair-m.is-crown::after{content:"";position:absolute;inset:-4px;border-radius:50%;background:radial-gradient(circle,rgba(255,236,150,.9) 0,rgba(255,226,122,.45) 45%,rgba(255,226,122,0) 70%);opacity:0;pointer-events:none;animation:sh-flair-glint 3.2s ease-in-out infinite}' +
+      '.sh-flair-more{font-size:10.5px;font-weight:700;opacity:.7;margin-left:1px;font-variant-numeric:tabular-nums}' +
+      /* the showcase (your rank card): every medal with its hub's name */
+      '.sh-flair.is-list{display:flex;flex-wrap:wrap;gap:5px;white-space:normal;margin:0;vertical-align:baseline;flex:1 1 auto;min-width:0;max-width:100%}' +
+      '.sh-flair-chip{display:inline-flex;align-items:center;gap:4px;padding:2px 8px 2px 3px;border-radius:999px;background:rgba(127,127,127,.13);font-size:12px;font-weight:600;line-height:1.2}' +
+      '.sh-flair.is-big .sh-flair-m{width:24px;height:24px}' +
+      /* the pop-up: a fixed inset:0 layer (no vh/vw, which overshoot when the text-size setting zooms <html>) */
+      '.sh-flair-pop{position:fixed;inset:0;z-index:2147483000;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(10,12,16,.45);animation:sh-flair-in .16s ease-out}' +
+      '.sh-flair-card{width:100%;max-width:340px;max-height:100%;overflow:auto;box-sizing:border-box;background:#1C1F26;color:#F3F1EC;border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:16px 16px 12px;box-shadow:0 18px 50px rgba(0,0,0,.45);font:14px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif}' +
+      '.sh-flair-card h3{margin:0 0 2px;font-size:16px;font-weight:700}' +
+      '.sh-flair-card p{margin:0 0 10px;font-size:12.5px;color:#B9B5AD}' +
+      '.sh-flair-card ul{list-style:none;margin:0;padding:0}' +
+      '.sh-flair-card li{display:flex;align-items:center;gap:12px;padding:7px 0;border-top:1px solid rgba(255,255,255,.08)}' +
+      '.sh-flair-card li:first-child{border-top:0}' +
+      '.sh-flair-card li .sh-flair-m{width:40px;height:40px}' +
+      '.sh-flair-card li b{display:block;font-size:14px}.sh-flair-card li small{font-size:12px;color:#B9B5AD}' +
+      '.sh-flair-card .sh-flair-x{display:block;margin:10px 0 0 auto;appearance:none;background:rgba(255,255,255,.1);color:inherit;border:0;border-radius:999px;padding:7px 16px;font:inherit;font-weight:600;cursor:pointer}' +
+      '@keyframes sh-flair-in{from{opacity:0}to{opacity:1}}' +
+      '@keyframes sh-flair-glint{0%,80%,100%{opacity:0}88%{opacity:1}}' +
+      '@media (prefers-reduced-motion: reduce){.sh-flair-m.is-crown::after,.sh-flair-pop{animation:none}}';
     (document.head || document.documentElement).appendChild(st);
+    document.addEventListener("click", function(e){
+      var b = e.target && e.target.closest && e.target.closest("[data-sh-flair]");
+      if (b) { e.preventDefault(); e.stopPropagation(); openFlair(b.getAttribute("data-flair-list"), b.getAttribute("data-flair-who")); }
+    }, true);
   }
-  /* shRanks.flair(str, { max, big }) -> inline medals; empty string when there's nothing to show */
+  function openFlair(s, who){
+    var list = parseFlair(s); if (!list.length) return;
+    var old = document.querySelector(".sh-flair-pop"); if (old) old.remove();
+    var back = document.activeElement, pop = document.createElement("div");
+    pop.className = "sh-flair-pop";
+    pop.innerHTML = '<div class="sh-flair-card" role="dialog" aria-modal="true" aria-label="Mastery medals">' +
+      '<h3>' + (who ? esc(who) + "'s mastery" : "Mastery medals") + '</h3><p>One medal per hub: the metal is how much of that hub\'s bank was right on the latest try (Bronze 50%, Silver 75%, Gold 90%, Crown 100%).</p><ul>' +
+      list.map(function(x){ return '<li><span class="sh-flair-m">' + medalSvg(x.lvl, 40, x.hub) + '</span><span><b>' + esc(hubName(x.hub)) + '</b><small>' + MASTERY[x.lvl - 1].n + ' mastery · ' + Math.round(MASTERY[x.lvl - 1].pct * 100) + '%</small></span></li>'; }).join("") +
+      '</ul><button type="button" class="sh-flair-x">Close</button></div>';
+    function close(){ pop.remove(); document.removeEventListener("keydown", key, true); try { if (back && back.focus) back.focus(); } catch (e) {} }
+    function key(e){ if (e.key === "Escape") { e.stopPropagation(); close(); } }
+    pop.addEventListener("click", function(e){ if (e.target === pop || e.target.closest(".sh-flair-x")) close(); });
+    document.addEventListener("keydown", key, true);
+    document.body.appendChild(pop);
+    var x = pop.querySelector(".sh-flair-x"); if (x) x.focus();
+    try { if (window.shTrack) window.shTrack("flair:open"); } catch (e) {}
+  }
+  function esc(s){ return String(s).replace(/[&<>"']/g, function(c){ return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  /* shRanks.flair(str, opt) -> mastery medals; empty string when there's nothing to show.
+     Default (board rows): one tappable medal, this page's hub first (else the best), then "+N"; fixed small width.
+     opt.list: every medal with its hub's name (the rank cards); opt.big: larger medals there.
+     opt.who: whose medals, for the pop-up's title. */
   function flair(s, opt){
     opt = opt || {};
     var list = parseFlair(s); if (!list.length) return "";
     flairCss();
-    var max = opt.max || 3, px = opt.big ? 24 : 16;
-    var label = list.map(function(x){ return hubName(x.hub) + ": " + MASTERY[x.lvl - 1].n + " mastery"; }).join(" · ");
-    return '<span class="sh-flair' + (opt.big ? ' is-big' : '') + '" role="img" aria-label="' + label + '" title="' + label + '">' +
-      list.slice(0, max).map(function(x){ return '<span class="sh-flair-m' + (x.lvl >= 4 ? ' is-crown' : '') + '">' + medalSvg(x.lvl, px) + '</span>'; }).join("") +
-      (list.length > max ? '<span class="sh-flair-more">+' + (list.length - max) + '</span>' : '') + '</span>';
+    if (opt.list) {
+      return '<span class="sh-flair is-list' + (opt.big ? ' is-big' : '') + '">' + list.map(function(x){
+        return '<span class="sh-flair-chip" title="' + esc(flairLabel(x)) + '"><span class="sh-flair-m' + (x.lvl >= 4 ? ' is-crown' : '') + '">' + medalSvg(x.lvl, opt.big ? 24 : 18, x.hub) + '</span>' + esc(hubName(x.hub)) + '</span>';
+      }).join("") + '</span>';
+    }
+    var here = pageHub(), lead = list.filter(function(x){ return x.hub === here; })[0] || list[0];
+    /* the name carries what the button shows ("+1"), so speech input and a screen reader agree with the screen (BUG-112) */
+    var rest = list.filter(function(x){ return x !== lead; });
+    var label = "Mastery medals: " + flairLabel(lead) + (rest.length ? ", +" + rest.length + " more: " + rest.map(flairLabel).join(" · ") : "");
+    return '<button type="button" class="sh-flair" data-sh-flair="medals" data-flair-list="' + esc(s) + '"' + (opt.who ? ' data-flair-who="' + esc(opt.who) + '"' : '') +
+      ' aria-label="' + esc(label) + '" title="' + esc(label) + '"><span class="sh-flair-m' + (lead.lvl >= 4 ? ' is-crown' : '') + '">' + medalSvg(lead.lvl, 18, lead.hub) + '</span>' +
+      (list.length > 1 ? '<span class="sh-flair-more">+' + (list.length - 1) + '</span>' : '') + '</button>';
   }
 
   /* ---------- unlockable accent colors (cosmetic; each needs that tier or higher) ---------- */
@@ -472,258 +625,236 @@
   }
 
   function svgDataUri(svg){ return 'url("data:image/svg+xml,' + encodeURIComponent(svg.replace(/ class="[^"]*"/, ' xmlns="http://www.w3.org/2000/svg"')) + '")'; }
-  function fmt(n){ return Math.round(n || 0).toLocaleString(); }
 
-  /* ---------- the hub widget: rank card, hub mastery, trophy case, link devices, accent unlocks ---------- */
-  function mount(H){
-    if (!H || window.__shRanksMounted) return;
-    window.__shRanksMounted = true;
-    var SB = H.supabase, esc = H.esc;
-    applyAccent(ls("sh_pref_accent"));
-    if (!SB) return;
-    function rpc(name, args){ return SB.rpc(name, args).then(function(r){ return r && !r.error ? r.data : null; }, function(){ return null; }); }
-    var profile = null, mastery = null;
-
-    var panel = H.statsPanel();
-    var sec = document.createElement("div");
-    sec.className = "shstat-sec sh-rank-sec"; sec.id = "sh-rank-sec";
-    sec.innerHTML = '<div class="shstat-empty">Loading your rank…</div>';
-    if (panel) { var first = panel.querySelector(".shstat-sec"); panel.insertBefore(sec, first || null); }
-
-    /* Settings: accent colors */
-    var settings = document.getElementById("shstat-settingspanel");
-    var accRow = document.createElement("div");
-    accRow.className = "shset-row sh-accent-row";
-    if (settings) { var eggsRow = settings.querySelector('[data-pref="eggs"]'); settings.insertBefore(accRow, eggsRow ? eggsRow.closest(".shset-row") : null); }
-    function drawAccents(){
-      var have = profile ? profile.tier : +(ls("sh_rank_tier") || 0), cur = ls("sh_pref_accent") || "default";
-      accRow.innerHTML = '<label>Accent color</label><div class="sh-accent-swatches">' +
-        '<button type="button" data-acc="default" aria-pressed="' + (cur === "default") + '" title="The hub\'s own color"><span class="sh-acc-dot sh-acc-default"></span>Hub</button>' +
-        Object.keys(ACCENTS).map(function(k){
-          var a = ACCENTS[k], locked = have < a.tier;
-          return '<button type="button" data-acc="' + k + '" aria-pressed="' + (cur === k) + '"' + (locked ? ' disabled title="Unlocks at ' + TIERS[a.tier].name + '"' : '') + '>' +
-            '<span class="sh-acc-dot" style="background:' + a.L[0] + ' url(\'' + accentTex(k) + '\') center/cover"></span>' + TIERS[a.tier].name + (locked ? ' <svg class="sh-acc-lock" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>' : '') + '</button>';
-        }).join("") + '</div><div class="shset-hint">Unlocked by your handpiece rank. Buttons, switches and progress bars in every hub take on that metal.</div>';
+  /* ---------- rank-up celebrations (widget/rankup.js, fetched the first time one is needed) ----------
+     track(profile) compares the rank with the last one this device saw (sh_rank_tier / sh_rank_step) and plays the
+     full cutscene for a new rank (Silver -> Gold) or the smaller coin flip for a new level (Gold I -> Gold II).
+     The hub widget and the dashboard both call it, so a rank-up shows on whichever page sees it first. It waits for
+     a visible tab and for opt.busy() (a mock exam) to be false; Settings -> Extras -> Rank-up and trophy cards off skips it. */
+  var RANKUP_SRC = (function(){
+    var src = (document.currentScript && document.currentScript.src) || "";
+    if (!src) { var el = document.querySelector('script[src*="ranks.js"]'); src = el ? el.src : ""; }
+    try { return src ? new URL("rankup.js", src).href : ""; } catch (e) { return ""; }
+  })();
+  var rankUpLoading = null;
+  function withRankUp(cb){
+    if (window.shRankUp) { cb(window.shRankUp); return; }
+    if (!RANKUP_SRC) return;
+    if (!rankUpLoading) {
+      rankUpLoading = [];
+      var s = document.createElement("script"); s.src = RANKUP_SRC; s.async = true;
+      s.onload = function(){ var q = rankUpLoading; rankUpLoading = null; if (window.shRankUp) q.forEach(function(f){ f(window.shRankUp); }); };
+      s.onerror = function(){ rankUpLoading = null; };
+      document.head.appendChild(s);
     }
-    accRow.addEventListener("click", function(e){
-      var b = e.target.closest("[data-acc]"); if (!b || b.disabled) return;
-      var k = b.getAttribute("data-acc"); ls("sh_pref_accent", k === "default" ? null : k); applyAccent(k); drawAccents();
+    rankUpLoading.push(cb);
+  }
+  /* the redesign's journeys: their scenes (widget/journeys.js) and the two later objects' drawings
+     (widget/hub-art/journeys.js, window.SH_JOURNEY_ART), each fetched the first time it is needed, never with the page */
+  function sibling(name){ try { return RANKUP_SRC ? new URL(name, RANKUP_SRC).href : ""; } catch (e) { return ""; } }
+  function loadOnce(src, ready, cbs){
+    return function(cb, fail){
+      if (ready()) { cb(ready()); return; }
+      if (!src) { if (fail) fail(); return; }
+      cbs.push([cb, fail]);
+      if (cbs.length > 1) return;
+      var s = document.createElement("script"); s.src = src; s.async = true;
+      s.onload = s.onerror = function(){ var q = cbs.splice(0), ok = ready(); q.forEach(function(x){ if (ok) x[0](ok); else if (x[1]) x[1](); }); };
+      document.head.appendChild(s);
+    };
+  }
+  var withJourneys = loadOnce(sibling("journeys.js"), function(){ return window.shJourneys; }, []);
+  var loadJourneyArt = loadOnce(sibling("hub-art/journeys.js"), function(){ return window.SH_JOURNEY_ART; }, []);
+  function needJourneyArt(cb){ loadJourneyArt(cb, function(){ cb(null); }); }
+  /* the redesign's trophy case: its drawings (widget/hub-art/trophies.js, window.SH_TROPHY_ART) and the case itself
+     (widget/trophies.js, window.shTrophies, which brings its own stylesheet), fetched the first time the case opens */
+  var loadTrophyArt = loadOnce(sibling("hub-art/trophies.js"), function(){ return window.SH_TROPHY_ART; }, []);
+  var withTrophyCase = loadOnce(sibling("trophies.js"), function(){ return window.shTrophies; }, []);
+  /* the case's and the redesign's cards' stylesheet (widget/trophies.css), once; cb when it has loaded (or failed) */
+  var cssWait = null;
+  function trophyCss(cb){
+    if (cssWait === true) { cb(); return; }
+    if (cssWait) { cssWait.push(cb); return; }
+    cssWait = [cb];
+    var fin = function(){ var q = cssWait; cssWait = true; q.forEach(function(f){ f(); }); }, href = sibling("trophies.css");
+    if (!href || document.getElementById("sh-trophies-css")) { fin(); return; }
+    var l = document.createElement("link"); l.rel = "stylesheet"; l.href = href; l.id = "sh-trophies-css"; l.onload = l.onerror = fin;
+    document.head.appendChild(l);
+  }
+  function trophyCase(cb){
+    var go = function(){ withTrophyCase(cb, function(){ cb(null); }); };
+    loadTrophyArt(go, go);
+  }
+  /* the class's share of each trophy, for the redesign's case and cards: get_trophy_stats_v2 (migration_v54, with the
+     journeys) or, until that is applied, get_trophy_stats (migration_v32). kind -> { n, total }, kept 10 minutes. The
+     client is the hub widget's (mount), the one passed in (the dashboard's) or window.shSupabase. */
+  var TS = { data: null, at: 0, q: null, sb: null };
+  function trophyStats(cb, sb){
+    sb = sb || TS.sb || window.shSupabase || null;
+    if (sb && !TS.sb) TS.sb = sb;
+    if ((TS.data && Date.now() - TS.at < 600000) || !sb || !sb.rpc) { if (cb) cb(TS.data); return; }
+    if (TS.q) { if (cb) TS.q.push(cb); return; }
+    TS.q = cb ? [cb] : [];
+    function call(name){
+      try { return Promise.resolve(sb.rpc(name, {})).then(function(r){ return r && !r.error && r.data && r.data.length ? r.data : null; }, function(){ return null; }); }
+      catch (e) { return Promise.resolve(null); }
+    }
+    call("get_trophy_stats_v2").then(function(rows){ return rows || call("get_trophy_stats"); }).then(function(rows){
+      if (rows) { var m = {}; rows.forEach(function(r){ if (r && r.kind) m[r.kind] = { n: r.n | 0, total: r.total | 0 }; }); TS.data = m; TS.at = Date.now(); }
+      var q = TS.q; TS.q = null; q.forEach(function(f){ try { f(TS.data); } catch (e) {} });
     });
-    drawAccents();
-
-    /* the little handpiece next to your name */
-    function badgeIcon(t){
-      var uri = svgDataUri(art(t, 20));
-      ["sh-ribbon-name", "shname-badge"].forEach(function(id){
-        var el = document.getElementById(id); if (!el) return;
-        el.classList.add("sh-has-rank"); el.style.setProperty("--sh-rank-img", uri); el.setAttribute("data-rank", TIERS[t].name);
-        if (profile && profile.level) el.setAttribute("data-rank-lv", ROMAN[profile.level - 1]);
-      });
+  }
+  /* one kind's share, or null when the server doesn't count it (Bowling) or hasn't answered */
+  function shareOf(k){
+    var r = TS.data && TS.data[k]; if (!r || !r.total) return null;
+    var p = r.n / r.total * 100;
+    return { n: r.n, total: r.total, p: p, label: !r.n ? "nobody yet" : p < 1 ? "<1%" : Math.round(p) + "%" };
+  }
+  /* a journey's medallion: the ModuPro's or the loupes' once their drawings are here, the handpiece's until then
+     (call needJourneyArt and draw again) */
+  function artOf(j, tier, px, opt){
+    var K = window.SH_JOURNEY_ART, sh = j > 0 && K ? K.shape(j) : null;
+    if (!sh) return art(tier, px, opt);
+    var o = {}, k; for (k in (opt || {})) o[k] = opt[k]; o.shape = sh;
+    return art(tier, px, o);
+  }
+  function playRankUp(kind, d, busy){
+    if (document.hidden || (busy && busy())) { setTimeout(function(){ playRankUp(kind, d, busy); }, 3000); return; }
+    withRankUp(function(U){ if (U[kind]) U[kind](d); });
+  }
+  /* trophies you earn by studying (the non-secret ones: answers, study days, runs, mock, arcade) used to land silently in
+     the trophy case; track() now announces each new one with a card (widget/rankup.js). Secret ones keep their own
+     moment (an egg's toast, Timmy Tooth), and hub mastery medals are announced by the hub widget (widget/ranks-hub.js). The
+     device remembers which it has seen in sh_trophy_seen; the first look only records them. */
+  /* the card: the drawn trophy (k, SH_TROPHY_ART), its share from the shared stats and what's next */
+  function trophyCard(tr, badges){
+    var c = { k: tr.k, name: tr.n, desc: tr.d, eyebrow: "New trophy", ic: tr.ic, pal: "gold", rarity: function(){ return shareOf(tr.k); } };
+    if (badges) { var n = caseCount(badges); c.next = n.won + " of " + n.of + " in your case"; }
+    return c;
+  }
+  function trackTrophies(p, busy){
+    var kinds = {}; (p.badges || []).forEach(function(b){ kinds[String(b).split(":")[0]] = 1; });
+    var have = Object.keys(kinds).sort().join(","), seen = ls("sh_trophy_seen");
+    if (have === seen) return;
+    ls("sh_trophy_seen", have);
+    if (seen === null || (ls("sh_pref_celebrate") || "on") === "off") return;
+    var old = {}; seen.split(",").forEach(function(k){ old[k] = 1; });
+    var fresh = TROPHIES.filter(function(tr){ return !tr.secret && !tr.scene && kinds[tr.k] && !old[tr.k]; });
+    if (fresh.length) trophyStats();
+    fresh.forEach(function(tr){ playRankUp("trophy", trophyCard(tr, p.badges), busy); });
+  }
+  /* a trophy won from now on pays 200 XP and crowns (migration_v68): when a v2 profile shows a trophy this device hasn't
+     had settled (sh_trophy_paid), the page asks the server (claim_trophies_v2), which pays the new ones and lists every
+     trophy it has settled. opt.claim(fn, args) is the page's call (the hub's and the dashboard's own client). */
+  var trophyAsked = false;
+  function claimTrophies(p, claim){
+    var kinds = {}, have = {};
+    (p.badges || []).forEach(function(b){ var k = String(b).split(":")[0]; if (!/^(mastery-|dark-seen-)/.test(k) && k !== "pet-adopt") kinds[k] = 1; });
+    String(ls("sh_trophy_paid") || "").split(",").forEach(function(k){ if (k) have[k] = 1; });
+    if (trophyAsked || !Object.keys(kinds).some(function(k){ return !have[k]; })) return;
+    trophyAsked = true;
+    claim("claim_trophies_v2", {}).then(function(r){
+      trophyAsked = false;
+      if (!r || typeof r !== "object" || r.ok === false) return;
+      if (Array.isArray(r.have)) ls("sh_trophy_paid", r.have.join(","));
+      var G = window.shGame, xp = r.xp | 0, n = Array.isArray(r.won) ? r.won.length : 0;
+      if (G && G.setCrowns) G.setCrowns(r.crowns);
+      else try { document.dispatchEvent(new CustomEvent("sh:crowns", { detail: { balance: r.crowns } })); } catch (e) {}
+      if (xp > 0) try { document.dispatchEvent(new CustomEvent("sh:prize", { detail: { src: "trophy", xp: xp, res: r,
+        text: G && G.prizeText ? G.prizeText("trophy", xp, r) : (n > 1 ? n + " new trophies" : "New trophy") + ": +" + xp + " XP and " + xp + " crowns" } })); } catch (e) {}
+    }, function(){ trophyAsked = false; });
+  }
+  function track(p, opt){
+    if (!p) return;
+    opt = opt || {};
+    var raw = p, v2 = isV2(raw); p = legacy(p);
+    trackTrophies(p, opt.busy);
+    if (v2 && opt.claim) claimTrophies(raw, opt.claim);
+    var t = p.tier || 0, step = p.step != null ? p.step : t * 3, pt = ls("sh_rank_tier"), ps = ls("sh_rank_step");
+    ls("sh_rank_tier", String(t)); ls("sh_rank_step", String(step));
+    var on = (ls("sh_pref_celebrate") || "on") !== "off";
+    /* a journey's own moments (v2 only): the hand-off and the Dark Matter unlock play alone, in place of the cards below */
+    var took = v2 ? trackJourney(raw, opt, on) : false;
+    if (pt === null || !on || took) return;
+    pt = +pt; ps = ps === null ? NaN : +ps;
+    var from = Math.floor(ps / 3) === pt ? ps : pt * 3;   // the dashboard used to save only the tier
+    var d = { from: pt, fromLevel: from % 3 + 1, to: t, level: p.level || step % 3 + 1, xp: p.xp, next_at: p.next_at, position: p.position, of: p.of };
+    if (v2) d.v2 = true;   // the redesign's cutscene names the rank's pieces for Timmy's place (game layer only)
+    if (t > pt) playRankUp("tier", d, opt.busy);
+    else if (t === pt && step > from) playRankUp("level", d, opt.busy);
+  }
+  /* The redesign's journeys (a v2 profile). The device remembers the step of 63 it last saw (sh_rank_g; the first look
+     only records it). A new journey plays the hand-off; reaching a journey's Dark Matter plays its unlock, once ever (the
+     server's dark_seen says whether it has played anywhere; opt.seen(journey) tells the server when it has); a rank or
+     level inside a later journey plays today's cards with that journey's object. Returns true when it played a scene
+     that stands in for the Handpiece's cards. Both scenes are widget/journeys.js, fetched when one is due. */
+  var darkPlayed = {};
+  function trackJourney(raw, opt, on){
+    var j = raw.journey | 0, g = raw.step != null ? raw.step : j * 21 + (raw.tier | 0) * 3 + (raw.level || 1) - 1, pg = ls("sh_rank_g");
+    ls("sh_rank_g", String(g));
+    if (!on) return false;
+    var took = false, base = { xp: raw.xp, next_at: raw.next_at, position: raw.position, of: raw.of };
+    function scene(kind, d, after){
+      playRankUp("scene", function(done){
+        withJourneys(function(J){ J[kind](d, function(){ if (after) after(); done(); }); }, done);
+      }, opt.busy);
     }
-
-    function masteryFor(){
-      var bank = ((window.SH_EXPORT || {}).questions || []).length;
-      var row = (mastery || []).filter(function(r){ return r.hub === H.hub; })[0];
-      var got = row ? row.latest_correct : 0, pct = bank ? got / bank : 0, lvl = -1;
-      MASTERY.forEach(function(m, i){ if (bank && pct >= m.pct) lvl = i; });
-      return { bank: bank, got: got, pct: pct, lvl: lvl };
-    }
-    /* how many people have each trophy (get_trophy_stats, migration_v32), out of everyone who has answered */
-    var tstats = null, tstatsAt = 0;
-    function loadTrophyStats(){
-      if (Date.now() - tstatsAt < 600000) return;
-      tstatsAt = Date.now();
-      rpc("get_trophy_stats", {}).then(function(rows){
-        if (!rows || !rows.length) { tstatsAt = 0; return; }
-        tstats = {}; rows.forEach(function(r){ tstats[r.kind] = { n: r.n | 0, total: r.total | 0 }; });
-        render();
-      });
-    }
-    function rarity(k){
-      if (!tstats) return null;
-      var any = null; for (var key in tstats) { any = tstats[key]; break; }
-      var r = tstats[k] || { n: 0, total: any ? any.total : 0 };
-      if (!r.total) return null;
-      var p = r.n / r.total * 100;
-      return { n: r.n, total: r.total, label: !r.n ? "nobody yet" : p < 1 ? "<1%" : Math.round(p) + "%" };
-    }
-    function trophyHTML(tr, earned){
-      var hidden = tr.secret && !earned, rr = rarity(tr.k);
-      return '<button type="button" class="sh-trophy' + (earned ? " is-earned" : "") + '" data-trophy="' + tr.k + '" title="' + esc(hidden ? "Secret: tap for a clue" : tr.d) + '">' +
-        '<span class="sh-trophy-medal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' +
-        (hidden ? '<path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .8-1 1.5V14M12 17.5h.01"/>' : '<path d="' + tr.ic + '"/>') + '</svg></span>' +
-        '<span class="sh-trophy-name">' + esc(hidden ? "???" : tr.n) + '</span>' +
-        (rr ? '<span class="sh-trophy-pct" title="' + rr.n + ' of ' + rr.total + ' classmates have it">' + esc(rr.label) + '</span>' : '') + '</button>';
-    }
-    function render(){
-      if (!profile) return;
-      var t = profile.tier || 0, xp = profile.xp || 0, next = profile.next_at, at = profile.step_at != null ? profile.step_at : (profile.tier_at || 0);
-      var lvl = profile.level || 1, step = profile.step != null ? profile.step : t * 3;
-      var pct = next ? Math.max(0, Math.min(1, (xp - at) / (next - at))) : 1;
-      var m = masteryFor(), badges = profile.badges || [];
-      var h = '<div class="sh-rank-card sh-tier-' + TIERS[t].key + '">' +
-        '<div class="sh-rank-art-wrap">' + art(t, 108, { animate: true, level: lvl }) + '</div>' +
-        '<div class="sh-rank-info"><div class="sh-rank-eyebrow">Your handpiece</div>' +
-        '<div class="sh-rank-name">' + rankName(t, lvl) + '</div>' +
-        '<div class="sh-rank-xp"><b>' + fmt(xp) + '</b> XP' + (profile.position ? ' · #' + profile.position + ' of ' + profile.of : '') + '</div>' +
-        '<div class="sh-rank-bar"><i style="width:' + (pct * 100).toFixed(1) + '%"></i></div>' +
-        '<div class="sh-rank-next">' + (next ? fmt(next - xp) + ' XP to ' + rankName(Math.floor((step + 1) / 3), (step + 1) % 3 + 1) : 'The highest rank there is.') + '</div>' +
-        (window.shEditName ? '<button type="button" class="sh-rank-rename">' + (window.shNameNow && window.shNameNow() ? 'Shown as ' + esc(window.shNameNow()) + ' · change' : 'Change your name') + '</button>' : '') +
-        '</div></div>';
-      if (m.bank) {
-        h += '<div class="sh-mastery"><div class="sh-mastery-top"><span>Mastery in this hub</span><b>' + Math.round(m.pct * 100) + '%' + (m.lvl >= 0 ? ' · ' + MASTERY[m.lvl].n : '') + '</b></div>' +
-          '<div class="sh-mastery-bar"><i style="width:' + (m.pct * 100).toFixed(1) + '%"></i>' +
-          MASTERY.map(function(x, i){ return '<span class="sh-mastery-tick' + (m.lvl >= i ? ' is-hit' : '') + '" style="left:' + (x.pct * 100) + '%" title="' + x.n + ' at ' + Math.round(x.pct * 100) + '%"></span>'; }).join("") +
-          '</div><div class="sh-mastery-note">' + fmt(m.got) + ' of ' + fmt(m.bank) + ' questions right on your latest try. Bronze 50% · Silver 75% · Gold 90% · Crown 100%. ' +
-          'Each one puts a medal next to your name on every leaderboard.</div></div>';
+    if (pg !== null) {
+      pg = +pg; var pj = Math.floor(pg / 21), ptier = Math.floor((pg % 21) / 3);
+      if (j > pj) { took = true; scene("handoff", { from: pj, to: j, xp: raw.xp, tier: raw.tier | 0, level: raw.level || 1 }); }
+      else if (j === pj && j > 0 && g > pg && !((raw.tier | 0) === 6 && ptier < 6)) {
+        var d = { from: ptier, fromLevel: pg % 3 + 1, to: raw.tier | 0, level: raw.level || 1, xp: raw.xp, next_at: raw.next_at, position: raw.position, of: raw.of, jn: JOURNEYS[j] };
+        needJourneyArt(function(K){ d.shape = K ? K.shape(j) : null; d.tier_next = K && d.to < 6 ? K.floor(j, d.to + 1) : 0; playRankUp(d.to > ptier ? "tier" : "level", d, opt.busy); });
       }
-      var myFlair = flairFromBadges(badges.concat(m.lvl >= 0 ? [MASTERY[m.lvl].k + ":" + H.hub] : []));
-      /* Timmy Tooth's house (widget/pet.js) hangs a pennant per mastered hub */
-      if ((ls("sh_rank_flair") || "") !== myFlair) { ls("sh_rank_flair", myFlair || null); try { document.dispatchEvent(new CustomEvent("sh:rank")); } catch (e) {} }
-      if (myFlair) h += '<div class="sh-flair-row"><span>Your leaderboard flair</span>' + flair(myFlair, { max: 8, big: true }) + '</div>';
-      var earned = {}; badges.forEach(function(b){ earned[b.split(":")[0]] = true; });
-      h += '<div class="sh-trophies-h"><span>Trophy case</span><b>' + TROPHIES.filter(function(x){ return earned[x.k]; }).length + ' / ' + TROPHIES.length + '</b></div>' +
-        '<div class="sh-trophies">' + TROPHIES.map(function(x){ return trophyHTML(x, earned[x.k]); }).join("") + '</div>' +
-        '<p class="sh-trophy-detail" aria-live="polite">' + psst(earned) + '</p>' +
-        '<details class="sh-rank-how"><summary>How XP works</summary><p>10 XP the first time you get a question right, 2 for any other right answer, 1 for a miss (effort counts), and 20 for every day you study. Answer XP is capped at 600 a day, so steady studying beats cramming. Each rank has three levels (I, II, III). Ranks start at: ' +
-        TIERS.map(function(x){ return x.name + ' ' + fmt(x.at); }).join(" · ") + ' XP.</p></details>' +
-        '<div class="sh-link"><button type="button" class="sh-link-toggle" aria-expanded="false">Link my devices</button><div class="sh-link-body" hidden></div></div>';
-      sec.innerHTML = h;
-      // hub mastery tiers become trophies on the server once reached; a new one is announced, since it shows to everyone
-      var fresh = -1;
-      for (var i = 0; i <= m.lvl; i++) {
-        var key = MASTERY[i].k;
-        if (badges.indexOf(key + ":" + H.hub) < 0) {
-          fresh = i; badges.push(key + ":" + H.hub);
-          rpc("record_achievement", { p_visitor: H.visitor, p_kind: key, p_hub: H.hub });
-        }
-      }
-      if (fresh >= 0) masteryToast(fresh);
     }
-    function masteryToast(i){
-      if (H.prefGet("sh_pref_eggs", "on") === "off") return;
-      var d = document.createElement("div");
-      d.className = "sh-egg sh-egg-toast is-gold"; d.setAttribute("role", "status");
-      d.innerHTML = '<span class="sh-egg-ic" style="width:40px;height:40px">' + medalSvg(i + 1, 40) + '</span><span><b>' + MASTERY[i].n + ' mastery in ' + esc(hubName(H.hub)) + '</b>' +
-        '<small>' + (i === 3 ? 'Every question right. The crown now sits next to your name on every leaderboard.' : 'A ' + MASTERY[i].n.toLowerCase() + ' medal now shows next to your name on every leaderboard.') + '</small></span>';
-      document.body.appendChild(d);
-      requestAnimationFrame(function(){ d.classList.add("is-shown"); });
-      H.confetti(); if (i >= 2) setTimeout(H.confetti, 400);
-      d.addEventListener("click", function(){ d.remove(); });
-      setTimeout(function(){ d.classList.remove("is-shown"); setTimeout(function(){ d.remove(); }, 350); }, 6500);
+    if ((raw.tier | 0) >= 6 && (raw.dark_seen || []).indexOf(j) < 0 && !darkPlayed[j]) {
+      darkPlayed[j] = 1; if (j === 0) took = true;
+      scene("dark", { journey: j, xp: base.xp, level: raw.level || 1, position: raw.position, of: raw.of }, function(){ if (opt.seen) opt.seen(j); });
     }
-
-    function levelToast(t, lvl){
-      if (H.prefGet("sh_pref_eggs", "on") === "off") return;
-      var d = document.createElement("div");
-      d.className = "sh-egg sh-egg-toast is-gold"; d.setAttribute("role", "status");
-      d.innerHTML = '<span class="sh-egg-ic" style="width:44px;height:44px">' + art(t, 44, { level: lvl }) + '</span><span><b>' + rankName(t, lvl) + '</b><small>Level up. Keep going.</small></span>';
-      document.body.appendChild(d);
-      requestAnimationFrame(function(){ d.classList.add("is-shown"); });
-      setTimeout(function(){ d.classList.remove("is-shown"); setTimeout(function(){ d.remove(); }, 350); }, 4200);
-    }
-    /* a clue for one secret you haven't found yet, different on each open */
-    function psst(earned){
-      var left = TROPHIES.filter(function(x){ return x.secret && !earned[x.k]; });
-      if (!left.length) return "You've found every secret. Tap a trophy to see what it's for.";
-      var x = left[Math.floor(Math.random() * left.length)];
-      return '<b>Psst.</b> ' + esc(x.clue) + ' <span class="sh-trophy-hint">Tap any trophy for more.</span>';
-    }
-    sec.addEventListener("click", function(e){ if (e.target.closest(".sh-rank-rename") && window.shEditName) window.shEditName(); });
-    document.addEventListener("sh:name", function(){ render(); });
-    sec.addEventListener("click", function(e){
-      var b = e.target.closest("[data-trophy]"); if (!b || !profile) return;
-      var tr = TROPHIES.filter(function(x){ return x.k === b.getAttribute("data-trophy"); })[0]; if (!tr) return;
-      var got = (profile.badges || []).some(function(k){ return k.split(":")[0] === tr.k; });
-      sec.querySelectorAll("[data-trophy]").forEach(function(x){ x.classList.toggle("is-sel", x === b); });
-      var rr = rarity(tr.k), share = !rr ? '' : ' <span class="sh-trophy-hint">' + (rr.n ? rr.n + ' of ' + rr.total + ' classmates (' + rr.label + ') have it.' : 'Nobody has found this one yet.') + '</span>';
-      sec.querySelector(".sh-trophy-detail").innerHTML = (got ? '<b>' + esc(tr.n) + '.</b> ' + esc(tr.d) + '. Earned.'
-        : tr.secret ? '<b>Secret.</b> ' + esc(tr.clue) : '<b>' + esc(tr.n) + '.</b> ' + esc(tr.d) + '.') + share;
-    });
-    function celebrate(t){
-      if (H.prefGet("sh_pref_eggs", "on") === "off") return;
-      var d = document.createElement("div");
-      d.className = "sh-egg sh-rankup"; d.setAttribute("role", "status");
-      d.innerHTML = '<div class="sh-rankup-card sh-tier-' + TIERS[t].key + '">' + art(t, 150, { animate: true }) + '<div class="sh-rank-eyebrow">New rank</div><div class="sh-rank-name">' +
-        TIERS[t].name + ' I</div><p>' + (ACCENTS[TIERS[t].key] ? "You also unlocked the " + TIERS[t].name + " accent color in Settings." : "Keep going.") + '</p><button type="button">Nice</button></div>';
-      document.body.appendChild(d);
-      requestAnimationFrame(function(){ d.classList.add("is-shown"); });
-      H.confetti(); setTimeout(H.confetti, 400);
-      d.addEventListener("click", function(e){ if (e.target === d || e.target.closest("button")) { d.classList.remove("is-shown"); setTimeout(function(){ d.remove(); }, 300); } });
-    }
-
-    var loading = false;
-    function load(){
-      if (loading) return; loading = true;
-      loadTrophyStats();
-      Promise.all([rpc("get_rank_profile", { p_visitor: H.visitor }), rpc("get_hub_mastery", { p_visitor: H.visitor })]).then(function(r){
-        loading = false;
-        if (!r[0]) { if (!profile) sec.innerHTML = '<div class="shstat-empty">Ranks load when you are online.</div>'; return; }
-        profile = r[0]; mastery = r[1] || [];
-        if (window.shPet && window.shPet.syncBadges) window.shPet.syncBadges(profile.badges);
-        var prev = ls("sh_rank_tier"), prevStep = ls("sh_rank_step"), stepNow = profile.step != null ? profile.step : (profile.tier || 0) * 3;
-        ls("sh_rank_tier", String(profile.tier || 0)); ls("sh_rank_step", String(stepNow));
-        if (prev !== null && (profile.tier || 0) > +prev) celebrate(profile.tier);
-        else if (prevStep !== null && stepNow > +prevStep) levelToast(profile.tier || 0, profile.level || 1);
-        badgeIcon(profile.tier || 0); render(); drawAccents(); applyAccent(ls("sh_pref_accent"));
-        /* Full Arch is once per hub: if it's done on any device, eggs.js stops showing it here */
-        if ((profile.badges || []).indexOf("fullarch:" + H.hub) >= 0) document.dispatchEvent(new CustomEvent("sh:arch-done", { detail: H.hub }));
-      });
-    }
-    load();
-    var sinceLoad = 0;
-    document.addEventListener(H.answeredEvent, function(){ if (++sinceLoad >= 10) { sinceLoad = 0; setTimeout(load, 1500); } });
-    document.addEventListener("click", function(e){
-      if (e.target.closest && e.target.closest("#shstat-stats-pill")) setTimeout(load, 50);
-    });
-    document.addEventListener("sh:mock-done", function(e){
-      var d = e.detail || {};
-      if (d.total > 0) rpc("record_mock_score", { p_visitor: H.visitor, p_hub: H.hub, p_correct: d.correct | 0, p_total: d.total | 0 });
-      if (d.total >= 20 && d.correct / d.total >= 0.9) rpc("record_achievement", { p_visitor: H.visitor, p_kind: "mock90", p_hub: H.hub }).then(function(){ setTimeout(load, 800); });
-    });
-
-    /* link my devices */
-    sec.addEventListener("click", function(e){
-      var tg = e.target.closest(".sh-link-toggle");
-      var body = sec.querySelector(".sh-link-body");
-      if (tg) {
-        var open = body.hidden; body.hidden = !open; tg.setAttribute("aria-expanded", String(open));
-        if (open) body.innerHTML = '<p>Use one rank, streak and trophy case on your phone and laptop. Your in-hub progress bars stay per device.</p>' +
-          '<div class="sh-link-step"><b>1. On the device you use most</b><button type="button" class="sh-link-make">Get a code</button><div class="sh-link-code" aria-live="polite"></div></div>' +
-          '<div class="sh-link-step"><b>2. On your other device</b><div class="sh-link-enter"><input type="text" maxlength="7" autocomplete="one-time-code" autocapitalize="characters" placeholder="Code" aria-label="Link code"><button type="button" class="sh-link-go">Link</button></div>' +
-          '<div class="sh-link-msg" aria-live="polite"></div></div>';
-        return;
-      }
-      if (e.target.closest(".sh-link-make")) {
-        var out = sec.querySelector(".sh-link-code"); out.textContent = "…";
-        rpc("create_link_code", { p_visitor: H.visitor }).then(function(c){
-          out.innerHTML = c ? '<span class="sh-link-big">' + esc(c.slice(0, 3) + " " + c.slice(3)) + '</span><small>Enter it on your other device in the next 10 minutes.</small>' : "Couldn’t make a code. Are you online?";
-        });
-        return;
-      }
-      if (e.target.closest(".sh-link-go")) {
-        var inp = sec.querySelector(".sh-link-enter input"), msg = sec.querySelector(".sh-link-msg");
-        var code = (inp.value || "").replace(/[^A-Za-z0-9]/g, "").toUpperCase();
-        if (code.length !== 6) { msg.textContent = "Codes are 6 letters and numbers."; return; }
-        msg.textContent = "Linking…";
-        rpc("redeem_link_code", { p_code: code, p_visitor: H.visitor }).then(function(id){
-          if (!id) { msg.textContent = "That code didn’t work. Codes last 10 minutes; make a fresh one and try again."; return; }
-          if (id === H.visitor) { msg.textContent = "This device already uses that code’s account."; return; }
-          ls("sh_visitor_id", id); ls("sh_display_name", null); ls("sh_rank_tier", null);
-          rpc("get_display_name", { p_visitor: id }).then(function(n){
-            if (n) ls("sh_display_name", n);
-            msg.textContent = "Linked! Reloading…";
-            setTimeout(function(){ location.reload(); }, 900);
-          });
-        });
-      }
-    });
+    return took;
+  }
+  /* try them from the console: shRanks.preview("tier", 3) (Silver -> Gold), shRanks.preview("level", 4, 2) (Gold I -> II),
+     shRanks.preview("trophy", 6) (a TROPHIES index), shRanks.preview("mastery", 2) (Gold), shRanks.preview("mock", 37, 40) */
+  function preview(kind, a, b){
+    if (kind === "trophy") { var tr = TROPHIES[Math.max(0, Math.min(TROPHIES.length - 1, a | 0))]; withRankUp(function(U){ U.trophy(trophyCard(tr)); }); return; }
+    if (kind === "mastery") { withRankUp(function(U){ U.trophy(masteryCard(Math.max(0, Math.min(3, a | 0)), pageHub())); }); return; }
+    if (kind === "mock") { var tot = b || 40, c = Math.min(tot, a == null ? 34 : a | 0); withRankUp(function(U){ U.mock({ correct: c, total: tot, hub: "Preview", prev: .8,
+      byLec: [{ label: "L1 · Lecture one", correct: 7, total: 8 }, { label: "L2 · Lecture two", correct: 5, total: 7 }, { label: "L3 · Lecture three", correct: 2, total: 3 }],
+      missed: function(){} }); }); return; }
+    a = a == null ? 3 : Math.max(0, Math.min(6, a | 0));
+    var d = kind === "level" ? { from: a, to: a, level: Math.max(2, Math.min(3, b || 2)) }
+      : { from: a, fromLevel: 3, to: Math.max(1, Math.min(6, b == null ? a + 1 : b | 0)), level: 1 };
+    if (kind !== "level" && d.to <= d.from) d.from = d.to - 1;
+    withRankUp(function(U){ U[kind === "level" ? "level" : "tier"](d); });
+  }
+  /* a hub mastery medal (Bronze 50% ... Crown 100%), as a trophy card */
+  var MASTERY_PAL = ["bronze", "silver", "gold", "gold"];
+  function masteryCard(i, hub){
+    var c = { name: MASTERY[i].n + " mastery", eyebrow: "Hub mastery" + (hub ? " · " + hubName(hub) : ""), art: medalSvg(i + 1, 84, hub), pal: MASTERY_PAL[i],
+      desc: i === 3 ? "Every question right. The crown now sits next to your name on every leaderboard." : "A " + MASTERY[i].n.toLowerCase() + " medal with this hub's emblem now shows next to your name on every leaderboard.",
+      rarity: function(){ return shareOf(MASTERY[i].k); } };
+    if (i < 3) c.next = MASTERY[i + 1].n + " at " + Math.round(MASTERY[i + 1].pct * 100) + "% right";
+    return c;
   }
 
   var miniCache = {};
   window.shRanks = {
-    TIERS: TIERS, TROPHIES: TROPHIES, MASTERY: MASTERY,
+    TIERS: TIERS, TROPHIES: TROPHIES, HUB_TROPHIES: HUB_TROPHIES, MASTERY: MASTERY,
+    /* the redesign's trophy case: Full Arch for those who keep it, the count, the class's shares and the case itself
+       (cb(shTrophies), or cb(null) offline) */
+    RETIRED: RETIRED, caseCount: caseCount, trophyStats: trophyStats, shareOf: shareOf, trophyCase: trophyCase, trophyCss: trophyCss,
+    needTrophyArt: function(cb){ loadTrophyArt(cb, function(){ cb(null); }); },
     art: art,
+    /* the journeys (the redesign): a v2 profile's name and medallion, its Handpiece view, and the later objects' drawings */
+    JOURNEYS: JOURNEYS, isV2: isV2, legacy: legacy, nameOf: nameOf, artOf: artOf, needJourneyArt: needJourneyArt,
+    /* the scenes and the road ahead (widget/journeys.js), with the drawings they use: cb(shJourneys), or cb(null) */
+    journeys: function(cb){ needJourneyArt(function(){ withJourneys(cb, function(){ cb(null); }); }); },
+    miniOf: function(j, tier, level){
+      if (!(j > 0) || !JOURNEYS[j]) return this.mini(tier, level);
+      tier = Math.max(0, Math.min(6, tier | 0)); level = level ? Math.max(1, Math.min(3, level | 0)) : 0;
+      return '<span class="sh-rank-mini" title="' + JOURNEYS[j] + " " + rankName(tier, level) + '">' + artOf(j, tier, 20) +
+        (level ? '<b class="sh-rank-lv sh-lv-' + TIERS[tier].key + '">' + ROMAN[level - 1] + '</b>' : '') + '</span>';
+    },
     mini: function(tier, level){
       tier = Math.max(0, Math.min(6, tier | 0)); level = level ? Math.max(1, Math.min(3, level | 0)) : 0;
       var k = tier + ":" + level;
@@ -731,7 +862,12 @@
         (level ? '<b class="sh-rank-lv sh-lv-' + TIERS[tier].key + '">' + ROMAN[level - 1] + '</b>' : '') + '</span>');
     },
     flair: flair, flairFromBadges: flairFromBadges, medal: medalSvg, hubName: hubName,
-    mount: mount, applyAccent: applyAccent, accentTex: accentTex, accentSvg: accentSvg, svgDataUri: svgDataUri, rankName: rankName, ACCENTS: ACCENTS,
+    track: track, preview: preview,
+    /* the hub widget's kit: widget/ranks-hub.js (shRanks.mount, loaded by widget/v3.js on a hub only) draws with these */
+    _hub: { TS: TS, ls: ls, ROMAN: ROMAN, RETIRED: RETIRED, HUB_NAMES: HUB_NAMES, playRankUp: playRankUp, trophyCard: trophyCard,
+      masteryCard: masteryCard },
+    /* widget/fx.js: the mock exam results card (and anything else that should take turns with the rank-ups) */
+    celebrate: function(kind, d){ withRankUp(function(U){ if (U[kind]) U[kind](d); }); }, applyAccent: applyAccent, accentTex: accentTex, accentSvg: accentSvg, svgDataUri: svgDataUri, rankName: rankName, ACCENTS: ACCENTS,
     tierFor: function(xp){ var t = 0; TIERS.forEach(function(x, i){ if (xp >= x.at) t = i; }); return t; },
     levelFor: function(xp){ var t = this.tierFor(xp), lo = TIERS[t].at, hi = t < 6 ? TIERS[t + 1].at : 125000; return Math.min(3, 1 + Math.floor((xp - lo) * 3 / (hi - lo))); },
     shade: shade

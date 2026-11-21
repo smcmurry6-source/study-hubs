@@ -42,7 +42,9 @@ for f in sorted(os.listdir(banks_dir)):
     if not tot_a:
         continue
     print(f'\n===== {hub}: {len(Q)} questions, {tot_a} attempts')
-    for label, key in (('lecture', lambda q: q['lec']), ('type', lambda q: q['type']), ('source', lambda q: q.get('src', '?'))):
+    # format: the question's fmt (tf, 2stmt, numbered, except) when it has one, else its type (mcq, multi, match, sequence)
+    for label, key in (('lecture', lambda q: q['lec']), ('type', lambda q: q['type']), ('format', lambda q: q.get('fmt') or q['type']),
+                       ('source', lambda q: q.get('src', '?'))):
         agg = defaultdict(lambda: [0, 0, 0])
         for q in Q:
             a, c = stats.get((hub, q['id']), (0, 0)); g = agg[key(q)]; g[0] += a; g[1] += c; g[2] += 1
@@ -50,6 +52,12 @@ for f in sorted(os.listdir(banks_dir)):
         for k, (a, c, n) in sorted(agg.items(), key=lambda kv: kv[1][1] / max(kv[1][0], 1)):
             name = L.get(k, {}).get('title', k) if label == 'lecture' else k
             print(f'    {round(100 * c / max(a, 1)):3d}%  {a / n:5.1f} tries/q  n={n:<3d} {name}')
+    # class stats under a qid the bank no longer has: a renamed or removed question; its history is cut off
+    # (keep ids stable when editing a question: vault/reference/analytics-data-quality.md)
+    ids = {q['id'] for q in Q}
+    orphans = sorted(qid for (h, qid) in stats if h == hub and qid not in ids)
+    if orphans:
+        print(f'  stats rows for ids no longer in the bank: {len(orphans)} ({", ".join(orphans[:8])}{" ..." if len(orphans) > 8 else ""})')
     hard = sorted(((stats[(hub, q['id'])], q) for q in Q if stats.get((hub, q['id']), (0, 0))[0] >= 12),
                   key=lambda t: t[0][1] / t[0][0])[:15]
     print('  hardest (12+ tries):')

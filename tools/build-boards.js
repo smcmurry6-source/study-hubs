@@ -251,6 +251,9 @@ function build(opt) {
     ['READINGS', `var READINGS = ${jsMap(READINGS)};`],
     ['READINGS_DEEP', `var READINGS_DEEP = ${jsMap(READINGS_DEEP)};`],
     ['READINGS_PLAIN', 'var READINGS_PLAIN = {};'],
+    /* High Likelihood Exam Questions (vault/rules/high-likelihood-topics.md): empty while no unit is published; a published
+       unit needs its ranked topics (what ranks them for a board exam is Sam's call, vault/tasks/ on main) */
+    ['LIKELY_TOPICS', 'var LIKELY_TOPICS = [];'],
     ['SECTIONS', `var SECTIONS = ${jsLines(SECTIONS)};`],
     ['REFS', `var REFS = ${jsMap(REFS)};`],
     ['FIGURES', `var FIGURES = ${jsMap(FIGURES)};`],

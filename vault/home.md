@@ -1,0 +1,145 @@
+---
+type: map
+tags: [map]
+---
+
+# Home
+
+The map of this vault: Sam's study hubs for UAB dental school exams (live at
+https://smcmurry6-source.github.io/study-hubs/ from `main`), and everything an agent needs to work on them. New here?
+Read `AGENTS.md` at the repo root first. How the vault works: [repo-is-the-vault](rules/repo-is-the-vault.md).
+
+## Tasks
+
+- [How tasks work](tasks/README.md): one note per task in `vault/tasks/`; finished ones in `vault/tasks/done/`.
+- [Inbox](tasks/inbox.md): quick ideas, one line each.
+- [Sam's decisions](decisions.md): what was approved, skipped or left alone. Check before proposing anything.
+
+## Rules (every agent, every change)
+
+Those marked *(on demand)* apply to one feature: read them when your task touches it (`CLAUDE.md` lists them under
+"Feature rules" instead of loading them into every session).
+
+Shipping and the vault
+- [The repo is the vault](rules/repo-is-the-vault.md): read from it, write back to it, link don't copy, nothing private.
+- [Anything left to do goes on the to-do list](rules/to-dos-go-in-the-vault.md) (a task note, the inbox, a Done when box),
+  never only in a chat, and is checked off when done.
+- [GitHub is the source of truth](rules/github-is-the-source-of-truth.md): fetch fresh, merge, never overwrite blind.
+- [Ship it now, never "after the exam"](rules/ship-it-now.md)
+- [American English everywhere](rules/american-english.md)
+- [The About page lists everything](rules/about-page.md) students can see.
+- [Secrets](rules/secrets.md): public repo; keys only from the environment.
+- [Content from lecture materials and graded coursework](rules/graded-coursework.md): no course files in the repo;
+  graded work never copied, closed quizzes only as context, previous years' never.
+- [One way to merge every change; preview only on request](rules/preview-and-release-test.md): no tiers; the checks
+  for what you touched, CI, a screenshot when students will see a difference, Sam's "merge" (no checkbox); a preview on
+  made-up data only when Sam asks ([the plan](../RELEASE_TEST_PLAN.md)).
+- [Learner data stays aggregate outside the database](rules/learner-data-privacy.md): per-person rows stay in Supabase,
+  groups of 5+, no new identifiers.
+- [Run the long tests once, then let CI be the check](rules/long-tests-once.md): after `main` is brought in, the fast
+  checks and a push; no second local run of a long suite.
+
+Questions
+- [Every choice gets a why](rules/every-choice-gets-a-why.md) *(on demand)*
+- [Two-statement and true/false questions](rules/two-statement-and-true-false.md) (CI minimums per taught lecture) *(on demand)*
+- [Numbered-statement questions](rules/numbered-statements.md) (CI minimum per taught lecture) *(on demand)*
+- ["Which statement is true / false?" questions](rules/which-statement-questions.md) (CI minimum per taught lecture) *(on demand)*
+- [High Likelihood Exam Questions](rules/high-likelihood-topics.md): `LIKELY_TOPICS` for every lecture *(on demand)*.
+- [Question Bank: the filter panel](rules/question-bank-filter-panel.md), lecture picker, order and pins *(on demand)*.
+- [Question ids are permanent](rules/question-ids-are-permanent.md): never renamed or reused (`tools/question-ids/`, checked by CI).
+- [Nothing on what a professor says you don't need](rules/dont-ask-what-professors-skip.md): check every recording; retire what tests it and leave it out of the notes, keeping the skip hint *(on demand)*.
+- [Question-health flags are leads](rules/question-health-flags-are-leads.md): nothing changes a question automatically; Sam decides *(on demand)*.
+
+Hub building
+- [Every hub opens on its own Home page](rules/hub-home-page.md)
+- [Every hub's arcade looks like that hub](rules/arcade-skins.md) *(on demand)*
+- [Every new hub gets its own drawn art](rules/every-hub-gets-its-own-art.md): its emblem, masthead scene and unique medals *(on demand)*.
+- [Text and audio must never drift](rules/text-and-audio-never-drift.md)
+- [Every Timmy Time episode has likes, dislikes and comments](rules/podcast-reactions.md), with 1-3 lore comments *(on demand)*.
+- [Timmy Time's cold open skips the minutiae](rules/podcast-intro.md): no question counts, exam times or LockDown Browser *(on demand)*.
+- [Building a hub = diagram review](rules/diagram-review.md), approved by Sam one candidate at a time *(on demand)*.
+- [Diagrams (the anima skill)](rules/diagrams-anima.md): house rules for drawn figures *(on demand)*.
+- [Figures teach the lecture](rules/figures-teach-the-lecture.md): outside sources for accuracy, the lecture for what's shown and named *(on demand)*.
+- [Outside sources are encouraged for every figure](rules/outside-sources-for-figures.md): for accuracy and for how it works, cited *(on demand)*.
+- [Archiving a hub = retrospective](rules/archiving-is-a-retrospective.md)
+- [Earning XP and crowns stays enjoyable](rules/earn-rates-stay-enjoyable.md): every lessons audit reads the earn rates against the shop's prices, in study days *(on demand)*.
+- [An archived hub's audio comes off the site](rules/archived-hubs-drop-their-audio.md): narration and Timmy Time, to stay under
+  GitHub Pages' 1 GB limit; the page stays and Listen uses the device's voice.
+
+## How-tos
+
+- [Ship a change](how-to/ship-a-change.md) · [Verify before pushing](how-to/verify-before-pushing.md) ·
+  [After a merge](how-to/after-a-merge.md): what the After merge workflow does by itself, and what to do when it fails ·
+  [Run a redesign session](how-to/run-a-redesign-session.md): one phase per fresh session, decisions before code, cheap tests
+- [Preview a change](how-to/preview-a-change.md): the site from a branch, on made-up data, with test accounts and time
+  travel · [Roll back a release](how-to/roll-back-a-release.md)
+- [Build a hub, or add a lecture to one](how-to/build-a-hub.md): the checklist, and every file a new hub touches.
+- [Draw a Patient Box case from its numbers](how-to/draw-a-patient-box-case.md): the shared case kit (chart, radiograph,
+  drawn view and the diagnosis from one set of numbers) every hub's Patient Box questions use.
+- [Draw a seasonal set or a rank set for Timmy's place](how-to/draw-a-seasonal-set.md): one list (`sets.mjs`), a pack per
+  set, the catalog and the build that checks them.
+- [Narrate with Kokoro](how-to/narrate-with-kokoro.md)
+- [Package the to-do list into sessions](how-to/package-the-to-dos.md): every open item in numbered packages, one PR each
+  (a really big item alone), and the prompt that starts the one Sam picks (Claude Code: `/backlog`).
+- [Read usage data and run surveys](how-to/read-usage-data.md)
+- [Run SQL on the live database without slowing the class](how-to/run-sql-on-the-live-database.md): the quiet
+  hours (1 to 5 am Central), one short query at a time under a time limit, and a migration's backfill at night or in batches.
+- [Student reports, suggestions and notices](how-to/reply-to-reports.md)
+- Lessons audit and refresh: `tools/lessons-refresh.md` (Claude Code: `/lessons-audit`). A Timmy Time episode:
+  `tools/podcast/README.md` (Claude Code: `/podcast`). Ideas from the Claude subreddits, checked against the repo:
+  `.claude/skills/reddit-scout/SKILL.md` (Claude Code: `/reddit-scout`; past runs in `tools/reddit-scout/log.md`).
+  The redesign's launch trailer: `tools/trailer/README.md`.
+
+## Release testing
+
+- [RELEASE_TEST_PLAN.md](../RELEASE_TEST_PLAN.md): the whole process, one for every change (no tiers since 2026-11-18), from the PR to rollback, and what waits on Sam.
+- [UAT checklist](release/uat-checklist.md) · [Bug log](release/bug-log.md) ·
+  [Release test report template](templates/release-test-report.md) · past reports in `vault/release/reports/`
+  ([the first one](release/reports/2026-11-04-release-process-dry-run.md)).
+- Tools: `tools/preview/` (previews) and `tools/release/` (the suites; `node tools/release/run.js` runs them all).
+
+## Reference
+
+- [Repo map](reference/repo-map.md): what every file and folder is.
+- [Shared infrastructure](reference/shared-infrastructure.md): the widget, Supabase, Pages, the Kokoro model.
+- [Admin operations](reference/admin-operations.md): the admin page's Live tab (who's studying now), hub archive
+  overrides (what wins over the dates, the audit log) and newest-first check-ins.
+- [Analytics governance](reference/analytics-governance.md): how usage data is collected, checked, kept and used. Its
+  notes: [event taxonomy](reference/event-taxonomy.md) · [data quality](reference/analytics-data-quality.md) ·
+  [retention](reference/analytics-retention.md) · [Insights dashboard](reference/insights-dashboard.md).
+- [Question health](reference/question-health.md): stable ids, versions, what's tracked per question, the flags and how to act on them.
+- [What moving pictures cost](reference/motion-cost.md): why the drawn pictures move when you arrive and rest
+  otherwise, which animations are free, and how to measure a page before adding one.
+- [The redesign's bundles](reference/bundles.md): what a redesigned page loads (four built files and one stylesheet), how a
+  held file runs, the slim database client, and what to run after changing a widget file.
+- [The game layer's server](reference/game-server.md): XP without a cap and its guardrails, server-checked answers, the three
+  journeys, Shiny Gold Crowns and Timmy's shop, the idea board (migration_v54, applied at the redesign's release).
+- [Ask Timmy's server](reference/ask-timmy.md): the `timmy` Edge Function, how a question is answered from a hub's content
+  with every quote checked, the limits and cost, the Report button, the eval (migration_v55, applied at the redesign's release).
+- `LESSONS.md`: what the data and archived hubs taught. Read it before building or restructuring a hub.
+- `DEPLOY_NOTES.md`: the change log, newest first. Grep it for a hub or feature.
+- `supabase/schema.sql` and `migration_v*.sql`: the database; `supabase/pending-migrations.txt` lists the ones written and
+  tested but not applied yet.
+
+## Hubs
+
+Live
+- [Review of Systems](hubs/review-of-systems.md): the two mock board exams, every course on them
+
+Archived
+- Removed (no folder, labels only): [Heme & Endo Exam 3](hubs/heme-endo-exam3.md) (2026-11-20, the morning of its exam), [Periodontology](hubs/perio.md) (2026-11-19, the day of its final), [Occlusion](hubs/occlusion.md) (2026-11-19),
+  the six old single-file pages (2026-11-19: [Heme & Endo Exam 2](hubs/heme-endo-exam2.md) · [PCD Implants Exam 1](hubs/pcd-implants-exam1.md) ·
+  [Heme & Endo Exam 1](hubs/heme-endo-exam1.md) · [MSK Exam 4](hubs/msk-exam4.md) · [PCD Fixed Pros Exam 3](hubs/pcd-exam3.md) ·
+  [MSK Exam 3](hubs/msk-exam3.md)), [Special Patient Care](hubs/special-patient-care.md) (2026-11-14), GI Exam 1 (`gi-exam1`),
+  GI Exam 2 (`hepatobiliary`), Genetics, Fixed Pros.
+
+Being built on its own branch
+- [Boards (INBDE + ADEX)](hubs/boards.md): on `claude/boards-hub`, not on `main` yet.
+
+Which hubs are live, and every exam date, comes from `hubs.js`: if this list disagrees, the code is right
+and this list needs fixing. A new hub gets a note from [the hub template](templates/hub.md).
+
+## Templates
+
+[Task](templates/task.md) · [Hub](templates/hub.md) · [Rule](templates/rule.md) ·
+[Release test report](templates/release-test-report.md)

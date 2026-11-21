@@ -1,0 +1,1789 @@
+/* The design system preview (phase 0 of the redesign). Renders every piece from window.SH_ART (art.js, built by
+   tools/figures/site/build.mjs) and the sample questions below. Reads no class data; saves only the preview's own
+   typeface, theme and hub choice in localStorage. */
+(function(){
+  "use strict";
+  var A = window.SH_ART || {};
+  var root = document.documentElement;
+  var reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function $(s, el){ return (el || document).querySelector(s); }
+  function $$(s, el){ return Array.prototype.slice.call((el || document).querySelectorAll(s)); }
+  function esc(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){ return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  function h(html){ var t = document.createElement("template"); t.innerHTML = html.trim(); return t.content.firstElementChild; }
+  function fmt(n){ return Number(n).toLocaleString("en-US"); }
+  function save(){ try { localStorage.setItem("sh_design_prefs", JSON.stringify({ face: root.dataset.face, theme: root.dataset.theme, hub: root.dataset.hub })); } catch (e) {} }
+
+  /* ---------- drawing helpers ---------- */
+  function icon(k, px, cls){
+    var b = A.icons && A.icons[k] ? A.icons[k].body : "";
+    return '<svg class="ic ' + (cls || "") + '" viewBox="0 0 24 24" width="' + (px || 20) + '" height="' + (px || 20) + '" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">' + b + "</svg>";
+  }
+  function art(inner, vb, cls, label){
+    return '<svg class="' + (cls || "") + '" viewBox="' + vb + '" ' + (label ? 'role="img" aria-label="' + esc(label) + '"' : 'aria-hidden="true"') + ' focusable="false">' + inner + "</svg>";
+  }
+  /* Timmy, the house and the handpieces come from the live code with ids inside; give every copy on the page its own */
+  var uq = 0;
+  function uniq(s){
+    var n = ++uq, map = {};
+    s = s.replace(/\sid="([^"]+)"/g, function(m, id){ map[id] = id + "-c" + n; return ' id="' + map[id] + '"'; });
+    return s.replace(/url\(#([^)]+)\)/g, function(m, id){ return "url(#" + (map[id] || id) + ")"; });
+  }
+  /* a static drawing goes on the page as an image (it's a picture, not a chart or text): its own document, so ids never collide */
+  function img(svgStr, alt, cls, vb){
+    if (vb) svgStr = '<svg viewBox="' + vb + '">' + svgStr + "</svg>";
+    if (!/xmlns=/.test(svgStr)) svgStr = svgStr.replace("<svg", '<svg xmlns="http://www.w3.org/2000/svg"');
+    return '<img class="' + (cls || "") + '" src="data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgStr) + '" alt="' + esc(alt || "") + '" decoding="async">';
+  }
+  function emblemDisc(hub, cls){
+    var t = A.tints[hub] || A.tints.generic, e = A.emblems[hub] || A.emblems.generic;
+    return img('<circle cx="32" cy="32" r="31" fill="' + t.light + '"/>' + '<g transform="translate(6.4 6.4) scale(.8)">' + e.body + "</g>", e.label, cls, "0 0 64 64");
+  }
+  function flame(level, cls){ return art(A.flame[level], "0 0 40 48", "flame " + (cls || ""), ["", "A new streak", "A streak", "A blazing streak", "A blue-hot streak", "A Dark Matter streak"][level]); }
+  /* the flame for a streak: it grows at 3 days, blazes at 7, burns blue at 10 and turns Dark Matter at 30 (Sam, 2026-11-10) */
+  function flameLevel(days){ return days >= 30 ? 5 : days >= 10 ? 4 : days >= 7 ? 3 : days >= 3 ? 2 : 1; }
+  function xpSpark(){ return art(A.xp, "0 0 24 24", ""); }
+  function ring(done, of, cls){
+    var r = 15, c = 2 * Math.PI * r, off = c * (1 - Math.min(1, done / of));
+    return '<svg class="ring ' + (cls || "") + '" viewBox="0 0 36 36" role="img" aria-label="' + done + " of " + of + ' questions today"><circle class="tr" cx="18" cy="18" r="' + r + '"/>' +
+      '<circle class="pr" cx="18" cy="18" r="' + r + '" stroke-dasharray="' + c.toFixed(2) + '" stroke-dashoffset="' + off.toFixed(2) + '"/></svg>';
+  }
+  function timmy(k){ return uniq(A.timmy.bar[k] || A.timmy.bar.happy); }
+
+  /* Today's goal as a ring of 20 teeth, the way the hub engine draws it (widget/hub-rewards.js teethRing; Sam, 2026-11-06: "a more
+     visually interesting progress circle"): each tooth is a twentieth of the goal and fills in the hub's color, a thin
+     arc shows the exact share, the tooth that just filled pops in */
+  var TOOTH = "M-5 -3C-5.5 -7-3.5-7.8-1.8-7C-.8-6.6.8-6.6 1.8-7C3.5-7.8 5.5-7 5-3C4.7-.5 4 1.5 3.2 5C2.8 7 1.4 7.4 1 5.4L.4 2.6C.2 2-.2 2-.4 2.6L-1 5.4C-1.4 7.4-2.8 7-3.2 5C-4 1.5-4.7-.5-5-3Z";
+  var teethShown = -1;
+  function teethRing(done, of){
+    var N = 20, f = of ? Math.min(1, done / of) * N : 0, on = Math.floor(f), r = 33, c = 2 * Math.PI * r, out = "";
+    for (var k = 0; k < N; k++){
+      var st = k < on ? "is-on" : k < f ? "is-part" : "";
+      if (k < on && teethShown >= 0 && k >= teethShown) st += " is-new";
+      out += '<g transform="rotate(' + (k * 360 / N) + ' 60 60) translate(60 13)"><g class="tooth' + (st ? " " + st : "") + '"><path d="' + TOOTH + '"/>' + (k < on ? '<path class="shine" d="M-3.1-4.4C-2.7-5.6-1.7-5.9-.9-5.6"/>' : "") + "</g></g>";
+    }
+    teethShown = on;
+    return '<svg class="teeth' + (of && done >= of ? " is-met" : "") + '" viewBox="0 0 120 120" role="img" aria-label="' + done + " of " + of + ' questions today">' +
+      '<circle class="t-track" cx="60" cy="60" r="' + r + '"/><circle class="t-arc" cx="60" cy="60" r="' + r + '" stroke-dasharray="' + c.toFixed(2) + '" stroke-dashoffset="' + (c * (1 - (of ? Math.min(1, done / of) : 0))).toFixed(2) + '"/>' + out + "</svg>";
+  }
+  /* the drawn answer marks: a hand-drawn ring or box that fills when picked, and a blob with a tick or a cross once
+     answered (marks like articulating paper leaves on a cusp) */
+  var RING = "M14 4.2C19.6 4 24 8.4 23.9 14c-.1 5.7-4.4 10-9.9 9.9C8.4 23.8 4.1 19.6 4.2 14 4.3 8.5 8.5 4.4 14 4.2Z";
+  var DOT = "M14 9.4c2.7-.1 4.7 2 4.6 4.6-.1 2.7-2 4.7-4.6 4.6-2.7-.1-4.6-2-4.6-4.6.1-2.6 2-4.5 4.6-4.6Z";
+  var BOX = "M7.5 4.6c4.3-.3 8.9-.3 13.1 0 1.8.1 2.8 1.1 2.9 2.9.2 4.3.2 8.7 0 13-.1 1.8-1.2 2.8-3 2.9-4.3.3-8.7.3-13 0-1.8-.1-2.8-1.1-2.9-2.9-.3-4.3-.3-8.7 0-13 .1-1.8 1.1-2.8 2.9-2.9Z";
+  var BLOB = "M14 3.6c6-.2 10.6 4.4 10.4 10.6-.2 6-4.6 10.4-10.6 10.2-6-.2-10.4-4.6-10.2-10.6.2-5.9 4.5-10 10.4-10.2Z";
+  function mark(kind, state){
+    var o = '<svg class="mark" viewBox="0 0 28 28" aria-hidden="true">';
+    if (state === "right") return o + '<path d="' + BLOB + '" fill="currentColor"/><path d="M9.2 14.4l3.4 3.4 6.4-7.4" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    if (state === "wrong") return o + '<path d="' + BLOB + '" fill="currentColor"/><path d="M10.2 10.2l7.6 7.6M17.8 10.2l-7.6 7.6" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></svg>';
+    if (state === "missed") return o + '<path d="' + (kind === "box" ? BOX : RING) + '" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="3 3"/><path d="M9.2 14.4l3.4 3.4 6.4-7.4" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    if (kind === "box") return o + '<path d="' + BOX + '" fill="none" stroke="currentColor" stroke-width="2"/><path class="on" d="M9 14.6l3.6 3.6 7-8.4" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    return o + '<path d="' + RING + '" fill="none" stroke="currentColor" stroke-width="2"/><path class="on" d="' + DOT + '" fill="currentColor"/></svg>';
+  }
+
+  /* ---------- the hubs (dates from the dashboard's HUBS) ---------- */
+  var HUBS = {
+    "occlusion":            { name: "Occlusion", exam: "Occlusion final", date: "2026-11-16", when: "Mon, Nov 16 · L6, L7 and L8", next: [["L7 Malocclusion and Dysfunction", 5], ["L6 Occlusal Instrumentation", 3]] },
+    "perio":                { name: "Perio", exam: "Perio final", date: "2026-11-19", when: "Thu, Nov 19 · Sessions 6 to 9", next: [["S8 Pharmacotherapy: Antibiotics & Host Modulation", 5], ["S7 Implants for Periodontally Compromised Patients", 3]] },
+    "pcd-implants-exam1":   { name: "PCD Implants", exam: "PCD Implants Exam 1", date: "2026-11-06", when: "Fri, Nov 6 · L1 to L9", next: [["L7 CBCT 101: Basic Science", 5], ["L3 Biomechanics in Implant Dentistry", 3]] },
+    "heme-endo-exam2":      { name: "Heme & Endo 2", exam: "Heme & Endo Exam 2", date: "2026-11-13", when: "Fri, Nov 13 · L11 to L18 and Lecture A", next: [["L12a Endocrine Pathology, Part 1", 5], ["L11 Pharmacology of Diabetes Mellitus", 3]] },
+    "special-patient-care": { name: "Special Patient Care", exam: "Special Patient Care exam", date: "2026-11-13", when: "Due Fri, Nov 13 · all eight lectures", next: [["L5 Syndromes and Oral Manifestations", 5], ["L2 Behavior Guidance and Protective Stabilization", 3]] },
+    "generic":              { name: "A new hub", exam: "The next exam", date: "", when: "The date goes here once it's announced", next: [["L2, the second lecture", 5], ["L1, the first lecture", 3]] }
+  };
+  function daysTo(iso){
+    if (!iso) return null;
+    var p = iso.split("-"), t = new Date(+p[0], +p[1] - 1, +p[2]), n = new Date(); n = new Date(n.getFullYear(), n.getMonth(), n.getDate());
+    return Math.round((t - n) / 864e5);
+  }
+
+  /* ---------- sample questions: Occlusion's own items, with their whys (as the hub has them) ---------- */
+  var TWO_CHOICES = ["Both statements are true", "Both statements are false", "Statement 1 is true; statement 2 is false", "Statement 1 is false; statement 2 is true"];
+  function two(o){
+    var claims = [[true, true], [false, false], [true, false], [false, true]], tv = function(b){ return b ? "true" : "false"; };
+    o.why = claims.map(function(c){
+      if (c[0] === o.t1 && c[1] === o.t2) return "Statement 1 is " + tv(o.t1) + ": " + o.r1 + " Statement 2 is " + tv(o.t2) + ": " + o.r2;
+      var out = [];
+      if (c[0] !== o.t1) out.push("Statement 1 is " + tv(o.t1) + ", not " + tv(c[0]) + ": " + o.r1);
+      if (c[1] !== o.t2) out.push("Statement 2 is " + tv(o.t2) + ", not " + tv(c[1]) + ": " + o.r2);
+      return out.join(" ");
+    });
+    o.choices = TWO_CHOICES.slice(); o.answer = claims.findIndex(function(c){ return c[0] === o.t1 && c[1] === o.t2; });
+    return o;
+  }
+  function numList(set){ return set.length === 1 ? String(set[0]) : set.slice(0, -1).join(", ") + " and " + set[set.length - 1]; }
+  function numLabel(set){ return set.length === 1 ? set[0] + " only" : set.length === 2 ? set[0] + " and " + set[1] + " only" : numList(set); }
+  function nums(o){
+    var right = [], falses = [];
+    o.truth.forEach(function(t, i){ (t ? right : falses).push(i + 1); });
+    var sets = [right].concat(o.wrong).sort(function(a, b){ for (var i = 0; i < Math.min(a.length, b.length); i++) if (a[i] !== b[i]) return a[i] - b[i]; return a.length - b.length; });
+    o.why = sets.map(function(set){
+      if (set === right) return (right.length === 1 ? "Only statement " + right[0] + " is true. " : "Statements " + numList(right) + " are true. ") +
+        falses.map(function(k){ return "Statement " + k + " is false: " + o.reasons[k - 1]; }).join(" ");
+      var out = [];
+      set.forEach(function(k){ if (!o.truth[k - 1]) out.push("It includes " + k + ", which is false: " + o.reasons[k - 1]); });
+      right.forEach(function(k){ if (set.indexOf(k) < 0) out.push("It leaves out " + k + ", which is true: " + o.reasons[k - 1]); });
+      return out.join(" ");
+    });
+    o.choices = sets.map(numLabel); o.answer = sets.indexOf(right);
+    return o;
+  }
+  /* "picks": made-up shares of the class's picks per choice (they add to 100), the way the live widget shows question_choices */
+  var Q = [
+    { id: "rv-embrasure", fmt: "single", name: "Single answer", lec: "L1 · Review of Basic Occlusion", likely: true,
+      stem: "Posterior proximal contacts sit buccal to the central fossa line. What does that do for chewing?",
+      choices: ["Lingual embrasures are larger, so food is preferentially returned toward the tongue", "Buccal embrasures are larger, so food is pushed out into the vestibule for the cheek to clear", "It keeps the marginal ridges level for cusp-fossa contact", "It lets the non-centric cusps carry the vertical dimension"],
+      answer: 0, picks: [61, 24, 9, 6], preset: 0,
+      ex: "Because contacts are buccal to the CF line, lingual embrasures are larger than buccal ones. Food falls back toward the tongue, “where you want it to go.” The tongue sweeps food that goes buccal back onto the table, working with the buccinator.",
+      why: ["Contacts sit buccal to the central fossa line, so lingual embrasures are larger and food returns toward the tongue.", "The buccal embrasures are the smaller ones, because the contacts sit buccal to the central fossa line.", "Embrasure size affects where food goes, not the level of the marginal ridges.", "Vertical dimension is held by the centric cusps, and this has nothing to do with embrasure size."] },
+    { id: "ex-noncentric", fmt: "except", name: "All except", lec: "L1 · Review of Basic Occlusion",
+      stem: "All of the following describe non-centric cusps EXCEPT:",
+      choices: ["They maintain the vertical dimension of occlusion", "They are relatively sharp, about 1/6 of the buccolingual width", "They help keep the bolus on the occlusal table", "They minimize cheek and tongue impingement"],
+      answer: 0, picks: [54, 21, 15, 10], preset: 1,
+      ex: "Maintaining VDO is the job of the CENTRIC cusps. Non-centric (shearing or guiding) cusps are sharp, near-contact by design, shear food, minimize tissue impingement and hold the bolus on the table.",
+      why: ["This is the false statement: maintaining the vertical dimension of occlusion is the job of the centric cusps.", "Non-centric cusps are relatively sharp and about 1/6 of the buccolingual width, about half the size of centric cusps.", "Non-centric cusps do help hold the bolus on the occlusal table.", "Non-centric cusps do minimize cheek and tongue impingement."] },
+    { id: "rv-goals", fmt: "multi", name: "Select all", lec: "L1 · Review of Basic Occlusion",
+      stem: "Select every item on Dr. Givan's list of goals for ideal (modern) occlusion.",
+      choices: ["Equal, simultaneous, stable centric contacts", "Occlusal forces directed down the long axes", "Elimination of balancing (mediotrusive) contacts", "Bilateral posterior contacts in all excursions", "Posterior contacts in protrusion to share load"],
+      correct: [0, 1, 2], picks: [88, 81, 52, 30, 12], preset: [0, 1, 3],
+      ex: "The goals: stable simultaneous centric contacts, force along the long axis, no balancing contacts, canine disclusion or anterior group function, i.e. mutually protected occlusion. Bilateral excursive contact is denture (balanced) occlusion; posterior protrusive contacts are what we try to eliminate.",
+      why: ["Equal, simultaneous, stable centric contacts are on the list of goals for ideal occlusion.", "Directing occlusal forces down the long axes of the teeth is one of the goals.", "Eliminating balancing (mediotrusive) contacts is one of the goals.", "Bilateral posterior contacts in all excursions is balanced occlusion for dentures, not the modern goal for natural teeth.", "Posterior contacts in protrusion are what the modern scheme tries to eliminate; anterior teeth should disclude them."] },
+    two({ id: "rv-2s-curves", fmt: "two", name: "Two statements", lec: "L1 · Review of Basic Occlusion",
+      s1: "The curve of Spee is seen in the sagittal plane.", s2: "The curve of Wilson is seen in the frontal plane.", t1: true, t2: true,
+      picks: [64, 7, 12, 17], preset: 3,
+      ex: "Both are true. Spee is the anteroposterior curve (side view), from the mandibular canine cusp tip back to the front of the condyle. Wilson is the mediolateral curve (front view): concave in the mandibular arch, convex in the maxillary.",
+      r1: "it runs from the mandibular canine cusp tip along the buccal cusp tips to the condyle, seen from the side.", r2: "it is the mediolateral curve of the posterior cusps, seen from the front." }),
+    { id: "rv-tf-embrasure", fmt: "tf", name: "True or false", lec: "L1 · Review of Basic Occlusion",
+      stem: "Because posterior contacts sit buccal to the central fossa line, the buccal embrasures are larger than the lingual ones.",
+      choices: ["True", "False"], answer: 1, picks: [38, 62], preset: 1,
+      ex: "False. With the contacts buccal to the central fossa line, the LINGUAL embrasures are larger, which returns food toward the tongue.",
+      why: ["Contacts buccal to the fossa line make the lingual embrasures larger, not the buccal ones.", "The lingual embrasures are the larger ones, so food falls back toward the tongue."] },
+    nums({ id: "an-num-1", fmt: "numbered", name: "Numbered statements", lec: "L2 · Functional TMJ Anatomy",
+      lead: "Which statements about the TMJ and its disc are true?",
+      stmts: ["Rotation happens in the lower compartment, between the disc and the condyle.", "The intermediate zone is the thickest part of the disc.", "The disc is slightly thicker medially than laterally.", "The retrodiscal tissues have no vessels or nerves, so loading them is painless."],
+      truth: [true, false, true, false], wrong: [[1, 3, 4], [2, 3], [3, 4]], picks: [47, 22, 19, 12], preset: 2,
+      ex: "Rotation happens in the lower compartment (disc to condyle), translation in the upper. The disc is biconcave: a thick anterior border, a thinner avascular intermediate zone where the condyle sits, and an even thicker posterior border; it is slightly thicker medially. The retrodiscal tissues are loaded with vessels and nerves.",
+      reasons: ["the lower compartment (disc to condyle) is where rotation happens; translation is in the upper.", "the intermediate zone is the thin part where the condyle sits; the posterior border is the thickest.", "it is slightly thicker medially, so a disc that slips tends to go forward or medially.", "the retrodiscal tissues are loaded with vessels and nerves, and functioning on them causes substantial pain."] }),
+    { id: "demo-cusp-30", fmt: "picture", name: "Picture", lec: "L1 · Review of Basic Occlusion",
+      stem: "Which cusp of #30 is shaded in this occlusal view?",
+      choices: ["Distobuccal", "Mesiobuccal", "Distal", "Distolingual"], answer: 0, picks: [58, 17, 16, 9], preset: 0,
+      ex: "A mandibular first molar has three buccal cusps (mesiobuccal, distobuccal, distal) and two lingual ones (mesiolingual, distolingual). The shaded one is the middle of the three buccal cusps: the distobuccal.",
+      why: ["It is the middle of the three buccal cusps, between the mesiobuccal and the small distal cusp.", "The mesiobuccal is the first buccal cusp, at the mesial end of the buccal side.", "The distal cusp is the smallest, at the distal end of the buccal side.", "The distolingual is on the lingual side, across from the shaded cusp."] },
+    { id: "cs-mo-mob-type", fmt: "case", name: "Patient Box", lec: "L7 · Malocclusion and Dysfunction",
+      pbox: [["Patient", "58-year-old man"], ["Teeth", "#24 and #25"], ["Mobility", "Miller 2 at last year's recall; Miller 2 today"], ["Perio", "Probing depths 2-3 mm, no bleeding; stable bone levels on radiographs"], ["Symptoms", "None; chews normally"]],
+      stem: "How should his mobility be classified?",
+      choices: ["Adapted mobility", "Traumatic mobility", "Physiologic mobility under 150 µm", "Implant-level mobility"], answer: 0, picks: [51, 33, 12, 4], preset: 1,
+      ex: "Miller 2 a year ago and Miller 2 today, without progression: adapted mobility, self-limiting and possibly present for years. Traumatic mobility increases over time. Class 2 is beyond the physiologic limit.",
+      why: ["Stable over a year: adapted mobility.", "Traumatic mobility increases over time.", "Miller 2 is beyond the 150 µm physiologic limit.", "Implants barely move; these are natural teeth."] },
+    { id: "recall-curves", fmt: "recall", name: "Recall card", lec: "L1 · Review of Basic Occlusion",
+      front: "Name the two curves of occlusion and the plane each one is seen in.",
+      back: "The curve of Spee: the sagittal plane (seen from the side). The curve of Wilson: the frontal plane (seen from the front)." }
+  ];
+  var LIVE = Q[0];
+
+  /* the picture question's figure: #30 from the occlusal side, mesial to the left, buccal at the bottom, drawn in ink */
+  function cuspFigure(){
+    var I = A.ink || "#3B2E3A";
+    return '<svg viewBox="0 0 280 190" role="img" aria-label="The occlusal outline of tooth 30 with five cusps; the middle buccal cusp is shaded.">' +
+      '<path d="M40 60 C46 30 92 22 140 24 C190 22 236 30 242 64 C250 96 248 132 238 152 C228 172 190 176 140 175 C90 176 52 172 42 150 C32 126 34 88 40 60 Z" fill="#FFFDF6" stroke="' + I + '" stroke-width="3.2" stroke-linejoin="round"/>' +
+      '<path d="M58 92 C78 98 104 100 122 96 C146 104 170 104 190 98 C206 102 220 100 230 96" fill="none" stroke="' + I + '" stroke-width="2" stroke-linecap="round" opacity=".55"/>' +
+      '<path d="M120 96 C118 74 124 52 130 34 M190 98 C192 120 186 146 178 168 M104 100 C100 124 96 148 92 168" fill="none" stroke="' + I + '" stroke-width="2" stroke-linecap="round" opacity=".55"/>' +
+      '<path class="hl" d="M106 104 C122 104 160 106 186 102 C190 124 184 150 176 166 C152 172 122 172 96 168 C98 146 100 124 106 104 Z" fill="var(--hub-mid)" opacity=".85"/>' +
+      [[82, 136, 15], [140, 138, 14], [208, 132, 11], [86, 58, 17], [190, 58, 17]].map(function(c){ return '<circle cx="' + c[0] + '" cy="' + c[1] + '" r="' + c[2] + '" fill="none" stroke="' + I + '" stroke-width="2.2"/>'; }).join("") +
+      '<path d="M70 50 C74 44 80 41 86 40" stroke="#fff" stroke-width="2" stroke-linecap="round" fill="none" opacity=".7"/></svg>';
+  }
+
+  /* ---------- the question card ---------- */
+  var state = { xp: 6240, goal: 19, of: 20, streak: 6, session: 24, right: 18, xpToday: 131, hp: 82, tried: {} };
+
+  function card(q, opt){
+    opt = opt || {};
+    var multi = q.fmt === "multi", tf = q.fmt === "tf";
+    var el = h('<article class="qc" data-fmt="' + q.fmt + '" aria-label="' + esc(q.name) + ' question"></article>');
+    var head = '<header class="qc-head"><span>' + esc(q.lec) + "</span>" + (q.likely ? '<span class="likely">' + icon("hints", 14) + "High likelihood</span>" : "") +
+      '<span class="grow"></span><span class="qc-tools"><button class="btn btn-icon" type="button" aria-label="Pin this question">' + icon("pin", 18) + "</button>" +
+      '<button class="btn btn-icon" type="button" aria-label="Report a problem with this question">' + icon("report", 18) + "</button></span></header>";
+    if (q.fmt === "recall") {
+      el.innerHTML = head + '<p class="qc-stem">Say it to yourself, then check.</p><div class="recall-face"><p>' + esc(q.front) + '</p><p class="recall-back" hidden><b>Answer.</b> ' + esc(q.back) + "</p></div>" +
+        '<div class="qc-go"><button class="btn btn-primary" type="button" data-reveal>Show the answer</button></div>' +
+        '<div class="qc-go" data-grade hidden><button class="btn" type="button" data-g="1">' + icon("check", 18) + 'Got it</button><button class="btn" type="button" data-g="0">' + icon("retry", 18) + "Not yet</button></div>";
+      $("[data-reveal]", el).addEventListener("click", function(){ $(".recall-back", el).hidden = false; this.parentNode.hidden = true; $("[data-grade]", el).hidden = false; });
+      $$("[data-g]", el).forEach(function(b){ b.addEventListener("click", function(){
+        var g = $("[data-grade]", el); g.innerHTML = '<p class="note">' + (b.dataset.g === "1" ? "Marked as known. It comes back in a few days." : "It comes back at the end of this set.") + '</p><button class="btn btn-text" type="button">' + icon("retry", 18) + "Again</button>";
+        $("button", g).addEventListener("click", function(){ var n = card(q, opt); el.replaceWith(n); });
+      }); });
+      if (opt.preset != null) { $("[data-reveal]", el).click(); }
+      return el;
+    }
+    var stem = "";
+    if (q.fmt === "two") stem = '<p class="qc-stem">Read the two statements.</p><ol class="qc-stmts"><li><b>1</b><span>' + esc(q.s1) + "</span></li><li><b>2</b><span>" + esc(q.s2) + "</span></li></ol>";
+    else if (q.fmt === "numbered") stem = '<p class="qc-stem">' + esc(q.lead) + '</p><ol class="qc-stmts">' + q.stmts.map(function(s, i){ return "<li><b>" + (i + 1) + "</b><span>" + esc(s) + "</span></li>"; }).join("") + "</ol>";
+    else if (q.fmt === "tf") stem = '<p class="qc-stem">True or false: ' + esc(q.stem) + "</p>";
+    else stem = '<p class="qc-stem">' + esc(q.stem) + "</p>";
+    if (q.fmt === "case") stem = '<dl class="pbox">' + q.pbox.map(function(r){ return "<div><dt>" + esc(r[0]) + "</dt><dd>" + esc(r[1]) + "</dd></div>"; }).join("") + "</dl>" + stem;
+    if (q.fmt === "picture") stem = '<figure class="qfig">' + cuspFigure() + "<figcaption>Occlusal view of #30: mesial to the left, buccal at the bottom</figcaption></figure>" + stem;
+    var choices = '<ul class="qc-choices' + (tf ? " qc-tf" : "") + '">' + q.choices.map(function(c, i){
+      return '<li><button class="ch" type="button" data-i="' + i + '" aria-pressed="false">' + mark(multi ? "box" : "ring") + '<span class="txt">' + esc(c) + '</span><span class="pct num" aria-hidden="true"></span><span class="share" aria-hidden="true"></span></button></li>';
+    }).join("") + "</ul>";
+    el.innerHTML = head + stem + choices + (multi ? '<div class="qc-go"><button class="btn btn-primary" type="button" data-check disabled>Check my answer</button><span class="note" data-hint>Select every right answer, then check.</span></div>' : "") +
+      '<section class="qc-result" hidden aria-live="polite"></section>';
+
+    var picked = [];
+    $$(".ch", el).forEach(function(b){
+      b.addEventListener("click", function(){
+        if (el.classList.contains("answered")) return;
+        var i = +b.dataset.i;
+        if (multi) {
+          var k = picked.indexOf(i); if (k > -1) picked.splice(k, 1); else picked.push(i);
+          b.setAttribute("aria-pressed", k > -1 ? "false" : "true");
+          $("[data-check]", el).disabled = !picked.length;
+          return;
+        }
+        picked = [i]; b.setAttribute("aria-pressed", "true");
+        answer(b);
+      });
+    });
+    if (multi) $("[data-check]", el).addEventListener("click", function(){ if (picked.length) answer(this); });
+
+    function answer(from){
+      el.classList.add("answered");
+      var good = multi ? q.correct : [q.answer];
+      var hits = picked.filter(function(i){ return good.indexOf(i) > -1; }).length;
+      var score = multi ? Math.max(0, (hits - (picked.length - hits)) / good.length) : (hits ? 1 : 0);
+      var right = score === 1;
+      $$(".ch", el).forEach(function(b){
+        var i = +b.dataset.i, isGood = good.indexOf(i) > -1, isPick = picked.indexOf(i) > -1;
+        var st = isGood && isPick ? "right" : isPick ? "wrong" : isGood ? (multi ? "missed" : "right") : "";
+        if (st === "right") b.classList.add("is-right"); else if (st === "wrong") b.classList.add("is-wrong"); else if (st === "missed") b.classList.add("is-missed");
+        if (st) b.querySelector(".mark").outerHTML = mark(multi ? "box" : "ring", st);
+        /* the state and the class's share are read out from text inside the button, so its name keeps its visible words */
+        var said = st === "right" ? (isPick ? "right, your pick" : "right") : st === "wrong" ? "your pick, wrong" : st === "missed" ? "right, not picked" : "";
+        b.querySelector(".txt").insertAdjacentHTML("beforeend", said ? '<span class="sr">, ' + said + "</span>" : "");
+        var pc = b.querySelector(".pct"); pc.innerHTML = q.picks[i] + '%<span class="sr"> of the class picked it</span>'; pc.removeAttribute("aria-hidden");
+        var sh = b.querySelector(".share"); requestAnimationFrame(function(){ sh.style.width = q.picks[i] + "%"; });
+      });
+      var go = $(".qc-go", el); if (go) go.hidden = true;
+      var first = !state.tried[q.id + (opt.live ? ":live" : opt.key || "")];
+      state.tried[q.id + (opt.live ? ":live" : opt.key || "")] = 1;
+      var xp = right ? (first ? 10 : 2) : 1;
+      var verdict = right ? '<p class="verdict ok">' + icon("check", 26) + 'Right<span class="xp num">+' + xp + " XP</span></p>"
+        : multi && score > 0 ? '<p class="verdict part">' + icon("goal", 26) + "Partly right: " + hits + " of " + good.length + '<span class="xp num">+' + xp + " XP</span></p>"
+        : '<p class="verdict no">' + icon("cross", 26) + 'Not quite<span class="xp num">+' + xp + " XP</span></p>";
+      var open = {};
+      $$(".ch", el).forEach(function(b){ if (b.classList.contains("is-wrong") || b.classList.contains("is-missed")) open[b.dataset.i] = 1; });
+      if (!Object.keys(open).length) open[picked[0]] = 1;
+      /* folded until the student taps it, as widget/hub.js draws it (Sam, 2026-11-06 and 2026-11-10) */
+      var whys = '<details class="why"><summary class="why-bar"><span>Why each choice</span><span class="chev">' + icon("chevron", 16) + "</span></summary>" + q.choices.map(function(c, i){
+        var b = $('.ch[data-i="' + i + '"]', el), tag = b.classList.contains("is-wrong") ? "Your pick" : b.classList.contains("is-right") && picked.indexOf(i) > -1 ? "Your pick" : b.classList.contains("is-missed") ? "You missed this one" : "";
+        var st = b.classList.contains("is-right") ? "right" : b.classList.contains("is-wrong") ? "wrong" : b.classList.contains("is-missed") ? "missed" : "";
+        return "<details" + (open[i] ? " open" : "") + '><summary><span class="tick" style="color:' + (st === "wrong" ? "var(--wrong)" : st ? "var(--right)" : "var(--muted)") + '">' + (st ? mark(multi ? "box" : "ring", st) : mark(multi ? "box" : "ring")) + "</span><span>" + esc(c) +
+          (tag ? ' <span class="tag">· ' + tag + "</span>" : "") + '</span><span class="chev">' + icon("chevron", 16) + "</span></summary><p>" + esc(q.why[i]) + "</p></details>";
+      }).join("") + "</details>";
+      var res = $(".qc-result", el);
+      res.innerHTML = verdict + '<p class="qc-ex">' + esc(q.ex) + ' <a href="#formats">Find this in the notes</a></p>' + whys +
+        '<div class="qc-after"><button class="btn" type="button" data-again>' + icon("retry", 18) + 'Try it again</button><span class="grow"></span>' +
+        '<span class="thumbs"><span class="thumbs-q" aria-live="polite">Good question?</span><button class="btn btn-icon" type="button" data-thumb="up" aria-pressed="false" aria-label="Good question">' + icon("thumbup", 18) + '</button><button class="btn btn-icon" type="button" data-thumb="down" aria-pressed="false" aria-label="Not a good question">' + icon("thumbdown", 18) + "</button></span></div>";
+      res.hidden = false;
+      /* the thumbs: the one you tap pops and fills (up: with a few sparks; down: a small dip), and the line thanks you */
+      $$("[data-thumb]", res).forEach(function(b){ b.addEventListener("click", function(){
+        var on = b.getAttribute("aria-pressed") !== "true", up = b.dataset.thumb === "up";
+        $$("[data-thumb]", res).forEach(function(o){ o.setAttribute("aria-pressed", "false"); o.classList.remove("pop"); $$(".thumb-spark", o).forEach(function(x){ o.removeChild(x); }); });
+        $(".thumbs-q", res).textContent = !on ? "Good question?" : up ? "Thanks! Glad it helped." : "Thanks. We'll take a look.";
+        if (!on) return;
+        b.setAttribute("aria-pressed", "true"); void b.offsetWidth; b.classList.add("pop");
+        if (up && !reduced) for (var i = 0; i < 5; i++) { var sp = document.createElement("i"); sp.className = "thumb-spark"; sp.style.setProperty("--a", (-150 + i * 30) + "deg"); sp.style.animationDelay = (i * 18) + "ms"; b.appendChild(sp); }
+      }); });
+      $("[data-again]", res).addEventListener("click", function(){ var n = card(q, opt); el.replaceWith(n); if (opt.live) n.querySelector(".ch").focus(); });
+      if (opt.live && !opt.silent) reward(from, right, xp);
+    }
+    if (opt.preset != null) {
+      var pre = [].concat(opt.preset);
+      if (multi) { pre.forEach(function(i){ $('.ch[data-i="' + i + '"]', el).click(); }); $("[data-check]", el).click(); }
+      else $('.ch[data-i="' + pre[0] + '"]', el).click();
+    }
+    return el;
+  }
+
+  /* ---------- the rewards on a live answer ---------- */
+  function visible(el){ return el && el.offsetParent !== null && el.getBoundingClientRect().width > 0; }
+  function reward(from, right, xp){
+    var target = [$("#rankPill"), $("#phoneXp")].filter(visible)[0];
+    flyXp(from, target, xp, function(){
+      state.xp += xp; state.xpToday += xp;
+      $$("[data-xp]").forEach(function(n){ countUp(n, state.xp - xp, state.xp); });
+      $$("[data-xptoday]").forEach(function(n){ n.textContent = "+" + fmt(state.xpToday) + " XP"; });
+      if (target) { target.classList.remove("bump"); void target.offsetWidth; target.classList.add("bump"); }
+    });
+    react(right, right ? "Nice one! +" + xp + " XP" : "So close. Read why each choice is what it is.");
+    state.session++; if (right) state.right++;
+    setTimeout(function(){
+      if (state.goal < state.of) {
+        state.goal++;
+        $$("[data-ring]").forEach(function(r){ r.outerHTML = ring(state.goal, state.of, r.getAttribute("class").replace("ring", "").trim()).replace("<svg ", '<svg data-ring="1" '); });
+        $$("[data-teeth]").forEach(function(w){ w.innerHTML = teethRing(state.goal, state.of); });
+        $$("[data-goalnum]").forEach(function(n){ n.textContent = state.goal; });
+        $$("[data-goaltext]").forEach(function(n){ n.textContent = state.goal + " of " + state.of; });
+        if (state.goal === state.of) {
+          state.streak++;
+          setTimeout(function(){
+            $$("[data-streak]").forEach(function(n){ n.textContent = state.streak + " days"; });
+            $$("[data-flame]").forEach(function(f){ var lvl = flameLevel(state.streak); var n = h(flame(lvl, "grow-in")); n.setAttribute("data-flame", "1"); f.replaceWith(n); });
+            $$("[data-goalcap]").forEach(function(n){ n.textContent = "Goal met. Your streak grows to " + state.streak + " days."; });
+            react(true, "Goal met! " + state.streak + " days in a row.");
+          }, 900);
+        }
+      }
+      if (state.session === 25) showRecap();
+      $$("[data-togo]").forEach(function(n){ var left = 25 - state.session; n.textContent = left > 0 ? left + " to go" : "done"; });
+      $$("[data-session]").forEach(function(n){ n.textContent = state.session + " answered · " + state.right + " right"; });
+    }, reduced ? 0 : 700);
+  }
+  function flyXp(from, to, xp, done){
+    if (!from || !to || reduced) { done(); return; }
+    var a = from.getBoundingClientRect(), b = to.getBoundingClientRect();
+    var n = h('<span class="xpfly" aria-hidden="true">' + xpSpark() + "+" + xp + "</span>");
+    document.body.appendChild(n);
+    var w = n.offsetWidth, hh = n.offsetHeight;
+    var x0 = a.left + Math.min(a.width - w - 12, 64), y0 = a.top + a.height / 2 - hh / 2, x1 = b.left + b.width / 2 - w / 2, y1 = b.top + b.height / 2 - hh / 2;
+    var mx = (x0 + x1) / 2, my = Math.min(y0, y1) - 80;
+    var anim = n.animate([
+      { transform: "translate(" + x0 + "px," + y0 + "px) scale(.6)", opacity: 0 },
+      { transform: "translate(" + x0 + "px," + (y0 - 18) + "px) scale(1.1)", opacity: 1, offset: .18 },
+      { transform: "translate(" + mx + "px," + my + "px) scale(1)", opacity: 1, offset: .6 },
+      { transform: "translate(" + x1 + "px," + y1 + "px) scale(.5)", opacity: .2 }
+    ], { duration: 950, easing: "cubic-bezier(0.22, 1, 0.36, 1)", fill: "forwards" });
+    anim.onfinish = function(){ n.remove(); done(); };
+  }
+  function countUp(n, a, b){
+    if (reduced) { n.textContent = fmt(b); return; }
+    var t0 = performance.now(), d = 450;
+    (function step(t){ var k = Math.min(1, (t - t0) / d), e = 1 - Math.pow(1 - k, 3); n.textContent = fmt(Math.round(a + (b - a) * e)); if (k < 1) requestAnimationFrame(step); })(t0);
+  }
+  var reactTimer;
+  function react(right, say){
+    var btn = $("#barTimmy"), bub = $("#bubble");
+    if (!btn) return;
+    clearTimeout(reactTimer);
+    btn.innerHTML = timmy(right ? "happy" : "scared");
+    btn.classList.remove("cheer", "flinch"); void btn.offsetWidth; btn.classList.add(right ? "cheer" : "flinch");
+    bub.textContent = say; bub.classList.add("on");
+    reactTimer = setTimeout(function(){ bub.classList.remove("on"); btn.classList.remove("cheer", "flinch"); btn.innerHTML = timmy("happy"); }, 2600);
+  }
+  function recapHTML(cls, hub){
+    var nx = (HUBS[hub] || HUBS.occlusion).next, right = hub ? state.right : 19, xp = hub ? state.xpToday : 141;
+    return '<div class="recap ' + (cls || "") + '"><h3>That was 25 questions</h3><div class="figs">' +
+      '<div><b class="num" data-count="' + right + '">' + right + '</b><span>right of 25</span></div><div><b class="num" data-count="' + xp + '">+' + xp + '</b><span>XP this session</span></div>' +
+      '<div><b class="num">+6</b><span>Timmy’s HP, now 88</span></div><div><b class="num">7 days</b><span>streak</span></div></div>' +
+      '<div class="next">Look at these next<ul>' + nx.map(function(n){ return "<li>" + esc(n[0]) + " <span>" + n[1] + " missed</span></li>"; }).join("") + '</ul></div>' +
+      '<div class="qc-go"><button class="btn btn-primary" type="button">Keep going</button><button class="btn" type="button">Practice the misses</button></div></div>';
+  }
+  function showRecap(){
+    var slot = $("#recapSlot"); if (!slot) return;
+    slot.innerHTML = recapHTML("enter", root.dataset.hub);
+    state.hp = 88; $$("[data-hp]").forEach(function(n){ n.textContent = state.hp + " HP"; });
+    $$("[data-count]", slot).forEach(function(n){ var to = +n.dataset.count, plus = n.textContent.charAt(0) === "+"; if (reduced) return; var t0 = performance.now();
+      (function step(t){ var k = Math.min(1, (t - t0) / 900), e = 1 - Math.pow(1 - k, 3); n.textContent = (plus ? "+" : "") + Math.round(to * e); if (k < 1) requestAnimationFrame(step); })(t0); });
+  }
+
+  /* ---------- the hub frame ---------- */
+  function buildHub(){
+    var hub = root.dataset.hub, H = HUBS[hub] || HUBS.generic, d = daysTo(H.date), M = A.mastheads[hub] || A.mastheads.generic;
+    var hp = A.handpieces[3];
+    var lvl = flameLevel(state.streak);
+    var count = d == null ? '<b>Soon</b><span>a countdown once the date is set</span>' : d > 1 ? '<b class="num">' + d + '</b><span>days to go</span>' : d === 1 ? '<b>Tomorrow</b><span>one more evening</span>' : d === 0 ? '<b>Today</b><span>good luck</span>' : '<b>Done</b><span>this exam has passed</span>';
+    var frame = '<div class="hubframe">' +
+      '<nav class="hubbar" aria-label="' + esc(H.name) + ' hub">' +
+        '<span class="hubname">' + emblemDisc(hub, "emb-disc") + "<span>" + esc(H.name) + "</span></span>" +
+        '<span class="tabs">' + [["home", "Home", 1], ["notes", "Notes"], ["questions", "Questions"], ["more", "More"]].map(function(t){
+          return '<button class="tab" type="button"' + (t[2] ? ' aria-current="page"' : "") + ">" + icon(t[0], 20) + "<span>" + t[1] + "</span></button>"; }).join("") + "</span>" +
+        '<span class="spacer"></span>' +
+        '<span class="meters">' +
+          '<span class="meter" title="Your streak">' + flame(lvl).replace("<svg ", '<svg data-flame="1" ') + '<span class="num" data-streak>' + state.streak + ' days</span></span>' +
+          '<span class="meter" title="Today\'s goal">' + ring(state.goal, state.of).replace("<svg ", '<svg data-ring="1" ') + '<span class="num lbl" data-goaltext>' + state.goal + " of " + state.of + "</span></span>" +
+          '<span class="rankpill" id="rankPill"><span class="hp">' + uniq(hp.svg) + '</span><b>Silver II</b><span class="xpn num"><span data-xp>' + fmt(state.xp) + "</span> XP</span></span>" +
+        "</span>" +
+        '<span class="barTimmy"><span class="bubble" id="bubble" role="status"></span><button class="timmy-btn" id="barTimmy" type="button" aria-label="Timmy, your tooth buddy: 82 HP">' + timmy("happy") + "</button></span>" +
+      "</nav>" +
+      '<div class="phonemeters" aria-label="Today">' +
+        '<span class="meter">' + flame(lvl).replace("<svg ", '<svg data-flame="1" ') + '<span class="num" data-streak>' + state.streak + " days</span></span>" +
+        '<span class="meter">' + ring(state.goal, state.of).replace("<svg ", '<svg data-ring="1" ') + '<span class="num" data-goaltext>' + state.goal + " of " + state.of + "</span></span>" +
+        '<span class="grow"></span><span class="meter" id="phoneXp">' + xpSpark().replace("<svg ", '<svg width="20" height="20" ') + '<span class="num"><span data-xp>' + fmt(state.xp) + "</span> XP</span></span>" +
+      "</div>" +
+      '<div class="hubbody">' +
+        '<figure class="mast">' + img(M.body, M.label, "", "0 0 600 200") + "</figure>" +
+        '<div class="examcard"><p class="exam-when">' + esc(H.when) + '</p><h3 class="exam-title">' + esc(H.exam) + '</h3><p class="count">' + count + "</p>" +
+          '<div class="quick"><button class="btn btn-primary" type="button">' + icon("questions", 20) + "Practice questions</button>" +
+          '<button class="btn" type="button">' + icon("drill", 20) + 'Daily drill</button><button class="btn" type="button">' + icon("notes", 20) + "Notes</button>" +
+          '<button class="btn" type="button">' + icon("mock", 20) + 'Mock exam</button><button class="btn" type="button">' + icon("podcast", 20) + "Timmy Time</button></div></div>" +
+        '<div class="qstrip" role="group" aria-label="Question sets"><h3>Questions</h3>' +
+          [["All", 412, 1], ["High likelihood", 38], ["Yesterday’s misses", 6], ["Daily drill", 15], ["Weak spots", 22], ["Mock", 50]].map(function(c){
+            return '<button class="chip" type="button" aria-pressed="' + (c[2] ? "true" : "false") + '">' + c[0] + ' <span class="n num">' + c[1] + "</span></button>"; }).join("") + "</div>" +
+        '<div class="livecard" id="liveCard"></div>' +
+        '<aside class="today" aria-label="Today">' +
+          '<div class="panel"><h3>Today</h3><div class="panel-body big-ring teeth-ring"><div class="teeth-wrap"><span data-teeth>' + teethRing(state.goal, state.of) + '</span><p class="teeth-num"><b class="num" data-goalnum>' + state.goal + '</b><span>of ' + state.of + '</span></p></div>' +
+            '<div><p class="ring-cap" data-goalcap>One more right or wrong answer meets today’s goal.</p></div></div>' +
+            '<dl class="kv"><div><dt>' + icon("flame", 18) + 'Streak</dt><dd class="num" data-streak>' + state.streak + " days</dd></div>" +
+            "<div><dt>" + icon("xp", 18) + 'XP today</dt><dd class="num" data-xptoday>+' + state.xpToday + " XP</dd></div>" +
+            "<div><dt>" + icon("questions", 18) + 'This session</dt><dd class="num" data-session>' + state.session + " answered · " + state.right + " right</dd></div>" +
+            "<div><dt>" + icon("tooth", 18) + 'Timmy</dt><dd class="num" data-hp>' + state.hp + " HP</dd></div></dl></div>" +
+          '<div id="recapSlot"><div class="panel soon"><h3>Session recap</h3><p>It opens here after 25 answers: <span class="num" data-togo>1 to go</span>.</p></div></div>' +
+        "</aside>" +
+      "</div></div>";
+    var wrap = $("#hubDemo"); wrap.innerHTML = frame;
+    var live = LIVE_BY_HUB[hub] || LIVE;
+    $("#liveCard").appendChild(card(live, { live: true }));
+  }
+  /* each hub's own question for the live card (its id, stem, choices and whys as the hub ships them) */
+  /* copied from each hub's bank (same id, stem, explanation and whys; the choices in a different order, as the hubs
+     shuffle them); the class's picks are made up */
+  var LIVE_BY_HUB = {
+    "perio": { id: "q1-02", fmt: "single", name: "Single answer", lec: "S1 · Overview of Diagnosis, Classification & Treatment Planning",
+      stem: "Probing depth is 7 mm, and the CEJ is felt 4 mm apical to the gingival margin (no visible recession). What is the clinical attachment level?",
+      choices: ["7 mm", "11 mm", "3 mm", "4 mm"], answer: 2, picks: [22, 9, 58, 11],
+      ex: "CAL = PD + GR using signed GR. Here GR = -4 (CEJ is subgingival), so CAL = 7 + (-4) = 3 mm of attachment loss.",
+      why: ["7 mm is the probing depth; it ignores the 4 mm of pocket that sits above the CEJ on enamel.", "11 mm adds the 4 mm instead of subtracting it; a subgingival CEJ makes GR negative.", "With the CEJ 4 mm below the margin, GR is -4, so CAL = 7 + (-4) = 3 mm.", "4 mm is the CEJ-to-margin distance (the negative recession), not the attachment loss."] },
+    "pcd-implants-exam1": { id: "ev-gold", fmt: "single", name: "Single answer", lec: "L1 · Evolution of Dental Implants",
+      stem: "Why did the gold roots used in 1809 fail to integrate with bone?",
+      choices: ["Gold is toxic and killed the surrounding bone", "Gold forms very little surface oxide for bone to bond to", "Gold was too brittle and fractured under normal chewing forces", "Gold corroded quickly in saliva"], answer: 1, picks: [14, 63, 9, 14],
+      ex: "Today's titanium implants carry a titanium oxide layer, a ceramic, and the bone integrates with that oxide. Gold has very little oxide, so it never osseointegrated.",
+      why: ["Lead was the toxic one; gold resists corrosion.", "Bone integrates with a metal's oxide layer, and gold has almost none.", "Porcelain was the one that broke; gold is soft and ductile.", "Gold resists corrosion; its problem was the missing oxide."] },
+    "heme-endo-exam2": { id: "dm-ins-shortest", fmt: "single", name: "Single answer", lec: "L11 · Pharmacology of Diabetes Mellitus",
+      stem: "Of these insulins, which one's effect wears off soonest?",
+      choices: ["Regular insulin", "NPH insulin", "Insulin detemir", "Insulin lispro"], answer: 3, picks: [27, 6, 4, 63],
+      ex: "Shortest to longest: rapid analogs (lispro, aspart, glulisine), then regular, then NPH, then the long-acting glargine and detemir, then ultra-long degludec. These time profiles decide which insulin is basal and which is used as needed with meals.",
+      why: ["Regular (short-acting) insulin peaks around 3 hours and is gone by about 8 hours, longer than the rapid analogs.", "NPH is intermediate-acting: protamine slows its absorption so it lasts longer than regular insulin.", "Detemir is a long-acting basal insulin.", "Lispro is rapid-acting: onset in 5 to 15 minutes and a total duration of about 4 hours, the shortest here."] },
+    "special-patient-care": { id: "in-rosa", fmt: "single", name: "Single answer", lec: "L1 · Introduction to Special Patient Care",
+      stem: "What did Rosa's Law (2010) do?",
+      choices: ["Required public schools to provide special education", "Added disability to the ADA Code of Ethics", "Removed the term “mental retardation” from U.S. federal documents", "Required dental schools to teach management of special needs patients"], answer: 2, picks: [12, 8, 71, 9],
+      ex: "By 2010, Rosa's Law eliminated “mental retardation” from federal documents; the DSM-5 made the same change in 2013, using intellectual disability.",
+      why: ["That came from national laws by 1978.", "That was the ADA's own revision in 2018.", "It replaced it with intellectual disability in federal documents.", "That was CODA's 2019 change to Standard 2."] }
+  };
+
+  /* ---------- page sections ---------- */
+  function tiles(){
+    var trophies = Object.keys(A.trophies || {}), secret = trophies.filter(function(k){ return A.trophies[k].secret; }).length;
+    var T = [
+      ["#icons", "Icons", Object.keys(A.icons || {}).length, "Drawn by hand on a 24 grid"],
+      ["#hubart", "Hub emblems and scenes", (A.hubs || []).length * 2, (A.hubs || []).length + " emblems and " + (A.hubs || []).length + " masthead scenes"],
+      ["#medals", "Mastery medals", (A.hubs || []).length * 4, "Bronze to Crown in each hub’s colors"],
+      ["#medals", "Trophies", trophies.length, secret + " of them secret until won"]
+    ];
+    $("#tiles").innerHTML = T.map(function(t){ return '<a class="tile s3" href="' + t[0] + '"><p class="tile-label">' + t[1] + '</p><p class="tile-value num">' + t[2] + '</p><p class="tile-cap">' + t[3] + "</p></a>"; }).join("");
+  }
+
+  function pairs(){
+    var out = $("#pairs");
+    Q.forEach(function(q){
+      var g = h('<div class="grid pair"><div class="pair-head"><h3>' + esc(q.name) + "</h3><p>" + esc(FORMAT_NOTE[q.fmt] || "") + '</p></div><div class="s6"><p class="state">Waiting for an answer</p></div><div class="s6"><p class="state">Answered</p></div></div>');
+      out.appendChild(g);
+      var cols = $$(".s6", g);
+      cols[0].appendChild(card(q, { key: ":a" }));
+      cols[1].appendChild(card(q, { key: ":b", preset: q.fmt === "recall" ? 1 : q.preset }));
+    });
+  }
+  var FORMAT_NOTE = {
+    single: "Tap a choice to answer; the High likelihood tag shows on the topics most likely to be on the exam.",
+    except: "The same card; the stem carries the EXCEPT.",
+    multi: "Tick boxes, then Check. Right picks, wrong picks and the ones you missed each get their own mark.",
+    two: "The statements are numbered and the four choices never shuffle.",
+    tf: "Two big choices, side by side.",
+    numbered: "The statements are numbered; the combinations stay in their fixed order.",
+    picture: "The drawing sits above the stem only when the question needs it.",
+    case: "The Patient Box sits above the stem.",
+    recall: "Say it, check it, and mark it known or not yet. No XP, no class picks."
+  };
+
+  function rewards(){
+    var g = $("#rewardGrid");
+    var flight = '<div class="flight" aria-hidden="true"><div class="from"><button class="ch is-right" type="button" tabindex="-1">' + mark("ring", "right") + '<span class="txt">Lingual embrasures are larger</span><span class="pct num" style="opacity:1">61%</span><span class="share" style="width:61%"></span></button></div>' +
+      '<svg class="path" viewBox="0 0 500 150" preserveAspectRatio="none"><path d="M262 84 C 292 30, 330 14, 352 18"/></svg>' +
+      '<span class="mid">' + xpSpark() + '</span><span class="to rankpill" id="demoPill"><span class="hp">' + uniq(A.handpieces[3].svg) + '</span><b>Silver II</b><span class="xpn num">6,250 XP</span></span></div>';
+    g.innerHTML =
+      '<div class="panel s6"><h3>The XP spark</h3><p>It lifts off the choice you picked and lands on your rank, which counts up: 10 XP the first time you get one right, 2 after that, 1 for a miss.</p><div class="panel-body">' + flight + '</div><div class="qc-go"><button class="btn" type="button" id="playFly">' + icon("play", 18) + "Play it</button></div></div>" +
+      '<div class="panel s6"><h3>Timmy reacts</h3><p>On the bar, never over the question: a hop and a cheer for a right answer, a flinch for a miss, a few words in his bubble.</p><div class="panel-body react">' +
+        '<figure><span class="tim" id="cheerTim">' + timmy("happy") + '</span><figcaption><span class="say">Nice one! +10 XP</span></figcaption></figure>' +
+        '<figure><span class="tim" id="flinchTim">' + timmy("scared") + '</span><figcaption><span class="say">So close. Read why.</span></figcaption></figure></div>' +
+        '<div class="qc-go"><button class="btn" type="button" id="playTim">' + icon("play", 18) + "Play it</button></div></div>" +
+      '<div class="s6 stack">' +
+        '<div class="panel"><h3>The streak flame</h3><p>A day counts when you meet your goal. The flame grows at 3 days, blazes at 7, burns blue at 10 and turns Dark Matter at 30.</p><div class="panel-body flames">' +
+          [[1, "1 day"], [2, "3 days"], [3, "7 days"], [4, "10 days: blue"], [5, "30 days: Dark Matter"]].map(function(f){ return "<figure>" + flame(f[0]) + "<figcaption>" + f[1] + "</figcaption></figure>"; }).join("") + "</div></div>" +
+        '<div class="panel"><h3>The daily goal</h3><p>20 questions a day unless you change it; Timmy cheers when the ring closes.</p><div class="panel-body rings">' +
+          [[0, "Not started"], [12, "12 of 20"], [20, "Done"]].map(function(r){ return "<figure>" + ring(r[0], 20) + "<figcaption>" + r[1] + "</figcaption></figure>"; }).join("") + "</div></div>" +
+      "</div>" +
+      '<div class="panel s6"><h3>The session recap</h3><p>After 25 answers, or when you leave the bank: what you did, what Timmy got out of it and the two lectures to look at next.</p><div class="panel-body">' + recapHTML("") + "</div></div>";
+    $("#playFly").addEventListener("click", function(){ var from = $(".flight .ch"), to = $("#demoPill"); flyXp(from, to, 10, function(){ to.classList.remove("bump"); void to.offsetWidth; to.classList.add("bump"); }); });
+    $("#playTim").addEventListener("click", function(){
+      [["#cheerTim", "cheer"], ["#flinchTim", "flinch"]].forEach(function(p){ var t = $(p[0]); t.classList.add("timmy-btn"); t.classList.remove("cheer", "flinch"); void t.offsetWidth; t.classList.add(p[1]); });
+    });
+  }
+
+  function faces(){
+    var f = [
+      ["nunito", "Nunito Sans", "face-nunito", "A humanist sans with rounded ends: friendly at 13 px on a phone, and its figures are all one width, so counters and timers don’t jitter.", ["Regular 400", 400], ["Bold 700", 700], ["Extra bold 800", 800]],
+      ["fraunces", "Fraunces", "face-fraunces", "A soft text serif with a lot of character at large sizes. Its figures are proportional (the font has no tabular set), so a number that counts up shifts as it changes.", ["Regular 400", 400], ["Semibold 600", 600], ["Bold 700", 700]]
+    ];
+    $("#faces").innerHTML = f.map(function(x){
+      return '<div class="panel s6 ' + x[2] + '"><h3>' + x[1] + "</h3><p>" + esc(x[3]) + '</p><div class="panel-body face-spec">' +
+        '<p class="aa">Aa Bb Gg 0123</p><p class="line">Centric cusps hold the vertical dimension; non-centric cusps shear, guide and keep the cheek clear.</p>' +
+        '<p class="weights">' + [x[4], x[5], x[6]].map(function(w){ return '<span style="font-weight:' + w[1] + '">' + w[0] + "</span>"; }).join("") + "</p>" +
+        '<table class="counter"><caption class="sr">XP figures in a column</caption><tbody><tr><td>Your XP</td><td class="num">6,240</td></tr><tr><td>The class leader</td><td class="num">11,118</td></tr><tr><td>A first week</td><td class="num">1,111</td></tr></tbody></table>' +
+        '<div class="qc-go"><button class="btn" type="button" data-setface="' + x[0] + '">Set the page in ' + x[1] + "</button></div></div></div>";
+    }).join("");
+    $$("[data-setface]").forEach(function(b){ b.addEventListener("click", function(){ setFace(b.dataset.setface); window.scrollTo({ top: 0, behavior: reduced ? "auto" : "smooth" }); }); });
+  }
+
+  var TOKENS = [
+    ["Ground", "--ground", "#FFFFFF", "#111111", "The page"],
+    ["Panel", "--panel", "#F7F3F6", "#1C1B1C", "A tone step off the ground"],
+    ["Row", "--row", "#FFFFFF", "#262426", "Choices, rows, inner cards"],
+    ["Border", "--border", "#E8E0E6", "#353135", "A row's edge"],
+    ["Ink", "--text", "#3B2E3A", "#F5F2F4", "Text and Timmy's outline"],
+    ["Muted", "--muted", "#685C66", "#B8B0B6", "Secondary text, 4.5:1 or more"],
+    ["Primary", "--primary", "#3B2E3A", "#F5F2F4", "The one filled button"],
+    ["Gold", "--gold", "#E2A72E", "#F2C14E", "The accent: XP, the goal ring"],
+    ["Gold text", "--gold-ink", "#8A5D00", "#F2C14E", "Gold as words"],
+    ["Right", "--right", "#247B50", "#4CC38A", "Right answers"],
+    ["Wrong", "--wrong", "#C4242A", "#F0727A", "Misses"],
+    ["Flame", "--flame", "#F59A1E", "#F7A83C", "The streak"]
+  ];
+  function tokens(){
+    var dark = root.dataset.theme === "dark";
+    var sw = TOKENS.map(function(t){ return '<div class="sw"><i style="background:var(' + t[1] + ')"></i><div><b>' + t[0] + "</b><span>" + t[4] + '</span><span class="num">' + (dark ? t[3] + " (dark)" : t[2] + " · dark " + t[3]) + "</span></div></div>"; }).join("");
+    var tints = (A.hubs || []).map(function(k){ var t = A.tints[k]; return '<div class="tint"><span class="steps"><i style="background:' + t.ink + '"></i><i style="background:' + t.mid + '"></i><i style="background:' + t.light + '"></i></span><div><b>' + esc(t.name) + '</b><span class="num">' + t.ink + " · " + t.mid + " · " + t.light + "</span></div></div>"; }).join("");
+    var scale = [["Title", "28 / " + (root.dataset.face === "fraunces" ? 700 : 800), "font-size:28px;font-weight:var(--w-title);line-height:1.15", "Occlusion final"],
+      ["Section", "20 / heading", "font-size:20px;font-weight:var(--w-head)", "Every question format"],
+      ["Question stem", "18 / strong", "font-size:18px;font-weight:var(--w-strong)", "Which cusp of #30 is shaded?"],
+      ["Body", "16 / 400", "font-size:16px", "Contacts sit buccal to the central fossa line."],
+      ["Label", "14 / strong", "font-size:14px;font-weight:var(--w-strong)", "Practice questions"],
+      ["Meta", "13 / 400", "font-size:13px;color:var(--muted)", "L1 · Review of Basic Occlusion"],
+      ["Figure", "32 / title", "font-size:32px;font-weight:var(--w-title);line-height:1", "11 days"]];
+    var motion = [["Press", "140 ms · ease-out", "var(--t-press)", "var(--ease-out)"], ["Hover", "180 ms · ease-out", "var(--t-hover)", "var(--ease-out)"],
+      ["Interface", "240 ms · ease-out", "var(--t-ui)", "var(--ease-out)"], ["Reveal", "800 ms · expo", "var(--t-reveal)", "var(--ease-expo)"]];
+    $("#tokenGrid").innerHTML =
+      '<div class="panel s12"><h3>Color</h3><p>Light and dark are designed, not inverted: dark mode is a true neutral with the same roles.</p><div class="panel-body swatches">' + sw + "</div></div>" +
+      '<div class="panel s12"><h3>Hub tints</h3><p>The tint marks a hub’s strip, active tab, picked choice and emblem; the rest of the hub is the shared ground and ink.</p><div class="panel-body tints">' + tints + "</div></div>" +
+      '<div class="panel s6 typescale"><h3>Type scale</h3><p>Seven sizes, each with one job, set in the typeface picked at the top.</p><dl class="panel-body scale">' + scale.map(function(s){ return "<div><dt>" + s[0] + " · " + s[1] + '</dt><dd style="' + s[2] + '">' + s[3] + "</dd></div>"; }).join("") + "</dl></div>" +
+      '<div class="s6" style="display:grid;gap:16px;align-content:start">' +
+        '<div class="panel"><h3>Radius and space</h3><p>16 for panels, 14 for rows inside them, round for buttons and chips. Space on a 4 px step; one 16 px gutter.</p><div class="panel-body radii">' +
+          '<figure><i style="border-radius:16px"></i>Panel 16</figure><figure><i style="border-radius:14px"></i>Row 14</figure><figure><i style="border-radius:999px"></i>Pill</figure></div></div>' +
+        '<div class="panel" id="motionPanel"><h3>Motion</h3><p>Transform and opacity only; reduced motion keeps the result and drops the travel.</p><dl class="panel-body motion">' +
+          motion.map(function(m){ return "<div><dt>" + m[0] + " · " + m[1] + '</dt><dd class="lane"><span class="dot" style="transition:transform ' + m[2] + " " + m[3] + '"></span></dd></div>'; }).join("") +
+          '</dl><div class="qc-go"><button class="btn" type="button" id="runMotion">' + icon("play", 18) + "Run</button></div></div>" +
+      "</div>";
+    $("#runMotion").addEventListener("click", function(){
+      var p = $("#motionPanel .motion"), lane = $(".lane", p).getBoundingClientRect().width;
+      p.style.setProperty("--lane", lane + "px"); p.classList.toggle("run");
+    });
+  }
+
+  function icons(){
+    var keys = Object.keys(A.icons || {});
+    $("#iconPanel").innerHTML = '<div class="icons">' + keys.map(function(k){ return "<figure>" + icon(k, 24) + "<figcaption>" + esc(A.icons[k].label) + "</figcaption></figure>"; }).join("") + "</div>" +
+      '<div class="icon-sizes">' + [16, 20, 24, 32].map(function(px){ return "<figure>" + icon("notes", px) + "<span>" + px + " px</span></figure>"; }).join("") +
+      [16, 20, 24, 32].map(function(px){ return "<figure>" + icon("questions", px) + "<span>" + px + " px</span></figure>"; }).join("") + "</div>";
+  }
+
+  function hubart(){
+    $("#emblemPanel").innerHTML = '<div class="emblems">' + (A.hubs || []).map(function(k){
+      var t = A.tints[k];
+      return '<figure data-hub="' + k + '">' + emblemDisc(k, "big") + "<b>" + esc(t.name) + '</b><span class="small">' + emblemDisc(k, "") + "On its tab</span></figure>";
+    }).join("") + "</div>";
+    $("#masts").innerHTML = (A.hubs || []).map(function(k){
+      var M = A.mastheads[k];
+      return '<figure><div class="m">' + img(M.body, M.label, "", "0 0 600 200") + "</div><figcaption><b>" + esc(A.tints[k].name) + ".</b> <span>" + esc(M.label) + "</span></figcaption></figure>";
+    }).join("");
+  }
+
+  function medals(){
+    var hubs = A.hubs || [], levels = A.medalLevels || ["Bronze", "Silver", "Gold", "Crown"];
+    var short = { "pcd-implants-exam1": "PCD Implants", "heme-endo-exam2": "Heme & Endo 2", "special-patient-care": "Special Patient Care", "generic": "A new hub" };
+    var table = '<table class="medals"><caption class="sr">Mastery medals by hub and level</caption><thead><tr><th scope="col">Level</th>' + hubs.map(function(k){ return '<th scope="col">' + esc(short[k] || A.tints[k].name) + "</th>"; }).join("") + "</tr></thead><tbody>" +
+      levels.map(function(l, i){ return '<tr><th scope="row" style="text-align:left;font-size:var(--fs-label);font-weight:var(--w-strong);color:var(--text);padding:8px 0;border-top:1px solid var(--rule)">' + esc(l) + "</th>" +
+        hubs.map(function(k){ return "<td>" + img(A.medals[k][i], A.tints[k].name + ", " + l + " mastery", "", "0 0 64 64") + "</td>"; }).join("") + "</tr>"; }).join("") + "</tbody></table>";
+    var keys = Object.keys(A.trophies || {});
+    var trophy = keys.map(function(k){ var t = A.trophies[k];
+      return '<div class="trophy">' + img(t.body, "", "", "0 0 64 64") + "<div><b>" + esc(t.name) + "</b><span>" + esc(t.desc) + (t.secret ? " · secret" : "") + "</span></div></div>"; }).join("");
+    var locked = keys.filter(function(k){ return A.trophies[k].secret; }).slice(0, 4).map(function(k){ var t = A.trophies[k];
+      return '<div class="trophy locked">' + img(t.sil.replace(/currentColor/g, "#B9ADB6"), "", "", "0 0 64 64") + "<div><b>Secret trophy</b><span>" + esc(t.clue) + "</span></div></div>"; }).join("");
+    var ranks = A.handpieces.map(function(r){ return "<figure>" + img(r.svg, r.name + " handpiece") + "<b>" + esc(r.name) + '</b><span class="num">' + fmt(r.at) + " XP</span></figure>"; }).join("");
+    $("#medalGrid").innerHTML =
+      '<div class="panel s12"><h3>Mastery medals</h3><p>Bronze at 50% right on your latest try, Silver at 75%, Gold at 90%, the Crown at every question.</p><div class="panel-body">' + table + "</div></div>" +
+      '<div class="panel s12"><h3>Trophies</h3><p>Every trophy, as it looks once you’ve won it.</p><div class="panel-body trophies">' + trophy + "</div></div>" +
+      '<div class="panel s12"><h3>Before a secret trophy is won</h3><p>A shape and its riddle, in place of a grid of question marks.</p><div class="panel-body trophies">' + locked + "</div></div>" +
+      '<div class="panel s12"><h3>Ranks: the handpieces</h3><p>Stone to Dark Matter, levels I to III, as drawn today; the rank name becomes plain type in place of the gradient.</p><div class="panel-body ranks">' + ranks + "</div></div>" +
+      journeysHTML();
+    journeysWire();
+  }
+
+  /* ---------- the three equipment journeys (phase 4, part A): a contact sheet drawn by the live code. The medallions
+     are shRanks.artOf (the handpiece by widget/ranks.js, the ModuPro and the loupes by widget/hub-art/journeys.js, from
+     tools/figures/site/journeys.mjs); the hand-off and the Dark Matter unlock are widget/journeys.js: their last frame
+     sits in the page (what reduced motion gets) and Play runs the scene itself. ---------- */
+  function journeysHTML(){
+    var R = window.shRanks, K = window.SH_JOURNEY_ART, SJ = window.shJourneys; if (!R || !K || !SJ) return "";
+    var ROMAN = ["I", "II", "III"], JN = R.JOURNEYS, T = R.TIERS;
+    function small(j, t){ return '<span class="hp">' + R.artOf(j, t, 30) + "</span>"; }
+    function rname(j, t, lv){ return R.nameOf({ journey: j, tier: t, level: lv }); }
+    var rows = JN.map(function(n, ji){
+      return '<div class="jr-row"><div class="jr-rowhead"><b>' + (ji + 1) + " · " + esc(n) + '</b><span class="num">' + fmt(125000 * ji) + " to " + fmt(125000 * (ji + 1)) + " XP" + (ji ? "" : " · as drawn today") + '</span></div><div class="ranks">' +
+        T.map(function(t, ti){ return "<figure>" + R.artOf(ji, ti, 96) + "<b>" + esc(t.name) + '</b><span class="num">' + fmt(K.floor(ji, ti)) + " XP</span></figure>"; }).join("") + "</div></div>";
+    }).join("");
+    function pill(j, t, lv, xp, boost){
+      return '<span class="rankpill jr-pill">' + small(j, t) + "<b>" + esc(rname(j, t, lv)) + '</b><span class="xpn num">' + fmt(xp) + " XP</span>" +
+        (boost ? '<span class="xboost"><i>2x</i><span class="num">' + esc(boost) + "</span></span>" : "") + "</span>";
+    }
+    var pills = '<div class="jr-pills">' + pill(0, 3, 2, 7420) + pill(1, 4, 2, 201400) + pill(2, 6, 3, 371250) + "</div>" +
+      '<p class="jr-cap">On a board, beside a name:</p><div class="jr-minis">' + [0, 1, 2].map(function(j){ return '<span class="jr-minirow">' + T.map(function(t, ti){ return small(j, ti); }).join("") + "</span>"; }).join("") + "</div>";
+    var boost = '<div class="jr-pills">' + pill(0, 3, 2, 7420, "23 h") + pill(0, 3, 2, 7480, "41 min") + "</div>" +
+      '<p class="jr-cap">The XP that flies to the pill says it too, and the pill’s label reads “Double XP, 23 hours left”:</p>' +
+      '<div class="jr-pills"><span class="xpfly jr-fly" aria-hidden="true">' + xpSpark() + '+20<i class="x2">2x</i></span><span class="xpfly jr-fly" aria-hidden="true">' + xpSpark() + "+10</span></div>" +
+      '<p class="jr-cap">Left: a first right answer during a boost. Right: the same answer without one.</p>';
+    function play(kind, arg, label){ return '<button class="btn" type="button" data-jplay="' + kind + '" data-jarg="' + arg + '">' + icon("play", 18) + esc(label) + "</button>"; }
+    var troph = Object.keys(K.trophies).map(function(k){ var t = K.trophies[k];
+      return '<div class="trophy">' + img(t.body, "", "", "0 0 64 64") + "<div><b>" + esc(t.name) + "</b><span>" + esc(t.desc) + "</span></div></div>"; }).join("") +
+      Object.keys(K.trophies).slice(1).map(function(k){ var t = K.trophies[k];
+        return '<div class="trophy locked">' + img(t.sil.replace(/currentColor/g, "#B9ADB6"), "", "", "0 0 64 64") + "<div><b>" + esc(t.name) + "</b><span>Not won yet: " + esc(t.desc) + "</span></div></div>"; }).join("");
+    return '<div class="panel s12" id="journeys"><h3>The three journeys</h3><p>The same seven materials in each, so Gold reads as Gold; the object changes. The Handpiece is today’s drawing, untouched. The ModuPro (the sim-lab typodont) and the loupes are new, drawn by the same medallion code: one drawing each, plus its antique.</p><div class="panel-body">' + rows + "</div></div>" +
+      '<div class="panel s6"><h3>The rank pill and the boards</h3><p>From the second journey the rank’s name carries the object: “ModuPro Gold II”.</p><div class="panel-body">' + pills + "</div></div>" +
+      '<div class="panel s6"><h3>Double XP on the rank pill</h3><p>A hub mastery medal starts 24 hours of double XP. The pill shows it with the time left.</p><div class="panel-body">' + boost + "</div></div>" +
+      '<div class="panel s12"><h3>The hand-off</h3><p>Plays once when a journey’s Dark Matter III is done, over the whole screen. <b>To the ModuPro</b> it is its own scene: the typodont eats the Handpiece. The screen darkens and rumbles, the typodont comes in from above and below with its jaws wide open around the Dark Matter III Handpiece, its mouth glowing purple inside, and pulls: dust and stars stream in and the Handpiece is sucked into the mouth. The jaws snap shut on it (a flash along the bite, the typodont shakes, shards of metal and Dark Matter sparks spray from the corners of the mouth), it chews twice, crumbs falling, swallows, and folds into the ModuPro medallion as the sim lab’s light comes on. The teeth are Wheeler’s crown outlines on real arch curves, so the back teeth turn away as in a photograph. About 9.5 seconds. <b>To the Loupes</b> it is a scene of its own too: the loupes come down over the Dark Matter ModuPro and their headlight clicks on, its beam grows into a sunbeam (the screen dims around it, dust turns in the light), the ModuPro trembles, goes white-hot, cracks and burns away into embers and ash with a flash and shock waves, the ModuPro’s nebula gives way to the Loupes’ sky, and the loupes come down through the light into its place and become the Loupes medallion, a glint across each lens. About 9 seconds. Then, in both, the name, its seven ranks lighting one by one, and the reward: 20,000 Shiny Gold Crowns for the ModuPro, 30,000 for the Loupes, counted up with a fountain and a rain of coins, and the finished journey’s trophy. Skip jumps to the last frame, Esc closes. Below is the ModuPro’s last frame, which is the whole card with reduced motion.</p>' +
+        '<div class="panel-body"><div class="jr-still" data-jstill="handoff" data-jarg="1"></div><div class="qc-go jr-plays">' + play("handoff", 1, "Play: the ModuPro") + play("handoff", 2, "Play: the Loupes") + "</div></div></div>" +
+      '<div class="panel s12"><h3>The Dark Matter unlock</h3><p>Once per journey, ever, and the biggest moment on the ladder. Gravity pulls dust into the Diamond III medallion and spins up a disk around it until it collapses into a point; a beat of dark; then it detonates: a flash, shock waves, the screen shakes, the journey’s sky opens and the Dark Matter medallion slams in and rises to its place, with “Dark Matter” letter by letter. Then the reward: 5,000 Shiny Gold Crowns counted up with a fountain and a rain of coins, and on the Handpiece its two Legendary pieces for Timmy’s place. About 8.5 seconds to “Collect 5,000 crowns”; Skip jumps to the last frame, Esc closes. Below: each one’s last frame (reduced motion gets this, faded in).</p>' +
+        '<div class="panel-body"><div class="jr-darks"><div class="jr-still" data-jstill="dark" data-jarg="0"></div><div class="jr-still" data-jstill="dark" data-jarg="1"></div><div class="jr-still" data-jstill="dark" data-jarg="2"></div></div>' +
+        '<div class="qc-go jr-plays">' + play("dark", 0, "Play: Handpiece") + play("dark", 1, "Play: ModuPro") + play("dark", 2, "Play: Loupes") + "</div></div></div>" +
+      '<div class="panel s12"><h3>The road ahead, on the “you” panel</h3><p>Where you are, and the next object shown locked. Top: on the Handpiece. Bottom: after the hand-off, with the trophy on the finished journey.</p><div class="panel-body">' +
+        SJ.road({ journey: 0, tier: 4, level: 2, xp: 17300 }) + SJ.road({ journey: 1, tier: 2, level: 1, xp: 161000 }) + "</div></div>" +
+      '<div class="panel s12"><h3>Journey trophies</h3><p>One for each journey finished. Top: won. Bottom: before they are won.</p><div class="panel-body trophies jr-troph">' + troph + "</div></div>";
+  }
+  function journeysWire(){
+    var SJ = window.shJourneys; if (!SJ) return;
+    $$("[data-jstill]").forEach(function(n){
+      var k = n.getAttribute("data-jstill"), a = +n.getAttribute("data-jarg");
+      n.appendChild(SJ.still(k, k === "dark" ? { journey: a } : { from: a - 1, to: a }));
+    });
+    $$("[data-jplay]").forEach(function(b){ b.addEventListener("click", function(){
+      var k = b.getAttribute("data-jplay"), a = +b.getAttribute("data-jarg");
+      if (k === "dark") SJ.dark({ journey: a }); else SJ.handoff({ from: a - 1, to: a });
+    }); });
+  }
+
+  function timmys(){
+    var moodName = { happy: "Happy", ok: "Okay", sad: "Sad", sick: "Sick", sleep: "Asleep", scared: "Startled" };
+    var condName = { sparkle: "Sparkling", plaque: "Plaque", stain: "Stains", gingivitis: "Gingivitis", caries: "Caries", perio: "Periodontitis", fracture: "Fracture", zero: "Needs treatment" };
+    var hp = A.timmy.hp.map(function(t){ var c = t.conditions.filter(function(x){ return x !== "zero" || t.hp === 0; }); var last = c.length ? condName[c[c.length - 1]] : "Healthy";
+      return '<figure><span class="t">' + img(t.svg, "Timmy at " + t.hp + " HP") + '</span><b class="num">' + t.hp + " HP</b><span>" + esc(last) + "</span></figure>"; }).join("");
+    var moods = A.timmy.moods.map(function(t){ return '<figure><span class="t">' + img(t.svg, "Timmy, " + moodName[t.k]) + "</span><b>" + moodName[t.k] + "</b><span>Mood</span></figure>"; }).join("");
+    $("#timmyGrid").innerHTML =
+      '<div class="panel s12"><h3>As his HP drops</h3><p>What shows at each level, worst last.</p><div class="panel-body timmys">' + hp + "</div></div>" +
+      '<div class="panel s12"><h3>Moods</h3><p>The moods his reactions use. He wears only what you put on him at his place (the shop\'s outfits, below).</p><div class="panel-body timmys" style="grid-template-columns:repeat(auto-fill,minmax(104px,1fr))">' + moods + "</div></div>";
+  }
+
+  /* ---------- Timmy's place (redesign phase 4, part C): place.js, built from tools/figures/site/place.mjs ----------
+     The stage draws the live kit (SH_PLACE.render) inline, in a shadow root so its CSS stays with it: Timmy hops between
+     spots on the ground (SH_PLACE.route), drawn in the scene's depth order, and tapping things plays their easter eggs.
+     The pickers are rarity cards; the galleries are still pictures, drawn as they scroll near. */
+  var TP = window.SH_PLACE;
+  /* the shop's own art (widget/hub-art/shop.js, from tools/figures/site/shop.mjs): the coin, the shelf thumbnails, the frames */
+  var SA = window.SH_SHOP_ART || { coinBody: function(){ return ""; }, coin: function(){ return ""; }, thumb: function(){ return ""; }, frame: function(){ return ""; }, ITEMS: [], RARITIES: [], CSS: "" };
+  var TIER_NAMES = ["Stone", "Antique", "Bronze", "Silver", "Gold", "Diamond", "Dark Matter"];
+  var LEVELS = ["I", "II", "III"];
+  var HOLS = [["", "No holiday"], ["halloween", "Halloween"], ["thanksgiving", "Thanksgiving"], ["winter", "Christmas"], ["newyear", "New Year's"], ["valentine", "Valentine's Day"], ["dentist", "Dentist's Day"], ["stpatrick", "St. Patrick's Day"], ["easter", "Easter"]];
+  var SEASONS = [["", "Summer"], ["spring", "Spring"], ["fall", "Fall"]];
+  var FLAIR_HUBS = ["occlusion", "perio", "heme-endo-exam2", "pcd-implants-exam1", "special-patient-care", "generic"];
+  /* a made-up student's hub medals: the live hubs' tints first, then more hues for the hubs still to come */
+  var MORE_TINTS = ["#C2417A", "#2E9E6B", "#8A4FD0", "#E08A1E", "#1FA3A8", "#D9483B", "#5B6FD6", "#7A8F2E", "#B5651D", "#3F8FBF", "#A04FA8", "#4F9A52", "#D46A6A", "#6B7A8F"];
+  function flairOf(lvls){ return lvls.map(function(l, i){ var h = FLAIR_HUBS[i] || "hub-" + (i + 1), t = A.tints && A.tints[h]; return { hub: h, lvl: l, tint: t ? t.ink || t.light : MORE_TINTS[(i - FLAIR_HUBS.length + MORE_TINTS.length * 2) % MORE_TINTS.length] }; }); }
+  var FLAIRS = [[], flairOf([2]), flairOf([3, 2, 1]), flairOf([4, 4, 3, 3, 2, 1]), flairOf([4, 4, 4, 3, 3, 3, 3, 2, 2, 2, 1, 1]), flairOf([4, 4, 4, 4, 4, 3, 3, 3, 3, 3, 3, 2, 2, 2, 2, 2, 1, 1, 1, 1])];
+  var FLAIR_NAMES = ["No hubs mastered yet", "One hub (Silver)", "Three hubs", "Six hubs, two crowned", "Twelve hubs", "Twenty hubs"];
+  /* names for the big view: the live hubs' own, then made-up ones for the hubs still to come */
+  var MORE_HUBS = ["Oral Pathology", "Endodontics", "Pharmacology", "Oral Surgery", "Pediatric Dentistry", "Orthodontics", "Dental Materials", "Radiology", "Head and Neck Anatomy", "Operative Dentistry", "Prosthodontics", "Cariology", "Local Anesthesia", "Oral Medicine", "Ethics", "Biochemistry"];
+  function hubLabel(h){ var t = A.tints && A.tints[h], m = /^hub-(\d+)$/.exec(h); return h === "generic" ? MORE_HUBS[15] : t && t.name ? t.name : m ? MORE_HUBS[(+m[1] - 7 + MORE_HUBS.length) % MORE_HUBS.length] : h; }
+  var builtIn = function(x){ return !x.set; }, inSets = function(x){ return x.set && x.set !== "rank" && !x.coll; }, inColl = function(x){ return !!x.coll; }, byRank = function(x){ return x.set === "rank"; };
+  var PS = { home: "cottage", scene: "hill", time: "clock", yard: { left: "garden", front: "mailbox", corner: "doghouse", right: "fountain" }, up: { chimney: true }, paint: "cream",
+    tier: 3, level: 2, flair: 3, holiday: "", season: "", hp: 82, outfit: "", mode: "play", pick: "home", still: false, found: {} };
+  function byK(list, k){ for (var i = 0; i < list.length; i++) if (list[i].k === k) return list[i]; return null; }
+  function clockNight(){ var hr = new Date().getHours(); return hr < 7 || hr >= 19; }
+  function isStill(){ return PS.still || reduced; }
+  function tpOpts(o){
+    return Object.assign({ home: PS.home, scene: PS.scene, night: PS.time === "night" || (PS.time === "clock" && clockNight()), yard: PS.yard, up: PS.up, paint: PS.paint,
+      tier: PS.tier, level: PS.level, flair: FLAIRS[PS.flair], holiday: PS.holiday, season: PS.season }, o || {});
+  }
+  function timmyArt(k){
+    var t = A.timmy, m = (t.moods || []).filter(function(x){ return x.k === k; })[0];
+    if (m) return m.svg;
+    var hp = (t.hp || []).filter(function(x){ return "hp" + x.hp === k; })[0];
+    return (hp || t.moods[0]).svg;
+  }
+  function timmySvg(mood, outfit){ var s = timmyArt(mood || "happy"); return outfit ? TP.dress(s, outfit) : s; }
+  /* Timmy inside a scene: his drawing at 36 wide, its feet (pet.js's shadow, y 226) on the spot */
+  function timmyG(svg, hl){
+    var star = function(x, y, k, d){ return '<path class="tp-twinkle" style="animation-delay:' + d + 's" transform="translate(' + x + " " + y + ") scale(" + k + ')" d="M0 -3 L.8 -.8 L3 0 L.8 .8 L0 3 L-.8 .8 L-3 0 L-.8 -.8 Z" fill="#FFE27A" stroke="#3B2E3A" stroke-width=".35"/>'; };
+    return '<g class="tp-tface"><g class="tp-tmood">' + '<svg x="-18" y="-46.1" width="36" height="47.2" viewBox="0 -30 200 262" overflow="visible">' + svg.replace(/^<svg[^>]*>/, "").replace(/<\/svg>\s*$/, "") + "</svg></g>" +
+      (hl && hl.k === "sparkling" ? star(-17, -38, 1, 0) + star(17, -28, .8, .7) + star(-19, -14, .7, 1.3) + star(15, -44, .6, 1.9) : "") + "</g>";
+  }
+  /* Timmy's health at his place: the kit's table (TP.HEALTH) says how he looks, moves and behaves at each level */
+  function HL(){ return TP.healthFor(PS.hp); }
+  function hpLine(t){ return String(t || "").replace("{hp}", PS.hp); }
+  function hpRange(h){ var i = TP.HEALTH.indexOf(h), top = i ? TP.HEALTH[i - 1].min - 1 : 100; return h.min === top ? h.min + " HP" : h.min + " to " + top + " HP"; }
+  function fmtPrice(n){ return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ","); }
+  var COIN = null;
+  function price(n){ if (!COIN) COIN = img(SA.coinBody(true), "Shiny Gold Crowns", "tp-coin", "0 0 24 24"); return n ? '<span class="tp-price">' + COIN + fmtPrice(n) + "</span>" : '<span class="tp-price free">Default</span>'; }
+  function rarTag(r){ return '<i class="tp-rar r-' + (r || "free") + '">' + esc(r || "Default") + "</i>"; }
+  /* a piece's rarity and price for a caption: free things just say so */
+  function isGift(x){ var se = x.set && TP.SETS && TP.SETS.seasons.filter(function(q){ return q.k === x.set; })[0]; return !!(se && se.gift); }
+  function priceOf(x){ return x.rank ? '<span class="tp-price free">' + esc(x.rankName) + " rank</span>" : isGift(x) ? '<span class="tp-price free">Yours</span>' : price(x.price || 0); }
+  function tagLine(x){ return x.rarity ? rarTag(x.rarity) + " " + priceOf(x) : rarTag(""); }
+  function sentence(t){ t = String(t || "").replace(/^(Free|Default|Uncommon|Rare|Epic|Legendary): /, ""); return t.charAt(0).toUpperCase() + t.slice(1); }
+  function lowerFirst(t){ return /^[A-Z][a-z]/.test(t) && !/^Timmy/.test(t) ? t.charAt(0).toLowerCase() + t.slice(1) : t; }
+  /* a still picture of a place, Timmy at a spot when asked (vb: the crop, from the kit's own viewBox) */
+  function placeFig(o, cap, sub, timmySpot, cls, outfit, art){
+    if (timmySpot) o = Object.assign({}, o, { timmy: { g: timmyG(timmySvg(art && art.art || "happy", outfit), art), at: timmySpot } });
+    var vb = o.viewBox || TP.VIEWBOX, r = TP.render(o);
+    var pic = img(r.svg, cap).replace("<img ", '<img width="' + vb[2] + '" height="' + vb[3] + '" ');
+    return '<figure class="tp-fig ' + (cls || "") + '"><div class="tp-pic' + (o.night ? " is-night" : "") + '">' + pic + "</div>" + (cap ? "<figcaption><b>" + esc(cap) + "</b>" + (sub ? "<span>" + sub + "</span>" : "") + "</figcaption>" : "") + "</figure>";
+  }
+  /* the card's scene goes on the page as a picture, with the kit's motion inside unless it's still */
+  function sceneImg(svgStr, alt, still){
+    if (!still) svgStr = svgStr.replace(/(<svg[^>]*>)/, function(m){ return m + "<style>" + TP.CSS.replace(/\.tp-still[^\n]*/, "") + "</style>"; });
+    return img(svgStr, alt, "tp-sceneimg");
+  }
+  function sceneAlt(){
+    var h = byK(TP.HOMES, PS.home), sc = byK(TP.SCENES, PS.scene), items = TP.SLOTS.map(function(s){ return PS.yard[s.k]; }).filter(Boolean).map(function(k){ return byK(TP.YARD, k).n.replace(/^A /, "a "); });
+    return "Timmy's place: " + h.n.replace(/^The /, "the ") + " on " + sc.n.replace(/^The /, "the ") + (items.length ? ", with " + (items.length > 1 ? items.slice(0, -1).join(", ") + " and " + items[items.length - 1] : items[0]) : "");
+  }
+  function crop(pts, pad){
+    var xs = [], ys = [];
+    pts.forEach(function(p){ var q = TP.project(p[0], p[1], p[2]); xs.push(q[0]); ys.push(q[1]); });
+    var x0 = Math.min.apply(null, xs) - pad, y0 = Math.min.apply(null, ys) - pad, x1 = Math.max.apply(null, xs) + pad, y1 = Math.max.apply(null, ys) + pad;
+    return [Math.round(x0), Math.round(y0), Math.round(x1 - x0), Math.round(y1 - y0)];
+  }
+  function cube(x0, y0, x1, y1, z){ return [[x0, y0, 0], [x1, y0, 0], [x1, y1, 0], [x0, y1, 0], [x0, y0, z], [x1, y0, z], [x1, y1, z], [x0, y1, z]]; }
+  var HOME_CROP = function(){ return crop(cube(1.2, 1.6, 10, 10.6, 11.6), 6); };
+  function slotCrop(k, wide){ var s = TP.SLOT_AT[k]; return crop(cube(s.x - .6, s.y - .6, s.x + TP.S + .6, s.y + (wide ? 7.5 : TP.S) + .6, 3.4), 8); }
+  function statueCrop(){ return crop(cube(1.9, 8.1, 4.2, 10.5, 3.6), 10); }
+
+  /* each rarity's card art, from the kit (frame()), as a picture with its own motion inside */
+  var FRAME_IMG = {};
+  function frameImg(r){
+    var k = r || "Common", key = k + (isStill() ? "-still" : "");
+    if (!FRAME_IMG[key]) {
+      var css = SA.CSS.split("\n").filter(function(l){ return /ts-r-|@keyframes ts-spin|prefers-reduced/.test(l); }).join("\n");
+      var s = SA.frame(k); if (!isStill()) s = s.replace(/(<svg[^>]*>)/, "$1<style>" + css + "</style>");
+      FRAME_IMG[key] = img(s, "", "tp-rframe");
+    }
+    return FRAME_IMG[key];
+  }
+  var THUMBS = {};
+  function thumbImg(kind, k, o){
+    var key = kind + ":" + k + ":" + JSON.stringify(o || {});
+    if (!THUMBS[key]) THUMBS[key] = kind === "outfit" ? img(timmySvg("happy", k), "") : img(TP.thumb(kind, k, o), "");
+    return THUMBS[key];
+  }
+  function cardName(n){ n = n.replace(/^(The|A|An) /, ""); return n.charAt(0).toUpperCase() + n.slice(1); }
+  /* a shop card: the rarity's art behind the thing itself, its name, rarity and price */
+  function rcard(x, thumb, on, data){
+    var r = x.rarity || "";
+    return '<button type="button" class="tp-rcard r-' + (r || "free") + (on ? " on" : "") + '" aria-pressed="' + (on ? "true" : "false") + '" ' + data + ">" + frameImg(r || "Common") +
+      (r ? '<span class="tp-rprice">' + priceOf(x) + "</span>" : "") +
+      '<span class="tp-rthumb">' + thumb + '</span><span class="tp-rtext"><span class="tp-rname">' + esc(cardName(x.n)) + '</span><span class="tp-rmeta">' + rarTag(r) + "</span></span></button>";
+  }
+
+  /* the same card where it's only shown, not picked (a shelf, a set) */
+  function scard(x, thumb, extra){ return rcard(x, thumb, false, "").replace('<button type="button" class="', '<span class="tp-static ').replace(/ aria-pressed="false"\s*>/, ">").replace(/<\/button>$/, (extra || "") + "</span>"); }
+  function kindOf(x){ return TP.HOMES.indexOf(x) >= 0 ? "home" : TP.SCENES.indexOf(x) >= 0 ? "scene" : TP.YARD.indexOf(x) >= 0 ? "yard" : "outfit"; }
+  function place(){
+    if (!TP) { $("#placeGrid").innerHTML = '<p class="note">place.js is missing: run node tools/figures/site/build.mjs</p>'; return; }
+    if (!$("#tpCss")) document.head.insertAdjacentHTML("beforeend", '<style id="tpCss">' + TP.CSS + "</style>");
+    $("#placeGrid").innerHTML =
+      '<div class="panel s12"><h3>Build it</h3><p>Play: tap things in the picture (the sun, the house, whatever’s in the yard) and Timmy hops over to see. Customize: the dock shows what’s in every spot now; tap one (or the spot in the picture) and the view moves in close on it while its drawer opens: homes and yard things on shelves, Timmy’s outfits on a wardrobe rail, each with Classics, Seasonal and Rank tabs. <b>Surprise me</b> redoes the whole place. <b>Timmy’s health</b> (under the picture) changes how he looks, moves and behaves: try the levels. Reduced motion: all still.</p>' +
+        '<div class="panel-body tp-build"><div class="tp-stage-wrap"><div class="tp-modebar"><div class="seg" role="group" aria-label="What tapping does">' +
+          '<button type="button" data-mode="play">Play</button><button type="button" data-mode="customize">Customize</button></div>' +
+          '<button type="button" class="tp-vrand tp-shuffle" id="tpShuffle">' + VIC.dice + '<span>Surprise me</span></button><button type="button" class="tp-zoom" id="tpZoom" aria-pressed="true">Close-up</button>' +
+          '<span class="tp-found" id="tpFound" aria-live="polite"></span></div>' +
+          '<div class="tp-stage" id="tpStage"></div><div class="tp-hp" id="tpHp"></div></div><div class="tp-side" id="tpSide"></div></div></div>' +
+      '<div class="panel s6"><h3>On the “you” card</h3><p>The small size, on the dashboard and in a hub’s More: what the builder shows, cropped close.</p><div class="panel-body"><div class="tp-card" id="tpCard"></div></div></div>' +
+      '<div class="panel s6 tp-short"><h3>How it’s built</h3><p>Slots, not free placement, so every combination looks right and nothing overlaps.</p><div class="panel-body tp-how"><ul>' +
+        "<li><b>No plot square:</b> each scene’s ground fills the picture, and the yard is its flat middle.</li>" +
+        "<li><b>Homes sit in their scene:</b> a soft shadow, the scene’s own ground round the walls, its path, tree and lamp.</li>" +
+        "<li><b>Five yard spots</b> along the front; the bowling lane takes two.</li>" +
+        "<li><b>What you’ve earned is part of it:</b> your rank is the statue by the door, and every hub you master goes in the display beside the house.</li>" +
+        "<li><b>Timmy hops on the ground</b> round the house and the yard things, never over them.</li>" +
+        "<li><b>Day and night</b> follow your clock (7 pm to 7 am).</li>" +
+        "<li><b>Light to load:</b> one kit draws every combination (about " + Math.round(TP.CSS.length / 1024 + 180) + " KB before compression), loaded only when his place is on screen.</li>" +
+        "</ul></div></div>" +
+      galleryPanel("tpThemes", "Themes", "Six sets of things that belong together, a scene, its homes, yard things and an outfit for Timmy, and the classics, which go anywhere. Every piece is sold on its own; a theme is just what matches.") +
+      galleryPanel("tpHomes", "The homes", "The cottage is free and stays every Timmy’s first home. Seven more from the shop, each shown in its own theme’s scene.") +
+      galleryPanel("tpNights", "At night", "Each home’s own lights: windows, a porch lamp, torches at the castle gate, fireflies round the mushroom, the lighthouse’s turning beam, the igloo’s glow, the observatory’s open slit.") +
+      galleryPanel("tpScenes", "The scenes", "Each with its own ground, path, tree and lamp, and something to find: number thirty-one’s house on the next hill and the rabbit down it, a whale and a crab, an owl in the pines, a yeti behind a rock, a friend in a crater, a hot-air balloon.") +
+      galleryPanel("tpYard", "The yard", "Twelve things for the yard spots, each drawn to fit one. Tap one in the builder for its egg.") +
+      galleryPanel("tpUps", "Upgrades of the home itself", "Fancy windows, a porch, a chimney and a Timmy flag: four shop items that every home draws its own way.") +
+      galleryPanel("tpPaint", "Paint", "Six colors: a home’s walls, or the mushroom’s cap, the castle’s roofs and banners, the lighthouse’s stripes, the igloo’s ice and the observatory’s dome.") +
+      galleryPanel("tpRanks", "Your rank", "The handpiece statue in each rank’s material. Every rank has three levels, I, II and III, and the statue stands on one step for each: one at I, two at II, three at III. Dark Matter glows, and its stars come out.") +
+      galleryPanel("tpMastery", "Hub mastery: the medal board", "Every hub you master hangs its medal on the board beside the house: the very medal the hub gives you, in miniature, with the hub’s ribbons, Bronze, Silver or Gold, and a crown on top for a Crown. It grows as you master more, and holds your best twenty. <b>Tap the board</b>, here or in the builder, and the big view opens with every hub’s medal at full size, its name and its level.") +
+      galleryPanel("tpJourneys", "Past the Handpiece: the ModuPro and the loupes", "New for phase 4, part C, for Sam’s look. At 125,000 XP the ModuPro journey starts: the pedestal by the door gets a wider base and carries a ModuPro (the two jaws of teeth on their hinge) in the rank’s material, on one step for each level, and the finished handpiece stands planted at its corner in Dark Matter. At 250,000 XP the loupes journey starts: the ModuPro is finished too, and Timmy wears loupes with a headlight in the rank’s material, under any hat. An outfit with its own eyewear, or one that covers his face, wins over the loupes.") +
+      galleryPanel("tpHealth", "Timmy’s health at home", "His HP shows at his place the way it does in the pet: the drawing (sparkles, then plaque, stains, a cavity, receding gums, a cracked cusp), how he moves (how high and fast he hops, how far he goes) and what he does (how much he wanders, how big his wave is, whether he’ll flip, what he says). At 0 HP he stays on the doorstep. Try it live in Build it, above. A visitor never sees it: a visited Timmy always looks well.") +
+      galleryPanel("tpRankSets", "Rank sets: earned, never sold", "Every full rank-up (not the I, II, III levels) gives Timmy an outfit and the yard a decoration in that rank’s material. These are the Handpiece’s six; the later journeys get theirs before anyone reaches them.") +
+      galleryPanel("tpColls", "The year-round collections", "New (2026-11-18, for Sam’s look): six more sets that belong together, drawn like a season’s, but never limited. Each is a Legendary home, an Epic scene, three outfits (Common, Uncommon, Rare) and three yard pieces (Uncommon, Rare, Epic), sold one by one in the daily and weekly picks all year. Tap a piece to try its collection at the place above.") +
+      galleryPanel("tpSets", "The seasonal sets", "Every season and holiday has a full set: a home and a scene (both Legendary), and a Rare, an Epic and a Legendary outfit and yard piece. A set is on sale only in its season (a short holiday for the seven days ending on its last day). Halloween’s is everyone’s from the start.") +
+      '<div class="panel s12"><h3>The shop</h3><p>A wooden shop: plank walls, a hanging sign, Timmy behind the counter and the pieces in wooden cabinets. Its shelves: daily picks, weekly picks, a seasonal shelf while a season is on, and on two days a month a “Back for today” shelf of three out-of-season pieces at their usual price, each marked with a small “Today only” stamp. <b>Tap any piece</b> and its window opens: the piece in its rarity’s display case, your place with it in, its set, the price against your crowns, Buy and Try. <b>Buying</b> plays out by rarity, with sound: coins fly in, the piece pops, and the party grows from a Common’s little pop to a Legendary’s charge-up, gold flash, confetti and fanfare (the speaker button turns sound off; reduced motion skips the animation). A design: the crowns here are made up, so buy away, and the real shop is part B.</p><div class="panel-body" id="tpShop"></div></div>' +
+      '<div class="panel s12"><h3>The rank board and visiting</h3><p>Every name has its rank’s handpiece beside it, and your own row carries your board name (never “You”) on a gold nameplate with your Timmy peeking over it. Everyone can be visited, with no switch to turn it off: tap <b>Visit</b> on a row, or <b>Visit someone random</b>, and clouds drift in from every side, cover the screen and scatter again over that person’s place. While you’re there, the arrows take you to the next or the last place, and <b>Back to mine</b> brings you home. A visitor sees the place under the board name and nothing else.</p><div class="panel-body tp-visiting" id="tpVisit"></div></div>' +
+      galleryPanel("tpShelf", "The shop’s own art: the coin and the shelf", "New for the shop’s art session, for Sam’s look. The Shiny Gold Crown beside a number at 16, 24 and 48 px (under 20 px it is a simpler cut, so it still reads), and what is always on the shelf: four snacks that heal Timmy (never sugar) and two XP boosts, each on a card in its rarity’s frame. The frames are told apart by their ornament as well as their color: rivets, a vine and a leaf, a cut gem, a star and rays, gold scrollwork and jewels.") +
+      galleryPanel("tpTen", "The shop’s ten outfits", "The five everyday outfits the catalog had no drawing for, and the five rare costumes. Each is shown twice: as it is, and in the Loupes journey. Safety glasses, the pirate’s patch, the astronaut’s helmet and Captain Enamel’s mask are their own eyewear, so they win over the loupes; the others leave room for them.") +
+      galleryPanel("tpFrames", "Rarity card art", "Every rarity has its own card in the shop and the customizer, and its own burst when you place something. Tap a card to see its burst.") +
+      galleryPanel("tpOutfits", "Outfits for Timmy", "One for each theme, drawn on the live Timmy the way his holiday outfits are.") +
+      galleryPanel("tpSeasons", "The seasons and holidays", "The yard follows the seasons and the holidays on any home and scene: the tree turns in the fall and blossoms in spring, snow and a snowman at Christmas, a prop by the door for each holiday.") +
+      '<div class="panel s12"><h3>Every easter egg</h3><p>What tapping each thing does, and what Timmy says. Spoilers, so it’s folded.</p><div class="panel-body"><details class="tp-eggs"><summary>Show all ' + Object.keys(TP.EGGS).length + "</summary><ul>" +
+        Object.keys(TP.EGGS).map(function(k){ var e = TP.EGGS[k]; return "<li><b>" + esc(e.n) + "</b> " + esc(e.does) + (e.say ? ": <q>" + esc(e.say) + "</q>" : "") + "</li>"; }).join("") + "</ul></details></div></div>";
+    $$(".tp-modebar [data-mode]").forEach(function(b){ b.addEventListener("click", function(){ PS.mode = b.dataset.mode; buildPlace(); }); });
+    $("#tpShuffle").addEventListener("click", shuffle);
+    $("#tpZoom").addEventListener("click", function(){ PS.wide = !PS.wide; buildPlace(); });
+    buildPlace();
+    shopMock(); visitMock();
+    lazyGalleries();
+  }
+  function galleryPanel(id, h, p){ return '<div class="panel s12"><h3>' + h + "</h3><p>" + p + '</p><div class="panel-body tp-gal" id="' + id + '" data-lazy="1"></div></div>'; }
+  function listN(names){ return names.length > 1 ? names.slice(0, -1).join(", ") + " and " + names[names.length - 1] : names[0] || ""; }
+  function themeFill(t){
+    var y = {}, order = ["left", "front", "right", "corner", "side"];
+    t.yard.forEach(function(k, i){ var it = byK(TP.YARD, k); if (it.wide) y.side = k; else y[order[i]] = k; });
+    return y;
+  }
+  var THEME_HOME = { hilltop: "cottage", seaside: "lighthouse", woodland: "treehouse", snowy: "igloo", starlight: "observatory", clouds: "castle" };
+  /* a gallery of sets (the seasons' or the collections'): each set's home in its scene with its yard and an outfit on
+     Timmy, then a card per piece; a tap tries the set at the builder's place (data-set-try) */
+  function setGallery(list, whenOf){
+    if (!list) return "";
+    return list.map(function(se){
+      var of = function(list){ return list.filter(function(x){ return x.set === se.k; }); }, homes = of(TP.HOMES), scenes = of(TP.SCENES), yard = of(TP.YARD), outfits = of(TP.OUTFITS);
+      var head = '<div class="tp-sethead"><b>' + esc(se.n) + "</b><span>" + esc(whenOf(se)) + "</span></div>";
+      if (!homes.length || !scenes.length) return '<div class="tp-set">' + head + '<p class="tp-note">Not drawn yet.</p></div>';
+      var yd = {}; yard.forEach(function(y, i){ yd[["left", "front", "right"][i]] = y.k; });
+      var pic = placeFig({ home: homes[0].k, scene: scenes[0].k, tier: 3, level: 2, yard: yd, up: { flag: true } }, "", "", "door", "tp-setpic", outfits.length ? outfits[outfits.length - 1].k : "");
+      var cards = homes.map(function(x){ return rcard(x, thumbImg("home", x.k, { scene: scenes[0].k }), false, 'data-set-try="' + se.k + '"'); })
+        .concat(scenes.map(function(x){ return rcard(x, thumbImg("scene", x.k), false, 'data-set-try="' + se.k + '"'); }),
+          outfits.map(function(x){ return rcard(x, thumbImg("outfit", x.k), false, 'data-set-try="' + se.k + '" data-set-outfit="' + x.k + '"'); }),
+          yard.map(function(x){ return rcard(x, thumbImg("yard", x.k, { scene: scenes[0].k }), false, 'data-set-try="' + se.k + '"'); }));
+      return '<div class="tp-set">' + head + '<div class="tp-setbody">' + pic + '<div class="tp-rcards">' + cards.join("") + "</div></div></div>";
+    }).join("");
+  }
+  var GALLERIES = {
+    tpThemes: function(){
+      return TP.THEMES.map(function(t){
+        var home = THEME_HOME[t.k] || "cottage", scene = t.scene || "hill", out = t.outfits[0] || "";
+        var pieces = [].concat(t.scene ? [byK(TP.SCENES, t.scene)] : [], t.homes.map(function(k){ return byK(TP.HOMES, k); }), t.yard.map(function(k){ return byK(TP.YARD, k); }), t.outfits.map(function(k){ return byK(TP.OUTFITS, k); }));
+        var list = '<span class="tp-pieces">' + pieces.map(function(x){ return '<span class="tp-piece">' + esc(cardName(x.n)) + " " + tagLine(x) + "</span>"; }).join("") + "</span>";
+        var o = { home: home, scene: scene, tier: 3, level: 2, yard: themeFill(t), up: { chimney: true, flag: true }, flair: FLAIRS[2] };
+        return placeFig(o, t.n, esc(t.note) + list + '<button type="button" class="btn tp-try" data-theme-try="' + t.k + '">Try it in the builder</button>', "lawn", "tp-theme", out);
+      }).join("");
+    },
+    tpHomes: function(){ return TP.HOMES.filter(builtIn).map(function(h){ var t = byK(TP.THEMES, h.theme) || {}; return placeFig({ home: h.k, scene: (t.scene) || "hill", tier: 1, yard: {} }, h.n, tagLine(h) + " " + esc(sentence(h.note)), "door"); }).join(""); },
+    tpNights: function(){ return TP.HOMES.filter(builtIn).map(function(h){ var up = {}; h.ups.forEach(function(k){ up[k] = true; }); return placeFig({ home: h.k, scene: "hill", tier: 3, night: true, up: up, yard: { front: "campfire" } }, h.n + " at night", "", "door"); }).join(""); },
+    tpScenes: function(){ return TP.SCENES.filter(builtIn).map(function(s){ return placeFig({ home: "cottage", scene: s.k, tier: 1, yard: {} }, s.n, tagLine(s) + " " + esc(sentence(s.note)), "door"); }).join(""); },
+    tpYard: function(){
+      return TP.YARD.filter(builtIn).map(function(y){ var t = byK(TP.THEMES, y.theme), sc = t && t.scene || "hill", k = y.wide ? "side" : "front", yd = {}; yd[k] = y.k;
+        return placeFig({ home: "cottage", scene: sc, tier: 0, bare: true, yard: yd, viewBox: slotCrop(k, y.wide) }, y.n, tagLine(y) + " " + esc(y.note), "", "tp-yardfig"); }).join("");
+    },
+    tpUps: function(){ return TP.HOMES.filter(builtIn).map(function(h){ var up = {}; h.ups.forEach(function(k){ if (k !== "paint") up[k] = true; });
+      return placeFig({ home: h.k, scene: "hill", tier: 0, up: up, yard: {}, viewBox: HOME_CROP() }, h.n, esc(h.ups.filter(function(k){ return k !== "paint"; }).map(function(k, i){ return i ? lowerFirst(h.upn[k]) : h.upn[k]; }).join(", "))); }).join("") +
+      '<div class="tp-upcards">' + TP.UPGRADES.map(function(u){ return '<span class="tp-piece">' + esc(cardName(u.n)) + " " + tagLine(u) + "</span>"; }).join("") + "</div>"; },
+    tpPaint: function(){ return TP.PAINTS.map(function(p){ return placeFig({ home: "cottage", scene: "hill", tier: 0, paint: p.k, yard: {}, viewBox: HOME_CROP() }, p.n, tagLine(p), "", "tp-small"); }).join("") +
+      TP.PAINTS.map(function(p){ return placeFig({ home: "lighthouse", scene: "hill", tier: 0, paint: p.k, yard: {}, viewBox: HOME_CROP() }, p.boldName + " stripes", "", "", "tp-small"); }).join(""); },
+    /* every rank has three levels and its statue stands on a step for each (Sam, 2026-11-10: the gallery showed the steps
+       for Gold only, which read as if only Gold had them) */
+    tpRanks: function(){
+      return TIER_NAMES.map(function(n, i){
+        return '<div class="tp-rankrow"><h5>' + hpImg(i, "tp-rankhp") + esc(n) + "</h5>" + LEVELS.map(function(l, k){
+          return placeFig({ home: "cottage", scene: "hill", tier: i, level: k + 1, yard: {}, viewBox: statueCrop(), night: i === 6 }, n + " " + l, (k + 1) + (k ? " steps" : " step"), "", "tp-small");
+        }).join("") + "</div>";
+      }).join("");
+    },
+    /* the medal board on a whole place (tap it for the big view), then close up at each size */
+    tpMastery: function(){
+      var vb = [185, 116, 70, 78];
+      var open = function(n, label){ return '<button type="button" class="btn tp-try" data-mastery-open="' + n + '">' + label + "</button>"; };
+      return placeFig({ home: "cottage", scene: "hill", tier: 4, level: 2, flair: FLAIRS[4], yard: { left: "garden", right: "hammock" } }, "On a place, by day", "Twelve hubs" + open(4, "Open the big view"), "door", "tp-wide") +
+        placeFig({ home: "castle", scene: "clouds", tier: 5, level: 3, night: true, flair: FLAIRS[5], yard: { left: "fountain", right: "telescope" } }, "At night the medals glow", "Twenty hubs" + open(5, "Open the big view"), "door", "tp-wide") +
+        FLAIRS.slice(1).map(function(fl, i){ return placeFig({ home: "cottage", scene: "hill", tier: 0, flair: fl, yard: {}, viewBox: vb }, FLAIR_NAMES[i + 1], open(i + 1, "Big view"), "", "tp-small"); }).join("");
+    },
+    /* the journeys' pieces (phase 4, part C): the ModuPro on the pedestal in each material, the Loupes journey's
+       pedestal, Timmy's loupes in each material, and how the loupes go with an outfit */
+    tpJourneys: function(){
+      var vb = crop(cube(2.0, 8.5, 4.1, 10.7, 3.5), 5), lv = function(i){ return i % 3 + 1; };
+      var worn = function(outfit, tier){ return TP.dress(timmyArt("happy"), outfit || "", { loupes: tier }); };
+      var tim = function(outfit, tier){ return { g: timmyG(worn(outfit, tier)), at: "door" }; };
+      var face = function(outfit, tier, cap, sub){ return '<figure class="tp-fig tp-face"><div class="tp-pic">' + img(worn(outfit, tier), cap) + "</div><figcaption><b>" + esc(cap) + "</b>" + (sub ? "<span>" + sub + "</span>" : "") + "</figcaption></figure>"; };
+      return '<div class="tp-jrow tp-jwide">' +
+        placeFig({ home: "cottage", scene: "hill", journey: 1, tier: 4, level: 2, flair: FLAIRS[3], yard: { left: "garden", right: "hammock" } }, "The ModuPro journey, by day", "ModuPro Gold II: two steps, the handpiece finished beside it", "door") +
+        placeFig({ home: "castle", scene: "clouds", journey: 2, tier: 5, level: 1, night: true, flair: FLAIRS[4], yard: { left: "fountain", right: "telescope" }, timmy: tim("", 5) }, "The loupes journey, at night", "Loupes Diamond I: both finished on the pedestal, the loupes on Timmy") + "</div>" +
+        '<div class="tp-jrow"><h5>The ModuPro, in each rank’s material</h5>' + TIER_NAMES.map(function(n, i){ return placeFig({ home: "cottage", scene: "hill", journey: 1, tier: i, level: lv(i), yard: {}, viewBox: vb, night: i === 6 }, "ModuPro " + n + " " + LEVELS[lv(i) - 1], lv(i) + (lv(i) > 1 ? " steps" : " step")); }).join("") +
+        placeFig({ home: "cottage", scene: "hill", journey: 2, tier: 0, level: 1, yard: {}, viewBox: vb }, "In the loupes journey", "Both finished, in Dark Matter") + "</div>" +
+        '<div class="tp-jrow"><h5>The loupes, in each rank’s material</h5>' + TIER_NAMES.map(function(n, i){ return face("", i, "Loupes " + n); }).join("") + "</div>" +
+        '<div class="tp-jrow"><h5>The loupes with an outfit</h5>' + [["ranger", "Under a hat", "The ranger hat"], ["surgical-scrubs", "With scrubs and a mask", "Ready for clinic"], ["rank-gold-outfit", "With a rank outfit", "Golden laurels and toga"], ["aviator", "Its own eyewear wins", "The aviator’s goggles, no loupes"], ["rank-silver-outfit", "A covered face wins", "The knight’s helm, no loupes"]].map(function(x){
+          return face(x[0], 4, x[1], x[2]); }).join("") + "</div>";
+    },
+    tpHealth: function(){
+      var o = { home: "cottage", scene: "hill", yard: { corner: "mailbox" } }, d = TP.layout(o).spots.corner, q = TP.project(d[0], d[1], d[2] || 0);
+      return TP.HEALTH.map(function(h){ return placeFig(Object.assign({ viewBox: [q[0] - 36, q[1] - 60, 62, 74] }, o), h.n, hpRange(h) + ". " + h.does + ".", "corner", "tp-small", "", h); }).join("");
+    },
+    tpRankSets: function(){
+      if (!TP.SETS) return "";
+      return TP.SETS.ranks.map(function(r){
+        var o = byK(TP.OUTFITS, r.outfit[0]), y = byK(TP.YARD, r.yard[0]);
+        if (!o || !y) return '<figure class="tp-fig"><figcaption><b>' + esc(r.rank) + "</b><span>Not drawn yet</span></figcaption></figure>";
+        return '<div class="tp-rankset"><div class="tp-sethead"><b>' + esc(r.rank) + '</b><span>Reach ' + esc(r.rank) + " I</span></div>" + '<div class="tp-rcards">' +
+          scard(o, thumbImg("outfit", o.k)) + scard(y, thumbImg("yard", y.k, {})) + "</div></div>"; }).join("");
+    },
+    tpSets: function(){ return setGallery(TP.SETS ? TP.SETS.seasons : null, function(se){ return se.when + (se.gift ? " · everyone’s from the start" : ""); }); },
+    /* the year-round collections (sets.mjs COLLECTIONS, 2026-11-18): drawn the same way, in the everyday rotation */
+    tpColls: function(){ return setGallery(TP.SETS ? TP.SETS.collections : null, function(se){ return se.note + " · all year"; }); },
+    tpFrames: function(){
+      var sample = { Common: ["yard", "mailbox"], Uncommon: ["yard", "campfire"], Rare: ["yard", "telescope"], Epic: ["home", "igloo"], Legendary: ["home", "lighthouse"] };
+      return SA.RARITIES.map(function(r){ var s = sample[r.k], x = s[0] === "home" ? byK(TP.HOMES, s[1]) : byK(TP.YARD, s[1]);
+        return '<div class="tp-framefig">' + rcard(x, thumbImg(s[0], s[1], {}), false, 'data-burst="' + r.k + '"') + "<p><b>" + esc(r.k) + "</b> " + fmtPrice(r.band[0]) + " to " + fmtPrice(r.band[1]) + "</p></div>"; }).join("");
+    },
+    tpOutfits: function(){
+      return TP.OUTFITS.filter(function(o){ return builtIn(o) && !o.costume && o.theme !== "classics"; }).map(function(o){ var t = byK(TP.THEMES, o.theme);
+        return '<figure class="tp-fig tp-outfig"><div class="tp-pic tp-outpic">' + thumbImg("outfit", o.k) + "</div><figcaption><b>" + esc(o.n) + "</b><span>" + tagLine(o) + " " + esc(t ? t.n : "") + "</span><span><q>" + esc(o.say[0]) + "</q></span></figcaption></figure>"; }).join("");
+    },
+    /* the shop's own art (session 1 of the shop): the coin beside a number at three sizes, and what is always on the
+       shelf, each as a card in its rarity's frame */
+    tpShelf: function(){
+      var coins = [[16, "1,250"], [24, "320"], [48, "20"]].map(function(q){ return '<span class="tp-coinfig"><span class="tp-coinnum" style="font-size:' + Math.max(13, Math.round(q[0] * .62)) + 'px">' + SA.coin(q[0]) + '<b class="num">' + q[1] + "</b></span><small>" + q[0] + " px</small></span>"; }).join("");
+      var cards = SA.ITEMS.map(function(it){ return '<div class="tp-framefig">' + scard({ n: it.n, rarity: it.rarity, price: it.price }, img(SA.thumb(it.id), "")) + "<p>" + esc(it.note) + "</p></div>"; }).join("");
+      return '<div class="tp-coinrow">' + coins + "</div>" + cards;
+    },
+    /* the shop's ten outfits on the live Timmy: the five everyday ones and the five rare costumes, each again with the
+       loupes of the Loupes journey (an outfit with its own eyewear keeps it) */
+    tpTen: function(){
+      var ten = ["scrub-cap", "bow-tie", "safety-glasses", "white-coat", "graduation-cap", "pirate", "astronaut", "detective", "chef", "captain-enamel"].map(function(k){ return byK(TP.OUTFITS, k); }).filter(Boolean);
+      return ten.map(function(o){ var own = TP.NO_LOUPES.indexOf(o.k) >= 0;
+        return '<figure class="tp-fig tp-outfig"><div class="tp-pic tp-outpic tp-pair">' + thumbImg("outfit", o.k) + img(TP.dress(timmyArt("happy"), o.k, { loupes: 4 }), "") + "</div><figcaption><b>" + esc(o.n) + "</b><span>" + tagLine(o) + " " + (o.costume ? "Rare costume" : "Everyday") + "</span><span>" + (own ? "Its own eyewear, so no loupes" : "Right: with the Gold loupes") + "</span><span><q>" + esc(o.say[0]) + "</q></span></figcaption></figure>"; }).join("");
+    },
+    tpSeasons: function(){
+      var list = [["", "fall", "Fall"], ["", "spring", "Spring"], ["winter", "", "Christmas"], ["halloween", "fall", "Halloween"], ["thanksgiving", "fall", "Thanksgiving"], ["newyear", "", "New Year's"], ["valentine", "", "Valentine's Day"], ["stpatrick", "spring", "St. Patrick's Day"], ["easter", "spring", "Easter"], ["dentist", "", "Dentist's Day"]];
+      var homes = TP.HOMES.filter(builtIn);
+      return list.map(function(x, i){ return placeFig({ home: homes[i % homes.length].k, scene: i === 2 ? "forest" : "hill", tier: 2, holiday: x[0], season: x[1], yard: { front: "garden" } }, x[2], "", "", "tp-small"); }).join("");
+    }
+  };
+  function lazyGalleries(){
+    var draw = function(el){ if (!el.dataset.lazy) return; delete el.dataset.lazy; el.innerHTML = GALLERIES[el.id]().replace(/<img /g, '<img loading="lazy" '); wireGallery(el); };
+    var els = $$(".tp-gal[data-lazy]");
+    if (!("IntersectionObserver" in window)) { els.forEach(draw); return; }
+    var io = new IntersectionObserver(function(es){ es.forEach(function(e){ if (e.isIntersecting) { io.unobserve(e.target); draw(e.target); } }); }, { rootMargin: "900px 0px" });
+    els.forEach(function(el){ io.observe(el); });
+    lazyGalleries.all = function(){ els.forEach(function(el){ io.unobserve(el); draw(el); }); };
+  }
+  function wireGallery(el){
+    $$("[data-theme-try]", el).forEach(function(b){ b.addEventListener("click", function(){
+      var t = byK(TP.THEMES, b.dataset.themeTry);
+      PS.scene = t.scene || PS.scene; PS.home = THEME_HOME[t.k] || PS.home; PS.yard = themeFill(t); PS.outfit = t.outfits[0] || ""; PS.paint = "cream";
+      buildPlace({ burst: "home" }); $("#place").scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "start" }); }); });
+    $$("[data-mastery-open]", el).forEach(function(b){ b.addEventListener("click", function(){ openMastery(FLAIRS[+b.dataset.masteryOpen]); }); });
+    $$("[data-set-try]", el).forEach(function(b){ b.addEventListener("click", function(){
+      var k = b.dataset.setTry, of = function(list){ return list.filter(function(x){ return x.set === k; }); }, yd = {};
+      of(TP.YARD).forEach(function(y, i){ yd[["left", "front", "right"][i]] = y.k; });
+      PS.home = of(TP.HOMES)[0].k; PS.scene = of(TP.SCENES)[0].k; PS.yard = yd; PS.paint = "cream"; PS.outfit = b.dataset.setOutfit || (of(TP.OUTFITS)[2] || {}).k || "";
+      buildPlace({ burst: "home" }); $("#place").scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "start" }); }); });
+    $$("[data-burst]", el).forEach(function(b){ b.addEventListener("click", function(){
+      if (isStill()) return;
+      var old = $(".tp-cardburst", b); if (old) old.remove();
+      b.insertAdjacentHTML("beforeend", '<span class="tp-cardburst">' + TP.burst(b.dataset.burst) + "</span>");
+      setTimeout(function(){ var n = $(".tp-cardburst", b); if (n) n.remove(); }, 1600); }); });
+  }
+
+  /* ---------- the stage: the scene inline (a shadow root), Timmy hopping, eggs, the customize targets ---------- */
+  var STAGE_CSS = [
+    ":host{display:block}.tp-box{position:relative;line-height:0}.tp-box>svg.tp-scene{display:block;width:100%;height:auto;user-select:none;-webkit-user-select:none}",
+    ".tp-egg{outline:none}.tp-egg:focus-visible{filter:drop-shadow(0 0 2px #fff) drop-shadow(0 0 2px #fff)}.tp-timmy{cursor:pointer}",
+    ".tp-hit{position:absolute;inset:0;width:100%;height:100%}.tp-hitarea{fill:transparent;stroke:transparent;stroke-width:2;cursor:pointer;outline:none;transition:fill .15s}",
+    ".tp-hitarea:hover,.tp-hitarea:focus-visible{fill:rgba(255,255,255,.2);stroke:#fff;stroke-dasharray:4 4}.tp-hitarea.on{stroke:#fff;stroke-width:2.6;stroke-dasharray:5 4;fill:rgba(255,255,255,.16)}",
+    ".tp-hithome.on,.tp-hithome:hover,.tp-hithome:focus-visible{fill:rgba(255,255,255,.08)}",
+    /* the speech bubble comes from Timmy: it sits over his head, its tail points at him, and it follows him as he hops */
+    ".tp-bubble{position:absolute;left:0;top:0;width:max-content;max-width:min(72%,300px);transform:translateY(5px) scale(.96);transform-origin:var(--tail,50%) 100%;background:#fff;color:#3B2E3A;border:2px solid #3B2E3A;border-radius:14px;",
+    "padding:6px 11px;font:inherit;font-size:13.5px;font-weight:650;line-height:1.35;opacity:0;transition:opacity .18s,transform .18s;pointer-events:none;text-align:center;z-index:2}",
+    ".tp-bubble.on{opacity:1;transform:none}",
+    ".tp-bubble::before,.tp-bubble::after{content:'';position:absolute;left:var(--tail,50%);top:100%;transform:translateX(-50%);border-left:7px solid transparent;border-right:7px solid transparent;border-top:9px solid #3B2E3A}",
+    ".tp-bubble::after{border-left-width:5px;border-right-width:5px;border-top:7px solid #fff;margin-top:-.5px}",
+    ".tp-bubble.below{transform-origin:var(--tail,50%) 0}.tp-bubble.below::before,.tp-bubble.below::after{top:auto;bottom:100%;border-top:0;border-bottom:9px solid #3B2E3A}.tp-bubble.below::after{border-bottom:7px solid #fff;margin:0 0 -.5px}.tp-bubble.small{font-size:12px;padding:5px 9px;max-width:min(66%,220px)}",
+    ".tp-burstpos{position:absolute;width:26%;aspect-ratio:1;transform:translate(-50%,-50%);pointer-events:none;line-height:0}",
+    /* Timmy waves with his right arm (the same move as the pet's do-wave) */
+    ".tp-timmy .shpet-arm-r{transform-box:fill-box;transform-origin:0% 40%}.tp-timmy.do-wave .shpet-arm-r{animation:tp-wave .38s ease-in-out var(--wn,6) alternate}@keyframes tp-wave{from{transform:rotate(0)}to{transform:rotate(var(--wa,-58deg))}}",
+    /* how he stands follows his health: a bounce at his best, a droop and sway when he hurts, a shiver at his worst */
+    ".tp-tmood{transform-box:fill-box;transform-origin:50% 100%}",
+    ".tp-timmy.hl-bounce .tp-tmood{animation:tp-hl-bounce 1.1s ease-in-out infinite}@keyframes tp-hl-bounce{0%,100%{transform:translateY(0) scale(1,1)}50%{transform:translateY(-1.7px) scale(.985,1.025)}}",
+    ".tp-timmy.hl-droop .tp-tmood{animation:tp-hl-droop 3.6s ease-in-out infinite}@keyframes tp-hl-droop{0%,100%{transform:rotate(-2.4deg) scale(1,.962)}50%{transform:rotate(2.4deg) scale(1.012,.948)}}",
+    ".tp-timmy.hl-shiver .tp-tmood{animation:tp-hl-shiver 2.2s linear infinite}@keyframes tp-hl-shiver{0%,56%,100%{transform:translateX(0) scale(1.01,.935)}60%,68%,76%,84%,92%{transform:translateX(-.55px) scale(1.01,.935)}64%,72%,80%,88%,96%{transform:translateX(.55px) scale(1.01,.935)}}",
+    ".tp-still .tp-tmood{animation:none!important}.tp-still .tp-timmy.hl-droop .tp-tmood{transform:scale(1,.96)}.tp-still .tp-timmy.hl-shiver .tp-tmood{transform:scale(1.01,.935)}",
+    "@media (prefers-reduced-motion: reduce){.tp-bubble{transition:none}.tp-timmy.do-wave .shpet-arm-r,.tp-tmood{animation:none!important}}"
+  ].join("\n");
+  var ST = { at: "door", pos: null, dir: 1, busy: false, next: null, raf: 0, tg: null, tw: null, face: null, depth: null, sr: null, wander: 0, lastTap: 0, layout: null, visible: true };
+  function buildPlace(opt){
+    opt = opt || {};
+    var host = $("#tpStage"); if (!host.shadowRoot) host.attachShadow({ mode: "open" });
+    var sr = host.shadowRoot, still = isStill(), o = tpOpts({ marks: PS.mode === "customize" && PS.pick !== "timmy" }), L = TP.layout(o), vb = TP.VIEWBOX;
+    cancelAnimationFrame(ST.raf); ST.busy = false; ST.next = null; ST.bub = null;
+    if (!L.spots[ST.at]) ST.at = "door";
+    var H = HL(); if (H.stay) ST.at = "door";
+    o.timmy = { g: timmyG(timmySvg(H.art, PS.outfit), H), at: ST.at };
+    var r = TP.render(o);
+    var hits = PS.mode !== "customize" ? "" : '<svg class="tp-hit" viewBox="' + vb.join(" ") + '" aria-label="Spots you can change">' +
+      Object.keys(r.slots).map(function(k){ var it = PS.yard[k], name = byK(TP.SLOTS, k).n;
+        return '<path class="tp-hitarea' + (PS.pick === k ? " on" : "") + '" data-pick="' + k + '" d="' + r.slots[k] + '" tabindex="0" role="button" aria-label="' + esc(name + ": " + (it ? byK(TP.YARD, it).n : "empty") + ". Change it") + '"/>'; }).join("") +
+      '<path class="tp-hitarea tp-hithome' + (PS.pick === "home" ? " on" : "") + '" data-pick="home" d="' + r.homeHit + '" tabindex="0" role="button" aria-label="' + esc(byK(TP.HOMES, PS.home).n + ". Change it") + '"/></svg>';
+    host.classList.toggle("is-night", !!(o.night || byK(TP.SCENES, PS.scene).alwaysNight));
+    sr.innerHTML = "<style>" + TP.CSS + "\n" + STAGE_CSS + "</style>" + '<div class="tp-box' + (still ? " tp-still" : "") + '">' +
+      r.svg.replace(' aria-hidden="true" focusable="false"', ' role="group" aria-label="' + esc(sceneAlt()) + '"') + hits + '<div class="tp-bubble" role="status" aria-live="polite"></div></div>';
+    ST.sr = sr; ST.layout = L; ST.depth = $(".tp-depth", sr); ST.tg = $(".tp-timmy", sr); ST.tw = ST.tg && ST.tg.parentNode; ST.face = ST.tg && $(".tp-tface", ST.tg);
+    ST.pos = L.spots[ST.at].slice(); setTimmy(ST.pos, 0, 1, 1);
+    camTo($$("svg.tp-scene, svg.tp-hit", sr), camFor(), still);
+    var zb = $("#tpZoom"); zb.hidden = PS.mode !== "customize"; zb.setAttribute("aria-pressed", PS.wide ? "false" : "true");
+    if (ST.tg) { ST.tg.setAttribute("role", "button"); ST.tg.setAttribute("tabindex", "0"); ST.tg.setAttribute("aria-label", "Timmy, " + H.n.toLowerCase() + ", " + PS.hp + " HP");
+      if (H.idle) ST.tg.classList.add("hl-" + H.idle);
+      ST.tg.addEventListener("click", function(e){ e.stopPropagation(); tapTimmy(); }); keyed(ST.tg, tapTimmy); }
+    $$(".tp-egg", sr).forEach(function(g){
+      var k = g.dataset.egg, e = TP.EGGS[k] || TP.EGGS.home;
+      g.setAttribute("role", "button"); g.setAttribute("tabindex", "0"); g.setAttribute("aria-label", e.n + ": " + e.does);
+      g.addEventListener("click", function(ev){ ev.stopPropagation(); playEgg(g); });
+      keyed(g, function(){ playEgg(g); });
+    });
+    $$(".tp-hitarea", sr).forEach(function(p){
+      var go = function(){ PS.pick = p.dataset.pick; buildPlace(); var n = ST.sr && $('.tp-hitarea[data-pick="' + PS.pick + '"]', ST.sr); if (n) n.focus(); };
+      p.addEventListener("click", function(e){ e.stopPropagation(); go(); }); keyed(p, go);
+    });
+    $$(".tp-modebar [data-mode]").forEach(function(b){ b.setAttribute("aria-pressed", b.dataset.mode === PS.mode ? "true" : "false"); });
+    found();
+    if (opt.burst) sfx("pop");
+    if (opt.burst && !still) burstAt(opt.burst);
+    if (opt.burst && opt.burst !== "home" && L.spots[opt.burst]) setTimeout(function(){ goTo(opt.burst); }, still ? 0 : 450);
+    if (opt.say) say(opt.say);
+    wanderOn();
+    side();
+    placeCard();
+    hpUI();
+  }
+  /* the health control under the picture: a preview of what the hubs will feed in (his HP follows your studying) */
+  var HP_PRESET = { sparkling: 100, healthy: 82, plaque: 62, stains: 48, cavity: 32, perio: 18, fracture: 6, zero: 0 };
+  function hpUI(){
+    var el = $("#tpHp"); if (!el) return;
+    var H = HL();
+    if (!el.firstChild) {
+      el.innerHTML = '<div class="tp-hphead"><b>Timmy’s health</b><output id="tpHpOut" for="tpHpRange"></output></div>' +
+        '<input type="range" id="tpHpRange" min="0" max="100" step="1" aria-label="Timmy’s HP">' +
+        '<div class="tp-hpsteps" role="group" aria-label="Health levels">' + TP.HEALTH.map(function(h){ return '<button type="button" data-hp="' + h.k + '" title="' + esc(hpRange(h)) + '">' + esc(h.n) + "</button>"; }).join("") + "</div>" +
+        '<p class="tp-note" id="tpHpDoes"></p><p class="tp-note tp-hpnote">A preview: in the hubs his HP follows your studying. Visitors never see it.</p>';
+      var set = function(v, speak){ PS.hp = Math.max(0, Math.min(100, Math.round(v))); var h = HL(); buildPlace(speak ? { say: hpLine(h.hello[0]) } : {}); };
+      $("#tpHpRange", el).addEventListener("input", function(e){ PS.hp = +e.target.value; hpUI(); });
+      $("#tpHpRange", el).addEventListener("change", function(e){ set(+e.target.value, true); });
+      $$("[data-hp]", el).forEach(function(b){ b.addEventListener("click", function(){ set(HP_PRESET[b.dataset.hp], true); }); });
+    }
+    $("#tpHpRange", el).value = PS.hp; el.dataset.level = H.k;
+    $("#tpHpRange", el).style.setProperty("--fill", PS.hp + "%");
+    $("#tpHpOut", el).textContent = PS.hp + " HP · " + H.n;
+    $("#tpHpDoes", el).textContent = H.does + ".";
+    $$("[data-hp]", el).forEach(function(b){ b.setAttribute("aria-pressed", b.dataset.hp === H.k ? "true" : "false"); });
+  }
+  /* the camera: in Customize the view moves in on what's being changed (the home, a yard spot, Timmy), and back out for
+     the scene, for Play and when Close-up is off. One viewBox, eased, shared by the picture and its tap areas */
+  function camFor(){
+    var V = TP.VIEWBOX, c, frac;
+    if (PS.mode !== "customize" || PS.wide || PS.pick === "scene" || !ST.layout) return V.slice();
+    if (PS.pick === "home") { c = HOME_CROP(); frac = .74; }
+    else if (PS.pick === "timmy") { var sp = ST.layout.spots[ST.at] || ST.layout.spots.door, q = TP.project(sp[0], sp[1], sp[2] || 0); c = [q[0] - 22, q[1] - 62, 44, 70]; frac = .46; }
+    else { var it = byK(TP.YARD, PS.yard[PS.pick] || ""); c = slotCrop(PS.pick, it && it.wide); frac = .58; }
+    var w = Math.min(V[2], Math.max(c[2] * 1.2, c[3] * 1.2 * V[2] / V[3], V[2] * frac)), h = w * V[3] / V[2];
+    return [Math.max(V[0], Math.min(V[0] + V[2] - w, c[0] + c[2] / 2 - w / 2)), Math.max(V[1], Math.min(V[1] + V[3] - h, c[1] + c[3] / 2 - h / 2)), w, h];
+  }
+  function camTo(svgs, to, now){
+    cancelAnimationFrame(ST.camRaf); ST.camGoal = to;
+    var from = ST.cam || TP.VIEWBOX.slice(), set = function(v){ ST.cam = v; svgs.forEach(function(n){ n.setAttribute("viewBox", v.map(function(x){ return x.toFixed(2); }).join(" ")); }); bubbleAt(); };
+    if (now || from.join() === to.join()) { set(to.slice()); return; }
+    set(from); var t0 = performance.now();
+    var step = function(t){ var u = Math.min(1, (t - t0) / 560), e = 1 - Math.pow(1 - u, 3); set(from.map(function(a, i){ return a + (to[i] - a) * e; })); if (u < 1) ST.camRaf = requestAnimationFrame(step); };
+    ST.camRaf = requestAnimationFrame(step);
+  }
+  /* Surprise me: a whole new place, from everything there is */
+  function shuffle(){
+    var any = function(l){ return l[Math.floor(Math.random() * l.length)]; }, yard = {}, small = TP.YARD.filter(function(y){ return !y.wide; });
+    ["left", "front", "right", "corner", "side"].forEach(function(k){ if (Math.random() < .72) { var y = any(small), used = Object.keys(yard).some(function(q){ return yard[q] === y.k; }); if (!used) yard[k] = y.k; } });
+    PS.home = any(TP.HOMES).k; PS.scene = any(TP.SCENES).k; PS.yard = yard; PS.outfit = Math.random() < .8 ? any(TP.OUTFITS).k : ""; PS.paint = any(TP.PAINTS).k;
+    PS.up = {}; (byK(TP.HOMES, PS.home).ups || []).forEach(function(u){ if (u !== "paint" && Math.random() < .5) PS.up[u] = true; });
+    var was = PS.wide; PS.wide = true; buildPlace({ burst: "home", say: "A whole new look! What do you think?" }); PS.wide = was;
+    if (!isStill()) setTimeout(function(){ flip(true); }, 500);
+  }
+  function keyed(el, fn){ el.addEventListener("keydown", function(e){ if (e.key === "Enter" || e.key === " "){ e.preventDefault(); e.stopPropagation(); fn(); } }); }
+  function found(){
+    var eggs = ST.sr ? $$(".tp-egg", ST.sr).map(function(g){ return g.dataset.egg; }) : [], seen = {};
+    eggs.forEach(function(k){ seen[k] = 1; });
+    var n = Object.keys(seen).length, got = Object.keys(seen).filter(function(k){ return PS.found[k]; }).length;
+    $("#tpFound").textContent = PS.mode === "play" ? (got ? got + " of " + n + " surprises found here" : n + " things here do something when tapped") : "Tap a dashed spot or the house";
+  }
+  function say(text){
+    var b = ST.sr && $(".tp-bubble", ST.sr); if (!b || !text) return;
+    b.textContent = text; b.classList.toggle("small", b.parentNode.clientWidth < 440); ST.bub = { el: b, w: b.offsetWidth, h: b.offsetHeight }; bubbleAt();
+    b.classList.add("on"); clearTimeout(say.t); say.t = setTimeout(function(){ b.classList.remove("on"); ST.bub = null; }, 3200);
+  }
+  /* put the bubble over Timmy's head (under him when there's no room above), kept inside the picture, its tail on him */
+  function bubbleAt(){
+    var u = ST.bub; if (!u || !ST.pos) return;
+    var box = u.el.parentNode, W = box.clientWidth, H = box.clientHeight, vb = ST.cam || TP.VIEWBOX, q = TP.project(ST.pos[0], ST.pos[1], ST.pos[2] || 0), k = TP.VIEWBOX[2] / vb[2];
+    var x = (q[0] - vb[0]) / vb[2] * W, head = (q[1] - (PS.outfit ? 60 : 50) - vb[1]) / vb[3] * H, feet = (q[1] + 4 - vb[1]) / vb[3] * H; void k;
+    var left = Math.max(6, Math.min(W - u.w - 6, x - u.w / 2)), below = head - u.h - 11 < 4, top = below ? feet + 11 : head - u.h - 11;
+    u.el.style.left = left.toFixed(1) + "px"; u.el.style.top = top.toFixed(1) + "px"; u.el.style.setProperty("--tail", Math.max(16, Math.min(u.w - 16, x - left)).toFixed(1) + "px"); u.el.classList.toggle("below", below);
+  }
+  function rankLine(){ return "Your rank, " + TIER_NAMES[PS.tier] + " " + LEVELS[PS.level - 1] + (PS.level < 3 ? ". One more step at the next level." : PS.tier < 6 ? ". The next rank changes what it's made of." : ". Made of Dark Matter, and it glows."); }
+  /* one shared window for the big views (mastery, a shop item): a dialog that closes on its X, Escape or a tap outside */
+  function openDlg(html, cls){
+    var d = $("#tpDlg");
+    if (!d) { d = document.createElement("dialog"); d.id = "tpDlg"; document.body.appendChild(d);
+      d.addEventListener("click", function(e){ if (e.target === d || e.target.closest("[data-dlg-close]")) d.close(); }); }
+    d.className = "tp-dlg " + (cls || ""); d.innerHTML = html;
+    if (d.open) d.close();
+    if (d.showModal) d.showModal(); else d.setAttribute("open", "");
+    return d;
+  }
+  var DLG_X = '<button type="button" class="tp-dlgx" data-dlg-close aria-label="Close"><svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button>';
+  /* hub mastery, large: the board opened up. Every hub's own medal (the same art the hub shows when you earn it), with its
+     name and level, best first, then the hubs with no medal yet. The made-up hubs still to come wear the placeholder
+     medal with their own ribbon colors, since a real hub always has its own set */
+  function mixHex(a, b, t){
+    var h = function(c){ c = c.replace("#", ""); return [0, 2, 4].map(function(i){ return parseInt(c.slice(i, i + 2), 16); }); }, x = h(a), y = h(b);
+    return "#" + x.map(function(v, i){ return ("0" + Math.round(v + (y[i] - v) * t).toString(16)).slice(-2); }).join("");
+  }
+  function medalImg(x, cls){
+    var lvl = Math.max(1, x.lvl), own = A.medals[x.hub], art = (own || A.medals.generic)[lvl - 1], g = A.tints.generic;
+    if (!own && x.tint && /^#[0-9a-f]{6}$/i.test(x.tint)) art = art.split(g.ink).join(x.tint).split(mixHex(g.ink, "#000000", .28)).join(mixHex(x.tint, "#000000", .28))
+      .split(g.mid).join(mixHex(x.tint, "#FFFFFF", .42)).split(mixHex(g.mid, "#000000", .2)).join(mixHex(x.tint, "#FFFFFF", .2));
+    return img(art, "", "tp-medal " + (cls || ""), "0 0 64 64");
+  }
+  function openMastery(flair){
+    var list = (flair || []).slice().sort(function(a, b){ return b.lvl - a.lvl; }), n = [0, 0, 0, 0, 0]; list.forEach(function(x){ n[x.lvl]++; });
+    var todo = [0, 1].map(function(i){ return { hub: "hub-" + (list.length + 7 + i), lvl: 0, tint: "" }; });
+    var chips = [4, 3, 2, 1].filter(function(l){ return n[l]; }).map(function(l){ return '<span class="tp-mchip">' + medalImg({ hub: "generic", lvl: l }) + "<b class=\"num\">" + n[l] + "</b> " + TP.MEDALS[l] + "</span>"; }).join("");
+    var card = function(x, i){ return '<li class="tp-mcard lvl-' + x.lvl + '" style="--i:' + i + '">' + medalImg(x) + "<b>" + esc(hubLabel(x.hub)) + '</b><span class="tp-mlvl">' + (x.lvl ? TP.MEDALS[x.lvl] : "No medal yet") + "</span></li>"; };
+    openDlg('<div class="tp-mboard">' + DLG_X +
+      '<div class="tp-mhead"><span class="tp-mcrest" aria-hidden="true">' + (list.length ? medalImg(list[0]) : medalImg({ hub: "generic", lvl: 1 }, "is-none")) + '</span><div><h3 id="tpDlgT">Your hub mastery</h3>' +
+        "<p>" + (list.length ? list.length + (list.length === 1 ? " hub" : " hubs") + " mastered" : "No hubs mastered yet: your first medal hangs here") + "</p></div></div>" +
+      (chips ? '<p class="tp-mchips">' + chips + "</p>" : "") +
+      '<ul class="tp-mgrid">' + list.concat(todo).map(card).join("") + "</ul>" +
+      '<p class="tp-mfoot">These are the medals each hub gives you, the same ones that pop up when you earn them. The board by the house hangs your best twenty.</p></div>', "tp-mdlg").setAttribute("aria-labelledby", "tpDlgT");
+  }
+  function masteryLine(){
+    var fl = FLAIRS[PS.flair], n = [0, 0, 0, 0, 0]; fl.forEach(function(x){ n[x.lvl]++; });
+    var parts = [[4, "Crown"], [3, "Gold"], [2, "Silver"], [1, "Bronze"]].filter(function(q){ return n[q[0]]; }).map(function(q){ return n[q[0]] + " " + q[1]; });
+    return fl.length + (fl.length === 1 ? " hub" : " hubs") + " mastered: " + listN(parts) + ".";
+  }
+  function playEgg(g){
+    var k = g.dataset.egg, e = TP.EGGS[k] || {};
+    g.classList.remove("tp-on"); void g.getBoundingClientRect(); g.classList.add("tp-on");
+    clearTimeout(g._t); g._t = setTimeout(function(){ g.classList.remove("tp-on"); }, 2600);
+    PS.found[k] = 1; found();
+    var H = HL(), line = k === "statue" ? rankLine() : k === "mastery" ? masteryLine() : e.say;
+    if (H.stay && k !== "mastery" && k !== "statue") { ST.rested = !ST.rested; line = ST.rested ? H.rest : line; }
+    say(line);
+    ST.lastTap = Date.now();
+    if (k === "mastery") { clearTimeout(ST.mt); ST.mt = setTimeout(function(){ openMastery(FLAIRS[PS.flair]); }, isStill() ? 0 : 650); }
+    if (isStill()) return;
+    var target = spotFor(g);
+    if (H.stay) { lookAt(target); return; }
+    if (target) goTo(target); else hopInPlace();
+  }
+  /* he turns to face a spot without leaving his own */
+  function lookAt(spot){
+    var sp = ST.layout && ST.layout.spots[spot]; if (!sp || !ST.pos || ST.busy) return;
+    var a = TP.project(ST.pos[0], ST.pos[1], 0), b = TP.project(sp[0], sp[1], 0);
+    if (Math.abs(b[0] - a[0]) > .5) { ST.dir = b[0] < a[0] ? -1 : 1; setTimmy(ST.pos, 0, 1, 1); }
+  }
+  /* where Timmy goes to see a thing: its yard spot, the door for the home and what's by it, else the nearest spot when
+     it stands on the ground in the yard; things in the sky or far off, he hops where he is */
+  function spotFor(g){
+    var it = g.closest(".tp-item"), k = g.dataset.egg, sp = ST.layout.spots;
+    if (it && sp[it.dataset.slot]) return it.dataset.slot;
+    if (k === "home" || k === "statue" || k === "brush" || k === "mastery") return sp.deck && Math.random() < .4 ? "deck" : "door";
+    var b; try { b = g.getBBox(); } catch (x) { return null; }
+    var q = TP.unproject(b.x + b.width / 2, b.y + b.height);
+    if (!(q[0] > -2 && q[1] > -2 && q[0] < 16.5 && q[1] < 16.5)) return null;
+    var best = null, bd = 1e9; Object.keys(sp).forEach(function(s){ var p = sp[s], d = (p[0] - q[0]) * (p[0] - q[0]) + (p[1] - q[1]) * (p[1] - q[1]); if (d < bd) { bd = d; best = s; } });
+    return best;
+  }
+  function setTimmy(p, arc, kx, ky){
+    if (!ST.tg) return;
+    var q = TP.project(p[0], p[1], p[2] || 0);
+    ST.tg.setAttribute("transform", "translate(" + q[0].toFixed(1) + " " + (q[1] - arc).toFixed(1) + ")");
+    ST.face.setAttribute("transform", "scale(" + (ST.dir * kx).toFixed(3) + " " + ky.toFixed(3) + ")");
+    /* drawn in the scene's depth order: in front of what's behind him, behind what's in front */
+    var z = p[0] + p[1] + .3, c = ST.depth.firstChild;
+    while (c && (c === ST.tw || +c.getAttribute("data-z") <= z)) c = c.nextSibling;
+    if (c !== ST.tw.nextSibling) ST.depth.insertBefore(ST.tw, c);
+    if (ST.bub) { var keep = ST.pos; ST.pos = p; bubbleAt(); ST.pos = keep; }
+  }
+  function lerp(a, b, t){ return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, (a[2] || 0) + ((b[2] || 0) - (a[2] || 0)) * t]; }
+  function goTo(spot){
+    if (!ST.layout || !ST.layout.spots[spot]) return;
+    if (HL().stay && spot !== "door") { lookAt(spot); return; }
+    if (isStill()) { ST.at = spot; ST.pos = ST.layout.spots[spot].slice(); setTimmy(ST.pos, 0, 1, 1); return; }
+    if (ST.busy) { ST.next = spot; return; }
+    if (spot === ST.at) { hopInPlace(); return; }
+    var path = TP.route(tpOpts(), ST.at, spot); ST.at = spot;
+    hops(path);
+  }
+  function hops(path, plain){
+    var list = [], H = HL(), stride = 1.15 * H.stride, soft = Math.min(1, H.hop + .25);
+    for (var i = 1; i < path.length; i++){
+      var a = path[i - 1], b = path[i], dz = (b[2] || 0) - (a[2] || 0), d = Math.sqrt((b[0] - a[0]) * (b[0] - a[0]) + (b[1] - a[1]) * (b[1] - a[1]) + dz * dz * 1.4);
+      var n = Math.max(1, Math.ceil(d / stride));
+      for (var j = 0; j < n; j++) list.push([lerp(a, b, j / n), lerp(a, b, (j + 1) / n), Math.abs(dz) > .3]);
+    }
+    if (!list.length) return;
+    ST.busy = true;
+    var hi = 0, t0 = performance.now(), AIR = 260 * H.pace, LAND = 90 * Math.max(1, H.pace * .8) + (H.hop < .5 ? 40 : 0), cheer = H.cheer && !plain;
+    var start = function(h){ var p = TP.project(h[0][0], h[0][1], h[0][2]), q = TP.project(h[1][0], h[1][1], h[1][2]); if (Math.abs(q[0] - p[0]) > .5) ST.dir = q[0] < p[0] ? -1 : 1; };
+    start(list[0]);
+    var frame = function(now){
+      if (!ST.tg) { ST.busy = false; return; }
+      var h = list[hi], t = now - t0;
+      /* a hop; with no hop left in him (hop 0) it's a limp: he dips and leans into each short step */
+      if (t < AIR) { var u = t / AIR, e = u < .5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2, w = Math.sin(Math.PI * u);
+        if (H.hop > 0) setTimmy(lerp(h[0], h[1], e), w * (h[2] ? 3 : 6) * H.hop, 1 - .04 * w * soft, 1 + .07 * w * soft);
+        else setTimmy(lerp(h[0], h[1], e), 0, 1 + .05 * w, 1 - .07 * w); }
+      else if (t < AIR + LAND) { var v = Math.sin(Math.PI * (t - AIR) / LAND); setTimmy(h[1], 0, 1 + .1 * v * soft, 1 - .13 * v * soft); }
+      else {
+        hi++; t0 = now;
+        if (hi >= list.length) { ST.busy = false; ST.pos = h[1]; setTimmy(h[1], 0, 1, 1); if (ST.next) { var n = ST.next; ST.next = null; goTo(n); } else if (cheer) hopInPlace(); return; }
+        start(list[hi]);
+      }
+      ST.raf = requestAnimationFrame(frame);
+    };
+    ST.raf = requestAnimationFrame(frame);
+  }
+  function hopInPlace(){ if (isStill() || ST.busy || !ST.pos || HL().hop <= 0) return; hops([ST.pos, ST.pos.slice(0, 2).concat([(ST.pos[2] || 0) + .01]), ST.pos], true); }
+  /* Timmy waves hello when he's tapped (and now and then by himself); tap him again while he's waving and he flips */
+  function wave(quiet){
+    if (!ST.tg) return;
+    var H = HL();
+    if (quiet !== true) { PS.found.timmy = 1; found(); say(hpLine(H.hello[(wave.n = (wave.n || 0) + 1) % H.hello.length])); }
+    if (isStill()) return;
+    ST.tg.style.setProperty("--wn", H.wave[0]); ST.tg.style.setProperty("--wa", -H.wave[1] + "deg");
+    ST.tg.classList.remove("do-wave"); void ST.tg.getBoundingClientRect(); ST.tg.classList.add("do-wave"); ST.waveAt = Date.now(); ST.waveFor = H.wave[0] * 380 + 120;
+    clearTimeout(wave.t); wave.t = setTimeout(function(){ if (ST.tg) ST.tg.classList.remove("do-wave"); }, ST.waveFor);
+  }
+  /* a second tap while he waves: a flip when he's well; when he isn't, he says why not (and manages a small hop if he can) */
+  function tapTimmy(){
+    ST.lastTap = Date.now();
+    var H = HL(), again = Date.now() - (ST.waveAt || 0) < Math.max(1400, ST.waveFor || 2400) && !isStill();
+    if (!again) { wave(); return; }
+    ST.waveAt = 0; if (ST.tg) ST.tg.classList.remove("do-wave");
+    if (H.flip) flip(); else { PS.found.timmy = 1; found(); say(hpLine(H.tired)); hopInPlace(); }
+  }
+  function flip(quiet){
+    if (quiet !== true) { PS.found.timmy = 1; found(); say(TP.EGGS.timmy.say); }
+    if (isStill() || ST.busy || !ST.pos) return;
+    var twice = HL().k === "sparkling";
+    ST.busy = true; var t0 = performance.now(), D = twice ? 860 : 620, p = ST.pos;
+    var frame = function(now){
+      if (!ST.tg) { ST.busy = false; return; }
+      var u = Math.min(1, (now - t0) / D);
+      setTimmy(p, Math.sin(Math.PI * u) * (twice ? 22 : 16), Math.cos(u * Math.PI * (twice ? 4 : 2)), 1);
+      if (u < 1) ST.raf = requestAnimationFrame(frame); else { setTimmy(p, 0, 1, 1); ST.busy = false; }
+    };
+    ST.raf = requestAnimationFrame(frame);
+  }
+  /* while it's on screen and nobody's tapping, he does something now and then: how often he wanders off, how far, and
+     what he does instead all follow his health */
+  function wanderOn(){
+    if (ST.wander) return;
+    var host = $("#tpStage");
+    if ("IntersectionObserver" in window) new IntersectionObserver(function(es){ ST.visible = es[0].isIntersecting; }).observe(host);
+    ST.wander = setInterval(function(){
+      if (isStill() || PS.mode !== "play" || ST.busy || !ST.visible || document.hidden || Date.now() - ST.lastTap < 6000 || !ST.layout) return;
+      var H = HL(), sp = ST.layout.spots;
+      if (H.stay) return;
+      if (Math.random() > H.roam) {
+        if (H.idle === "bounce") { if (Math.random() < .4) flip(true); else if (Math.random() < .5) hopInPlace(); else wave(true); }
+        else if (H.wave[0] >= 4 && Math.random() < .55) wave(true);
+        return;
+      }
+      var keys = Object.keys(sp).filter(function(k){ return k !== ST.at; });
+      if (H.near) { var d = sp.door; keys = keys.filter(function(k){ var q = sp[k]; return k === "door" || k === "deck" || Math.sqrt((q[0] - d[0]) * (q[0] - d[0]) + (q[1] - d[1]) * (q[1] - d[1])) < 4.2; }); }
+      if (keys.length) goTo(keys[Math.floor(Math.random() * keys.length)]);
+    }, 5200);
+  }
+  function burstAt(where){
+    var it = where === "home" ? null : PS.yard[where], x = it ? byK(TP.YARD, it) : byK(TP.HOMES, PS.home), r = x && x.rarity || "Common", vb = ST.camGoal || TP.VIEWBOX, q;
+    if (where === "home") q = TP.project(5.5, 5.5, 4);
+    else { var s = TP.SLOT_AT[where]; q = TP.project(s.x + TP.S / 2, s.y + (x && x.wide ? 3.75 : TP.S / 2), 1); }
+    var box = ST.sr && $(".tp-box", ST.sr); if (!box) return;
+    box.insertAdjacentHTML("beforeend", '<div class="tp-burstpos" style="width:' + (26 * TP.VIEWBOX[2] / vb[2]).toFixed(1) + "%;left:" + ((q[0] - vb[0]) / vb[2] * 100).toFixed(2) + "%;top:" + ((q[1] - vb[1]) / vb[3] * 100).toFixed(2) + '%">' + TP.burst(r) + "</div>");
+    setTimeout(function(){ var b = ST.sr && $(".tp-burstpos", ST.sr); if (b) b.remove(); }, 1700);
+  }
+
+  /* ---------- the side panel: what to change, as rarity cards ---------- */
+  function chip(label, on, data, extra){ return '<button type="button" class="tp-chip' + (on ? " on" : "") + '" aria-pressed="' + (on ? "true" : "false") + '" ' + data + ">" + (extra || "") + esc(label) + "</button>"; }
+  var DOCK_N = { right: "Back", side: "Side", left: "Path, left", front: "Path, right", corner: "Front" };
+  var DRAWER = { home: ["Homes", "The cottage is free. Everything else is on its shelf."], scene: ["Scenes", "Where the whole place stands."], timmy: ["Timmy’s wardrobe", "Pick an outfit off the rail."] };
+  function side(){
+    var el = $("#tpSide"), pick = PS.pick, h = byK(TP.HOMES, PS.home), lane = PS.yard.side === "lane";
+    if (pick === "corner" && lane) pick = PS.pick = "side";
+    /* the dock: what's in every spot right now, as pictures */
+    var tile = function(k, label, pic, full, small){ return '<button type="button" class="tp-dtile' + (small ? " is-slot" : "") + (pick === k ? " on" : "") + (pic ? "" : " is-empty") + '" data-pick="' + k + '" aria-pressed="' + (pick === k) + '" aria-label="' + esc(full) + '"><span class="tp-dpic">' + (pic || '<svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><path d="M10 4.500v11M4.500 10h11" fill="none" stroke="currentColor" stroke-width="2.400" stroke-linecap="round"/></svg>') + "</span><b>" + esc(label) + "</b></button>"; };
+    var cur0 = byK(TP.OUTFITS, PS.outfit), sc = byK(TP.SCENES, PS.scene);
+    var dock = '<div class="tp-dock" role="group" aria-label="What to change"><div class="tp-dmain">' +
+      tile("home", "Home", thumbImg("home", PS.home, { scene: PS.scene }), "Home: " + h.n) + tile("scene", "Scene", thumbImg("scene", PS.scene), "Scene: " + sc.n) + tile("timmy", "Timmy", thumbImg("outfit", PS.outfit), "Timmy: " + (cur0 ? cur0.n : "no outfit")) + "</div>" +
+      '<div class="tp-dyard"><span class="tp-dlab">The yard</span>' + TP.SLOTS.filter(function(q){ return !(q.k === "corner" && lane); }).map(function(q){ var it = byK(TP.YARD, PS.yard[q.k] || "");
+        return tile(q.k, DOCK_N[q.k] || q.n, it ? thumbImg("yard", it.k, { scene: PS.scene }) : "", q.n + ": " + (it ? it.n : "empty"), true); }).join("") + "</div></div>";
+    /* the drawer: one kind of thing, in three tabs (the classics, the seasonal sets by set, the rank rewards) */
+    var kind = pick === "home" || pick === "scene" || pick === "timmy" ? pick : "yard", sl = kind === "yard" ? byK(TP.SLOTS, pick) : null, curK = kind === "home" ? PS.home : kind === "scene" ? PS.scene : kind === "timmy" ? PS.outfit : PS.yard[pick];
+    var list = kind === "home" ? TP.HOMES : kind === "scene" ? TP.SCENES : kind === "timmy" ? TP.OUTFITS : TP.YARD.filter(function(y){ return !y.wide || pick === "side" || pick === "corner"; });
+    var data = kind === "home" ? "data-home" : kind === "scene" ? "data-scene" : kind === "timmy" ? "data-outfit" : "data-item";
+    var card = function(x){ return rcard(x, kind === "timmy" ? thumbImg("outfit", x.k) : kind === "scene" ? thumbImg("scene", x.k) : thumbImg(kind, x.k, { scene: PS.scene }), x.k === curK, data + '="' + x.k + '"'); };
+    var cur = byK(list, curK || ""), groups = [["classic", "Classics", list.filter(builtIn)], ["coll", "Collections", list.filter(inColl)], ["sets", "Seasonal", list.filter(inSets)], ["rank", "Rank", list.filter(byRank)]].filter(function(g){ return g[2].length; });
+    var src = side.src[kind]; if (!src || side.last !== pick + ":" + (curK || "")) src = cur && inColl(cur) ? "coll" : cur && inSets(cur) ? "sets" : cur && byRank(cur) ? "rank" : src || "classic";
+    if (!groups.some(function(g){ return g[0] === src; })) src = groups[0][0];
+    side.src[kind] = src; side.last = pick + ":" + (curK || "");
+    var tabs = groups.length < 2 ? "" : '<div class="seg tp-dsrc" role="group" aria-label="Which pieces">' + groups.map(function(g){ return '<button type="button" data-src="' + g[0] + '" aria-pressed="' + (g[0] === src) + '">' + g[1] + ' <span class="num">' + g[2].length + "</span></button>"; }).join("") + "</div>";
+    var shown = groups.filter(function(g){ return g[0] === src; })[0][2], rack = kind === "timmy" ? "tp-rail" : "tp-plank", cards;
+    if (src === "sets" || src === "coll") cards = (src === "coll" ? TP.SETS.collections || [] : TP.SETS.seasons).map(function(se){ var mine = shown.filter(function(x){ return x.set === se.k; }); return mine.length ? '<h5 class="tp-seth">' + esc(se.n) + (se.gift ? " <small>yours already</small>" : "") + '</h5><div class="tp-rcards ' + rack + '">' + mine.map(card).join("") + "</div>" : ""; }).join("");
+    else cards = '<div class="tp-rcards ' + rack + '">' + (kind === "timmy" && src === "classic" ? rcard({ n: "Just Timmy", rarity: "", price: 0 }, thumbImg("outfit", ""), !PS.outfit, 'data-outfit=""') : "") + shown.map(card).join("") + "</div>" +
+      (src === "rank" ? '<p class="tp-note">Rank pieces are earned, never sold: one outfit and one yard piece at every full rank-up.</p>' : "");
+    var head = sl ? [sl.n, cur ? "Here now: " + lowerFirst(cur.n) + "." : "Nothing here yet. Pick something for it."] : [DRAWER[kind][0], kind === "timmy" ? (cur ? "Wearing " + lowerFirst(cur.n) + "." : DRAWER.timmy[1]) : (cur ? "Now: " + lowerFirst(cur.n) + ". " : "") + DRAWER[kind][1]];
+    var body = '<div class="tp-dhead"><div><h4>' + esc(head[0]) + "</h4><p>" + esc(head[1]) + "</p></div>" + (sl && cur ? '<button type="button" class="btn tp-dclear" data-item="">Clear this spot</button>' : "") + "</div>" + tabs + '<div class="tp-dcards">' + cards + "</div>";
+    if (kind === "home") body += '<div class="tp-dextra"><h4>Upgrades for ' + esc(h.n.replace(/^The /, "the ")) + '</h4><div class="tp-opts">' + TP.UPGRADES.filter(function(u){ return h.ups.indexOf(u.k) >= 0; }).map(function(u){
+          var on = !!PS.up[u.k], own = h.upn[u.k], same = cardName(own).toLowerCase() === cardName(u.n).toLowerCase();
+          return '<button type="button" class="tp-upg' + (on ? " on" : "") + '" aria-pressed="' + on + '" data-up="' + u.k + '">' + rarTag(u.rarity) +
+            '<span class="tp-upn"><b>' + esc(cardName(u.n)) + "</b><small>" + esc(same ? "" : own) + "</small></span>" + price(u.price) + "</button>"; }).join("") + "</div>" +
+        (h.ups.indexOf("paint") < 0 ? "" : "<h4>" + esc(h.upn.paint) + '</h4><div class="tp-opts tp-paints">' + TP.PAINTS.map(function(p){ var bold = /mushroom|castle|lighthouse/.test(PS.home) || !!h.set, c = h.set && p.k === "cream" ? "#F4EFE6" : bold ? p.bold : p.c;
+          return '<button type="button" class="tp-swatch' + (PS.paint === p.k ? " on" : "") + '" data-paint="' + p.k + '" aria-pressed="' + (PS.paint === p.k) + '" aria-label="' + esc(bold ? p.boldName : p.n) + '" title="' + esc((bold ? p.boldName : p.n) + (p.price ? ", " + p.price + " gold crowns" : ", free")) + '" style="--sw:' + c + '"></button>'; }).join("") + "</div>") + "</div>";
+    if (kind === "yard" && (pick === "side" || pick === "corner")) body += '<p class="tp-note">The bowling lane is long: it takes the side yard and the front corner together.</p>';
+    body += '<div class="tp-shop"><a class="btn" href="#tpShop">Get more in the shop</a><span class="tp-note">Here everything is yours to try. Prices are in Shiny Gold Crowns.</span></div>';
+    var prev = '<details class="tp-prev"' + (side.open ? " open" : "") + "><summary>Preview only: time, rank, season</summary>" +
+      '<div class="tp-ctl"><span>Time</span><div class="seg" role="group" aria-label="Time of day">' + [["clock", "Your clock"], ["day", "Day"], ["night", "Night"]].map(function(t){ return '<button type="button" data-time="' + t[0] + '" aria-pressed="' + (PS.time === t[0]) + '">' + t[1] + "</button>"; }).join("") + "</div></div>" +
+      selRow("Rank", "tier", TIER_NAMES.map(function(n, i){ return [i, n]; }), PS.tier) +
+      selRow("Level", "level", LEVELS.map(function(n, i){ return [i + 1, n]; }), PS.level) +
+      selRow("Mastery", "flair", FLAIR_NAMES.map(function(n, i){ return [i, n]; }), PS.flair) +
+      selRow("Season", "season", SEASONS, PS.season) + selRow("Holiday", "holiday", HOLS, PS.holiday) +
+      '<label class="tp-ctl tp-check"><input type="checkbox" data-still="1"' + (PS.still ? " checked" : "") + "> Show it as reduced motion does (still)</label></div></details>";
+    var keep = $(".tp-dcards", el), top = keep && side.kept === kind + src ? keep.scrollTop : 0; side.kept = kind + src;
+    el.innerHTML = dock + '<div class="tp-drawer d-' + kind + '">' + body + "</div>" + prev;
+    if (top) $(".tp-dcards", el).scrollTop = top;
+    $(".tp-prev", el).addEventListener("toggle", function(e){ side.open = e.target.open; });
+    $$("[data-src]", el).forEach(function(b){ b.addEventListener("click", function(){ side.src[kind] = b.dataset.src; side(); var n = $('[data-src="' + b.dataset.src + '"]', el); if (n) n.focus(); }); });
+    $$("[data-pick]", el).forEach(function(b){ b.addEventListener("click", function(){ PS.pick = b.dataset.pick; PS.mode = "customize"; buildPlace(); var n = $('.tp-dtile[data-pick="' + PS.pick + '"]', el); if (n) n.focus({ preventScroll: true }); }); });
+    $$("[data-home]", el).forEach(function(b){ b.addEventListener("click", function(){ if (PS.home === b.dataset.home) return; PS.home = b.dataset.home; buildPlace({ burst: "home", say: byK(TP.HOMES, PS.home).n + ". Home sweet home." }); }); });
+    $$("[data-up]", el).forEach(function(b){ b.addEventListener("click", function(){ PS.up[b.dataset.up] = !PS.up[b.dataset.up]; buildPlace(PS.up[b.dataset.up] ? { burst: "home" } : {}); }); });
+    $$("[data-paint]", el).forEach(function(b){ b.addEventListener("click", function(){ PS.paint = b.dataset.paint; buildPlace(); }); });
+    $$("[data-scene]", el).forEach(function(b){ b.addEventListener("click", function(){ PS.scene = b.dataset.scene; buildPlace({ say: byK(TP.SCENES, PS.scene).n + ". Let's look around." }); }); });
+    $$("[data-outfit]", el).forEach(function(b){ b.addEventListener("click", function(){ PS.outfit = b.dataset.outfit; var o = byK(TP.OUTFITS, PS.outfit); buildPlace({ say: o ? o.say[0] : "Back to just me." }); if (!isStill()) setTimeout(function(){ flip(true); }, 120); }); });
+    $$("[data-item]", el).forEach(function(b){ b.addEventListener("click", function(){
+      var k = PS.pick, it = b.dataset.item;
+      if (it === "lane") { delete PS.yard.corner; PS.yard.side = "lane"; k = PS.pick = "side"; }
+      else if (it) { if (k === "side" && PS.yard.side === "lane" && it !== "lane") delete PS.yard.side; PS.yard[k] = it; }
+      else delete PS.yard[k];
+      buildPlace(it ? { burst: k, say: "New: " + byK(TP.YARD, it).n.replace(/^A /, "a ") + "." } : {}); }); });
+    $$("[data-time]", el).forEach(function(b){ b.addEventListener("click", function(){ PS.time = b.dataset.time; buildPlace(); }); });
+    $$("select[data-k]", el).forEach(function(s){ s.addEventListener("change", function(){ var k = s.dataset.k; PS[k] = k === "tier" || k === "flair" || k === "level" ? +s.value : s.value; buildPlace(); }); });
+    $("[data-still]", el).addEventListener("change", function(e){ PS.still = e.target.checked; buildPlace(); });
+  }
+  side.src = {};
+  function selRow(label, k, opts, cur){
+    return '<label class="tp-ctl"><span>' + label + '</span><span class="select-wrap"><select class="select" data-k="' + k + '">' + opts.map(function(o){ return '<option value="' + o[0] + '"' + (String(o[0]) === String(cur) ? " selected" : "") + ">" + esc(o[1]) + "</option>"; }).join("") + "</select>" + icon("chevron", 18) + "</span></label>";
+  }
+  function placeCard(){
+    var o = tpOpts({ viewBox: TP.CARD, timmy: { g: timmyG(timmySvg(HL().art, PS.outfit), HL()), at: "door" } }), rr = TP.render(o), h = byK(TP.HOMES, PS.home), s = byK(TP.SCENES, PS.scene);
+    $("#tpCard").innerHTML = '<div class="tp-pic tp-cardpic' + (o.night ? " is-night" : "") + '">' + sceneImg(rr.svg, sceneAlt(), isStill()) + "</div>" +
+      '<div class="tp-cardfoot"><div><b>Timmy’s place</b><span>' + esc(h.n) + " · " + esc(s.n.replace(/^The /, "the ")) + '</span></div><a class="btn" href="#place">Change it</a></div>';
+  }
+
+  /* ---------- the shop: a storefront of shelves (what get_my_shop returns: today, this week, the season, a throwback),
+     and a window that opens on any piece. A mock: the wallet and what's owned live on this page only ---------- */
+  var SHOP = { wallet: 3450, owned: {} };
+  var KIND_N = { home: "Home", scene: "Scene", yard: "Yard piece", outfit: "Outfit for Timmy" };
+  var SIC = {
+    clock: '<svg viewBox="0 0 20 20" width="15" height="15" aria-hidden="true"><circle cx="10" cy="10" r="7.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10 5.800V10l2.800 1.900" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    glass: '<svg viewBox="0 0 20 20" width="15" height="15" aria-hidden="true"><path d="M5 2.500h10M5 17.500h10M6.200 2.500c0 4 3.800 5 3.800 7.500s-3.800 3.500-3.800 7.500M13.800 2.500c0 4-3.800 5-3.800 7.500s3.800 3.500 3.800 7.500" fill="none" stroke="currentColor" stroke-width="1.900" stroke-linecap="round" stroke-linejoin="round"/><path d="M7.600 16.500c.6-1.900 4.200-1.900 4.800 0Z" fill="currentColor"/></svg>',
+    check: '<svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M4.500 10.500l3.700 3.700L15.500 6.500" fill="none" stroke="currentColor" stroke-width="2.800" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+  };
+  /* sound cues, synthesized (no files): a tick when a window opens, coins when you pay, a fanfare that grows with the
+     rarity, a thud when you can't afford it, a whoosh for the clouds. One switch turns them off; the real thing follows
+     the site's own sound setting */
+  var SND = { on: true, ctx: null };
+  try { SND.on = localStorage.getItem("sh_design_sound") !== "off"; } catch (e) {}
+  function audio(){
+    if (!SND.on) return null;
+    try { if (!SND.ctx) SND.ctx = new (window.AudioContext || window.webkitAudioContext)(); if (SND.ctx.state === "suspended") SND.ctx.resume(); return SND.ctx; } catch (e) { return null; }
+  }
+  function tone(f, at, dur, type, vol, to){
+    var c = audio(); if (!c) return;
+    var o = c.createOscillator(), g = c.createGain(), t = c.currentTime + .02 + at;
+    o.type = type || "triangle"; o.frequency.setValueAtTime(f, t); if (to) o.frequency.exponentialRampToValueAtTime(to, t + dur);
+    g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(vol || .08, t + .012); g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+    o.connect(g); g.connect(c.destination); o.start(t); o.stop(t + dur + .03);
+  }
+  function hiss(at, dur, vol, f0, f1){
+    var c = audio(); if (!c) return;
+    var n = Math.floor(c.sampleRate * dur), buf = c.createBuffer(1, n, c.sampleRate), d = buf.getChannelData(0); for (var i = 0; i < n; i++) d[i] = Math.random() * 2 - 1;
+    var src = c.createBufferSource(), flt = c.createBiquadFilter(), g = c.createGain(), t = c.currentTime + .02 + at; src.buffer = buf; flt.type = "bandpass"; flt.Q.value = .8;
+    flt.frequency.setValueAtTime(f0, t); flt.frequency.exponentialRampToValueAtTime(f1, t + dur * .5); flt.frequency.exponentialRampToValueAtTime(f0, t + dur);
+    g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + dur * .45); g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+    src.connect(flt); flt.connect(g); g.connect(c.destination); src.start(t); src.stop(t + dur + .05);
+  }
+  var NOTE = { G4: 392, C5: 523.25, D5: 587.33, E5: 659.25, Fs5: 739.99, G5: 783.99, A5: 880, C6: 1046.5, D6: 1174.66, E6: 1318.51, Fs6: 1479.98, G6: 1567.98, C7: 2093 };
+  function sfx(k, at){
+    at = at || 0;
+    if (k === "open") { tone(660, at, .07, "triangle", .06); tone(990, at + .05, .1, "triangle", .05); }
+    else if (k === "pop") tone(320, at, .12, "sine", .1, 640);
+    else if (k === "deny") { tone(196, at, .16, "triangle", .1, 130); tone(147, at + .12, .2, "triangle", .08, 98); }
+    else if (k === "coins") for (var i = 0; i < 5; i++) { tone(i % 2 ? 1976 : 1568, at + i * .075, .09, "triangle", .06); tone(i % 2 ? 3136 : 2637, at + i * .075 + .015, .06, "sine", .03); }
+    else if (k === "whoosh") hiss(at, 1.5, .09, 280, 1900);
+    else if (k === "rise") { tone(196, at, .72, "triangle", .07, 784); tone(98, at, .72, "sine", .08, 196); hiss(at, .72, .04, 500, 3200); }
+    else if (k === "Common") { tone(NOTE.C5, at, .12, "triangle", .09); tone(NOTE.E5, at + .09, .2, "triangle", .09); }
+    else if (k === "Uncommon") { [NOTE.C5, NOTE.E5, NOTE.G5].forEach(function(f, i){ tone(f, at + i * .09, i === 2 ? .3 : .12, "triangle", .09); }); }
+    else if (k === "Rare") { [NOTE.C5, NOTE.E5, NOTE.G5, NOTE.C6].forEach(function(f, i){ tone(f, at + i * .085, i === 3 ? .45 : .12, "triangle", .09); }); tone(NOTE.C7, at + .36, .3, "sine", .03); tone(NOTE.G6, at + .44, .3, "sine", .03); }
+    else if (k === "Epic") { [NOTE.D5, NOTE.Fs5, NOTE.A5, NOTE.D6, NOTE.Fs6].forEach(function(f, i){ tone(f, at + i * .08, i === 4 ? .6 : .12, "triangle", .09); });
+      [293.66, 440, NOTE.Fs5].forEach(function(f){ tone(f, at + .32, .75, "sine", .05); }); [NOTE.D6, NOTE.Fs6, 1760].forEach(function(f, i){ tone(f * 2, at + .5 + i * .07, .22, "sine", .02); }); tone(110, at, .3, "sine", .12, 55); }
+    else if (k === "Legendary") { [NOTE.G4, NOTE.C5, NOTE.E5, NOTE.G5].forEach(function(f, i){ tone(f, at + i * .07, .11, "triangle", .1); }); tone(NOTE.C6, at + .3, 1.1, "triangle", .1);
+      [261.63, 329.63, 392, NOTE.C5].forEach(function(f){ tone(f, at + .3, 1.2, "sine", .05); }); [NOTE.E6, NOTE.G6, NOTE.C7, NOTE.G6, NOTE.C7].forEach(function(f, i){ tone(f, at + .5 + i * .09, .2, "sine", .03); });
+      tone(90, at, .4, "sine", .16, 40); tone(90, at + .3, .5, "sine", .14, 40); hiss(at + .28, .8, .04, 2500, 6000); }
+  }
+  function allPieces(){ return TP.HOMES.concat(TP.SCENES, TP.OUTFITS, TP.YARD); }
+  function seasonOf(x){ return x.set && x.set !== "rank" && TP.SETS ? TP.SETS.seasons.filter(function(q){ return q.k === x.set; })[0] : null; }
+  function pieceId(x){ return kindOf(x) + ":" + x.k; }
+  function pieceBy(id){ var q = id.split(":"), list = q[0] === "home" ? TP.HOMES : q[0] === "scene" ? TP.SCENES : q[0] === "yard" ? TP.YARD : TP.OUTFITS; return byK(list, q[1]); }
+  /* a set piece is shown in its own set's scene, anything else in yours */
+  function sceneFor(x){ var sc = x.set ? TP.SCENES.filter(function(q){ return q.set === x.set; })[0] : null; return sc ? sc.k : PS.scene; }
+  function pieceThumb(x){ var kind = kindOf(x); return kind === "outfit" ? thumbImg("outfit", x.k) : kind === "scene" ? thumbImg("scene", x.k) : thumbImg(kind, x.k, { scene: sceneFor(x) }); }
+  function slotFor(x){ if (x.wide) return "side"; var free = ["left", "front", "right", "corner"].filter(function(k){ return !PS.yard[k] && !(k === "corner" && PS.yard.side === "lane"); }); return free[0] || "left"; }
+  /* your place with the piece in it (the window's "At my place" view, and what "Try it" does to the builder) */
+  function withPiece(x, apply){
+    var kind = kindOf(x), t = apply ? PS : { home: PS.home, scene: PS.scene, outfit: PS.outfit, yard: Object.assign({}, PS.yard) };
+    if (kind === "home") t.home = x.k; else if (kind === "scene") t.scene = x.k; else if (kind === "outfit") t.outfit = x.k;
+    else { var sl = slotFor(x); if (x.wide) delete t.yard.corner; else if (sl === "side" && t.yard.side === "lane") delete t.yard.side; t.yard[sl] = x.k; if (apply) PS.pick = sl; }
+    if (apply) { if (kind !== "yard") PS.pick = kind === "outfit" ? "timmy" : kind; return null; }
+    return tpOpts({ home: t.home, scene: t.scene, yard: t.yard, timmy: { g: timmyG(timmySvg("happy", t.outfit)), at: "door" } });
+  }
+  function shopCard(x, shelf){
+    var own = SHOP.owned[pieceId(x)], extra = (shelf === "back" ? '<span class="tp-stamp">' + SIC.glass + "<b>Today only</b></span>" : "") + (own ? '<span class="tp-owned">' + SIC.check + "Yours</span>" : "");
+    return rcard(x, pieceThumb(x), false, 'data-shop="' + pieceId(x) + '" data-shelf="' + shelf + '" aria-label="' + esc(cardName(x.n) + ", " + (x.rarity || "") + ", " + (own ? "yours" : fmtPrice(x.price || 0) + " crowns") + (shelf === "back" ? ", back for today only" : "") + ". Open") + '"')
+      .replace(' aria-pressed="false"', "").replace(/<\/button>$/, extra + "</button>");
+  }
+  /* a layer of the shop's storefront as a picture, with its own motion inside (still when the page is) */
+  var STORE_IMG = {};
+  function storeImg(layer){
+    var key = layer + (isStill() ? "-still" : "");
+    if (!STORE_IMG[key]) {
+      var css = SA.CSS.split("\n").filter(function(l){ return /ts-s-|@keyframes ts-spin|@keyframes ts-r-tw|prefers-reduced/.test(l); }).join("\n");
+      var svg = SA.store(layer); if (!isStill()) svg = svg.replace(/(<svg[^>]*>)/, "$1<style>" + css + "</style>");
+      STORE_IMG[key] = img(svg, "", "tp-frontart");
+    }
+    return STORE_IMG[key];
+  }
+  /* the shop: a storefront with Timmy at the counter, the day's showcase on a stand, then the shelves */
+  function shopMock(){
+    var el = $("#tpShop"); if (!el) return;
+    var pick = function(list, ks){ return ks.map(function(k){ return byK(list, k); }).filter(Boolean); };
+    var head = function(title, when, ic, note){ return '<header><h4 class="tp-tagsign">' + esc(title) + '</h4><span class="tp-when">' + ic + esc(when) + "</span>" + (note ? '<p class="tp-note">' + esc(note) + "</p>" : "") + "</header>"; };
+    var shelf = function(k, title, when, ic, note, items){ return '<section class="tp-shelf tp-shelf-' + k + '">' + head(title, when, ic, note) +
+      '<div class="tp-rcards tp-plank" style="--n:' + items.length + '">' + items.map(function(x){ return typeof x === "string" ? x : shopCard(x, k); }).join("") + "</div></section>"; };
+    var season = TP.SETS && TP.SETS.seasons.filter(function(q){ return q.k === "thanksgiving"; })[0], of = function(list, k){ return list.filter(function(x){ return x.set === k; }); };
+    var seasonal = season ? of(TP.HOMES, season.k).concat(of(TP.SCENES, season.k), of(TP.OUTFITS, season.k), of(TP.YARD, season.k)) : [];
+    var back = [].concat(of(TP.YARD, "spring").slice(1, 2), of(TP.OUTFITS, "valentine").slice(0, 1), of(TP.HOMES, "summer").slice(0, 1));
+    var today = pick(TP.YARD, ["mailbox", "campfire"]).concat(pick(TP.OUTFITS, ["sunhat"]), pick(TP.YARD, ["telescope"])), week = pick(TP.HOMES, ["igloo"]).concat(pick(TP.SCENES, ["beach"]), pick(TP.YARD, ["pool"]));
+    var stripes = ""; for (var n = 0; n < 40; n++) stripes += "<i></i>";
+    /* the showcase: the rarest piece on sale today (the dearest among those), large, on a stand in its rarity's colors */
+    var rank = function(x){ return ["Common", "Uncommon", "Rare", "Epic", "Legendary"].indexOf(x.rarity) * 100000 + (x.price || 0); };
+    var star = today.concat(week, seasonal, back).filter(function(x){ return !SHOP.owned[pieceId(x)]; }).sort(function(p, q){ return rank(q) - rank(p); })[0];
+    var show = "";
+    if (star) {
+      var R = SA.RARITIES.filter(function(r){ return r.k === star.rarity; })[0] || SA.RARITIES[0], se = seasonOf(star), sk = kindOf(star), shelfOf = seasonal.indexOf(star) >= 0 ? "season" : back.indexOf(star) >= 0 ? "back" : week.indexOf(star) >= 0 ? "week" : "today";
+      show = '<section class="tp-show r-' + R.k + '" style="--sr-fill:' + R.fill + ";--sr-edge:" + R.edge + ";--sr-deep:" + R.deep + ";--sr-ink:" + R.ink + '">' +
+        '<div class="tp-showcase" aria-hidden="true">' + rays() + '<span class="tp-showpiece k-' + sk + '">' + (sk === "outfit" ? img(timmySvg("happy", star.k), "") : pieceThumb(star)) + '</span><span class="tp-showstand">' + img(SA.stand(R.k), "") + "</span>" +
+          '<i class="tp-showtw a"></i><i class="tp-showtw b"></i><i class="tp-showtw c"></i></div>' +
+        '<div class="tp-showinfo"><h4 class="tp-showkick">Today’s showcase</h4><p class="tp-showname">' + esc(cardName(star.n)) + "</p>" +
+          '<p class="tp-itags">' + rarTag(R.k) + "<span>" + esc(KIND_N[sk]) + (se ? " · " + esc(se.n) + " set" : "") + "</span></p>" +
+          '<p class="tp-showdesc">' + esc(sentence(star.note)) + ".</p>" +
+          '<div class="tp-showbuy"><span class="tp-ibig">' + img(SA.coinBody(false), "", "tp-coin", "0 0 24 24") + '<b class="num">' + fmtPrice(star.price || 0) + '</b></span><button type="button" class="tp-buy" data-shop="' + pieceId(star) + '" data-shelf="' + shelfOf + '">Take a closer look</button></div>' +
+          '<p class="tp-showwhen">' + SIC.clock + (shelfOf === "season" ? "In the shop until November 27" : shelfOf === "back" ? "Back for today only" : shelfOf === "week" ? "In the shop for 5 more days" : "In the shop until midnight") + "</p></div></section>";
+    }
+    /* rare costumes: the ones that have turned up wait here; the others are shapes until they do */
+    var seen = { pirate: 1, chef: 1 }, costumes = TP.OUTFITS.filter(function(o){ return o.costume; });
+    var spotted = costumes.map(function(o){ return seen[o.k] ? shopCard(o, "spotted") :
+      '<span class="tp-rcard tp-static tp-unseen r-Common" role="img" aria-label="A rare costume you haven’t spotted yet">' + frameImg("Common") + '<span class="tp-rthumb">' + thumbImg("outfit", o.k) + '</span><span class="tp-rtext"><span class="tp-rname">Not spotted yet</span></span></span>'; });
+    /* always here: the snacks and the boosts, from the shop's own art */
+    var always = SA.ITEMS.map(function(it){ return scard({ n: it.n, rarity: it.rarity, price: it.price }, img(SA.thumb(it.id), ""), '<span class="tp-does">' + esc(it.hp ? "+" + it.hp + " HP" : "2x XP · " + (it.minutes / 60) + " h") + "</span>"); });
+    var seasonPic = "";
+    if (season && seasonal.length) { var yd = {}; of(TP.YARD, season.k).forEach(function(y, i){ yd[["left", "front", "right"][i]] = y.k; });
+      seasonPic = '<div class="tp-poster">' + sceneImg(TP.render(tpOpts({ home: of(TP.HOMES, season.k)[0].k, scene: of(TP.SCENES, season.k)[0].k, yard: yd, night: false, viewBox: TP.CARD, timmy: { g: timmyG(timmySvg("happy", (of(TP.OUTFITS, season.k).slice(-1)[0] || {}).k)), at: "door" } })).svg, "The whole " + season.n + " set at Timmy’s place", isStill()) + "</div>"; }
+    el.innerHTML = '<div class="tp-store"><div class="tp-awning" aria-hidden="true">' + stripes + "</div>" +
+      '<div class="tp-front"><span class="tp-frontlayer" aria-hidden="true">' + storeImg("back") + '</span><span class="tp-keeper" aria-hidden="true">' + img(timmySvg("happy", "bow-tie"), "") + '</span><span class="tp-frontlayer" aria-hidden="true">' + storeImg("front") + "</span>" +
+        '<div class="tp-sign"><i class="tp-nail a"></i><i class="tp-nail b"></i><b>' + img(SA.coinBody(false), "", "tp-coin", "0 0 24 24") + "Timmy’s Shop</b><span>Tap anything for a closer look.</span></div>" +
+        '<button type="button" class="tp-snd" id="tpSnd" aria-pressed="' + SND.on + '" aria-label="Sound"><svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d="M3 7.500h3l4-3.500v12l-4-3.500H3Z" fill="currentColor"/>' + (SND.on ? '<path d="M13 7a4.200 4.200 0 0 1 0 6M15.200 4.800a7.300 7.300 0 0 1 0 10.400" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round"/>' : '<path d="M13.200 7.800l4 4.400M17.200 7.800l-4 4.400" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round"/>') + "</svg><span>" + (SND.on ? "Sound on" : "Sound off") + '</span></button>' +
+        '<span class="tp-wallet" title="Shiny Gold Crowns">' + img(SA.coinBody(false), "", "tp-coin", "0 0 24 24") + '<span><b class="num">' + fmtPrice(SHOP.wallet) + "</b><small>Shiny Gold Crowns</small></span></span></div>" +
+      show +
+      shelf("today", "Today’s picks", "New picks in 6 h 12 min", SIC.clock, "Four pieces, the same for everyone, new every day.", today) +
+      '<div class="tp-aisle a11">' + shelf("week", "This week", "5 days left", SIC.clock, "Three bigger pieces that stay all week.", week) +
+        (back.length ? shelf("back", "Back for today", "Gone at midnight", SIC.glass, "A throwback day, two a month: three pieces from seasons that have passed, at their usual price.", back) : "") + "</div>" +
+      (seasonal.length ? '<section class="tp-shelf tp-shelf-season">' + head(season.n, "Until November 27", SIC.clock, "The season’s set, only while the season lasts. Nothing from a season or a holiday is ever sold before its dates. Two seasons at once (fall is on too) get a shelf each.") +
+        '<div class="tp-seasonbody">' + seasonPic + '<div class="tp-rcards tp-plank" style="--n:4">' + seasonal.map(function(x){ return shopCard(x, "season"); }).join("") + "</div></div></section>" : "") +
+      shelf("spotted", "Spotted", "2 of 5 so far", SIC.glass, "Rare costumes turn up without warning. One you’ve spotted waits here until you buy it.", spotted) +
+      shelf("always", "Always here", "Never sells out", SIC.check, "Snacks put health back on Timmy’s bar, one of each a day. A boost doubles your XP from the moment you buy it. Shown here; buying them comes with the shop itself.", always) +
+      '<p class="tp-note tp-storefoot">Halloween’s set is already in everyone’s inventory, and rank sets are never on a shelf: you earn them. The crowns and what you buy here are made up for this page.</p></div>';
+    $$("[data-shop]", el).forEach(function(b){ b.addEventListener("click", function(){ sfx("open"); openItem(pieceBy(b.dataset.shop), b.dataset.shelf); }); });
+    $("#tpSnd", el).addEventListener("click", function(){ SND.on = !SND.on; try { localStorage.setItem("sh_design_sound", SND.on ? "on" : "off"); } catch (e) {} shopMock(); if (SND.on) sfx("open"); var n = $("#tpSnd"); if (n) n.focus(); });
+  }
+  /* the window on one piece: a display case in the rarity's color with turning rays, the piece itself or your place with
+     it in, what it is, its set, the price against your crowns, Buy and Try */
+  function rays(){ var s = ""; for (var a = 0; a < 12; a++) s += '<path d="M0 0L-13 -120L13 -120Z" transform="rotate(' + a * 30 + ')"/>'; return '<svg class="tp-irays" viewBox="-100 -100 200 200" aria-hidden="true"><g fill="#fff">' + s + "</g></svg>"; }
+  /* buying: the coins fly into the piece, it pops, and the rarity decides how big the party is. Common: a pop and a few
+     dots. Uncommon: a ring too. Rare: a flash, two rings, the word. Epic: the piece spins, three rings, a star shower.
+     Legendary: it charges up first (the case shakes, the rays race, a rising note), then a gold flash over the whole
+     window, the kit's Legendary burst, confetti everywhere and a fanfare */
+  var FX = { Common: { n: 10, rings: 0, t: 900, pal: ["#8A847E", "#C9C2BA", "#FFD23F"] }, Uncommon: { n: 16, rings: 1, t: 1050, pal: ["#1C6E52", "#7FD6AE", "#FFD23F", "#FFFFFF"] },
+    Rare: { n: 24, rings: 2, t: 1250, word: "Rare!", flash: 1, pal: ["#1C5C88", "#7CC4F2", "#FFD23F", "#FFFFFF"] }, Epic: { n: 38, rings: 3, t: 1550, word: "Epic!", flash: 1, spin: 1, pal: ["#4E3492", "#B79BFF", "#FF8BD0", "#FFD23F", "#FFFFFF"] },
+    Legendary: { n: 70, rings: 3, t: 2300, word: "Legendary!", flash: 2, spin: 1, charge: 750, pal: ["#F2C230", "#FFE27A", "#FF8B7B", "#7CC4F2", "#B79BFF", "#FFFFFF"] } };
+  function purchaseFx(d, r, done){
+    var fx = FX[r] || FX.Common, box = $(".tp-item", d), cs = $(".tp-icase", d), wait = fx.charge || 0, html = "", i;
+    for (i = 0; i < 5; i++) html += '<span class="tp-fxcoin" style="--i:' + i + ";--sx:" + (60 + i * 26) + "px;--sy:" + (150 - (i % 2) * 30) + 'px">' + img(SA.coinBody(false), "", "", "0 0 24 24") + "</span>";
+    cs.insertAdjacentHTML("beforeend", '<div class="tp-fx" aria-hidden="true">' + html + "</div>");
+    sfx("coins"); if (wait) { box.classList.add("is-charging"); sfx("rise", .25); }
+    setTimeout(function(){
+      if (!d.open) { done(); return; }
+      var layer = $(".tp-fx", cs), W = cs.clientWidth, far = Math.max(W, cs.clientHeight) * (r === "Legendary" ? .95 : r === "Epic" ? .8 : .6), out = "";
+      for (i = 0; i < fx.rings; i++) out += '<i class="tp-fxring" style="--t:' + i * 130 + 'ms"></i>';
+      for (i = 0; i < fx.n; i++) { var a = (i / fx.n) * Math.PI * 2 + (i % 3) * .21, dist = far * (.45 + ((i * 37) % 11) / 20), star = i % 4 === 0 && fx.rings > 1;
+        out += '<i class="tp-fxbit' + (star ? " is-star" : i % 3 === 1 ? " is-bar" : "") + '" style="--x:' + Math.round(Math.cos(a) * dist) + "px;--y:" + Math.round(Math.sin(a) * dist * .8) + "px;--r:" + ((i * 71) % 360 - 180) + "deg;--c:" + fx.pal[i % fx.pal.length] + ";--t:" + (i % 5) * 28 + "ms;--s:" + (7 + (i * 13) % 8) + 'px"></i>'; }
+      layer.innerHTML = (fx.flash ? '<i class="tp-fxflash"></i>' : "") + out + '<div class="tp-iburst">' + TP.burst(r) + "</div>" + (fx.word ? '<b class="tp-fxword">' + fx.word + "</b>" : "");
+      box.classList.remove("is-charging"); box.classList.add("is-bought"); if (fx.spin) box.classList.add("is-spin"); if (fx.flash > 1) box.classList.add("is-gold");
+      sfx("pop"); sfx(r, .05);
+      setTimeout(done, fx.t);
+    }, 430 + wait);
+  }
+  function openItem(x, shelf, view, bought){
+    if (!x) return;
+    var kind = kindOf(x), id = pieceId(x), r = x.rarity || "Common", se = seasonOf(x), own = !!SHOP.owned[id], cost = x.price || 0, short = cost - SHOP.wallet; view = view || "piece";
+    var pic = view === "place" ? '<div class="tp-iplace">' + sceneImg(TP.render(withPiece(x)).svg, "Your place with " + x.n.replace(/^(The|A|An) /, function(m){ return m.toLowerCase(); }), isStill()) + "</div>"
+      : '<div class="tp-ipiece k-' + kind + '">' + (kind === "outfit" ? '<span class="tp-ipod" aria-hidden="true"></span>' + img(timmySvg("happy", x.k), "Timmy in " + x.n.replace(/^(The|A|An) /, function(m){ return m.toLowerCase(); })) : pieceThumb(x).replace('alt=""', 'alt="' + esc(cardName(x.n)) + '"')) + "</div>";
+    var others = se ? allPieces().filter(function(q){ return q.set === x.set && q !== x; }) : [];
+    var fits = kind === "yard" ? (x.wide ? "It’s long: it takes the side yard and the front corner together." : "Fits any spot in the yard.") : kind === "home" ? "Your yard, upgrades and paint move in with you." : kind === "scene" ? "Your home and yard move over as they are." : "Timmy wears it at his place, and on your card.";
+    var buy = own ? '<p class="tp-iown">' + SIC.check + (bought ? "It’s yours! " : "Yours. ") + "It’s in your inventory for good.</p>" + '<button type="button" class="tp-buy" data-item-try="1">Put it out at my place</button>'
+      : '<div class="tp-iprice"><span class="tp-ibig">' + img(SA.coinBody(false), "", "tp-coin", "0 0 24 24") + '<b class="num">' + fmtPrice(cost) + "</b></span><span class=\"tp-ihave\">" + (short > 0 ? "You have " + fmtPrice(SHOP.wallet) + ": " + fmtPrice(short) + " more to go" : "You have " + fmtPrice(SHOP.wallet) + ", so " + fmtPrice(-short) + " left after") + "</span>" +
+          (short > 0 ? '<span class="tp-ibar" aria-hidden="true"><i style="width:' + Math.round(SHOP.wallet / cost * 100) + '%"></i></span>' : "") + "</div>" +
+        '<div class="tp-iacts"><span class="tp-buywrap"><button type="button" class="tp-buy" data-item-buy="1"' + (short > 0 ? " disabled" : "") + ">" + (short > 0 ? "Not enough yet" : "Buy for " + fmtPrice(cost)) + '</button></span><button type="button" class="btn tp-itry" data-item-try="1">Try it at my place</button></div>';
+    var d = openDlg('<div class="tp-item r-' + r + (bought ? " is-new" : "") + '">' + DLG_X +
+      '<div class="tp-icase">' + rays() + '<span class="tp-icorner a" aria-hidden="true"></span><span class="tp-icorner b" aria-hidden="true"></span>' + pic + 
+        '<div class="seg tp-iview" role="group" aria-label="What the picture shows"><button type="button" data-iview="piece" aria-pressed="' + (view === "piece") + '">The piece</button><button type="button" data-iview="place" aria-pressed="' + (view === "place") + '">At my place</button></div></div>' +
+      '<div class="tp-iinfo"><p class="tp-ikind">' + esc(KIND_N[kind]) + (se ? " · " + esc(se.n) + " set" : "") + '</p><h3 id="tpDlgT">' + esc(cardName(x.n)) + "</h3>" +
+        '<p class="tp-itags">' + rarTag(r) + (shelf === "back" ? '<span class="tp-stamp is-inline">' + SIC.glass + "<b>Back for today only</b></span>" : "") + "</p>" +
+        '<p class="tp-idesc">' + esc(sentence(x.note)) + ". " + fits + "</p>" +
+        (kind === "outfit" && x.say ? '<p class="tp-isay"><span aria-hidden="true">' + img(timmySvg("happy", ""), "") + "</span><q>" + esc(x.say[(x.say.length > 1 ? 1 : 0)]) + "</q></p>" : "") +
+        (se ? '<div class="tp-iset"><b>' + esc(se.n) + " set</b><span>" + esc(shelf === "back" ? "Its season has passed: this piece is back today only, gone at midnight. The rest of the set comes back with its season." : "On sale: " + se.when + ".") + '</span><div class="tp-isetrow">' +
+          others.map(function(q){ return shelf === "back" ? '<span class="tp-imini is-off" title="' + esc(cardName(q.n)) + '">' + pieceThumb(q) + "</span>" : '<button type="button" class="tp-imini" data-item-go="' + pieceId(q) + '" aria-label="' + esc(cardName(q.n)) + '" title="' + esc(cardName(q.n)) + '">' + pieceThumb(q) + "</button>"; }).join("") + "</div></div>" : "") +
+        '<div class="tp-ibuy">' + buy + "</div></div></div>", "tp-idlg");
+    d.setAttribute("aria-labelledby", "tpDlgT");
+    $$("[data-iview]", d).forEach(function(b){ b.addEventListener("click", function(){ openItem(x, shelf, b.dataset.iview); var n = $('[data-iview="' + b.dataset.iview + '"]', $("#tpDlg")); if (n) n.focus(); }); });
+    $$("[data-item-go]", d).forEach(function(b){ b.addEventListener("click", function(){ sfx("open"); openItem(pieceBy(b.dataset.itemGo), shelf); }); });
+    var wrap = $(".tp-iacts", d); if (wrap && short > 0) wrap.addEventListener("click", function(e){ if (e.target.closest(".tp-buywrap")) { sfx("deny"); var bar = $(".tp-iprice", d); bar.classList.remove("is-no"); void bar.offsetWidth; bar.classList.add("is-no"); } });
+    $$("[data-item-buy]", d).forEach(function(b){ b.addEventListener("click", function(){
+      if (SHOP.wallet < cost || d.dataset.busy) return;
+      SHOP.wallet -= cost; SHOP.owned[id] = 1; shopMock();
+      var done = function(){ delete d.dataset.busy; if (!d.open) return; openItem(x, shelf, view, true); var n = $(".tp-buy", $("#tpDlg")); if (n) n.focus(); };
+      if (isStill()) { sfx("coins"); sfx(r, .3); done(); return; }
+      d.dataset.busy = "1"; b.disabled = true; purchaseFx(d, r, done); }); });
+    $$("[data-item-try]", d).forEach(function(b){ b.addEventListener("click", function(){
+      withPiece(x, true); PS.mode = "customize"; d.close(); buildPlace(kind === "yard" ? { burst: PS.pick } : kind === "home" ? { burst: "home" } : kind === "outfit" && x.say ? { say: x.say[0] } : {});
+      $("#tpStage").scrollIntoView({ block: "center", behavior: isStill() ? "auto" : "smooth" }); }); });
+  }
+
+  /* ---------- visiting: from a name on the boards to that person's place (made-up names and places) ---------- */
+  var VISIT = [
+    { name: "Molar Maverick", xp: "48,210", tier: 5, level: 3, o: { home: "castle", scene: "clouds", yard: { left: "fountain", front: "garden", side: "lane" }, up: { flag: true }, flair: 4 }, outfit: "aviator" },
+    { name: "Floss Boss", xp: "41,775", tier: 4, level: 2, o: { home: "harvest-barn", scene: "harvest-fields", yard: { left: "hay-bales", front: "harvest-table", right: "turkey-balloon" }, up: { flag: true }, flair: 3 }, outfit: "parade-marshal" },
+    { name: "Captain Cuspid", xp: "39,020", tier: 4, level: 1, o: { home: "lighthouse", scene: "beach", yard: { left: "umbrella", front: "sandcastle", right: "pool" }, up: { porch: true }, flair: 2 }, outfit: "captain" },
+    { name: "Enamel Ninja", xp: "33,480", tier: 3, level: 3, o: { home: "cottage", scene: "hill", yard: { left: "doghouse", side: "lane" }, up: { windows: true, chimney: true }, flair: 3 }, outfit: "sunhat" },
+    { name: "Bicuspid Bandit", xp: "29,150", tier: 3, level: 2, me: true },
+    { name: "Plaque Attack", xp: "27,900", tier: 3, level: 1, o: { home: "mushroom", scene: "forest", yard: { left: "campfire", front: "mailbox", right: "hammock" }, up: { chimney: true }, flair: 2 }, outfit: "ranger" },
+    { name: "Wisdom Whiz", xp: "22,340", tier: 2, level: 3, o: { home: "igloo", scene: "mountain", night: true, yard: { left: "hotspring", right: "telescope" }, up: {}, flair: 1 }, outfit: "beanie" },
+    { name: "Sir Flossalot", xp: "18,060", tier: 2, level: 1, o: { home: "observatory", scene: "space", yard: { left: "telescope", front: "doghouse" }, up: { flag: true }, flair: 1 }, outfit: "nightcap" }
+  ];
+  var ME = 4, VS = { at: 0 };
+  var VIC = {
+    dice: '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="4.5" fill="#fff" stroke="currentColor" stroke-width="2"/><circle cx="8.5" cy="8.5" r="1.6" fill="currentColor"/><circle cx="15.5" cy="15.5" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="15.5" cy="8.5" r="1.6" fill="currentColor"/><circle cx="8.5" cy="15.5" r="1.6" fill="currentColor"/></svg>',
+    go: '<svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M7.5 4.5L13 10l-5.5 5.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    back: '<svg viewBox="0 0 20 20" width="22" height="22" aria-hidden="true"><path d="M12.5 4.5L7 10l5.5 5.5" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    next: '<svg viewBox="0 0 20 20" width="22" height="22" aria-hidden="true"><path d="M7.5 4.5L13 10l-5.5 5.5" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    pin: '<svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M10 18s5.5-5.4 5.5-9.6A5.5 5.5 0 0 0 4.500 8.400C4.500 12.600 10 18 10 18Z" fill="currentColor"/><circle cx="10" cy="8.300" r="2" fill="#fff"/></svg>',
+    home: '<svg viewBox="0 0 20 20" width="17" height="17" aria-hidden="true"><path d="M3 9.500L10 3.500l7 6M5 8.500V16.500h10V8.500" fill="none" stroke="currentColor" stroke-width="2.200" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+  };
+  function hpImg(tier, cls){ var h = A.handpieces[tier] || A.handpieces[0]; return img(h.svg, h.name + " handpiece", cls || "tp-vhp"); }
+  /* what a visitor sees: the person's place under their board name. Your own row shows the place from the builder */
+  function visitOpts(v){
+    if (v.me) return tpOpts({ timmy: { g: timmyG(timmySvg("happy", PS.outfit)), at: "door" } });
+    var o = Object.assign({ tier: v.tier, level: v.level, timmy: { g: timmyG(timmySvg("happy", v.outfit)), at: "door" } }, v.o, { flair: FLAIRS[v.o.flair] });
+    ["home", "scene"].forEach(function(k){ if (!byK(k === "home" ? TP.HOMES : TP.SCENES, o[k])) o[k] = k === "home" ? "cottage" : "hill"; });
+    o.yard = Object.assign({}, o.yard); Object.keys(o.yard).forEach(function(k){ if (!byK(TP.YARD, o.yard[k])) delete o.yard[k]; });
+    return o;
+  }
+  function visitThumb(v){ var o = v.me ? { home: PS.home, scene: PS.scene } : v.o; return thumbImg("home", byK(TP.HOMES, o.home) ? o.home : "cottage", { scene: byK(TP.SCENES, o.scene) ? o.scene : "hill" }); }
+  function visitable(){ return VISIT.map(function(r, i){ return i; }).filter(function(i){ return !VISIT[i].me; }); }
+  function visitStep(d){ var l = visitable(), at = l.indexOf(VS.at); return l[at < 0 ? (d > 0 ? 0 : l.length - 1) : (at + d + l.length) % l.length]; }
+  function visitMock(){
+    var el = $("#tpVisit"); if (!el) return;
+    var v = VISIT[VS.at], list = visitable(), nth = list.indexOf(VS.at), prev = VISIT[visitStep(-1)], next = VISIT[visitStep(1)];
+    var rows = VISIT.map(function(r, i){
+      var here = i === VS.at, act;
+      if (r.me) act = '<button type="button" class="tp-vgo is-mine" data-visit="' + i + '" aria-pressed="' + here + '"><span class="tp-vthumb">' + visitThumb(r) + "</span><span>" + (here ? "Home" : "My place") + "</span></button>";
+      else act = '<button type="button" class="tp-vgo" data-visit="' + i + '" aria-pressed="' + here + '" aria-label="' + esc((here ? "You are visiting " : "Visit ") + r.name) + '"><span class="tp-vthumb">' + visitThumb(r) + "</span><span>" + (here ? "Here" : "Visit") + "</span>" + (here ? VIC.pin : VIC.go) + "</button>";
+      return '<li class="tp-vrow' + (r.me ? " me" : "") + (here ? " here" : "") + '">' +
+        (r.me ? '<span class="tp-vsheen" aria-hidden="true"></span><span class="tp-vpeek" aria-hidden="true">' + img(timmySvg("happy", PS.outfit), "") + '</span><span class="tp-vflag">That’s you</span>' : "") +
+        '<span class="num tp-vpos">' + (i + 1) + "</span>" + hpImg(r.tier) + '<span class="tp-vname">' + esc(r.name) + "<small>" + esc(TIER_NAMES[r.tier] + " " + LEVELS[r.level - 1]) + '</small></span><span class="num xp-gold">' + r.xp + " XP</span>" + act + "</li>"; }).join("");
+    var o = visitOpts(v);
+    el.innerHTML = '<div class="tp-vboard"><div class="tp-vtop"><h4>The rank board</h4><button type="button" class="tp-vrand" data-visit-random="1">' + VIC.dice + "<span>Visit someone random</span></button></div><ol>" + rows + "</ol></div>" +
+      '<div class="tp-vplace" id="tpVisitPlace"><div class="tp-vhead" role="status">' + hpImg(v.tier, "tp-vhp big") + "<div><b>" + esc(v.me ? "Your place" : v.name + "’s place") + "</b><span>" + esc(TIER_NAMES[v.tier] + " " + LEVELS[v.level - 1]) + (v.me ? " · home again" : " · visiting: look, don’t touch") + "</span></div>" +
+          (v.me ? "" : '<button type="button" class="btn tp-vhome" data-visit="' + ME + '">' + VIC.home + "Back to mine</button>") + "</div>" +
+        '<div class="tp-pic tp-vpic' + (o.night || (byK(TP.SCENES, o.scene) || {}).alwaysNight ? " is-night" : "") + '">' + sceneImg(TP.render(o).svg, v.me ? "Your place" : v.name + "'s place", isStill()) +
+          '<button type="button" class="tp-vnav prev" data-visit="' + visitStep(-1) + '" aria-label="' + esc("Previous place: " + prev.name) + '">' + VIC.back + '</button><button type="button" class="tp-vnav next" data-visit="' + visitStep(1) + '" aria-label="' + esc("Next place: " + next.name) + '">' + VIC.next + "</button></div>" +
+        '<div class="tp-vfoot"><span>' + (nth < 0 ? list.length + " places open to visit" : "Place " + (nth + 1) + " of " + list.length + " open to visit") + '</span><span class="tp-vnext">Next: ' + esc(next.name) + "</span></div></div>";
+    $$("[data-visit]", el).forEach(function(b){ b.addEventListener("click", function(){ visitGo(+b.dataset.visit, b.classList.contains("tp-vnav")); }); });
+    $("[data-visit-random]", el).addEventListener("click", function(){ var l = visitable().filter(function(i){ return i !== VS.at; }); visitGo(l[Math.floor(Math.random() * l.length)]); });
+  }
+  /* going to a place: clouds roll in over the whole screen, the place changes behind them, and they part */
+  function visitGo(i, nav){
+    if (i === VS.at || !VISIT[i]) return;
+    var v = VISIT[i];
+    clouds(v.me ? "Heading home" : "Off to " + v.name + "’s place", hpImg(v.tier, "tp-vhp"), function(){
+      VS.at = i; visitMock();
+      var pl = $("#tpVisitPlace"), r = pl.getBoundingClientRect();
+      if (r.top < 60 || r.bottom > innerHeight) pl.scrollIntoView({ block: r.height > innerHeight - 80 ? "start" : "center" });
+      var f = nav ? $(".tp-vnav." + (nav && visitStep(1) !== i ? "next" : "next"), pl) : $(".tp-vhead", pl); if (nav && f) f.focus({ preventScroll: true });
+    });
+  }
+  /* the trip: a sky of separate clouds drifts in from every side and piles up over the whole screen, the place changes
+     behind them, and they scatter outward again (Sam, 2026-11-10: "it shouldn't look like two curtains coming together") */
+  var CLOUD_SHAPES = [
+    [[30, 62, 22], [58, 44, 30], [92, 50, 26], [118, 66, 18], [74, 70, 26], [48, 74, 18], [100, 76, 16]],
+    [[26, 60, 18], [50, 48, 26], [82, 40, 28], [112, 54, 24], [92, 72, 22], [60, 74, 22], [34, 74, 14]],
+    [[34, 56, 24], [66, 42, 26], [98, 46, 30], [122, 68, 16], [84, 72, 24], [52, 72, 20]]
+  ];
+  /* soft clouds: no ink outline, a pale underside and a faint halo, so a pile of them melts into one sky
+     (Sam: "the individual clouds should be less harsh so it comes together more seamlessly") */
+  function cloudSvg(k){
+    var c = CLOUD_SHAPES[k % CLOUD_SHAPES.length], ring = function(grow, dy){ return c.map(function(q){ return '<circle cx="' + q[0] + '" cy="' + (q[1] + dy) + '" r="' + (q[2] + grow) + '"/>'; }).join(""); };
+    return '<svg viewBox="-12 -8 168 128" aria-hidden="true"><g fill="#B9AEDA" opacity=".16">' + ring(9, 8) + '</g><g fill="#FFFFFF" opacity=".55">' + ring(6, 0) + '</g><g fill="#E0D8EF">' + ring(0, 5) + '</g><g fill="#FFFFFF">' + ring(0, 0) + "</g>" +
+      '<g fill="none" stroke="#E4DDF1" stroke-width="4" stroke-linecap="round">' + c.slice(1, 4).map(function(q){ return '<path d="M' + (q[0] - q[2] * .5).toFixed(1) + " " + (q[1] + q[2] * .52).toFixed(1) + " q" + (q[2] * .5).toFixed(1) + " " + (q[2] * .3).toFixed(1) + " " + (q[2] * 1.02).toFixed(1) + ' 0"/>'; }).join("") + "</g></svg>";
+  }
+  function clouds(label, emblem, swap){
+    if (isStill()) { swap(); return; }
+    var c = $("#tpClouds");
+    if (!c) { c = document.createElement("div"); c.id = "tpClouds"; c.setAttribute("aria-hidden", "true"); document.body.appendChild(c); }
+    var W = innerWidth, H = innerHeight, cols = W > H ? 4 : 3, rows = W > H ? 3 : 4, size = Math.max(W / cols, H / rows) * 2.05, far = Math.max(W, H) * .9, html = "", n = 0;
+    for (var r = 0; r < rows; r++) for (var q = 0; q < cols; q++, n++) {
+      var jx = ((n * 37) % 11 - 5) / 60, jy = ((n * 53) % 9 - 4) / 60, x = (q + .5) / cols + jx, y = (r + .5) / rows + jy;
+      var vx = x - .5, vy = (y - .5) * .8, len = Math.sqrt(vx * vx + vy * vy);
+      if (len < .12) { var a = n * 2.4; vx = Math.cos(a); vy = Math.sin(a) + .4; len = Math.sqrt(vx * vx + vy * vy); }
+      html += '<span class="tp-cloud" style="--x:' + (x * 100).toFixed(1) + "%;--y:" + (y * 100).toFixed(1) + "%;--s:" + Math.round(size * (.86 + ((n * 29) % 7) / 22)) + "px;--dx:" + Math.round(vx / len * far) + "px;--dy:" + Math.round(vy / len * far) +
+        "px;--r:" + (((n * 17) % 9) - 4) * 3 + "deg;--d:" + ((n * 7) % cols * 45 + (n % 3) * 35) + "ms;--d2:" + ((n * 5) % 4) * 45 + 'ms">' + cloudSvg(n) + "</span>";
+    }
+    c.innerHTML = '<i class="tp-clfill"></i>' + html + '<div class="tp-clmsg">' + emblem + "<b>" + esc(label) + "</b></div>";
+    c.className = "tp-clouds"; void c.offsetWidth; c.className = "tp-clouds in"; sfx("whoosh");
+    [clouds.a, clouds.b, clouds.c].forEach(clearTimeout);
+    clouds.a = setTimeout(function(){ swap(); }, 800);
+    clouds.b = setTimeout(function(){ c.className = "tp-clouds out"; }, 1400);
+    clouds.c = setTimeout(function(){ c.className = "tp-clouds"; c.innerHTML = ""; }, 2350);
+  }
+
+  /* ---------- the bowling egg (phase 4, part D): eight clips on the alley's screen ---------- */
+  var BW = window.SH_BOWL, BS = { k: null, all: false, still: false, n: 0, timer: 0, next: 0 };
+  function bwClip(k){ return BW.CLIPS.filter(function(c){ return c.k === k; })[0]; }
+  /* a clip as a picture, with its motion inside it; a new number each time, so it starts again from the top */
+  function bwImg(k, still){
+    var c = bwClip(k), svg = BW.render(k, { still: still }).replace(/^(<svg[^>]*)>/, function(m, a){ return a + ' data-n="' + (++BS.n) + '"><style>' + BW.css(k) + "</style>"; });
+    return img(svg, c.alt + (still ? " (the last frame)" : ""), "bw-img");
+  }
+  function bwScreen(k, still){
+    var c = bwClip(k);
+    return bwImg(k, still) + '<span class="bw-word' + (still ? " is-still" : "") + '" data-w="' + esc(c.word) + '" style="animation-delay:' + c.wordAt + "s;left:" + c.wordPos[0] + "%;top:" + c.wordPos[1] + '%" aria-hidden="true">' + esc(c.word) + "</span>";
+  }
+  function bwPlay(k, still){
+    clearTimeout(BS.timer); clearTimeout(BS.next);
+    var c = bwClip(k), scr = $("#bwScreen");
+    BS.k = k; still = !!(still || BS.still || reduced);
+    scr.innerHTML = bwScreen(k, still);
+    scr.classList.toggle("is-playing", !still);
+    scr.setAttribute("aria-label", still ? c.n + ": the last frame. Tap to play it." : "Playing " + c.n + ". Tap to skip to the end.");
+    $$("#bwChips .tp-chip").forEach(function(b){ var on = b.dataset.bw === k; b.classList.toggle("on", on); b.setAttribute("aria-pressed", on ? "true" : "false"); });
+    $("#bwNow").innerHTML = "<b>" + esc(c.n) + " <span class=\"bw-len\">" + c.D + " s</span></b><span>" + esc(c.note) + "</span>";
+    if (!still) BS.timer = setTimeout(function(){ scr.classList.remove("is-playing"); scr.setAttribute("aria-label", c.n + ": the last frame. Tap to play it again."); if (BS.all) bwNext(); }, c.D * 1000 + 700);
+    else if (BS.all) BS.next = setTimeout(bwNext, 1500);
+  }
+  function bwNext(){
+    var i = BW.CLIPS.map(function(c){ return c.k; }).indexOf(BS.k);
+    if (i < BW.CLIPS.length - 1) BS.next = setTimeout(function(){ bwPlay(BW.CLIPS[i + 1].k); }, 500);
+    else { BS.all = false; bwAllBtn(); }
+  }
+  function bwAllBtn(){ var b = $("#bwAll"); if (b) { b.textContent = BS.all ? "Stop" : "Play all eight"; b.setAttribute("aria-pressed", BS.all ? "true" : "false"); } }
+  /* the secret trophy for seeing all eight (medals.mjs EGG_TROPHIES; its words are widget/bowling.js's shBowl.TROPHY) */
+  function bwTrophy(){
+    var t = A.eggTrophies && A.eggTrophies.bowling; if (!t) return "";
+    return '<div class="panel s12"><h3>The trophy</h3><p>Seeing all eight on one device is a secret trophy, kept on that device for now (the server takes it after the release). Its card and its place in the trophy case come with the trophy case.</p><div class="panel-body trophies">' +
+      '<div class="trophy">' + img(t.body, "", "", "0 0 64 64") + "<div><b>Lane Legend</b><span>Saw all eight bowling clips · secret</span></div></div>" +
+      '<div class="trophy locked">' + img(t.sil.replace(/currentColor/g, "#B9ADB6"), "", "", "0 0 64 64") + "<div><b>Secret trophy</b><span>The alley’s screen plays something odd after a strike. There are eight.</span></div></div>" +
+      '<figure class="bw-tbig">' + img(t.body, "The Lane Legend trophy: a gold bowling pin on a plinth with the sugar-free mint resting against it", "", "0 0 64 64") + "</figure></div></div>";
+  }
+  function bowling(){
+    if (!BW) { $("#bowlGrid").innerHTML = '<p class="note">bowling.js is missing: run node tools/figures/site/build.mjs</p>'; return; }
+    var chips = BW.CLIPS.map(function(c, i){ return '<button type="button" class="tp-chip" aria-pressed="false" data-bw="' + c.k + '"><i class="bw-num">' + (i + 1) + "</i>" + esc(c.n) + "</button>"; }).join("");
+    var cast = BW.CREW.map(function(c, i){ return '<figure class="bw-castfig">' + img(BW.part(c.k), "A bowling pin drawn as " + c.n, "bw-pin") + "<figcaption>" + esc(c.n) + (i === 0 ? "<span>the head pin</span>" : "") + "</figcaption></figure>"; }).join("") +
+      '<figure class="bw-castfig">' + img(BW.part("mint"), "A giant sugar-free mint, white with a pinwheel of mint green", "bw-pin bw-round") + "<figcaption>The ball<span>a sugar-free mint</span></figcaption></figure>";
+    var guests = [["thirtyOne", "Number thirty-one", "the neighbor, with his thermometer", "Number thirty-one, a nervous molar with a thermometer in his mouth"],
+      ["brush", "The toothbrush", "from Timmy's front door", "The toothbrush from Timmy's front door, bristles down to sweep"],
+      ["turkey", "The turkey", "in Timmy's pilgrim hat", "A turkey wearing Timmy's pilgrim hat"],
+      ["handpiece", "The handpiece", "the ball, in disguise", "A high-speed handpiece standing on its back end"]].map(function(g){
+        return '<figure class="bw-castfig">' + img(BW.part(g[0]), g[3], "bw-pin") + "<figcaption>" + esc(g[1]) + "<span>" + esc(g[2]) + "</span></figcaption></figure>"; }).join("");
+    $("#bowlGrid").innerHTML =
+      '<div class="panel s12"><h3>On the alley’s screen</h3><p>Pick a clip, or play all eight. Tap the screen to skip to the end, the way a student skips one on the bar. With reduced motion (or “Still”), each is its last frame and its word.</p>' +
+        '<div class="panel-body bw-play"><div class="bw-tv"><button type="button" class="bw-screen" id="bwScreen"></button></div>' +
+        '<div class="bw-side"><div class="tp-opts" id="bwChips" role="group" aria-label="The clips">' + chips + '</div><p class="bw-now" id="bwNow" aria-live="polite"></p>' +
+        '<div class="bw-btns"><button type="button" class="btn btn-primary" id="bwAgain">Play it again</button><button type="button" class="btn" id="bwAll" aria-pressed="false">Play all eight</button></div>' +
+        '<label class="tp-ctl tp-check"><input type="checkbox" id="bwStill"' + (reduced ? " checked disabled" : "") + "> <span>Still (as with reduced motion)" + (reduced ? ": your device asks for it" : "") + "</span></label></div></div></div>" +
+      '<div class="panel s12"><h3>The still versions</h3><p>What a student who asked for reduced motion sees instead: the last frame and the word, held until they tap it away.</p><div class="panel-body bw-gal">' +
+        BW.CLIPS.map(function(c){ return '<figure class="bw-fig"><div class="bw-mini">' + bwScreen(c.k, true) + "</div><figcaption>" + esc(c.n) + "<span>" + esc(c.note) + "</span></figcaption></figure>"; }).join("") + "</div></div>" +
+      '<div class="panel s12"><h3>The cast</h3><p>The pins are the Plaque crew from the boss egg, in their colors, never teeth. Each wears what sets it apart: Tartar’s cracks, Biofilm’s drips, the Mutans chain, Cavity Creep’s hole, the Goblin’s ears, the Haze, the Red Complex’s tails.</p>' +
+        '<div class="panel-body"><div class="bw-cast">' + cast + guests + "</div></div></div>" +
+      bwTrophy() +
+      '<div class="panel s12"><h3>How it’s found</h3><p>On the redesign’s pages only (vault/tasks/done/2026-11-06-redesign-bowling-egg.md, its build spec).</p><div class="panel-body tp-how bw-how"><ul>' +
+        "<li><b>In the bank</b>: a run of first-try right answers, kept on the device across hubs. At 50 and at 100 a strike clip (one of the six), at 150 the turkey, and the run starts again. A wrong first try puts it back to 0. Not in the mock or the arcade.</li>" +
+        "<li><b>After the verdict</b>, in a small card at the bottom of the screen, never over a question waiting for an answer. A tap skips it; each lasts 3 to 5 seconds. It waits its turn behind a rank-up or trophy card.</li>" +
+        "<li><b>At Timmy’s place</b>: tap the bowling lane in the yard for a random clip, the spare included.</li>" +
+        "<li><b>Seen on this device</b>: the first sighting of each is kept on the device; seeing all eight is a secret trophy.</li>" +
+        "<li><b>Off</b> with the eggs switch in Settings, like every egg, and in Focus mode. Tracked as <code>egg:bowling=&lt;clip&gt;</code>.</li>" +
+        "<li><b>Light to load</b>: one kit draws all eight, fetched only when a clip is due, never with a page.</li>" +
+        "</ul></div></div>";
+    $$("#bwChips .tp-chip").forEach(function(b){ b.addEventListener("click", function(){ BS.all = false; bwAllBtn(); bwPlay(b.dataset.bw); }); });
+    $("#bwScreen").addEventListener("click", function(){ bwPlay(BS.k, $("#bwScreen").classList.contains("is-playing")); });
+    $("#bwAgain").addEventListener("click", function(){ bwPlay(BS.k); });
+    $("#bwAll").addEventListener("click", function(){ BS.all = !BS.all; bwAllBtn(); if (BS.all) bwPlay(BW.CLIPS[0].k); else { clearTimeout(BS.next); } });
+    $("#bwStill").addEventListener("change", function(e){ BS.still = e.target.checked; bwPlay(BS.k); });
+    /* the screen starts on the first clip's last frame; it plays when it scrolls into view the first time */
+    bwPlay(BW.CLIPS[0].k, true);
+    if (!reduced && "IntersectionObserver" in window) {
+      var io = new IntersectionObserver(function(es){ if (es[0].isIntersecting) { io.disconnect(); if (!BS.still) bwPlay(BS.k); } }, { threshold: .6 });
+      io.observe($("#bwScreen"));
+    }
+  }
+
+  /* ---------- controls ---------- */
+  function setFace(f){ root.dataset.face = f; $$(".seg [data-face]").forEach(function(b){ b.setAttribute("aria-pressed", b.dataset.face === f ? "true" : "false"); }); save(); tokens(); }
+  function setTheme(t){ root.dataset.theme = t; $$(".seg [data-theme]").forEach(function(b){ b.setAttribute("aria-pressed", b.dataset.theme === t ? "true" : "false"); }); save(); tokens(); }
+  function setHub(k){ root.dataset.hub = k; $("#hubPick").value = k; save(); buildHub(); }
+
+  function init(){
+    if (!A.icons) { document.body.insertAdjacentHTML("afterbegin", '<p class="note" style="padding:16px">art.js is missing: run node tools/figures/site/build.mjs</p>'); return; }
+    $("#brandMark").innerHTML = timmy("happy");
+    var pick = $("#hubPick");
+    pick.innerHTML = A.hubs.map(function(k){ return '<option value="' + k + '">' + esc(A.tints[k].name) + "</option>"; }).join("");
+    pick.value = root.dataset.hub;
+    $("#hubChev").outerHTML = icon("chevron", 18);
+    $$(".seg [data-face]").forEach(function(b){ b.setAttribute("aria-pressed", b.dataset.face === root.dataset.face ? "true" : "false"); b.addEventListener("click", function(){ setFace(b.dataset.face); }); });
+    $$(".seg [data-theme]").forEach(function(b){ b.setAttribute("aria-pressed", b.dataset.theme === root.dataset.theme ? "true" : "false"); b.addEventListener("click", function(){ setTheme(b.dataset.theme); }); });
+    pick.addEventListener("change", function(){ setHub(pick.value); });
+    tiles(); buildHub(); pairs(); rewards(); faces(); tokens(); icons(); hubart(); medals(); timmys(); place(); bowling();
+  }
+  window.SH_DESIGN = { shop: SHOP, sfx: sfx, LIVE_BY_HUB: LIVE_BY_HUB, rebuild: buildHub, place: PS, rebuildPlace: function(o){ buildPlace(o); }, drawGalleries: function(){ if (lazyGalleries.all) lazyGalleries.all(); }, placeStage: ST,
+    bowl: BS, playBowl: function(k, still){ bwPlay(k, still); } };
+  init();
+})();

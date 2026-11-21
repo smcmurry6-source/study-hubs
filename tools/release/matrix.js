@@ -1,0 +1,244 @@
+#!/usr/bin/env node
+// Device matrix and resilience (RELEASE_TEST_PLAN.md, "Browsers and devices", "Resilience"), on a preview.
+// Matrix: small and large phones, a tablet both ways, a laptop and a wide desktop. On each: the dashboard and every
+// mode of every live hub open without a JavaScript error, without scrolling sideways and without a control under 24x24 px.
+// Engines: Chromium by default; SH_ENGINES=chromium,webkit,firefox adds Safari's engine and Firefox where Playwright
+// has them installed (CI's release workflow does). Real iPhones and Android phones are still checked by hand (UAT).
+// Resilience, on a phone and a laptop:
+//   refresh      the mode you were in and an answer you gave survive a reload; the write log keeps going
+//   history      dashboard -> hub -> Back -> Forward works, and Back from a hub returns to the dashboard
+//   offline      after one visit, the dashboard and a hub open with no connection (service worker), and come back
+//                fresh when the connection returns
+//   class data   with class data slow (2 s a request) or unreachable, every hub still opens and works
+//   slow network on a slow 3G connection (400 ms, 400 kbps), each live hub is usable (mode bar shown, its script and
+//                the shared widget run) in under 45 s
+//   node tools/release/matrix.js [--quick]   (--quick: two devices, no slow 3G)
+'use strict';
+const fs = require('fs'), path = require('path');
+const L = require('./lib');
+const { start } = require('../preview/serve');
+const QUICK = process.argv.includes('--quick');
+
+(async () => {
+  const pw = require(process.env.PLAYWRIGHT_PATH || 'playwright');
+  const D = pw.devices;
+  const MATRIX = [
+    ['phone, small (iPhone SE)', D['iPhone SE']], ['phone (iPhone 13)', D['iPhone 13']], ['phone (Pixel 7)', D['Pixel 7']],
+    ['tablet portrait (iPad Mini)', D['iPad Mini']], ['tablet landscape (iPad Mini)', D['iPad Mini landscape']],
+    ['laptop 1280x800', { viewport: { width: 1280, height: 800 } }], ['desktop 1920x1080', { viewport: { width: 1920, height: 1080 } }]
+  ].filter((m, i) => !QUICK || i === 2 || i === 5);
+  const engines = (process.env.SH_ENGINES || 'chromium').split(',').map(s => s.trim()).filter(Boolean);
+  const problems = [], notes = [];
+  const srv = await start({});
+  const status = L.hubStatus(), live = L.hubs().filter(h => status[h] === 'live');
+  const strip = d => { const o = Object.assign({}, d); delete o.defaultBrowserType; return o; };
+
+  for (const engine of engines) {
+    let browser;
+    try { browser = await pw[engine].launch(engine === 'chromium' && process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {}); }
+    catch (e) {
+      /* on a computer a missing engine is skipped; in CI every job installs the one it runs, so one that won't start
+         is a problem (2026-11-18: a skip there would pass without testing anything) */
+      if (process.env.CI) { problems.push(`${engine}: wouldn't start: ${e.message.split('\n')[0]}`); continue; }
+      notes.push(`${engine}: not installed here, skipped (npx playwright install ${engine})`); continue;
+    }
+    for (const [label, dev] of MATRIX) {
+      const tag = `${engine} · ${label}`;
+      const opts = Object.assign(strip(dev), { serviceWorkers: 'block' });
+      if (engine === 'firefox') delete opts.isMobile;   /* Firefox has no mobile emulation: size, touch and user agent only */
+      const ctx = await browser.newContext(opts);
+      await L.guard(ctx);
+      const page = await ctx.newPage(); const errs = [];
+      page.on('pageerror', e => errs.push(e.message));
+      await page.goto(srv.url + 'index.html?persona=returning'); await L.settle(page);
+      /* Measured against the layout width (clientWidth), not innerWidth: a phone browser zooms out to fit a page that's
+         too wide, which grows innerWidth to match, so Chromium's phone emulation hid real overflow. Names the element
+         that sticks out furthest (fixed elements and anything inside a clipping box can't scroll the page). */
+      const sideways = async where => {
+        const r = await page.evaluate(() => {
+          const cw = document.documentElement.clientWidth, w = document.documentElement.scrollWidth - cw;
+          if (w <= 1) return null;
+          const clipped = e => { for (let p = e.parentElement; p && p !== document.body; p = p.parentElement) if (getComputedStyle(p).overflowX !== 'visible') return true; return false; };
+          let worst = null;
+          for (const e of document.querySelectorAll('body *')) {
+            const b = e.getBoundingClientRect();
+            if (!b.width || b.right + scrollX <= cw + 1 || (worst && b.right <= worst.right)) continue;
+            if (getComputedStyle(e).position === 'fixed' || clipped(e)) continue;
+            worst = { right: b.right, e };
+          }
+          if (!worst) return { w, who: 'no element named' };
+          const e = worst.e, cls = typeof e.className === 'string' ? e.className.trim().split(/\s+/).filter(Boolean).slice(0, 2) : [];
+          const text = (e.textContent || '').trim().replace(/\s+/g, ' ').slice(0, 24);
+          return { w, who: e.tagName.toLowerCase() + (e.id ? '#' + e.id : '') + cls.map(c => '.' + c).join('') + (text ? ` "${text}"` : '') };
+        });
+        if (r) problems.push(`${tag}: ${where} scrolls sideways by ${r.w}px (furthest out: ${r.who})`);
+      };
+      /* WCAG 2.2 target size (minimum): every button, tab, box and menu at least 24x24 CSS px. Counted on each screen and,
+         since 2026-11-19 (BUG-009: the 4 on 11-04 were on the old single-file hub pages, all archived; the redesign's
+         pages had none), a problem that names them. Links in text are exempt, so links aren't counted. */
+      const tinySeen = new Set();
+      const small = async where => {
+        for (const t of await page.evaluate(() => [...document.querySelectorAll('button, [role="button"], [role="tab"], input[type="checkbox"], input[type="radio"], select')]
+          .filter(e => { const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0 && (r.width < 24 || r.height < 24) && getComputedStyle(e).visibility !== 'hidden' && !e.closest('#shpv-pill, #shpv-panel'); })
+          .map(e => { const r = e.getBoundingClientRect(), cls = typeof e.className === 'string' ? e.className.trim().split(/\s+/).filter(Boolean).slice(0, 2) : [];
+            return `${e.tagName.toLowerCase()}${e.id ? '#' + e.id : ''}${cls.map(c => '.' + c).join('')} "${(e.getAttribute('aria-label') || e.textContent || '').trim().replace(/\s+/g, ' ').slice(0, 24)}" ${Math.round(r.width)}x${Math.round(r.height)}`; })))
+          if (!tinySeen.has(t)) { tinySeen.add(t); problems.push(`${tag}: ${where}: a control under 24x24 px: ${t}`); }
+      };
+      await sideways('dashboard'); await small('dashboard');
+      let screens = 1;
+      /* the dashboard (widget/dash.js): each hub's tab and the class board's two lists */
+      {
+        const tabs = await page.$$eval('#hubTabs [data-tab]', ts => ts.map(t => t.getAttribute('data-tab')));
+        if (!tabs.length) problems.push(`${tag}: dashboard shows no hub tabs`);
+        for (const t of tabs) { await page.click(`#hubTabs [data-tab="${t}"]`).catch(() => {}); await page.waitForTimeout(250); await sideways(`dashboard · ${t}`); await small(`dashboard · ${t}`); screens++; }
+        for (const bn of await page.$$('#boardSeg button')) { await bn.click().catch(() => {}); await page.waitForTimeout(350); }
+        await sideways('dashboard · class board');
+      }
+      for (const hub of live) {
+        await page.goto(srv.url + `hubs/${hub}/`); await L.settle(page);
+        const modes = await page.$$eval('#modeSwitch [data-mode]', bs => bs.map(b => b.getAttribute('data-mode')));
+        if (!modes.length) problems.push(`${tag}: ${hub} shows no mode bar`);
+        for (const m of modes) {
+          await page.click(`#modeSwitch [data-mode="${m}"]`, { timeout: 5000 }).catch(e => problems.push(`${tag}: ${hub} can't open ${m}: ${e.message.split('\n')[0]}`));
+          await page.waitForTimeout(250); screens++;
+          await sideways(`${hub} · ${m}`); await small(`${hub} · ${m}`);
+        }
+      }
+      errs.forEach(e => problems.push(`${tag}: JavaScript error: ${e}`));
+      notes.push(`${tag}: ${screens} screens, ${errs.length} errors, ${tinySeen.size} controls under 24x24 px`);
+      await ctx.close();
+    }
+    await browser.close();
+  }
+
+  /* ---------- resilience (Chromium) ---------- */
+  /* It uses Chromium's network emulation, so only a run with Chromium in SH_ENGINES checks it. CI's WebKit and Firefox
+     jobs have only their own browser: until 2026-11-18 they stopped here ("Executable doesn't exist", reported as
+     blocked, which passed), and every problem their devices had found was lost. */
+  if (!engines.includes('chromium')) {
+    notes.push('resilience: checked in the Chromium run');
+    srv.server.close();
+    process.exit(L.report('devices and resilience', problems, notes));
+  }
+  const browser = await L.launch();
+  for (const [label, dev] of [['phone', D['Pixel 7']], ['laptop', { viewport: { width: 1280, height: 800 } }]]) {
+    const hub = live[0] || L.hubs()[0];
+    /* refresh: mode and answers survive a reload */
+    {
+      const ctx = await browser.newContext(Object.assign(strip(dev), { serviceWorkers: 'block' })); await L.guard(ctx);
+      const page = await ctx.newPage(); const errs = []; page.on('pageerror', e => errs.push(e.message));
+      await page.goto(srv.url + `hubs/${hub}/?persona=returning`); await L.settle(page);
+      const modes = await page.$$eval('#modeSwitch [data-mode]', bs => bs.map(b => b.getAttribute('data-mode')));
+      const target = modes[1] || modes[0];
+      await page.click(`#modeSwitch [data-mode="${target}"]`); await page.waitForTimeout(400);
+      /* a hub on the engine fills SH_EXPORT.questions once its bank has loaded, and its widget tag comes with the bundle */
+      await page.waitForFunction(() => window.SH_EXPORT && Array.isArray(window.SH_EXPORT.questions) && window.SH_EXPORT.questions.length > 1 && document.querySelector('script[data-answered-event]'), null, { timeout: 30000 }).catch(() => {});
+      const qid = await page.evaluate(() => { const ev = document.querySelector('script[data-answered-event]').dataset.answeredEvent, q = window.SH_EXPORT.questions[1];
+        /* a miss: the game layer's pages are graded from the key, so the choice sent is one that isn't it */
+        document.dispatchEvent(new CustomEvent(ev, { detail: { qid: q.id, correct: false, choice: q.answer === 1 ? 0 : 1 } })); return q.id; });
+      await page.waitForTimeout(600);
+      const logBefore = await page.evaluate(() => window.__shPreview.log().length);
+      await page.reload(); await L.settle(page);
+      const after = await page.evaluate(([h, q]) => ({ mode: (document.querySelector('#modeSwitch [aria-selected="true"], #modeSwitch [aria-current="page"]') || {}).dataset, srs: (localStorage.getItem('sh_srs_' + h) || '').includes(q),
+        log: window.__shPreview.log().length, mine: (window.__shPreview.db().answers[h] || []).some(r => r[0] === q && !r[2]) }), [hub, qid]);
+      if (!after.mode || after.mode.mode !== target) problems.push(`refresh (${label}): ${hub} reopened in ${after.mode ? after.mode.mode : 'no mode'}, not ${target}`);
+      if (!after.srs) problems.push(`refresh (${label}): the missed question isn't in spaced review after a reload`);
+      if (!after.mine) problems.push(`refresh (${label}): the answer didn't reach the (fixture) server`);
+      if (after.log < logBefore) problems.push(`refresh (${label}): the preview's write log was lost on reload`);
+      errs.forEach(e => problems.push(`refresh (${label}): JavaScript error: ${e}`));
+      notes.push(`refresh (${label}): ${hub} kept "${target}", the missed answer and the log across a reload`);
+      await ctx.close();
+    }
+    /* history: dashboard -> hub -> back -> forward */
+    {
+      const ctx = await browser.newContext(Object.assign(strip(dev), { serviceWorkers: 'block' })); await L.guard(ctx);
+      const page = await ctx.newPage(); const errs = []; page.on('pageerror', e => errs.push(e.message));
+      await page.goto(srv.url + 'index.html?persona=returning'); await L.settle(page);
+      /* the dashboard shows one hub at a time: its tab first, then the way in */
+      await page.click(`#hubTabs [data-tab="${hub}"]`).then(() => page.waitForTimeout(250), () => {});
+      const link = await page.$(`a[href*="hubs/${hub}/"]`);
+      if (!link) problems.push(`history (${label}): no link to ${hub} on the dashboard`);
+      else {
+        await Promise.all([page.waitForNavigation(), link.click()]); await L.settle(page);
+        if (!page.url().includes(`hubs/${hub}/`)) problems.push(`history (${label}): the dashboard's link didn't open ${hub}`);
+        await page.click('#modeSwitch [data-mode]:nth-child(2)').catch(() => {});
+        /* a hub on the engine keeps its views in the address (#notes), so Back walks its views first and then leaves
+           the hub; an old hub leaves at once. Forward takes the same number of steps back in. */
+        let steps = 0;
+        do { await page.goBack(); await page.waitForLoadState(); await page.waitForTimeout(300); steps++; } while (page.url().includes('/hubs/') && steps < 4);
+        await L.settle(page);
+        if (page.url().includes('/hubs/')) problems.push(`history (${label}): Back from ${hub} didn't return to the dashboard (${page.url()})`);
+        if (!(await page.$('#shpv-pill'))) problems.push(`history (${label}): the dashboard didn't render after Back`);
+        for (let i = 0; i < steps; i++) { await page.goForward(); await page.waitForLoadState(); await page.waitForTimeout(300); }
+        await L.settle(page);
+        if (!page.url().includes(`hubs/${hub}/`) || !(await page.$('#modeSwitch'))) problems.push(`history (${label}): Forward didn't bring ${hub} back`);
+        /* the way back to the dashboard, always on the screen: the bar's "All hubs", or on a phone on the engine "Hubs"
+           at the start of the top strip (Sam, 2026-11-13: "a convenient back to dashboard button when you are in a hub") */
+        const backSel = (await page.isVisible('#sh-ribbon-back')) ? '#sh-ribbon-back' : (await page.isVisible('.hx-strip .hx-home')) ? '.hx-strip .hx-home' : '#shhome-pill';
+        await page.click(backSel, { timeout: 3000 }).catch(() => problems.push(`history (${label}): no back-to-dashboard button on the screen in ${hub}`));
+        await page.waitForLoadState(); await L.settle(page);
+        if (page.url().includes('/hubs/')) problems.push(`history (${label}): ${hub}'s back button didn't open the dashboard`);
+      }
+      errs.forEach(e => problems.push(`history (${label}): JavaScript error: ${e}`));
+      notes.push(`history (${label}): dashboard → ${hub} → Back → Forward → back button`);
+      await ctx.close();
+    }
+    /* offline and cache recovery: the service worker */
+    {
+      const ctx = await browser.newContext(strip(dev)); await L.guard(ctx);
+      const page = await ctx.newPage(); const errs = []; page.on('pageerror', e => errs.push(e.message));
+      await page.goto(srv.url + 'index.html?persona=returning'); await L.settle(page);
+      await page.goto(srv.url + `hubs/${hub}/`); await L.settle(page);
+      const sw = await page.evaluate(async () => { if (!navigator.serviceWorker) return 'none'; const r = await Promise.race([navigator.serviceWorker.ready, new Promise(ok => setTimeout(() => ok(null), 8000))]); return r ? 'ready' : 'not ready'; });
+      await page.waitForTimeout(1500);
+      await page.reload(); await L.settle(page);   /* the page is now controlled, and its files cached */
+      await ctx.setOffline(true);
+      for (const url of [`hubs/${hub}/`, 'index.html']) {
+        const ok = await page.goto(srv.url + url).then(() => true, () => false); await L.settle(page);
+        const shown = ok && await page.evaluate(() => !!(document.querySelector('#modeSwitch') || document.querySelector('.hub-card, [data-hub], #shpv-pill')));
+        if (!shown) problems.push(`offline (${label}): ${url} didn't open with no connection (service worker: ${sw})`);
+      }
+      await ctx.setOffline(false);
+      await page.goto(srv.url + `hubs/${hub}/`); await L.settle(page);
+      if (!(await page.$('#modeSwitch'))) problems.push(`offline (${label}): ${hub} didn't recover after the connection came back`);
+      errs.forEach(e => problems.push(`offline (${label}): JavaScript error: ${e}`));
+      notes.push(`offline (${label}): service worker ${sw}; dashboard and ${hub} opened offline and recovered online`);
+      await ctx.close();
+    }
+    /* class data slow or unreachable */
+    for (const speed of ['slow', 'down']) {
+      const ctx = await browser.newContext(Object.assign(strip(dev), { serviceWorkers: 'block' })); await L.guard(ctx);
+      await ctx.addInitScript(s => { try { const u = JSON.parse(localStorage.getItem('sh_preview_ui') || '{}'); u.speed = s; localStorage.setItem('sh_preview_ui', JSON.stringify(u)); } catch (e) {} }, speed);
+      const page = await ctx.newPage(); const errs = []; page.on('pageerror', e => errs.push(e.message));
+      for (const url of ['index.html?persona=returning', ...live.map(h => `hubs/${h}/`)]) {
+        await page.goto(srv.url + url); await L.settle(page);
+        if (url.startsWith('hubs/')) {
+          const modes = await page.$$eval('#modeSwitch [data-mode]', bs => bs.map(b => b.getAttribute('data-mode')));
+          for (const m of modes) await page.click(`#modeSwitch [data-mode="${m}"]`).catch(e => problems.push(`class data ${speed} (${label}): ${url} ${m}: ${e.message.split('\n')[0]}`));
+        }
+      }
+      errs.forEach(e => problems.push(`class data ${speed} (${label}): JavaScript error: ${e}`));
+      notes.push(`class data ${speed === 'down' ? 'unreachable' : 'slow'} (${label}): dashboard and ${live.length} live hubs opened and every mode worked`);
+      await ctx.close();
+    }
+  }
+  /* slow 3G: time until the mode bar can be used */
+  if (!QUICK) for (const hub of live) {
+    const ctx = await browser.newContext(Object.assign(strip(D['Pixel 7']), { serviceWorkers: 'block' })); await L.guard(ctx);
+    await ctx.addInitScript(() => { try { localStorage.setItem('sh_tour', 'no'); localStorage.setItem('sh_tour_hub', 'no'); } catch (e) {} });
+    const page = await ctx.newPage(); const cdp = await ctx.newCDPSession(page);
+    await cdp.send('Network.enable'); await cdp.send('Network.emulateNetworkConditions', { offline: false, latency: 400, downloadThroughput: 400e3 / 8, uploadThroughput: 400e3 / 8 });
+    const t0 = Date.now();
+    await page.goto(srv.url + `hubs/${hub}/`, { waitUntil: 'commit', timeout: 120000 });
+    /* usable = the mode bar is on screen, the hub's script has run to its end (SH_EXPORT is its last statement) and
+       the shared widget has started (shSupabase): before that, taps do nothing */
+    const ok = await page.waitForSelector('#modeSwitch [data-mode]', { state: 'visible', timeout: 90000 })
+      .then(() => page.waitForFunction(() => window.SH_EXPORT && 'shSupabase' in window, null, { timeout: 90000 })).then(() => true, () => false);
+    const ms = Date.now() - t0;
+    if (!ok || ms > 45000) problems.push(`slow 3G: ${hub}'s mode bar took ${ok ? Math.round(ms / 1000) + ' s' : 'over 90 s'} (limit 45 s)`);
+    notes.push(`slow 3G: ${hub} usable in ${(ms / 1000).toFixed(1)} s`);
+    await ctx.close();
+  }
+  await browser.close(); srv.server.close();
+  process.exit(L.report('devices and resilience', problems, notes));
+})().catch(e => { console.error(e); process.exit(1); });

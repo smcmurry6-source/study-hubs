@@ -1,0 +1,57 @@
+# Timmy Time: podcast episodes for the hubs
+
+A hub's audio review episode, hosted by Timmy Tooth: a script, a Kokoro voice, synthesized music and mastering.
+In the site it's played by `widget/podcast.js` (a hub opts in with `window.SH_PODCAST` and a `<div data-sh-podcast>` slot),
+which also draws the episode's likes, dislikes and comments, its 1-3 lore comments first (`SH_PODCAST.fans`;
+`vault/rules/podcast-reactions.md`). The cold open skips the minutiae (`vault/rules/podcast-intro.md`).
+
+```
+tools/podcast/
+  render_podcast.py   script -> per-segment voice stems (kokoro-onnx), with lexicon.json for hard words
+  produce.py          stems -> finished mp3: voice chain, music, ducking, stingers, loudness; writes <out>.json (chapters)
+  lexicon.json        exact Kokoro phonemes for drug/anatomy/hormone words espeak gets wrong
+  extract_hub.js      a hub's notes, exam facts, hints, cram sheet and likely topics as plain text, to write from
+  LORE.md             Timmy Tooth's canon: read it before writing, add to it after
+  <hub>/script.md     one episode's script (msk-exam4, occlusion, heme-endo-exam1, pcd-implants-exam1, heme-endo-exam2)
+```
+
+The whole procedure, from asking Sam to merging, is the `/podcast` skill (`.claude/skills/podcast/SKILL.md`).
+
+## Build an episode
+
+```bash
+pip install scipy                               # plus ffmpeg on PATH; Kokoro and its model install themselves on the
+                                                # first render (tools/kokoro-setup.sh, vault/how-to/narrate-with-kokoro.md)
+node tools/podcast/extract_hub.js <hub> /tmp/src                   # the material to write from
+python tools/podcast/render_podcast.py tools/podcast/msk-exam4/script.md --words        # hard words + heteronyms
+python tools/podcast/render_podcast.py tools/podcast/msk-exam4/script.md --check        # every paragraph's phonemes
+python tools/podcast/render_podcast.py tools/podcast/msk-exam4/script.md /tmp/stems     # ~10 min on 4 CPUs
+python tools/podcast/produce.py /tmp/stems hubs/msk-exam4/audio/timmy-time.mp3 \
+  --script tools/podcast/msk-exam4/script.md --title "Timmy Time: MSK Exam 4"
+```
+
+Then copy `duration` and `chapters` from `timmy-time.mp3.json` into the hub's `window.SH_PODCAST` (don't commit the json).
+Stems are cached: after editing one segment, re-render it with `--only N --force` and run `produce.py` again.
+
+## The sound
+
+- **Voice**: `am_michael:0.6,am_onyx:0.4` (a deep, smooth blend), speed 0.95. Chain: 75 Hz high-pass, warmth at 140 Hz,
+  less box at 380 Hz, presence at 3.3 kHz, a softer top, de-esser, 2.5:1 compression.
+- **Music** (all synthesized in `produce.py`, nothing to license): a lo-fi theme in D, 78 bpm, FM electric piano,
+  sine bass, brushed drums, vinyl hiss. Intro theme, one-bar stingers between segments, a low groove under the lightning
+  round with a bell as each answer is revealed, and the theme again under the sign-off. Music ducks about 19 dB under speech.
+- **Master**: -16 LUFS integrated, -1.5 dB true peak, 44.1 kHz stereo, 96 kbps.
+
+## Writing a script for Kokoro
+
+- `##` headings are segments (chapters). `<!-- -->` and `#` lines are not spoken. `[pause N]` is N seconds of silence;
+  inline pauses mid-paragraph (the lightning round) also cue the answer bell.
+- Write letters that are read as letters with hyphens and in capitals: `A-band`, `I-G-G`, `A-T-P`, `type two-B`.
+  A plain "A band" reads "uh band", and "ay" reads "eye".
+- Spell out numbers, units and symbols; avoid parentheses, slashes and abbreviations.
+- Watch heteronyms ("live" was read as the adjective).
+- New hard word: add it to `lexicon.json`, run `--words`, read its phonemes. Hyphenated compounds hide their words
+  from the lexicon (`prolactin-releasing`): drop the hyphen or add the compound.
+- `--words` also prints every sentence with a heteronym in it: "close" (verb or adjective), "use" (verb or noun),
+  "live", "read". Reword when espeak picks the wrong one ("shut", "have closed", "bind").
+- Content follows the hub's own notes and exam hints. The graded-coursework rules (`vault/rules/graded-coursework.md`) apply here too.

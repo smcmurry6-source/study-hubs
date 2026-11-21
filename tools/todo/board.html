@@ -1,0 +1,438 @@
+<title>Study Hubs Backlog</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,400;6..12,700;6..12,800&display=swap">
+<!-- The backlog board: the to-do list as numbered packages, one PR each, with a button that starts a Claude Code session
+     for one. tools/todo/board.mjs fills BOARD_DATA from /backlog's packages and the prompt template in
+     vault/how-to/package-the-to-dos.md. The page is a view: the to-do list itself stays in the vault. -->
+<style>
+/* Layout: four columns of package cards (This week, Next, Later, Set aside) on a wide screen, two on a tablet, and one
+   column with tabs on a phone. Tokens are the study hubs' own (widget/hub.css): plum-grey neutrals, Nunito Sans. */
+:root {
+  --ground: #ffffff; --panel: #f7f3f6; --row: #ffffff; --active: #eee7ec; --border: #e8e0e6; --rule: #efe9ed; --control: #cdc2ca;
+  --text: #3b2e3a; --muted: #685c66; --primary: #3b2e3a; --on-primary: #ffffff;
+  --gold: #e2a72e; --gold-ink: #8a5d00;
+  --right: #247b50; --right-bg: #dcf5e5; --right-ink: #0f4a2c;
+  --wrong-bg: #ffe9e6; --wrong-ink: #831c1e;
+  --sun: #ffe8a3; --sun-ink: #7a5300; --mint: #def4e6; --mint-ink: #1d6a42; --peach: #ffe6d9; --peach-ink: #9c3d17;
+  --lilac: #ece6f8; --lilac-ink: #58408a;
+  --focus: #2f62c8;
+  --shadow: 0 1px 2px rgba(30, 20, 30, .06), 0 2px 8px rgba(30, 20, 30, .05);
+  --float-shadow: 0 12px 40px rgba(30, 20, 30, .22);
+  --font: "Nunito Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --r-panel: 16px; --r-row: 12px; --r-pill: 999px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #111111; --panel: #1c1b1c; --row: #262426; --active: #343134; --border: #353135; --rule: #2b292b; --control: #555055;
+    --text: #f5f2f4; --muted: #b8b0b6; --primary: #f5f2f4; --on-primary: #2b2230;
+    --gold: #f2c14e; --gold-ink: #f2c14e;
+    --right: #4cc38a; --right-bg: #173022; --right-ink: #8fe0b6;
+    --wrong-bg: #3a1b1f; --wrong-ink: #f7a9ae;
+    --sun: #2c2414; --sun-ink: #f2c14e; --mint: #152a1f; --mint-ink: #7fd8a8; --peach: #321f17; --peach-ink: #f4a582;
+    --lilac: #251f30; --lilac-ink: #c3a9f0;
+    --focus: #7fa6f2;
+    --shadow: none; --float-shadow: 0 12px 40px rgba(0, 0, 0, .6);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #111111; --panel: #1c1b1c; --row: #262426; --active: #343134; --border: #353135; --rule: #2b292b; --control: #555055;
+  --text: #f5f2f4; --muted: #b8b0b6; --primary: #f5f2f4; --on-primary: #2b2230;
+  --gold: #f2c14e; --gold-ink: #f2c14e;
+  --right: #4cc38a; --right-bg: #173022; --right-ink: #8fe0b6;
+  --wrong-bg: #3a1b1f; --wrong-ink: #f7a9ae;
+  --sun: #2c2414; --sun-ink: #f2c14e; --mint: #152a1f; --mint-ink: #7fd8a8; --peach: #321f17; --peach-ink: #f4a582;
+  --lilac: #251f30; --lilac-ink: #c3a9f0;
+  --focus: #7fa6f2;
+  --shadow: none; --float-shadow: 0 12px 40px rgba(0, 0, 0, .6);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--ground); color: var(--text); font-family: var(--font); font-size: 15px; line-height: 1.45;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 20px 40px; -webkit-text-size-adjust: 100%; }
+a { color: inherit; text-underline-offset: 2px; }
+code { font-family: var(--mono); font-size: .86em; overflow-wrap: anywhere; }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: 6px; }
+.page { max-width: 1480px; margin: 0 auto; display: grid; gap: 18px; }
+
+/* the masthead */
+.top { display: grid; gap: 6px; }
+.top h1 { margin: 0; font-size: 26px; font-weight: 800; letter-spacing: -.01em; text-wrap: balance; display: flex; align-items: center; gap: 10px; }
+.top h1 svg { flex: none; }
+.meta { margin: 0; color: var(--muted); font-size: 14px; font-variant-numeric: tabular-nums; }
+.cal { margin: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.cal span { background: var(--peach); color: var(--peach-ink); border-radius: var(--r-pill); padding: 3px 11px; font-size: 13px; font-weight: 700; }
+.note { margin: 0; font-size: 13px; color: var(--muted); max-width: 70ch; }
+.note[data-tone="ok"] { color: var(--right-ink); }
+
+/* the phone's tabs */
+.tabs { display: none; gap: 4px; background: var(--panel); border-radius: var(--r-pill); padding: 4px; position: sticky;
+  top: env(safe-area-inset-top, 0px); z-index: 5; box-shadow: var(--shadow); }
+.tabs button { flex: 1 1 0; min-width: 0; border: 0; background: transparent; border-radius: var(--r-pill); padding: 8px 4px;
+  font-size: 13px; font-weight: 800; cursor: pointer; white-space: nowrap; color: var(--muted); }
+.tabs button[aria-selected="true"] { background: var(--row); color: var(--text); box-shadow: var(--shadow); }
+.tabs .n { font-weight: 700; opacity: .75; font-variant-numeric: tabular-nums; }
+
+/* the board */
+.board { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; align-items: start; }
+.col { background: var(--panel); border-radius: var(--r-panel); padding: 12px; display: grid; gap: 10px; min-width: 0; }
+.col > h2 { margin: 2px 4px 2px; font-size: 14px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase;
+  display: flex; align-items: center; gap: 8px; }
+.col > h2 .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--tone); flex: none; }
+.col > h2 .n { margin-left: auto; color: var(--muted); font-variant-numeric: tabular-nums; letter-spacing: 0; }
+.col[data-col="week"] { --tone: var(--gold); }
+.col[data-col="next"] { --tone: var(--lilac-ink); }
+.col[data-col="later"] { --tone: var(--mint-ink); }
+.col[data-col="aside"] { --tone: var(--control); }
+.empty { margin: 4px; color: var(--muted); font-size: 14px; }
+
+.card { background: var(--row); border: 1px solid var(--border); border-radius: var(--r-row); padding: 12px 12px 10px;
+  display: grid; gap: 8px; box-shadow: var(--shadow); min-width: 0; scroll-margin-top: 70px; }
+.card-head { display: flex; gap: 10px; align-items: flex-start; }
+.num { flex: none; min-width: 32px; height: 32px; padding: 0 6px; border-radius: 10px; background: var(--primary); color: var(--on-primary);
+  display: grid; place-items: center; font-weight: 800; font-size: 16px; font-variant-numeric: tabular-nums; }
+.card h3 { margin: 4px 0 0; font-size: 16px; font-weight: 800; line-height: 1.25; text-wrap: balance; min-width: 0; }
+.chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.chip { border-radius: var(--r-pill); padding: 2px 9px; font-size: 12px; font-weight: 800; background: var(--active); color: var(--text); }
+.chip.size-L { background: var(--peach); color: var(--peach-ink); }
+.chip.size-M { background: var(--lilac); color: var(--lilac-ink); }
+.chip.size-S { background: var(--mint); color: var(--mint-ink); }
+.chip.st-ready { background: var(--right-bg); color: var(--right-ink); }
+.chip.st-waiting { background: var(--sun); color: var(--sun-ink); }
+.chip.st-ask { background: var(--lilac); color: var(--lilac-ink); }
+.chip.st-started { background: var(--primary); color: var(--on-primary); }
+.line { margin: 0; font-size: 13.5px; }
+.line b { font-weight: 800; }
+.line.waits { color: var(--sun-ink); }
+.line.why { color: var(--muted); }
+.items { margin: 0; padding: 0; list-style: none; display: grid; gap: 7px; }
+.items li { display: grid; gap: 1px; padding-left: 12px; position: relative; font-size: 14px; }
+.items li::before { content: ""; position: absolute; left: 0; top: .62em; width: 5px; height: 5px; border-radius: 50%; background: var(--control); }
+.where { color: var(--muted); font-size: 12px; overflow-wrap: anywhere; }
+.actions { display: flex; flex-wrap: wrap; gap: 6px; padding-top: 2px; }
+.btn { border: 1px solid var(--control); background: var(--row); border-radius: var(--r-pill); padding: 6px 13px; font-size: 13px;
+  font-weight: 800; cursor: pointer; min-height: 34px; }
+.btn:hover { background: var(--active); }
+.btn.primary { background: var(--primary); border-color: var(--primary); color: var(--on-primary); }
+.btn.primary:hover { filter: brightness(1.15); }
+.btn.ghost { border-color: transparent; color: var(--muted); }
+.btn[disabled] { opacity: .55; cursor: default; }
+.started { margin: 0; font-size: 13px; font-weight: 700; }
+.prompt { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font-family: var(--mono); font-size: 12px; line-height: 1.5;
+  background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 10px; max-height: 340px; overflow: auto; }
+.flash { font-size: 12.5px; color: var(--right-ink); font-weight: 700; align-self: center; }
+
+/* Set aside */
+.group { background: var(--row); border: 1px solid var(--border); border-radius: var(--r-row); padding: 10px 12px; display: grid; gap: 6px; }
+.group h3 { margin: 0; font-size: 13px; font-weight: 800; }
+.group ul { margin: 0; padding-left: 18px; display: grid; gap: 5px; font-size: 13.5px; }
+.foot { color: var(--muted); font-size: 13px; margin: 0; max-width: 80ch; }
+
+/* the start sheet */
+.scrim { position: fixed; inset: 0; background: rgba(20, 12, 20, .45); z-index: 20; display: grid; place-items: center;
+  padding: max(16px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(16px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); }
+.sheet { background: var(--row); color: var(--text); border-radius: var(--r-panel); box-shadow: var(--float-shadow); width: min(680px, 100%);
+  max-height: 100%; overflow: auto; padding: 18px; display: grid; gap: 12px; }
+.sheet h2 { margin: 0; font-size: 19px; font-weight: 800; text-wrap: balance; }
+.sheet label { font-size: 13px; font-weight: 800; }
+.sheet textarea { width: 100%; min-height: 240px; resize: vertical; font-family: var(--mono); font-size: 12.5px; line-height: 1.5;
+  color: var(--text); background: var(--panel); border: 1px solid var(--control); border-radius: 10px; padding: 10px; }
+.sheet .row { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
+.msg { margin: 0; font-size: 14px; border-radius: 10px; padding: 9px 11px; }
+.msg[data-tone="warn"] { background: var(--sun); color: var(--sun-ink); }
+.msg[data-tone="bad"] { background: var(--wrong-bg); color: var(--wrong-ink); }
+.msg[data-tone="ok"] { background: var(--right-bg); color: var(--right-ink); }
+.msg[data-tone="info"] { background: var(--panel); color: var(--text); }
+
+@media (max-width: 1180px) { .board { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 760px) {
+  .tabs { display: flex; }
+  .board { grid-template-columns: minmax(0, 1fr); }
+  .board .col:not(.is-on) { display: none; }
+  .top h1 { font-size: 22px; }
+}
+@media (prefers-reduced-motion: no-preference) { .btn, .tabs button { transition: background-color .15s ease, filter .15s ease; } }
+</style>
+
+<div class="page">
+  <header class="top">
+    <h1><svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true"><path d="M13 3.2c-2.2-1.6-6.4-1.9-8.1.9-1.6 2.6-.6 6.2.4 9.4.8 2.6 1 5.3 1.7 7.9.4 1.4 2 1.6 2.6.2.9-2.1 1.2-5.6 3.4-5.6s2.5 3.5 3.4 5.6c.6 1.4 2.2 1.2 2.6-.2.7-2.6.9-5.3 1.7-7.9 1-3.2 2-6.8.4-9.4-1.7-2.8-5.9-2.5-8.1-.9Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>Study Hubs Backlog</h1>
+    <p class="meta" id="meta"></p>
+    <p class="cal" id="cal"></p>
+    <p class="note" id="mcpNote">Copy a package's prompt into a new Claude Code session. Starting one from here works when this board is open in claude.ai.</p>
+  </header>
+  <nav class="tabs" id="tabs" role="tablist" aria-label="Columns"></nav>
+  <main class="board" id="board"></main>
+  <p class="foot">This board is a view of the to-do list, which lives in the vault (<code>vault/tasks/</code>, the inbox, the bug log). Run <code>/backlog</code> in a Claude Code session to refresh it; a session you start here ticks its items off in its own pull request.</p>
+</div>
+
+<script type="application/json" id="board-data">/*BOARD_DATA*/</script>
+<script>
+(function () {
+  'use strict';
+  var DATA;
+  try { DATA = JSON.parse(document.getElementById('board-data').textContent); } catch (e) { DATA = null; }
+  var board = document.getElementById('board');
+  if (!DATA || !DATA.packages) { board.innerHTML = '<p class="empty">No packages yet. Run /backlog to fill this board.</p>'; return; }
+
+  var SERVER = 'Claude Code Remote', TOOL = 'create_session';
+  var COLS = [
+    { id: 'week', name: 'This week' }, { id: 'next', name: 'Next' }, { id: 'later', name: 'Later' }, { id: 'aside', name: 'Set aside' }
+  ];
+  var SIZE = { S: 'about an hour, a few files', M: 'one feature or a handful of fixes in one area', L: 'a session of its own' };
+  var ASIDE = [
+    ['pr', 'In a PR'], ['waiting', 'Waiting'], ['sam', 'For you'], ['parked', 'Parked'], ['moot', 'Probably done or moot']
+  ];
+  var mcp = null, canStart = false;
+
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  // a little markdown: `code` and [text](https://...) links, nothing else
+  function md(s) {
+    var out = esc(s);
+    out = out.replace(/`([^`]+)`/g, '<code>$1</code>');
+    out = out.replace(/\[([^\]]+)\]\((https:\/\/[^\s)]+)\)/g, function (m, t, u) { return '<a href="' + u + '" target="_blank" rel="noopener">' + t + '</a>'; });
+    return out;
+  }
+  function el(tag, cls, html) { var e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; }
+  function store(get, val) {
+    var key = 'shBacklog:started:' + DATA.asOf;
+    try {
+      var m = JSON.parse(localStorage.getItem(key) || '{}');
+      if (get) return m;
+      m[val.n] = val.url; localStorage.setItem(key, JSON.stringify(m));
+    } catch (e) { return {}; }
+  }
+  function pref(k, v) { try { if (v === undefined) return localStorage.getItem('shBacklog:' + k); localStorage.setItem('shBacklog:' + k, v); } catch (e) { return null; } }
+
+  // ---------- the masthead ----------
+  var counts = { week: 0, next: 0, later: 0 };
+  DATA.packages.forEach(function (p) { counts[p.tier] = (counts[p.tier] || 0) + 1; });
+  document.getElementById('meta').textContent = 'As of ' + (DATA.asOfLabel || DATA.asOf) + ' · ' + DATA.packages.length +
+    ' packages · reply with a number in chat, or start one here';
+  var cal = document.getElementById('cal');
+  (DATA.calendar || []).forEach(function (c) { cal.appendChild(el('span', '', esc(c))); });
+  if (!cal.children.length) cal.hidden = true;
+
+  // ---------- the columns ----------
+  var tabs = document.getElementById('tabs');
+  var on = pref('tab') || 'week';
+  if (!COLS.some(function (c) { return c.id === on; })) on = 'week';
+  COLS.forEach(function (c) {
+    var n = c.id === 'aside' ? '' : (counts[c.id] || 0);
+    var col = el('section', 'col' + (c.id === on ? ' is-on' : ''));
+    col.dataset.col = c.id; col.id = 'col-' + c.id; col.setAttribute('aria-label', c.name);
+    col.appendChild(el('h2', '', '<span class="dot" aria-hidden="true"></span>' + esc(c.name) + (n !== '' ? '<span class="n">' + n + '</span>' : '')));
+    board.appendChild(col);
+    var t = el('button', '', esc(c.name) + (n !== '' ? ' <span class="n">' + n + '</span>' : ''));
+    t.type = 'button'; t.setAttribute('role', 'tab'); t.setAttribute('aria-controls', col.id); t.setAttribute('aria-selected', c.id === on ? 'true' : 'false');
+    t.addEventListener('click', function () {
+      on = c.id; pref('tab', on);
+      [].forEach.call(tabs.children, function (b) { b.setAttribute('aria-selected', b === t ? 'true' : 'false'); });
+      [].forEach.call(board.children, function (x) { x.classList.toggle('is-on', x.dataset.col === on); });
+    });
+    tabs.appendChild(t);
+  });
+  function col(id) { return document.getElementById('col-' + id); }
+
+  var started = store(true) || {};
+  var cards = [];
+  DATA.packages.forEach(function (p) {
+    var c = el('article', 'card'); c.id = 'p' + p.n; c.dataset.n = p.n;
+    var head = el('div', 'card-head');
+    head.appendChild(el('span', 'num', esc(p.n)));
+    head.appendChild(el('h3', '', esc(p.title)));
+    c.appendChild(head);
+    var chips = el('div', 'chips');
+    chips.appendChild(el('span', 'chip size-' + esc(p.size), esc(p.size) + (p.alone ? ' · alone' : ''))).title = SIZE[p.size] || '';
+    var st = p.state || 'ready';
+    var stChip = el('span', 'chip st-' + esc(st), st === 'waiting' ? 'Waiting' : st === 'ask' ? 'Asks you first' : 'Ready');
+    chips.appendChild(stChip);
+    c.appendChild(chips);
+    if (p.waits) c.appendChild(el('p', 'line waits', '<b>Waits on:</b> ' + md(p.waits)));
+    var ul = el('ul', 'items');
+    (p.items || []).forEach(function (it) {
+      var li = el('li', '', '<span>' + md(it.text) + '</span>' + (it.where ? '<span class="where">' + md(it.where) + '</span>' : ''));
+      ul.appendChild(li);
+    });
+    c.appendChild(ul);
+    if (p.why) c.appendChild(el('p', 'line why', md(p.why)));
+    if (p.ask && p.ask.length) c.appendChild(el('p', 'line', '<b>Asks you first:</b> ' + md(p.ask.join(' '))));
+    var acts = el('div', 'actions');
+    var start = el('button', 'btn primary', 'Start session'); start.type = 'button'; start.hidden = true;
+    var copy = el('button', 'btn', 'Copy prompt'); copy.type = 'button';
+    var show = el('button', 'btn ghost', 'Show prompt'); show.type = 'button'; show.setAttribute('aria-expanded', 'false');
+    var flash = el('span', 'flash'); flash.setAttribute('role', 'status');
+    acts.appendChild(start); acts.appendChild(copy); acts.appendChild(show); acts.appendChild(flash);
+    c.appendChild(acts);
+    var done = el('p', 'started'); done.hidden = true; c.appendChild(done);
+    var pre = el('pre', 'prompt'); pre.textContent = p.prompt; pre.hidden = true; pre.id = 'prompt-' + p.n; pre.tabIndex = 0;
+    show.setAttribute('aria-controls', pre.id);
+    c.appendChild(pre);
+    show.addEventListener('click', function () {
+      pre.hidden = !pre.hidden; show.setAttribute('aria-expanded', String(!pre.hidden)); show.textContent = pre.hidden ? 'Show prompt' : 'Hide prompt';
+    });
+    copy.addEventListener('click', function () { copyText(p.prompt, flash, pre, show); });
+    start.addEventListener('click', function () { openSheet(p, start); });
+    function markStarted(url) {
+      stChip.className = 'chip st-started'; stChip.textContent = 'Started';
+      done.hidden = false;
+      done.innerHTML = url ? 'Started · <a href="' + esc(url) + '" target="_blank" rel="noopener">Open the session</a>' : 'Started · find it in your Claude Code sessions';
+    }
+    if (started[p.n] !== undefined) markStarted(started[p.n]);
+    (col(p.tier) || col('later')).appendChild(c);
+    cards.push({ p: p, start: start, markStarted: markStarted });
+  });
+  ['week', 'next', 'later'].forEach(function (id) { if (!counts[id]) col(id).appendChild(el('p', 'empty', 'Nothing here.')); });
+
+  var aside = DATA.aside || {};
+  ASIDE.forEach(function (a) {
+    var list = aside[a[0]] || [];
+    var g = el('div', 'group');
+    g.appendChild(el('h3', '', esc(a[1])));
+    if (!list.length) g.appendChild(el('p', 'line why', 'Nothing.'));
+    else { var u = el('ul'); list.forEach(function (s) { u.appendChild(el('li', '', md(s))); }); g.appendChild(u); }
+    col('aside').appendChild(g);
+  });
+
+  // ---------- copy ----------
+  function copyText(text, flash, pre, show) {
+    function fallback() {
+      pre.hidden = false; show.setAttribute('aria-expanded', 'true'); show.textContent = 'Hide prompt';
+      var r = document.createRange(); r.selectNodeContents(pre);
+      var s = window.getSelection(); s.removeAllRanges(); s.addRange(r); pre.focus();
+      flash.textContent = 'Selected: copy it with your device';
+    }
+    try {
+      navigator.clipboard.writeText(text).then(function () {
+        flash.textContent = 'Copied'; setTimeout(function () { flash.textContent = ''; }, 2400);
+      }, fallback);
+    } catch (e) { fallback(); }
+  }
+
+  // ---------- starting a session (the Claude Code Remote connector) ----------
+  var note = document.getElementById('mcpNote');
+  function sessionFrom(res) {
+    var id = '', url = '';
+    (function walk(x, d) {
+      if (x == null || d > 5) return;
+      if (typeof x === 'string') {
+        if (!url && /^https:\/\/claude\.ai\/code\/\S+$/.test(x)) url = x;
+        if (!id) { var m = x.match(/\bsession_[A-Za-z0-9]+\b/); if (m) id = m[0]; }
+        return;
+      }
+      if (typeof x === 'object') for (var k in x) if (Object.prototype.hasOwnProperty.call(x, k)) walk(x[k], d + 1);
+    })(res && res.payload !== undefined ? res.payload : res, 0);
+    if (!id && res && res.content) (res.content || []).forEach(function (b) { if (!id && b && typeof b.text === 'string') { var m = b.text.match(/\bsession_[A-Za-z0-9]+\b/); if (m) id = m[0]; } });
+    if (!url && id) url = 'https://claude.ai/code/' + id;
+    return { id: id, url: url };
+  }
+  function why(err) {
+    var code = err && err.code;
+    switch (code) {
+      case 'not_in_manifest': return ['bad', 'This board isn’t allowed to use Claude Code Remote. Allow it in the board’s permissions, or copy the prompt instead.'];
+      case 'approval_required': return ['warn', 'Starting a session needs your OK. Press Start session again and choose Allow, or copy the prompt.'];
+      case 'server_not_connected': return ['bad', 'Claude Code Remote isn’t connected for you. Add it in claude.ai Settings → Connectors, or copy the prompt.'];
+      case 'needs_reauth': return ['bad', 'Claude Code Remote needs to be reconnected in claude.ai Settings → Connectors. Then try again.'];
+      case 'selection_required': return ['warn', 'You have more than one Claude Code Remote connector. Pick one when claude.ai asks, then try again.'];
+      case 'blocked_by_policy': return ['bad', 'Your organization doesn’t let a page start sessions. Copy the prompt instead.'];
+      case 'tool_error': return ['bad', 'The session didn’t start: ' + (err.message || 'Claude Code Remote reported an error') + '. Check your sessions before you try again.'];
+      case 'server_unavailable': case 'upstream_error': case 'cancelled':
+        return ['warn', 'No answer from Claude Code Remote, so the session may or may not have started. Look in your sessions at claude.ai/code before you press Start again.'];
+      default: return ['bad', 'The session didn’t start (' + (code || 'unknown error') + '). Check your sessions at claude.ai/code, or copy the prompt.'];
+    }
+  }
+
+  var scrim = null, lastFocus = null;
+  function closeSheet() {
+    if (!scrim) return;
+    scrim.remove(); scrim = null;
+    document.removeEventListener('keydown', onKey, true);
+    if (lastFocus) lastFocus.focus();
+  }
+  function onKey(e) {
+    if (e.key === 'Escape' && scrim && !scrim.dataset.busy) { e.preventDefault(); closeSheet(); }
+    if (e.key === 'Tab' && scrim) {
+      var f = scrim.querySelectorAll('button:not([disabled]), textarea, a[href]');
+      if (!f.length) return;
+      var first = f[0], last = f[f.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
+  }
+  function openSheet(p, from) {
+    lastFocus = from;
+    scrim = el('div', 'scrim');
+    var sheet = el('div', 'sheet'); sheet.setAttribute('role', 'dialog'); sheet.setAttribute('aria-modal', 'true'); sheet.setAttribute('aria-labelledby', 'sheet-title');
+    sheet.appendChild(el('h2', '', 'Start package ' + esc(p.n) + ': ' + esc(p.title))).id = 'sheet-title';
+    if (p.state === 'waiting' && p.waits) sheet.appendChild(el('p', 'msg', 'This package waits on: ' + md(p.waits) + '. Start it anyway only if that has happened.')).dataset.tone = 'warn';
+    sheet.appendChild(el('p', 'msg', 'A new cloud session opens on ' + esc((DATA.repo || '').replace('https://github.com/', '')) +
+      ' with this prompt. Add your answers to its questions here first, if it asks any.')).dataset.tone = 'info';
+    var lab = el('label', '', 'Prompt'); lab.setAttribute('for', 'sheet-prompt');
+    var ta = el('textarea'); ta.id = 'sheet-prompt'; ta.value = p.prompt; ta.spellcheck = false;
+    sheet.appendChild(lab); sheet.appendChild(ta);
+    var msg = el('p', 'msg'); msg.hidden = true; msg.setAttribute('role', 'status'); sheet.appendChild(msg);
+    var row = el('div', 'row');
+    var cancel = el('button', 'btn', 'Cancel'); cancel.type = 'button';
+    var go = el('button', 'btn primary', 'Start session'); go.type = 'button';
+    row.appendChild(cancel); row.appendChild(go); sheet.appendChild(row);
+    scrim.appendChild(sheet); document.body.appendChild(scrim);
+    document.addEventListener('keydown', onKey, true);
+    scrim.addEventListener('click', function (e) { if (e.target === scrim && !scrim.dataset.busy) closeSheet(); });
+    cancel.addEventListener('click', closeSheet);
+    go.focus();
+    go.addEventListener('click', function () {
+      var text = ta.value.trim();
+      if (!text) { msg.hidden = false; msg.dataset.tone = 'bad'; msg.textContent = 'The prompt is empty.'; return; }
+      var input = { source_url: DATA.repo, title: p.title, prompt: text };
+      if (DATA.environmentId) input.environment_id = DATA.environmentId;
+      go.disabled = true; cancel.disabled = true; scrim.dataset.busy = '1'; go.textContent = 'Starting…';
+      msg.hidden = false; msg.dataset.tone = 'info'; msg.textContent = 'Asking Claude Code Remote to start the session…';
+      mcp.callTool(SERVER, TOOL, input, { cache: false }).then(function (res) {
+        var s = sessionFrom(res);
+        store(false, { n: p.n, url: s.url || '' });
+        cards.forEach(function (c) { if (c.p.n === p.n) c.markStarted(s.url); });
+        delete scrim.dataset.busy; cancel.disabled = false; cancel.textContent = 'Close'; go.hidden = true;
+        msg.dataset.tone = 'ok';
+        msg.innerHTML = s.url ? 'Session started. <a href="' + esc(s.url) + '" target="_blank" rel="noopener">Open it</a>.' :
+          'Session started. Find it in your Claude Code sessions at <a href="https://claude.ai/code" target="_blank" rel="noopener">claude.ai/code</a>.';
+        cancel.focus();
+      }, function (err) {
+        var w = why(err);
+        delete scrim.dataset.busy; cancel.disabled = false; go.disabled = false; go.textContent = 'Start session';
+        msg.dataset.tone = w[0]; msg.innerHTML = md(w[1]).replace('claude.ai/code', '<a href="https://claude.ai/code" target="_blank" rel="noopener">claude.ai/code</a>');
+        if (err && err.code === 'blocked_by_policy') { canStart = false; cards.forEach(function (c) { c.start.hidden = true; }); go.hidden = true; }
+      });
+    });
+  }
+
+  function lightUp(tools) {
+    var names = (tools || []).map(function (t) { return t && t.name; });
+    if (names.indexOf(TOOL) < 0) {
+      note.textContent = 'Starting a session from here needs the Claude Code Remote connector with its "start a session" tool, which isn’t available to you here. Copy a package’s prompt into a new Claude Code session instead.';
+      return;
+    }
+    canStart = true;
+    cards.forEach(function (c) { c.start.hidden = false; });
+    note.dataset.tone = 'ok';
+    note.textContent = 'Start session opens a new Claude Code cloud session for that package. The first time, claude.ai asks you to allow Claude Code Remote for this board.';
+  }
+  try {
+    var use = window.claude && window.claude.use;
+    if (typeof use === 'function') {
+      window.claude.use('mcp').then(function (m) {
+        if (!m) return;
+        mcp = m;
+        return m.listTools(SERVER).then(function (r) {
+          var s = (r && r.servers || []).filter(function (x) { return x && x.server === SERVER; })[0];
+          lightUp(s ? s.tools : []);
+        }, function () { lightUp([]); });
+      }, function () {});
+    }
+  } catch (e) { /* the copy buttons still work */ }
+})();
+</script>

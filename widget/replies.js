@@ -3,7 +3,10 @@
    question report, what was fixed). Notices to everyone (site_notices, posted from the admin Inbox's "Tell everyone")
    pop up once per device (sh_notice_seen) while they're live, on whichever page is opened first. Everything also stays
    in one Inbox (replies 90 days, notices 60), the same on every hub and the dashboard; a notice's hub only labels it.
-   Any [data-sh-inbox] element opens it; .sh-inbox-badge elements show the unread count. Data: get_my_inbox; reading a reply calls mark_reply_seen.
+   Any [data-sh-inbox] element opens it; .sh-inbox-badge elements show the unread count. Data: get_my_inbox (get_my_inbox_v2 once the game layer is there, which adds the idea board's status notes, kind "idea"); reading a reply calls mark_reply_seen.
+   The live survey (get_my_survey) also waits at the top of the Inbox until it's answered, so "Later" on the dashboard's
+   survey pop-up (or never seeing it) still leaves it one tap away; it counts as unread until the Inbox is opened
+   (sh_survey_seen) and is answered right there (submit_survey). shReplies.refresh() reloads after the pop-up is used.
    Used by widget/v3.js (hubs) and the dashboard:
      shReplies.start({ sb: supabaseClient, visitor: "..." or null, hub: "perio" | "dashboard" }) */
 (function(){
@@ -62,13 +65,28 @@
     "@media (max-width:560px){.sh-inbox{align-items:flex-end;padding:0;}" +
     ".sh-inbox-card{width:100%;max-height:88%;border-radius:18px 18px 0 0;padding-bottom:env(safe-area-inset-bottom,0px);}}" +
     "@media (prefers-reduced-motion:reduce){.sh-reply,.sh-inbox{animation:none;}}" +
-    ".sh-inbox-badge[hidden]{display:none !important;}";
+    ".sh-inbox-badge[hidden]{display:none !important;}" +
+    /* the survey, answered inside the Inbox */
+    ".sh-sv-q{margin:12px 0 0;}.sh-sv-q p{margin:0 0 7px;font-weight:600;font-size:14px;}" +
+    ".sh-sv-opts{display:flex;flex-wrap:wrap;gap:6px;}" +
+    ".sh-sv-opt{font:inherit;font-size:13.5px;padding:6px 12px;border-radius:999px;border:1px solid var(--r-line);background:var(--r-bg);color:var(--r-ink);cursor:pointer;}" +
+    ".sh-sv-opt[aria-pressed=\"true\"]{background:var(--r-ink);border-color:var(--r-ink);color:var(--r-bg);}" +
+    ".sh-sv-scale .sh-sv-opt{min-width:40px;}" +
+    ".sh-sv-ends{display:flex;justify-content:space-between;font-size:12px;color:var(--r-ink2);margin-top:4px;}" +
+    ".sh-inbox textarea{width:100%;min-height:60px;font:inherit;font-size:14px;padding:8px 10px;border-radius:10px;border:1px solid var(--r-line);background:var(--r-bg2);color:var(--r-ink);resize:vertical;}" +
+    ".sh-sv-other{margin-top:8px;}" +
+    ".sh-sv-send{margin-top:14px;display:flex;justify-content:flex-end;align-items:center;gap:10px;}" +
+    ".sh-sv-send .sh-reply-ok[disabled]{opacity:.45;cursor:default;}" +
+    ".sh-sv-note{font-size:12.5px;color:var(--r-ink2);margin-right:auto;}" +
+    "@media (max-width:560px){.sh-inbox textarea{font-size:16px;}}";
   var CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m8 12.5 2.8 2.8L16.5 9.5"/></svg>';
+  var CLIPBOARD = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4.5V3h6v1.5M9 10h6M9 14h6M9 18h3"/></svg>';
   var MEGAPHONE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11v2a1 1 0 0 0 1 1h2l5 4V6L6 10H4a1 1 0 0 0-1 1z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg>';
 
   /* the widget appends "  — question <id> · <section>" to a report; show the student only what they typed */
   function ownWords(note){ return String(note || "").replace(/\s+—\s+(question\s+\S+|[a-z-]+\/[\w-]+)(\s+·\s+\S+)?\s*$/i, "").trim(); }
   function qidOf(note){ var m = /—\s+question\s+(\S+)/.exec(String(note || "")); return m ? m[1] : ""; }
+  function esc(t){ return String(t == null ? "" : t).replace(/[&<>"']/g, function(c){ return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
   function fmtDate(t){ try { return new Date(t).toLocaleDateString(undefined, { month: "short", day: "numeric" }); } catch (e) { return ""; } }
   /* The text-size setting zooms the whole page (html style.zoom), and 100vh/100vw inside a zoomed page are
      bigger than the screen, so the pop-up measures the real viewport in zoomed px instead. The inbox needs
@@ -85,22 +103,26 @@
   }
 
   var pendingOpen = false;
-  var api = window.shReplies = { start: start, open: function(){ pendingOpen = true; }, unread: 0 };
+  var api = window.shReplies = { start: start, open: function(){ pendingOpen = true; }, refresh: function(){}, unread: 0 };
 
   function start(o){
     if (!o || !o.sb || api.started) return;
     api.started = true;
     var sb = o.sb, visitor = o.visitor || null;
     var items = [], loading = null;
+    var bootstrap = o.bootstrap || (window.shBootstrap && window.shBootstrap.ready) || null, bootstrapUsed = false;
 
-    function seenNotices(){ try { return JSON.parse(localStorage.getItem(SEEN_KEY) || "[]") || []; } catch (e) { return []; } }
-    function isUnread(r){ return r.kind === "notice" ? seenNotices().indexOf(r.id) < 0 : !r.seen; }
+    function seenList(key){ try { return JSON.parse(localStorage.getItem(key) || "[]") || []; } catch (e) { return []; } }
+    function seenNotices(){ return seenList(SEEN_KEY); }
+    function isUnread(r){ return r.kind === "notice" ? seenNotices().indexOf(r.id) < 0 : r.kind === "survey" ? seenList("sh_survey_seen").indexOf(r.id) < 0 : !r.seen; }
     function markSeen(r){
-      if (r.kind === "notice") {
-        try { var d = seenNotices(); if (d.indexOf(r.id) < 0) d.push(r.id); localStorage.setItem(SEEN_KEY, JSON.stringify(d.slice(-80))); } catch (e) {}
+      if (r.kind === "notice" || r.kind === "survey") {
+        var key = r.kind === "notice" ? SEEN_KEY : "sh_survey_seen";
+        try { var d = seenList(key); if (d.indexOf(r.id) < 0) d.push(r.id); localStorage.setItem(key, JSON.stringify(d.slice(-80))); } catch (e) {}
       } else if (!r.seen) {
         r.seen = true;
-        try { sb.rpc("mark_reply_seen", { p_visitor: visitor, p_kind: r.kind, p_id: r.id }).then(function(){}, function(){}); } catch (e) {}
+        /* an idea's status note (the idea board, migration_v54) has its own table */
+        try { (r.kind === "idea" ? sb.rpc("mark_idea_note_seen", { p_visitor: visitor, p_id: r.id }) : sb.rpc("mark_reply_seen", { p_visitor: visitor, p_kind: r.kind, p_id: r.id })).then(function(){}, function(){}); } catch (e) {}
       }
       updateBadges();
     }
@@ -113,20 +135,136 @@
       });
       try { document.dispatchEvent(new CustomEvent("sh:inbox", { detail: { unread: n } })); } catch (e) {}
     }
+    function setItems(inbox, surveys){
+      /* one inbox: the same list on every hub and the dashboard (a notice's hub is just its label); an unanswered survey first */
+      var sv = (surveys || []).filter(function(x){ return x && Array.isArray(x.questions) && x.questions.length; })[0];
+      items = (sv ? [{ kind: "survey", id: sv.id, title: sv.title, questions: sv.questions.slice(0, 5), at: sv.starts_at }] : []).concat(inbox || []);
+      updateBadges();
+      return items;
+    }
+    function loadRemote(){
+      function rowsOf(res){ return res && !res.error && Array.isArray(res.data) ? res.data : []; }
+      function missingFn(res){ var e = res && res.error; return !!e && (e.code === "PGRST202" || e.code === "42883" || res.status === 404 || /could not find the function|does not exist/i.test(e.message || "")); }
+      var none = Promise.resolve(null);
+      return Promise.all([
+        /* o.v2() says the game layer's Inbox is wanted (migration_v54: the idea board's status notes ride in it). Since
+           2026-11-19 it's true on a page that wants the game layer and hasn't found it missing (it was true only once a
+           reply had confirmed it, so with the bootstrap timed out the Inbox left out the idea board's notes; a hub didn't
+           pass it at all); a database without the v2 call gets today's */
+        (typeof o.v2 === "function" && o.v2() ? sb.rpc("get_my_inbox_v2", { p_visitor: visitor }).then(function(res){
+          return missingFn(res) ? sb.rpc("get_my_inbox", { p_visitor: visitor }) : res;
+        }) : sb.rpc("get_my_inbox", { p_visitor: visitor })).then(rowsOf, function(){ return null; }),
+        visitor ? sb.rpc("get_my_survey", { p_visitor: visitor }).then(rowsOf, function(){ return []; }) : none
+      ]).then(function(r){
+        if (!r[0]) return items;
+        return setItems(r[0], r[1]);
+      });
+    }
     function load(){
       if (loading) return loading;
-      loading = sb.rpc("get_my_inbox", { p_visitor: visitor }).then(function(res){
-        var rows = res && !res.error && Array.isArray(res.data) ? res.data : [];
-        items = rows;  /* one inbox: the same list on every hub and the dashboard (a notice's hub is just its label) */
-        updateBadges();
-        return items;
-      }, function(){ return items; });
+      if (!bootstrapUsed && bootstrap && typeof bootstrap.then === "function") {
+        bootstrapUsed = true;
+        loading = bootstrap.then(function(data){
+          if (data && Array.isArray(data.inbox)) {
+            var surveys = Array.isArray(data.survey) ? data.survey : data.survey ? [data.survey] : [];
+            return setItems(data.inbox, surveys);
+          }
+          loading = null;
+          return load();
+        }, function(){ loading = null; return load(); });
+      } else loading = loadRemote();
       return loading;
+    }
+    api.refresh = function(){ loading = null; return load(); };
+
+    /* ---------- the survey, answered in the Inbox (same question kinds as the dashboard pop-up) ---------- */
+    function surveyItem(el, r){
+      var qs = r.questions, answers = {};
+      var h = '<div class="sh-reply-top">' + CLIPBOARD + '<span>' + esc(r.title || "Quick survey") + '</span></div>' +
+        '<div class="sh-reply-meta">Quick survey · ' + (qs.length === 1 ? "1 question" : qs.length + " questions") + '</div>';
+      qs.forEach(function(q, qi){
+        var id = String(q.id || ("q" + (qi + 1))), kind = q.kind || "choice";
+        h += '<div class="sh-sv-q" data-sq="' + esc(id) + '" data-kind="' + esc(kind) + '"><p>' + esc(q.prompt || "") + '</p>';
+        if (kind === "text") h += '<textarea maxlength="600" aria-label="' + esc(q.prompt || "Your answer") + '"></textarea>';
+        else if (kind === "scale") {
+          h += '<div class="sh-sv-opts sh-sv-scale">';
+          for (var n = 1; n <= 5; n++) h += '<button type="button" class="sh-sv-opt" aria-pressed="false" data-sv="' + n + '">' + n + '</button>';
+          h += '</div><div class="sh-sv-ends"><span>' + esc((q.ends && q.ends[0]) || "Not at all") + '</span><span>' + esc((q.ends && q.ends[1]) || "Very") + '</span></div>';
+        } else {
+          h += '<div class="sh-sv-opts">' + (q.options || []).map(function(o){ return '<button type="button" class="sh-sv-opt" aria-pressed="false" data-sv="' + esc(o) + '">' + esc(o) + '</button>'; }).join("") +
+            (q.other ? '<button type="button" class="sh-sv-opt" aria-pressed="false" data-sv="Other" data-other>Other</button>' : '') + '</div>';
+          if (q.other) h += '<textarea class="sh-sv-other" maxlength="300" hidden aria-label="Other: type your answer" placeholder="Type your answer"></textarea>';
+        }
+        h += '</div>';
+      });
+      h += '<div class="sh-sv-send"><span class="sh-sv-note"></span><button type="button" class="sh-reply-ok" disabled>Send</button></div>';
+      el.innerHTML = h;
+      var send = el.querySelector(".sh-reply-ok"), note = el.querySelector(".sh-sv-note");
+      function refreshAnswers(){
+        el.querySelectorAll("textarea").forEach(function(t){
+          var id = t.closest(".sh-sv-q").getAttribute("data-sq"), other = t.classList.contains("sh-sv-other");
+          if (other) id += "_other";
+          var v = other && t.hidden ? "" : t.value.trim();
+          if (v) answers[id] = v.slice(0, other ? 300 : 600); else delete answers[id];
+        });
+        send.disabled = !Object.keys(answers).length;
+      }
+      el.addEventListener("input", refreshAnswers);
+      el.addEventListener("click", function(e){
+        var opt = e.target.closest(".sh-sv-opt");
+        if (!opt) return;
+        var q = opt.closest(".sh-sv-q"), id = q.getAttribute("data-sq"), kind = q.getAttribute("data-kind");
+        var on = opt.getAttribute("aria-pressed") !== "true";
+        if (kind !== "multi") q.querySelectorAll(".sh-sv-opt").forEach(function(b){ b.setAttribute("aria-pressed", "false"); });
+        opt.setAttribute("aria-pressed", String(on));
+        var box = q.querySelector(".sh-sv-other");
+        if (box) { box.hidden = !q.querySelector('.sh-sv-opt[data-other][aria-pressed="true"]'); if (!box.hidden && opt.hasAttribute("data-other")) box.focus(); }
+        var picked = Array.prototype.map.call(q.querySelectorAll('.sh-sv-opt[aria-pressed="true"]'), function(b){ return b.getAttribute("data-sv"); });
+        if (!picked.length) delete answers[id];
+        else answers[id] = kind === "multi" ? picked : (kind === "scale" ? +picked[0] : picked[0]);
+        refreshAnswers();
+      });
+      send.addEventListener("click", function(){
+        if (send.disabled) return;
+        send.disabled = true; note.textContent = "Sending…";
+        /* submit_survey_v2 (migration_v60) answers { ok, xp, crowns }: the first answer to each survey pays 1,000 XP (migration_v61) and 1,000
+           crowns. Without it, the old call's true or false. */
+        var args = { p_survey: r.id, p_visitor: visitor, p_answers: answers };
+        function missing(res){ var e = res && res.error; return !!e && (e.code === "PGRST202" || e.code === "42883" || res.status === 404 || /could not find the function|does not exist/i.test(e.message || "")); }
+        sb.rpc("submit_survey_v2", args).then(function(res){
+          if (missing(res)) return sb.rpc("submit_survey", args).then(function(o){ return { ok: !!o && !o.error && o.data !== false, xp: 0, crowns: 0 }; });
+          var d = res && !res.error && res.data && typeof res.data === "object" ? res.data : null;
+          return { ok: !!(d && d.ok), xp: d && d.xp | 0, crowns: d && d.crowns | 0 };
+        }).then(function(res){
+          if (!res.ok) { send.disabled = false; note.textContent = "That didn't send. Try again?"; return; }
+          try { localStorage.setItem("sh_survey_done_" + r.id, "1"); } catch (e) {}
+          items = items.filter(function(x){ return x !== r; });
+          updateBadges();
+          el.innerHTML = '<div class="sh-reply-top">' + CHECK + '<span>Thank you!</span></div><div class="sh-reply-msg">Your answers go straight into what gets built next.' +
+            (res.xp > 0 ? ' <b>+' + Number(res.xp).toLocaleString() + ' XP</b> and <b>+' + Number(res.crowns).toLocaleString() + ' Shiny Gold Crowns</b> for sharing.' : '') + '</div>';
+          try { document.dispatchEvent(new CustomEvent("sh:survey-done", { detail: { id: r.id } })); } catch (e) {}
+          if (res.xp > 0) try { document.dispatchEvent(new CustomEvent("sh:reward", { detail: { xp: res.xp, crowns: res.crowns } })); } catch (e) {}
+        }, function(){ send.disabled = false; note.textContent = "That didn't send. Try again?"; });
+      });
     }
 
     /* one card's contents, shared by the pop-up and the inbox list */
     var CARD = '<div class="sh-reply-top"></div><div class="sh-reply-meta"></div><div class="sh-reply-you"></div><div class="sh-reply-msg"></div>';
+    /* an idea's new status (the idea board): it goes to the idea's author and everyone who voted it up. The row's
+       title is the idea's, its note the status, its message Sam's one line on why. */
+    var IDEA_STATUS = { considering: ["under consideration", "Sam is thinking this one over."], planned: ["planned", "It's on the list to build."],
+      shipped: ["shipped", "It's built. Thanks for the idea and the votes."], "not-doing": ["not being built", "This one won't be built."] };
+    function fillIdea(el, r){
+      var st = IDEA_STATUS[r.note] || ["updated", "Its status changed."];
+      el.querySelector(".sh-reply-top").innerHTML = CHECK + "<span></span>";
+      el.querySelector(".sh-reply-top span").textContent = "An idea you posted or voted for is " + st[0];
+      el.querySelector(".sh-reply-meta").textContent = ["Idea board", HUB_NAME[r.hub] || r.hub || "All hubs", r.at ? fmtDate(r.at) : ""].filter(Boolean).join(" · ");
+      var t = String(r.title || "");
+      el.querySelector(".sh-reply-you").textContent = "The idea: " + (t.length > 240 ? t.slice(0, 237) + "..." : t);
+      el.querySelector(".sh-reply-msg").textContent = (r.message || "").trim() || st[1];
+    }
     function fill(el, r){
+      if (r.kind === "idea") { fillIdea(el, r); return; }
       var flag = r.kind === "flag", notice = r.kind === "notice";
       var yours = notice ? "" : ownWords(r.note), qid = flag ? qidOf(r.note) : "";
       var msg = (r.message || "").trim() || (flag
@@ -196,14 +334,15 @@
       load().then(function(rows){
         var list = wrap.querySelector(".sh-inbox-list");
         if (!rows.length) {
-          list.innerHTML = '<div class="sh-inbox-empty">Nothing here yet. When a problem you report or an idea you suggest is dealt with, the reply lands here, along with news for the whole class.</div>';
+          list.innerHTML = '<div class="sh-inbox-empty">Nothing here yet. When a problem you report or an idea you suggest is dealt with, the reply lands here, along with news for the whole class and any survey you haven\'t answered.</div>';
           return;
         }
         list.innerHTML = "";
         rows.forEach(function(r){
           var el = document.createElement("div");
-          el.className = "sh-inbox-item"; el.innerHTML = CARD;
-          fill(el, r);
+          el.className = "sh-inbox-item";
+          if (r.kind === "survey") surveyItem(el, r);
+          else { el.innerHTML = CARD; fill(el, r); }
           if (isUnread(r)) {
             var tag = document.createElement("span"); tag.className = "sh-inbox-new"; tag.textContent = "New";
             el.querySelector(".sh-reply-top").appendChild(tag);
@@ -224,9 +363,13 @@
       load().then(function(rows){
         var now = Date.now();
         var fresh = rows.filter(function(r){
-          return isUnread(r) && (r.kind !== "notice" || !r.expires_at || new Date(r.expires_at).getTime() > now);
+          return r.kind !== "survey" && isUnread(r) && (r.kind !== "notice" || !r.expires_at || new Date(r.expires_at).getTime() > now);
         }).reverse();  /* oldest first */
-        if (fresh.length && !document.querySelector(".sh-inbox")) popup(fresh.slice(0, 10));
+        if (!fresh.length) return;
+        /* on the dashboard, wait while the guided tour (widget/tour.js) is on screen */
+        (window.shTour ? window.shTour.whenIdle : function(fn){ fn(); })(function(){
+          if (!document.querySelector(".sh-inbox")) popup(fresh.slice(0, 10));
+        });
       });
     }, 1500);
   }

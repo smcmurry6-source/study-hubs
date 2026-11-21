@@ -1,0 +1,287 @@
+---
+type: hub
+tags: [hub, archived, removed]
+hub: occlusion
+status: archived
+---
+
+# Occlusion
+
+**Its page came down 2026-11-19** (Sam: "occlusion can be retired since the exam has already happened", then "we can
+take the page down"; [decisions](../decisions.md)): `hubs/occlusion/` (the page, its content JSON and its images) and
+`assets/og-occlusion.png` are gone, with its About page entries (What cusp hits where?, its diagrams, its arcade column,
+its filters and question formats), Ask Timmy's 43 test cases for it (`tools/timmy/test-set.json`) and its figure build in
+"Check hubs". Its retrospective and recap were done first (2026-11-17). What stays: its entry in `hubs.js` (no card since
+it archived; the final's exam check-in under Past hubs until `debriefDays` runs out; the midterm's closed 2026-11-19, Sam: `checkinClosed:true`,
+refused by the server since `migration_v86.sql`), `tools/question-ids/occlusion.txt`
+so its ids are never reused, its drawn art (`widget/hub-art/occlusion.js`, `tools/figures/site/`), the figure kit in
+`tools/figures/occlusion/` (its `build.mjs` has nothing to write to now), `tools/podcast/occlusion/` and the class's data in
+Supabase. The admin page sees the 404 and won't set it Live. The last version of the page is in git:
+`git log --diff-filter=D -- hubs/occlusion/index.html` names the commit that removed it, and its parent has everything.
+The tests that used its bank or page use Perio's now (`tools/release/xp.js`, `tools/release/admin-ui.js`). The notes below
+describe the hub as it was.
+
+**Archived 2026-11-16 at 10 pm**, after its final that evening. Its retrospective is in `LESSONS.md` ("Hub retrospectives",
+written by the 11-17 lessons audit from the first 3 check-ins: later ones go into the next audit), its recap is on the dashboard
+(published 11-17), and **its narration, High yield recordings and Timmy Time came off the site** with that audit
+([archived-hubs-drop-their-audio](../rules/archived-hubs-drop-their-audio.md): `"audio": "off"` in `content/core.json`, out of `HUBS`
+in `sw.js`). Its last reports (#49-#52, exam day) were left open by Sam's call ([decisions](../decisions.md)). The page stays up; moving its
+entry into `archived` in `hubs.js` is optional. Everything below is how the hub was built and run.
+
+Dr. Givan's D2 Occlusion course. Two exams: the midterm (Wed Oct 21, L1-L5, done) and the **final (Mon Nov 16, 6:30-7:45 pm, the midterm's window, moved up from Thu Nov 19;
+not comprehensive: L6 on, building on the midterm)**. The hub now leans to the final. Its lectures are Dr. Givan's except
+**L9 `nccl`, Noncarious Cervical Lesions, Dr. Lawson's** (prerecorded for the 11/12 session; added 2026-11-10) and
+**L10 `occtrauma`, Occlusion and the Periodontium: Occlusal Trauma, Dr. Abou-Arraj's** (the first hour of the 11/12
+session; added 2026-11-12). L10 is the last lecture on the final (Sam, 2026-11-12: "the last occlusion materials").
+Dates and check-in hours: its entry in `hubs.js`.
+
+## Before you work on it
+
+- **On the engine since the redesign's release** (2026-11): the page, `hubs/occlusion/index.html`, is settings only
+  (`window.SH_HUB`), and **the source is `hubs/occlusion/content/`**: `core.json` (lectures, exam info, dates, predicted
+  topics, the mock, the podcast, the cases), `questions.json`, `notes.json`, `study.json` (hints, cram, the Side by side
+  tables, sort sets), `arcade.js/css`, and `figures.js/css` (built, below). Edit the JSON, then
+  `node tools/hub-next/build.mjs --hub occlusion`; after a merge that changed questions, load the hub's answer keys
+  ([build-a-hub](../how-to/build-a-hub.md)). The old single-file page's names in this note (`LECTURES`, `MOCK_BLUEPRINT`,
+  `EXAM_INFO`, `two()`, `whyHTML`...) are history: the same data is now in the JSON (`lectures`, `mock.blueprint`,
+  `examInfo`, a question's `fmt` and `why`).
+- **Lectures:** L1-L5 carry `exam:'midterm'`, L6 `instruments`, L7 `malocclusion`, L8 `dentures`, L9 `nccl` and L10
+  `occtrauma` carry `exam:'final'`.
+  **Each new final lecture:** add it to `core.json`'s `lectures` with `"exam": "final"`, add it to `mock.blueprint`, and
+  update `examInfo`, `courseDates`, the words in the page's `SH_HUB` (the hints banner, the mock's blurb, the Home notice
+  "New: ...") and the hub's words in `hubs.js`. The engine gives each lecture its color by its place in the list. The mock stays at 45
+  questions, 80 s each (the midterm's pace), split over the final's lectures until the format is announced: 9 each from
+  L6-L10 (2026-11-12; 12/12/12/9 with four, 15 each with three).
+  **Seven of each lecture's nine are High likelihood questions** (Sam, 2026-11-15: "mostly high likelihood. Like 75%"):
+  `mock.likelyShare: 0.75` in `core.json`, read by `buildMock()` in `widget/hub-bank.js` (each side unseen and missed first;
+  a side that runs short is topped up from the other, so L10, all High likelihood, gives 9 of 9). If the blueprint changes,
+  the mock's blurb in `SH_HUB` and the About page's High Likelihood entry say "7 of each lecture's 9": fix them too.
+- **No fact more than twice** (Sam, 2026-11-10, [decisions](../decisions.md)): a concept may be asked two ways, not for every
+  concept. `mo-10` was retired for it, and on 2026-11-11 the rest of the final's questions were checked the same way
+  ("check the rest of the final questions"): 58 facts in L6-L9 were asked three to five times, and 58 questions came out,
+  so every fact is now asked at most twice (the list is in the PR, [#319](https://github.com/smcmurry6-source/study-hubs/pull/319)).
+  **How it was counted:** every statement of a two-statement or numbered item counts as asking its fact, a which/whichf
+  item counts for its key, a case question for what it applies, and a fact asked in two lectures counts across both. The
+  two kept are in different formats where possible, a Patient Box question is kept over a plain one, and nothing was
+  retired that would leave a fact unasked or a lecture under its format minimums. The 10% fact is now in
+  `mo-tf-3` (and a true statement of `in-wf-cr`; `in-2s-4` came out on 2026-11-15, its wax fact asked by `in-cr-wax`). **Before adding a final question, check its fact isn't already asked twice.** Don't add questions for it.
+- **The final's bank audit** (2026-11-15, [#370](https://github.com/smcmurry6-source/study-hubs/pull/370), Sam: "audit occlusions question bank ... higher yield ... accurate, with good
+  answer options and sufficient explanations", then "make sure the exam hints are utilized as best as possible"): every L6-L10
+  question was checked against the notes and the Exam Hints. 156 were fixed (4 keys or case facts that the notes contradict:
+  `cs-in-crown-lab`'s case, `nc-sel-acid`, `mo-histo`, `ot-sel-clin`), every emphasized hint was mapped to the questions that
+  test it, 4 questions were written for hints none tested (`in-worth`, `mo-joint-load`, `mo-splint-cause`, `dn-wf-skel`),
+  3 High likelihood topics were added for L7's orphan hints, and Sam retired `mo-better-q`, `mo-swim` and `in-2s-4` (kept:
+  `mo-bell`, `mo-occupational`, `ot-tf-4`, `ot-tf-5`, `dn-tf-6`). The PR lists every change.
+  - **Every question carries its own copy of its topic** (`likely` on the question, the whole `{lec, t, basis, ids}`
+    object): the build doesn't make it from `core.json`'s `likelyTopics`. After changing a topic (its words, or a question
+    added or removed), rewrite the copies of every question it lists, or the bank's chip and the High yield won't follow.
+    One topic per question.
+  - **Choices rewritten in place keep their old picks** (class numbers are stored by choice position):
+    `tools/data-fixes/2026-11-15-occlusion-audit.sql` recounted them from the new version's answers (run once after the
+    merge, 2026-11-15, with the 11-14 Bennett fix that hadn't run). A data fix added to `tools/data-fixes/` now runs by
+    itself after its merge ([after-a-merge](../how-to/after-a-merge.md)). The next audit that rewrites a choice's meaning needs the same kind of fix (and
+    `2026-11-14-in-bennett.sql` before it).
+  - **Sam's calls on the two open points** (2026-11-15, [decisions](../decisions.md)): the repositioning splint is
+    **irreversible**, as on Dr. Givan's slides (Okeson calls it reversible; `mo-ws-splint`, `mo-2s-6`, `mo-rev-sel` follow
+    the slides). L10 keeps **"Miller"**: Dr. Abou-Arraj's slide says "Miller mobility scale" over its Degrees 0-3 (its
+    wording reads like Lindhe's textbook version), so the notes' warning that Dr. Givan's L7 handout grades Miller's
+    index differently stays, and so do `ot-class3` (his scale) and `mo-miller2` (the L7 handout). Don't re-raise either.
+- **Bennett movement vs the Bennett angle setting** (2026-11-13, `in-bennett`): the midterm's determinants table pairs a greater Bennett
+  movement with shorter cusps, while the articulator handout ties the Bennett angle setting to the width of the central fossae, so
+  "Cusp height" can be argued for either. Don't offer it as a wrong answer to a Bennett question (54% picked it): on 11-14 it
+  became "How steep the cusps can be in protrusion" (the Bennett angle is a lateral setting), and its old picks were cleared.
+- **The page's weight budget** is `hubs/occlusion/` in `tools/release/budgets.json` (800 KB since the engine's bundles,
+  2026-11-13; the old single-file page was at 1480 KB, its limit). On 2026-11-15 `node tools/release/perf.js --page
+  hubs/occlusion/` measured 771 KB: room for content, but check it after a big addition, and raise the budget only with a
+  reason in the PR that Sam approves (as BUG-087 did). It was at 800 KB on `main` on 2026-11-19, the shared bundles'
+  growth since 11-15, when the dashboard's What's new box took it to 801; then `perf.js` stopped measuring archived hubs
+  and the page came down (above), so its budget line is gone too.
+- **The final's format** isn't announced (question count, Canvas or not): `FINAL_TIME` / `FINAL_CLOSES` are `'18:30'` /
+  `'19:45'`, and the dashboard's check-in button and pop-up go out at 8 pm (`checkinHour:20, promptHour:20`), after the
+  window closes ([task](../tasks/done/2026-11-03-occlusion-final-time-and-format.md)).
+- **Built on** the MSK Exam 4 engine; palette "articulating paper" (Bricolage Grotesque / Public Sans / JetBrains Mono).
+  It is the model other hubs copy for `two()`, `tf()`, `nums()`, `choiceOrder()`, `whyHTML`, shared patients (`CASES`,
+  `pc()`) and Patient Box pictures (`pimg`, `CASE_IMG`).
+- **Sources** (Drive, Occlusion): the help sheet (`Occ Lec0 help`, Hubs folder), the Midterm and Final folders (slides,
+  handouts, lecture captures). Board-exam items in last year's class deck were deliberately not reproduced.
+  **L8 (`dentures`)** is built from the 11/5 recording (`occ nov 5.txt` in Occlusion/Hubs/Final) and, since
+  2026-11-06, the slides and handout (`Occ Lec7 RDP Occlusion`, the course's Lecture 7, in Occlusion/Final;
+  [task](../tasks/done/2026-11-05-occlusion-l8-follow-ups.md)). Where class and slides differ the notes say both
+  (lingualized anterior contact: "never" in class, "difficult, can be compensated" on the slides). Hanau's term is the
+  **Realeff**. L8 spells **Thielemann** (the slides); the Review lecture, `rv-thielmann*` and the podcast keep the
+  spelling they were written with, "Thielmann" (Sam, 2026-11-06: leave them; no narration redo). The history slides say "No test questions", so L8 has
+  no history questions (seven retired) and its Review no history rows; the notes keep the history, as narrated. Its cases are `dnflat`,
+  `dnbal`, `dnret`. Its notes are narrated with `tools/narrate.py`'s `spoken()`/`render()` on the extracted
+  `dentures` template literals (the hub's READINGS isn't one JSON line), substituting "one sixteenth" for 1/16 and
+  "divided by" in Thielemann's formula.
+  **L9 (`nccl`, Dr. Lawson)** is built from his prerecorded lecture for the 11/12 session (`en-Dr. Lawson NCCLs.txt` in
+  Occlusion/Hubs/Final; the transcript is not in the repo) and, since 2026-11-12, checked against his slides
+  (`Dr. Lawson Non-carious cervical lesions.pdf`; the "Recording" badge is gone). The slides added: RDA must be below 250
+  for the ADA seal, the sensor changes color, the summary slide, where acid demineralizes vs where plaque does (`nc-rda-seal`,
+  `nc-erosion-sites` are new), the buffering experiment's pH 6.5, the drinks' pH (OJ about 3.6 and wine about 4.0 aren't
+  the lowest, 2.5, yet need the most bicarbonate), mouth rinses as low as about 3.2, and "Milo's unsweet tea" (the
+  recording says sweet tea made with Splenda: the notes give both). The slides name none of Dzakovich, Dr. Burgess, Basic
+  Bites, Crest Pro-Health or the 124 toothpaste, so those keep the recording's spellings (no question is keyed on a name).
+  **L10 (`occtrauma`, Dr. Abou-Arraj, periodontics)** is built from the 11/12 recording (`nov 12 occ.txt`, the first
+  hour; the Perio course took the rest) and his slides (`Dr. Abou-Arraj Occlusion and Periodontal Correlations.pdf`), both
+  in the Occlusion Drive folder, not in the repo. Its questions are `ot-*` and `cs-ot-*` on three text-only Patient Box
+  cases (`otcrown`, `otperio`, `otfrem`). He said the researchers' names aren't needed ("Conclusions are enough"): the
+  notes keep them only to follow the story, a de-emphasize hint says so, and no question is keyed on a name. **His
+  mobility scale differs from Dr. Givan's L7 handout** (his: 0 physiologic, 1 up to 1 mm, 2 more than 1 mm, 3 horizontal
+  and vertical): his questions say "on Dr. Abou-Arraj's scale", a reading note and `mo-miller2`'s explanation point out the
+  difference, and Review has a row for it. Where class and slide differ on whether wedges are jiggling, the notes say both
+  and no question is keyed on it. L10's facts that L7 already asks (the attachment apparatus as the site, single vs
+  multi-rooted, the 150 µm, progressive mobility) weren't asked again (no fact more than twice). Its questions
+  are `nc-*` and `cs-nc-*` on three text-only Patient Box cases (`ncbrush`, `ncgrind`, `ncacid`). Where it meets L7 the
+  notes say both: Dr. Lawson teaches abfraction as one of three causes, with a night guard for it; Dr. Givan's L7 slides
+  call it supported in vitro but unproven clinically. Restoring follows both (his "cleansable, doesn't hurt, doesn't look
+  bad, not deep" and L7's "when necessary"). Names spelled by ear, the judgment calls, the slides check and the other
+  11/12 lecture: [task](../tasks/done/2026-11-10-occlusion-l9-follow-ups.md).
+- **Figures and the cusp game** come from `tools/figures/occlusion/`: `od.js` (the kit, the contact map, `CASE_IMG`
+  and **`FIG_PLACE`**, which lives in the generated block: edit it in `od.js`, never in the hub), `game.js`, `cases.js`,
+  and the anima figures in `anima/*.mjs`. `node tools/figures/occlusion/build.mjs` writes them to
+  `hubs/occlusion/content/figures.js` and `figures.css` (figure text raised to the engine's 11 px floor); `--check`
+  fails if they're stale; `--preview` writes pages. The Question Bank mounts `CUSP_GAME` only if
+  `SH_HUB.bank.cuspGame` is true (currently Occlusion), on its base Questions route before the filters; preserve that
+  engine wiring when changing the bank.
+  - Controls of a figure inside the notes must not use `data-go`, `data-view`, `data-tab`, `data-sub`, `data-mode`,
+    `data-lec` or `data-group` (the notes and the widget read those).
+  - The anima kit sets `vector-effect:non-scaling-stroke`; a path drawn with `stroke-dasharray` needs `vector-effect:none`.
+  - `mounterr` (L6) is computed, not drawn to the rule: `meModel` solves protrusion in closed form for the patient and for
+    casts offset on the articulator (both casts move together), and the chart's microns come from it. Its geometry and
+    assumptions are in the file's header and the figure's "What's simplified"; if the notes' guidance angles or the slide's
+    rule change, re-check that the four errors still come out the slide's way.
+  - The side-view figures share `anima/l7rig.mjs`: a whole skull (`BACK` behind the mandible, `FRONT` over it, with
+    `EDGES`, `SHADE`, `ORBIT`, `NASAL`, `EAM`), a real mandible, the disc in its true profile and the teeth, in mm (y up,
+    the seated condyle at the origin, facing left), plus a contact solver run in Node at build time. `crslide` (Fig 7,
+    mirrored), `hingearc` (Fig 12), `tolerance`, `stability` and `splints` (Figs 15-17) draw it. Reuse it for any new side
+    view of the jaws rather than drawing another skull. Where a frame crops the skull, fade it (`rgScene`'s `fog`, or
+    `rgFog`) instead of leaving a hard cut, and put labels on a soft card (`rgCard`), never across bone lines.
+  - The L8 figures share `anima/l8den.mjs`: a frontal section through the first molars of a patient wearing complete
+    dentures (maxilla and palate, mandible, tongue, both bases, the molars), in mm with the occlusal plane at y = 0, a jaw
+    move `{dx, dy, rot}`, a lower-denture tip about its right ridge crest, separate denture offsets (`opt.up`, `ddx`/`ddy`)
+    and a contact finder; plus the four posterior tooth profiles (`PROF`: anatomic 30°, semi-anatomic 20°, flat 0°,
+    lingualized with a wide, shallow lower fossa). `schemes` (Fig 22) solves its poses in Node at build time, so a profile
+    change re-poses it: look at every scheme and move again after one. Reuse it for any new denture section.
+    Fig 20's proportions come from outside sources (2026-11-06, [outside-sources-for-figures](../rules/outside-sources-for-figures.md)):
+    the mandible loses about twice the maxilla's ridge height (Tallgren), and the basal bone stays put (Cawood & Howell).
+  - The anima figures are numbered Fig 1-31 (plus Fig 2b) in lecture order; a new one takes the next free number. The
+    number is written in each figure's file (`plateHtml({ fig: "Fig 29" ...})` and its first comment), not computed.
+  - **An alias shows a figure under a second lecture** without a second copy of its drawing: an entry
+    `{ id, alias, lec, title, caption, data }` in `anima/index.mjs` (after the figure it copies); `build.mjs` gives it the
+    original's markup and live code, and `data` overrides the original's. `erosion9` is Fig 19 under L9: `start` opens it
+    on bulimia and `extra` adds L9's reasons to the bulimia and NCCL summaries (`erLive` reads both).
+  - L9's figures draw what the L9 notes teach, with sources cited in each one's "What this shows" block. `abfract`
+    (Fig 24) bends a mandibular premolar as a cantilever about the bone crest (exaggerated about 100x), the load on the
+    buccal cusp's outer incline pushing the crown lingually, so the buccal side is tensile. `cupping` (Fig 26) is a
+    mandibular first molar's mesial cusps in section; its pH scale places the critical pHs at about 6.3 (dentin) and 5.5
+    (enamel) but labels only their order, since the lecture gave no numbers. `buffer` (Fig 25) computes both drinks'
+    pH: A an unbuffered strong acid, B citric acid from its three pKa values, sized so A takes 5 drops and B 40.
+  - L10's figures (2026-11-12) draw what the L10 notes teach. `otsupport` (Fig 27), `otjiggle` (Fig 28) and `otmobility`
+    (Fig 30) share `anima/l10tooth.mjs`, a mandibular premolar in buccolingual section in its bone with normal or reduced
+    support; reuse it for any new L10 tooth. How far a tooth tips is illustrative, and Figs 27-28 draw the ligament
+    0.45 mm wide (real: about 0.25) so the hourglass shows; Fig 30 is to scale (18 px per mm), uses Dr. Abou-Arraj's
+    degrees and shows L7's grading in a note. `otxray` (Fig 29) is a periapical film of #28-#30 drawn in the Patient Box
+    films' style, one control per radiographic sign. `otanimal` (Fig 31) is the animal experiments: trauma (none,
+    jiggling, stopped 10 weeks later) by inflammation (none, gingivitis, periodontitis), with the dogs and the monkeys
+    side by side where they disagreed; its millimeters are illustrative and its labels use words. No figure names a
+    researcher on screen ("Conclusions are enough"); the citations are in each one's "What this shows".
+  - **What settles a figure's content** (audit of every figure, 2026-11-04, [PR #232](https://github.com/smcmurry6-source/study-hubs/pull/232)):
+    the notes, then the help sheet's contact pictures for `CONTACTS` (Class III: #4's lingual cusp goes to the
+    **mesial** fossa of #30, as the sheet draws it, though real crown widths would put it nearer the central fossa) and
+    Dr. Givan's handout for the envelope's letters (both views run A-D round the shape as he numbers them 1-4; frontal:
+    C = right lateral opening, D = right lateral superior). Labels and hover text name only what the lecture teaches
+    ([figures-teach-the-lecture](../rules/figures-teach-the-lecture.md)): say "ear canal" (the facebow lecture's words),
+    not EAM; no orbit, mastoid, sigmoid notch or postglenoid process.
+  - Picture questions on the arrow figures (`fig-pmax-*`, `fig-pmand-*`) ask "which movement does arrow A show?": the
+    arrows carry letters only, so the stem doesn't name the direction.
+- **Select-all ticks** reach `question_choices` only from 2026-11-04 (`picks` in `occl:answered`, set in `recordAnswer`). Hubs
+  copied from this engine need the same lines.
+- **Narration:** `audio/<lecture>-full.mp3` and `-plain.mp3` for all ten lectures. The notes are template literals,
+  not the one-line objects `tools/narrate.py` reads, so L8 was narrated through a small wrapper that evaluates READINGS
+  and calls `narrate.spoken()` / `narrate.render()` (spoken "1/16" as "one sixteenth", "11/5" as "November fifth").
+  L9 the same way ("11/12" as "November twelfth", "lower-RDA" as "lower RDA"); the lexicon gained NCCLs, Dzakovich,
+  chelator, exostoses, tori, subgingivally and CEJ for it.
+  L10 and L9's slide fixes (2026-11-12) were recorded straight from the content's `notes.json`
+  (now `python3 tools/narrate.py occlusion --lec <id> --level full|plain|hy --force`); the
+  lexicon gained Abou-Arraj, Waerhaug, supraperiosteal, suprabony, furcation and a few more for L10.
+  **High yield** (the third level) is narrated too, since 2026-11-12: `audio/<lecture>-hy.mp3` for the five final
+  lectures, made from `content/notes.json`. It changes whenever a final lecture's notes, predicted topics, hints or
+  questions do, so a question edit there can mean recording that lecture's High yield again in the same PR: the smoke lint
+  says which ([text-and-audio-never-drift](../rules/text-and-audio-never-drift.md)).
+- **Timmy Time:** the **final's episode** (`final-review`, since 2026-11-15, Sam: "Podcast for occlusion final. Replace
+  the midterm with it"): L6-L10, script `tools/podcast/occlusion/script.md`, `podcast` in `content/core.json`, the mp3
+  `audio/timmy-time.mp3`. It took the midterm episode's place (`midterm-review`, script kept as
+  `tools/podcast/occlusion/midterm.md`; its likes and comments stay with its id). **A change to L6-L10's notes means fixing
+  the script and rebuilding the episode in the same PR** ([text-and-audio-never-drift](../rules/text-and-audio-never-drift.md)).
+  The server pays its minutes once `podcast_episodes` has the row (`admin_set_podcast_episode`, after the merge).
+- **Arcade:** the Freeway Space Arcade, skin `OCCL_SKIN`. Lab Escape is a painted backdrop (`img/lab-escape.webp`) with
+  hotspots measured onto it: a new backdrop means re-measuring every `api.spot()`.
+
+## On the engine (since the redesign's release)
+
+Built as `hubs/occlusion/next/` beside the old page ([phase 1](../tasks/done/2026-11-05-redesign-phase-1-hub-engine.md))
+and moved to `hubs/occlusion/` at the [release](../tasks/done/2026-11-06-redesign-release.md), when the old single-file page
+went (git keeps it: the commit before the release's merge).
+- `window.SH_HUB` in the page holds the hub's own words (the Home exam card, the hints banner, the mock's blurb, the
+  arcade's games and which one is up front). When the final's format or a lecture's dates change, change them there.
+- It is in `sw.js`'s `HUBS`, so its page, art and content are precached; a content edit shows on the page load after the
+  one that fetched it.
+- Its art (tint `#2747a3`, emblem, masthead, medals) is `widget/hub-art/occlusion.js`, built by
+  `node tools/figures/site/build.mjs` from `tools/figures/site/`.
+- Narration and the podcast are in `audio/`.
+- Test it through the preview (`node tools/preview/serve.js`, then `/hubs/occlusion/`) or a scripted browser with the
+  class's data stubbed: a plain static server would reach the class's data.
+- `SH_HUB.home.prof` and `SH_HUB.hints.prof` say "the professors" and `SH_HUB.hints.words` "In the professors' words"
+  (2026-11-12, as on Heme & Endo Exam 2 and Perio), since L9's hints are Dr. Lawson's and L10's Dr. Abou-Arraj's.
+- Since 2026-11-11 (Sam's look at Heme & Endo Exam 2's new version: "more color"), **each lecture has its own color** here too,
+  from the engine, by its place in `LECTURES` (L1 blue, L2 orange, L3 teal, L4 magenta, L5 olive, L6 violet, L7 mustard, L8
+  sky, L9 brown, L10 the next), and the notes have **Notes done**. A lecture added at the end takes the next color; one inserted earlier
+  shifts the rest.
+- Since 2026-11-11 (Sam: "Redesign the timmy time ui/card"), **More > Timmy Time** is the engine's own page: the shared
+  player (`widget/podcast.js`) fills the slot and `podDress` in `widget/hub.js` lays it out (the episode on the hub's color
+  with Timmy in headphones, the chapters always open, then what the class thinks; `.pod-x` in `widget/hub.css`). This is
+  the only hub on the engine with an episode so far, so check it here after any change to the player. Home's animated card
+  is unchanged.
+
+## Diagram decisions
+
+- 2026-10-14 (first review): all four candidates of that review skipped.
+- 2026-10-20: Sam approved ten anima figures for L1-L5 (all built). 2026-10-27: four for L6 (built).
+- 2026-11-03: five for L7 (built 2026-11-04: `tolerance`, `stability`, `splints`, `thirds`, `erosion`;
+  [task](../tasks/done/2026-11-03-occlusion-l7-diagrams.md)). L1-L7's diagram reviews are done; don't propose these again.
+- 2026-11-05: Sam approved all four L8 candidates (the three schemes in motion, ridge resorption,
+  support/stability/retention, posterior tooth forms); built the same day as Figs 20-23 (`resorb`, `ssr`, `schemes`,
+  `toothforms`; [PR #260](https://github.com/smcmurry6-source/study-hubs/pull/260)). L8's diagram review is done; don't
+  propose these again.
+- 2026-11-10: Sam approved all four L9 candidates ("make all diagrams"); built the same day as Figs 24-26 (`abfract`,
+  `cupping`, `buffer`) plus `erosion9`, Fig 19 again under L9 opened on bulimia
+  ([task](../tasks/done/2026-11-10-occlusion-l9-follow-ups.md)). L9's diagram review is done; don't propose these again.
+- 2026-11-12: Sam approved every L10 candidate ("yes to all figures and anima"); built the same day as Figs 27-31
+  (`otsupport`, `otjiggle`, `otxray`, `otmobility`, `otanimal`). L10's diagram review is done; don't propose these again.
+
+## Drawn Patient Box cases
+
+The hub loads the shared case kit (`widget/cases.js`, 2026-11-05) and has an empty `PCASES` between its `pcases`
+markers, so a Patient Box question can name a case (`pcase`) and get a chart, film and drawn view from its numbers
+([draw-a-patient-box-case](../how-to/draw-a-patient-box-case.md)). Its own case pictures (`CASE_IMG`, `pimg`: casts,
+marks, the TMJ view) stay as they are; use the kit for any new perio chart or radiograph.
+
+- **"Which statement" items** (2026-11-10, [rule](../rules/which-statement-questions.md)): `which()` and `whichf()` sit right
+  after `nums()`, followed by two of each for L6-L8 (`in-`, `mo-`, `dn-` + `ws-`/`wf-`); L9's (`nc-ws-*`, `nc-wf-*`) sit
+  with its other questions. Each new final lecture needs at
+  least one of each (CI); the midterm lectures are grandfathered. `rv-mip-dynamic`, `rv-cf` and `ap-mip` are tagged `which`.
+
+## Pending
+
+- The 2026-11-15 bank audit's after-merge steps: [the inbox](../tasks/inbox.md).
+- [The final's time and format](../tasks/done/2026-11-03-occlusion-final-time-and-format.md)
+- Figure questions the 2026-11-04 audit left for Sam (the notes don't settle them; listed in [PR #232](https://github.com/smcmurry6-source/study-hubs/pull/232)):
+  the TMJ figure's TM ligament shortens as the condyle translates while its readout says "taut"; Fig 2b's swing is
+  exaggerated (about 9°); group function's lower partners (#26-28) are inferred; the thirds (Fig 18) are counted from the
+  central fossa (Okeson), and the notes don't say from which end; the contact map's distal band (c..d) against the sheet's
+  "oblique ridge to distal fossa"; case `sda` says "flared and worn ... see the chart", which a perio chart can't show.
+
+History: grep `Occlusion` in "Recent major changes" (`DEPLOY_NOTES.md`). Data: `LESSONS.md` → Live signals.
+
+Related: [home](../home.md) · [diagrams-anima](../rules/diagrams-anima.md) · [perio](perio.md) (same final day)

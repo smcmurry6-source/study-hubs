@@ -1,5 +1,38 @@
 # Archived hubs' question banks stay off the public repo (exam integrity); keep them locally.
 question-banks/
+# Pages the anima skill's example build scripts write (regenerate with node .claude/skills/anima/examples/<name>/build.mjs)
+.claude/skills/anima/examples/*/*.html
+
+# Built preview pages of the hub figures (node tools/figures/<hub>/build.mjs --preview)
+tools/figures/*/dist/
+
+# Obsidian: open the repo root as a vault (vault/rules/repo-is-the-vault.md). Share the link and template settings;
+# keep each device's layout, plugins and trash out of the public repo.
+.obsidian/*
+!.obsidian/app.json
+!.obsidian/templates.json
+!.obsidian/core-plugins.json
+.trash/
+
+# Working files the taste skill's scripts write (draw sheets, inspector screenshots, downloaded pictures)
+.taste-skill/
+
+# Timmy Time build byproducts (tools/podcast/produce.py): chapters json and the temporary mix, never committed;
+# copy duration and chapters into the hub's SH_PODCAST instead
+hubs/*/audio/*.mp3.json
+hubs/*/audio/*.mix.wav
+
+# Built previews (node tools/preview/build.js): never committed
+_preview/
+
+# npm i --no-save playwright axe-core (CI and the release tests): never committed
+node_modules/
+__pycache__/
+
+# The launch trailer (tools/trailer/): its working files and the video are never committed (the site publishes every
+# file in main), and neither is the list of leaderboard names its footage may show (learner-data-privacy)
+tools/trailer/out/
+tools/trailer/names.local.json
 
 # Boards hub: cached copies of fact sources (tools/boards/check-quotes.mjs)
 .cache/

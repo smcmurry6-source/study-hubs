@@ -1,0 +1,196 @@
+{
+ "about": "Known accessibility issues per screen, so tools/release/a11y.js can fail only on new ones. Lower these numbers; never raise them to make a check pass (fix the page instead), except for a deliberate change Sam approved.",
+ "updated": "2026-11-20",
+ "pages": {
+  "about": {
+   "axe": {},
+   "focus": {
+    "invisible": 0,
+    "stuck": 0,
+    "where": [],
+    "why": []
+   },
+   "motion": 0
+  },
+  "about (dark, spoilers shown)": {
+   "axe": {},
+   "focus": {
+    "invisible": 0,
+    "stuck": 0,
+    "where": [],
+    "why": []
+   },
+   "motion": 0
+  },
+  "about (phone, spoilers shown)": {
+   "axe": {},
+   "focus": {
+    "invisible": 0,
+    "stuck": 0,
+    "where": [],
+    "why": []
+   },
+   "motion": 0
+  },
+  "review (sign-in)": {
+   "axe": {},
+   "focus": {
+    "invisible": 0,
+    "stuck": 0,
+    "where": [],
+    "why": []
+   },
+   "motion": 0
+  },
+  "dashboard": {
+   "axe": {},
+   "focus": {
+    "invisible": 0,
+    "stuck": 0,
+    "where": [],
+    "why": []
+   },
+   "motion": 0
+  },
+  "dashboard · settings": {
+   "axe": {},
+   "focus": null,
+   "motion": 0
+  },
+  "dashboard · boards": {
+   "axe": {},
+   "focus": null,
+   "motion": 0
+  },
+  "dashboard · visited place": {
+   "axe": {},
+   "focus": null,
+   "motion": 0
+  },
+  "review-of-systems · home": {
+   "axe": {},
+   "focus": {
+    "invisible": 0,
+    "stuck": 0,
+    "where": [],
+    "why": []
+   },
+   "motion": 0
+  },
+  "review-of-systems · notes": {
+   "axe": {},
+   "focus": null,
+   "motion": 0
+  },
+  "review-of-systems · questions": {
+   "axe": {},
+   "focus": null,
+   "motion": 0
+  },
+  "review-of-systems · more": {
+   "axe": {},
+   "focus": null,
+   "motion": 0
+  },
+  "review-of-systems · place": {
+   "axe": {},
+   "focus": null,
+   "motion": 0
+  },
+  "review-of-systems · place, full view": {
+   "axe": {},
+   "focus": null,
+   "motion": 0
+  },
+  "review-of-systems · place, customize": {
+   "axe": {},
+   "focus": null,
+   "motion": 0
+  },
+  "review-of-systems · shop": {
+   "axe": {},
+   "focus": {
+    "invisible": 0,
+    "stuck": 0,
+    "where": [],
+    "why": []
+   },
+   "motion": 0
+  },
+  "review-of-systems · shop, an item's sheet": {
+   "axe": {},
+   "focus": null,
+   "motion": 0
+  },
+  "review-of-systems · bowling clip": {
+   "axe": {},
+   "focus": null,
+   "motion": 0
+  },
+  "review-of-systems · trophy case": {
+   "axe": {},
+   "focus": {
+    "invisible": 0,
+    "stuck": 0,
+    "where": [],
+    "why": []
+   },
+   "motion": 0
+  },
+  "review-of-systems · trophy card": {
+   "axe": {},
+   "focus": null,
+   "motion": 0
+  },
+  "perio · home": {
+   "axe": {},
+   "focus": {
+    "invisible": 0,
+    "stuck": 0,
+    "where": [],
+    "why": []
+   },
+   "motion": 0
+  },
+  "perio · notes": {
+   "axe": {},
+   "focus": null,
+   "motion": 0
+  },
+  "perio · questions": {
+   "axe": {},
+   "focus": null,
+   "motion": 0
+  },
+  "perio · more": {
+   "axe": {},
+   "focus": null,
+   "motion": 0
+  },
+  "dashboard (dark)": {
+   "axe": {},
+   "focus": null,
+   "motion": 0
+  },
+  "review-of-systems (dark)": {
+   "axe": {},
+   "focus": null,
+   "motion": 0
+  },
+  "perio (dark)": {
+   "axe": {},
+   "focus": null,
+   "motion": 0
+  },
+  "dashboard · visited place (dark)": {
+   "axe": {},
+   "focus": null,
+   "motion": 0
+  },
+  "review-of-systems · shop (dark)": {
+   "axe": {},
+   "focus": null,
+   "motion": 0
+  }
+ }
+}

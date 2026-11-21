@@ -1,0 +1,190 @@
+// Preview transform: turns a copy of the live site into a production-safe preview (RELEASE_TEST_PLAN.md).
+// Used by tools/preview/serve.js (on the fly) and tools/preview/build.js (a static copy for a preview host).
+//
+// Four independent layers keep a preview away from the class's real data; any one of them alone is enough:
+//   1. every production Supabase URL and key in the served HTML/JS is rewritten to a fixture host on the reserved
+//      .invalid TLD (RFC 6761: it never resolves), or to a staging project when one is configured;
+//   2. a Content-Security-Policy meta tag (connect-src) that leaves the production host out, so the browser itself
+//      refuses any fetch, XHR, WebSocket or beacon to it, however the URL was built;
+//   3. the preview runtime (tools/preview/runtime/preview.js, loaded first in <head>) answers the fixture host from
+//      in-browser fixture data and blocks and logs anything aimed at production;
+//   4. previews are served from their own origin, so they never share localStorage or the service worker with the
+//      live site (see RELEASE_TEST_PLAN.md, "Where previews are hosted").
+// Plus noindex: a robots meta tag on every page, X-Robots-Tag on every response, robots.txt disallowing everything.
+'use strict';
+const fs = require('fs'), path = require('path');
+
+const ROOT = path.resolve(__dirname, '../..');
+const PROD_HOST = 'thytmzsgymydbzcqdnix.supabase.co';
+const PROD_URL = 'https://' + PROD_HOST;
+const PROD_KEY = 'sb_publishable_6s_2KEdBVkEfEZH3qn8ouw_w7b8WcMS';
+const FIXTURE_HOST = 'fixtures.preview.invalid';
+const FIXTURE_URL = 'https://' + FIXTURE_HOST;
+const FIXTURE_KEY = 'sb_preview_fixture_not_a_key';
+const LIVE_SITE = 'https://smcmurry6-source.github.io/study-hubs/';
+const PREVIEW_DIR = '__preview';   // where the runtime is served, at the preview's site root
+const ROBOTS = 'noindex, nofollow, noarchive, nosnippet, noimageindex';
+
+/* What the live site serves (and so what a preview serves). Everything else in the repo (vault, tools, SQL, notes)
+   isn't part of the site. */
+const SITE_ENTRIES = ['index.html', 'hubs.js', 'about', 'review', 'hubs', 'widget', 'assets', 'manifest.webmanifest', 'sw.js'];   // hubs.js: the dashboard's hubs and dates
+/* Pages that aren't part of the site but are shown in a preview for Sam to look at: the redesign's design system
+   (tools/preview/design, Phase 0). A preview serves and builds them like a site page; a release doesn't check them. */
+const PREVIEW_PAGES = ['tools/preview/design'];
+const inPreview = rel => SITE_ENTRIES.includes(rel.split('/')[0]) || PREVIEW_PAGES.some(e => rel === e || rel.startsWith(e + '/'));
+const TEXT_EXT = new Set(['.html', '.js', '.css', '.json', '.webmanifest', '.svg', '.txt', '.md']);
+
+function gitInfo(){
+  const run = args => { try { return require('child_process').execFileSync('git', args, { cwd: ROOT, stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim(); } catch (e) { return ''; } };
+  return { ref: process.env.SH_PREVIEW_REF || run(['rev-parse', '--abbrev-ref', 'HEAD']) || 'local', sha: (process.env.SH_PREVIEW_SHA || run(['rev-parse', 'HEAD']) || '').slice(0, 12) };
+}
+
+/* opts: { data: 'fixture' | 'staging', stagingUrl, stagingKey, label, ref, sha, audio: { mode: 'local' | 'remote', included: [paths] } } */
+function options(o){
+  o = Object.assign({ data: 'fixture', audio: { mode: 'local', included: [] } }, o || {});
+  if (o.data === 'staging') {
+    if (!/^https:\/\/[a-z0-9-]+\.supabase\.co$/.test(o.stagingUrl || '')) throw new Error('staging data needs SH_STAGING_URL, e.g. https://<ref>.supabase.co (see RELEASE_TEST_PLAN.md)');
+    if (o.stagingUrl === PROD_URL) throw new Error('SH_STAGING_URL is the production project; a preview never talks to production');
+    if (!/^sb_publishable_/.test(o.stagingKey || '')) throw new Error('staging data needs SH_STAGING_KEY (the staging project\'s publishable key, never a secret or service-role key)');
+  } else if (o.data !== 'fixture') throw new Error(`unknown data mode "${o.data}" (fixture or staging)`);
+  const g = gitInfo();
+  o.ref = o.ref || g.ref; o.sha = o.sha || g.sha;
+  o.label = o.label || o.ref;
+  o.builtAt = o.builtAt || new Date().toISOString();
+  return o;
+}
+function target(o){ return o.data === 'staging' ? { url: o.stagingUrl, key: o.stagingKey } : { url: FIXTURE_URL, key: FIXTURE_KEY }; }
+
+function rewriteText(text, o){
+  const t = target(o);
+  return text.split(PROD_URL).join(t.url).split(PROD_HOST).join(new URL(t.url).host).split(PROD_KEY).join(t.key);
+}
+
+function csp(o){
+  const extra = o.data === 'staging' ? [o.stagingUrl, o.stagingUrl.replace(/^https:/, 'wss:')] : [];
+  /* connect-src (fetch, XHR, WebSocket, beacons), img-src and media-src: the ways a page can send a request with data
+     in it. The production host is deliberately absent. Scripts, styles and fonts load as they do on the live site.
+     LIVE_SITE is there for static narration files a hosted preview leaves out (plain GETs of public files). */
+  const live = new URL(LIVE_SITE).origin;
+  return [`connect-src 'self' data: blob: https://fonts.googleapis.com https://fonts.gstatic.com ${live} ${extra.join(' ')}`.trim(),
+    `img-src 'self' data: blob: ${live}`, `media-src 'self' data: blob: ${live}`].join('; ');
+}
+
+/* page: site-relative path of the HTML file, e.g. "hubs/occlusion/index.html" */
+function transformHtml(html, page, o){
+  const depth = page.split('/').length - 1;
+  const rel = '../'.repeat(depth);
+  const head = `\n<meta name="robots" content="${ROBOTS}">` +
+    `\n<meta http-equiv="Content-Security-Policy" content="${csp(o)}">` +
+    `\n<script src="${rel}${PREVIEW_DIR}/preview.js"></script>`;
+  let out = rewriteText(html, o);
+  out = out.replace(/<meta\s+name=["']robots["'][^>]*>\s*/gi, '');          // one robots tag, ours
+  const charset = /<meta\s+charset=[^>]*>/i.exec(out);
+  if (charset) out = out.slice(0, charset.index + charset[0].length) + head + out.slice(charset.index + charset[0].length);
+  else if (/<head[^>]*>/i.test(out)) out = out.replace(/<head[^>]*>/i, m => m + head);
+  else out = head + out;
+  out = out.replace(/<title>([\s\S]*?)<\/title>/i, (m, t) => `<title>Preview · ${t.trim()}</title>`);
+  return out;
+}
+
+function transformSw(js, o){
+  /* its own cache name, so a preview's offline copy is never confused with another build's */
+  return rewriteText(js, o).replace(/var VERSION = '([^']+)';/, (m, v) => `var VERSION = '${v}-preview-${(o.sha || 'local').slice(0, 7)}';`);
+}
+
+/* widget/pet.js: the day the redesign went live (FULL_FROM: a Timmy born on or after it starts at 100 HP, everyone has
+   Timmy) is, in a preview, the day its test account started (the runtime's SH_PREVIEW_TIMMY_FROM), so the "new" account
+   meets him at 100 and the others keep their history. A pet.js without the line fails loudly rather than quietly. */
+const PET_FROM = /var FULL_FROM = "(\d{4}-\d{2}-\d{2})";/;
+/* the redesign's pages get pet.js inside this bundle (tools/bundle/build.mjs keeps the line as it is written) */
+const PET_FILES = ['widget/pet.js', 'widget/rest.bundle.js'];
+function transformPet(js, o, rel){
+  if (!PET_FROM.test(js)) throw new Error((rel || 'widget/pet.js') + ' has no `var FULL_FROM = "yyyy-mm-dd";` line for the preview to point at its own start (tools/preview/transform.js)');
+  return rewriteText(js, o).replace(PET_FROM, (m, day) => 'var FULL_FROM = window.SH_PREVIEW_TIMMY_FROM || "' + day + '";');
+}
+
+/* body for a site-relative file, or null to serve it untouched (binary) */
+function transformFile(rel, buf, o){
+  const ext = path.extname(rel).toLowerCase();
+  if (!TEXT_EXT.has(ext)) return null;
+  const text = buf.toString('utf8');
+  if (ext === '.html') return transformHtml(text, rel, o);
+  if (rel === 'sw.js') return transformSw(text, o);
+  if (PET_FILES.includes(rel)) return transformPet(text, o, rel);
+  return rewriteText(text, o);
+}
+
+/* the shop's catalog, read from the migration that writes it (migration_v54's two inserts into shop_items, then any later
+   migration's `update public.shop_items set ... where id = '...'`), so the preview's shelves sell exactly what the server will: one row each, [id, name, kind, rarity, price, season, slot, hp,
+   boost_minutes, boost_mult, shelf, rotates, gift, rank_tier, wide, sort, collection] (collection: migration_v75's year-round
+   collections, one `update ... set collection = '<k>' where id = '<id>'` a row) */
+const SHOP_COLS = ['id', 'name', 'kind', 'rarity', 'price', 'season', 'slot', 'hp', 'boost_minutes', 'boost_mult', 'shelf', 'rotates', 'gift', 'rank_tier', 'wide', 'sort', 'collection'];
+function shopCatalog(){
+  let sql = '';
+  try { sql = fs.readFileSync(path.join(ROOT, 'migration_v54.sql'), 'utf8'); } catch (e) { return null; }
+  const rows = [], wide = {};
+  const re = /insert into public\.shop_items \(([^)]*)\) values\s*([\s\S]*?)\n(?:on conflict[^;]*)?;/g;
+  let m;
+  while ((m = re.exec(sql))) {
+    const cols = m[1].split(',').map(s => s.trim());
+    const tuple = /\(((?:'(?:[^']|'')*'|[^()'])*)\)/g; let t;
+    while ((t = tuple.exec(m[2]))) {
+      const vals = [], cell = /\s*('(?:[^']|'')*'|[^,]+)\s*(?:,|$)/g; let c;
+      while ((c = cell.exec(t[1])) && c[0]) {
+        const v = c[1].trim();
+        vals.push(v[0] === "'" ? v.slice(1, -1).replace(/''/g, "'") : v === 'null' ? null : v === 'true' ? true : v === 'false' ? false : Number(v));
+      }
+      const r = {}; cols.forEach((k, i) => { r[k] = vals[i]; });
+      rows.push(r);
+    }
+  }
+  (sql.match(/update public\.shop_items set wide = true where id = '([a-z0-9-]+)'/g) || []).forEach(s => { wide[/'([a-z0-9-]+)'/.exec(s)[1]] = true; });
+  /* a later migration's new rows (migration_v65: the collections, five costumes, six paints) and its change to a row
+     (migration_v62: the boosts' rarity and price), in the migrations' order */
+  const lit = v => v[0] === "'" ? v.slice(1, -1).replace(/''/g, "'") : v === 'null' ? null : v === 'true' ? true : v === 'false' ? false : Number(v);
+  fs.readdirSync(ROOT).map(f => /^migration_v(\d+)\.sql$/.exec(f)).filter(f => f && +f[1] > 54).sort((x, y) => x[1] - y[1]).forEach(f => {
+    const text = fs.readFileSync(path.join(ROOT, f[0]), 'utf8').replace(/--[^\n]*/g, '');
+    const ins = /insert into public\.shop_items \(([^)]*)\) values\s*([\s\S]*?)\n(?:on conflict[^;]*)?;/g;
+    let n;
+    while ((n = ins.exec(text))) {
+      const cols = n[1].split(',').map(x => x.trim());
+      const tuple = /\(((?:'(?:[^']|'')*'|[^()'])*)\)/g; let t;
+      while ((t = tuple.exec(n[2]))) {
+        const vals = [], cell = /\s*('(?:[^']|'')*'|[^,]+)\s*(?:,|$)/g; let c;
+        while ((c = cell.exec(t[1])) && c[0]) vals.push(lit(c[1].trim()));
+        const r = {}; cols.forEach((k, i) => { r[k] = vals[i]; });
+        if (!rows.some(x => x.id === r.id)) rows.push(r);
+      }
+    }
+    const up = /update public\.shop_items set ((?:\s*[a-z_]+ = (?:'(?:[^']|'')*'|-?[0-9]+|true|false|null)\s*,?)+) where id = '([a-z0-9-]+)';/g;
+    let u;
+    while ((u = up.exec(text))) {
+      const row = rows.find(r => r.id === u[2]), as = /([a-z_]+) = ('(?:[^']|'')*'|-?[0-9]+|true|false|null)/g;
+      let x;
+      if (row) while ((x = as.exec(u[1]))) row[x[1]] = lit(x[2]);
+    }
+  });
+  if (!rows.length) return null;
+  return rows.map(r => SHOP_COLS.map(k => k === 'wide' ? !!wide[r.id] : k === 'shelf' || k === 'gift' ? !!r[k] : k === 'rotates' ? (r.rotates == null ? true : r.rotates) : r[k] == null ? null : r[k]));
+}
+
+function runtime(o){
+  const src = fs.readFileSync(path.join(__dirname, 'runtime', 'preview.js'), 'utf8');
+  const personas = JSON.parse(fs.readFileSync(path.join(__dirname, 'fixtures', 'personas.json'), 'utf8'));
+  const cfg = {
+    label: o.label, ref: o.ref, sha: o.sha, builtAt: o.builtAt, data: o.data,
+    fixtureHost: FIXTURE_HOST, stagingHost: o.data === 'staging' ? new URL(o.stagingUrl).host : null,
+    liveSite: LIVE_SITE, audio: o.audio || { mode: 'local', included: [] }, personas: personas.personas, adminSecret: personas.adminSecret,
+    shop: { cols: SHOP_COLS, rows: shopCatalog() }
+  };
+  return `window.SH_PREVIEW_CONFIG = ${JSON.stringify(cfg)};\n` + src;
+}
+
+function headersFile(){
+  /* Cloudflare Pages and Netlify read _headers; other hosts need the same header set in their config */
+  return `/*\n  X-Robots-Tag: ${ROBOTS}\n  Referrer-Policy: no-referrer\n  X-Content-Type-Options: nosniff\n`;
+}
+function robotsTxt(){ return 'User-agent: *\nDisallow: /\n'; }
+
+module.exports = { ROOT, PROD_HOST, PROD_URL, PROD_KEY, FIXTURE_HOST, FIXTURE_URL, FIXTURE_KEY, LIVE_SITE, PREVIEW_DIR, ROBOTS, SITE_ENTRIES, PREVIEW_PAGES, inPreview,
+  options, rewriteText, transformHtml, transformFile, runtime, headersFile, robotsTxt, csp };
