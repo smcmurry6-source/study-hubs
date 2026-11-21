@@ -32,6 +32,14 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-21 (the old analytics compacted, Claude Code)** — The last part of the retention schedule: `migration_v93.sql`
+  (pending until applied after the merge). The nightly job collapses `activity_hourly`, `activity_visits` and `question_events`
+  older than the school year (365 Central days, a day a night, the first about 2027-09-13) into `activity_daily`,
+  `activity_visits_daily` and `question_events_daily` (people counts, no ids). What the collapsed hours paid in time crowns is kept
+  per visitor first (`activity_time_kept`, capped pings), and `sh_time_crowns` adds it, so no balance moves; linking devices moves it.
+  `question_feedback` goes when a hub's page comes down: the After merge workflow's new `down` step, and a data fix for the five
+  hubs already down. Sam's answers on the two question-health rows are in `vault/decisions.md`. `tools/release/retention.js` checks it.
+
 - **2026-11-20 (Patient Box v2.0: the tooth library, modules, new views and checks, Claude Code)** — The Patient Box v2
   package ([task](vault/tasks/done/2026-11-06-patient-box-v2-modular-cases.md)). `widget/teeth.js` is the tooth library
   (`window.SH_TEETH`, `require()` in Node): the Wheeler table and outlines moved out of `widget/cases.js`, plus a catalogue
