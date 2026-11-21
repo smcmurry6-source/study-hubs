@@ -446,6 +446,29 @@ it as `sh:crowns` (the hub's meters and a gold "+n crowns" pop, the dashboard's 
 - **The rebuild keeps them**: `sh_xp_rebuild` replays only answers and goals; prize rows (and the old fix rows) stay. Link my devices
   copies them like any award row (a key already paid on the other device is skipped).
 
+## More ways to earn crowns (migration_v92)
+
+Sam, 2026-11-20: "yes want more ways to earn crowns", then, to the list with each amount in median study days (a median
+study day earned about 950 crowns): "Yes and backpay". Seven prizes, each one `xp_awards` row with a key that pays once,
+as many crowns as XP (`sh_is_prize`), never boosted; the amounts are in `sh_prizes()` and `PRIZES` in `widget/v3.js`.
+
+| Prize | Pays | Key | Where it's paid |
+|---|---|---|---|
+| The first Tooth Fairy caught | 250 | `fairy` | `claim_fairy_v2(hub, visitor, gold)` (and the old `record_fairy`), through `sh_fairy` |
+| The first Golden Tooth Fairy caught | 500 | `goldfairy` | `claim_fairy_v2` with `p_gold`; the catch is kept in `egg_events` with `qid` `gold` |
+| A Golden Probe won (the class's first that day, per hub) | 300 | `probe:<hub>:<day>` | `claim_golden_probe_v2` (`first`), and the old `claim_golden_probe` |
+| A perfect mock: 20+ questions, all right, none left out | 750 | `perfect:<hub>` | `sh_session_finish` (the reply's `perfect`) |
+| Yesterday's misses (3+) all answered right today | 100 | `misses:<hub>:<day>` | `claim_misses_v2(visitor, hub)` (`n`, `left`), asked by `widget/hub-bank.js` when the set's every question is right |
+| An idea of yours marked Shipped | 500 | `idea:<id>` | `admin_set_idea` (the reply's `paid`), to the author's primary id |
+| The first answer after 7+ days without studying | 200 | `back:<day>` | `sh_streak_step` (in the answer's `bonus`, `n` the days away) |
+
+- The Tooth Fairy is caught on the page, so only the first catch pays: a catch every minute can't be farmed.
+- **Back pay** (in the migration, section 4, to a linked device's primary id): the first fairy catch of everyone who caught
+  one, every Golden Probe ever won, each hub's first perfect mock in `mock_scores` (applied 2026-11-20: 42 fairies, 58 probes from 29 people, 8 perfect mocks from 7 people). Not the Golden Tooth Fairy (no record of
+  which catches were golden before v92), a day back, yesterday's misses or ideas (none shipped had a student author).
+- `widget/eggs.js` asks the new calls through `shGame.claim` (the reward card and the balance), and the old calls when
+  the game layer or the new call isn't there. `tools/release/xp.js` section 14e checks all of it.
+
 ## Collections (migration_v75)
 
 Sam, 2026-11-19: "in the timmy card i want there to be a button where you can view your collections of items bought in the

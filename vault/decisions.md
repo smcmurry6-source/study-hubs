@@ -15,6 +15,7 @@ changes" in `DEPLOY_NOTES.md` (grep it before re-proposing something).
 
 | Date | Decision | Applies to | Source |
 |---|---|---|---|
+| 2026-11-20 | **More ways to earn crowns:** "yes want more ways to earn crowns", then **"Yes and backpay"** to the list in median study days (a median day about 950 crowns): the first Tooth Fairy 250, the first Golden one 500, a Golden Probe won 300, a perfect mock 750 once per hub, yesterday's misses all right 100, an idea shipped 500, the first day back after a week away 200. Back pay for what has a record (first fairies, Golden Probes, perfect mocks) | `sh_prizes`, migration_v92 | [game-server](reference/game-server.md), chat, Claude Code |
 | 2026-11-20 | Review of Systems' arcade: **"No arcade"**. It stays without one (More hides the tile, `TEXT_ONLY` in `sw.js`). | Review of Systems | chat, picking from the backlog |
 | 2026-11-20 | The boards hub: **"keep the boards branch"**. `claude/boards-hub` stays and gets caught up with `main` ([the task](tasks/2026-11-03-boards-hub-catch-up-with-main.md)); its 16 open PRs wait for Sam's call, one by one. | `claude/boards-hub`, [the boards hub](hubs/boards.md) | chat, picking from the backlog |
 | 2026-11-20 | **"yes want more ways to earn crowns"**: new one-time crown prizes get built, from the ideas in [the inbox](tasks/inbox.md) ("More ways to earn crowns"), each amount checked against [earn-rates-stay-enjoyable](rules/earn-rates-stay-enjoyable.md) and shown to Sam before it ships. | the wallet, `sh_prizes()` | chat, picking from the backlog |
