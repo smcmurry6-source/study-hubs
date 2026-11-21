@@ -7,7 +7,7 @@ requested-by: Sam
 due: after the redesign's release
 waiting-on: 
 agent: Claude Code
-pr: 
+pr: https://github.com/smcmurry6-source/study-hubs/pull/510
 ---
 
 # The ModuPro's and the Loupes' rank sets for Timmy's place
@@ -103,7 +103,10 @@ owns that tier's set and not the next), `node tools/release/rls.js`, the smoke t
   headlight (none on `NO_LOUPES`). Rarity: the ModuPro Epic to Silver, Legendary from Gold; the Loupes all Legendary. The
   rows are `migration_v91.sql` (the number reserved for it). The later outfits are their own file,
   `widget/hub-art/outfits/journeys.js` (in `outfits.js` they made it 81 KB from 50 KB). `pack-preview.mjs` takes
-  `ranks:modupro` / `ranks:loupes` for one journey's sheet, with the loupes on. Contact sheets sent to Sam.
+  `ranks:modupro` / `ranks:loupes` for one journey's sheet, with the loupes on. Contact sheets sent to Sam; then, at Sam's
+  ask, a second Opus 5.5 agent reviewed and redrew 13 pieces and nine outfits (side-on articulator, chair and prism; a
+  bench casting machine; a library telescope; a bigger sundial; outfits kept off the mouth and the headlight) and fixed
+  five lines (e.g. "a gypsum product", wax carving before casting). Revised sheets sent.
 
 ## Outcome
 

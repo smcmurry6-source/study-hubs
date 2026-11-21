@@ -226,7 +226,7 @@ export function pack(T){
      - The ModuPro (the sim lab): each set is a dental material or a thing from the lab, in the rank's material: dental
        stone, the brass articulator, casting, the first three instruments, the chair, the diamond bur, and a nebula (the
        ModuPro's Dark Matter sky).
-     - The Loupes (light and sight): a loupe is two little telescopes, so each set is something people have used to see
+     - The Loupes (light and sight): a pair of loupes is two little telescopes, so each set is something people have used to see
        better or by: the sun, a spyglass, the armillary sphere, the microscope, the lighthouse, the prism, the
        observatory. In this journey Timmy wears his loupes (with their headlight on the bridge, place.mjs loupes()), so
        these seven outfits keep off his face and above the headlight: none is on NO_LOUPES.
@@ -235,8 +235,13 @@ export function pack(T){
        casting machine (a spring-wound arm in a tub, the crucible at one end and a counterweight at the other): dental
        laboratory texts' descriptions (Craig's Restorative Dental Materials; the casting chapter of Phillips' Science of
        Dental Materials).
-     - The armillary sphere (equator, meridian and ecliptic rings round a small Earth), the hand microscope (horseshoe
-       foot, pillar, arm, stage, mirror under it) and the pith helmet: museum catalog descriptions. */
+     - The armillary sphere (equator, meridian and ecliptic rings around a small Earth, the ecliptic 23.4 degrees off
+       the equator), the library telescope (a long tube with draw tubes, a finder and a dew shield, on a turned pillar
+       with three claw feet), the hand microscope (horseshoe foot, pillar, arm, stage, mirror under it) and the pith
+       helmet: museum catalog descriptions. The sundial's gnomon rises at Birmingham's latitude, about 33.5 degrees.
+     - The diamond bur's color ring: the manufacturers' grit code (blue for medium, the standard grit).
+     - The pieces best read from the side (the articulator, the casting machine, the chair, the telescope, the prism)
+       are drawn in the front-on frame below (FP, ext). */
   var ST = { c: "#C4BEB4", s: "#968F84", h: "#E3DFD8" }, STEEL = { c: "#D6DCE2", s: "#9AA4AE", h: "#FFFFFF" };
   var WOOD = { top: K.woodLight, left: K.wood, right: K.woodShade }, o2b = { sw: 1.5, si: 1 };
   var NEB = ["#E070B0", "#7FE7D8", "#B57BFF"];
@@ -244,18 +249,34 @@ export function pack(T){
   function glow(x, y, r, c, op){ return circ(x, y, r, c, 0).replace("/>", ' opacity="' + (op || ".25") + '"/>'); }
   /* points of a horizontal ring (radius r at height z round cx, cy), from angle a0 to a1 in degrees, n steps */
   function ringPts(cx, cy, z, r, a0, a1, n){ var out = [], j, t; for (j = 0; j <= n; j++){ t = (a0 + (a1 - a0) * j / n) * Math.PI / 180; out.push([cx + Math.cos(t) * r, cy + Math.sin(t) * r, z]); } return out; }
-  /* a dental arch (a horseshoe of teeth) at height z, open toward the back (low x and y): its teeth as little bumps */
-  function arch(cx, cy, z, r, fill, up){
-    var pts = ringPts(cx, cy, z, r, -25, 115, 12), s = L(D(pts, true), 7.4) + L(D(pts, true), 5, fill);
-    pts.forEach(function(q, i){ if (i % 2) return; var e = P(q[0], q[1], q[2]); s += ell(e[0], e[1] + (up ? -2 : 2), 2.4, 2, WHITE, .9); });
-    return s;
+  /* the front-on frame, for a piece best read from its side (an articulator, a chair, a casting arm, a prism): u runs
+     across the picture to the right, w into it (straight up the picture), z up, from the footprint's middle. A solid is
+     an outline in (u, z) pushed back along w: ext() draws its front and every face of it that looks up (the others are
+     out of sight from the yard's eye, which sits along (u, w, z) = (0, -1.41, 1)). */
+  var SQ = Math.SQRT1_2;
+  function FP(u, w, z){ return P(1.8 + (u - w) * SQ, 1.8 - (u + w) * SQ, z || 0); }
+  function ext(prof, w0, w1, fill, top, sw){
+    var s = "", n = prof.length, A = 0, i, a, b;
+    for (i = 0; i < n; i++){ a = prof[i]; b = prof[(i + 1) % n]; A += a[0] * b[1] - b[0] * a[1]; }
+    for (i = 0; i < n; i++){ a = prof[i]; b = prof[(i + 1) % n];
+      if ((A > 0 ? a[0] - b[0] : b[0] - a[0]) > 1e-6) s += FO(T.D2([FP(a[0], w0, a[1]), FP(b[0], w0, b[1]), FP(b[0], w1, b[1]), FP(a[0], w1, a[1])]), top || fill, 1.1); }
+    return s + FO(T.D2(prof.map(function(q){ return FP(q[0], w0, q[1]); })), fill, sw || 1.6);
+  }
+  function rect(u0, z0, u1, z1){ return [[u0, z0], [u1, z0], [u1, z1], [u0, z1]]; }
+  function rot(prof, c, deg){ var t = deg * Math.PI / 180, cs = Math.cos(t), sn = Math.sin(t); return prof.map(function(q){ var du = q[0] - c[0], dz = q[1] - c[1]; return [c[0] + du * cs - dz * sn, c[1] + du * sn + dz * cs]; }); }
+  function disc(u, z, r, n){ var out = [], i; n = n || 14; for (i = 0; i < n; i++) out.push([u + Math.cos(i / n * Math.PI * 2) * r, z + Math.sin(i / n * Math.PI * 2) * r]); return out; }
+  /* part of an ellipse in screen space (rx, ry, turned a degrees), from t0 to t1 (degrees; 0 to 180 is its near, lower half) */
+  function arcE(x, y, rx, ry, a, t0, t1){
+    var r = a * Math.PI / 180, cs = Math.cos(r), sn = Math.sin(r), out = [], i, t;
+    for (i = 0; i <= 16; i++){ t = (t0 + (t1 - t0) * i / 16) * Math.PI / 180; var ex = Math.cos(t) * rx, ey = Math.sin(t) * ry; out.push([x + ex * cs - ey * sn, y + ex * sn + ey * cs]); }
+    return T.D2(out, true);
   }
 
   var later = {
     /* ---------------------------------------------------------------- the ModuPro's yard ------------------------- */
     "rank-modu-stone-yard": {
       note: "A block of dental stone with a molar half carved out of it, a chisel and a mallet beside it", spot: [3.4, 3.45],
-      egg: { n: "The stone molar", does: "chips fly", say: "ModuPro Stone! Dental stone is gypsum: every cast you pour starts as powder and water." }, anim: "tp-sparks 1.6s ease-out",
+      egg: { n: "The stone molar", does: "chips fly", say: "ModuPro Stone! Dental stone is a gypsum product: every cast you pour starts as powder and water." }, anim: "tp-sparks 1.6s ease-out",
       draw: function(o){
         var s = shadow(1.8, 1.95, 28, 10);
         s += box(.85, .85, 0, 1.9, 1.9, 1.05, mat(ST), o2b);
@@ -277,111 +298,175 @@ export function pack(T){
     "rank-modu-antique-yard": {
       note: "A brass hinge articulator on a wooden base, plaster casts of both arches closed on it", spot: [3.4, 3.45],
       egg: { n: "The articulator", does: "it opens and closes", say: "ModuPro Antique! An articulator holds the casts the way the jaws meet, so the bite is right before the patient ever sits down." }, anim: "tp-pop 2.2s",
+      move: { ".tp-aim": "tp-aim 2.4s ease-in-out" },
+      /* seen from its side, front-on: the hinge at the back (left), the incisors at the front (right); it stands a little
+         open so both arches show, and its upper member swings on the hinge while the egg plays */
       draw: function(o){
-        var s = shadow(1.8, 1.95, 30, 10), CR = "#F4F1EA", CRs = "#D9D2C2", i, q, e;
-        s += box(.55, .75, 0, 2.6, 2.2, .3, WOOD, o2b);
-        /* the posts at the back, the hinge across their tops */
-        var a0 = P(.95, .95, .3), a1 = P(.95, .95, 2.5), b0 = P(2.65, .95, .3), b1 = P(2.65, .95, 2.5);
-        s += rod(a0, a1, 2, BR.c) + rod(b0, b1, 2, BR.s) + rod(a1, b1, 2.6, BR.c) + circ(a1[0], a1[1], 2.6, BR.h, 1) + circ(b1[0], b1[1], 2.6, BR.h, 1);
-        /* the lower cast on its brass plate, the upper on its arm, the teeth meeting between them */
-        s += cyl(1.8, 1.95, .3, .92, .42, .92, BR.c, BR.s, BR.h, o2b) + cyl(1.8, 1.95, .42, .78, .9, .74, CR, CRs, CR, o2b);
-        for (i = 0; i < 9; i++){ q = ringPts(1.8, 1.95, .95, .62, -20 + i * 17.5, 0, 1)[0]; e = P(q[0], q[1], q[2]); s += ell(e[0], e[1], 2.6, 2.2, WHITE, 1); }
-        s += cyl(1.8, 1.95, 1.0, .74, 1.5, .78, CR, CRs, CR, o2b) + cyl(1.8, 1.95, 1.5, .92, 1.62, .92, BR.c, BR.s, BR.h, o2b);
-        var up = P(1.8, 1.95, 1.62); s += rod(a1, up, 2, BR.c) + rod(b1, up, 2, BR.s) + circ(up[0], up[1], 2.6, BR.h, 1);
-        /* the incisal pin at the front, down to its table */
-        var pin0 = P(2.85, 2.85, .3), pin1 = P(2.85, 2.85, 1.85);
-        s += box(2.6, 2.6, .3, .5, .5, .12, mat(BR), o2b) + rod(pin0, pin1, 1.4, BR.c) + rod(pin1, P(2.4, 2.4, 1.62), 1.6, BR.c) + circ(pin1[0], pin1[1], 1.8, BR.h, .9) + circ(P(1.3, 2.6, .3)[0], P(1.3, 2.6, .3)[1], 1.2, BR.pat);
-        if (o.snow) s += ell(up[0], up[1], 12, 3, WHITE, 0);
+        var s = shadow(1.8, 1.9, 30, 10), W0 = -.24, W1 = .24, Z = .3, TH = .42, ZL = 1.16, ZU = ZL + TH * 2, HG = [-1.8, ZU + .78], OPEN = 15;
+        var GUM = "#F49AAE", GUMt = "#F9C2CF", CR = "#F4F1EA", CRt = "#FFFFFF", BRt = "#C99A5E";
+        var R = function(q){ return rot(q, HG, OPEN); }, same = function(q){ return q; };
+        /* a row of teeth standing on the gum line z (hanging from it for the upper arch), the molars at the back */
+        var teeth = function(z, down, fwd){
+          var out = "", sg = down ? -1 : 1, tf = down ? R : same, h = TH, row = [[-1.15, -.73, 2], [-.73, -.31, 2], [-.31, -.02, 1], [-.02, .27, 1], [.27, .55, 0], [.55, .82, 3], [.82, 1.09 + (fwd || 0), 3]];
+          row.forEach(function(t){
+            var u0 = t[0] + .025, u1 = t[1] - .025, m = (u0 + u1) / 2, q = t[2] === 2 ? [[u0, z], [u1, z], [u1, z + sg * h * .76], [u1 - .09, z + sg * h], [m, z + sg * h * .8], [u0 + .09, z + sg * h], [u0, z + sg * h * .76]]
+              : t[2] === 1 ? [[u0, z], [u1, z], [u1, z + sg * h * .78], [m, z + sg * h * 1.02], [u0, z + sg * h * .78]]
+              : t[2] === 0 ? [[u0, z], [u1, z], [u1, z + sg * h * .8], [m, z + sg * h * 1.2], [u0, z + sg * h * .8]]
+              : [[u0, z], [u1, z], [u1, z + sg * h * 1.04], [u0, z + sg * h * 1.04]];
+            out += FO(T.D2(tf(q).map(function(e){ return FP(e[0], W0, e[1]); })), WHITE, 1.1);
+          });
+          return out;
+        };
+        s += cyl(1.8, 1.8, 0, 1.75, Z, 1.75, "#8A5A3A", "#6B4128", "#A26E48", o2b);
+        /* the lower member, its incisal table at the front, the post at the back */
+        s += ext(rect(-2.02, Z, 1.9, Z + .22), W0 - .06, W1 + .06, BR.c, BRt) + ext(rect(1.34, Z + .22, 1.88, Z + .36), -.18, .18, BR.s, BRt);
+        s += ext(rect(-2.02, Z + .22, -1.62, HG[1] + .02), -.16, .16, BR.c, BRt);
+        /* the lower cast: its plaster base, the gum, the teeth */
+        s += ext(rect(-1.25, Z + .22, 1.25, ZL - .24), W0, W1, CR, CRt) + ext([[-1.24, ZL - .26], [1.24, ZL - .26], [1.2, ZL + .04], [-1.22, ZL + .04]], W0, W1, GUM, GUMt) + teeth(ZL);
+        /* the upper member, swung open on the hinge: its teeth, gum, plaster base, the arm and the incisal pin at its front */
+        var up = teeth(ZU, true, .07) + ext(R([[-1.22, ZU - .04], [1.26, ZU - .04], [1.24, ZU + .26], [-1.24, ZU + .26]]), W0, W1, GUM, GUMt) +
+          ext(R(rect(-1.25, ZU + .26, 1.29, HG[1] - .1)), W0, W1, CR, CRt) + ext(R(rect(1.6, ZL - .1, 1.74, HG[1] - .1)), -.06, .06, BR.c, BRt, 1.3) +
+          ext(R(rect(-2.0, HG[1] - .1, 1.92, HG[1] + .14)), W0 - .06, W1 + .06, BR.c, BRt) + ext(R(disc(1.67, HG[1] + .25, .12, 10)), -.06, .06, BR.h, BRt, 1.2);
+        /* everything above the bite turns about the hinge: drawn open, and the egg's swing turns it about the same point */
+        var H = FP(HG[0], W0, HG[1]);
+        s += '<g class="tp-aim" style="transform-origin:' + f(H[0]) + "px " + f(H[1]) + 'px">' + up + "</g>";
+        /* the hinge pin across the top of the post */
+        s += ext(disc(HG[0], HG[1], .2, 12), -.34, .34, BR.h, BRt, 1.4) + circ(FP(HG[0], -.34, HG[1])[0], FP(HG[0], -.34, HG[1])[1], 1, BR.s);
+        s += circ(FP(-.9, W0 - .06, Z + .11)[0], FP(-.9, W0 - .06, Z + .11)[1], 1.1, BR.pat) + circ(FP(1.5, W0 - .06, Z + .11)[0], FP(1.5, W0 - .06, Z + .11)[1], .9, BR.pat);
+        if (o.snow){ var sq = R([[-.2, HG[1] + .14]])[0], sn = FP(sq[0], 0, sq[1]); s += ell(sn[0], sn[1] - 1, 13, 2.4, WHITE, 0); }
         return s;
       },
-      bits: function(){ var c = P(1.75, 1.95, 1.4), x = c[0], y = c[1]; return L("M" + f(x - 24) + " " + f(y - 6) + " q-4 -6 0 -12 M" + f(x + 24) + " " + f(y - 6) + " q4 -6 0 -12", 1.6, BR.s); }
+      bits: function(){ var a = FP(1.9, 0, 3.1), x = a[0], y = a[1]; return L("M" + f(x + 3) + " " + f(y - 8) + " q6 5 4 13 M" + f(x + 8) + " " + f(y - 11) + " q8 7 5 17", 1.6, BR.s) + star4(x + 10, y + 12, 3.4, WHITE); }
     },
     "rank-modu-bronze-yard": {
       note: "A bronze casting machine: a spring-wound arm in its tub, a crucible at one end and a weight at the other", spot: [3.4, 3.45],
       egg: { n: "The casting machine", does: "the arm spins", say: "ModuPro Bronze! A casting machine flings melted metal into a mold. That's how cast crowns and inlays get their shape." }, anim: "tp-sparks 1.6s ease-out",
+      /* the broken-arm machine, its arm seen side on (front-on): the counterweight at one end; at the other the hinge that
+         lets the end swing (the "broken arm"), the crucible with its melt and the casting ring the metal is flung into */
       draw: function(o){
-        var s = shadow(1.8, 1.95, 30, 11);
-        s += cyl(1.8, 1.8, 0, .62, .9, .4, IRON[0], IRON[1], null, o2b);
-        /* the tub, open at the top, and the dark inside */
-        s += cyl(1.8, 1.8, .9, 1.3, 1.85, 1.45, BZ.c, BZ.s, null, { open: true, sw: 1.6 });
-        var tt = P(1.8, 1.8, 1.85);
-        s += ell(tt[0], tt[1], T.RX(1.45), T.RY(1.45), "#3A2418", 1.4) + ell(tt[0], tt[1] + 1, T.RX(1.25), T.RY(1.25), "#4E3022", 0);
-        /* the arm across it: the crucible and its mold at one end, the counterweight at the other, the spindle */
-        var e0 = P(.85, 2.3, 1.9), e1 = P(2.75, 1.3, 1.9), hb = P(1.8, 1.8, 1.9);
-        s += rod(e0, e1, 2.6, BZ.h) + circ(hb[0], hb[1], 3, BZ.s, 1.2);
-        s += box(.6, 2.12, 1.82, .42, .38, .32, mat(STEEL), o2b) + box(.25, 2.18, 1.86, .36, .3, .26, { top: "#F28C28", left: "#D46A12", right: "#B5560E" }, o2b);
-        s += circ(e1[0], e1[1] - 2, 4.6, BZ.c, 1.4) + circ(e1[0] - 1.2, e1[1] - 3.2, 1.4, BZ.h);
-        /* the winding knob on the side */
-        var kn = P(3.1, 1.8, 1.3); s += circ(kn[0], kn[1], 2.4, BZ.h, 1);
-        if (o.snow) s += ell(tt[0] - 12, tt[1] + 2, 8, 2, WHITE, 0);
+        var s = shadow(1.8, 1.95, 32, 11), MELT = o.night ? "#FFD166" : "#F7A531";
+        /* the bench cabinet it stands on (a panel, vents, a tooth plaque), the iron tub on top: its inner wall, floor, front wall */
+        s += box(.7, .7, 0, 2.2, 2.2, .92, { top: BZ.h, left: BZ.c, right: BZ.s }, o2b);
+        s += O(D(T.onY(2.9, T.rectUV(.95, 2.65, .14, .76))), 1.1) + L(D([[2.9, 1.0, .56], [2.9, 1.7, .56]], true) + D([[2.9, 1.0, .44], [2.9, 1.7, .44]], true) + D([[2.9, 1.0, .32], [2.9, 1.7, .32]], true), 1.2, "#7A4520");
+        var pl = P(1.8, 2.9, .45); s += T.tinyTooth(pl[0], pl[1], .62, BZ.h);
+        var tub = cyl(1.8, 1.8, .92, 1.1, 1.36, 1.26, IRON[0], IRON[1], null, { open: true, sw: 1.7 }), tt = P(1.8, 1.8, 1.36), fl = P(1.8, 1.8, 1.0);
+        s += tub + ell(tt[0], tt[1], T.RX(1.26), T.RY(1.26), "#4A4456", 1.5) + ell(fl[0], fl[1], T.RX(1.06), T.RY(1.06), "#2E2A36", 0) + tub + L(arcE(tt[0], tt[1], T.RX(1.26) - 1.3, T.RY(1.26) - .9, 0, 205, 300), 1.4, "#8E8898", .9);
+        /* the spindle up out of the tub, the arm across it */
+        var Z = 2.1;
+        s += ext(rect(-.1, 1.0, .1, Z), -.1, .1, STEEL.c, STEEL.h, 1.3);
+        s += ext(rect(-1.7, Z, 1.02, Z + .26), -.13, .13, BZ.h, BZ.c);
+        /* the counterweight, a drum on the arm's end, and its locking nut */
+        s += ext(rect(-2.2, Z - .3, -1.5, Z + .56), -.34, .34, BZ.c, BZ.h) + ext(rect(-2.2, Z - .3, -1.94, Z + .56), -.34, .34, BZ.s, BZ.c, 1.3) + ext(rect(-1.5, Z - .04, -1.36, Z + .3), -.14, .14, STEEL.c, STEEL.h, 1.2);
+        /* the broken arm: its hinge, then the crucible with the melt glowing in it, then the casting ring */
+        s += ext(disc(1.06, Z + .13, .18, 10), -.16, .16, BZ.s, BZ.c, 1.3);
+        s += ext(rect(1.1, Z - .02, 1.62, Z + .18), -.12, .12, BZ.h, BZ.c, 1.3);
+        s += ext([[1.18, Z + .14], [1.56, Z + .14], [1.66, Z + .58], [1.1, Z + .58]], -.24, .24, "#EDE5D8", MELT, 1.4);
+        s += ext(rect(1.66, Z - .28, 2.3, Z + .58), -.38, .38, STEEL.c, STEEL.h) + L(T.seg(FP(1.98, -.38, Z - .28), FP(1.98, -.38, Z + .58)), 1.1, STEEL.s) + circ(FP(1.68, -.1, Z + .15)[0], FP(1.68, -.1, Z + .15)[1], 1.4, "#3A2418");
+        /* the hub cap and the winding pin on the tub's rim */
+        var hb = FP(0, 0, Z + .26);
+        s += ell(hb[0], hb[1], 3.2, 1.8, BZ.s, 1.2) + ell(hb[0] - .6, hb[1] - .5, 1.2, .6, BZ.h, 0);
+        if (o.snow) s += ell(FP(-1.85, 0, Z + .56)[0], FP(-1.85, 0, Z + .56)[1] - 1, 5, 1.6, WHITE, 0) + ell(FP(1.98, 0, Z + .58)[0], FP(1.98, 0, Z + .58)[1] - 1, 5, 1.6, WHITE, 0);
         return s;
       },
-      bits: function(){ var c = P(1.8, 1.8, 1.9), x = c[0], y = c[1]; return G("tp-sparks", circ(x - 14, y - 10, 1.6, "#F2C230") + circ(x + 8, y - 16, 1.3, "#F28C28") + circ(x + 18, y - 6, 1.5, "#F2C230") + circ(x - 4, y - 20, 1.2, "#F28C28")) + L("M" + f(x - 30) + " " + f(y + 4) + " q30 -18 60 0", 1.4, BZ.s); }
+      lights: function(o){ if (!o || !o.night) return ""; var m = FP(1.38, 0, 2.68); return glow(m[0], m[1], 10, "#FFB347", ".3") + glow(m[0], m[1], 5, "#FFE08A", ".4"); },
+      bits: function(){ var c = FP(0, 0, 2.2), m = FP(1.38, 0, 2.68), x = c[0], y = c[1];
+        return L(arcE(x, y, 34, 11, 0, 200, 340), 1.6, BZ.s) + L(arcE(x, y, 34, 11, 0, 20, 160), 1.6, BZ.s, .7) + '<path d="M' + f(x + 30) + " " + f(y + 7) + ' l5 -1 -2 4.6 z" fill="' + BZ.s + '"/>' +
+          G("tp-sparks", circ(m[0] - 4, m[1] - 6, 1.5, "#F2C230") + circ(m[0] + 3, m[1] - 10, 1.2, "#F28C28") + circ(m[0] + 8, m[1] - 4, 1.4, "#F2C230") + circ(m[0] - 1, m[1] - 14, 1.1, "#F28C28")); }
     },
     "rank-modu-silver-yard": {
       note: "A silver instrument tray on its stand, with a mouth mirror, an explorer and a probe", spot: [3.4, 3.45],
       egg: { n: "The instrument tray", does: "the mirror catches the light", say: "ModuPro Silver! Mirror, explorer, probe: the first three instruments you ever picked up." }, anim: "tp-sparks 2s ease-out",
+      /* a Mayo stand's tray with a rolled rim, the three instruments laid along it on a paper liner, their working ends at
+         the back: the mouth mirror, the explorer's curled tip and the probe with its marks */
       draw: function(o){
-        var s = shadow(1.8, 1.95, 26, 9), c0 = P(1.8, 1.8, .15), c1 = P(1.8, 1.8, 1.6), i, a, Z = 1.78;
-        for (i = 0; i < 5; i++){ a = (i * 72 + 18) * Math.PI / 180; var e = P(1.8 + Math.cos(a) * 1.0, 1.8 + Math.sin(a) * 1.0, 0); s += rod(c0, e, 2, STEEL.s) + circ(e[0], e[1], 1.8, IRON[1], .8); }
-        s += rod(c0, c1, 3, STEEL.c) + circ(c0[0], c0[1], 3.4, STEEL.s, 1.1);
-        /* the tray with its turned-up rim, a paper liner on it */
-        s += box(.7, 1.0, 1.6, 2.3, 1.7, .18, mat(SV), o2b) + FO(D([[.85, 1.15, Z], [2.85, 1.15, Z], [2.85, 2.55, Z], [.85, 2.55, Z]]), "#DDF2FB", 1);
-        /* the three instruments, handles toward the right */
-        var inst = function(y, tip){ var h0 = P(1.25, y, Z + .05), h1 = P(2.7, y, Z + .05), t = P(.95, y, Z + .05);
-          return rod(h0, h1, 3, SV.c) + L(T.seg([h0[0] + 6, h0[1] + 3.4], [h1[0] - 4, h1[1] - 2.2]), 1, SV.s) + tip(t, h0); };
-        s += inst(1.45, function(t, h){ return rod(t, h, 1.2, SV.s) + ell(t[0] - 2, t[1] - 1, 4.6, 3.4, SV.c, 1.3) + ell(t[0] - 2, t[1] - 1, 3.2, 2.2, "#BFE6F7", 0) + L("M" + f(t[0] - 4) + " " + f(t[1] - 2) + " l2 -1", 1, WHITE); });
-        s += inst(1.85, function(t, h){ return L("M" + f(h[0]) + " " + f(h[1]) + " L" + f(t[0]) + " " + f(t[1]) + " q-3 0 -2.6 -4", 2.6) + L("M" + f(h[0]) + " " + f(h[1]) + " L" + f(t[0]) + " " + f(t[1]) + " q-3 0 -2.6 -4", 1.2, SV.c); });
-        s += inst(2.25, function(t, h){ return rod(t, h, 1.2, SV.c) + L("M" + f(t[0] + 2.4) + " " + f(t[1] - 1) + " l1 1.6 M" + f(t[0] + 4.8) + " " + f(t[1] - 2.4) + " l1 1.6", 1, INK); });
-        if (o.snow) s += ell(P(1.8, 1.8, Z)[0], P(1.8, 1.8, Z)[1], 13, 3, WHITE, 0);
+        var s = shadow(1.8, 1.95, 28, 10), Z = 2.0, X0 = .5, X1 = 3.1, Y0 = .7, Y1 = 2.9, i;
+        /* the stand: a weighted base on casters, the pole up under the tray */
+        [[1.15, 1.15], [2.45, 1.15], [1.15, 2.45], [2.45, 2.45]].forEach(function(q){ var c = P(q[0], q[1], 0); s += circ(c[0], c[1] - .6, 1.7, IRON[1], 1); });
+        s += cyl(1.8, 1.8, .1, .9, .3, .9, SV.s, "#7E8995", SV.c, o2b) + cyl(1.8, 1.8, .3, .13, Z - .1, .13, SV.c, SV.s, null, o2b) + cyl(1.8, 1.8, 1.0, .19, 1.14, .19, SV.s, "#7E8995", SV.c, o2b);
+        /* the tray: the pan, the liner on its floor */
+        s += box(X0, Y0, Z - .12, X1 - X0, Y1 - Y0, .2, mat(SV), o2b);
+        s += FO(D([[X0 + .14, Y0 + .14, Z + .08], [X1 - .14, Y0 + .14, Z + .08], [X1 - .14, Y1 - .14, Z + .08], [X0 + .14, Y1 - .14, Z + .08]]), "#A9B4BF", 1);
+        s += FO(D([[X0 + .28, Y0 + .28, Z + .08], [X1 - .3, Y0 + .28, Z + .08], [X1 - .3, Y1 - .3, Z + .08], [X0 + .28, Y1 - .3, Z + .08]]), "#CDEBF7", .9);
+        /* the three instruments: a handle knurled at its grip, its end, and each one's working end at the back */
+        /* each handle wears its color-coding ring near the end, as a clinic's sorted kit does */
+        var ZI = Z + .1, hand = function(y, ring){ var a = P(1.25, y, ZI), b = P(2.75, y, ZI), g0 = P(2.28, y, ZI), g1 = P(2.5, y, ZI);
+          return L(T.seg(a, b), 4.4) + L(T.seg(a, b), 2.8, SV.c) + L(T.seg([a[0] + 1, a[1] - .9], [b[0] - 1, b[1] - .9]), .9, WHITE) + L(T.seg(g0, g1), 5.2) + L(T.seg(g0, g1), 3.6, ring) + circ(b[0], b[1], 1.6, SV.c, 1.1); };
+        /* the probe, at the back: a thin straight tip with its millimeter bands */
+        var y = 1.08, a = P(1.25, y, ZI), t = P(.54, y, ZI), m = function(k){ return [a[0] + (t[0] - a[0]) * k, a[1] + (t[1] - a[1]) * k]; };
+        s += hand(y, "#E8615A") + L(T.seg(a, t), 2.6) + L(T.seg(a, t), 1.1, SV.c) + L(T.seg(m(.5), m(.6)) + T.seg(m(.72), m(.82)), 1.1, INK);
+        /* the explorer: a fine wire tip that ends in a curl, the shepherd's hook */
+        y = 1.82; a = P(1.25, y, ZI); t = P(.76, y, ZI);
+        var hook = "M" + f(a[0]) + " " + f(a[1]) + " L" + f(t[0]) + " " + f(t[1]) + " q-4 -1.4 -3.4 -4.2 q.6 -2 3 -1.2";
+        s += hand(y, "#4FA3E3") + L(hook, 2.6) + L(hook, 1.1, SV.c);
+        /* the mirror, at the front: a round head on its neck, the glass lying flat and catching the light */
+        y = 2.52; a = P(1.25, y, ZI); var hc = P(.82, y, ZI + .02);
+        s += hand(y, "#5CC489") + L(T.seg(a, hc), 2.8) + L(T.seg(a, hc), 1.3, SV.c) + ell(hc[0], hc[1], 5.4, 3.3, SV.c, 1.4) + ell(hc[0], hc[1], 4, 2.3, "#BFE6F7", 0) + L("M" + f(hc[0] - 2.6) + " " + f(hc[1] - .4) + " l2.2 -1.2", 1.1, WHITE);
+        if (o.snow) s += ell(P(2.2, 1.8, Z)[0], P(2.2, 1.8, Z)[1], 13, 3, WHITE, 0);
         return s;
       },
-      bits: function(){ var t = P(.95, 1.45, 1.83), x = t[0], y = t[1]; return star4(x - 6, y - 10, 5, WHITE) + star4(x + 10, y - 18, 3.6, SV.h) + star4(x - 14, y - 2, 3, WHITE); }
+      bits: function(){ var m = P(.82, 2.52, 2.12), x = m[0], y = m[1]; return star4(x - 4, y - 9, 5, WHITE) + star4(x + 8, y - 15, 3.6, SV.h) + star4(x - 12, y - 2, 3, WHITE) + L("M" + f(x) + " " + f(y - 3) + " l-6 -14 M" + f(x + 2) + " " + f(y - 3) + " l4 -16", 1.4, "#FFF3B0", .9); }
     },
     "rank-modu-gold-yard": {
       note: "A golden dental chair with ruby upholstery, its light on a golden arm", spot: [3.4, 3.45],
       egg: { n: "The golden chair", does: "the light comes on", say: "ModuPro Gold! The best seat in the clinic is yours. Recline and review." }, anim: "tp-sparks 2s ease-out",
+      /* seen from the side: a gold base and column, the seat, the back reclined with its headrest, the leg rest sloping
+         down to a foot plate, an armrest on the near side, all in ruby on gold shells; the light on a post behind the head,
+         its arm reaching over and its lamp turned down to where the patient's mouth would be */
       draw: function(o){
-        var s = shadow(1.8, 1.95, 32, 11), RU = { top: "#D9483B", left: "#C4392E", right: "#9C2A22" };
-        s += cyl(1.8, 1.9, 0, .7, .45, .45, GD.c, GD.s, GD.h, o2b);
-        /* the seat, the back reclined toward the left-back, the headrest, the leg rest toward the front */
-        s += box(1.25, 1.35, .45, 1.1, 1.1, .3, mat(GD), o2b) + box(1.25, 1.35, .75, 1.1, 1.1, .2, RU, o2b);
-        var back = [[1.25, 1.35, .95], [2.35, 1.35, .95], [2.35, .75, 2.45], [1.25, .75, 2.45]];
-        s += FO(D(back), RU.left, 1.5) + L(D([[1.8, 1.25, 1.2], [1.8, .85, 2.2]], true), .9, RU.right);
-        s += box(1.45, .5, 2.4, .7, .4, .4, RU, o2b);
-        var leg = [[1.25, 2.45, .95], [2.35, 2.45, .95], [2.35, 3.25, .45], [1.25, 3.25, .45]];
-        s += FO(D(leg), RU.top, 1.5) + FO(D([[1.25, 3.25, .45], [2.35, 3.25, .45], [2.35, 3.25, .3], [1.25, 3.25, .3]]), GD.s, 1.2);
-        /* an armrest on the near side */
-        s += box(2.35, 1.4, .95, .18, 1.0, .1, mat(GD), o2b);
-        /* the light: a pole at the back, its arm, the lamp head turned down */
-        var pb = P(2.9, .55, 0), pt = P(2.9, .55, 3.6), ar = P(2.2, 1.5, 3.4);
-        s += rod(pb, pt, 2, GD.c) + rod(pt, ar, 1.8, GD.c) + ell(ar[0], ar[1] + 2, 6, 3.4, GD.c, 1.3) + ell(ar[0], ar[1] + 3, 4, 1.6, o.night ? K.lit : "#FFF6CF", .8);
-        if (o.snow) s += ell(P(1.8, .62, 2.8)[0], P(1.8, .62, 2.8)[1], 8, 2, WHITE, 0);
+        var s = shadow(1.8, 1.95, 30, 10), RF = "#C4392E", RT = "#E0574A", BK = [-.95, 1.36], LG = [1.0, 1.49];
+        var back = function(q){ return rot(q, BK, 34); }, legs = function(q){ return rot(q, LG, -28); };
+        /* drawn at four fifths of its working size, so the whole chair and its light stand inside the yard */
+        var k = .8, Q = function(u, w, z){ return FP(u * k, w * k, z * k); }, E = function(q, w0, w1, a, b){ return ext(q.map(function(v){ return [v[0] * k, v[1] * k]; }), w0 * k, w1 * k, a, b); };
+        /* the light's post, behind the chair */
+        var p0 = Q(-2.7, .5, .1), p1 = Q(-2.7, .5, 4.75);
+        s += ell(p0[0], p0[1], 5, 2.2, GD.s, 1.2) + rod(p0, p1, 2.6, GD.c) + L(T.seg([p0[0] + .7, p0[1] - 2], [p1[0] + .7, p1[1] + 2]), .8, GD.h);
+        /* the base and the column */
+        s += cyl(1.8, 1.8, 0, .8, .18, .8, GD.s, "#9C7414", GD.c, o2b) + cyl(1.8, 1.8, .18, .3, .88, .3, GD.c, GD.s, null, o2b);
+        s += E(rect(-.9, 1.06, 1.0, 1.28), -.62, .62, GD.c, GD.h);
+        /* the leg rest and its foot plate, then the seat, then the back over its edge */
+        s += E(legs(rect(1.0, 1.14, 2.3, 1.3)), -.6, .6, GD.c, GD.h) + E(legs(rect(1.0, 1.3, 2.3, 1.68)), -.54, .54, RF, RT);
+        s += E(legs(rect(2.3, 1.08, 2.46, 1.84)), -.5, .5, GD.c, GD.h);
+        s += E(rect(-1.0, 1.28, 1.06, 1.68), -.56, .56, RF, RT);
+        s += E(back(rect(-1.5, 1.3, -1.32, 3.54)), -.62, .62, GD.c, GD.h) + E(back(rect(-1.32, 1.3, -.95, 3.5)), -.54, .54, RF, RT);
+        /* the headrest on its gold stem */
+        s += E(back(rect(-1.28, 3.46, -1.1, 3.62)), -.2, .2, GD.c, GD.h) + E(back(rect(-1.38, 3.62, -.98, 4.18)), -.44, .44, RF, RT);
+        /* the arm over the chair and the lamp, its lens turned down toward the headrest */
+        var a1 = Q(-1.15, .1, 4.75), lc = Q(-1.15, 0, 4.42);
+        s += rod(p1, a1, 2.2, GD.c) + circ(p1[0], p1[1], 2.2, GD.c, 1.2) + circ(a1[0], a1[1], 1.8, GD.s, 1.1);
+        var hood = "M" + f(lc[0] - 9) + " " + f(lc[1] + 2.6) + " Q" + f(lc[0] - 8) + " " + f(lc[1] - 5.4) + " " + f(lc[0] + 1) + " " + f(lc[1] - 5.6) + " Q" + f(lc[0] + 9) + " " + f(lc[1] - 5) + " " + f(lc[0] + 9) + " " + f(lc[1] + 1.4) + " Z";
+        s += FO(hood, GD.c, 1.5) + L("M" + f(lc[0] - 5) + " " + f(lc[1] - 3.4) + " Q" + f(lc[0]) + " " + f(lc[1] - 5) + " " + f(lc[0] + 5) + " " + f(lc[1] - 3.6), 1, GD.h);
+        s += FO("M" + f(lc[0] - 8.4) + " " + f(lc[1] + 2.4) + " L" + f(lc[0] + 8.4) + " " + f(lc[1] + 1.4) + " Q" + f(lc[0]) + " " + f(lc[1] + 5.6) + " " + f(lc[0] - 8.4) + " " + f(lc[1] + 2.4) + " Z", o.night ? K.lit : "#FFF6CF", 1.2);
+        if (o.snow){ var t0 = Q(-.4, .3, 1.68); s += ell(t0[0], t0[1] - 1, 9, 2, WHITE, 0); }
         return s;
       },
-      lights: function(o){ if (!o || !o.night) return ""; var a = P(2.2, 1.5, 3.4); return T.glowAt(a[0], a[1] + 8, 12); },
-      bits: function(){ var a = P(2.2, 1.5, 3.4), x = a[0], y = a[1]; return '<path d="M' + f(x - 5) + " " + f(y + 4) + " L" + f(x - 16) + " " + f(y + 30) + " L" + f(x + 10) + " " + f(y + 30) + " L" + f(x + 5) + " " + f(y + 4) + ' Z" fill="#FFF6CF" opacity=".55"/>' + star4(x - 14, y - 6, 4, GD.h) + star4(x + 14, y - 10, 3.4, WHITE); }
+      lights: function(o){ if (!o || !o.night) return ""; var a = FP(-1.28, 0, 2.9); return T.glowAt(a[0], a[1], 13); },
+      bits: function(){ var c = FP(-.92, 0, 3.54), h = FP(-1.52, -.16, 3.0), x = c[0], y = c[1];
+        return '<path d="M' + f(x - 7) + " " + f(y + 3) + " L" + f(h[0] - 9) + " " + f(h[1] + 2) + " L" + f(h[0] + 5) + " " + f(h[1] + 6) + " L" + f(x + 7) + " " + f(y + 2) + ' Z" fill="#FFF6CF" opacity=".6"/>' + star4(x + 14, y - 8, 4, GD.h) + star4(x - 16, y - 12, 3.4, WHITE) + star4(h[0] - 12, h[1] - 4, 3, GD.h); }
     },
     "rank-modu-diamond-yard": {
-      note: "A giant diamond bur standing in a steel bur block, sparkling with diamond grit", spot: [3.4, 3.45],
-      egg: { n: "The diamond bur", does: "it sparkles", say: "ModuPro Diamond! A diamond bur is coated in real diamond grit. It cuts enamel smooth and clean." }, anim: "tp-sparks 2s ease-out",
+      note: "A giant diamond bur standing in a steel bur block, sparkling with diamond grit, the blue ring of a medium grit on its shank", spot: [3.4, 3.45],
+      egg: { n: "The diamond bur", does: "it sparkles", say: "ModuPro Diamond! A diamond bur is coated in real diamond grit. It grinds through enamel; the finer the grit, the smoother the finish." }, anim: "tp-sparks 2s ease-out",
       draw: function(o){
         var s = shadow(1.8, 1.95, 28, 10), i;
         s += box(.7, .85, 0, 2.2, 1.9, .55, mat(STEEL), o2b);
         /* holes in the block, a few little burs in them */
         [[1.05, 1.2], [1.05, 2.4], [2.55, 1.2], [2.55, 2.4], [1.8, 2.5]].forEach(function(q, j){ var e = P(q[0], q[1], .55); s += ell(e[0], e[1], 2.2, 1.2, "#4E5862", .8); if (j < 3) s += rod(e, [e[0], e[1] - 9], 1, STEEL.c) + circ(e[0], e[1] - 9.6, 1.6, j === 1 ? DI.c : STEEL.h, .8); });
         /* the giant bur: shank, neck, the tapered head coated with grit */
-        var a = P(1.8, 1.8, .55), b = P(1.8, 1.8, 2.0), c = P(1.8, 1.8, 2.35), d = P(1.8, 1.8, 4.6);
-        s += rod(a, b, 4.4, STEEL.c) + L(T.seg([a[0] + 1.2, a[1]], [b[0] + 1.2, b[1]]), 1.2, STEEL.s);
-        s += rod(b, c, 2.8, STEEL.s);
-        var head = "M" + f(c[0] - 7.4) + " " + f(c[1]) + " L" + f(d[0] - 3.4) + " " + f(d[1] + 2) + " Q" + f(d[0]) + " " + f(d[1] - 3) + " " + f(d[0] + 3.4) + " " + f(d[1] + 2) + " L" + f(c[0] + 7.4) + " " + f(c[1]) + " Z";
-        s += F(head, DI.c) + F("M" + f(c[0] + 1) + " " + f(c[1]) + " L" + f(d[0] + .6) + " " + f(d[1] - .4) + " Q" + f(d[0] + 2) + " " + f(d[1]) + " " + f(d[0] + 3.4) + " " + f(d[1] + 2) + " L" + f(c[0] + 6) + " " + f(c[1]) + " Z", DI.s) + O(head, 1.8);
-        for (i = 0; i < 14; i++){ var u = (i * 37 % 11) / 11 - .5, v = (i * 53 % 13) / 13; s += circ(c[0] + u * (12 - v * 5), c[1] - v * (c[1] - d[1] - 2), .8, i % 3 ? WHITE : DI.s); }
+        var a = P(1.8, 1.8, .55), b = P(1.8, 1.8, 1.95), c = P(1.8, 1.8, 2.3), d = P(1.8, 1.8, 5.25);
+        s += rod(a, b, 4.6, STEEL.c) + L(T.seg([a[0] + 1.3, a[1]], [b[0] + 1.3, b[1]]), 1.2, STEEL.s);
+        /* the blue ring a medium-grit diamond wears on its shank */
+        s += L(T.seg([b[0], b[1] + 4.6], [b[0], b[1] + 1.4]), 6.4) + L(T.seg([b[0], b[1] + 4.6], [b[0], b[1] + 1.4]), 4.6, "#3F8FE0");
+        s += rod(b, c, 3, STEEL.s);
+        /* the tapered head with its round end, thick with grit */
+        var hw = 8.8, tw = 4.4, head = "M" + f(c[0] - hw) + " " + f(c[1]) + " L" + f(d[0] - tw) + " " + f(d[1] + tw * .8) + " Q" + f(d[0] - tw) + " " + f(d[1] - 1.6) + " " + f(d[0]) + " " + f(d[1] - 1.8) + " Q" + f(d[0] + tw) + " " + f(d[1] - 1.6) + " " + f(d[0] + tw) + " " + f(d[1] + tw * .8) + " L" + f(c[0] + hw) + " " + f(c[1]) + " Q" + f(c[0]) + " " + f(c[1] + 2.4) + " " + f(c[0] - hw) + " " + f(c[1]) + " Z";
+        s += F(head, DI.c) + F("M" + f(c[0] + 1.6) + " " + f(c[1] + 1.2) + " L" + f(d[0] + 1) + " " + f(d[1] - 1.6) + " Q" + f(d[0] + tw) + " " + f(d[1] - 1.4) + " " + f(d[0] + tw) + " " + f(d[1] + tw * .8) + " L" + f(c[0] + hw) + " " + f(c[1]) + " Q" + f(c[0] + 5) + " " + f(c[1] + 1.4) + " " + f(c[0] + 1.6) + " " + f(c[1] + 1.2) + " Z", DI.s) + O(head, 1.8);
+        for (i = 0; i < 26; i++){ var u = (i * 37 % 11) / 11 - .5, v = (i * 53 % 13) / 13 * .94, wd = hw - (hw - tw) * v; s += circ(c[0] + u * wd * 1.45, c[1] - v * (c[1] - d[1]) - .4, i % 4 ? .8 : 1.1, i % 3 ? WHITE : DI.s); }
+        s += L("M" + f(c[0] - hw + 2.4) + " " + f(c[1] - 2.6) + " L" + f(d[0] - tw + 1.4) + " " + f(d[1] + 2.4), 1.4, WHITE, .8);
         s += T.dmStar(d[0] - 9, d[1] + 4, 3.6, WHITE, "tp-twinkle", .3) + T.dmStar(d[0] + 10, d[1] + 14, 2.8, WHITE, "tp-twinkle", 1.4);
         if (o.snow) s += ell(P(1.8, 1.8, .55)[0] - 14, P(1.8, 1.8, .55)[1] + 6, 8, 2, WHITE, 0);
         return s;
       },
-      bits: function(){ var d = P(1.8, 1.8, 3.3), x = d[0], y = d[1]; return star4(x - 14, y - 6, 5, WHITE) + star4(x + 14, y - 16, 4.4, DI.c) + star4(x + 4, y - 30, 4, WHITE) + star4(x - 10, y + 10, 3, DI.c); }
+      bits: function(){ var d = P(1.8, 1.8, 3.8), x = d[0], y = d[1]; return star4(x - 16, y - 6, 5, WHITE) + star4(x + 14, y - 16, 4.4, DI.c) + star4(x + 4, y - 30, 4, WHITE) + star4(x - 10, y + 10, 3, DI.c); }
     },
     "rank-modu-dark-yard": {
       note: "A nebula in a glass bell jar, its pink and teal clouds full of new stars, on a dark stone stand", spot: [3.4, 3.45],
@@ -407,58 +492,87 @@ export function pack(T){
       note: "A stone sundial on a carved pedestal, its pointer casting the hour", spot: [3.4, 3.45],
       egg: { n: "The sundial", does: "its shadow moves", say: "Loupes Stone! Before headlights, dentists worked by sunlight from the window. Now you bring your own light." }, anim: "tp-pop 2.4s",
       draw: function(o){
-        var s = shadow(1.8, 1.95, 26, 9);
-        s += cyl(1.8, 1.8, 0, 1.0, .25, 1.0, ST.c, ST.s, ST.h, o2b) + cyl(1.8, 1.8, .25, .42, 1.55, .36, ST.c, ST.s, ST.h, o2b) + cyl(1.8, 1.8, 1.55, .9, 1.72, .9, ST.c, ST.s, ST.h, o2b);
-        var c = P(1.8, 1.8, 1.72), i, q;
-        /* the hour marks round the dial */
-        for (i = 0; i < 12; i++){ q = ringPts(1.8, 1.8, 1.72, .74, i * 30, i * 30, 1)[0]; var e = P(q[0], q[1], q[2]), m = P(1.8 + (q[0] - 1.8) * .82, 1.8 + (q[1] - 1.8) * .82, 1.72); s += L(T.seg(e, m), 1, ST.s); }
-        /* the gnomon: a triangle standing on the dial's line toward the back, and its shadow */
-        s += L(T.seg(c, P(2.45, 1.4, 1.72)), 2.2, ST.s, .55);
-        s += FO(D([[1.8, 1.8, 1.72], [1.8, 1.05, 1.72], [1.8, 1.05, 2.42]]), ST.s, 1.4) + L(D([[1.8, 1.8, 1.72], [1.8, 1.05, 2.42]], true), 1, ST.h);
-        s += L("M" + f(P(1.8, 2.95, .25)[0]) + " " + f(P(1.8, 2.95, .25)[1] - 3) + " q3 -2 6 0", 1, ST.s);
-        if (o.snow) s += ell(c[0], c[1], 14, 4, WHITE, 0);
+        var s = shadow(1.8, 1.95, 30, 11), ZD = 3.0, i, q;
+        /* two square steps */
+        s += box(.6, .6, 0, 2.4, 2.4, .3, mat(ST), o2b) + box(1.0, 1.0, .3, 1.6, 1.6, .24, mat(ST), o2b);
+        /* the baluster: a foot, a swelling belly, a neck and the cap under the dial */
+        s += cyl(1.8, 1.8, .54, .5, .74, .34, ST.c, ST.s, ST.h, o2b) + cyl(1.8, 1.8, .74, .34, 1.55, .46, ST.c, ST.s, null, o2b) + cyl(1.8, 1.8, 1.55, .46, 2.64, .24, ST.c, ST.s, null, o2b) + cyl(1.8, 1.8, 2.64, .3, 2.8, .56, ST.c, ST.s, ST.h, o2b);
+        /* a tooth carved on the belly */
+        var tb = P(2.1, 2.1, 1.32); s += T.tinyTooth(tb[0], tb[1], .5, ST.h);
+        /* the dial, its ring and the twelve hour marks */
+        s += cyl(1.8, 1.8, 2.8, 1.08, ZD, 1.08, ST.c, ST.s, ST.h, o2b);
+        var c = P(1.8, 1.8, ZD);
+        s += ell(c[0], c[1], T.RX(.88), T.RY(.88), "none", 1, ST.s);
+        for (i = 0; i < 12; i++){ q = ringPts(1.8, 1.8, ZD, .88, i * 30, i * 30, 1)[0]; var e = P(q[0], q[1], q[2]), m = P(1.8 + (q[0] - 1.8) * .8, 1.8 + (q[1] - 1.8) * .8, ZD); s += L(T.seg(e, m), i % 3 ? 1 : 1.8, ST.s); }
+        /* the hour's shadow across the dial, then the gnomon: its edge rises at the latitude (about 33.5 degrees in
+           Birmingham) toward the pole */
+        s += F(D([[1.8, 1.8, ZD], [2.6, 2.0, ZD], [2.55, 2.18, ZD]]), "#5C564C", .45);
+        s += FO(D([[1.8, 1.8, ZD], [1.8, .98, ZD], [1.8, .98, ZD + .54]]), ST.s, 1.4) + L(D([[1.8, 1.8, ZD], [1.8, .98, ZD + .54]], true), 1, ST.h);
+        if (o.snow) s += ell(c[0] - 4, c[1] + 2, 12, 3.6, WHITE, 0);
         return s;
       },
-      bits: function(){ var c = P(1.8, 1.8, 1.72); return L(T.seg(c, P(1.3, 2.5, 1.72)), 2.4, ST.s, .6); }
+      bits: function(){ var c = P(1.8, 1.8, 3.0); return F(D([[1.8, 1.8, 3.0], [1.2, 2.45, 3.0], [1.36, 2.58, 3.0]]), "#5C564C", .5) + star4(c[0] + 16, c[1] - 18, 5, "#FFF3B0") + star4(c[0] + 26, c[1] - 8, 3, "#FFF3B0"); }
     },
     "rank-loupes-antique-yard": {
-      note: "A brass telescope on a wooden tripod, pointed at the sky", spot: [3.4, 3.45],
-      egg: { n: "The brass telescope", does: "it spots a star", say: "Loupes Antique! A loupe is two little telescopes, one for each eye. This one is a big one." }, anim: "tp-pop 2.4s",
+      note: "A long brass telescope on a claw-footed stand: its draw tubes out, a finder on top, a dew shield on the far end", spot: [3.4, 3.45],
+      egg: { n: "The brass telescope", does: "it spots a star", say: "Loupes Antique! Loupes are two little telescopes, one for each eye. This one is a big one." }, anim: "tp-pop 2.4s",
+      /* a library telescope of the old instrument makers, seen from the side: a turned wooden pillar on three curved brass
+         claws, a knuckle joint, and the tube tilted up to the right (the eyepiece end low on the left) */
       draw: function(o){
-        var s = shadow(1.8, 1.95, 26, 9), top = P(1.8, 1.8, 2.1);
-        [[.9, 1.1], [2.8, 1.4], [1.6, 2.9]].forEach(function(q){ var e = P(q[0], q[1], 0); s += rod(top, e, 1.8, K.wood) + circ(e[0], e[1], 1.3, BR.s); });
-        /* the tube: draw tube, main tube, the dew cap at the far end, the eyepiece at the near */
-        var a = P(1.0, 2.5, 2.0), b = P(2.9, 1.2, 3.1), m = P(1.9, 1.85, 2.55);
-        s += L(T.seg(a, b), 8.6) + L(T.seg(a, b), 6.2, BR.c) + L(T.seg([a[0], a[1] - 1.6], [b[0], b[1] - 1.6]), 1.4, BR.h);
-        s += L(T.seg(P(2.6, 1.4, 2.95), b), 10.6) + L(T.seg(P(2.6, 1.4, 2.95), b), 8.2, BR.c);
-        s += ell(b[0], b[1], 2.4, 4.6, "#4E3A2C", 1.3) + ell(b[0] - .4, b[1] - .8, 1.2, 2.4, "#9FD8F0", 0);
-        s += L(T.seg(a, P(.7, 2.75, 1.85)), 5.2) + L(T.seg(a, P(.7, 2.75, 1.85)), 3.2, BR.s);
-        s += circ(m[0], m[1], 3.4, BR.s, 1.2) + circ(m[0], m[1], 1.2, BR.h) + rod(m, top, 1.6, BR.s);
-        [P(1.45, 2.2, 2.25), P(2.3, 1.6, 2.75)].forEach(function(e){ s += L("M" + f(e[0] - 1.4) + " " + f(e[1] - 3.4) + " l2.8 6.8", 1.2); });
-        s += circ(P(1.7, 1.9, 2.4)[0], P(1.7, 1.9, 2.4)[1], .9, BR.pat);
-        if (o.snow) s += ell(b[0] - 12, b[1] + 3, 7, 1.8, WHITE, 0);
+        var s = shadow(1.8, 1.95, 28, 10), KN = [0, 2.5], A = 22 * Math.PI / 180, du = Math.cos(A), dz = Math.sin(A);
+        var at = function(t, n){ return FP(KN[0] + t * du - (n || 0) * dz, 0, KN[1] + t * dz + (n || 0) * du); };
+        var claw = function(a){ var r = a * Math.PI / 180, e = P(1.8 + Math.cos(r) * 1.15, 1.8 + Math.sin(r) * 1.15, 0), b = P(1.8, 1.8, .62), m = P(1.8 + Math.cos(r) * .7, 1.8 + Math.sin(r) * .7, .5);
+          var d = "M" + f(b[0]) + " " + f(b[1]) + " Q" + f(m[0]) + " " + f(m[1]) + " " + f(e[0]) + " " + f(e[1]);
+          return L(d, 4.4) + L(d, 2.6, BR.c) + circ(e[0], e[1], 1.9, BR.s, 1.1); };
+        /* the claw at the back, the pillar, the two at the front */
+        s += claw(225) + cyl(1.8, 1.8, .42, .3, .7, .3, BR.c, BR.s, BR.h, o2b) + cyl(1.8, 1.8, .7, .18, 1.25, .26, K.wood, BR.s, null, o2b) + cyl(1.8, 1.8, 1.25, .26, 1.5, .14, K.wood, BR.s, null, o2b) + cyl(1.8, 1.8, 1.5, .18, 2.2, .14, K.wood, BR.s, null, o2b) + cyl(1.8, 1.8, 2.2, .2, 2.32, .2, BR.c, BR.s, BR.h, o2b);
+        s += claw(345) + claw(105);
+        /* the cradle on the knuckle */
+        var k0 = FP(0, 0, 2.32), k1 = at(0);
+        s += rod(k0, k1, 2.4, BR.s) + circ(k0[0], k0[1] - 1, 2.6, BR.c, 1.2);
+        /* the tube: draw tubes and the eyepiece at the low end, the main tube in bands, the wider dew shield at the far end */
+        var tube = function(t0, t1, w, c){ var a = at(t0), b = at(t1); return L(T.seg(a, b), w + 2.4) + L(T.seg(a, b), w, c); };
+        s += tube(-2.55, -2.3, 2.6, "#3B2E3A") + tube(-2.32, -1.95, 3.8, BR.h) + tube(-1.98, -1.55, 5.2, BR.c) + tube(-1.6, 1.3, 7, BR.c);
+        s += L(T.seg(at(-1.5, .14), at(1.2, .14)), 1.6, BR.h) + L(T.seg(at(-1.5, -.14), at(1.2, -.14)), 1.6, BR.s);
+        [-1.0, .05, .95].forEach(function(t){ s += L(T.seg(at(t - .04, -.3), at(t - .04, .3)), 2.4) + L(T.seg(at(t, -.28), at(t, .28)), 1.4, BR.h); });
+        s += tube(1.25, 2.0, 9.4, BR.c) + L(T.seg(at(1.3, .2), at(1.95, .2)), 1.6, BR.h);
+        var ob = at(2.0); s += ell(ob[0], ob[1], 2.6, 5.4, "#3B2E3A", 1.3) + ell(ob[0] - .3, ob[1] - .6, 1.3, 3, "#9FD8F0", 0);
+        /* the finder riding on top on two little posts */
+        [.35, 1.05].forEach(function(t){ s += L(T.seg(at(t, .3), at(t, .6)), 2.6) + L(T.seg(at(t, .3), at(t, .6)), 1, BR.s); });
+        var f0 = at(.15, .62), f1 = at(1.25, .62); s += L(T.seg(f0, f1), 5.4) + L(T.seg(f0, f1), 3, BR.c) + circ(f1[0], f1[1], 1.5, "#9FD8F0", 1);
+        /* verdigris where the brass has aged */
+        [[-.6, -.1], [.6, .12], [1.6, -.2]].forEach(function(q){ var e = at(q[0], q[1]); s += circ(e[0], e[1], .9, BR.pat); });
+        if (o.snow) s += L(T.seg(at(1.3, .36), at(1.95, .36)), 2, WHITE);
         return s;
       },
-      bits: function(){ var b = P(2.9, 1.2, 3.1); return star4(b[0] + 12, b[1] - 16, 6, "#FFF3B0") + star4(b[0] + 22, b[1] - 6, 3, WHITE) + star4(b[0] + 2, b[1] - 24, 3, WHITE); }
+      bits: function(){ var b = FP(1.85, 0, 3.25); return star4(b[0] + 12, b[1] - 16, 6, "#FFF3B0") + star4(b[0] + 22, b[1] - 6, 3, WHITE) + star4(b[0] + 2, b[1] - 24, 3, WHITE); }
     },
     "rank-loupes-bronze-yard": {
-      note: "A bronze armillary sphere: rings for the equator, the meridian and the sun's path round a little Earth", spot: [3.4, 3.45],
+      note: "A bronze armillary sphere: rings for the equator, the meridian and the sun's path around a little Earth", spot: [3.4, 3.45],
       egg: { n: "The armillary sphere", does: "its rings turn", say: "Loupes Bronze! Old astronomers mapped the sky with rings like these. You've mapped a whole mouth." }, anim: "tp-pop 2.4s",
       draw: function(o){
-        var s = shadow(1.8, 1.95, 24, 9);
-        s += cyl(1.8, 1.8, 0, .85, .25, .75, BZ.s, "#7A4520", BZ.c, o2b) + cyl(1.8, 1.8, .25, .2, 1.4, .16, BZ.c, BZ.s, BZ.h, o2b);
-        var c = P(1.8, 1.8, 2.45), x = c[0], y = c[1], r = 15;
-        var ring = function(rx, ry, a, col, back){ return '<ellipse cx="' + f(x) + '" cy="' + f(y) + '" rx="' + rx + '" ry="' + ry + '" transform="rotate(' + a + " " + f(x) + " " + f(y) + ')" fill="none" stroke="' + INK + '" stroke-width="' + (back ? 3.4 : 4.6) + '"/>' +
-          '<ellipse cx="' + f(x) + '" cy="' + f(y) + '" rx="' + rx + '" ry="' + ry + '" transform="rotate(' + a + " " + f(x) + " " + f(y) + ')" fill="none" stroke="' + col + '" stroke-width="' + (back ? 1.6 : 2.6) + '"/>'; };
-        /* the stand's half ring holding it, the rings, the Earth in the middle */
-        s += L("M" + f(x - r - 3) + " " + f(y + 4) + " A" + (r + 3) + " " + (r + 3) + " 0 0 0 " + f(x + r + 3) + " " + f(y + 4), 4.6) + L("M" + f(x - r - 3) + " " + f(y + 4) + " A" + (r + 3) + " " + (r + 3) + " 0 0 0 " + f(x + r + 3) + " " + f(y + 4), 2.6, BZ.s);
-        s += ring(r, 5, 0, BZ.s, true) + circ(x, y, 5.2, "#3FA7E0", 1.4) + F("M" + f(x - 3) + " " + f(y - 2) + " q2 -2 4 0 q1 2 -1 3 q-2 1 -3 -3 z", "#5E8A3A") + circ(x - 1.6, y - 2, 1, WHITE, 0);
-        s += ring(5, r, 0, BZ.c) + ring(r, 5, 0, BZ.c) + ring(r, 5.6, -24, BZ.h);
-        s += L("M" + f(x - 4) + " " + f(y - r - 6) + " L" + f(x + 4) + " " + f(y + r + 6), 1.6, BZ.s) + circ(x + 4, y + r + 6, 1.4, BZ.s, .8);
-        if (o.snow) s += ell(x, y - r, 5, 1.6, WHITE, 0);
+        var s = shadow(1.8, 1.95, 26, 9);
+        /* the stand: a stepped foot, a turned column, the cradle the meridian ring sits in */
+        s += cyl(1.8, 1.8, 0, .9, .22, .9, BZ.s, "#7A4520", BZ.c, o2b) + cyl(1.8, 1.8, .22, .5, .42, .36, BZ.c, BZ.s, BZ.h, o2b) + cyl(1.8, 1.8, .42, .16, 1.05, .12, BZ.c, BZ.s, null, o2b) + cyl(1.8, 1.8, 1.05, .2, 1.18, .3, BZ.c, BZ.s, BZ.h, o2b);
+        var c = P(1.8, 1.8, 2.6), x = c[0], y = c[1], R = 16;
+        var ring = function(rx, ry, a, t0, t1, col, front){ var d = arcE(x, y, rx, ry, a, t0, t1); return L(d, front ? 4.6 : 3.6) + L(d, front ? 2.6 : 1.6, col); };
+        /* the far halves of the horizon band, the equator and the sun's path (the ecliptic, 23.4 degrees off the equator) */
+        s += ring(R + 3, 6.4, 0, 180, 360, BZ.s) + ring(R - 1, 6, -28, 180, 360, BZ.s) + ring(R - 1, 6.6, -4.6, 180, 360, BZ.s);
+        /* the meridian ring, upright and facing us, and the polar axis through it */
+        s += L(T.seg([x, y + R + 4.6], [x, y + R]), 4.4) + L(T.seg([x, y + R + 4.6], [x, y + R]), 2.4, BZ.s);
+        var md = "M" + f(x - R) + " " + f(y) + " A" + R + " " + R + " 0 1 1 " + f(x + R) + " " + f(y) + " A" + R + " " + R + " 0 1 1 " + f(x - R) + " " + f(y);
+        s += L(md, 4.6) + L(md, 2.6, BZ.c) + L("M" + f(x - R * .8) + " " + f(y - R * .6) + " A" + R + " " + R + " 0 0 1 " + f(x + R * .8) + " " + f(y - R * .6), 1, BZ.h);
+        var ax = [Math.sin(28 * Math.PI / 180), Math.cos(28 * Math.PI / 180)], a0 = [x - ax[0] * (R + 3), y - ax[1] * (R + 3)], a1 = [x + ax[0] * (R + 3), y + ax[1] * (R + 3)];
+        s += L(T.seg(a0, a1), 3.4) + L(T.seg(a0, a1), 1.6, BZ.h);
+        /* the little Earth in the middle */
+        s += circ(x, y, 5.4, "#3FA7E0", 1.4) + F("M" + f(x - 3.4) + " " + f(y - 1.6) + " q2 -2.6 4.4 -.6 q1 2.2 -1.4 3.2 q-2.2 .8 -3 -2.6 z M" + f(x + 1) + " " + f(y + 2.4) + " q2 -.4 2.6 1.2 q-1.6 1 -2.6 -1.2 z", "#5E8A3A") + circ(x - 2, y - 2.4, 1, WHITE, 0);
+        /* the near halves, over the Earth */
+        s += ring(R - 1, 6, -28, 0, 180, BZ.c, true) + ring(R - 1, 6.6, -4.6, 0, 180, BZ.h, true) + ring(R + 3, 6.4, 0, 0, 180, BZ.c, true);
+        s += circ(a0[0], a0[1], 1.9, BZ.c, 1.1) + circ(a1[0], a1[1], 1.9, BZ.c, 1.1);
+        if (o.snow) s += ell(x, y - R - 1, 5, 1.6, WHITE, 0);
         return s;
       },
-      bits: function(){ var c = P(1.8, 1.8, 2.45), x = c[0], y = c[1]; return L("M" + f(x - 24) + " " + f(y - 10) + " q-4 10 0 20 M" + f(x + 24) + " " + f(y - 10) + " q4 10 0 20", 1.6, BZ.s) + star4(x + 18, y - 20, 3.4, "#FFF3B0"); }
+      bits: function(){ var c = P(1.8, 1.8, 2.6), x = c[0], y = c[1]; return L("M" + f(x - 26) + " " + f(y - 10) + " q-4 10 0 20 M" + f(x + 26) + " " + f(y - 10) + " q4 10 0 20", 1.6, BZ.s) + star4(x + 18, y - 22, 3.4, "#FFF3B0") + star4(x - 20, y - 18, 2.6, WHITE); }
     },
     "rank-loupes-silver-yard": {
       note: "A silver microscope on its horseshoe foot: the arm, the tube and eyepiece, the stage and the mirror under it", spot: [3.4, 3.45],
@@ -486,8 +600,8 @@ export function pack(T){
       bits: function(){ var m = P(1.95, 1.95, .7); return star4(m[0] + 8, m[1] - 4, 5, WHITE) + star4(m[0] - 10, m[1] - 10, 3.4, SV.h) + star4(m[0] + 16, m[1] - 16, 3, WHITE); }
     },
     "rank-loupes-gold-yard": {
-      note: "A golden lighthouse on its rocks, white bands round its tower and a lamp at the top", spot: [3.4, 3.45],
-      egg: { n: "The lighthouse", does: "its beam sweeps round", say: "Loupes Gold! A lighthouse keeps ships off the rocks. Your headlight keeps the drill on the right tooth." }, anim: "tp-pop 2.4s",
+      note: "A golden lighthouse on its rocks, white bands around its tower and a lamp at the top", spot: [3.4, 3.45],
+      egg: { n: "The lighthouse", does: "its beam sweeps around", say: "Loupes Gold! A lighthouse keeps ships off the rocks. Your headlight keeps the drill on the right tooth." }, anim: "tp-pop 2.4s",
       draw: function(o){
         var s = shadow(1.8, 1.95, 28, 10);
         [[1.0, 2.4, .5], [2.6, 2.6, .42], [2.7, 1.1, .38], [1.1, 1.1, .4]].forEach(function(q){ var e = P(q[0], q[1], 0); s += ell(e[0], e[1] - 2, q[2] * 14, q[2] * 9, K.stone, 1.4) + ell(e[0] - 2, e[1] - 4, q[2] * 6, q[2] * 3, "#E3DFD8", 0); });
@@ -511,43 +625,56 @@ export function pack(T){
       note: "A crystal prism on a stone plinth: white light goes in, a rainbow comes out", spot: [3.4, 3.45],
       egg: { n: "The prism", does: "the rainbow brightens", say: "Loupes Diamond! White light is every color at once. A prism just lets them out." }, anim: "tp-sparks 2s ease-out",
       draw: function(o){
-        var s = shadow(1.8, 1.95, 28, 10), RB = ["#E0484A", "#F28C28", "#F2C230", "#5E8A3A", "#3FA7E0", "#7A3CFF"], i, e;
-        s += box(1.0, 1.0, 0, 1.6, 1.6, .7, { top: K.stone, left: K.stone, right: K.stoneShade }, o2b);
-        /* the white beam in from the left, the rainbow out to the right, falling on the grass */
-        var at = P(1.8, 1.9, 1.15);
-        s += L(T.seg(P(.1, 3.4, 1.6), [at[0] - 7, at[1]]), 3, INK, .25) + L(T.seg(P(.1, 3.4, 1.6), [at[0] - 7, at[1]]), 2.4, WHITE);
-        for (i = 0; i < 6; i++){ e = P(3.5, .3 + i * .3, 0); s += L(T.seg([at[0] + 7, at[1] + 1], e), 2, RB[i], .85); }
-        /* the prism: a triangular block lying on its long side, its triangle end toward the front left */
-        var A = [1.35, 2.45], B = [2.35, 2.45], z0 = .7, h = 1.0, fr = [[1.35, 2.45, z0], [1.35, 1.45, z0], [1.35, 1.95, z0 + h]], bk = [[2.35, 2.45, z0], [2.35, 1.45, z0], [2.35, 1.95, z0 + h]];
-        var top1 = D([fr[0], fr[2], bk[2], bk[0]]), top2 = D([fr[2], fr[1], bk[1], bk[2]]), end = D([bk[0], bk[1], bk[2]]), front = D(fr);
-        s += F(top2, DI.s, .9) + F(top1, DI.c, .9) + F(end, "#FFFFFF", .85) + O(top1, 1.5) + O(top2, 1.5) + O(end, 1.5) + L(D([fr[2], bk[2]], true), 1.4, WHITE, .9);
-        s += star4(P(1.9, 1.95, z0 + h)[0] - 2, P(1.9, 1.95, z0 + h)[1] + 5, 3, WHITE) + T.dmStar(P(2.35, 1.45, 1.7)[0] + 6, P(2.35, 1.45, 1.7)[1] - 6, 3, WHITE, "tp-twinkle", .8);
-        if (o.snow) s += F(top1, WHITE);
+        var s = shadow(1.8, 1.95, 28, 10), RB = ["#E0484A", "#F28C28", "#F2C230", "#5EB04A", "#3FA7E0", "#7A3CFF"], i;
+        /* seen from the side: the stone plinth with a course line, the prism standing on it (an equilateral triangle,
+           pushed back), the white beam in on the left face, the colors out of the right face, red bent least and violet most */
+        s += ext(rect(-1.5, 0, 1.5, .95), -.72, .72, "#C9CFD6", K.stone) + L(T.seg(FP(-1.5, -.72, .48), FP(1.5, -.72, .48)), 1, K.stoneShade);
+        var Z0 = .95, HW = 1.0, ZA = Z0 + HW * Math.sqrt(3), W0 = -.55, W1 = .55;
+        var q = function(a){ return T.D2(a.map(function(v){ return FP(v[0], v[1], v[2]); })); };
+        s += FO(q([[-HW, W0, Z0], [0, W0, ZA], [0, W1, ZA], [-HW, W1, Z0]]), "#EAF8FF", 1.4) + FO(q([[0, W0, ZA], [HW, W0, Z0], [HW, W1, Z0], [0, W1, ZA]]), "#BFE6F7", 1.4);
+        /* the beam's path through the glass, seen through the near face */
+        var pin = FP(-HW / 2, 0, (Z0 + ZA) / 2), pout = FP(HW / 2, 0, (Z0 + ZA) / 2);
+        s += FO(q([[-HW, W0, Z0], [HW, W0, Z0], [0, W0, ZA]]), DI.c, 1.6).replace("<path", '<path fill-opacity=".82"') + L(T.seg(pin, pout), 1.8, WHITE, .75) + L(T.D2([FP(-HW + .2, W0, Z0 + .3), FP(-.12, W0, ZA - .3)], true), 1.2, WHITE, .9);
+        /* the white light in */
+        var src = FP(-2.8, 0, 1.05);
+        s += L(T.seg(src, pin), 3.2) + L(T.seg(src, pin), 1.8, WHITE);
+        /* the fan of colors out */
+        var A0 = -6, A1 = -40, LN = 2.5;
+        for (i = 0; i < 6; i++){ var a = (A0 + (A1 - A0) * i / 6) * Math.PI / 180, b = (A0 + (A1 - A0) * (i + 1) / 6) * Math.PI / 180;
+          s += F(T.D2([pout, FP(HW / 2 + LN * Math.cos(a), 0, (Z0 + ZA) / 2 + LN * Math.sin(a)), FP(HW / 2 + LN * Math.cos(b), 0, (Z0 + ZA) / 2 + LN * Math.sin(b))]), RB[i], .92); }
+        s += L(T.D2([FP(HW / 2 + LN * Math.cos(A0 * Math.PI / 180), 0, (Z0 + ZA) / 2 + LN * Math.sin(A0 * Math.PI / 180)), pout, FP(HW / 2 + LN * Math.cos(A1 * Math.PI / 180), 0, (Z0 + ZA) / 2 + LN * Math.sin(A1 * Math.PI / 180))], true), 1, INK, .5);
+        var ap = FP(0, W0, ZA); s += star4(ap[0] - 1, ap[1] - 4, 3, WHITE) + T.dmStar(ap[0] + 12, ap[1] - 6, 3, WHITE, "tp-twinkle", .8);
+        if (o.snow){ var st = FP(-.7, .2, 1.1); s += ell(st[0] - 3, st[1], 5, 1.6, WHITE, 0); }
         return s;
       },
-      bits: function(){ var c = P(1.8, 2.3, 1.6); return star4(c[0] + 14, c[1] - 6, 5, "#F2C230") + star4(c[0] + 24, c[1] + 8, 4, "#3FA7E0") + star4(c[0] + 6, c[1] - 22, 4, WHITE) + star4(c[0] - 12, c[1] - 14, 3, "#E0484A"); }
+      bits: function(){ var c = FP(1.6, 0, 1.4); return star4(c[0] + 10, c[1] - 8, 5, "#F2C230") + star4(c[0] + 14, c[1] + 8, 4, "#3FA7E0") + star4(c[0] - 6, c[1] - 26, 4, WHITE) + star4(c[0] - 40, c[1] - 6, 3, "#E0484A"); }
     },
     "rank-loupes-dark-yard": {
       note: "A little Dark Matter observatory: a violet drum, its dome open and a telescope looking out at the stars", spot: [3.4, 3.45],
       egg: { n: "The observatory", does: "the dome turns", say: "Loupes Dark Matter. Every journey finished. Look up: that's how far you've come." }, anim: "tp-sparks 2s ease-out",
       draw: function(o){
-        var s = shadow(1.8, 1.95, 30, 11);
-        s += cyl(1.8, 1.8, 0, 1.25, 1.7, 1.25, DM.c, DM.s, null, { open: true, sw: 1.8 });
-        s += F(D(T.onY(1.8 + 1.2, T.rectUV(1.55, 2.05, 0, 1.05))), "#1B1240") + O(D(T.onY(1.8 + 1.2, T.rectUV(1.55, 2.05, 0, 1.05))), 1.2);
-        var c = P(1.8, 1.8, 1.7), rx = T.RX(1.3), ry = T.RY(1.3);
-        s += ell(c[0], c[1], rx, ry, DM.s, 1.6);
-        var dome = "M" + f(c[0] - rx) + " " + f(c[1]) + " A" + f(rx) + " " + f(rx * .95) + " 0 0 1 " + f(c[0] + rx) + " " + f(c[1]) + " A" + f(rx) + " " + f(ry) + " 0 0 1 " + f(c[0] - rx) + " " + f(c[1]) + " Z";
-        s += F(dome, "#5B3AA0") + F("M" + f(c[0] + 4) + " " + f(c[1] - rx * .94) + " A" + f(rx) + " " + f(rx * .95) + " 0 0 1 " + f(c[0] + rx) + " " + f(c[1]) + " A" + f(rx) + " " + f(ry) + " 0 0 1 " + f(c[0] + 8) + " " + f(c[1] + ry * .9) + " Q" + f(c[0] + 12) + " " + f(c[1] - 10) + " " + f(c[0] + 4) + " " + f(c[1] - rx * .94) + " Z", DM.s) + O(dome, 1.8);
-        /* the slit and the telescope poking out of it toward the sky */
-        var sl = "M" + f(c[0] - 3) + " " + f(c[1] + ry * .6) + " L" + f(c[0] - 4) + " " + f(c[1] - rx * .9) + " L" + f(c[0] + 4) + " " + f(c[1] - rx * .9) + " L" + f(c[0] + 3) + " " + f(c[1] + ry * .6) + " Z";
-        s += F(sl, "#120A2A") + O(sl, 1.3) + rod([c[0], c[1] - 6], [c[0] + 14, c[1] - 24], 3.2, DM.h) + circ(c[0] + 14, c[1] - 24, 2.2, K.dmTeal, 1);
-        s += L("M" + f(c[0] - rx) + " " + f(c[1]) + " A" + f(rx) + " " + f(ry) + " 0 0 0 " + f(c[0] + rx) + " " + f(c[1]), 2, K.dmTeal);
-        s += star4(c[0] - 14, c[1] - 10, 2.4, WHITE) + star4(c[0] + 16, c[1] + 22, 2.2, DM.h) + T.dmStar(c[0] - 20, c[1] - 30, 3.2, WHITE, "tp-twinkle", .4) + T.dmStar(c[0] + 24, c[1] - 36, 2.6, K.dmTeal, "tp-twinkle", 1.2);
-        if (o.snow) s += F("M" + f(c[0] - rx + 4) + " " + f(c[1] - 10) + " Q" + f(c[0] - 10) + " " + f(c[1] - rx * .96) + " " + f(c[0] - 5) + " " + f(c[1] - rx * .92) + " L" + f(c[0] - 6) + " " + f(c[1] - 14) + " Z", WHITE);
+        var s = shadow(1.8, 1.95, 30, 11), ZR = 1.75;
+        /* the round stone platform, the violet drum in courses, its door and its window */
+        s += cyl(1.8, 1.8, 0, 1.62, .22, 1.62, "#3A2A50", "#24193A", "#54447A", o2b) + cyl(1.8, 1.8, .22, 1.25, ZR, 1.25, DM.c, DM.s, null, { open: true, sw: 1.8 });
+        [.72, 1.22].forEach(function(z){ var c = P(1.8, 1.8, z); s += L(arcE(c[0], c[1], T.RX(1.25), T.RY(1.25), 0, 8, 172), 1, DM.s); });
+        var door = T.onY(1.8 + 1.18, T.rectUV(1.45, 1.95, .22, 1.1)), win = T.onX(1.8 + 1.18, T.rectUV(1.5, 1.9, .78, 1.28));
+        s += FO(D(door), "#1B1240", 1.2) + FO(D(win), o.night ? K.lit : "#2A1D52", 1.2);
+        /* the dome, pale against the drum, the teal band where it sits, its ribs, the open slit full of stars */
+        var r0 = P(1.8, 1.8, ZR), rx = T.RX(1.3), ry = T.RY(1.3);
+        s += T.dome(1.8, 1.8, ZR, 1.3, 1.25, "#CBB8F5", "#9A82DA") + L(arcE(r0[0], r0[1], rx, ry, 0, -4, 184), 4.6) + L(arcE(r0[0], r0[1], rx, ry, 0, -4, 184), 2.4, K.dmTeal);
+        var hy = 1.25 * 10.5 + T.RY(1.3) * .2, dx = T.RX(1.3), cx = r0[0], cy = r0[1];
+        [-.55, .55].forEach(function(k){ s += L("M" + f(cx + dx * k) + " " + f(cy + T.RY(1.3) * Math.sqrt(1 - k * k) * .96) + " Q" + f(cx + dx * k * 1.08) + " " + f(cy - hy * .62) + " " + f(cx + dx * k * .3) + " " + f(cy - hy * .97), 1, "#8E76CF"); });
+        var sl = "M" + f(cx + 2) + " " + f(cy + T.RY(1.3) * .98) + " L" + f(cx - 2.4) + " " + f(cy - hy * .98) + " L" + f(cx + 5.6) + " " + f(cy - hy * .93) + " L" + f(cx + 9.4) + " " + f(cy + T.RY(1.3) * .9) + " Z";
+        s += FO(sl, "#120A2A", 1.4) + circ(cx + 2.6, cy - 4, .8, WHITE) + circ(cx + 4.4, cy + 3, .6, DM.h) + circ(cx + 1.6, cy - 10, .6, WHITE);
+        /* the telescope out of the slit, aimed high */
+        var t0 = [cx + 3.4, cy - 3], t1 = [cx + 17, cy - 21];
+        s += L(T.seg(t0, t1), 6.4) + L(T.seg(t0, t1), 4, "#E7DDFF") + L(T.seg([t0[0] + 1, t0[1] - 1.4], [t1[0] + 1, t1[1] - 1.4]), 1, WHITE) + circ(t1[0], t1[1], 2.6, K.dmTeal, 1.2);
+        s += T.dmStar(cx - 22, cy - 26, 3.2, WHITE, "tp-twinkle", .4) + T.dmStar(cx + 26, cy - 34, 2.6, K.dmTeal, "tp-twinkle", 1.2) + star4(cx - 16, cy - 8, 2.2, DM.h);
+        if (o.snow) s += F("M" + f(cx - dx + 3) + " " + f(cy - 4) + " Q" + f(cx - dx * .6) + " " + f(cy - hy * .9) + " " + f(cx - 4) + " " + f(cy - hy * .96) + " L" + f(cx - 5) + " " + f(cy - hy * .7) + " Q" + f(cx - dx * .5) + " " + f(cy - hy * .6) + " " + f(cx - dx + 3) + " " + f(cy - 4) + " Z", WHITE);
         return s;
       },
-      lights: function(){ var c = P(1.8, 1.8, 1.7); return glow(c[0] + 14, c[1] - 24, 9, K.dmTeal, ".3") + glow(c[0], c[1] - 6, 30, DM.h, ".1"); },
-      bits: function(){ var c = P(1.8, 1.8, 1.7), x = c[0] + 14, y = c[1] - 24; return star4(x + 10, y - 12, 5, WHITE) + star4(x + 22, y - 2, 3.4, K.dmTeal) + star4(x - 2, y - 24, 4, DM.h) + L("M" + f(x + 4) + " " + f(y - 4) + " L" + f(x + 26) + " " + f(y - 26), 1.4, K.dmTeal, .6); }
+      lights: function(o){ var c = P(1.8, 1.8, 1.75), t = [c[0] + 17, c[1] - 21], s = glow(t[0], t[1], 9, K.dmTeal, ".3") + glow(c[0], c[1] - 8, 30, DM.h, ".1"); if (o && o.night){ var w = P(3.0, 1.7, 1.03); s += T.glowAt(w[0], w[1], 8); } return s; },
+      bits: function(){ var c = P(1.8, 1.8, 1.75), x = c[0] + 17, y = c[1] - 21; return star4(x + 10, y - 12, 5, WHITE) + star4(x + 22, y - 2, 3.4, K.dmTeal) + star4(x - 2, y - 24, 4, DM.h) + L("M" + f(x + 4) + " " + f(y - 4) + " L" + f(x + 26) + " " + f(y - 26), 1.4, K.dmTeal, .6); }
     }
   };
   Object.keys(later).forEach(function(k){ yard[k] = later[k]; });
@@ -667,15 +794,16 @@ export function pack(T){
       face: p("M46 112 Q72 124 100 126 Q128 124 154 112 L156 128 Q100 160 44 128 Z", ST.h, O3) + p("M100 126 L88 146 L100 140 L112 146 Z", ST.c, O2) + spots([[60, 122], [74, 132, 1.2], [130, 130], [142, 120, 1.2], [96, 134, 1.1], [118, 138, 1.3]], ST.s),
       top: p("M38 42 C34 20 70 4 106 6 C142 8 166 24 160 40 C150 52 52 54 38 42 Z", "#5B6B82") + '<path d="M120 8 C150 12 168 28 160 40 C154 46 140 49 124 50 C138 40 138 22 120 8 Z" fill="#46546A"/>' +
         p("M40 40 Q100 56 158 40 L158 47 Q100 63 40 47 Z", "#3A4658", O3) + p("M102 6 q2 -9 8 -10", "none", O3) + hi("M54 28 Q66 14 88 10", 3, .35) + spots([[70, 22], [126, 30, 1.2], [96, 16, 1.2]], ST.h),
-      say: ["ModuPro Stone! Pour, wait, carve. Patience is a material too.", "Every crown starts as a stone cast.", "Dental stone sets hard. So does what you study twice."]
+      say: ["ModuPro Stone! Pour, wait, carve. Patience is a material too.", "A good crown starts with a good stone cast.", "Dental stone sets hard. So does what you study twice."]
     },
     "rank-modu-antique-outfit": {
       note: "A green visor on a brass band, and a lab coat with brass buttons",
       face: p("M46 110 Q70 120 92 124 L100 160 L108 124 Q130 120 154 110 L156 132 Q100 172 44 132 Z", "#FFFDF6", O3) + p("M92 124 L100 150 L108 124 Q100 130 92 124 Z", "#7FA38A", O2) +
         p("M56 116 L84 126 L76 142 Z M144 116 L116 126 L124 142 Z", "#EFE7D6", O2) + dot(90, 140, 2.6, BR.c) + dot(110, 140, 2.6, BR.c) + dot(92, 152, 2.2, BR.c) + dot(108, 152, 2.2, BR.c),
-      top: p("M40 50 Q100 30 160 50 L160 58 Q100 38 40 58 Z", BR.c, O3) + line("M46 51 Q100 35 154 51", BR.h, 1.6) +
-        '<path d="M48 56 Q100 38 152 56 L142 70 Q100 56 58 70 Z" fill="#3F8F5A" fill-opacity=".8" ' + O3 + "/>" + line("M60 64 Q100 52 140 64", "#7FD49A", 1.6) + dot(44, 54, 3, BR.h) + dot(156, 54, 3, BR.s),
-      say: ["ModuPro Antique! A visor, a lab coat and a steady hand.", "In the old labs, every crown was carved in wax first.", "Brass buttons: I'm very well articulated."]
+      /* the bill is short and see-through, so it stops above the loupes' headlight */
+      top: p("M40 48 Q100 28 160 48 L160 56 Q100 36 40 56 Z", BR.c, O3) + line("M46 49 Q100 33 154 49", BR.h, 1.6) +
+        '<path d="M48 54 Q100 36 152 54 L146 62 Q100 46 54 62 Z" fill="#3F8F5A" fill-opacity=".55" ' + O3 + "/>" + line("M60 58 Q100 45 140 58", "#7FD49A", 1.4) + dot(44, 52, 3, BR.h) + dot(156, 52, 3, BR.s),
+      say: ["ModuPro Antique! A visor, a lab coat and a steady hand.", "Before a crown is cast, it's carved in wax.", "Brass buttons: I'm very well articulated."]
     },
     "rank-modu-bronze-outfit": {
       note: "A leather foundry cap with bronze goggles pushed up, a leather apron with bronze rivets, and casting tongs",
@@ -694,7 +822,8 @@ export function pack(T){
       top: p("M42 52 C36 18 68 -2 100 -2 C132 -2 164 18 158 52 Q100 40 42 52 Z", "#B6BEC7") + '<path d="M124 2 C150 10 164 30 158 52 Q150 48 140 46 C144 30 138 14 124 2 Z" fill="' + SV.s + '"/>' +
         spots([[62, 26, 2.2], [84, 12, 2.2], [112, 10, 2.2], [136, 22, 2.2], [74, 38, 2.2], [100, 26, 2.2], [126, 38, 2.2], [150, 40, 2.2]], SV.h) + p("M42 52 Q100 40 158 52 L158 58 Q100 46 42 58 Z", SV.s, O3) +
         line("M44 56 Q100 44 156 56", INK, 6) + line("M44 56 Q100 44 156 56", "#3A4047", 3.4) +
-        '<circle cx="112" cy="50" r="15" fill="' + SV.c + '" ' + O3 + '/><circle cx="112" cy="50" r="11" fill="#BFE6F7" ' + O2 + '/><circle cx="112" cy="50" r="3" fill="#3A4047"/>' + hi("M104 43 Q107 40 111 39", 2.4, .95),
+        /* the head mirror sits to one side of the forehead, clear of the loupes' headlight */
+        '<circle cx="130" cy="44" r="13" fill="' + SV.c + '" ' + O3 + '/><circle cx="130" cy="44" r="9.4" fill="#BFE6F7" ' + O2 + '/><circle cx="130" cy="44" r="2.6" fill="#3A4047"/>' + hi("M123 38 Q126 35 130 34.4", 2.2, .95),
       say: ["ModuPro Silver! Mirror up. Light on the tooth.", "The head mirror: the first headlight. No batteries.", "Mirror, explorer, probe. Say it with me."]
     },
     "rank-modu-gold-outfit": {
@@ -708,7 +837,8 @@ export function pack(T){
     },
     "rank-modu-diamond-outfit": {
       note: "A clear crystal face shield on a band, and a bandolier of diamond burs",
-      face: p("M44 106 L150 132 L148 142 L42 116 Z", "#7FCDEB", O3) + (function(){ var s = "", i, x, y; for (i = 0; i < 6; i++){ x = 56 + i * 17; y = 109 + i * 4.2;
+      /* the bandolier crosses his front below the mouth */
+      face: p("M44 126 L152 148 L150 158 L42 136 Z", "#7FCDEB", O3) + (function(){ var s = "", i, x, y; for (i = 0; i < 6; i++){ x = 56 + i * 17; y = 128.4 + i * 3.46;
           s += line("M" + x + " " + (y + 8) + " L" + x + " " + (y - 2), INK, 4) + line("M" + x + " " + (y + 8) + " L" + x + " " + (y - 2), STEEL.c, 2) + '<path d="M' + (x - 3) + " " + (y - 2) + " L" + x + " " + (y - 10) + " L" + (x + 3) + " " + (y - 2) + ' Z" fill="' + DI.c + '" ' + thin + "/>"; } return s; })(),
       top: p("M40 50 Q100 32 160 50 L160 58 Q100 40 40 58 Z", DI.s, O3) +
         '<path d="M42 56 Q100 40 158 56 L160 124 Q100 140 40 124 Z" fill="#CFF1FF" fill-opacity=".22" ' + O3 + "/>" + hi("M54 70 L52 112", 3, .8) + hi("M62 66 L60 84", 2.2, .6) + star4(146, 70, 4.4, WHITE) + star4(60, 120, 3, WHITE) + gem(100, 47, 10, 10, [DI.c, DI.s]),
@@ -716,8 +846,10 @@ export function pack(T){
     },
     "rank-modu-dark-outfit": {
       note: "A cape swirling with a pink and teal nebula, and a little ringed planet circling over his head",
-      back: cape("#1B1240", "#120A2A") + '<path d="M20 170 Q50 140 80 176 Q60 200 26 196 Z M120 150 Q160 130 186 170 Q160 190 128 176 Z" fill="' + NEB[0] + '" opacity=".5"/>' +
-        '<path d="M30 120 Q60 106 74 132 Q50 146 30 136 Z M138 100 Q170 96 176 126 Q156 134 140 120 Z" fill="' + NEB[1] + '" opacity=".4"/>' + cloakStars([[24, 150, 4.4], [40, 186, 3, NEB[1]], [172, 150, 4.4, DM.h], [184, 194, 3.4], [160, 120, 2.6]]),
+      /* the nebula's clouds sit on the cape's edges, where it shows beside him */
+      back: cape("#1B1240", "#120A2A") + '<path d="M3 200 Q8 168 26 160 Q42 172 36 196 Q22 212 3 200 Z M197 200 Q192 168 174 160 Q158 172 164 196 Q178 212 197 200 Z" fill="' + NEB[0] + '" opacity=".55"/>' +
+        '<path d="M14 132 Q22 112 38 108 Q46 124 36 142 Q22 148 14 132 Z M186 132 Q178 112 162 108 Q154 124 164 142 Q178 148 186 132 Z" fill="' + NEB[1] + '" opacity=".45"/>' +
+        '<path d="M8 176 Q20 164 34 172 Q26 186 10 186 Z M192 176 Q180 164 166 172 Q174 186 190 186 Z" fill="' + NEB[2] + '" opacity=".5"/>' + cloakStars([[18, 150, 4.4], [24, 190, 3, NEB[1]], [182, 150, 4.4, DM.h], [180, 194, 3.4], [30, 120, 2.6], [170, 122, 2.6, NEB[1]]]),
       face: '<circle cx="100" cy="132" r="7.4" fill="' + NEB[0] + '" ' + O3 + "/>" + star4(100, 132, 4.4, WHITE),
       top: '<g transform="rotate(-14 100 8)"><path d="M70 8 A30 8 0 0 1 130 8" fill="none" stroke="' + INK + '" stroke-width="6"/><path d="M70 8 A30 8 0 0 1 130 8" fill="none" stroke="' + K.dmTeal + '" stroke-width="3"/>' +
         '<circle cx="100" cy="8" r="15" fill="' + DM.v + '" ' + O3 + '/><path d="M90 0 Q104 -2 112 8 Q100 6 88 10 Z" fill="' + NEB[2] + '" opacity=".8"/><path d="M88 14 Q100 18 112 14" fill="none" stroke="' + DM.s + '" stroke-width="2"/>' +
@@ -728,7 +860,8 @@ export function pack(T){
     /* the Loupes: everything keeps off his face and above the loupes' headlight */
     "rank-loupes-stone-outfit": {
       note: "A stone-gray explorer's pith helmet and a red neckerchief",
-      face: p("M70 116 Q100 126 130 116 L126 128 Q100 136 74 128 Z", "#D9483B", O3) + p("M96 126 L86 148 L100 140 L114 148 L104 126 Z", "#B5382E", O2),
+      /* the neckerchief ties below the mouth */
+      face: p("M52 112 Q100 134 148 112 L146 124 Q100 146 54 124 Z", "#D9483B", O3) + p("M95 132 L85 154 L100 146 L115 154 L105 132 Z", "#B5382E", O2) + '<circle cx="100" cy="133" r="4.4" fill="#B5382E" ' + O2 + "/>",
       top: '<ellipse cx="100" cy="42" rx="68" ry="10" fill="' + ST.s + '" ' + O4 + "/>" +
         p("M54 42 C50 8 74 -10 100 -10 C126 -10 150 8 146 42 Q100 50 54 42 Z", ST.c) + '<path d="M122 -6 C142 4 150 22 146 42 Q138 45 128 46 C134 26 132 8 122 -6 Z" fill="' + ST.s + '"/>' +
         p("M55 32 Q100 42 145 32 L146 42 Q100 50 54 42 Z", "#6B5A48", O3) + line("M100 -10 V30", ST.s, 2) + dot(100, -10, 3.4, ST.h) + hi("M64 22 Q68 4 86 -4", 3, .45),
@@ -743,10 +876,13 @@ export function pack(T){
     },
     "rank-loupes-bronze-outfit": {
       note: "A lamplighter's flat cap with a bronze button, and a bronze lantern",
-      back: line("M22 112 L24 128", INK, 2.4) + p("M14 128 L36 128 L34 158 L16 158 Z", "#FFE48A", O3) + p("M12 124 L38 124 L36 130 L14 130 Z M14 156 L36 156 L38 162 L12 162 Z", BZ.c, O3) +
-        line("M20 130 V156 M30 130 V156", BZ.s, 2.4) + p("M18 124 Q25 112 32 124", "none", O3) + '<path d="M25 136 q-4 6 0 12 q4 -6 0 -12 Z" fill="#F28C28"/>',
-      top: p("M38 50 C34 22 64 4 100 4 C136 4 160 20 160 42 Q100 34 38 50 Z", "#9C5C28") + '<path d="M124 8 C146 14 160 28 160 42 Q150 40 140 40 C142 28 136 16 124 8 Z" fill="#7A4520"/>' +
-        p("M38 50 Q22 58 26 64 Q60 58 92 48 Q66 44 38 50 Z", "#7A4520", O3) + dot(100, 6, 4, BZ.h) + line("M60 18 Q100 8 140 16", "#7A4520", 1.8) + hi("M50 34 Q58 20 76 14", 2.6, .35),
+      /* the lantern hangs from his hand, in front of him */
+      face: line("M31 114 V126", INK, 2.4) + p("M24 133 Q31 120 38 133", "none", O3) + p("M18 132 L44 132 L42 138 L20 138 Z", BZ.c, O3) + p("M21 138 L41 138 L39 160 L23 160 Z", "#FFE48A", O3) +
+        line("M27 139 V159 M35 139 V159", BZ.s, 2.2) + '<path d="M31 144 q-4 6 0 12 q4 -6 0 -12 Z" fill="#F28C28"/>' + p("M20 160 L42 160 L44 166 L18 166 Z", BZ.c, O3) + dot(31, 132, 1.8, BZ.h),
+      /* a puffy flat cap, its short brim at the front stopping above the headlight */
+      top: p("M38 44 C30 16 66 -2 100 -2 C134 -2 170 16 162 44 Q100 30 38 44 Z", "#9C5C28") + '<path d="M126 2 C152 10 168 26 162 44 Q152 41 142 39 C146 24 140 10 126 2 Z" fill="#7A4520"/>' +
+        line("M58 30 Q100 14 142 28 M76 6 Q92 16 96 34", "#7A4520", 1.6) + p("M66 38 Q100 28 134 38 Q130 48.5 100 48.5 Q70 48.5 66 38 Z", "#7A4520", O3) + line("M74 41 Q100 35 126 41", "#9C5C28", 1.4) +
+        dot(100, 0, 4, BZ.h) + hi("M48 30 Q56 16 74 8", 2.6, .35),
       say: ["Loupes Bronze! Lamps lit, street by street. Tooth by tooth.", "A lantern for the dark corners of the mouth.", "Light first, then look. That's the loupes' rule."]
     },
     "rank-loupes-silver-outfit": {
@@ -761,7 +897,8 @@ export function pack(T){
     },
     "rank-loupes-gold-outfit": {
       note: "A crown of golden sun rays, and a gold sash with a sun on it",
-      face: p("M48 104 L60 100 L152 132 L148 142 Z", GD.c, O3) + line("M56 104 L150 136", GD.h, 1.6) + '<circle cx="104" cy="120" r="9" fill="' + GD.c + '" ' + O3 + '/><circle cx="104" cy="120" r="4.4" fill="#F28C28"/>',
+      /* the sash runs below the mouth */
+      face: p("M46 118 L58 112 L154 142 L150 152 Z", GD.c, O3) + line("M57 117 L151 146", GD.h, 1.6) + '<circle cx="101" cy="131" r="8.6" fill="' + GD.c + '" ' + O3 + '/><circle cx="101" cy="131" r="4.2" fill="#F28C28"/>',
       top: (function(){ var s = "", i, a, x, y; for (i = 0; i < 11; i++){ a = (-165 + i * 15) * Math.PI / 180; x = 100 + Math.cos(a) * 54; y = 46 + Math.sin(a) * 40;
           s += p("M" + f(100 + Math.cos(a - .09) * 40) + " " + f(46 + Math.sin(a - .09) * 30) + " L" + f(x) + " " + f(y) + " L" + f(100 + Math.cos(a + .09) * 40) + " " + f(46 + Math.sin(a + .09) * 30) + " Z", i % 2 ? GD.c : GD.h, O2); }
         return s; })() + p("M58 40 Q100 24 142 40 L142 50 Q100 34 58 50 Z", GD.c, O3) + line("M62 42 Q100 28 138 42", GD.h, 1.6) + '<circle cx="100" cy="36" r="6" fill="#F28C28" ' + O2 + "/>",
@@ -772,7 +909,7 @@ export function pack(T){
       back: (function(){ var RB = ["#E0484A", "#F28C28", "#F2C230", "#5E8A3A", "#3FA7E0", "#7A3CFF"], s = cape(DI.c, DI.s), i;
         for (i = 0; i < 6; i++){ var dx = 4 + i * 3.6; s += '<path d="M' + (34 + dx) + " 96 C" + (20 + dx) + " 128 " + (6 + dx) + " 168 " + (3 + dx) + " 208 M" + (166 - dx) + " 96 C" + (180 - dx) + " 128 " + (194 - dx) + " 168 " + (197 - dx) + ' 208" fill="none" stroke="' + RB[i] + '" stroke-width="3.6"/>'; }
         return s + line("M30 110 L52 140 L24 168 M170 110 L148 140 L176 168 M52 140 L44 196 M148 140 L156 196", "#5BB4D9", 1.6) + p(CAPE, "none") + star4(20, 130, 5, WHITE) + star4(182, 150, 4.4, WHITE); })(),
-      face: p("M100 120 L112 140 L88 140 Z", DI.c, O3) + '<path d="M100 120 L112 140 L100 140 Z" fill="' + DI.s + '"/>' + p("M100 120 L112 140 L88 140 Z", "none", O3) + line("M112 136 l10 4 M112 138 l9 7", "#F2C230", 1.6) + line("M112 140 l7 9", "#7A3CFF", 1.6),
+      face: p("M100 126 L112 146 L88 146 Z", DI.c, O3) + '<path d="M100 126 L112 146 L100 146 Z" fill="' + DI.s + '"/>' + p("M100 126 L112 146 L88 146 Z", "none", O3) + line("M112 142 l10 4 M112 144 l9 7", "#F2C230", 1.6) + line("M112 146 l7 9", "#7A3CFF", 1.6),
       say: ["Loupes Diamond! Every color, all at once.", "White light in, rainbow out. Very refracting of me.", "Diamonds bend light more than glass. So do I."]
     },
     "rank-loupes-dark-outfit": {
