@@ -32,12 +32,22 @@ what v2.0 left, so it isn't lost. Its own track (Sam, 2026-11-06, [decisions](..
       case (restoration, caries, endo, the odontogram, the bitewing, the full-mouth series)
 - [ ] The About page gets the new kinds of picture (odontogram, bitewing, full-mouth series) when a live hub first shows one
       ([about-page](../rules/about-page.md))
-- [ ] Restorations and caries (Order step 2, Sturdevant's): today any amalgam or gold draws the occlusal box on a film and a
-      composite the same box dimmer; draw proximal-only and Class V shapes from the surfaces, recurrent caries under a
-      restoration, and the odontogram's marks Sam approves
-- [ ] Endodontic findings (step 3, Cohen's Pathways of the Pulp): a widened PDL before a lesion, short and long fills, a post
+- [x] Restorations and caries (Order step 2, Sturdevant's): preparation outlines that follow the crown's own surface (smooth
+      walls, rounded line angles, flat gingival floors), inlays, onlays, veneers, crowns by material, overhangs, open
+      margins and recurrent caries under a restoration (v2.1, 2026-11-21); the odontogram's marks still go to Sam with
+      their first case (the box above)
+- [x] Endodontic findings (step 3, Cohen's Pathways of the Pulp): a widened PDL before a lesion, short, long and voided
+      fills, posts and cores, a separated instrument, a missed canal (v2.1)
+- [x] Fractures (Sam, 2026-11-21): crown, cusp, crack, vertical and horizontal root fractures, on every view, with the checks
+      that keep a question off a picture that can't show one (a crack on no film) (v2.1)
+- [ ] Sam looks at v2.1's drawings with their first case (crown materials, posts, fractures, bridges, the redrawn fillings
+      and calculus), the way the box above says; the screenshots are in v2.1's PR
+- [ ] Root tips, resorption, sealants and temporary restorations (left out of v2.1; optional in Sam's ask)
+- [ ] A crack's own row: the kit has no bite-test or transillumination field, so a crack question gives its finding in the
+      question's `pbox`; a `tests` field in the record would put it in the case's own rows
 - [ ] Implants on modules (step 4): an `implant` module for what is per-tooth numbers today
-- [ ] Prosthodontics and other hubs (step 5): bridges and dentures on the odontogram and films; Occlusion's `CASE_IMG`
+- [ ] Prosthodontics and other hubs (step 5): fixed bridges are done on every view (v2.1); still to do: removable partial and
+      complete dentures, a cantilever or resin-bonded bridge, an implant-supported bridge, and Occlusion's `CASE_IMG`
       pictures onto the kit
 - [ ] More figures from the library as they're next touched: `widget/journeys.js`'s typodont (`TYPO`) still carries its own
       copy of the size table and outlines, and the arcade's other tooth tiles (Pocket Showdown, Cross-Section) are drawn by hand
@@ -46,6 +56,9 @@ what v2.0 left, so it isn't lost. Its own track (Sam, 2026-11-06, [decisions](..
 ## Log
 
 - 2026-11-20: written by the v2.0 session with what it left.
+- 2026-11-21: Patient Box v2.1 (branch `claude/patient-box-v2-1`): crown materials, inlays, onlays and veneers, endodontics,
+  fractures, margins and bridges, the filling and calculus redraw, examples 3 and 4. Ticked steps 2 and 3; added what it
+  left.
 
 ## Outcome
 

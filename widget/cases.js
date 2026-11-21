@@ -9,7 +9,13 @@
    Anatomy: tooth sizes and shapes follow Wheeler's Dental Anatomy (average crown length, root length, mesiodistal
    width at the contacts and at the cervix; cusp count and position; contact heights; root number, trunk length and
    apical curvature). Charts follow the conventions of a standard probing chart; staging, grading, recession types,
-   Glickman classes and peri-implant case definitions as the hubs teach them. Everything drawn is original SVG. */
+   Glickman classes and peri-implant case definitions as the hubs teach them. Patient Box v2.1 (2026-11-21): crowns by
+   material, inlays, onlays and veneers, posts and cores and root canal fillings by quality, fractures, recurrent caries,
+   overhangs, open margins and fixed bridges, on every view, from Rosenstiel's Contemporary Fixed Prosthodontics, Cohen's
+   Pathways of the Pulp, Andreasen's Textbook and Color Atlas of Traumatic Injuries (crown and root fractures) and White and
+   Pharoah (how each looks on a film: metal brightest, zirconia close to it, lithium disilicate and porcelain a shade under
+   enamel, a fiber post barely brighter than dentin; a vertical root fracture's J-shaped radiolucency; a crack that no film
+   shows). Everything drawn is original SVG. */
 (function(){
   'use strict';
   var I = {};
@@ -796,7 +802,7 @@
     [[r0, -1, c[0]], [rN, 1, c[1]]].forEach(function(e, j){
       var r = e[0], sg = e[1], y0 = g.cej + .15 * k, y1 = Math.min(g.cej + 3.4 * k, Math.max(g.cej + 1.3 * k, e[2] - .6 * k)), inner = [], outer = [], N = 12, seed = (+g.o.n || 3) * 1.7 + j * 2.3;
       for(var i = 0; i <= N; i++){ var u = i / N, y = y0 + (y1 - y0) * u, tt = Math.max(0, (y - r.y0) / r.len), x = rAx(r, tt) + sg * rHw(r, tt);
-        var th = (u < .2 ? .2 + 2.6 * u : .72 * Math.pow(1 - (u - .2) / .8, 1.3)) * k * (1 + .2 * Math.sin(u * 13 + seed)) + .02 * k;
+        var th = (u < .2 ? .3 + 3.6 * u : 1.02 * Math.pow(1 - (u - .2) / .8, 1.2)) * k * (1 + .2 * Math.sin(u * 13 + seed)) + .02 * k;
         inner.push([x - sg * .05 * k, y]); outer.push([x + sg * th, y]); }
       s += path('xr-calc', dense(outer, false, 3).concat(inner.reverse())); });
     return s;

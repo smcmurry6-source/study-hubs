@@ -32,6 +32,20 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-21 (Patient Box v2.1: crown materials, endodontics, fractures, bridges; cleaner fillings and calculus, Claude Code)** —
+  Sam: "more possibilities like endodontically treated teeth, fractured teeth, and different crown materials... when theres a
+  filling, the lines dont look clean and accurate. Also calculus looks bad." `widget/teeth.js` draws restorations from the
+  crown's own outline (`restoParts`, `prepMM`, `recurMM`, `ponticMM`, `PREP`): smooth walls, rounded line angles, flat
+  floors 2.8 mm under the contact, a softer edge for composite and ceramic. `widget/cases.js` adds crowns by material (gold,
+  PFM, zirconia, lithium disilicate, SSC), inlays, onlays and veneers, overhangs and open margins, recurrent caries, posts and
+  cores, fill quality, a separated instrument, a missed canal, a widened PDL, the `fracture` module (crown, cusp, crack,
+  vertical and horizontal root) and the `bridge` module, on the film, bitewing, full-mouth series, chart, view and
+  odontogram, with their checks (a VRF on a vital unrestored tooth is an error) and three new `rests` (`endo`, `fracture`,
+  `resto`; a crack never rests on a film). Calculus is redrawn: tapering spurs on films, a tan band on the view. v1 records
+  draw as before except for v1's amalgam (now the O outline) and calculus. Two new examples (`v21-bridge-post`,
+  `v21-trauma`) in `tools/cases/examples.json`; `sw.js` `sh-v70`. No live hub has cases, so students see nothing yet.
+  How: [draw-a-patient-box-case](vault/how-to/draw-a-patient-box-case.md); what's left:
+  [the next steps](vault/tasks/2026-11-20-patient-box-v2-next-steps.md).
 - **2026-11-20 (Patient Box v2.0: the tooth library, modules, new views and checks, Claude Code)** — The Patient Box v2
   package ([task](vault/tasks/done/2026-11-06-patient-box-v2-modular-cases.md)). `widget/teeth.js` is the tooth library
   (`window.SH_TEETH`, `require()` in Node): the Wheeler table and outlines moved out of `widget/cases.js`, plus a catalogue

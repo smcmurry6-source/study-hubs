@@ -23,7 +23,14 @@
    8 mm from the CEJ; the crest about 1.5-2 mm below the CEJ in health); White and Pharoah's Oral Radiology (which films
    show which teeth: bitewings for the posterior teeth, a maxillary premolar's furcation rarely seen on a film; how caries and
    restorations look on a film); Sturdevant's Art and Science of Operative Dentistry (preparation outlines by
-   class: the proximal box's gingival floor and axial wall, the Class III, IV and V outlines).
+   class: the proximal box's gingival floor and axial wall, the Class III, IV and V outlines, rounded internal line angles,
+   inlay and onlay walls and cusp reduction). Patient Box v2.1 (2026-11-21) adds restoParts (a restoration's outline, with an
+   overhang or an open margin), recurMM (recurrent caries under a margin), prepMM and PREP (a crown's preparation by material:
+   margin width, axial and occlusal reduction, for gold, PFM, zirconia, lithium disilicate and stainless steel crowns),
+   ponticMM (a pontic's outline, ridge lap) and the curve helpers (crownLoop, onSide, sideArc, overArc, fillet, shrink):
+   restorations follow the crown's own outer surface, so a filling meets it exactly. Its sources: Rosenstiel, Land and
+   Fujimoto's Contemporary Fixed Prosthodontics (reduction and margins by crown material, posts and cores, pontic design);
+   Cohen's Pathways of the Pulp (fill length and quality, post space, separated instruments, cracked teeth and root fractures).
    Everything drawn from it is original SVG. CI: node tools/ci/cases.js. */
 (function(){
   'use strict';
