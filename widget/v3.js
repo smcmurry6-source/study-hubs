@@ -21,11 +21,12 @@
      isn't mounted, and v3.css hides the hub's Timmy Time links (html.sh-audio-off). */
   var AUDIO_OFF = ds.audio === "off";
   if (AUDIO_OFF) try { document.documentElement.classList.add("sh-audio-off"); } catch (e) {}
-  /* data-game="v2": the redesign's hubs (widget/hub.js writes it) use the game layer's server once the database has it
-     (migration_v54, applied at the redesign's release; vault/reference/game-server.md): one call per answer that the
-     server grades and pays, the journeys' rank profile, mock sessions. Until the functions exist, and on every live hub,
-     everything below works as it does today. on: null until the page knows, then true or false. */
-  var GAME = { want: ds.game === "v2", on: null, boost: null };
+  /* The game layer's server (migration_v54, applied at the redesign's release; vault/reference/game-server.md): one call
+     per answer that the server grades and pays, the journeys' rank profile, mock sessions. Every page that loads this file
+     is a hub on the engine (widget/hub.js still writes data-game="v2" on the tag), so it is always asked for: the
+     fallbacks to the calls from before it came out on 2026-11-21, with the last old single-file hub pages gone
+     (2026-11-19). on: null until the bootstrap shows the journeys' rank, then true. */
+  var GAME = { on: null, boost: null };
   function rpcMissing(r){ var e = r && r.error; return !!e && (e.code === "PGRST202" || e.code === "42883" || r.status === 404 || /could not find the function|does not exist/i.test(e.message || "")); }
   var SB_URL = "https://thytmzsgymydbzcqdnix.supabase.co";
   var SB_KEY = "sb_publishable_6s_2KEdBVkEfEZH3qn8ouw_w7b8WcMS";
@@ -1142,8 +1143,7 @@
       try { supabase.rpc("set_display_name", { p_visitor: VISITOR_ID, p_name: name }).then(function(res){ if (dbFailed(res)) dbFail(); else answered(); }, function(){ dbFail(); }); } catch (e) {}
     }
     /* the first name chosen pays 500 XP and crowns (set_display_name_v2, migration_v68); the old call otherwise */
-    if (GAME.want && GAME.on !== false) claimPrize("set_display_name_v2", { p_visitor: VISITOR_ID, p_name: name }, "name").then(function(r){ if (!r || r.missing) old(); else answered(); });
-    else old();
+    claimPrize("set_display_name_v2", { p_visitor: VISITOR_ID, p_name: name }, "name").then(function(r){ if (!r || r.missing) old(); else answered(); });
   }
   function saveName(name){
     name = String(name || "").trim().slice(0, 24);
@@ -1471,27 +1471,21 @@
         p_include_pins: !!window.SH_PINS,
         p_link_name: bootstrap.linkName || null
       };
-      /* a page on the game layer asks for the v2 bootstrap (today's, with the journeys' rank) and falls back to
-         today's when the database doesn't have it yet */
-      var ansSent = GAME.want ? ansLoad() : null, v2Args = bootArgs;
+      /* the v2 bootstrap (with the journeys' rank and the answers saved since the device's newest) */
+      var ansSent = ansLoad(), v2Args = bootArgs;
       if (ansSent) v2Args = Object.assign({ p_answers_after: ansSent.id, p_answers_n: ansSent.n }, bootArgs);
       function bootV2(args){
         return supabase.rpc("get_widget_bootstrap_v2", args).then(function(res){
-          /* a database without v84 doesn't know the cursor: ask again without it, then today's */
+          /* a database without v84 doesn't know the cursor: ask again without it */
           if (rpcMissing(res) && args !== bootArgs) { ansSent = null; ansOff = true; ansDrop(); return bootV2(bootArgs); }
-          if (rpcMissing(res)) { GAME.on = false; return supabase.rpc("get_widget_bootstrap", bootArgs); }
           return res;
         });
       }
-      var bootCall = !GAME.want ? supabase.rpc("get_widget_bootstrap", bootArgs) : bootV2(v2Args);
-      bootstrap.ready = bootCall.then(function(res){
+      bootstrap.ready = bootV2(v2Args).then(function(res){
         if (!res || res.error || !res.data || typeof res.data !== "object") return null;
         bootstrap.data = ansAbsorb(res.data, ansSent);
-        if (GAME.want && GAME.on === null) {
-          var rk = res.data.rank;
-          GAME.on = !!(rk && rk.journey != null);
-          if (GAME.on) GAME.boost = rk.boost || null;
-        }
+        var rk = res.data.rank;
+        if (GAME.on === null && rk && rk.journey != null) { GAME.on = true; GAME.boost = rk.boost || null; }
         return bootstrap.data;
       }, function(){ return null; });
     } catch (e) { bootstrap.ready = Promise.resolve(null); }
@@ -1598,21 +1592,24 @@
      an id, so the server's name (the bootstrap's display_name) is theirs, and a device that has a name of its own takes
      the server's when they differ. Not when this device's own rename hasn't reached the server (sh_name_unsaved: it is
      sent again) or was made after the bootstrap was asked. A device with no name of its own keeps showing the server's
-     as it always has. Returns the name taken, or "". */
-  function nameFromServer(server, asked){
+     as it always has. When the server's is the random one (the bootstrap's name_custom false, migration_v94: the linked
+     device went back to a random name), this device drops its copy too. Returns the name taken ("" for the random one),
+     or null when this device keeps its own. */
+  function nameFromServer(server, asked, custom){
     server = String(server || "").trim().slice(0, 24);
     var mine = currentName(), unsaved = null;
-    if (!server || !mine || mine !== (asked || "")) return "";
+    if (!server || !mine || mine !== (asked || "")) return null;
     try { unsaved = localStorage.getItem(SH_NAME_UNSAVED); } catch (e) {}
-    if (unsaved === mine && server !== mine) { sendName(mine); return ""; }
+    if (unsaved === mine && server !== mine) { sendName(mine); return null; }
     if (unsaved !== null) try { localStorage.removeItem(SH_NAME_UNSAVED); } catch (e) {}
-    if (server === mine) return "";
+    if (custom === false) { try { localStorage.removeItem(SH_NAME_KEY); } catch (e) {} return ""; }
+    if (server === mine) return null;
     try { localStorage.setItem(SH_NAME_KEY, server); } catch (e) {}
     return server;
   }
   bootstrap.ready.then(function(data){
-    var took = data ? nameFromServer(data.display_name, bootstrap.linkName) : "";
-    if (data && data.display_name) { resolvedAnonName = data.display_name; renderNameBadge(); syncNameInputs(); try { document.dispatchEvent(new CustomEvent("sh:name", { detail: took ? { name: took } : {} })); } catch (e) {} return; }
+    var took = data ? nameFromServer(data.display_name, bootstrap.linkName, data.name_custom) : null;
+    if (data && data.display_name) { resolvedAnonName = data.display_name; renderNameBadge(); syncNameInputs(); try { document.dispatchEvent(new CustomEvent("sh:name", { detail: took !== null ? { name: took } : {} })); } catch (e) {} return; }
     /* Compatibility while the migration is being deployed; current schemas use
        the bootstrap field above and make no second eager read. */
     if (supabase) try { supabase.rpc("get_display_name", { p_visitor: VISITOR_ID }).then(function(res){
@@ -1980,9 +1977,8 @@
      server's key and pays it. The page sends what was picked (a choice, the ticked choices, the order as placed, or
      the student's own grade), the question's version, where it was answered and a random id, so a retried call
      records and pays once. What comes back goes out as sh:answer-paid for the engine (widget/hub-rewards.js): the XP
-     paid, the day's bonuses, a new medal and its double XP, the total. The answer falls back to today's calls when
-     the database doesn't have the function yet, or when the server can't grade what was sent (a one-choice question
-     with no pick index: an older arcade game). Automated browsers record nothing, as today. */
+     paid, the day's bonuses, a new medal and its double XP, the total. The answer goes by the old calls only when the
+     server can't grade what was sent (a one-choice question with no pick index: an older arcade game). Automated browsers record nothing, as today. */
   var gamePending = {}, sessionInfo = {}, lineSeq = 0;
   function gameId(){
     var a = new Uint8Array(16), out = "", abc = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
@@ -2047,7 +2043,6 @@
     var call;
     try { call = supabase.rpc("record_answer_v2", job.args); } catch (e) { return Promise.resolve(false); }
     return call.then(function(res){
-      if (rpcMissing(res)) { GAME.on = false; answerToday(job.d, job.c); return false; }
       if (res && res.error) {
         if (dbFailed(res)) { dbFail(); return true; }
         return false;
@@ -2109,7 +2104,7 @@
      server takes a session's answers and its finish for 6 hours after it started). Nothing is kept on a page off the
      game layer. */
   var KEEP_KEY = "sh_answers_kept:" + HUB, KEEP_MS = 3 * 864e5, KEEP_TRIES = 24, KEEP_MAX = 300;
-  function keepOn(){ return !!supabase && !AUTOMATED && GAME.want && GAME.on !== false && !!HUB; }
+  function keepOn(){ return !!supabase && !AUTOMATED && !!HUB; }
   function keepRead(){
     var a = null;
     try { a = JSON.parse(localStorage.getItem(KEEP_KEY) || "null"); } catch (e) {}
@@ -2177,7 +2172,7 @@
   window.addEventListener("pagehide", keepLine);
   window.addEventListener("pageshow", function(e){ if (e && e.persisted) keepClaim(); });
   /* a new page: once its bootstrap has answered (or not), it sends what an earlier page kept */
-  if (supabase && !AUTOMATED && GAME.want && HUB) bootstrap.ready.then(function(){ setTimeout(keepClaim, 2500); }, function(){ setTimeout(keepClaim, 2500); });
+  if (supabase && !AUTOMATED && HUB) bootstrap.ready.then(function(){ setTimeout(keepClaim, 2500); }, function(){ setTimeout(keepClaim, 2500); });
   /* the bowling egg's secret trophy: widget/bowling.js keeps it on the device that saw all eight clips (sh_bowl_trophy);
      the server takes the kind since migration_v63, so it is sent once, when it is won or at the next page load (the
      trophy then pays its 25 crowns and counts in the class's share). sh_bowl_trophy_sent marks it sent. */
@@ -2230,7 +2225,7 @@
      (after `delay` ms, for the nuke's countdown), the balance as sh:crowns. Answers { missing: true } when the database
      doesn't have the function yet, so a caller can do what it did before; null when it couldn't be asked. */
   function claimPrize(fn, args, src, delay){
-    if (!supabase || AUTOMATED || !GAME.want || GAME.on === false) return Promise.resolve(null);
+    if (!supabase || AUTOMATED) return Promise.resolve(null);
     var call; try { call = supabase.rpc(fn, args); } catch (e) { return Promise.resolve(null); }
     return call.then(function(res){
       if (rpcMissing(res)) return { missing: true };
@@ -2245,23 +2240,22 @@
      answers and its +50 only inside one, and saves the mock's score itself when it is finished) */
   window.shGame = {
     prizes: PRIZES, prizeText: prizeText, prizeName: prizeName, claim: claimPrize, setCrowns: setCrowns, crowns: function(){ return CROWNS; },
-    /* whether to offer prizes on the page: the game layer is wanted and hasn't been found missing (before the bootstrap
-       answers, v2() is still false; a card drawn then still says what it pays) */
-    live: function(){ return GAME.want && GAME.on !== false; },
+    /* whether to offer prizes on the page: always, since every page is on the game layer (before the bootstrap answers,
+       v2() is still false; a card drawn then still says what it pays) */
+    live: function(){ return true; },
     /* a plain rpc that answers a value (notes_start_v2's read id), or null */
     ask: function(fn, args){
-      if (!supabase || AUTOMATED || !GAME.want || GAME.on === false) return Promise.resolve(null);
+      if (!supabase || AUTOMATED) return Promise.resolve(null);
       try { return supabase.rpc(fn, args).then(function(res){ return res && !res.error ? res.data : null; }, function(){ return null; }); } catch (e) { return Promise.resolve(null); }
     },
-    want: GAME.want,
+    want: true,
     v2: function(){ return GAME.on === true; },
     boost: function(){ var b = GAME.boost; return b && b.until && new Date(b.until).getTime() > Date.now() ? b : null; },
     setBoost: function(b){ GAME.boost = b || null; },
     startSession: function(kind, game){
-      if (!supabase || AUTOMATED || !GAME.want || GAME.on === false) return Promise.resolve(null);
+      if (!supabase || AUTOMATED) return Promise.resolve(null);
       try {
         return supabase.rpc("xp_session_start", { p_visitor: VISITOR_ID, p_hub: HUB, p_kind: kind, p_game: game || null }).then(function(res){
-          if (rpcMissing(res)) { GAME.on = false; return null; }
           var id = res && !res.error && typeof res.data === "string" ? res.data : null;
           if (id) sessionInfo[id] = { kind: kind, game: game || null };
           return id;
@@ -2325,7 +2319,7 @@
     var d = (e && e.detail) || {};
     var isCorrect = !!d.correct;
     srsRecord(String(d.qid || ""), isCorrect);
-    if (GAME.want && GAME.on !== false) answerV2(d, isCorrect); else answerToday(d, isCorrect);
+    answerV2(d, isCorrect);
     var prevStreak = sessionCorrectStreak;
     if (isCorrect) {
       sessionCorrectStreak++;
@@ -2532,7 +2526,7 @@
     nukeBadgeEl = document.createElement("button");
     nukeBadgeEl.type = "button";
     nukeBadgeEl.id = "sh-nuke-badge";
-    var prize = GAME.want && GAME.on !== false ? fmtN(PRIZES.nuke) : "";
+    var prize = fmtN(PRIZES.nuke);
     nukeBadgeEl.innerHTML = '<span class="sh-nuke-icon sh-nuke-icon-md" aria-hidden="true"></span><span class="sh-nuke-badge-label">Tactical Nuke Ready</span>' +
       (prize ? '<span class="sh-nuke-badge-prize" aria-hidden="true">+' + prize + "<i> XP and crowns</i></span>" : "");
     nukeBadgeEl.setAttribute("aria-label", "Tactical nuke ready" + (prize ? ", worth " + prize + " XP and " + prize + " crowns" : "") + " -- tap to call it in");
@@ -3692,9 +3686,9 @@
   window.shEggHooks = {
     hub: HUB, answeredEvent: ANSWERED_EVENT, visitor: VISITOR_ID, supabase: supabase, bootstrap: bootstrap.ready,
     v2: function(){ return GAME.on === true; },
-    /* the game layer is wanted and hasn't been found missing (shGame.live): true before the page knows, as when its
-       bootstrap timed out in a busy minute */
-    live: function(){ return GAME.want && GAME.on !== false; },
+    /* always true (shGame.live): every page is on the game layer, also before the page knows, as when its bootstrap
+       timed out in a busy minute */
+    live: function(){ return true; },
     send: function(payload){ try { if (channel) channel.send({ type: "broadcast", event: "egg", payload: payload }); } catch (e) {} },
     name: displayName, section: currentSection, online: function(){ return onlineCount; },
     toast: showStreakToast, confetti: fireConfetti, prefGet: prefGet, prefSet: prefSet, esc: esc,
@@ -3812,8 +3806,7 @@
         else decide(cached());
       }
       function fallback(){
-        /* Compatibility only while a database migration is rolling out. On a
-           current schema the initial overrides come from get_widget_bootstrap. */
+        /* when the bootstrap (get_widget_bootstrap_v2, which carries them) didn't answer, as in a busy minute */
         try { supabase.rpc("get_hub_overrides").then(function(r){ useRows(r && !r.error ? r.data : null); }, function(){ useRows(null); }); } catch (e) { useRows(null); }
       }
       bootstrap.ready.then(function(data){

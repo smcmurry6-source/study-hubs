@@ -20,7 +20,8 @@ the home of the details: read `migration_v54.sql` (its sections are numbered as 
 
 - Today's functions keep today's rules for every page that still calls them: `record_personal_answer` (the 600-a-day cap
   included), `record_achievement`, `get_rank_profile`, `get_widget_bootstrap`, `get_pet_days`, `get_my_inbox`,
-  `set_report_resolved` and the boards. The new pages call the `_v2` functions and the new ones below.
+  `set_report_resolved` and the boards. The new pages call the `_v2` functions and the new ones below
+  (and, since 2026-11-21, #523, no page falls back to the old ones).
 - Three of today's functions are replaced with versions that do the same while the new tables are empty (`tools/release/xp.js`
   checks every total, profile, board and trophy rate before and after): `sh_xp_on_insert` (a v2 answer adds no capped answer
   XP; its award pays instead), `sh_xp_rebuild` (adds the award rows and replays the v2 answers) and `redeem_link_code` (also

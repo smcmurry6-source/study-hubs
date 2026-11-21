@@ -42,6 +42,17 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   view's restorations rechecked (a Class II box now shows as a sliver at the outline; a lingual surface no longer draws a
   labial Class V). Old cases validate and their films draw as before. CI's records in `tools/ci/cases.js`; example
   `v21-buccal-decay` with `v21-ex-5`; `sw.js` sh-v72. No live hub has dental cases, so students see nothing yet.
+- **2026-11-21 (Back to a random name on a linked device; the game layer's last fallbacks out, #523, Claude Code)** —
+  BUG-196's follow-up: `migration_v94` (applied live 2026-11-21, 8:09 am Central, md5-checked) adds `name_custom` to
+  `get_widget_bootstrap_v2` (true when `visitor_names` has the id's row), and `nameFromServer` in `widget/v3.js` and `widget/dash.js` drops the device's copy when it's false, so "Go
+  back to a random name" on one linked device reaches the other (before, the other kept the random name as one it had
+  picked). The fallbacks for a database without the game layer came out: `widget/v3.js` always asks for
+  `get_widget_bootstrap_v2` and never switches to the old answer calls (`GAME.want` is gone, `GAME.on` is never false);
+  `widget/ranks-hub.js` reads only `get_rank_profile_v2`, `widget/ranks.js` only `get_trophy_stats_v2`, `widget/replies.js`
+  only `submit_survey_v2`; the preview (`tools/preview/runtime/preview.js`) no longer answers the old names. The five
+  archived hubs' tint lines left `widget/hub.css` (and Perio's darker ink), and `widget/eggs.js`'s VT323 fetch for pages
+  without `shx`. The `shx` class stays (the preview's pill and the figure builds select it). Nothing students see, except the
+  random name now following. `tools/release/xp.js` checks the flag; `tools/ci/quiet.js` passed.
 - **2026-11-21 (Patient Box v2.1's clinical calls settled from outside sources, Claude Code)** — Sam: "Use outside sources to
   determine answers" to the questions v2.1's review left. Radiopacity on a film now follows mm-Al studies (Pekkan 2011, Atala
   2019, Erzurumlu 2021, Hitij and Fidler 2013, Balci 2023): zirconia nearly as bright as metal, composite about enamel's or a

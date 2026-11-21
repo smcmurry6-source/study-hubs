@@ -54,14 +54,20 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   `tools/ci/smoke.js`'s `wiringCheck` (Million-Dollar Smile's sessions and answers, Timmy Time's minutes) needs a live engine hub
   with Smile in its `content/arcade.js`, and Review of Systems has no arcade, so it is skipped until one is built. When the next
   hub with an arcade ships, check its smoke run prints "the game layer's wiring" for it (nothing to change: it picks the hub itself).
-- [ ] **The rest of the fallbacks for a database without the game layer** (2026-11-20, found in #512; nothing students see):
+- [x] **The rest of the fallbacks for a database without the game layer** (2026-11-20, found in #512; nothing students see):
   every page asks for the game layer now, but `widget/v3.js` still falls back to `get_widget_bootstrap` (`GAME.want`,
   `GAME.on = false`), `widget/ranks-hub.js` to `get_rank_profile`, `widget/ranks.js` to `get_trophy_stats`, and
   `widget/replies.js` and `widget/dash.js` to `submit_survey` (and `submit_exam_debrief`), with the preview's answers to
   each (`tools/preview/runtime/preview.js`) and the smoke test's stubs. Take them out together, with `tools/ci/quiet.js`
   run, since a missing `_v2` call then fails instead of falling back. Also: the five archived hubs' tint lines in
   `widget/hub.css` (`:root[data-hx-hub="perio"]`... `.hx[data-hub=...]`: check the dashboard's Past hubs and the idea
-  board's notes still need the `.hx` half) and whether pages still need to set the `shx` class (`widget/eggs.js` reads it).
+  board's notes still need the `.hx` half) and whether pages still need to set the `shx` class (`widget/eggs.js` reads it). (#523: the page always asks for the game layer
+  and never switches back to the old calls; the preview answers only the `_v2` names; `tools/ci/quiet.js` passed. The five
+  tint lines came out: no page sets those hubs' `data-hx-hub`, and the dashboard's tinted parts and the idea board's notes
+  take inline colors, not `.hx[data-hub]`. The `shx` class stays: the preview's pill and the figure builds select
+  `html.shx`; eggs.js's font fallback for pages without it came out. Left as they are: `answerToday()` for an answer the
+  server can't grade, the prize calls' `missing` fallbacks, `get_display_name` and `get_hub_overrides` when the bootstrap
+  times out, and the database's old functions themselves, which `tools/release/xp.js` still tests.)
 - [ ] **Learn: a typed answer** (2026-11-13, idea from making Learn "more like quizlet"): Quizlet's Learn ends on written
   questions. Ours ends on recall before the choices show (Sam's call 5, 2026-11-06), because a typed answer can't be
   graded against a bank question's choice. Only if Sam asks for it.
@@ -77,11 +83,12 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   `mcp__c63257eb-1d94-419c-8868-716ff71ffcf6__*`), so `.claude/hooks/supabase-confirm.js` never runs there (no line in its log) and
   `apply_migration`'s question goes to Sam's app and times out (about 4 minutes). Sam's call: widen the matcher (add that id, or
   match all servers and let the hook check the question), or keep applying from a session where the server is named "Supabase".
-- [ ] **Going back to a random name on one linked device: the other takes it as picked** (2026-11-21, BUG-196's fix): the
+- [x] **Going back to a random name on one linked device: the other takes it as picked** (2026-11-21, BUG-196's fix): the
   other device now shows the server's name, but the bootstrap's `display_name` doesn't say whether it is a random one, so
   that device keeps it as its own (its name window offers "Go back to a random name"; the idea board asks for a name when it
   refuses one). Small: a `name_custom` flag in `get_widget_bootstrap_v2` (a migration copied from `main`'s newest copy), and
-  `nameFromServer` in `widget/v3.js` and `widget/dash.js` clears the device's copy when it's false.
+  `nameFromServer` in `widget/v3.js` and `widget/dash.js` clears the device's copy when it's false. (#523: `migration_v94`, applied
+  2026-11-21 at 8:09 am Central; retested with BUG-196 after the merge.)
 - [ ] **Before the first collapse (about 2027-09-13), point the year-spanning readers at the totals** (2026-11-21, migration_v93):
   `sh_insights` (the admin page's Insights, every hub side by side), `get_hub_recap`, `tools/retro.sql` and `tools/lessons-daily.sql` read
   `activity_hourly` only, so a hub older than a year would show no time. Read `activity_daily` / `activity_visits_daily` (people per day,
