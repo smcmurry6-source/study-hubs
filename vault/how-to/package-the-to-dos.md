@@ -98,7 +98,7 @@ It covers (each is written down in the vault; read it first):
 <Order: ... | Deadline: ... | It needs <PR> merged first.>
 Out of scope: anything else on the to-do list. Put what you find on the list instead.
 
-Wait for my "merge". In the same PR, tick each item off where it's written (the inbox line as `- [x] ... (#524)`, the task note's boxes,
+Wait for my "merge". In the same PR, tick each item off where it's written (the inbox line as `- [x] ... (#PR)`, the task note's boxes,
 Outcome and status, the bug row's status), and put anything left over on the to-do list. Open a draft PR.
 ```
 
