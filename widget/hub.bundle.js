@@ -248,8 +248,8 @@ var PRIZE_CSS =
 ".hxp-burst i{position:absolute;left:-4px;top:-6px;width:8px;height:12px;border-radius:2px;background:var(--c);opacity:0;animation:hxp-bit var(--t) var(--d) cubic-bezier(.2,.7,.4,1) both}" +
 ".hxp-burst i.is-art{left:-9px;top:-9px;width:18px;height:18px;background:none}.hxp-burst i svg{display:block;width:100%;height:100%}" +
 ".hxp-fly{position:fixed;z-index:60;left:0;top:0;width:24px;height:24px;pointer-events:none}.hxp-fly svg{display:block;width:100%;height:100%}" +
-"html.shx[data-theme=dark] .hxp-card{box-shadow:0 4px 0 #120d12,0 0 0 1px rgba(242,193,78,.5),0 16px 44px rgba(242,193,78,.28)}" +
-"@media (prefers-color-scheme:dark){html.shx:not([data-theme=light]) .hxp-card{box-shadow:0 4px 0 #120d12,0 0 0 1px rgba(242,193,78,.5),0 16px 44px rgba(242,193,78,.28)}}" +
+":root[data-theme=dark] .hxp-card{box-shadow:0 4px 0 #120d12,0 0 0 1px rgba(242,193,78,.5),0 16px 44px rgba(242,193,78,.28)}" +
+"@media (prefers-color-scheme:dark){:root:not([data-theme=light]) .hxp-card{box-shadow:0 4px 0 #120d12,0 0 0 1px rgba(242,193,78,.5),0 16px 44px rgba(242,193,78,.28)}}" +
 "@keyframes hxp-in{0%{opacity:0;transform:translateY(var(--hxp-y)) scale(.86) rotate(-2deg)}100%{opacity:1;transform:none}}" +
 "@keyframes hxp-out{to{opacity:0;transform:translateY(calc(var(--hxp-y) * .4)) scale(.95)}}" +
 "@keyframes hxp-shine{to{left:130%}}" +
@@ -653,18 +653,26 @@ paintMeters();
 if (d.kind === "handoff") HX.say(name ? "The " + name + "! A whole new climb." : "A whole new climb!", "do-hop");
 else if (d.kind === "dark") HX.say("Dark Matter. You earned that one.", "do-hop");
 });
+function put(n, html){ if (n._hxH !== html) { n.innerHTML = html; n._hxH = html; } }
 function paintMeters(){
 if (!HX.shell) return;
 var n = streakDays(), t = todayRec(), g = goal();
-$$("[data-streakm]").forEach(function(m){ m.innerHTML = flame(n) + '<span class="num" aria-hidden="true">' + (n ? n + '<span class="fold"> ' + (n === 1 ? "day" : "days") + "</span>" : '<span class="fold">No streak</span><span class="unfold">0</span>') + '</span><span class="sr">' + (n ? pl(n, "day") + " in a row studied" : "No streak yet") + "</span>"; });
+$$("[data-streakm]").forEach(function(m){ put(m, flame(n) + '<span class="num" aria-hidden="true">' + (n ? n + '<span class="fold"> ' + (n === 1 ? "day" : "days") + "</span>" : '<span class="fold">No streak</span><span class="unfold">0</span>') + '</span><span class="sr">' + (n ? pl(n, "day") + " in a row studied" : "No streak yet") + "</span>"); });
 var dn = doneToday(t), what = t.k ? " questions and flashcards today" : " questions today";
-$$("[data-goalm]").forEach(function(m){ m.innerHTML = ring(dn, g) + '<span class="num" aria-hidden="true">' + Math.min(dn, 999) + '<span class="fold"> of </span><span class="unfold">/</span>' + g + '</span><span class="sr">' + Math.min(dn, 999) + " of " + g + what + "</span>"; });
+$$("[data-goalm]").forEach(function(m){ put(m, ring(dn, g) + '<span class="num" aria-hidden="true">' + Math.min(dn, 999) + '<span class="fold"> of </span><span class="unfold">/</span>' + g + '</span><span class="sr">' + Math.min(dn, 999) + " of " + g + what + "</span>"); });
 var x = rankXp(), rk = $("#hxRank"), chip = boostChip();
 var nm = rankName(), R = window.shRanks, jn = RANK.p && RANK.p.journey > 0 && R && R.JOURNEYS ? (R.JOURNEYS[RANK.p.journey | 0] || "") + " " : "";
 var nameHTML = jn.length > 1 && nm.indexOf(jn) === 0 ? '<span class="jn">' + esc(jn) + "</span>" + esc(nm.slice(jn.length)) : esc(nm);
-if (rk) rk.innerHTML = '<span class="hp" aria-hidden="true">' + rankArt() + '</span><span class="sr">Your rank: </span><b>' + nameHTML + '</b><span class="sr">, </span><span class="xpn num"><span data-xp>' + (x === null ? "+" + fmt(t.xp) : fmt(x)) + "</span> XP" + (x === null ? " today" : "") + '</span><span class="sr">. </span>' + chip + '<span class="sr">Open your stats</span>';
-$$("[data-xpm]").forEach(function(m){ m.innerHTML = artSvg(A.xp || "", "0 0 24 24", "xpi") + '<span class="num"><span data-xp>' + (x === null ? "+" + fmt(t.xp) : fmt(x)) + '</span><span class="fold-xp"> XP</span></span>' + (boostShown ? '<i class="x2" aria-hidden="true">2x</i><span class="sr">Double XP is on</span>' : ""); });
-$$("[data-today]").forEach(function(p){ p.outerHTML = todayPanel(); });
+if (rk) put(rk, '<span class="hp" aria-hidden="true">' + rankArt() + '</span><span class="sr">Your rank: </span><b>' + nameHTML + '</b><span class="sr">, </span><span class="xpn num"><span data-xp>' + (x === null ? "+" + fmt(t.xp) : fmt(x)) + "</span> XP" + (x === null ? " today" : "") + '</span><span class="sr">. </span>' + chip + '<span class="sr">Open your stats</span>');
+$$("[data-xpm]").forEach(function(m){ put(m, artSvg(A.xp || "", "0 0 24 24", "xpi") + '<span class="num"><span data-xp>' + (x === null ? "+" + fmt(t.xp) : fmt(x)) + '</span><span class="fold-xp"> XP</span></span>' + (boostShown ? '<i class="x2" aria-hidden="true">2x</i><span class="sr">Double XP is on</span>' : "")); });
+var tp = null;
+$$("[data-today]").forEach(function(p){
+if (tp === null) tp = todayPanel();
+if (p._hxH === tp) return;
+var t = document.createElement("template"); t.innerHTML = tp; var nw = t.content.firstElementChild;
+if (!nw) { p.outerHTML = tp; return; }
+nw._hxH = tp; p.replaceWith(nw);
+});
 fitSoon();
 $$("[data-rankart]").forEach(function(n){ n.innerHTML = rankArt(+n.getAttribute("data-rankart") || 30); });
 paintLive();
@@ -1099,11 +1107,12 @@ return '<p class="qc-stem">' + esc(lead.join(" ").trim()) + '</p><ol class="qc-s
 return '<p class="qc-stem">' + esc(s) + "</p>";
 }
 function pboxHTML(q){
-if (!q.pbox) return "";
+var rows = q.pcase && HX.CORE.pcases && window.shCases && window.shCases.boxRows ? window.shCases.boxRows(q, HX.CORE.pcases) : q.pbox;
+if (!rows || !rows.length) return "";
 var set = q.pcase ? HX.IDX.filter(function(r){ return QBY[r.id] && QBY[r.id].pcase === q.pcase; }) : [];
 var at = set.map(function(r){ return r.id; }).indexOf(q.id);
 return '<div class="pbox"><p class="pbox-head">' + icon("notes", 18) + "<span>Patient box</span>" + (set.length > 1 ? '<span class="note">Same patient · ' + (at + 1) + " of " + set.length + "</span>" : "") + "</p><dl>" +
-q.pbox.map(function(r){ return "<div><dt>" + esc(r[0]) + "</dt><dd>" + esc(r[1]) + "</dd></div>"; }).join("") + "</dl>" + (HX.FIG && q.pimg ? '<div class="pbox-img">' + HX.FIG.caseImgHTML(q) + "</div>" : "") +
+rows.map(function(r){ return "<div><dt>" + esc(r[0]) + "</dt><dd>" + esc(r[1]) + "</dd></div>"; }).join("") + "</dl>" + (HX.FIG && q.pimg ? '<div class="pbox-img">' + HX.FIG.caseImgHTML(q) + "</div>" : "") +
 (q.pcase && HX.CORE.pcases && window.shCases ? window.shCases.pboxFigures(q, HX.CORE.pcases) : "") + "</div>";
 }
 function figHTML(q){ var f = HX.FIG && q.img && !q.imgAfter && HX.FIG.FIGS[q.img]; return f ? '<figure class="qfig" aria-label="' + esc(f.title) + '">' + f.svg + "</figure>" : ""; }
@@ -1647,6 +1656,15 @@ track("bank:retry-shown");
 }
 }
 if (cardEl.classList.contains("is-retry")) track("bank:retry-" + (right ? "right" : "missed"));
+if (L.ctx === "misses" && right) {
+L.right = L.right || {}; L.right[q.id] = 1;
+var G = window.shGame;
+if (!L.claimed && L.items.length >= 3 && L.items.every(function(x){ return L.right[x.id]; }) && G && G.live && G.live()) {
+L.claimed = true;
+var ask = function(again){ G.claim("claim_misses_v2", { p_visitor: ls("sh_visitor_id"), p_hub: HUB }, "misses").then(function(r){ if (again && r && r.ok && r.left > 0) setTimeout(function(){ ask(false); }, 8000); }); };
+setTimeout(function(){ ask(true); }, 2500);
+}
+}
 if (L.ctx === "drill") {
 setTimeout(function(){
 var D = window.shDrill; if (!D || !D.set) return;
@@ -1997,8 +2015,42 @@ var CORE = null, QS = null, QBY = {}, QBL = {}, LECS = [], LBY = {}, GROUPS = nu
 var EXAM = null, EXAM_LECS = {}, REVIEW = {};
 var memo = {};
 function getJSON(name){
-return memo[name] || (memo[name] = fetch(BASE + name).then(function(r){ if (!r.ok) throw new Error(name + " " + r.status); return r.json(); })
+return memo[name] || (memo[name] = fetch(BASE + name).then(function(r){ if (!r.ok) throw new Error(name + " " + r.status); return STEPPED[name] ? r.text().then(function(t){ return parseSteps(t); }) : r.json(); })
 .catch(function(e){ delete memo[name]; throw e; }));
+}
+var STEPPED = { "notes.json": 1, "questions.json": 1, "variants.json": 1 };
+function parseSteps(text, pace){
+pace = pace || function(f){ setTimeout(f, 0); };
+var P = window.performance, now = P && P.now ? function(){ return P.now(); } : Date.now;
+return new Promise(function(done, fail){
+var at = 0, stack = [], root, have = false, KEY = /^"((?:[^"\\]|\\.)*)"\s*:\s*/;
+function put(v, k){
+var top = stack[stack.length - 1];
+if (!top) { if (have) throw 0; root = v; have = true; return; }
+if (Array.isArray(top.v)) { if (k !== null) throw 0; top.v.push(v); }
+else { if (k === null || k === "__proto__" || Object.prototype.hasOwnProperty.call(top.v, k)) throw 0; top.v[k] = v; }
+}
+function whole(){ try { done(JSON.parse(text)); } catch (e) { fail(e); } }
+function step(){
+var end = now() + 15;
+try {
+for (var first = at; at < text.length;) {
+if (at > first && now() > end) { pace(step); return; }
+var nl = text.indexOf("\n", at); if (nl < 0) nl = text.length;
+var t = text.slice(at, nl).trim(); at = nl + 1; if (!t) continue;
+if (t.charAt(t.length - 1) === ",") t = t.slice(0, -1);
+var k = null, top = stack[stack.length - 1], m = top && !Array.isArray(top.v) && KEY.exec(t);
+if (m) { k = JSON.parse('"' + m[1] + '"'); t = t.slice(m[0].length); }
+if (t === "{" || t === "[") { if (have && !stack.length) throw 0; stack.push({ v: t === "{" ? {} : [], k: k }); continue; }
+if ((t === "}" || t === "]") && k === null) { var c = stack.pop(); if (!c || (t === "]") !== Array.isArray(c.v)) throw 0; put(c.v, c.k); continue; }
+put(JSON.parse(t), k);
+}
+if (stack.length || !have) throw 0;
+} catch (e) { whole(); return; }
+done(root);
+}
+pace(step);
+});
 }
 function loadScript(src){
 return memo[src] || (memo[src] = new Promise(function(res, rej){
@@ -2078,10 +2130,90 @@ function needStudy(){ return getJSON("study.json").then(function(s){ STUDY = s; 
 function needFigures(){
 loadCss(BASE + "figures.css");
 if (CORE.pcases) loadCss(WIDGET + "cases.css");
-return Promise.all([loadScript(BASE + "figures.js"), CORE.pcases ? loadScript(WIDGET + "cases.js") : null]).then(function(){
-if (!FIG && window.SH_FIGURES) FIG = window.SH_FIGURES({ esc: esc, shuffled: shuffled, save: saveState, state: STATE });
+return Promise.all([loadScript(BASE + "figures.js"), CORE.pcases ? loadScript(WIDGET + "teeth.js").then(function(){ return loadScript(WIDGET + "cases.js"); }) : null]).then(function(){
+if (!FIG && window.SH_FIGURES) { FIG = window.SH_FIGURES({ esc: esc, shuffled: shuffled, save: saveState, state: STATE }); figZoomWrap(FIG); }
 return FIG;
 });
+}
+var FZ = null, fzT = 0;
+function figZoomWrap(F){
+if (!F || !F.ANIMA || F.ANIMA._fz) return;
+var m = F.ANIMA.mount; F.ANIMA._fz = 1;
+F.ANIMA.mount = function(root){ var r = m.apply(this, arguments); try { figZoomAdd(root); } catch (e) {} return r; };
+window.addEventListener("resize", function(){ clearTimeout(fzT); fzT = setTimeout(function(){ $$(".anima[data-fz]").forEach(figZoomFit); }, 200); });
+}
+function figZoomW(an){ var s = $(".am-svg svg", an), vb = s && s.viewBox && s.viewBox.baseVal; return vb && vb.width ? vb.width : 0; }
+function figZoomFit(an){
+var b = $(".hx-fz-btn", an), s = $(".am-svg svg", an), w = figZoomW(an);
+if (!b || !s || an.closest(".hx-figzoom")) return;
+var shown = s.getBoundingClientRect().width;
+b.hidden = !(w && shown && shown < w * 0.85);
+}
+function figZoomAdd(root){
+$$(".anima", root || document).forEach(function(an){
+var svg = $(".am-svg", an);
+if (!svg || an.hasAttribute("data-fz")) return;
+an.setAttribute("data-fz", "");
+var b = document.createElement("button"), t = $('[data-corner="title"]', an);
+b.type = "button"; b.className = "hx-fz-btn"; b.hidden = true;
+b.innerHTML = '<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5"/><path d="M12.6 12.6 17 17M8.5 6v5M6 8.5h5"/></svg>Zoom';
+b.setAttribute("aria-label", "Zoom in on the figure" + (t ? ": " + t.textContent.trim() : ""));
+b.addEventListener("click", function(){ figZoomOpen(an, b); });
+svg.parentNode.insertBefore(b, svg.nextSibling);
+figZoomFit(an);
+});
+}
+function figZoomOpen(an, btn){
+if (FZ) figZoomClose();
+var w = figZoomW(an); if (!w) return;
+var t = $('[data-corner="title"]', an), ph = document.createComment("fz"), dlg = document.createElement("div");
+an.parentNode.insertBefore(ph, an);
+dlg.className = "hx-figzoom"; dlg.setAttribute("role", "dialog"); dlg.setAttribute("aria-modal", "true");
+dlg.setAttribute("aria-label", (t ? t.textContent.trim() : "Figure") + ", zoomed in");
+dlg.innerHTML = '<div class="hx-fz-bar"><span class="hx-fz-t"></span>' +
+'<button type="button" data-fz="out" aria-label="Zoom out">−</button><button type="button" data-fz="fit">Fit</button>' +
+'<button type="button" data-fz="in" aria-label="Zoom in">+</button><button type="button" data-fz="close" class="hx-fz-x">Close</button></div>' +
+'<div class="hx-fz-body"><p class="hx-fz-tip">Scroll the drawing sideways, or turn your phone.</p></div>';
+$(".hx-fz-t", dlg).textContent = t ? t.textContent.trim() : "";
+$(".hx-fz-body", dlg).appendChild(an);
+document.body.appendChild(dlg);
+document.documentElement.classList.add("hx-fz-open");
+var steps = [0, 1, 1.5, 2], i = 1;
+function set(k){
+i = Math.max(0, Math.min(steps.length - 1, k));
+an.style.setProperty("--fz-w", steps[i] ? Math.round(w * steps[i]) + "px" : "100%");
+$('[data-fz="out"]', dlg).disabled = i === 0; $('[data-fz="in"]', dlg).disabled = i === steps.length - 1;
+$('[data-fz="fit"]', dlg).setAttribute("aria-pressed", i === 0 ? "true" : "false");
+}
+set(1);
+function key(e){
+if (e.key === "Escape") { e.preventDefault(); figZoomClose(); return; }
+if (e.key !== "Tab") return;
+var f = $$('button:not([disabled]), input, select, a[href], [tabindex]:not([tabindex="-1"])', dlg).filter(function(x){ return x.offsetParent !== null; });
+if (!f.length) return;
+if (e.shiftKey && document.activeElement === f[0]) { e.preventDefault(); f[f.length - 1].focus(); }
+else if (!e.shiftKey && document.activeElement === f[f.length - 1]) { e.preventDefault(); f[0].focus(); }
+}
+dlg.addEventListener("click", function(e){
+var c = e.target.closest && e.target.closest("[data-fz]"); if (!c || !dlg.contains(c)) return;
+var k = c.getAttribute("data-fz");
+if (k === "close") figZoomClose(); else if (k === "in") set(i + 1); else if (k === "out") set(i - 1); else if (k === "fit") set(0);
+});
+document.addEventListener("keydown", key, true);
+FZ = { an: an, ph: ph, dlg: dlg, btn: btn, key: key };
+$('[data-fz="close"]', dlg).focus();
+track("fig-zoom:" + (an.getAttribute("data-anima") || "figure"));
+}
+function figZoomClose(){
+if (!FZ) return;
+var z = FZ; FZ = null;
+document.removeEventListener("keydown", z.key, true);
+z.an.style.removeProperty("--fz-w");
+var p = $(".iso-plate", z.an); if (p) p.scrollLeft = 0;
+if (z.ph.parentNode) z.ph.parentNode.replaceChild(z.an, z.ph);
+if (z.dlg.parentNode) z.dlg.parentNode.removeChild(z.dlg);
+document.documentElement.classList.remove("hx-fz-open");
+if (z.btn && z.btn.isConnected) z.btn.focus({ preventScroll: true });
 }
 function needsFig(q){ return !!(q && (q.img || q.pimg || q.pcase)); }
 var VIEWS = [["home", "Home"], ["notes", "Notes"], ["questions", "Questions"], ["more", "More"]];
@@ -2210,14 +2342,37 @@ var all = {}; try { all = JSON.parse(ls("sh_srs_" + HUB) || "{}") || {}; } catch
 var y = day(-1); return Object.keys(all).filter(function(id){ var r = all[id]; return r && r.t === y && !r.b && QBL[(IDX.filter(function(x){ return x.id === id; })[0] || {}).lec]; });
 }
 var homeTimer = 0;
-function renderHome(el){
-clearInterval(homeTimer);
+function wireHome(root){
+$$("[data-cardsdue]", root).forEach(function(a){ a.addEventListener("click", function(){ HX.bankReset(); HX.bankSearch = ""; STATE.ui.qview = "cards"; saveState(); track("home:cards-due"); }); });
+$$("[data-home-practice]", root).forEach(function(a){ a.addEventListener("click", function(){ var ex = LECS.filter(function(l){ return isExamLec(l.id); }).map(function(l){ return l.id; }); HX.bankReset(); STATE.ui.qlec = ex.length ? HX.lecValue(ex) : "all"; STATE.ui.qstatus = "unseen"; HX.bankSearch = ""; saveState(); }); });
+}
+var HOME_HP = null, HP = null;
+function hp(k, html){ if (HP) HP[k] = html; return html; }
+function refreshHome(el){
+var page = el && el.firstElementChild, was = HOME_HP;
+if (!was || !page || page !== was.page) return route();
+renderHome(el, function(){
+var next = HOME_HP, keys = Object.keys(next.parts), live = {};
+if (keys.join("|") !== Object.keys(was.parts).join("|")) { HOME_HP = null; route(); return; }
+next.page = page;
+var changed = keys.filter(function(k){ return next.parts[k] !== was.parts[k]; });
+if (!changed.length) return;
+var t = document.createElement("template"), made = {};
+t.innerHTML = changed.map(function(k){ return next.parts[k]; }).join("");
+$$("[data-hp]", t.content).forEach(function(n){ made[n.getAttribute("data-hp")] = n; });
+$$("[data-hp]", page).forEach(function(n){ live[n.getAttribute("data-hp")] = n; });
+changed.forEach(function(k){ var o = live[k], n = made[k]; if (!o || !n) return; o.replaceWith(n); wireHome(n); });
+});
+}
+function renderHome(el, redraw){
+if (!redraw) clearInterval(homeTimer);
+HP = {};
 var X = Object.assign({}, C.home || {}, ((C.home || {}).byExam || {})[EXAM && EXAM.id] || {}), rows = LECS.map(lecProgress), fin = rows.filter(function(r){ return isExamLec(r.l.id); });
 var total = fin.reduce(function(n, r){ return n + r.total; }, 0), right = fin.reduce(function(n, r){ return n + r.right; }, 0);
 var left = IDX.filter(function(q){ return !ansOf(q.id) && isExamLec(q.lec); }).length;
 var cont = LBY[STATE.ui.lec] || LECS[0], d = EXAM ? calDays(EXAM.date) : null, M = AH.masthead || { body: "", label: "" };
 var mis = srsMisses().length, examWeek = d !== null && d >= 0 && d <= 7;
-var pod = CORE.podcast;
+var pod = CORE.podcast, today = HX.todayPanel();
 var q = function(href, ic, title, sub, cls){ return '<a class="ql' + (cls ? " " + cls : "") + '" href="' + href + '"' + (cls === "is-primary" ? " data-home-practice" : "") + ">" + icon(ic, 22) + "<span><b>" + esc(title) + "</b><small>" + esc(sub) + "</small></span></a>"; };
 var html = '<div class="hx-page home">' +
 '<div class="home-top">' +
@@ -2229,7 +2384,7 @@ var html = '<div class="hx-page home">' +
 '<p class="live-line" data-liveline></p>' +
 (X.chips ? '<p class="exam-facts">' + X.chips.map(esc).join(" · ") + "</p>" : "") +
 "</div>" +
-'<nav class="quick' + (pod ? " has-pod" : "") + '" aria-label="Start studying">' +
+hp("quick", '<nav class="quick' + (pod ? " has-pod" : "") + '" aria-label="Start studying" data-hp="quick">' +
 q("#questions", "questions", "Practice questions", pl(left, "question") + " for the exam you haven't tried", "is-primary") +
 q("#questions/drill", "drill", "Daily drill", "Misses and high-yield, a few minutes") +
 q("#notes/" + esc(cont.id), "notes", "Notes", lecLabel(cont) + " " + shortTitle(cont)) +
@@ -2237,21 +2392,23 @@ q("#questions/mock", "mock", "Mock exam", pl(HX.mockTotal(), "question") + ", ti
 q("#more/hints", "hints", hintsName(), courses() ? "What each course stressed most" : "What " + (X.prof || "the professor") + " said to know") +
 q("#more/cram", "cram", "Cram sheet", "Every lecture on one page") +
 (pod ? podMiniHTML(pod) : "") +
-"</nav>" +
+"</nav>") +
 (X.links && X.links.length ? '<nav class="quick-more" aria-label="More to do">' + X.links.map(function(l){ return q(l.href, l.icon || "arcade", l.title, l.sub || "", "ql-wide"); }).join("") + "</nav>" : "") +
 "</div>" +
 (X.notice ? '<p class="notice">' + icon("notes", 20) + "<span><b>" + esc(X.notice[0]) + "</b> " + esc(X.notice[1]) + "</span></p>" : "") +
 '<div class="home-grid">' +
-'<section class="panel next" aria-labelledby="hnH"><h2 id="hnH">Where to next</h2>' + nextHTML(rows, mis, examWeek) + "</section>" +
-HX.todayPanel() +
-'<section class="panel lecs" aria-labelledby="hlH"><h2 id="hlH">Your progress by lecture</h2><p class="note">How much of each lecture\'s bank you\'ve tried; the solid part is right on your latest try. ' + right + " of " + total + " for the exam right so far.</p>" + lecsHTML(fin.concat(rows.filter(function(r){ return !isExamLec(r.l.id); }))) + "</section>" +
+hp("next", '<section class="panel next" aria-labelledby="hnH" data-hp="next"><h2 id="hnH">Where to next</h2>' + nextHTML(rows, mis, examWeek) + "</section>") +
+today +
+'<section class="panel lecs" aria-labelledby="hlH"><h2 id="hlH">Your progress by lecture</h2>' + hp("lecs-note", '<p class="note" data-hp="lecs-note">How much of each lecture\'s bank you\'ve tried; the solid part is right on your latest try. ' + right + " of " + total + " for the exam right so far.</p>") + lecsHTML(fin.concat(rows.filter(function(r){ return !isExamLec(r.l.id); }))) + "</section>" +
 '<div class="home-side">' +
 '<section class="panel" aria-labelledby="htH"><h2 id="htH">Course timeline</h2>' + timelineHTML() + "</section>" +
 "</div>" +
 "</div></div>";
-el.innerHTML = html;
-$$("[data-cardsdue]", el).forEach(function(a){ a.addEventListener("click", function(){ HX.bankReset(); HX.bankSearch = ""; STATE.ui.qview = "cards"; saveState(); track("home:cards-due"); }); });
-$$("[data-home-practice]", el).forEach(function(a){ a.addEventListener("click", function(){ var ex = LECS.filter(function(l){ return isExamLec(l.id); }).map(function(l){ return l.id; }); HX.bankReset(); STATE.ui.qlec = ex.length ? HX.lecValue(ex) : "all"; STATE.ui.qstatus = "unseen"; HX.bankSearch = ""; saveState(); }); });
+HOME_HP = { parts: HP, page: null }; HP = null;
+if (redraw) return redraw();
+el.innerHTML = html; HOME_HP.page = el.firstElementChild;
+var tp = $("[data-today]", el); if (tp) tp._hxH = today;
+wireHome(el);
 paintLive();
 homeTimer = setInterval(function(){ var c = $("#hxCount"); if (!c || !c.isConnected || view !== "home") { clearInterval(homeTimer); return; } c.innerHTML = countHTML(); }, 30000);
 tip(el, "home", "Your daily goal is the ring in the bar: " + HX.goal() + " questions a day. The flame counts the days in a row you study. Change the goal in More, Settings.");
@@ -2285,9 +2442,9 @@ if (grp !== last) {
 var gt = GROUPS ? (GROUPS.filter(function(g){ return g.id === grp; })[0] || {}).title || "" : grp === "on" ? (X.onExam || "On the exam") : (X.offExam || "Earlier lectures");
 head = '<li class="grp' + (GROUPS ? " grp-c" : "") + '">' + esc(gt) + "</li>"; last = grp;
 }
-return head + '<li class="' + lc(r.l.id).trim() + '">' + lecBadge(r.l, "lb-s") + '<div class="lr-main"><p><b><span class="sr">' + esc(lecLabel(r.l)) + " · </span>" + esc(shortTitle(r.l)) + "</b>" + (isRead(r.l.id) ? ' <span class="read-tag">' + icon("check", 14) + "Notes done</span>" : "") + '</p><span class="bar" role="img" aria-label="' + r.tried + " of " + r.total + " tried, " + r.right + ' right"><i class="tried" style="width:' + tw + '%"></i><i class="right" style="width:' + rw + '%"></i></span>' +
+return head + hp("lec:" + r.l.id, '<li class="' + lc(r.l.id).trim() + '" data-hp="lec:' + esc(r.l.id) + '">' + lecBadge(r.l, "lb-s") + '<div class="lr-main"><p><b><span class="sr">' + esc(lecLabel(r.l)) + " · </span>" + esc(shortTitle(r.l)) + "</b>" + (isRead(r.l.id) ? ' <span class="read-tag">' + icon("check", 14) + "Notes done</span>" : "") + '</p><span class="bar" role="img" aria-label="' + r.tried + " of " + r.total + " tried, " + r.right + ' right"><i class="tried" style="width:' + tw + '%"></i><i class="right" style="width:' + rw + '%"></i></span>' +
 '<p class="note num">' + r.tried + " of " + r.total + " tried" + (r.pct !== null ? " · " + r.pct + "% of answers right" : "") + "</p></div>" +
-'<span class="lr-acts"><a class="btn btn-text" href="#notes/' + esc(r.l.id) + '" aria-label="Notes for ' + esc(lecLabel(r.l)) + (isRead(r.l.id) ? ", done" : "") + '">Notes</a><a class="btn btn-text" href="#questions" data-lecq="' + esc(r.l.id) + '" aria-label="Questions for ' + esc(lecLabel(r.l)) + '">Questions</a></span></li>';
+'<span class="lr-acts"><a class="btn btn-text" href="#notes/' + esc(r.l.id) + '" aria-label="Notes for ' + esc(lecLabel(r.l)) + (isRead(r.l.id) ? ", done" : "") + '">Notes</a><a class="btn btn-text" href="#questions" data-lecq="' + esc(r.l.id) + '" aria-label="Questions for ' + esc(lecLabel(r.l)) + '">Questions</a></span></li>');
 }).join("") + "</ul>";
 }
 function timelineHTML(){
@@ -3270,7 +3427,8 @@ else if (STATE.days.indexOf(d) === -1) { STATE.days.push(d); changed = true; }
 if (!changed) return;
 if (!ANSWERED) STATE.days.sort(); HX.achievements(true); saveNow(); HX.paintMeters();
 if (added) toast(pl(added, "question") + " from your other devices", "sync");
-if (Date.now() - LOADED < 8000 && (view === "home" || (view === "questions" && !HX.SESSION.n && !parse()[1] && !(document.activeElement && document.activeElement.matches("input, textarea"))))) route();
+if (Date.now() - LOADED < 8000 && view === "home") setTimeout(function(){ if (view === "home") refreshHome($('.hx-view[data-view="home"]')); }, 0);
+else if (Date.now() - LOADED < 8000 && view === "questions" && !HX.SESSION.n && !parse()[1] && !(document.activeElement && document.activeElement.matches("input, textarea"))) route();
 }
 };
 window.SH_DRILL = {

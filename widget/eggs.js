@@ -33,6 +33,7 @@
      the rank is read again at the next tenth answer instead of worked out on the page (sh:trophy-sent, widget/v3.js's
      shRankLocal, 2026-11-19) */
   var TROPHY_NEW = { record_achievement: function(d){ return d === true; }, record_fairy: function(d){ return d === 1 || d === 5; }, claim_golden_probe: function(d){ return d === true; } };
+  function trophySent(name, d){ if (TROPHY_NEW[name] && TROPHY_NEW[name](d)) try { document.dispatchEvent(new CustomEvent("sh:trophy-sent")); } catch (e) {} }
   function rpc(name, args){
     if (!SB) return Promise.resolve(null);
     return SB.rpc(name, args).then(function(r){
@@ -499,7 +500,14 @@
     var day = centralParts().day;
     if (qid !== goldenQid() || ls("sh_egg_golden_" + HUB) === day) return;
     ls("sh_egg_golden_" + HUB, day);
-    rpc("claim_golden_probe", { p_hub: HUB, p_visitor: VISITOR, p_qid: qid }).then(function(won){
+    /* since migration_v92 a win pays 300 XP and crowns: the prize call (shGame.claim) says so on the reward card; a page
+       without the game layer, or a database without the call, asks the old way */
+    var G = window.shGame, args = { p_hub: HUB, p_visitor: VISITOR, p_qid: qid };
+    var ask = G && G.live && G.live() ? G.claim("claim_golden_probe_v2", args, "probe").then(function(r){
+      if (r && r.ok) { trophySent("claim_golden_probe", r.first === true); return r.first === true; }
+      return rpc("claim_golden_probe", args);
+    }) : rpc("claim_golden_probe", args);
+    ask.then(function(won){
       if (won === true) {
         H.confetti(); setTimeout(H.confetti, 450);
         toast(row(IC.probe, "You found today's Golden Probe!", "First in the class to answer it right. Your name is on the dashboard until midnight."), 7000, "is-gold");
@@ -553,7 +561,14 @@
       if (v.rare) { H.confetti(); }
       announce("fairy", { look: v.id });
       if (test) { toast(row(fairyArt(v), "Preview: Tooth Fairy caught", v.id + " · " + path), 4000); return; }
-      rpc("record_fairy", { p_hub: HUB, p_visitor: VISITOR }).then(function(n){
+      /* since migration_v92 the first catch pays 250 XP and crowns, the first Golden one 500 (shGame.claim says so on the
+         reward card); without the game layer, or the call, the old way */
+      var G = window.shGame, fargs = { p_hub: HUB, p_visitor: VISITOR };
+      var ask = G && G.live && G.live() ? G.claim("claim_fairy_v2", { p_hub: HUB, p_visitor: VISITOR, p_gold: !!v.rare }).then(function(r){
+        if (r && r.ok) { trophySent("record_fairy", r.n); return r.n; }
+        return rpc("record_fairy", fargs);
+      }) : rpc("record_fairy", fargs);
+      ask.then(function(n){
         var line = CAUGHT[Math.floor(Math.random() * CAUGHT.length)];
         toast(row(fairyArt(v), v.rare ? "You caught the Golden Tooth Fairy!" : "You caught the Tooth Fairy!", line + (n ? " That's " + n + " caught so far. Collectors are listed under Stats." : "")), 5600, v.rare ? "is-gold" : "");
       });

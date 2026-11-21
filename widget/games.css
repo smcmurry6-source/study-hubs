@@ -128,9 +128,12 @@ b.ok,.sg-msg b.ok{color:var(--sg-good)} b.bad,.sg-msg b.bad{color:var(--sg-bad)}
 /* ---------- Cross-Section ---------- */
 /* min-height: until a puzzle starts the stage holds only the intro overlay (absolutely placed), so without it the stage
    was a 30 px strip that hid the intro and its "New puzzle" button */
-.cx-stage{display:flex;flex-wrap:wrap;gap:18px;padding:16px;align-items:flex-start;min-height:380px}
-/* the grid sets its own width (fixed cells); the clues take the rest and drop below it when under 280px */
-.cx-left{--cx:min(34px, calc((100vw - 96px) / var(--cols, 13) - 2px));flex:0 0 auto;width:max-content;max-width:100%;margin:0 auto}
+.cx-stage{container-type:inline-size;display:flex;flex-wrap:wrap;gap:18px;padding:16px;align-items:flex-start;min-height:380px}
+/* the grid sets its own width (fixed cells), sized from the stage's own width (cqi), not the screen's: the largest text
+   zooms the page 1.45x, so 100vw is wider than the stage (a 320px phone at XX-Large lays out in 220px) and the grid ran
+   past the edge; 100vw stays as the fallback where container units don't work. The clues take the rest
+   and drop below it when under 280px, and their column minimum gives way to a narrower stage */
+.cx-left{--cx:min(34px, calc((100vw - 96px) / var(--cols, 13) - 2px));--cx:min(34px, calc((100cqi - 8px) / var(--cols, 13) - 2px));flex:0 0 auto;width:max-content;max-width:100%;margin:0 auto}
 .cx-right{flex:1 1 280px;min-width:min(100%, 280px)}
 .cx-grid{display:grid;grid-template-columns:repeat(var(--cols, 13), var(--cx));gap:2px;width:max-content;background:var(--ar-bg);padding:3px;border-radius:10px;touch-action:manipulation}
 .cx-cell{position:relative;width:var(--cx);height:var(--cx);background:transparent;border-radius:4px}
@@ -141,7 +144,7 @@ b.ok,.sg-msg b.ok{color:var(--sg-good)} b.bad,.sg-msg b.bad{color:var(--sg-bad)}
 .cx-cell.on.ok{background:#b8f0d9}
 .cx-cell span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--sg-display);font-size:calc(var(--cx) * .5);color:#1a2533}
 .cx-cell em{position:absolute;top:1px;left:3px;font-style:normal;font-family:var(--sg-mono);font-size:.56rem;color:#56606b}
-.cx-clues{display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:14px;min-width:0}
+.cx-clues{display:grid;grid-template-columns:repeat(auto-fit, minmax(min(200px, 100%), 1fr));gap:14px;min-width:0}
 .cx-clues h4{font-family:var(--sg-display);font-weight:400;color:var(--c);margin:0 0 6px;font-size:.9rem}
 .cx-clues ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:3px}
 .cx-clue{appearance:none;display:block;width:100%;text-align:left;cursor:pointer;background:transparent;border:0;color:var(--ar-dim);padding:5px 8px;border-radius:8px;font:inherit;font-size:.87rem;line-height:1.35}
@@ -198,3 +201,25 @@ b.ok,.sg-msg b.ok{color:var(--sg-good)} b.bad,.sg-msg b.bad{color:var(--sg-bad)}
 .sg-stage>*{position:relative}
 .sg-stage .sg-board-foot,.sg-stage .sg-board-foot span{color:#f4f1ff;text-shadow:0 1px 4px rgba(0,0,0,.7)}
 @media (max-width: 760px){ .sg-stage{padding:4px;gap:8px} }
+/* a small phone at the largest text (2026-11-20, every game swept at 320px, XX-Large, which lays out in 220px):
+   - the engine's page gutter is --pad (16px on a phone), but a hub's arcade.css bleeds the dark panel by its old page's
+     20px, so every game scrolled the page sideways by a few pixels; bleed by the gutter the page has
+   - a hub's own sort game (Lab Sort, Cusp Sort: .ss-bins) splits its bins 1fr 1fr, so one long word ("Hypothyroidism")
+     pushed the second bin off the screen; the halves stay equal and a long word breaks */
+.arcade-stage#panel-arcade{margin-left:calc(-1 * min(20px, var(--pad, 20px)));margin-right:calc(-1 * min(20px, var(--pad, 20px)));padding-left:min(20px, var(--pad, 20px));padding-right:min(20px, var(--pad, 20px))}
+#panel-arcade .ss-bins{grid-template-columns:repeat(2, minmax(0, 1fr))}
+#panel-arcade .ss-bin{min-width:0;overflow-wrap:anywhere;hyphens:auto}
+/* - a long intro (The Yellow Body's) is taller than its stage there, so its Play button sat below the fold of the
+     overlay's own scroll; it stays at the overlay's bottom edge while the words scroll above it */
+#panel-arcade .sg-stage .gm-overlay > [data-start],#panel-arcade .cx-stage .gm-overlay > [data-start],#panel-arcade .gm-stage:has(.ms-stage) .gm-overlay > [data-start]{position:sticky;bottom:6px;z-index:1;box-shadow:0 -10px 18px 6px var(--ar-bg, #000)}
+/* - Showdown's board: five lecture columns at 220px left each header and tile about 36px, so the names ran into each
+     other and "$100" was cut; a column shows only its lecture's tag ("L18") and the tiles' amounts get smaller
+   - The Yellow Body's marquee put its title beside the follicle, where "THE YELLOW BODY" was cut by the frame; it stacks */
+@media (max-width: 420px){
+  #panel-arcade .sg-cat .sg-cat-rest{display:none}
+  #panel-arcade .sg-cat{overflow:hidden;overflow-wrap:anywhere}
+  #panel-arcade .sg-tile{font-size:.5rem;padding:0;overflow:hidden}
+  #panel-arcade .ms-banner:not(.ms-banner--art){flex-direction:column;text-align:center}
+  #panel-arcade .ms-banner:not(.ms-banner--art) .ms-title{align-items:center;max-width:100%}
+  #panel-arcade .ss-bin{font-size:.85rem}
+}

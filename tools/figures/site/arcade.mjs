@@ -39,6 +39,10 @@
              furcation open, the root's thirds ruled beside it; the staging chart on a clipboard, one stage ticked and
              the grade's three tokens, the worst one circled. */
 import { INK, C, HI } from "./style.mjs";
+import { createRequire } from "node:module";
+/* the tooth library the Patient Box cases draw from (widget/teeth.js): Stage & Grade's film draws its molar from it, so the
+   arcade's tooth and a case's are the same tooth (Patient Box v2, Sam 2026-11-06: "Figures pull from the tooth catalogue too") */
+const TEETH = createRequire(import.meta.url)("../../../widget/teeth.js");
 
 const ink = (w = 2.5) => `stroke="${INK}" stroke-width="${w}" stroke-linejoin="round" stroke-linecap="round"`;
 const line = (d, w = 2.5, col = INK) => `<path d="${d}" fill="none" stroke="${col}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round"/>`;
@@ -667,18 +671,37 @@ function pCrusher(T){
     star(300, 112, 1) + star(30, 104, .8);
 }
 
-function pStage(T){
-  /* the viewer and its film: a lower molar, the crest at the middle third, a vertical defect down its mesial root and the
-     furcation open between the roots; the root's thirds ruled in gold */
-  const film = `<rect x="34" y="22" width="104" height="112" rx="6" fill="#2E2533"/>` +
-    `<path d="M38 82 L52 82 L64 106 L64 82 L134 82 L134 130 L38 130 Z" fill="${C.metalShade}"/>` +
+/* a mandibular first molar on a periapical film, from the tooth library: its crown outline, its mesial and distal roots and
+   the trunk between them at their real sizes (Wheeler's, 4.4 px a millimeter, the CEJ at y 59), the enamel thinning to
+   nothing at the CEJ over dentin (TEETH.dejPts), the pulp chamber with its horns under the cusps and a canal down each root
+   (TEETH.pulpPts, the cases' own), the bone crest lowered to the root's middle third, a vertical defect down the mesial
+   root, and the furcation open where the crest has dropped past the root trunk (3 mm on this tooth, the library's). */
+function stageMolar(){
+  const k = 4.4, cx = 87, cej = 59, d = TEETH.XT.manM1, X = (x) => cx + x * k;
+  const P = (pts) => "M" + pts.map((p) => p[0].toFixed(1) + " " + p[1].toFixed(1)).join("L") + "Z";
+  const roots = TEETH.mkRoots(d, X, k, cej);
+  const crown = TEETH.dense(TEETH.crownMM(d), true, 6).map((p) => [X(p[0]), cej - p[1] * k]);
+  const dentin = TEETH.dejPts(crown, d, cx, cej - d.ch * k, cej, k);
+  const pulp = TEETH.pulpPts(d, X, k, cej, roots);
+  const trunk = TEETH.trunkPts(roots, 1, 0, cej - 1, cej + d.tr * k, k);
+  /* the bone: the crest at y 88, dropping into a vertical defect along the mesial root to y 106 (its far side hidden under
+     the root), level again between the roots, where the dark gap below the furcation is the open furcation */
+  const mx = TEETH.rAx(roots[0], (106 - cej) / roots[0].len) - TEETH.rHw(roots[0], (106 - cej) / roots[0].len);
+  const tick = (t) => (cej + t * d.rl * k).toFixed(1);
+  return `<path d="M38 88 L54 88 L${(mx - 1).toFixed(1)} 106 L${(mx + 6).toFixed(1)} 88 L134 88 L134 130 L38 130 Z" fill="${C.metalShade}"/>` +
     [46, 62, 78, 94, 110, 126].map((x, i) => `<path d="M${x} 128 Q${x + 6} ${108 + (i % 2) * 8} ${x + 2} ${90 + (i % 3) * 3}" fill="none" stroke="#6C7076" stroke-width="1.4"/>`).join("") +
-    `<path d="M66 54 C65 78 68 104 76 124 C80 122 82 104 85 90 L89 90 C92 104 94 122 98 124 C106 104 109 78 108 54 Z" fill="#D4D6D9"/>` +
-    `<path d="M85 90 L89 90 C91 98 92 104 91 108 C89 110 85 110 83 108 C82 104 83 98 85 90 Z" fill="#2E2533"/>` +
-    `<path d="M66 54 L63 36 Q64 27 73 28 Q80 33 87 29 Q94 33 101 28 Q110 27 111 36 L108 54 Z" fill="#F3F4F5"/>` +
-    `<path d="M75 40 Q87 35 99 40 L97 62 L77 62 Z" fill="#5B5F64"/>` +
-    line("M38 82 L134 82", 2.2, C.blue) +
-    line("M126 54 L126 124", 2, C.gold) + [54, 77, 101, 124].map((y) => line(`M122 ${y} L130 ${y}`, 2, C.gold)).join("");
+    roots.map((r) => `<path d="${P(TEETH.rootOutline(r, 0, cej, cej))}" fill="#D4D6D9"/>`).join("") +
+    (trunk ? `<path d="${P(trunk)}" fill="#D4D6D9"/>` : "") +
+    `<path d="${P(crown)}" fill="#F3F4F5"/><path d="${P(dentin)}" fill="#D4D6D9"/>` +
+    pulp.map((q) => `<path d="${P(q)}" fill="#5B5F64"/>`).join("") +
+    line("M38 88 L134 88", 2.2, C.blue) +
+    line(`M126 ${cej} L126 ${tick(1)}`, 2, C.gold) + [0, 1 / 3, 2 / 3, 1].map((t) => line(`M122 ${tick(t)} L130 ${tick(t)}`, 2, C.gold)).join("");
+}
+
+function pStage(T){
+  /* the viewer and its film: a lower first molar from the tooth library (stageMolar), the crest at the middle third, a
+     vertical defect down its mesial root and the furcation open between the roots; the root's thirds ruled in gold */
+  const film = `<rect x="34" y="22" width="104" height="112" rx="6" fill="#2E2533"/>` + stageMolar();
   /* the clipboard: four stage rows, the third ticked; the grade's tokens under it, C circled */
   const rows = [0, 1, 2, 3].map((i) => { const y = 50 + i * 17, on = i === 2;
     return (on ? `<rect x="190" y="${y - 7}" width="92" height="14" rx="4" fill="${T.light}"/>` : "") +

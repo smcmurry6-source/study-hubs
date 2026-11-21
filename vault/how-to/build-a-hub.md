@@ -46,7 +46,8 @@ Since the redesign's release (2026-11) every hub runs on the shared engine (`wid
 - **Its own drawn art** ([every-hub-gets-its-own-art](../rules/every-hub-gets-its-own-art.md)): an emblem, a masthead
   scene, a mastery medal set and the arcade lobby's drawings unique to the hub, plus its tint (the hub's color: there is
   no palette or type trio to pick any more), drawn in SVG in Timmy's ink in `tools/figures/site/` (then
-  `node tools/figures/site/build.mjs`, which writes `widget/hub-art/<hub-id>.js`). Never another hub's art, a recolored
+  `node tools/figures/site/build.mjs`, which writes `widget/hub-art/<hub-id>.js` once `hubs/<hub-id>/index.html` exists,
+  and deletes it when the page comes down). Never another hub's art, a recolored
   copy or the generic placeholder; Sam sees it in screenshots (and the hub's preview, if Sam asks for one).
 - **Questions:** every choice with its why ([every-choice-gets-a-why](../rules/every-choice-gets-a-why.md)),
   `likelyTopics` ([high-likelihood-topics](../rules/high-likelihood-topics.md)), and per taught lecture about 5
@@ -63,6 +64,21 @@ Since the redesign's release (2026-11) every hub runs on the shared engine (`wid
   11 px at the smallest.
 - **Arcade:** the games list is `SH_HUB.arcade.games`, the hub's pick `arcade.first`, and its skin `content/arcade.js`
   and `arcade.css`, with the hub's own names, story and art ([arcade-skins](../rules/arcade-skins.md)).
+  Starting from Exam 3's `content/arcade.js` (git, `b0057d1`): **leave out its own lobby**, which the engine never shows
+  (checked 2026-11-20). More's Arcade is drawn by `moreArcade()` in `widget/hub.js`, and every game's Back, the game-over
+  card's Arcade button included, goes to that lobby (the engine takes the click before the game's own handler), so
+  `renderLobby()`, `renderBoards()` (the per-game top-ten boards, `.ar-board-grid`; Perio's `.ar-board-tabs`),
+  `thumbTile()`, the lobby's mute button and their `.ar-hero` / `.ar-board*` / `.ar-tile` styles in `arcade.css` are dead
+  code there; `startGame()`'s "still loading" fallback toasts without drawing a lobby, and `bindCommon()`'s Back only has
+  to leave full screen. The only class board a game shows is the game-over card's top five (`.gm-lb`), where a name opens
+  that classmate's place. The return value the engine needs is `{ startGame, stopAll, current }`.
+  **A small phone:** `widget/games.css` keeps every game inside a 320 px phone at XX-Large (220 px of layout; the 2026-11-20
+  sweep of Exam 3's six games): the dark panel bleeds by the page's gutter, not `arcade.css`'s 20 px; a sort game's two
+  bins (`.ss-bins`) stay equal halves; the crossword sizes its cells from its stage (`cqi`, not `100vw`, which the text
+  size's zoom makes too wide); Showdown's columns show only the lecture's tag; Smile's marquee stacks and a long intro
+  keeps its Play button in view. A hub's own game in `arcade.js` needs the same care: a grid of `1fr` columns is
+  `minmax(0, 1fr)`, a size from `vw` is from the stage. `tools/ci/smoke.js` opens and starts every game at that size
+  and fails on sideways scroll, and checks a visit from the game-over board.
 - **Patient Box cases** go in `core.json`'s `pcases` ([draw-a-patient-box-case](draw-a-patient-box-case.md)).
 
 ## Wire it into the site, in the same PR

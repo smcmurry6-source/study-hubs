@@ -1,12 +1,12 @@
 ---
 type: task
-status: open
+status: done
 hub: widget
 created: 2026-11-06
 requested-by: Sam
 due: 
 waiting-on: 
-agent: 
+agent: Claude Code
 pr: 
 ---
 
@@ -25,15 +25,15 @@ to the redesign's release.
 
 ## Context
 
-- What exists: [draw-a-patient-box-case](../how-to/draw-a-patient-box-case.md), `widget/cases.js` + `widget/cases.css`,
-  `node tools/ci/cases.js`, [the first engine's task](done/2026-11-04-perio-visual-case-engine.md),
-  [shared-infrastructure](../reference/shared-infrastructure.md). Hub notes: [perio](../hubs/perio.md),
-  [pcd-implants-exam1](../hubs/pcd-implants-exam1.md), [occlusion](../hubs/occlusion.md).
-- Rules that matter most here: [outside-sources-for-figures](../rules/outside-sources-for-figures.md),
-  [figures-teach-the-lecture](../rules/figures-teach-the-lecture.md), [diagrams-anima](../rules/diagrams-anima.md) (a
-  picture never gives the answer away), [question-ids-are-permanent](../rules/question-ids-are-permanent.md),
-  [every-choice-gets-a-why](../rules/every-choice-gets-a-why.md), [ship-it-now](../rules/ship-it-now.md),
-  [preview-and-release-test](../rules/preview-and-release-test.md).
+- What exists: [draw-a-patient-box-case](../../how-to/draw-a-patient-box-case.md), `widget/cases.js` + `widget/cases.css`,
+  `node tools/ci/cases.js`, [the first engine's task](2026-11-04-perio-visual-case-engine.md),
+  [shared-infrastructure](../../reference/shared-infrastructure.md). Hub notes: [perio](../../hubs/perio.md),
+  [pcd-implants-exam1](../../hubs/pcd-implants-exam1.md), [occlusion](../../hubs/occlusion.md).
+- Rules that matter most here: [outside-sources-for-figures](../../rules/outside-sources-for-figures.md),
+  [figures-teach-the-lecture](../../rules/figures-teach-the-lecture.md), [diagrams-anima](../../rules/diagrams-anima.md) (a
+  picture never gives the answer away), [question-ids-are-permanent](../../rules/question-ids-are-permanent.md),
+  [every-choice-gets-a-why](../../rules/every-choice-gets-a-why.md), [ship-it-now](../../rules/ship-it-now.md),
+  [preview-and-release-test](../../rules/preview-and-release-test.md).
 
 ## What exists already (since 2026-11-04)
 
@@ -47,7 +47,7 @@ tooth types (`XT`); `derive()` for staging, grading, recession types, Glickman c
 ## What the data says
 
 Pictures and cases are the class's top request (17 of 95 check-ins), ahead of exam wording (12): of Sam's 2026-11-06
-ideas, this one has the strongest evidence ([the audit](done/2026-11-05-redesign-audit-and-plan.md), section 1).
+ideas, this one has the strongest evidence ([the audit](2026-11-05-redesign-audit-and-plan.md), section 1).
 
 ## What v2 adds
 
@@ -87,37 +87,60 @@ ideas, this one has the strongest evidence ([the audit](done/2026-11-05-redesign
 ## Where it goes
 
 **Its own track** (Sam, 2026-11-06), not tied to the redesign's release. The kit is content the live hubs use, and
-[ship-it-now](../rules/ship-it-now.md) holds, so each step ships to the live hubs when it's ready, with `cases.css` styled for
+[ship-it-now](../../rules/ship-it-now.md) holds, so each step ships to the live hubs when it's ready, with `cases.css` styled for
 today's hubs and for the redesign's tokens. Each step ships like any change
-([preview-and-release-test](../rules/preview-and-release-test.md)): CI, screenshots on a phone and in both themes, Sam's
+([preview-and-release-test](../../rules/preview-and-release-test.md)): CI, screenshots on a phone and in both themes, Sam's
 "merge". A new module goes to Sam with its first case, the way a figure does
-([diagram-review](../rules/diagram-review.md)).
+([diagram-review](../../rules/diagram-review.md)).
 
-## Sam's calls (2026-11-06, [decisions](../decisions.md))
+## Sam's calls (2026-11-06, [decisions](../../decisions.md))
 
 Patient Box v2 is done by itself, on its own track. Figures pull from the tooth catalogue too. The first version's scope
 (Order, step 1) and Sam's approval of each new module with its first case stand as proposed.
 
 ## Done when
 
-- [x] Sam's calls are in [decisions](../decisions.md) and this note (decisions, 2026-11-06: its own track, figures pull
+- [x] Sam's calls are in [decisions](../../decisions.md) and this note (decisions, 2026-11-06: its own track, figures pull
       from the catalogue; this note's "Sam's calls")
-- [ ] v2.0 built: the library, the modules, the new views, the new checks in `validate()` and `tools/ci/cases.js`
-- [ ] The figure builds read the same library (one existing tooth figure redrawn from it to prove the path); `--check` still passes
+- [x] v2.0 built: the library, the modules, the new views, the new checks in `validate()` and `tools/ci/cases.js`
+- [x] The figure builds read the same library (one existing tooth figure redrawn from it to prove the path); `--check` still passes
+      (the arcade's Stage & Grade tile, `stageMolar()` in `tools/figures/site/arcade.mjs`)
 - [x] ~~Perio's cases on modules with the same ids and keys (`node tools/ci/smoke.js`, `node tools/ci/cases.js`)~~ (moot: Perio's
   page came down 2026-11-19, [#464](https://github.com/smcmurry6-source/study-hubs/pull/464); v2's first cases are the next hub's)
-- [ ] The how-to rewritten ([draw-a-patient-box-case](../how-to/draw-a-patient-box-case.md)); the About page if a new kind
-      of picture shows ([about-page](../rules/about-page.md))
-- [ ] CI passes; screenshots on a phone and in both themes; Sam's "merge"
-- [ ] Vault written back (decisions, hub notes, `DEPLOY_NOTES.md`, this note's Outcome)
+- [x] The how-to rewritten ([draw-a-patient-box-case](../../how-to/draw-a-patient-box-case.md)); the About page if a new kind
+      of picture shows ([about-page](../../rules/about-page.md)) (none shows yet: no live hub has dental cases; the About entry
+      waits for the first, [the next steps](../2026-11-20-patient-box-v2-next-steps.md))
+- [x] CI passes; screenshots on a phone and in both themes; Sam's "merge" (with this note's PR)
+- [x] Vault written back (decisions, hub notes, `DEPLOY_NOTES.md`, this note's Outcome)
 
 ## Log
 
 - 2026-11-06: workshop of Sam's idea.
 - 2026-11-06: Sam's calls (above): its own track; figures pull from the catalogue. Ready for an agent.
 - 2026-11-19: the first box ticked (the housekeeping package): the calls were already in decisions (2026-11-06) and above.
+- 2026-11-20: v2.0 built (the Patient Box v2 package); the rest of the Order moved to [the next steps](../2026-11-20-patient-box-v2-next-steps.md).
 
 ## Outcome
 
-Related: [draw-a-patient-box-case](../how-to/draw-a-patient-box-case.md) · [perio](../hubs/perio.md) ·
-[outside-sources-for-figures](../rules/outside-sources-for-figures.md) · [the audit and plan](done/2026-11-05-redesign-audit-and-plan.md)
+v2.0 shipped (2026-11-20, Claude Code):
+
+- **The tooth library**, `widget/teeth.js` (`window.SH_TEETH`, `require()` in Node): v1's Wheeler table and outlines moved out
+  of the kit, plus a catalogue entry for each of the 32 teeth (surfaces, roots by name, furcation entrances and where each
+  is probed from, the root trunk with the maxillary first premolar's 8 mm, the six sites, landmarks, films) and
+  `outlineMM(n)`. The kit reads it; the engine loads it before `cases.js`; `sw.js` precaches it.
+- **Modules**: `missing`, `restoration`, `caries`, `endo`, `bone` (horizontal or vertical; writes bone, CAL, recession,
+  probing depth, furcations and mobility so they agree), `bop` / `pus` / `plaque`, `recession`; `spec.t` still overrides.
+  `full: true` makes a full-mouth record.
+- **New views**: `odontogram` (with the chart as text), `bitewing`, `fmx` (14 periapicals and 4 bitewings); films now draw
+  caries, composites and periapical lesions. **One record**: a case without a `box` gets its rows from the record
+  (`shCases.rows`), and the engine shows them.
+- **New checks**: impossible combinations, `checkFigs()` (no bitewing of an incisor, a full-mouth view that agrees with the
+  counts), **answerable from what's shown** (`rests` on a question) and **the numbers an explanation quotes** (`says`).
+  `tools/ci/cases.js` checks the library's 32 teeth, every hub's cases and `tools/cases/examples.json` (two made-up
+  patients built from modules; the next hub copies from them).
+- Perio's eleven old cases (from git) still draw byte for byte as before and validate.
+- Left for later: [the next steps](../2026-11-20-patient-box-v2-next-steps.md) (Sam's approval of each module with the next
+  hub's first case, the About page, Order steps 2-5, more figures from the library).
+
+Related: [draw-a-patient-box-case](../../how-to/draw-a-patient-box-case.md) · [perio](../../hubs/perio.md) ·
+[outside-sources-for-figures](../../rules/outside-sources-for-figures.md) · [the audit and plan](2026-11-05-redesign-audit-and-plan.md)

@@ -7,8 +7,8 @@
 /* a tinted piece carries its hub's four colors inline (dash.js tintVars) and works them out for the theme here */
 .dx .tinted { --hub-text: var(--hub); --hub-soft: var(--hub-light); }
 .dx .tinted[data-hub="perio"] { --hub-text: #9e3a60; }   /* as in widget/hub.css: Perio's #b4466f is 4.05:1 on its light tint */
-html.shx[data-theme="dark"] .dx .tinted { --hub-text: var(--hub-dark); --hub-soft: color-mix(in srgb, var(--hub) 34%, #1c1b1c); }
-@media (prefers-color-scheme: dark) { html.shx:not([data-theme="light"]) .dx .tinted { --hub-text: var(--hub-dark); --hub-soft: color-mix(in srgb, var(--hub) 34%, #1c1b1c); } }
+:root[data-theme="dark"] .dx .tinted { --hub-text: var(--hub-dark); --hub-soft: color-mix(in srgb, var(--hub) 34%, #1c1b1c); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .dx .tinted { --hub-text: var(--hub-dark); --hub-soft: color-mix(in srgb, var(--hub) 34%, #1c1b1c); } }
 
 html.sh-dash { scroll-behavior: smooth; scroll-padding-top: 80px; }
 @media (prefers-reduced-motion: reduce) { html.sh-dash { scroll-behavior: auto; } }
@@ -72,8 +72,8 @@ html.sh-dash { scroll-behavior: smooth; scroll-padding-top: 80px; }
 .dx-now { --now-bg: #3b2e3a; --now-ink: #ffffff; --now-soft: #dcd2d9; --now-chip: rgba(255, 255, 255, .12); --now-live: #6fe0a8;
   display: flex; flex-wrap: wrap; align-items: center; gap: 12px 28px; padding: 16px 20px; border-radius: var(--r-row);
   background: var(--now-bg); color: var(--now-ink); }
-html.shx[data-theme="dark"] .dx-now { --now-bg: #2d2a2d; }
-@media (prefers-color-scheme: dark) { html.shx:not([data-theme="light"]) .dx-now { --now-bg: #2d2a2d; } }
+:root[data-theme="dark"] .dx-now { --now-bg: #2d2a2d; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .dx-now { --now-bg: #2d2a2d; } }
 .dx-now-num { display: flex; align-items: center; gap: 16px; }
 .dx-now-num b { font-size: 56px; line-height: 1; font-weight: var(--w-title); letter-spacing: -0.02em; }
 .dx-now-num span { max-width: 9ch; font-size: 18px; line-height: 1.2; font-weight: var(--w-strong); color: var(--now-soft); }
@@ -336,7 +336,7 @@ html.hx-still .dx-luck *, html.hx-still .dx-luck *::after { animation: none !imp
 .dx-wn-msg { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; font-size: var(--fs-label); line-height: 1.4; color: #3b2e3a; }
 .dx-wn-card.is-open .dx-wn-msg { display: block; overflow: visible; }
 .dx-wn-msg b { font-weight: var(--w-head); }
-.dx .dx-wn-more { min-height: 24px; margin: 2px 0 0 -6px; padding: 0 6px; border: 0; border-radius: 6px; background: none; color: var(--hub); font-size: var(--fs-meta); font-weight: var(--w-head); cursor: pointer; }
+.dx .dx-wn-more { min-height: 28px; margin: 2px 0 0 -6px; padding: 2px 6px; border: 0; border-radius: 6px; background: none; color: var(--hub); font-size: var(--fs-meta); font-weight: var(--w-head); cursor: pointer; }
 .dx .dx-wn-more:hover { text-decoration: underline; }
 /* the hub's description, behind "About this hub" in the header; open, it takes a row of its own under the header's */
 .dx-wn-about { flex: none; }
@@ -516,30 +516,30 @@ html.hx-still .dx-wn *, html.hx-still .dx-wn *::after { animation: none !importa
 .dx .dx-meter .flame { width: 20px; height: 24px; }
 
 /* Timmy's house in the "you" card (widget/pet.js draws it into #petHome; Timmy's place takes this spot in phase 4) */
-html.shx .dx .shpet-house { grid-template-columns: minmax(0, 1fr); gap: 10px; margin: 0; padding: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
-html.shx .dx .shpet-housesvg { border-radius: var(--r-row); max-height: none; }
-html.shx .dx .shpet-info { padding: 0 2px; }
-html.shx .dx .shpet-title b { font-family: var(--font); font-size: 18px; font-weight: var(--w-head); }
-html.shx .dx .shpet-hpnum, html.shx .dx .shpet-status { color: var(--muted); font-size: var(--fs-meta); }
-html.shx .dx .shpet-house .shpet-hp { height: 10px; border-radius: var(--r-pill); background: var(--track); border: 0; overflow: hidden; }
-html.shx .dx .shpet-ghost { min-height: 36px; padding: 0 14px; border: 1px solid var(--control); border-radius: var(--r-pill); background: var(--row); color: var(--text);
+:root .dx .shpet-house { grid-template-columns: minmax(0, 1fr); gap: 10px; margin: 0; padding: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
+:root .dx .shpet-housesvg { border-radius: var(--r-row); max-height: none; }
+:root .dx .shpet-info { padding: 0 2px; }
+:root .dx .shpet-title b { font-family: var(--font); font-size: 18px; font-weight: var(--w-head); }
+:root .dx .shpet-hpnum, :root .dx .shpet-status { color: var(--muted); font-size: var(--fs-meta); }
+:root .dx .shpet-house .shpet-hp { height: 10px; border-radius: var(--r-pill); background: var(--track); border: 0; overflow: hidden; }
+:root .dx .shpet-ghost { min-height: 36px; padding: 0 14px; border: 1px solid var(--control); border-radius: var(--r-pill); background: var(--row); color: var(--text);
   font: inherit; font-size: var(--fs-meta); font-weight: var(--w-strong); }
-html.shx .dx .shpet-ghost:hover { background: var(--active); }
+:root .dx .shpet-ghost:hover { background: var(--active); }
 
 /* Timmy's place over the house picture (widget/dash.js placeHost, widget/place.js): the still kept on this device shows
    at once and the live place takes over on first use, so these few rules are here and the rest are in place.css, which
    comes with the renderer. pet.js's own Timmy steps aside (he's in the picture) and his bubble hangs over the door. */
-html.shx .dx .tpc-host:empty { display: none; }
-html.shx .dx .tpc { position: relative; display: block; width: 100%; margin: 0; padding: 0; border: 0; border-radius: var(--r-row); background: var(--panel);
+:root .dx .tpc-host:empty { display: none; }
+:root .dx .tpc { position: relative; display: block; width: 100%; margin: 0; padding: 0; border: 0; border-radius: var(--r-row); background: var(--panel);
   line-height: 0; overflow: hidden; cursor: pointer; }
-html.shx .dx .tpc img { display: block; width: 100%; height: auto; aspect-ratio: 296 / 262; }
-html.shx .dx .tpc:focus-visible { outline: 3px solid var(--text); outline-offset: 2px; }
-html.shx .dx .shpet-scene.has-place { max-width: 380px; margin: 0 auto; width: 100%; }
-html.shx .dx .shpet-scene.has-place .shpet-housesvg, html.shx .dx .shpet-scene.has-place .shpet-btn { display: none; }
-html.shx .dx .shpet-scene.has-place .shpet-spot { left: 0; top: var(--tp-y, 52%); bottom: auto; width: 100%; height: 0; pointer-events: none; }
-html.shx .dx .shpet-scene.has-place .shpet-say { left: auto; right: max(4px, calc(100% - var(--tp-x, 40%) - 30px)); bottom: 6px;
+:root .dx .tpc img { display: block; width: 100%; height: auto; aspect-ratio: 296 / 262; }
+:root .dx .tpc:focus-visible { outline: 3px solid var(--text); outline-offset: 2px; }
+:root .dx .shpet-scene.has-place { max-width: 380px; margin: 0 auto; width: 100%; }
+:root .dx .shpet-scene.has-place .shpet-housesvg, :root .dx .shpet-scene.has-place .shpet-btn { display: none; }
+:root .dx .shpet-scene.has-place .shpet-spot { left: 0; top: var(--tp-y, 52%); bottom: auto; width: 100%; height: 0; pointer-events: none; }
+:root .dx .shpet-scene.has-place .shpet-say { left: auto; right: max(4px, calc(100% - var(--tp-x, 40%) - 30px)); bottom: 6px;
   max-width: min(200px, calc(var(--tp-x, 40%) + 26px)); }
-html.shx .dx .shpet-scene.has-place .shpet-say.is-on { pointer-events: auto; }
+:root .dx .shpet-scene.has-place .shpet-say.is-on { pointer-events: auto; }
 
 /* the small handpiece beside a name (widget/ranks.js mini): the medallion with its level, I to III, on its corner */
 .dx .sh-rank-mini { position: relative; display: inline-flex; width: 26px; height: 26px; flex: none; margin-right: 4px; }
@@ -745,15 +745,15 @@ button.dx-ck:focus-visible { outline: 3px solid var(--text); outline-offset: 2px
 .rc-tough-a { font-size: var(--fs-meta); color: #dcd2d9; }
 .rc-tough-n { flex: none; font-weight: var(--w-title); white-space: nowrap; color: #ffe08a; }
 /* drawn in ink, so in the dark theme the graph and the crowd stay on paper, the way the hubs' scenes do */
-html.shx[data-theme="dark"] .rc-chart, html.shx[data-theme="dark"] .rc-crowd { background: var(--hub-light); color: #3b2e3a; }
-html.shx[data-theme="dark"] .rc-chart .rc-x { color: #5d4d5a; }
-html.shx[data-theme="dark"] .rc-crowd b { color: var(--hub); }
-html.shx[data-theme="dark"] .dx .rc-chart h4 { color: #3b2e3a; }
+:root[data-theme="dark"] .rc-chart, :root[data-theme="dark"] .rc-crowd { background: var(--hub-light); color: #3b2e3a; }
+:root[data-theme="dark"] .rc-chart .rc-x { color: #5d4d5a; }
+:root[data-theme="dark"] .rc-crowd b { color: var(--hub); }
+:root[data-theme="dark"] .dx .rc-chart h4 { color: #3b2e3a; }
 @media (prefers-color-scheme: dark) {
-  html.shx:not([data-theme="light"]) .rc-chart, html.shx:not([data-theme="light"]) .rc-crowd { background: var(--hub-light); color: #3b2e3a; }
-  html.shx:not([data-theme="light"]) .rc-chart .rc-x { color: #5d4d5a; }
-  html.shx:not([data-theme="light"]) .rc-crowd b { color: var(--hub); }
-  html.shx:not([data-theme="light"]) .dx .rc-chart h4 { color: #3b2e3a; }
+  :root:not([data-theme="light"]) .rc-chart, :root:not([data-theme="light"]) .rc-crowd { background: var(--hub-light); color: #3b2e3a; }
+  :root:not([data-theme="light"]) .rc-chart .rc-x { color: #5d4d5a; }
+  :root:not([data-theme="light"]) .rc-crowd b { color: var(--hub); }
+  :root:not([data-theme="light"]) .dx .rc-chart h4 { color: #3b2e3a; }
 }
 .rk-bar { transform-box: fill-box; transform-origin: 50% 100%; }
 /* the bars grow once; .is-played (widget/dash.js, after the first run) keeps them still while the page rests and wakes */
@@ -966,12 +966,12 @@ html.hx-still .dx .dx-rank.is-gain { animation: none; }
   .dx-stagebody { grid-template-columns: minmax(0, 1fr); }
   .dx-go { grid-template-columns: minmax(0, 1fr) auto; align-items: center; min-width: 0; }
   .dx-you, .dx-class { grid-column: 1 / -1; }
-  html.shx .dx .shpet-house { grid-template-columns: minmax(0, 300px) minmax(0, 1fr); gap: 16px; align-items: center; }
+  :root .dx .shpet-house { grid-template-columns: minmax(0, 300px) minmax(0, 1fr); gap: 16px; align-items: center; }
 }
 /* ---------- a phone ---------- */
 @media (max-width: 640px) {
   /* the hubs drop their top bar for a tab bar on a phone (hub.css zeroes --bar-h and sets --sh-tabbar-h); the dashboard keeps its bar and has no tab bar */
-  html.shx.sh-dash { --bar-h: 56px; --sh-tabbar-h: 0px; }
+  :root.sh-dash { --bar-h: 56px; --sh-tabbar-h: 0px; }
   .dx-bar { gap: 4px; padding: 0 8px 0 12px; }
   .dx-page { width: calc(100% - 32px); padding: 16px 0 56px; gap: 24px; }
   .dx-tabs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
@@ -1010,7 +1010,7 @@ html.hx-still .dx .dx-rank.is-gain { animation: none; }
   .dx-count b { min-width: 64px; font-size: 44px; }
   .dx-actions .btn { flex: 1 1 auto; }
   .dx-cols { gap: 24px; }
-  html.shx .dx .shpet-house { grid-template-columns: minmax(0, 1fr); }
+  :root .dx .shpet-house { grid-template-columns: minmax(0, 1fr); }
   .dx-classhead .seg { width: 100%; }
   .dx-classhead .seg button { flex: 1; justify-content: center; padding: 0 8px; }
   /* one column on a phone, also when no recap is beside it (that rule above is more specific and gave two) */
@@ -1034,7 +1034,7 @@ html.hx-still .dx .dx-rank.is-gain { animation: none; }
   .dx .survey-say { left: calc(14px + var(--tw) + 2px); font-size: var(--fs-meta); }
   .dx .survey-body { padding: 16px; }
   /* a reply to your report: the hubs move it to the top on a phone, clear of their tab bar; here there is none, and at the top it covers the bar's menu */
-  html.shx.sh-dash .sh-reply { top: auto; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); max-height: calc(100% - 120px); }
+  :root.sh-dash .sh-reply { top: auto; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); max-height: calc(100% - 120px); }
   .dx-dlgcard { padding: 20px 16px; }
 }
 /* the largest text on a phone: the hub tabs go one to a row so their names fit */

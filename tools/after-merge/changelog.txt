@@ -89,4 +89,5 @@ all | Finishing the ModuPro hands you the Loupes in a scene of its own: their he
 all | Reaching a new journey pays Shiny Gold Crowns: 20,000 for the ModuPro and 30,000 for the Loupes, shown on the screen that hands it to you. Already there? They're in your balance.
 all | Pop-up messages got a makeover: tips, "one moment" notes, connection hiccups, syncs, streak cheers, achievements and update notices now come up as colorful cards with their own icon and a countdown bar, not plain dark boxes. Tap one to close it.
 all | On a phone, a reply to your report no longer hides the gold card when you earn XP: the card now shows on top of it for its few seconds.
+all | More ways to earn crowns: a perfect mock, getting all of yesterday's misses right, an idea of yours shipped, coming back after a week away, and a couple of the easter eggs now pay XP and crowns too. Already done some? You've been paid.
 all | Timmy's place: the ModuPro's and the Loupes' ranks each give an outfit and a yard piece now, from a stone molar and a brass articulator to a golden dental chair, a lighthouse and a Dark Matter observatory.

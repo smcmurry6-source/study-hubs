@@ -342,6 +342,7 @@ function ok(){ return on() && !inMock(); }
 function feat(k){ return H.prefGet("sh_pref_" + k, "on") !== "off" && !inMock(); }
 function ls(k, v){ try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } }
 var TROPHY_NEW = { record_achievement: function(d){ return d === true; }, record_fairy: function(d){ return d === 1 || d === 5; }, claim_golden_probe: function(d){ return d === true; } };
+function trophySent(name, d){ if (TROPHY_NEW[name] && TROPHY_NEW[name](d)) try { document.dispatchEvent(new CustomEvent("sh:trophy-sent")); } catch (e) {} }
 function rpc(name, args){
 if (!SB) return Promise.resolve(null);
 return SB.rpc(name, args).then(function(r){
@@ -778,7 +779,12 @@ function checkGolden(qid){
 var day = centralParts().day;
 if (qid !== goldenQid() || ls("sh_egg_golden_" + HUB) === day) return;
 ls("sh_egg_golden_" + HUB, day);
-rpc("claim_golden_probe", { p_hub: HUB, p_visitor: VISITOR, p_qid: qid }).then(function(won){
+var G = window.shGame, args = { p_hub: HUB, p_visitor: VISITOR, p_qid: qid };
+var ask = G && G.live && G.live() ? G.claim("claim_golden_probe_v2", args, "probe").then(function(r){
+if (r && r.ok) { trophySent("claim_golden_probe", r.first === true); return r.first === true; }
+return rpc("claim_golden_probe", args);
+}) : rpc("claim_golden_probe", args);
+ask.then(function(won){
 if (won === true) {
 H.confetti(); setTimeout(H.confetti, 450);
 toast(row(IC.probe, "You found today's Golden Probe!", "First in the class to answer it right. Your name is on the dashboard until midnight."), 7000, "is-gold");
@@ -828,7 +834,12 @@ setTimeout(function(){ f.remove(); }, 500);
 if (v.rare) { H.confetti(); }
 announce("fairy", { look: v.id });
 if (test) { toast(row(fairyArt(v), "Preview: Tooth Fairy caught", v.id + " · " + path), 4000); return; }
-rpc("record_fairy", { p_hub: HUB, p_visitor: VISITOR }).then(function(n){
+var G = window.shGame, fargs = { p_hub: HUB, p_visitor: VISITOR };
+var ask = G && G.live && G.live() ? G.claim("claim_fairy_v2", { p_hub: HUB, p_visitor: VISITOR, p_gold: !!v.rare }).then(function(r){
+if (r && r.ok) { trophySent("record_fairy", r.n); return r.n; }
+return rpc("record_fairy", fargs);
+}) : rpc("record_fairy", fargs);
+ask.then(function(n){
 var line = CAUGHT[Math.floor(Math.random() * CAUGHT.length)];
 toast(row(fairyArt(v), v.rare ? "You caught the Golden Tooth Fairy!" : "You caught the Tooth Fairy!", line + (n ? " That's " + n + " caught so far. Collectors are listed under Stats." : "")), 5600, v.rare ? "is-gold" : "");
 });
@@ -4631,7 +4642,7 @@ if (res && !res.error) try { localStorage.setItem("sh_bowl_trophy_sent", "1"); i
 }
 document.addEventListener("sh:bowl-trophy", sendBowlTrophy);
 setTimeout(sendBowlTrophy, 5000);
-var PRIZES = { name: 500, ring: 5, boss: 500, nuke: 10000, alltime: 20000, notes: 50, trophy: 200, visit: 50, game: 100, pb: 50, top: 250, report: 100, collection: 1000, dark: 5000, modupro: 20000, loupes: 30000, streak: [[3, 100], [7, 300], [14, 700], [30, 1500], [60, 3000], [100, 5000]], row: [[10, 25], [25, 100], [50, 250]], medal: [250, 500, 750, 1000] };
+var PRIZES = { name: 500, ring: 5, boss: 500, nuke: 10000, alltime: 20000, notes: 50, trophy: 200, visit: 50, game: 100, pb: 50, top: 250, report: 100, collection: 1000, dark: 5000, modupro: 20000, loupes: 30000, fairy: 250, goldfairy: 500, probe: 300, perfect: 750, misses: 100, idea: 500, back: 200, streak: [[3, 100], [7, 300], [14, 700], [30, 1500], [60, 3000], [100, 5000]], row: [[10, 25], [25, 100], [50, 250]], medal: [250, 500, 750, 1000] };
 function fmtN(n){ return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ","); }
 function prizeName(src, d){
 d = d || {};
@@ -4640,7 +4651,9 @@ return { name: "Your leaderboard name", ring: "Daily goal done", boss: "Your sha
 alltime: "New all-time record, " + (d.n || "") + " right in a row", notes: "Notes read to the end", trophy: won > 1 ? won + " new trophies" : "New trophy",
 visit: "Visiting a classmate's Timmy", game: "First game today", pb: "New personal best", top: "Top score in this hub", report: "Report fixed",
 row: (d.n || "") + " right in a row", streak: (d.n || "") + " days in a row", medal: "Hub medal", "pod-done": "Timmy Time finished",
-collection: won > 1 ? won + " collections finished" : "Collection finished" }[src] || "Bonus";
+collection: won > 1 ? won + " collections finished" : "Collection finished",
+fairy: "First Tooth Fairy caught", goldfairy: "First Golden Tooth Fairy caught", probe: "Today's Golden Probe", perfect: "A perfect mock",
+misses: "Yesterday's misses, all right", idea: "Your idea shipped", back: "Welcome back" }[src] || "Bonus";
 }
 function prizeText(src, xp, d){
 return prizeName(src, d) + ": +" + fmtN(xp) + " XP and " + fmtN(xp) + (xp === 1 ? " crown" : " crowns");
@@ -4707,7 +4720,7 @@ return r;
 function finishPaid(id, info, r){
 if (!r || !r.ok) return;
 try { document.dispatchEvent(new CustomEvent("sh:session-paid", { detail: { session: id, kind: info.kind || "mock", game: info.game || null, res: r } })); } catch (e) {}
-setCrowns(r.crowns); prizeWon("game", r.game, r); prizeWon("pb", r.pb, r); prizeWon("top", r.top, r);
+setCrowns(r.crowns); prizeWon("game", r.game, r); prizeWon("pb", r.pb, r); prizeWon("top", r.top, r); prizeWon("perfect", r.perfect, r);
 }
 function sessionWaiting(id){
 return answerLine.some(function(j){ return !j.f && !j.gone && j.args.p_session === id; }) || sessionKept(id);
@@ -6141,15 +6154,15 @@ var h = document.querySelector("header.hub-header, .hub-header");
 if (h && window.ResizeObserver) new ResizeObserver(fit).observe(h);
 document.addEventListener("sh:pref", function(){ setTimeout(fit, 30); });
 }
-if (document.body) start(); else document.addEventListener("DOMContentLoaded", start);
+function soon(){ if (window.requestAnimationFrame) requestAnimationFrame(start); else start(); }
+if (document.body) soon(); else document.addEventListener("DOMContentLoaded", soon);
 })();
 var clicksSb = !supabase ? null : { rpc: function(fn, a){
 if ((fn === "record_clicks" || fn === "record_events") && a && Array.isArray(a.p_items)) { window.shAnalytics.send(fn === "record_clicks" ? "clicks" : "events", a.p_items); return Promise.resolve({ data: null, error: null }); }
 return supabase.rpc(fn, a);
 } };
 if (!EXPORT_ONLY && supabase) widgetFile("clicks.js", function(){ if (window.shClicks) window.shClicks.start({ sb: clicksSb, hub: HUB, visitor: VISITOR_ID, section: currentSection }); });
-if (!EXPORT_ONLY && supabase) widgetFile("replies.js", function(){ if (window.shReplies) window.shReplies.start({ sb: supabase, visitor: VISITOR_ID, hub: HUB, bootstrap: bootstrap.ready,
-v2: function(){ return GAME.want && GAME.on !== false; } }); });
+if (!EXPORT_ONLY && supabase) widgetFile("replies.js", function(){ if (window.shReplies) window.shReplies.start({ sb: supabase, visitor: VISITOR_ID, hub: HUB, bootstrap: bootstrap.ready }); });
 if (!EXPORT_ONLY && supabase) widgetFile("linkask.js", function(){ if (window.shLinkAsk) window.shLinkAsk.start({ sb: supabase, hub: HUB, section: currentSection, bootstrap: bootstrap.ready, bootstrapName: bootstrap.linkName }); });
 })();
 ;

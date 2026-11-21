@@ -34,7 +34,10 @@ tags: [widget, supabase]
   27 trophies (the journeys and Bowling in), the cards' look and `shRanks.trophyCase()`, which fetches
   `widget/trophies.js` + `.css` and `widget/hub-art/trophies.js` on first use. Until 2026-11-20 this was gated on the `shx`
   class (`NEW`) so the old single-file hub pages kept the old cards and 23 trophies; with those pages down, the gates
-  came out (CSS selectors that start `html.shx` still match, since every page sets it). **Full Arch is retired on every
+  came out, and on 2026-11-20 the stylesheets' `html.shx` prefix became `:root`. **Keep that prefix:** it gives the
+  design system's rules the weight to win over the shared widget's own styles (`widget/v3.css`, the CSS `pet.js`,
+  `ranks.js` and `replies.js` write); stripped bare, the rank name lost its metal, Timmy's bubble and the pin buttons
+  restyled. Pages still set the `shx` class (`widget/eggs.js` reads it). **Full Arch is retired on every
   page** (the release): the chart and its switch are gone from `widget/eggs.js`, and someone who won it keeps it as a
   retired trophy. ([the task](../tasks/done/2026-11-12-redesign-trophy-case-and-cards.md))
 - **Everyone has Timmy** (the release): `widget/pet.js` has no adoption, introduction or holiday outfits any more. He is
@@ -54,6 +57,9 @@ tags: [widget, supabase]
   and `widget/v3.js` (the streak cheer, Welcome back, the update notice) and `widget/pet.js` use it when it's there (an
   old page without it keeps the dark pill). **A new message calls it with a kind** (the list is at the top of the file);
   what pays XP or crowns goes on the gold reward card (`widget/prize.js`) instead ([decisions](../decisions.md)).
+- **`widget/teeth.js`** (`window.SH_TEETH`; `require()` in Node): the tooth library (Patient Box v2, 2026-11-20): Wheeler's
+  sizes and outlines and one catalogue entry for each of the 32 teeth. The case kit reads it and the figure builds import it
+  (the arcade's Stage & Grade tile), so a drawn tooth and a case's agree. A hub loads it before `cases.js`.
 - **`widget/cases.js` + `widget/cases.css`** (`window.shCases`): the dental case kit. A Patient Box question in any
   hub names a case (`pcase`) in that hub's `PCASES`, and the kit draws its periodontal chart, periapical radiograph
   and buccal view from the case's numbers, works out the diagnosis from them and validates that every number is
