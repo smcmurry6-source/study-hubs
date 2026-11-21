@@ -1328,6 +1328,23 @@ setTimeout(function(){ try{ (q("input", d) || q(".dx-x", d)).focus(); }catch(e){
 return { el: d, close: close };
 }
 var nameSb = null;
+var NAME_UNSAVED = "sh_name_unsaved";
+function sendName(v){
+lsSet(NAME_UNSAVED, v);
+if (!nameSb) return;
+function answered(){ if (ls(NAME_UNSAVED) === v) lsSet(NAME_UNSAVED, null); }
+function old(){ nameSb.rpc("set_display_name", { p_visitor: VISITOR, p_name: v }).then(function(r){ if (r && (!r.error || (r.status >= 400 && r.status < 500))) answered(); }, function(){}); }
+dashPrize(nameSb, "set_display_name_v2", { p_visitor: VISITOR, p_name: v }, "name").then(function(r){ if (!r || r.missing) old(); else answered(); });
+}
+function nameFromServer(server, asked){
+server = String(server || "").trim().slice(0, 24);
+if (!server || !localName || localName !== (asked || "")) return;
+var unsaved = ls(NAME_UNSAVED);
+if (unsaved === localName && server !== localName) { sendName(localName); return; }
+if (unsaved !== null) lsSet(NAME_UNSAVED, null);
+if (server === localName) return;
+localName = server; lsSet("sh_display_name", server); paintName(); nameChanged();
+}
 function paintName(){
 var name = localName || randomName;
 $("youName").innerHTML = (name ? "<b>" + esc(name) + "</b>" : "<b>No name yet</b>") +
@@ -1356,7 +1373,7 @@ setTimeout(function(){ try{ input.select(); }catch(e){} }, 40);
 d.addEventListener("click", function(e){
 if (e.target.closest("[data-namelink]")) { dlg.close(); openLink($("greetLink") || $("greetEdit"), "name"); return; }
 if (!e.target.closest(".dx-namereset")) return;
-localName = ""; lsSet("sh_display_name", null); track("name:reset"); nameChanged();
+localName = ""; lsSet("sh_display_name", null); lsSet(NAME_UNSAVED, null); track("name:reset"); nameChanged();
 if (nameSb) nameSb.rpc("clear_display_name", { p_visitor: VISITOR }).then(function(r){ if (r && r.data){ randomName = r.data; paintName(); } }, function(){});
 paintName(); dlg.close();
 });
@@ -1364,7 +1381,7 @@ q("form", d).addEventListener("submit", function(e){
 e.preventDefault();
 var v = input.value.trim().slice(0, 24);
 if (!v){ msg.textContent = "Type a name first."; input.focus(); return; }
-if (nameSb) dashPrize(nameSb, "set_display_name_v2", { p_visitor: VISITOR, p_name: v }, "name").then(function(r){ if (!r || r.missing) nameSb.rpc("set_display_name", { p_visitor: VISITOR, p_name: v }).then(function(){}, function(){}); });
+sendName(v);
 track("name:set");
 localName = v; lsSet("sh_display_name", v); paintName(); nameChanged();
 if (window.shLinkAsk) window.shLinkAsk.check(v);
@@ -1768,7 +1785,9 @@ p_visitor: VISITOR, p_hub: null, p_cavity_week: null, p_episode: null, p_include
 p_luck_hub: luckFor ? luckFor.hub : null, p_luck_date: luckFor ? luckFor.date : null, p_link_name: boot.linkName || null
 }).then(function(r){
 if (!r || r.error || !r.data || typeof r.data !== "object") return null;
-boot.data = r.data; return boot.data;
+boot.data = r.data;
+try { nameFromServer(r.data.display_name, boot.linkName); } catch (e) {}
+return boot.data;
 }, function(){ return null; });
 } catch (e) {}
 window.shBootstrap = boot;

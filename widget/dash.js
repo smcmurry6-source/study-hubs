@@ -1362,6 +1362,30 @@
     return { el: d, close: close };
   }
   var nameSb = null;
+  /* The server keeps one name for linked devices (they share an id); this device keeps a copy (sh_display_name). The
+     same as a hub's (widget/v3.js): a name picked here is marked unsaved until the server answers, so a page that loads
+     before it's saved sends it again; otherwise a name changed on a linked device comes in with the bootstrap and this
+     device takes it (nameFromServer). */
+  var NAME_UNSAVED = "sh_name_unsaved";
+  function sendName(v){
+    lsSet(NAME_UNSAVED, v);
+    if (!nameSb) return;
+    function answered(){ if (ls(NAME_UNSAVED) === v) lsSet(NAME_UNSAVED, null); }
+    function old(){ nameSb.rpc("set_display_name", { p_visitor: VISITOR, p_name: v }).then(function(r){ if (r && (!r.error || (r.status >= 400 && r.status < 500))) answered(); }, function(){}); }
+    /* the first name chosen pays 500 XP and crowns (set_display_name_v2, migration_v68); the old call when it isn't there */
+    dashPrize(nameSb, "set_display_name_v2", { p_visitor: VISITOR, p_name: v }, "name").then(function(r){ if (!r || r.missing) old(); else answered(); });
+  }
+  /* the bootstrap's display_name, asked with this device's name `asked`: take it when this device has a name of its own
+     that differs, unless this device's rename is still unsaved (sent again) or newer than the ask */
+  function nameFromServer(server, asked){
+    server = String(server || "").trim().slice(0, 24);
+    if (!server || !localName || localName !== (asked || "")) return;
+    var unsaved = ls(NAME_UNSAVED);
+    if (unsaved === localName && server !== localName) { sendName(localName); return; }
+    if (unsaved !== null) lsSet(NAME_UNSAVED, null);
+    if (server === localName) return;
+    localName = server; lsSet("sh_display_name", server); paintName(); nameChanged();
+  }
   function paintName(){
     var name = localName || randomName;
     $("youName").innerHTML = (name ? "<b>" + esc(name) + "</b>" : "<b>No name yet</b>") +
@@ -1392,7 +1416,7 @@
     d.addEventListener("click", function(e){
       if (e.target.closest("[data-namelink]")) { dlg.close(); openLink($("greetLink") || $("greetEdit"), "name"); return; }
       if (!e.target.closest(".dx-namereset")) return;
-      localName = ""; lsSet("sh_display_name", null); track("name:reset"); nameChanged();
+      localName = ""; lsSet("sh_display_name", null); lsSet(NAME_UNSAVED, null); track("name:reset"); nameChanged();
       if (nameSb) nameSb.rpc("clear_display_name", { p_visitor: VISITOR }).then(function(r){ if (r && r.data){ randomName = r.data; paintName(); } }, function(){});
       paintName(); dlg.close();
     });
@@ -1400,8 +1424,7 @@
       e.preventDefault();
       var v = input.value.trim().slice(0, 24);
       if (!v){ msg.textContent = "Type a name first."; input.focus(); return; }
-      /* the first name chosen pays 500 XP and crowns (set_display_name_v2, migration_v68); the old call when it isn't there */
-      if (nameSb) dashPrize(nameSb, "set_display_name_v2", { p_visitor: VISITOR, p_name: v }, "name").then(function(r){ if (!r || r.missing) nameSb.rpc("set_display_name", { p_visitor: VISITOR, p_name: v }).then(function(){}, function(){}); });
+      sendName(v);
       track("name:set");
       localName = v; lsSet("sh_display_name", v); paintName(); nameChanged();
       /* another, unlinked device already uses this name: ask whether it's theirs (widget/linkask.js) */
@@ -1881,7 +1904,10 @@
         p_luck_hub: luckFor ? luckFor.hub : null, p_luck_date: luckFor ? luckFor.date : null, p_link_name: boot.linkName || null
       }).then(function(r){
         if (!r || r.error || !r.data || typeof r.data !== "object") return null;
-        boot.data = r.data; return boot.data;
+        boot.data = r.data;
+        /* first, so Timmy's hello and the "you" card already have a name changed on a linked device */
+        try { nameFromServer(r.data.display_name, boot.linkName); } catch (e) {}
+        return boot.data;
       }, function(){ return null; });
     } catch (e) {}
     window.shBootstrap = boot;

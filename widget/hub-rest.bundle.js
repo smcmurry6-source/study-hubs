@@ -3842,11 +3842,21 @@ el.value = n;
 if (resolvedAnonName) el.placeholder = "Right now you're " + resolvedAnonName;
 });
 }
+var SH_NAME_UNSAVED = "sh_name_unsaved";
+function sendName(name){
+try { localStorage.setItem(SH_NAME_UNSAVED, name); } catch (e) {}
+function answered(){ try { if (localStorage.getItem(SH_NAME_UNSAVED) === name) localStorage.removeItem(SH_NAME_UNSAVED); } catch (e) {} }
+function old(){
+if (!supabase) return;
+try { supabase.rpc("set_display_name", { p_visitor: VISITOR_ID, p_name: name }).then(function(res){ if (dbFailed(res)) dbFail(); else answered(); }, function(){ dbFail(); }); } catch (e) {}
+}
+if (GAME.want && GAME.on !== false) claimPrize("set_display_name_v2", { p_visitor: VISITOR_ID, p_name: name }, "name").then(function(r){ if (!r || r.missing) old(); else answered(); });
+else old();
+}
 function saveName(name){
 name = String(name || "").trim().slice(0, 24);
 if (!name) return false;
-if (GAME.want && GAME.on !== false) claimPrize("set_display_name_v2", { p_visitor: VISITOR_ID, p_name: name }, "name").then(function(r){ if (!r || r.missing) safeRpc("set_display_name", { p_visitor: VISITOR_ID, p_name: name }); });
-else safeRpc("set_display_name", { p_visitor: VISITOR_ID, p_name: name });
+sendName(name);
 shTrackSafe("name:set");
 prefSet(SH_NAME_KEY, name);
 renderNameBadge(); syncNameInputs();
@@ -3855,7 +3865,7 @@ if (window.shLinkAsk) window.shLinkAsk.check(name);
 return true;
 }
 function resetName(){
-try { localStorage.removeItem(SH_NAME_KEY); } catch (e) {}
+try { localStorage.removeItem(SH_NAME_KEY); localStorage.removeItem(SH_NAME_UNSAVED); } catch (e) {}
 shTrackSafe("name:reset");
 if (supabase) try {
 supabase.rpc("clear_display_name", { p_visitor: VISITOR_ID }).then(function(res){
@@ -3919,10 +3929,16 @@ nameBadge.addEventListener("click", openNameEditor);
 (function(){
 var visits = (parseInt(prefGet(SH_VISITS_KEY, "0"), 10) || 0) + 1;
 prefSet(SH_VISITS_KEY, String(visits));
-var n = currentName();
-if (visits > 1 && n) {
-setTimeout(function(){ if (window.shToast) showStreakToast("Good to see you, " + n + ".", null, { kind: "hi", ms: 3400 }); else showStreakToast("Welcome back, " + n); }, 900);
+if (visits < 2 || !currentName()) return;
+var t0 = Date.now(), said = false;
+function say(){
+if (said) return; said = true;
+setTimeout(function(){
+var n = currentName(); if (!n) return;
+if (window.shToast) showStreakToast("Good to see you, " + n + ".", null, { kind: "hi", ms: 3400 }); else showStreakToast("Welcome back, " + n);
+}, Math.max(0, 900 - (Date.now() - t0)));
 }
+setTimeout(function(){ if (bootstrap && bootstrap.ready) bootstrap.ready.then(say, say); setTimeout(say, 3000); }, 0);
 })();
 var shMusic = (function(){
 var AUDIO_BASE = (function(){
@@ -4197,8 +4213,20 @@ document.addEventListener("visibilitychange", function(){ if (document.visibilit
 window.addEventListener("pagehide", function(){ run(true, true); });
 })();
 var resolvedAnonName = "";
+function nameFromServer(server, asked){
+server = String(server || "").trim().slice(0, 24);
+var mine = currentName(), unsaved = null;
+if (!server || !mine || mine !== (asked || "")) return "";
+try { unsaved = localStorage.getItem(SH_NAME_UNSAVED); } catch (e) {}
+if (unsaved === mine && server !== mine) { sendName(mine); return ""; }
+if (unsaved !== null) try { localStorage.removeItem(SH_NAME_UNSAVED); } catch (e) {}
+if (server === mine) return "";
+try { localStorage.setItem(SH_NAME_KEY, server); } catch (e) {}
+return server;
+}
 bootstrap.ready.then(function(data){
-if (data && data.display_name) { resolvedAnonName = data.display_name; renderNameBadge(); syncNameInputs(); try { document.dispatchEvent(new CustomEvent("sh:name", { detail: {} })); } catch (e) {} return; }
+var took = data ? nameFromServer(data.display_name, bootstrap.linkName) : "";
+if (data && data.display_name) { resolvedAnonName = data.display_name; renderNameBadge(); syncNameInputs(); try { document.dispatchEvent(new CustomEvent("sh:name", { detail: took ? { name: took } : {} })); } catch (e) {} return; }
 if (supabase) try { supabase.rpc("get_display_name", { p_visitor: VISITOR_ID }).then(function(res){
 if (res && !res.error && res.data) { resolvedAnonName = res.data; renderNameBadge(); syncNameInputs(); try { document.dispatchEvent(new CustomEvent("sh:name", { detail: {} })); } catch (e) {} }
 }, function(){}); } catch (e) {}

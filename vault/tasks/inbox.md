@@ -165,6 +165,11 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   `mcp__c63257eb-1d94-419c-8868-716ff71ffcf6__*`), so `.claude/hooks/supabase-confirm.js` never runs there (no line in its log) and
   `apply_migration`'s question goes to Sam's app and times out (about 4 minutes). Sam's call: widen the matcher (add that id, or
   match all servers and let the hook check the question), or keep applying from a session where the server is named "Supabase".
+- [ ] **Going back to a random name on one linked device: the other takes it as picked** (2026-11-21, BUG-196's fix): the
+  other device now shows the server's name, but the bootstrap's `display_name` doesn't say whether it is a random one, so
+  that device keeps it as its own (its name window offers "Go back to a random name"; the idea board asks for a name when it
+  refuses one). Small: a `name_custom` flag in `get_widget_bootstrap_v2` (a migration copied from `main`'s newest copy), and
+  `nameFromServer` in `widget/v3.js` and `widget/dash.js` clears the device's copy when it's false.
 - [ ] **Before the first collapse (about 2027-09-13), point the year-spanning readers at the totals** (2026-11-21, migration_v93):
   `sh_insights` (the admin page's Insights, every hub side by side), `get_hub_recap`, `tools/retro.sql` and `tools/lessons-daily.sql` read
   `activity_hourly` only, so a hub older than a year would show no time. Read `activity_daily` / `activity_visits_daily` (people per day,
