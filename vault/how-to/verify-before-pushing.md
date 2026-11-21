@@ -40,9 +40,8 @@ reproducing a failure). Both run in
 parallel jobs since 2026-11-13, each read as one result (`check`, `release`), and on a PR both keep an earlier green
 result when only notes changed since it (`tools/ci/reuse.js`; `node tools/ci/reuse.js --diff <sha>` says whether a
 change would). Run them locally before pushing; the smoke test needs Playwright
-(`PLAYWRIGHT_PATH`/`CHROMIUM_PATH` env vars point it at a preinstalled copy). The lint reads a hub on the engine from
-its content JSON (`hubs/<hub>/content/`), and an old single-file hub by injecting a hook just before
-`window.SH_EXPORT = {`, so that line stays at the end of each old hub's script.
+(`PLAYWRIGHT_PATH`/`CHROMIUM_PATH` env vars point it at a preinstalled copy). The lint reads a hub from its content JSON
+(`hubs/<hub>/content/`).
 
 - After changing a hub's content (`hubs/<hub>/content/*.json`): `node tools/hub-next/build.mjs`, and commit what it
   rewrites (the question index, High yield, the layout). After changing the About page: `node tools/timmy/build.mjs`

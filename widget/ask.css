@@ -1,5 +1,5 @@
 /* Ask Timmy's chat (widget/ask.js loads this file by itself). On the redesign's design system: the tokens come from
-   widget/hub.css (html.shx: the new hubs and the new dashboard), everything else is styled here, so the chat looks the
+   widget/hub.css, everything else is styled here, so the chat looks the
    same on a hub and on the dashboard. A bottom sheet on a phone, a side panel on a laptop; the Ask icon sits in Timmy's
    corner when he isn't there. */
 

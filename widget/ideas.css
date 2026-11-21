@@ -1,5 +1,5 @@
 /* The idea board's look (widget/ideas.js loads this file by itself). On the redesign's design system: the tokens come
-   from widget/hub.css (html.shx), the buttons, segments and notes are its own (.hx .btn, .seg, .note). The tick
+   from widget/hub.css, the buttons, segments and notes are its own (.hx .btn, .seg, .note). The tick
    (.shi-tick) also sits in the shared widget's Suggest panel, outside .hx, so it styles everything it uses. */
 
 /* ---------- the board ---------- */
