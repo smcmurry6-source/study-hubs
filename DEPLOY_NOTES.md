@@ -51,6 +51,15 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   `v21-trauma`) in `tools/cases/examples.json`; `sw.js` `sh-v70`. No live hub has cases, so students see nothing yet.
   How: [draw-a-patient-box-case](vault/how-to/draw-a-patient-box-case.md); what's left:
   [the next steps](vault/tasks/2026-11-20-patient-box-v2-next-steps.md).
+- **2026-11-21 (the old analytics compacted, Claude Code)** — The last part of the retention schedule: `migration_v93.sql`
+  (pending until applied after the merge). The nightly job collapses `activity_hourly`, `activity_visits` and `question_events`
+  older than the school year (365 Central days, a day a night, the first about 2027-09-13) into `activity_daily`,
+  `activity_visits_daily` and `question_events_daily` (people counts, no ids). What the collapsed hours paid in time crowns is kept
+  per visitor first (`activity_time_kept`, capped pings), and `sh_time_crowns` adds it, so no balance moves; linking devices moves it.
+  `question_feedback` goes when a hub's page comes down: the After merge workflow's new `down` step, and a data fix for the five
+  hubs already down. Sam's answers on the two question-health rows are in `vault/decisions.md`. `tools/release/retention.js` checks it.
+- **2026-11-20 (The ModuPro's and the Loupes' rank sets, Claude Code)** — Every full rank-up of the later two journeys now gives an outfit and a yard piece, as the Handpiece's do: 28 drawings in `tools/figures/site/packs/ranks.mjs` (listed in `sets.mjs` `RANKS`, gtier 7-20, Stone to Dark Matter in each journey), 28 catalog rows in `migration_v91.sql` (applied through the connector at the merge, 2026-11-20), the outfits in a new `widget/hub-art/outfits/journeys.js` so `outfits.js` stays its size, and a locked one reads "Reach ModuPro Gold" (`RANKS` in `widget/place.js`). The ModuPro's are the sim lab's (a half-carved stone molar, a brass articulator, a casting machine, an instrument tray, a golden dental chair, a giant diamond bur, a nebula in a bell jar); the Loupes' are things to see by (a sundial, a brass telescope, an armillary sphere, a microscope, a lighthouse, a prism, an observatory), their outfits clear of the loupes and headlight. `tools/release/xp.js` checks forty rank rows and every later tier; `pack-preview.mjs ranks:modupro|loupes` draws one journey's sheet. [Task](vault/tasks/2026-11-12-redesign-later-journeys-rank-sets.md).
+
 - **2026-11-20 (Patient Box v2.0: the tooth library, modules, new views and checks, Claude Code)** — The Patient Box v2
   package ([task](vault/tasks/done/2026-11-06-patient-box-v2-modular-cases.md)). `widget/teeth.js` is the tooth library
   (`window.SH_TEETH`, `require()` in Node): the Wheeler table and outlines moved out of `widget/cases.js`, plus a catalogue

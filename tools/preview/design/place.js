@@ -7304,6 +7304,465 @@ function pack(T){
     }
   };
 
+  /* ================================================================================================================
+     The later journeys' rank sets (gtier 7-13 the ModuPro, 14-20 the Loupes; sets.mjs RANKS). Each journey runs the
+     same seven materials, Stone to Dark Matter, so its seven sets are in them too.
+     - The ModuPro (the sim lab): each set is a dental material or a thing from the lab, in the rank's material: dental
+       stone, the brass articulator, casting, the first three instruments, the chair, the diamond bur, and a nebula (the
+       ModuPro's Dark Matter sky).
+     - The Loupes (light and sight): a pair of loupes is two little telescopes, so each set is something people have used to see
+       better or by: the sun, a spyglass, the armillary sphere, the microscope, the lighthouse, the prism, the
+       observatory. In this journey Timmy wears his loupes (with their headlight on the bridge, place.mjs loupes()), so
+       these seven outfits keep off his face and above the headlight: none is on NO_LOUPES.
+     Sources, for the shapes only (drawn schematically, nothing copied):
+     - Plain-line articulators (the hinge, the two arms, the incisal pin at the front) and the broken-arm centrifugal
+       casting machine (a spring-wound arm in a tub, the crucible at one end and a counterweight at the other): dental
+       laboratory texts' descriptions (Craig's Restorative Dental Materials; the casting chapter of Phillips' Science of
+       Dental Materials).
+     - The armillary sphere (equator, meridian and ecliptic rings around a small Earth, the ecliptic 23.4 degrees off
+       the equator), the library telescope (a long tube with draw tubes, a finder and a dew shield, on a turned pillar
+       with three claw feet), the hand microscope (horseshoe foot, pillar, arm, stage, mirror under it) and the pith
+       helmet: museum catalog descriptions. The sundial's gnomon rises at Birmingham's latitude, about 33.5 degrees.
+     - The diamond bur's color ring: the manufacturers' grit code (blue for medium, the standard grit).
+     - The pieces best read from the side (the articulator, the casting machine, the chair, the telescope, the prism)
+       are drawn in the front-on frame below (FP, ext). */
+  var ST = { c: "#C4BEB4", s: "#968F84", h: "#E3DFD8" }, STEEL = { c: "#D6DCE2", s: "#9AA4AE", h: "#FFFFFF" };
+  var WOOD = { top: K.woodLight, left: K.wood, right: K.woodShade }, o2b = { sw: 1.5, si: 1 };
+  var NEB = ["#E070B0", "#7FE7D8", "#B57BFF"];
+  function mat(m){ return { top: m.h || m.c, left: m.c, right: m.s }; }
+  function glow(x, y, r, c, op){ return circ(x, y, r, c, 0).replace("/>", ' opacity="' + (op || ".25") + '"/>'); }
+  /* points of a horizontal ring (radius r at height z round cx, cy), from angle a0 to a1 in degrees, n steps */
+  function ringPts(cx, cy, z, r, a0, a1, n){ var out = [], j, t; for (j = 0; j <= n; j++){ t = (a0 + (a1 - a0) * j / n) * Math.PI / 180; out.push([cx + Math.cos(t) * r, cy + Math.sin(t) * r, z]); } return out; }
+  /* the front-on frame, for a piece best read from its side (an articulator, a chair, a casting arm, a prism): u runs
+     across the picture to the right, w into it (straight up the picture), z up, from the footprint's middle. A solid is
+     an outline in (u, z) pushed back along w: ext() draws its front and every face of it that looks up (the others are
+     out of sight from the yard's eye, which sits along (u, w, z) = (0, -1.41, 1)). */
+  var SQ = Math.SQRT1_2;
+  function FP(u, w, z){ return P(1.8 + (u - w) * SQ, 1.8 - (u + w) * SQ, z || 0); }
+  function ext(prof, w0, w1, fill, top, sw){
+    var s = "", n = prof.length, A = 0, i, a, b;
+    for (i = 0; i < n; i++){ a = prof[i]; b = prof[(i + 1) % n]; A += a[0] * b[1] - b[0] * a[1]; }
+    for (i = 0; i < n; i++){ a = prof[i]; b = prof[(i + 1) % n];
+      if ((A > 0 ? a[0] - b[0] : b[0] - a[0]) > 1e-6) s += FO(T.D2([FP(a[0], w0, a[1]), FP(b[0], w0, b[1]), FP(b[0], w1, b[1]), FP(a[0], w1, a[1])]), top || fill, 1.1); }
+    return s + FO(T.D2(prof.map(function(q){ return FP(q[0], w0, q[1]); })), fill, sw || 1.6);
+  }
+  function rect(u0, z0, u1, z1){ return [[u0, z0], [u1, z0], [u1, z1], [u0, z1]]; }
+  function rot(prof, c, deg){ var t = deg * Math.PI / 180, cs = Math.cos(t), sn = Math.sin(t); return prof.map(function(q){ var du = q[0] - c[0], dz = q[1] - c[1]; return [c[0] + du * cs - dz * sn, c[1] + du * sn + dz * cs]; }); }
+  function disc(u, z, r, n){ var out = [], i; n = n || 14; for (i = 0; i < n; i++) out.push([u + Math.cos(i / n * Math.PI * 2) * r, z + Math.sin(i / n * Math.PI * 2) * r]); return out; }
+  /* part of an ellipse in screen space (rx, ry, turned a degrees), from t0 to t1 (degrees; 0 to 180 is its near, lower half) */
+  function arcE(x, y, rx, ry, a, t0, t1){
+    var r = a * Math.PI / 180, cs = Math.cos(r), sn = Math.sin(r), out = [], i, t;
+    for (i = 0; i <= 16; i++){ t = (t0 + (t1 - t0) * i / 16) * Math.PI / 180; var ex = Math.cos(t) * rx, ey = Math.sin(t) * ry; out.push([x + ex * cs - ey * sn, y + ex * sn + ey * cs]); }
+    return T.D2(out, true);
+  }
+
+  var later = {
+    /* ---------------------------------------------------------------- the ModuPro's yard ------------------------- */
+    "rank-modu-stone-yard": {
+      note: "A block of dental stone with a molar half carved out of it, a chisel and a mallet beside it", spot: [3.4, 3.45],
+      egg: { n: "The stone molar", does: "chips fly", say: "ModuPro Stone! Dental stone is a gypsum product: every cast you pour starts as powder and water." }, anim: "tp-sparks 1.6s ease-out",
+      draw: function(o){
+        var s = shadow(1.8, 1.95, 28, 10);
+        s += box(.85, .85, 0, 1.9, 1.9, 1.05, mat(ST), o2b);
+        /* the rough top where the carving starts: a few chisel cuts */
+        s += L(D([[1.0, 2.75, .8], [1.4, 2.75, .62]], true) + D([[2.75, 1.3, .9], [2.75, 1.7, .7]], true) + D([[1.9, 2.75, .9], [2.3, 2.75, .76]], true), 1, ST.s);
+        var t = P(1.8, 1.8, 1.05), k = 2.7;
+        s += ell(t[0], t[1], 13, 4.6, ST.s, 1.2) + molar(t[0], t[1] - 5.1 * k + 1, k, ST, 1.9);
+        /* the molar's lower half is still in the block: a rough collar of stone round its neck */
+        s += F("M" + f(t[0] - 13) + " " + f(t[1] - 1) + " q4 -6 8 -3 q3 -5 6 -1 q4 -5 7 0 q4 -3 5 4 q-13 6 -26 0 z", ST.c) + O("M" + f(t[0] - 13) + " " + f(t[1] - 1) + " q4 -6 8 -3 q3 -5 6 -1 q4 -5 7 0 q4 -3 5 4", 1.3);
+        /* the chisel leaning on the block, the mallet on the grass */
+        s += rod(P(3.05, 1.35, 0), P(2.85, 1.55, 1.3), 1.6, STEEL.c) + rod(P(2.85, 1.55, 1.3), P(2.75, 1.65, 1.85), 2.6, K.wood);
+        s += box(.25, 2.95, 0, .8, .42, .42, WOOD, o2b) + rod(P(1.05, 3.16, .2), P(1.9, 3.3, .1), 1.8, K.woodLight);
+        s += circ(P(2.4, 3.0, 0)[0], P(2.4, 3.0, 0)[1], 1.4, ST.h, .8) + circ(P(3.1, 2.4, 0)[0], P(3.1, 2.4, 0)[1], 1.1, ST.h, .8);
+        if (o.snow) s += ell(t[0], t[1] - 13.6, 7, 2, WHITE, 0);
+        return s;
+      },
+      bits: function(){ var t = P(1.8, 1.8, 1.05), x = t[0], y = t[1] - 10; return G("tp-sparks", circ(x - 16, y - 4, 1.8, ST.h, .8) + circ(x - 10, y - 16, 1.4, ST.c, .8) + circ(x + 12, y - 12, 1.6, ST.h, .8) + circ(x + 18, y, 1.2, ST.c, .8) + circ(x + 2, y - 22, 1.2, ST.h, .8)); }
+    },
+    "rank-modu-antique-yard": {
+      note: "A brass hinge articulator on a wooden base, plaster casts of both arches closed on it", spot: [3.4, 3.45],
+      egg: { n: "The articulator", does: "it opens and closes", say: "ModuPro Antique! An articulator holds the casts the way the jaws meet, so the bite is right before the patient ever sits down." }, anim: "tp-pop 2.2s",
+      move: { ".tp-aim": "tp-aim 2.4s ease-in-out" },
+      /* seen from its side, front-on: the hinge at the back (left), the incisors at the front (right); it stands a little
+         open so both arches show, and its upper member swings on the hinge while the egg plays */
+      draw: function(o){
+        var s = shadow(1.8, 1.9, 30, 10), W0 = -.24, W1 = .24, Z = .3, TH = .42, ZL = 1.16, ZU = ZL + TH * 2, HG = [-1.8, ZU + .78], OPEN = 15;
+        var GUM = "#F49AAE", GUMt = "#F9C2CF", CR = "#F4F1EA", CRt = "#FFFFFF", BRt = "#C99A5E";
+        var R = function(q){ return rot(q, HG, OPEN); }, same = function(q){ return q; };
+        /* a row of teeth standing on the gum line z (hanging from it for the upper arch), the molars at the back */
+        var teeth = function(z, down, fwd){
+          var out = "", sg = down ? -1 : 1, tf = down ? R : same, h = TH, row = [[-1.15, -.73, 2], [-.73, -.31, 2], [-.31, -.02, 1], [-.02, .27, 1], [.27, .55, 0], [.55, .82, 3], [.82, 1.09 + (fwd || 0), 3]];
+          row.forEach(function(t){
+            var u0 = t[0] + .025, u1 = t[1] - .025, m = (u0 + u1) / 2, q = t[2] === 2 ? [[u0, z], [u1, z], [u1, z + sg * h * .76], [u1 - .09, z + sg * h], [m, z + sg * h * .8], [u0 + .09, z + sg * h], [u0, z + sg * h * .76]]
+              : t[2] === 1 ? [[u0, z], [u1, z], [u1, z + sg * h * .78], [m, z + sg * h * 1.02], [u0, z + sg * h * .78]]
+              : t[2] === 0 ? [[u0, z], [u1, z], [u1, z + sg * h * .8], [m, z + sg * h * 1.2], [u0, z + sg * h * .8]]
+              : [[u0, z], [u1, z], [u1, z + sg * h * 1.04], [u0, z + sg * h * 1.04]];
+            out += FO(T.D2(tf(q).map(function(e){ return FP(e[0], W0, e[1]); })), WHITE, 1.1);
+          });
+          return out;
+        };
+        s += cyl(1.8, 1.8, 0, 1.75, Z, 1.75, "#8A5A3A", "#6B4128", "#A26E48", o2b);
+        /* the lower member, its incisal table at the front, the post at the back */
+        s += ext(rect(-2.02, Z, 1.9, Z + .22), W0 - .06, W1 + .06, BR.c, BRt) + ext(rect(1.34, Z + .22, 1.88, Z + .36), -.18, .18, BR.s, BRt);
+        s += ext(rect(-2.02, Z + .22, -1.62, HG[1] + .02), -.16, .16, BR.c, BRt);
+        /* the lower cast: its plaster base, the gum, the teeth */
+        s += ext(rect(-1.25, Z + .22, 1.25, ZL - .24), W0, W1, CR, CRt) + ext([[-1.24, ZL - .26], [1.24, ZL - .26], [1.2, ZL + .04], [-1.22, ZL + .04]], W0, W1, GUM, GUMt) + teeth(ZL);
+        /* the upper member, swung open on the hinge: its teeth, gum, plaster base, the arm and the incisal pin at its front */
+        var up = teeth(ZU, true, .07) + ext(R([[-1.22, ZU - .04], [1.26, ZU - .04], [1.24, ZU + .26], [-1.24, ZU + .26]]), W0, W1, GUM, GUMt) +
+          ext(R(rect(-1.25, ZU + .26, 1.29, HG[1] - .1)), W0, W1, CR, CRt) + ext(R(rect(1.6, ZL - .1, 1.74, HG[1] - .1)), -.06, .06, BR.c, BRt, 1.3) +
+          ext(R(rect(-2.0, HG[1] - .1, 1.92, HG[1] + .14)), W0 - .06, W1 + .06, BR.c, BRt) + ext(R(disc(1.67, HG[1] + .25, .12, 10)), -.06, .06, BR.h, BRt, 1.2);
+        /* everything above the bite turns about the hinge: drawn open, and the egg's swing turns it about the same point */
+        var H = FP(HG[0], W0, HG[1]);
+        s += '<g class="tp-aim" style="transform-origin:' + f(H[0]) + "px " + f(H[1]) + 'px">' + up + "</g>";
+        /* the hinge pin across the top of the post */
+        s += ext(disc(HG[0], HG[1], .2, 12), -.34, .34, BR.h, BRt, 1.4) + circ(FP(HG[0], -.34, HG[1])[0], FP(HG[0], -.34, HG[1])[1], 1, BR.s);
+        s += circ(FP(-.9, W0 - .06, Z + .11)[0], FP(-.9, W0 - .06, Z + .11)[1], 1.1, BR.pat) + circ(FP(1.5, W0 - .06, Z + .11)[0], FP(1.5, W0 - .06, Z + .11)[1], .9, BR.pat);
+        if (o.snow){ var sq = R([[-.2, HG[1] + .14]])[0], sn = FP(sq[0], 0, sq[1]); s += ell(sn[0], sn[1] - 1, 13, 2.4, WHITE, 0); }
+        return s;
+      },
+      bits: function(){ var a = FP(1.9, 0, 3.1), x = a[0], y = a[1]; return L("M" + f(x + 3) + " " + f(y - 8) + " q6 5 4 13 M" + f(x + 8) + " " + f(y - 11) + " q8 7 5 17", 1.6, BR.s) + star4(x + 10, y + 12, 3.4, WHITE); }
+    },
+    "rank-modu-bronze-yard": {
+      note: "A bronze casting machine: a spring-wound arm in its tub, a crucible at one end and a weight at the other", spot: [3.4, 3.45],
+      egg: { n: "The casting machine", does: "the arm spins", say: "ModuPro Bronze! A casting machine flings melted metal into a mold. That's how cast crowns and inlays get their shape." }, anim: "tp-sparks 1.6s ease-out",
+      /* the broken-arm machine, its arm seen side on (front-on): the counterweight at one end; at the other the hinge that
+         lets the end swing (the "broken arm"), the crucible with its melt and the casting ring the metal is flung into */
+      draw: function(o){
+        var s = shadow(1.8, 1.95, 32, 11), MELT = o.night ? "#FFD166" : "#F7A531";
+        /* the bench cabinet it stands on (a panel, vents, a tooth plaque), the iron tub on top: its inner wall, floor, front wall */
+        s += box(.7, .7, 0, 2.2, 2.2, .92, { top: BZ.h, left: BZ.c, right: BZ.s }, o2b);
+        s += O(D(T.onY(2.9, T.rectUV(.95, 2.65, .14, .76))), 1.1) + L(D([[2.9, 1.0, .56], [2.9, 1.7, .56]], true) + D([[2.9, 1.0, .44], [2.9, 1.7, .44]], true) + D([[2.9, 1.0, .32], [2.9, 1.7, .32]], true), 1.2, "#7A4520");
+        var pl = P(1.8, 2.9, .45); s += T.tinyTooth(pl[0], pl[1], .62, BZ.h);
+        var tub = cyl(1.8, 1.8, .92, 1.1, 1.36, 1.26, IRON[0], IRON[1], null, { open: true, sw: 1.7 }), tt = P(1.8, 1.8, 1.36), fl = P(1.8, 1.8, 1.0);
+        s += tub + ell(tt[0], tt[1], T.RX(1.26), T.RY(1.26), "#4A4456", 1.5) + ell(fl[0], fl[1], T.RX(1.06), T.RY(1.06), "#2E2A36", 0) + tub + L(arcE(tt[0], tt[1], T.RX(1.26) - 1.3, T.RY(1.26) - .9, 0, 205, 300), 1.4, "#8E8898", .9);
+        /* the spindle up out of the tub, the arm across it */
+        var Z = 2.1;
+        s += ext(rect(-.1, 1.0, .1, Z), -.1, .1, STEEL.c, STEEL.h, 1.3);
+        s += ext(rect(-1.7, Z, 1.02, Z + .26), -.13, .13, BZ.h, BZ.c);
+        /* the counterweight, a drum on the arm's end, and its locking nut */
+        s += ext(rect(-2.2, Z - .3, -1.5, Z + .56), -.34, .34, BZ.c, BZ.h) + ext(rect(-2.2, Z - .3, -1.94, Z + .56), -.34, .34, BZ.s, BZ.c, 1.3) + ext(rect(-1.5, Z - .04, -1.36, Z + .3), -.14, .14, STEEL.c, STEEL.h, 1.2);
+        /* the broken arm: its hinge, then the crucible with the melt glowing in it, then the casting ring */
+        s += ext(disc(1.06, Z + .13, .18, 10), -.16, .16, BZ.s, BZ.c, 1.3);
+        s += ext(rect(1.1, Z - .02, 1.62, Z + .18), -.12, .12, BZ.h, BZ.c, 1.3);
+        s += ext([[1.18, Z + .14], [1.56, Z + .14], [1.66, Z + .58], [1.1, Z + .58]], -.24, .24, "#EDE5D8", MELT, 1.4);
+        s += ext(rect(1.66, Z - .28, 2.3, Z + .58), -.38, .38, STEEL.c, STEEL.h) + L(T.seg(FP(1.98, -.38, Z - .28), FP(1.98, -.38, Z + .58)), 1.1, STEEL.s) + circ(FP(1.68, -.1, Z + .15)[0], FP(1.68, -.1, Z + .15)[1], 1.4, "#3A2418");
+        /* the hub cap and the winding pin on the tub's rim */
+        var hb = FP(0, 0, Z + .26);
+        s += ell(hb[0], hb[1], 3.2, 1.8, BZ.s, 1.2) + ell(hb[0] - .6, hb[1] - .5, 1.2, .6, BZ.h, 0);
+        if (o.snow) s += ell(FP(-1.85, 0, Z + .56)[0], FP(-1.85, 0, Z + .56)[1] - 1, 5, 1.6, WHITE, 0) + ell(FP(1.98, 0, Z + .58)[0], FP(1.98, 0, Z + .58)[1] - 1, 5, 1.6, WHITE, 0);
+        return s;
+      },
+      lights: function(o){ if (!o || !o.night) return ""; var m = FP(1.38, 0, 2.68); return glow(m[0], m[1], 10, "#FFB347", ".3") + glow(m[0], m[1], 5, "#FFE08A", ".4"); },
+      bits: function(){ var c = FP(0, 0, 2.2), m = FP(1.38, 0, 2.68), x = c[0], y = c[1];
+        return L(arcE(x, y, 34, 11, 0, 200, 340), 1.6, BZ.s) + L(arcE(x, y, 34, 11, 0, 20, 160), 1.6, BZ.s, .7) + '<path d="M' + f(x + 30) + " " + f(y + 7) + ' l5 -1 -2 4.6 z" fill="' + BZ.s + '"/>' +
+          G("tp-sparks", circ(m[0] - 4, m[1] - 6, 1.5, "#F2C230") + circ(m[0] + 3, m[1] - 10, 1.2, "#F28C28") + circ(m[0] + 8, m[1] - 4, 1.4, "#F2C230") + circ(m[0] - 1, m[1] - 14, 1.1, "#F28C28")); }
+    },
+    "rank-modu-silver-yard": {
+      note: "A silver instrument tray on its stand, with a mouth mirror, an explorer and a probe", spot: [3.4, 3.45],
+      egg: { n: "The instrument tray", does: "the mirror catches the light", say: "ModuPro Silver! Mirror, explorer, probe: the first three instruments you ever picked up." }, anim: "tp-sparks 2s ease-out",
+      /* a Mayo stand's tray with a rolled rim, the three instruments laid along it on a paper liner, their working ends at
+         the back: the mouth mirror, the explorer's curled tip and the probe with its marks */
+      draw: function(o){
+        var s = shadow(1.8, 1.95, 28, 10), Z = 2.0, X0 = .5, X1 = 3.1, Y0 = .7, Y1 = 2.9, i;
+        /* the stand: a weighted base on casters, the pole up under the tray */
+        [[1.15, 1.15], [2.45, 1.15], [1.15, 2.45], [2.45, 2.45]].forEach(function(q){ var c = P(q[0], q[1], 0); s += circ(c[0], c[1] - .6, 1.7, IRON[1], 1); });
+        s += cyl(1.8, 1.8, .1, .9, .3, .9, SV.s, "#7E8995", SV.c, o2b) + cyl(1.8, 1.8, .3, .13, Z - .1, .13, SV.c, SV.s, null, o2b) + cyl(1.8, 1.8, 1.0, .19, 1.14, .19, SV.s, "#7E8995", SV.c, o2b);
+        /* the tray: the pan, the liner on its floor */
+        s += box(X0, Y0, Z - .12, X1 - X0, Y1 - Y0, .2, mat(SV), o2b);
+        s += FO(D([[X0 + .14, Y0 + .14, Z + .08], [X1 - .14, Y0 + .14, Z + .08], [X1 - .14, Y1 - .14, Z + .08], [X0 + .14, Y1 - .14, Z + .08]]), "#A9B4BF", 1);
+        s += FO(D([[X0 + .28, Y0 + .28, Z + .08], [X1 - .3, Y0 + .28, Z + .08], [X1 - .3, Y1 - .3, Z + .08], [X0 + .28, Y1 - .3, Z + .08]]), "#CDEBF7", .9);
+        /* the three instruments: a handle knurled at its grip, its end, and each one's working end at the back */
+        /* each handle wears its color-coding ring near the end, as a clinic's sorted kit does */
+        var ZI = Z + .1, hand = function(y, ring){ var a = P(1.25, y, ZI), b = P(2.75, y, ZI), g0 = P(2.28, y, ZI), g1 = P(2.5, y, ZI);
+          return L(T.seg(a, b), 4.4) + L(T.seg(a, b), 2.8, SV.c) + L(T.seg([a[0] + 1, a[1] - .9], [b[0] - 1, b[1] - .9]), .9, WHITE) + L(T.seg(g0, g1), 5.2) + L(T.seg(g0, g1), 3.6, ring) + circ(b[0], b[1], 1.6, SV.c, 1.1); };
+        /* the probe, at the back: a thin straight tip with its millimeter bands */
+        var y = 1.08, a = P(1.25, y, ZI), t = P(.54, y, ZI), m = function(k){ return [a[0] + (t[0] - a[0]) * k, a[1] + (t[1] - a[1]) * k]; };
+        s += hand(y, "#E8615A") + L(T.seg(a, t), 2.6) + L(T.seg(a, t), 1.1, SV.c) + L(T.seg(m(.5), m(.6)) + T.seg(m(.72), m(.82)), 1.1, INK);
+        /* the explorer: a fine wire tip that ends in a curl, the shepherd's hook */
+        y = 1.82; a = P(1.25, y, ZI); t = P(.76, y, ZI);
+        var hook = "M" + f(a[0]) + " " + f(a[1]) + " L" + f(t[0]) + " " + f(t[1]) + " q-4 -1.4 -3.4 -4.2 q.6 -2 3 -1.2";
+        s += hand(y, "#4FA3E3") + L(hook, 2.6) + L(hook, 1.1, SV.c);
+        /* the mirror, at the front: a round head on its neck, the glass lying flat and catching the light */
+        y = 2.52; a = P(1.25, y, ZI); var hc = P(.82, y, ZI + .02);
+        s += hand(y, "#5CC489") + L(T.seg(a, hc), 2.8) + L(T.seg(a, hc), 1.3, SV.c) + ell(hc[0], hc[1], 5.4, 3.3, SV.c, 1.4) + ell(hc[0], hc[1], 4, 2.3, "#BFE6F7", 0) + L("M" + f(hc[0] - 2.6) + " " + f(hc[1] - .4) + " l2.2 -1.2", 1.1, WHITE);
+        if (o.snow) s += ell(P(2.2, 1.8, Z)[0], P(2.2, 1.8, Z)[1], 13, 3, WHITE, 0);
+        return s;
+      },
+      bits: function(){ var m = P(.82, 2.52, 2.12), x = m[0], y = m[1]; return star4(x - 4, y - 9, 5, WHITE) + star4(x + 8, y - 15, 3.6, SV.h) + star4(x - 12, y - 2, 3, WHITE) + L("M" + f(x) + " " + f(y - 3) + " l-6 -14 M" + f(x + 2) + " " + f(y - 3) + " l4 -16", 1.4, "#FFF3B0", .9); }
+    },
+    "rank-modu-gold-yard": {
+      note: "A golden dental chair with ruby upholstery, its light on a golden arm", spot: [3.4, 3.45],
+      egg: { n: "The golden chair", does: "the light comes on", say: "ModuPro Gold! The best seat in the clinic is yours. Recline and review." }, anim: "tp-sparks 2s ease-out",
+      /* seen from the side: a gold base and column, the seat, the back reclined with its headrest, the leg rest sloping
+         down to a foot plate, an armrest on the near side, all in ruby on gold shells; the light on a post behind the head,
+         its arm reaching over and its lamp turned down to where the patient's mouth would be */
+      draw: function(o){
+        var s = shadow(1.8, 1.95, 30, 10), RF = "#C4392E", RT = "#E0574A", BK = [-.95, 1.36], LG = [1.0, 1.49];
+        var back = function(q){ return rot(q, BK, 34); }, legs = function(q){ return rot(q, LG, -28); };
+        /* drawn at four fifths of its working size, so the whole chair and its light stand inside the yard */
+        var k = .8, Q = function(u, w, z){ return FP(u * k, w * k, z * k); }, E = function(q, w0, w1, a, b){ return ext(q.map(function(v){ return [v[0] * k, v[1] * k]; }), w0 * k, w1 * k, a, b); };
+        /* the light's post, behind the chair */
+        var p0 = Q(-2.7, .5, .1), p1 = Q(-2.7, .5, 4.75);
+        s += ell(p0[0], p0[1], 5, 2.2, GD.s, 1.2) + rod(p0, p1, 2.6, GD.c) + L(T.seg([p0[0] + .7, p0[1] - 2], [p1[0] + .7, p1[1] + 2]), .8, GD.h);
+        /* the base and the column */
+        s += cyl(1.8, 1.8, 0, .8, .18, .8, GD.s, "#9C7414", GD.c, o2b) + cyl(1.8, 1.8, .18, .3, .88, .3, GD.c, GD.s, null, o2b);
+        s += E(rect(-.9, 1.06, 1.0, 1.28), -.62, .62, GD.c, GD.h);
+        /* the leg rest and its foot plate, then the seat, then the back over its edge */
+        s += E(legs(rect(1.0, 1.14, 2.3, 1.3)), -.6, .6, GD.c, GD.h) + E(legs(rect(1.0, 1.3, 2.3, 1.68)), -.54, .54, RF, RT);
+        s += E(legs(rect(2.3, 1.08, 2.46, 1.84)), -.5, .5, GD.c, GD.h);
+        s += E(rect(-1.0, 1.28, 1.06, 1.68), -.56, .56, RF, RT);
+        s += E(back(rect(-1.5, 1.3, -1.32, 3.54)), -.62, .62, GD.c, GD.h) + E(back(rect(-1.32, 1.3, -.95, 3.5)), -.54, .54, RF, RT);
+        /* the headrest on its gold stem */
+        s += E(back(rect(-1.28, 3.46, -1.1, 3.62)), -.2, .2, GD.c, GD.h) + E(back(rect(-1.38, 3.62, -.98, 4.18)), -.44, .44, RF, RT);
+        /* the arm over the chair and the lamp, its lens turned down toward the headrest */
+        var a1 = Q(-1.15, .1, 4.75), lc = Q(-1.15, 0, 4.42);
+        s += rod(p1, a1, 2.2, GD.c) + circ(p1[0], p1[1], 2.2, GD.c, 1.2) + circ(a1[0], a1[1], 1.8, GD.s, 1.1);
+        var hood = "M" + f(lc[0] - 9) + " " + f(lc[1] + 2.6) + " Q" + f(lc[0] - 8) + " " + f(lc[1] - 5.4) + " " + f(lc[0] + 1) + " " + f(lc[1] - 5.6) + " Q" + f(lc[0] + 9) + " " + f(lc[1] - 5) + " " + f(lc[0] + 9) + " " + f(lc[1] + 1.4) + " Z";
+        s += FO(hood, GD.c, 1.5) + L("M" + f(lc[0] - 5) + " " + f(lc[1] - 3.4) + " Q" + f(lc[0]) + " " + f(lc[1] - 5) + " " + f(lc[0] + 5) + " " + f(lc[1] - 3.6), 1, GD.h);
+        s += FO("M" + f(lc[0] - 8.4) + " " + f(lc[1] + 2.4) + " L" + f(lc[0] + 8.4) + " " + f(lc[1] + 1.4) + " Q" + f(lc[0]) + " " + f(lc[1] + 5.6) + " " + f(lc[0] - 8.4) + " " + f(lc[1] + 2.4) + " Z", o.night ? K.lit : "#FFF6CF", 1.2);
+        if (o.snow){ var t0 = Q(-.4, .3, 1.68); s += ell(t0[0], t0[1] - 1, 9, 2, WHITE, 0); }
+        return s;
+      },
+      lights: function(o){ if (!o || !o.night) return ""; var a = FP(-1.28, 0, 2.9); return T.glowAt(a[0], a[1], 13); },
+      bits: function(){ var c = FP(-.92, 0, 3.54), h = FP(-1.52, -.16, 3.0), x = c[0], y = c[1];
+        return '<path d="M' + f(x - 7) + " " + f(y + 3) + " L" + f(h[0] - 9) + " " + f(h[1] + 2) + " L" + f(h[0] + 5) + " " + f(h[1] + 6) + " L" + f(x + 7) + " " + f(y + 2) + ' Z" fill="#FFF6CF" opacity=".6"/>' + star4(x + 14, y - 8, 4, GD.h) + star4(x - 16, y - 12, 3.4, WHITE) + star4(h[0] - 12, h[1] - 4, 3, GD.h); }
+    },
+    "rank-modu-diamond-yard": {
+      note: "A giant diamond bur standing in a steel bur block, sparkling with diamond grit, the blue ring of a medium grit on its shank", spot: [3.4, 3.45],
+      egg: { n: "The diamond bur", does: "it sparkles", say: "ModuPro Diamond! A diamond bur is coated in real diamond grit. It grinds through enamel; the finer the grit, the smoother the finish." }, anim: "tp-sparks 2s ease-out",
+      draw: function(o){
+        var s = shadow(1.8, 1.95, 28, 10), i;
+        s += box(.7, .85, 0, 2.2, 1.9, .55, mat(STEEL), o2b);
+        /* holes in the block, a few little burs in them */
+        [[1.05, 1.2], [1.05, 2.4], [2.55, 1.2], [2.55, 2.4], [1.8, 2.5]].forEach(function(q, j){ var e = P(q[0], q[1], .55); s += ell(e[0], e[1], 2.2, 1.2, "#4E5862", .8); if (j < 3) s += rod(e, [e[0], e[1] - 9], 1, STEEL.c) + circ(e[0], e[1] - 9.6, 1.6, j === 1 ? DI.c : STEEL.h, .8); });
+        /* the giant bur: shank, neck, the tapered head coated with grit */
+        var a = P(1.8, 1.8, .55), b = P(1.8, 1.8, 1.95), c = P(1.8, 1.8, 2.3), d = P(1.8, 1.8, 5.25);
+        s += rod(a, b, 4.6, STEEL.c) + L(T.seg([a[0] + 1.3, a[1]], [b[0] + 1.3, b[1]]), 1.2, STEEL.s);
+        /* the blue ring a medium-grit diamond wears on its shank */
+        s += L(T.seg([b[0], b[1] + 4.6], [b[0], b[1] + 1.4]), 6.4) + L(T.seg([b[0], b[1] + 4.6], [b[0], b[1] + 1.4]), 4.6, "#3F8FE0");
+        s += rod(b, c, 3, STEEL.s);
+        /* the tapered head with its round end, thick with grit */
+        var hw = 8.8, tw = 4.4, head = "M" + f(c[0] - hw) + " " + f(c[1]) + " L" + f(d[0] - tw) + " " + f(d[1] + tw * .8) + " Q" + f(d[0] - tw) + " " + f(d[1] - 1.6) + " " + f(d[0]) + " " + f(d[1] - 1.8) + " Q" + f(d[0] + tw) + " " + f(d[1] - 1.6) + " " + f(d[0] + tw) + " " + f(d[1] + tw * .8) + " L" + f(c[0] + hw) + " " + f(c[1]) + " Q" + f(c[0]) + " " + f(c[1] + 2.4) + " " + f(c[0] - hw) + " " + f(c[1]) + " Z";
+        s += F(head, DI.c) + F("M" + f(c[0] + 1.6) + " " + f(c[1] + 1.2) + " L" + f(d[0] + 1) + " " + f(d[1] - 1.6) + " Q" + f(d[0] + tw) + " " + f(d[1] - 1.4) + " " + f(d[0] + tw) + " " + f(d[1] + tw * .8) + " L" + f(c[0] + hw) + " " + f(c[1]) + " Q" + f(c[0] + 5) + " " + f(c[1] + 1.4) + " " + f(c[0] + 1.6) + " " + f(c[1] + 1.2) + " Z", DI.s) + O(head, 1.8);
+        for (i = 0; i < 26; i++){ var u = (i * 37 % 11) / 11 - .5, v = (i * 53 % 13) / 13 * .94, wd = hw - (hw - tw) * v; s += circ(c[0] + u * wd * 1.45, c[1] - v * (c[1] - d[1]) - .4, i % 4 ? .8 : 1.1, i % 3 ? WHITE : DI.s); }
+        s += L("M" + f(c[0] - hw + 2.4) + " " + f(c[1] - 2.6) + " L" + f(d[0] - tw + 1.4) + " " + f(d[1] + 2.4), 1.4, WHITE, .8);
+        s += T.dmStar(d[0] - 9, d[1] + 4, 3.6, WHITE, "tp-twinkle", .3) + T.dmStar(d[0] + 10, d[1] + 14, 2.8, WHITE, "tp-twinkle", 1.4);
+        if (o.snow) s += ell(P(1.8, 1.8, .55)[0] - 14, P(1.8, 1.8, .55)[1] + 6, 8, 2, WHITE, 0);
+        return s;
+      },
+      bits: function(){ var d = P(1.8, 1.8, 3.8), x = d[0], y = d[1]; return star4(x - 16, y - 6, 5, WHITE) + star4(x + 14, y - 16, 4.4, DI.c) + star4(x + 4, y - 30, 4, WHITE) + star4(x - 10, y + 10, 3, DI.c); }
+    },
+    "rank-modu-dark-yard": {
+      note: "A nebula in a glass bell jar, its pink and teal clouds full of new stars, on a dark stone stand", spot: [3.4, 3.45],
+      egg: { n: "The nebula jar", does: "the clouds swirl", say: "ModuPro Dark Matter! A nebula is where stars are born. Two journeys done, one to go." }, anim: "tp-sparks 2s ease-out",
+      draw: function(o){
+        var s = shadow(1.8, 1.95, 28, 10);
+        s += cyl(1.8, 1.8, 0, .95, .35, .85, "#3A2A50", "#24193A", "#4A3A64", o2b) + cyl(1.8, 1.8, .35, .7, .65, .7, DM.c, DM.s, "#5B3AA0", o2b);
+        var b = P(1.8, 1.8, .65), x = b[0], y = b[1], w = 15, h = 34;
+        var jar = "M" + f(x - w) + " " + f(y) + " L" + f(x - w) + " " + f(y - h * .55) + " C" + f(x - w) + " " + f(y - h) + " " + f(x + w) + " " + f(y - h) + " " + f(x + w) + " " + f(y - h * .55) + " L" + f(x + w) + " " + f(y) + " Z";
+        s += F(jar, "#1B1240") + ell(x - 3, y - 14, 10, 7, NEB[0], 0).replace("/>", ' opacity=".55"/>') + ell(x + 5, y - 20, 9, 6, NEB[1], 0).replace("/>", ' opacity=".45"/>') + ell(x - 1, y - 9, 12, 4, NEB[2], 0).replace("/>", ' opacity=".5"/>');
+        s += star4(x - 6, y - 18, 3.4, WHITE) + star4(x + 6, y - 10, 2.6, WHITE) + star4(x + 2, y - 25, 2.2, NEB[1]) + circ(x - 9, y - 7, .9, WHITE) + circ(x + 9, y - 22, .9, WHITE);
+        s += F(jar, "#CFF1FF", .18) + O(jar, 1.8) + L("M" + f(x - w + 3.4) + " " + f(y - 4) + " V" + f(y - h * .55) + " Q" + f(x - w + 4) + " " + f(y - h * .82) + " " + f(x - 3) + " " + f(y - h * .86), 1.8, WHITE, .7);
+        s += ell(x, y, w, 3.4, "none", 1.4) + circ(x, y - h * .9, 3, DM.c, 1.2) + circ(x - .8, y - h * .92, 1, DM.h);
+        if (o.snow) s += ell(x, y - h * .86, 9, 2.2, WHITE, 0);
+        return s;
+      },
+      lights: function(){ var b = P(1.8, 1.8, .65); return glow(b[0], b[1] - 16, 26, NEB[0], ".14") + glow(b[0], b[1] - 16, 16, NEB[1], ".14"); },
+      bits: function(){ var b = P(1.8, 1.8, .65), x = b[0], y = b[1] - 16; return star4(x - 24, y - 6, 4.4, NEB[1]) + star4(x + 22, y - 14, 5, WHITE) + star4(x - 8, y - 28, 3.4, NEB[0]) + star4(x + 26, y + 8, 3.4, NEB[2]); }
+    },
+
+    /* ---------------------------------------------------------------- the Loupes' yard --------------------------- */
+    "rank-loupes-stone-yard": {
+      note: "A stone sundial on a carved pedestal, its pointer casting the hour", spot: [3.4, 3.45],
+      egg: { n: "The sundial", does: "its shadow moves", say: "Loupes Stone! Before headlights, dentists worked by sunlight from the window. Now you bring your own light." }, anim: "tp-pop 2.4s",
+      draw: function(o){
+        var s = shadow(1.8, 1.95, 30, 11), ZD = 3.0, i, q;
+        /* two square steps */
+        s += box(.6, .6, 0, 2.4, 2.4, .3, mat(ST), o2b) + box(1.0, 1.0, .3, 1.6, 1.6, .24, mat(ST), o2b);
+        /* the baluster: a foot, a swelling belly, a neck and the cap under the dial */
+        s += cyl(1.8, 1.8, .54, .5, .74, .34, ST.c, ST.s, ST.h, o2b) + cyl(1.8, 1.8, .74, .34, 1.55, .46, ST.c, ST.s, null, o2b) + cyl(1.8, 1.8, 1.55, .46, 2.64, .24, ST.c, ST.s, null, o2b) + cyl(1.8, 1.8, 2.64, .3, 2.8, .56, ST.c, ST.s, ST.h, o2b);
+        /* a tooth carved on the belly */
+        var tb = P(2.1, 2.1, 1.32); s += T.tinyTooth(tb[0], tb[1], .5, ST.h);
+        /* the dial, its ring and the twelve hour marks */
+        s += cyl(1.8, 1.8, 2.8, 1.08, ZD, 1.08, ST.c, ST.s, ST.h, o2b);
+        var c = P(1.8, 1.8, ZD);
+        s += ell(c[0], c[1], T.RX(.88), T.RY(.88), "none", 1, ST.s);
+        for (i = 0; i < 12; i++){ q = ringPts(1.8, 1.8, ZD, .88, i * 30, i * 30, 1)[0]; var e = P(q[0], q[1], q[2]), m = P(1.8 + (q[0] - 1.8) * .8, 1.8 + (q[1] - 1.8) * .8, ZD); s += L(T.seg(e, m), i % 3 ? 1 : 1.8, ST.s); }
+        /* the hour's shadow across the dial, then the gnomon: its edge rises at the latitude (about 33.5 degrees in
+           Birmingham) toward the pole */
+        s += F(D([[1.8, 1.8, ZD], [2.6, 2.0, ZD], [2.55, 2.18, ZD]]), "#5C564C", .45);
+        s += FO(D([[1.8, 1.8, ZD], [1.8, .98, ZD], [1.8, .98, ZD + .54]]), ST.s, 1.4) + L(D([[1.8, 1.8, ZD], [1.8, .98, ZD + .54]], true), 1, ST.h);
+        if (o.snow) s += ell(c[0] - 4, c[1] + 2, 12, 3.6, WHITE, 0);
+        return s;
+      },
+      bits: function(){ var c = P(1.8, 1.8, 3.0); return F(D([[1.8, 1.8, 3.0], [1.2, 2.45, 3.0], [1.36, 2.58, 3.0]]), "#5C564C", .5) + star4(c[0] + 16, c[1] - 18, 5, "#FFF3B0") + star4(c[0] + 26, c[1] - 8, 3, "#FFF3B0"); }
+    },
+    "rank-loupes-antique-yard": {
+      note: "A long brass telescope on a claw-footed stand: its draw tubes out, a finder on top, a dew shield on the far end", spot: [3.4, 3.45],
+      egg: { n: "The brass telescope", does: "it spots a star", say: "Loupes Antique! Loupes are two little telescopes, one for each eye. This one is a big one." }, anim: "tp-pop 2.4s",
+      /* a library telescope of the old instrument makers, seen from the side: a turned wooden pillar on three curved brass
+         claws, a knuckle joint, and the tube tilted up to the right (the eyepiece end low on the left) */
+      draw: function(o){
+        var s = shadow(1.8, 1.95, 28, 10), KN = [0, 2.5], A = 22 * Math.PI / 180, du = Math.cos(A), dz = Math.sin(A);
+        var at = function(t, n){ return FP(KN[0] + t * du - (n || 0) * dz, 0, KN[1] + t * dz + (n || 0) * du); };
+        var claw = function(a){ var r = a * Math.PI / 180, e = P(1.8 + Math.cos(r) * 1.15, 1.8 + Math.sin(r) * 1.15, 0), b = P(1.8, 1.8, .62), m = P(1.8 + Math.cos(r) * .7, 1.8 + Math.sin(r) * .7, .5);
+          var d = "M" + f(b[0]) + " " + f(b[1]) + " Q" + f(m[0]) + " " + f(m[1]) + " " + f(e[0]) + " " + f(e[1]);
+          return L(d, 4.4) + L(d, 2.6, BR.c) + circ(e[0], e[1], 1.9, BR.s, 1.1); };
+        /* the claw at the back, the pillar, the two at the front */
+        s += claw(225) + cyl(1.8, 1.8, .42, .3, .7, .3, BR.c, BR.s, BR.h, o2b) + cyl(1.8, 1.8, .7, .18, 1.25, .26, K.wood, BR.s, null, o2b) + cyl(1.8, 1.8, 1.25, .26, 1.5, .14, K.wood, BR.s, null, o2b) + cyl(1.8, 1.8, 1.5, .18, 2.2, .14, K.wood, BR.s, null, o2b) + cyl(1.8, 1.8, 2.2, .2, 2.32, .2, BR.c, BR.s, BR.h, o2b);
+        s += claw(345) + claw(105);
+        /* the cradle on the knuckle */
+        var k0 = FP(0, 0, 2.32), k1 = at(0);
+        s += rod(k0, k1, 2.4, BR.s) + circ(k0[0], k0[1] - 1, 2.6, BR.c, 1.2);
+        /* the tube: draw tubes and the eyepiece at the low end, the main tube in bands, the wider dew shield at the far end */
+        var tube = function(t0, t1, w, c){ var a = at(t0), b = at(t1); return L(T.seg(a, b), w + 2.4) + L(T.seg(a, b), w, c); };
+        s += tube(-2.55, -2.3, 2.6, "#3B2E3A") + tube(-2.32, -1.95, 3.8, BR.h) + tube(-1.98, -1.55, 5.2, BR.c) + tube(-1.6, 1.3, 7, BR.c);
+        s += L(T.seg(at(-1.5, .14), at(1.2, .14)), 1.6, BR.h) + L(T.seg(at(-1.5, -.14), at(1.2, -.14)), 1.6, BR.s);
+        [-1.0, .05, .95].forEach(function(t){ s += L(T.seg(at(t - .04, -.3), at(t - .04, .3)), 2.4) + L(T.seg(at(t, -.28), at(t, .28)), 1.4, BR.h); });
+        s += tube(1.25, 2.0, 9.4, BR.c) + L(T.seg(at(1.3, .2), at(1.95, .2)), 1.6, BR.h);
+        var ob = at(2.0); s += ell(ob[0], ob[1], 2.6, 5.4, "#3B2E3A", 1.3) + ell(ob[0] - .3, ob[1] - .6, 1.3, 3, "#9FD8F0", 0);
+        /* the finder riding on top on two little posts */
+        [.35, 1.05].forEach(function(t){ s += L(T.seg(at(t, .3), at(t, .6)), 2.6) + L(T.seg(at(t, .3), at(t, .6)), 1, BR.s); });
+        var f0 = at(.15, .62), f1 = at(1.25, .62); s += L(T.seg(f0, f1), 5.4) + L(T.seg(f0, f1), 3, BR.c) + circ(f1[0], f1[1], 1.5, "#9FD8F0", 1);
+        /* verdigris where the brass has aged */
+        [[-.6, -.1], [.6, .12], [1.6, -.2]].forEach(function(q){ var e = at(q[0], q[1]); s += circ(e[0], e[1], .9, BR.pat); });
+        if (o.snow) s += L(T.seg(at(1.3, .36), at(1.95, .36)), 2, WHITE);
+        return s;
+      },
+      bits: function(){ var b = FP(1.85, 0, 3.25); return star4(b[0] + 12, b[1] - 16, 6, "#FFF3B0") + star4(b[0] + 22, b[1] - 6, 3, WHITE) + star4(b[0] + 2, b[1] - 24, 3, WHITE); }
+    },
+    "rank-loupes-bronze-yard": {
+      note: "A bronze armillary sphere: rings for the equator, the meridian and the sun's path around a little Earth", spot: [3.4, 3.45],
+      egg: { n: "The armillary sphere", does: "its rings turn", say: "Loupes Bronze! Old astronomers mapped the sky with rings like these. You've mapped a whole mouth." }, anim: "tp-pop 2.4s",
+      draw: function(o){
+        var s = shadow(1.8, 1.95, 26, 9);
+        /* the stand: a stepped foot, a turned column, the cradle the meridian ring sits in */
+        s += cyl(1.8, 1.8, 0, .9, .22, .9, BZ.s, "#7A4520", BZ.c, o2b) + cyl(1.8, 1.8, .22, .5, .42, .36, BZ.c, BZ.s, BZ.h, o2b) + cyl(1.8, 1.8, .42, .16, 1.05, .12, BZ.c, BZ.s, null, o2b) + cyl(1.8, 1.8, 1.05, .2, 1.18, .3, BZ.c, BZ.s, BZ.h, o2b);
+        var c = P(1.8, 1.8, 2.6), x = c[0], y = c[1], R = 16;
+        var ring = function(rx, ry, a, t0, t1, col, front){ var d = arcE(x, y, rx, ry, a, t0, t1); return L(d, front ? 4.6 : 3.6) + L(d, front ? 2.6 : 1.6, col); };
+        /* the far halves of the horizon band, the equator and the sun's path (the ecliptic, 23.4 degrees off the equator) */
+        s += ring(R + 3, 6.4, 0, 180, 360, BZ.s) + ring(R - 1, 6, -28, 180, 360, BZ.s) + ring(R - 1, 6.6, -4.6, 180, 360, BZ.s);
+        /* the meridian ring, upright and facing us, and the polar axis through it */
+        s += L(T.seg([x, y + R + 4.6], [x, y + R]), 4.4) + L(T.seg([x, y + R + 4.6], [x, y + R]), 2.4, BZ.s);
+        var md = "M" + f(x - R) + " " + f(y) + " A" + R + " " + R + " 0 1 1 " + f(x + R) + " " + f(y) + " A" + R + " " + R + " 0 1 1 " + f(x - R) + " " + f(y);
+        s += L(md, 4.6) + L(md, 2.6, BZ.c) + L("M" + f(x - R * .8) + " " + f(y - R * .6) + " A" + R + " " + R + " 0 0 1 " + f(x + R * .8) + " " + f(y - R * .6), 1, BZ.h);
+        var ax = [Math.sin(28 * Math.PI / 180), Math.cos(28 * Math.PI / 180)], a0 = [x - ax[0] * (R + 3), y - ax[1] * (R + 3)], a1 = [x + ax[0] * (R + 3), y + ax[1] * (R + 3)];
+        s += L(T.seg(a0, a1), 3.4) + L(T.seg(a0, a1), 1.6, BZ.h);
+        /* the little Earth in the middle */
+        s += circ(x, y, 5.4, "#3FA7E0", 1.4) + F("M" + f(x - 3.4) + " " + f(y - 1.6) + " q2 -2.6 4.4 -.6 q1 2.2 -1.4 3.2 q-2.2 .8 -3 -2.6 z M" + f(x + 1) + " " + f(y + 2.4) + " q2 -.4 2.6 1.2 q-1.6 1 -2.6 -1.2 z", "#5E8A3A") + circ(x - 2, y - 2.4, 1, WHITE, 0);
+        /* the near halves, over the Earth */
+        s += ring(R - 1, 6, -28, 0, 180, BZ.c, true) + ring(R - 1, 6.6, -4.6, 0, 180, BZ.h, true) + ring(R + 3, 6.4, 0, 0, 180, BZ.c, true);
+        s += circ(a0[0], a0[1], 1.9, BZ.c, 1.1) + circ(a1[0], a1[1], 1.9, BZ.c, 1.1);
+        if (o.snow) s += ell(x, y - R - 1, 5, 1.6, WHITE, 0);
+        return s;
+      },
+      bits: function(){ var c = P(1.8, 1.8, 2.6), x = c[0], y = c[1]; return L("M" + f(x - 26) + " " + f(y - 10) + " q-4 10 0 20 M" + f(x + 26) + " " + f(y - 10) + " q4 10 0 20", 1.6, BZ.s) + star4(x + 18, y - 22, 3.4, "#FFF3B0") + star4(x - 20, y - 18, 2.6, WHITE); }
+    },
+    "rank-loupes-silver-yard": {
+      note: "A silver microscope on its horseshoe foot: the arm, the tube and eyepiece, the stage and the mirror under it", spot: [3.4, 3.45],
+      egg: { n: "The microscope", does: "the mirror flashes", say: "Loupes Silver! Loupes make a tooth a few times bigger. A microscope, a few hundred. Both see what the eye alone misses." }, anim: "tp-sparks 2s ease-out",
+      draw: function(o){
+        var s = shadow(1.8, 1.95, 24, 9);
+        /* the foot, the pillar at the back, the mirror on its fork under the stage */
+        s += box(.85, .95, 0, 1.9, 1.7, .26, mat(SV), o2b);
+        var pb = P(1.15, 2.2, .26), pt = P(1.15, 2.2, 1.3), mi = P(1.95, 1.9, .72);
+        s += rod(pb, pt, 4.4, SV.s) + rod(P(1.95, 1.9, .26), mi, 1.4, SV.s) + ell(mi[0], mi[1], 5, 3.4, SV.c, 1.3) + ell(mi[0], mi[1], 3.4, 2.2, "#BFE6F7", 0) + L("M" + f(mi[0] - 3) + " " + f(mi[1] - 1) + " l2 -1", 1, WHITE);
+        /* the stage with a slide on it and its two clips */
+        s += box(1.4, 1.35, 1.25, 1.1, 1.05, .14, mat(SV), o2b);
+        var st = P(1.95, 1.9, 1.39);
+        s += F("M" + f(st[0] - 7) + " " + f(st[1]) + " l7 -3.6 7 3.6 -7 3.6 z", "#DDF2FB", .95) + O("M" + f(st[0] - 7) + " " + f(st[1]) + " l7 -3.6 7 3.6 -7 3.6 z", .9) + L("M" + f(st[0] - 9) + " " + f(st[1] - 2) + " l4 2.2 M" + f(st[0] + 9) + " " + f(st[1] - 2) + " l-4 2.2", 1.4);
+        /* the arm from the pillar up and over, the tube down to its objective over the slide, the eyepiece, the focus knob */
+        var top = [st[0] - 3, st[1] - 27], ob = [st[0], st[1] - 7];
+        s += tube("M" + f(pt[0]) + " " + f(pt[1]) + " C" + f(pt[0] - 6) + " " + f(pt[1] - 12) + " " + f(pt[0] + 2) + " " + f(top[1] + 2) + " " + f(top[0] - 1) + " " + f(top[1] + 9), 4.4, SV.c);
+        s += L(T.seg(top, ob), 10.4) + L(T.seg(top, ob), 8, SV.c) + L(T.seg([top[0] + 2.4, top[1]], [ob[0] + 2.4, ob[1]]), 2.4, SV.s) + L(T.seg([top[0] - 2.4, top[1] + 2], [ob[0] - 2.2, ob[1] - 4]), 1.4, WHITE, .8);
+        s += L(T.seg(ob, [ob[0] + .6, ob[1] + 5]), 6) + L(T.seg(ob, [ob[0] + .6, ob[1] + 5]), 3.6, SV.s);
+        s += L(T.seg(top, [top[0] - 1.2, top[1] - 7]), 8.4) + L(T.seg(top, [top[0] - 1.2, top[1] - 7]), 6, SV.s) + ell(top[0] - 1.2, top[1] - 7, 3.4, 1.6, "#3A4047", 1);
+        s += circ(pt[0] - 2, pt[1] - 8, 3.6, SV.s, 1.2) + circ(pt[0] - 2, pt[1] - 8, 1.4, SV.h);
+        if (o.snow) s += ell(top[0] - 1, top[1] - 8, 4, 1.4, WHITE, 0);
+        return s;
+      },
+      bits: function(){ var m = P(1.95, 1.95, .7); return star4(m[0] + 8, m[1] - 4, 5, WHITE) + star4(m[0] - 10, m[1] - 10, 3.4, SV.h) + star4(m[0] + 16, m[1] - 16, 3, WHITE); }
+    },
+    "rank-loupes-gold-yard": {
+      note: "A golden lighthouse on its rocks, white bands around its tower and a lamp at the top", spot: [3.4, 3.45],
+      egg: { n: "The lighthouse", does: "its beam sweeps around", say: "Loupes Gold! A lighthouse keeps ships off the rocks. Your headlight keeps the drill on the right tooth." }, anim: "tp-pop 2.4s",
+      draw: function(o){
+        var s = shadow(1.8, 1.95, 28, 10);
+        [[1.0, 2.4, .5], [2.6, 2.6, .42], [2.7, 1.1, .38], [1.1, 1.1, .4]].forEach(function(q){ var e = P(q[0], q[1], 0); s += ell(e[0], e[1] - 2, q[2] * 14, q[2] * 9, K.stone, 1.4) + ell(e[0] - 2, e[1] - 4, q[2] * 6, q[2] * 3, "#E3DFD8", 0); });
+        s += cyl(1.8, 1.8, 0, .9, .3, .9, K.stone, K.stoneShade, "#E3DFD8", o2b);
+        /* the tower in bands, gold and white */
+        var bands = [[.3, 1.0, GD.c], [1.0, 1.7, "#FFFDF6"], [1.7, 2.4, GD.c], [2.4, 3.1, "#FFFDF6"], [3.1, 3.7, GD.c]], rr = function(z){ return .72 - (z - .3) * .1; };
+        bands.forEach(function(q){ s += cyl(1.8, 1.8, q[0], rr(q[0]), q[1], rr(q[1]), q[2], q[2] === GD.c ? GD.s : "#E3DCCB", null, { open: true, sw: 1.6 }); });
+        s += cyl(1.8, 1.8, 3.7, .55, 3.82, .55, GD.s, GD.s, GD.c, o2b);
+        var g = P(1.8, 1.8, 3.82), gw = T.RX(.38), lamp = "M" + f(g[0] - gw) + " " + f(g[1]) + " v-9 h" + f(gw * 2) + " v9 z";
+        s += F(lamp, o.night ? K.lit : "#DDF2FB") + O(lamp, 1.5) + L("M" + f(g[0]) + " " + f(g[1]) + " v-9", 1.2) + circ(g[0], g[1] - 4.6, 2.4, "#FFF3B0", 1);
+        s += cyl(1.8, 1.8, 4.68, .5, 5.3, .06, GD.c, GD.s, null, { open: true, sw: 1.6 }) + circ(P(1.8, 1.8, 5.32)[0], P(1.8, 1.8, 5.32)[1], 1.8, GD.h, 1);
+        s += F(D(T.onY(2.5, T.rectUV(1.65, 1.95, .3, .85))), "#6B4A32") + O(D(T.onY(2.5, T.rectUV(1.65, 1.95, .3, .85))), 1.1);
+        s += T.dmStar(g[0] + 12, g[1] - 4, 3.4, WHITE, "tp-twinkle", .6);
+        if (o.snow) s += ell(P(1.8, 1.8, 5.0)[0], P(1.8, 1.8, 5.0)[1], 6, 1.6, WHITE, 0);
+        return s;
+      },
+      lights: function(o){ var g = P(1.8, 1.8, 3.82); return o && o.night ? '<path d="M' + f(g[0]) + " " + f(g[1] - 5) + " L" + f(g[0] - 46) + " " + f(g[1] - 18) + " L" + f(g[0] - 46) + " " + f(g[1] + 4) + ' Z" fill="#FFF3B0" opacity=".28"/>' + T.glowAt(g[0], g[1] - 5, 12) : ""; },
+      bits: function(){ var g = P(1.8, 1.8, 3.82); return '<path d="M' + f(g[0]) + " " + f(g[1] - 5) + " L" + f(g[0] + 44) + " " + f(g[1] - 20) + " L" + f(g[0] + 44) + " " + f(g[1] + 6) + ' Z" fill="#FFF3B0" opacity=".6"/>'; }
+    },
+    "rank-loupes-diamond-yard": {
+      note: "A crystal prism on a stone plinth: white light goes in, a rainbow comes out", spot: [3.4, 3.45],
+      egg: { n: "The prism", does: "the rainbow brightens", say: "Loupes Diamond! White light is every color at once. A prism just lets them out." }, anim: "tp-sparks 2s ease-out",
+      draw: function(o){
+        var s = shadow(1.8, 1.95, 28, 10), RB = ["#E0484A", "#F28C28", "#F2C230", "#5EB04A", "#3FA7E0", "#7A3CFF"], i;
+        /* seen from the side: the stone plinth with a course line, the prism standing on it (an equilateral triangle,
+           pushed back), the white beam in on the left face, the colors out of the right face, red bent least and violet most */
+        s += ext(rect(-1.5, 0, 1.5, .95), -.72, .72, "#C9CFD6", K.stone) + L(T.seg(FP(-1.5, -.72, .48), FP(1.5, -.72, .48)), 1, K.stoneShade);
+        var Z0 = .95, HW = 1.0, ZA = Z0 + HW * Math.sqrt(3), W0 = -.55, W1 = .55;
+        var q = function(a){ return T.D2(a.map(function(v){ return FP(v[0], v[1], v[2]); })); };
+        s += FO(q([[-HW, W0, Z0], [0, W0, ZA], [0, W1, ZA], [-HW, W1, Z0]]), "#EAF8FF", 1.4) + FO(q([[0, W0, ZA], [HW, W0, Z0], [HW, W1, Z0], [0, W1, ZA]]), "#BFE6F7", 1.4);
+        /* the beam's path through the glass, seen through the near face */
+        var pin = FP(-HW / 2, 0, (Z0 + ZA) / 2), pout = FP(HW / 2, 0, (Z0 + ZA) / 2);
+        s += FO(q([[-HW, W0, Z0], [HW, W0, Z0], [0, W0, ZA]]), DI.c, 1.6).replace("<path", '<path fill-opacity=".82"') + L(T.seg(pin, pout), 1.8, WHITE, .75) + L(T.D2([FP(-HW + .2, W0, Z0 + .3), FP(-.12, W0, ZA - .3)], true), 1.2, WHITE, .9);
+        /* the white light in */
+        var src = FP(-2.8, 0, 1.05);
+        s += L(T.seg(src, pin), 3.2) + L(T.seg(src, pin), 1.8, WHITE);
+        /* the fan of colors out */
+        var A0 = -6, A1 = -40, LN = 2.5;
+        for (i = 0; i < 6; i++){ var a = (A0 + (A1 - A0) * i / 6) * Math.PI / 180, b = (A0 + (A1 - A0) * (i + 1) / 6) * Math.PI / 180;
+          s += F(T.D2([pout, FP(HW / 2 + LN * Math.cos(a), 0, (Z0 + ZA) / 2 + LN * Math.sin(a)), FP(HW / 2 + LN * Math.cos(b), 0, (Z0 + ZA) / 2 + LN * Math.sin(b))]), RB[i], .92); }
+        s += L(T.D2([FP(HW / 2 + LN * Math.cos(A0 * Math.PI / 180), 0, (Z0 + ZA) / 2 + LN * Math.sin(A0 * Math.PI / 180)), pout, FP(HW / 2 + LN * Math.cos(A1 * Math.PI / 180), 0, (Z0 + ZA) / 2 + LN * Math.sin(A1 * Math.PI / 180))], true), 1, INK, .5);
+        var ap = FP(0, W0, ZA); s += star4(ap[0] - 1, ap[1] - 4, 3, WHITE) + T.dmStar(ap[0] + 12, ap[1] - 6, 3, WHITE, "tp-twinkle", .8);
+        if (o.snow){ var st = FP(-.7, .2, 1.1); s += ell(st[0] - 3, st[1], 5, 1.6, WHITE, 0); }
+        return s;
+      },
+      bits: function(){ var c = FP(1.6, 0, 1.4); return star4(c[0] + 10, c[1] - 8, 5, "#F2C230") + star4(c[0] + 14, c[1] + 8, 4, "#3FA7E0") + star4(c[0] - 6, c[1] - 26, 4, WHITE) + star4(c[0] - 40, c[1] - 6, 3, "#E0484A"); }
+    },
+    "rank-loupes-dark-yard": {
+      note: "A little Dark Matter observatory: a violet drum, its dome open and a telescope looking out at the stars", spot: [3.4, 3.45],
+      egg: { n: "The observatory", does: "the dome turns", say: "Loupes Dark Matter. Every journey finished. Look up: that's how far you've come." }, anim: "tp-sparks 2s ease-out",
+      draw: function(o){
+        var s = shadow(1.8, 1.95, 30, 11), ZR = 1.75;
+        /* the round stone platform, the violet drum in courses, its door and its window */
+        s += cyl(1.8, 1.8, 0, 1.62, .22, 1.62, "#3A2A50", "#24193A", "#54447A", o2b) + cyl(1.8, 1.8, .22, 1.25, ZR, 1.25, DM.c, DM.s, null, { open: true, sw: 1.8 });
+        [.72, 1.22].forEach(function(z){ var c = P(1.8, 1.8, z); s += L(arcE(c[0], c[1], T.RX(1.25), T.RY(1.25), 0, 8, 172), 1, DM.s); });
+        var door = T.onY(1.8 + 1.18, T.rectUV(1.45, 1.95, .22, 1.1)), win = T.onX(1.8 + 1.18, T.rectUV(1.5, 1.9, .78, 1.28));
+        s += FO(D(door), "#1B1240", 1.2) + FO(D(win), o.night ? K.lit : "#2A1D52", 1.2);
+        /* the dome, pale against the drum, the teal band where it sits, its ribs, the open slit full of stars */
+        var r0 = P(1.8, 1.8, ZR), rx = T.RX(1.3), ry = T.RY(1.3);
+        s += T.dome(1.8, 1.8, ZR, 1.3, 1.25, "#CBB8F5", "#9A82DA") + L(arcE(r0[0], r0[1], rx, ry, 0, -4, 184), 4.6) + L(arcE(r0[0], r0[1], rx, ry, 0, -4, 184), 2.4, K.dmTeal);
+        var hy = 1.25 * 10.5 + T.RY(1.3) * .2, dx = T.RX(1.3), cx = r0[0], cy = r0[1];
+        [-.55, .55].forEach(function(k){ s += L("M" + f(cx + dx * k) + " " + f(cy + T.RY(1.3) * Math.sqrt(1 - k * k) * .96) + " Q" + f(cx + dx * k * 1.08) + " " + f(cy - hy * .62) + " " + f(cx + dx * k * .3) + " " + f(cy - hy * .97), 1, "#8E76CF"); });
+        var sl = "M" + f(cx + 2) + " " + f(cy + T.RY(1.3) * .98) + " L" + f(cx - 2.4) + " " + f(cy - hy * .98) + " L" + f(cx + 5.6) + " " + f(cy - hy * .93) + " L" + f(cx + 9.4) + " " + f(cy + T.RY(1.3) * .9) + " Z";
+        s += FO(sl, "#120A2A", 1.4) + circ(cx + 2.6, cy - 4, .8, WHITE) + circ(cx + 4.4, cy + 3, .6, DM.h) + circ(cx + 1.6, cy - 10, .6, WHITE);
+        /* the telescope out of the slit, aimed high */
+        var t0 = [cx + 3.4, cy - 3], t1 = [cx + 17, cy - 21];
+        s += L(T.seg(t0, t1), 6.4) + L(T.seg(t0, t1), 4, "#E7DDFF") + L(T.seg([t0[0] + 1, t0[1] - 1.4], [t1[0] + 1, t1[1] - 1.4]), 1, WHITE) + circ(t1[0], t1[1], 2.6, K.dmTeal, 1.2);
+        s += T.dmStar(cx - 22, cy - 26, 3.2, WHITE, "tp-twinkle", .4) + T.dmStar(cx + 26, cy - 34, 2.6, K.dmTeal, "tp-twinkle", 1.2) + star4(cx - 16, cy - 8, 2.2, DM.h);
+        if (o.snow) s += F("M" + f(cx - dx + 3) + " " + f(cy - 4) + " Q" + f(cx - dx * .6) + " " + f(cy - hy * .9) + " " + f(cx - 4) + " " + f(cy - hy * .96) + " L" + f(cx - 5) + " " + f(cy - hy * .7) + " Q" + f(cx - dx * .5) + " " + f(cy - hy * .6) + " " + f(cx - dx + 3) + " " + f(cy - 4) + " Z", WHITE);
+        return s;
+      },
+      lights: function(o){ var c = P(1.8, 1.8, 1.75), t = [c[0] + 17, c[1] - 21], s = glow(t[0], t[1], 9, K.dmTeal, ".3") + glow(c[0], c[1] - 8, 30, DM.h, ".1"); if (o && o.night){ var w = P(3.0, 1.7, 1.03); s += T.glowAt(w[0], w[1], 8); } return s; },
+      bits: function(){ var c = P(1.8, 1.8, 1.75), x = c[0] + 17, y = c[1] - 21; return star4(x + 10, y - 12, 5, WHITE) + star4(x + 22, y - 2, 3.4, K.dmTeal) + star4(x - 2, y - 24, 4, DM.h) + L("M" + f(x + 4) + " " + f(y - 4) + " L" + f(x + 26) + " " + f(y - 26), 1.4, K.dmTeal, .6); }
+    }
+  };
+  Object.keys(later).forEach(function(k){ yard[k] = later[k]; });
+
   /* ------------------------------------------------------------------ the outfits ----------------------------------- */
   var thin = O2.replace("2.2", "1.4"), EO = ' fill-rule="evenodd"';
   function hi(d, w, op){ return '<path d="' + d + '" fill="none" stroke="#FFFFFF" stroke-width="' + (w || 3) + '" stroke-linecap="round" opacity="' + (op || .6) + '"/>'; }
@@ -7403,6 +7862,168 @@ function pack(T){
       say: ["Dark Matter rank. You studied your way off the chart.", "From in here I see every star. And every missed spot.", "Most of the universe is dark matter. Most of me is dentin."]
     }
   };
+
+  /* ---------------------------------------------------------------- the later journeys' outfits ---------------- */
+  var spots = function(list, c, r){ var s = ""; list.forEach(function(q){ s += '<circle cx="' + q[0] + '" cy="' + q[1] + '" r="' + (q[2] || r || 1.6) + '" fill="' + c + '"/>'; }); return s; };
+  var dot = function(x, y, r, c){ return '<circle cx="' + f(x) + '" cy="' + f(y) + '" r="' + r + '" fill="' + c + '" ' + thin + "/>"; };
+  /* a cape behind him from the shoulders, hem at y 214, in fill c with its shade s */
+  var CAPE = "M100 30 C62 30 38 52 34 84 C20 120 6 166 2 212 Q26 222 50 214 Q76 222 100 216 Q124 222 150 214 Q174 222 198 212 C194 166 180 120 166 84 C162 52 138 30 100 30 Z";
+  var cape = function(c, sh){ return p(CAPE, c) + '<path d="M150 46 C166 60 172 80 168 92 C184 128 194 170 198 212 Q186 217 172 216 C170 160 164 110 150 46 Z" fill="' + sh + '"/>' + p(CAPE, "none"); };
+  var laterOutfits = {
+    /* ModuPro */
+    "rank-modu-stone-outfit": {
+      note: "A sculptor's beret and a smock dusted with dental stone, a chisel in his hand",
+      back: '<path d="M164 128 L182 92" stroke="' + INK + '" stroke-width="7.4" stroke-linecap="round"/><path d="M164 128 L182 92" stroke="' + STEEL.c + '" stroke-width="3.6" stroke-linecap="round"/>' +
+        '<path d="M160 136 L167 122" stroke="' + INK + '" stroke-width="10" stroke-linecap="round"/><path d="M160 136 L167 122" stroke="' + K.wood + '" stroke-width="6" stroke-linecap="round"/>',
+      face: p("M46 112 Q72 124 100 126 Q128 124 154 112 L156 128 Q100 160 44 128 Z", ST.h, O3) + p("M100 126 L88 146 L100 140 L112 146 Z", ST.c, O2) + spots([[60, 122], [74, 132, 1.2], [130, 130], [142, 120, 1.2], [96, 134, 1.1], [118, 138, 1.3]], ST.s),
+      top: p("M38 42 C34 20 70 4 106 6 C142 8 166 24 160 40 C150 52 52 54 38 42 Z", "#5B6B82") + '<path d="M120 8 C150 12 168 28 160 40 C154 46 140 49 124 50 C138 40 138 22 120 8 Z" fill="#46546A"/>' +
+        p("M40 40 Q100 56 158 40 L158 47 Q100 63 40 47 Z", "#3A4658", O3) + p("M102 6 q2 -9 8 -10", "none", O3) + hi("M54 28 Q66 14 88 10", 3, .35) + spots([[70, 22], [126, 30, 1.2], [96, 16, 1.2]], ST.h),
+      say: ["ModuPro Stone! Pour, wait, carve. Patience is a material too.", "A good crown starts with a good stone cast.", "Dental stone sets hard. So does what you study twice."]
+    },
+    "rank-modu-antique-outfit": {
+      note: "A green visor on a brass band, and a lab coat with brass buttons",
+      face: p("M46 110 Q70 120 92 124 L100 160 L108 124 Q130 120 154 110 L156 132 Q100 172 44 132 Z", "#FFFDF6", O3) + p("M92 124 L100 150 L108 124 Q100 130 92 124 Z", "#7FA38A", O2) +
+        p("M56 116 L84 126 L76 142 Z M144 116 L116 126 L124 142 Z", "#EFE7D6", O2) + dot(90, 140, 2.6, BR.c) + dot(110, 140, 2.6, BR.c) + dot(92, 152, 2.2, BR.c) + dot(108, 152, 2.2, BR.c),
+      /* the bill is short and see-through, so it stops above the loupes' headlight */
+      top: p("M40 48 Q100 28 160 48 L160 56 Q100 36 40 56 Z", BR.c, O3) + line("M46 49 Q100 33 154 49", BR.h, 1.6) +
+        '<path d="M48 54 Q100 36 152 54 L146 62 Q100 46 54 62 Z" fill="#3F8F5A" fill-opacity=".55" ' + O3 + "/>" + line("M60 58 Q100 45 140 58", "#7FD49A", 1.4) + dot(44, 52, 3, BR.h) + dot(156, 52, 3, BR.s),
+      say: ["ModuPro Antique! A visor, a lab coat and a steady hand.", "Before a crown is cast, it's carved in wax.", "Brass buttons: I'm very well articulated."]
+    },
+    "rank-modu-bronze-outfit": {
+      note: "A leather foundry cap with bronze goggles pushed up, a leather apron with bronze rivets, and casting tongs",
+      back: line("M164 132 L188 84 M170 134 L192 90", INK, 6.4) + line("M164 132 L188 84 M170 134 L192 90", BZ.s, 3) + '<circle cx="190" cy="86" r="4.4" fill="' + BZ.c + '" ' + O2 + "/>",
+      face: line("M68 124 L52 104 M132 124 L148 104", INK, 5.4) + line("M68 124 L52 104 M132 124 L148 104", "#8A5A3A", 3) +
+        p("M66 122 Q100 128 134 122 L136 146 Q100 170 64 146 Z", "#C49A6C", O3) + '<path d="M118 126 Q128 125 134 122 L136 146 Q128 154 118 160 Q124 142 118 126 Z" fill="#A87C4E"/>' + p("M66 122 Q100 128 134 122 L136 146 Q100 170 64 146 Z", "none", O3) +
+        dot(70, 127, 2.4, BZ.h) + dot(130, 127, 2.4, BZ.h) + p("M86 136 h28 v12 q-14 5 -28 0 z", "#A87C4E", O2) + line("M90 140 h20", BZ.s, 1.6),
+      top: p("M44 50 C40 16 70 0 100 0 C130 0 160 16 156 50 Q100 38 44 50 Z", "#8A5A3A") + '<path d="M122 4 C146 12 160 30 156 50 Q148 47 138 45 C142 30 136 14 122 4 Z" fill="#6B4128"/>' +
+        line("M100 0 V40", "#6B4128", 2) + line("M48 40 Q100 24 152 40", INK, 5) + line("M48 40 Q100 24 152 40", "#3A2A20", 2.8) +
+        '<circle cx="78" cy="30" r="10.4" fill="' + BZ.c + '" ' + O3 + '/><circle cx="122" cy="30" r="10.4" fill="' + BZ.s + '" ' + O3 + "/>" +
+        '<circle cx="78" cy="30" r="6.4" fill="#4E3022" ' + O2 + '/><circle cx="122" cy="30" r="6.4" fill="#4E3022" ' + O2 + "/>" + line("M88 30 Q100 26 112 30", INK, 3) + hi("M74 26 l3 -2", 2, .9) + hi("M118 26 l3 -2", 2, .9),
+      say: ["ModuPro Bronze! Casting day. Stand back from the crucible.", "Lost-wax casting: the wax goes, the crown stays.", "Goggles up, apron on, tongs ready."]
+    },
+    "rank-modu-silver-outfit": {
+      note: "A silver scrub cap and the classic head mirror on its band",
+      top: p("M42 52 C36 18 68 -2 100 -2 C132 -2 164 18 158 52 Q100 40 42 52 Z", "#B6BEC7") + '<path d="M124 2 C150 10 164 30 158 52 Q150 48 140 46 C144 30 138 14 124 2 Z" fill="' + SV.s + '"/>' +
+        spots([[62, 26, 2.2], [84, 12, 2.2], [112, 10, 2.2], [136, 22, 2.2], [74, 38, 2.2], [100, 26, 2.2], [126, 38, 2.2], [150, 40, 2.2]], SV.h) + p("M42 52 Q100 40 158 52 L158 58 Q100 46 42 58 Z", SV.s, O3) +
+        line("M44 56 Q100 44 156 56", INK, 6) + line("M44 56 Q100 44 156 56", "#3A4047", 3.4) +
+        /* the head mirror sits to one side of the forehead, clear of the loupes' headlight */
+        '<circle cx="130" cy="44" r="13" fill="' + SV.c + '" ' + O3 + '/><circle cx="130" cy="44" r="9.4" fill="#BFE6F7" ' + O2 + '/><circle cx="130" cy="44" r="2.6" fill="#3A4047"/>' + hi("M123 38 Q126 35 130 34.4", 2.2, .95),
+      say: ["ModuPro Silver! Mirror up. Light on the tooth.", "The head mirror: the first headlight. No batteries.", "Mirror, explorer, probe. Say it with me."]
+    },
+    "rank-modu-gold-outfit": {
+      note: "A gold crown set with rubies, a red velvet cape and an ermine collar",
+      back: cape("#B5382E", "#8E2A22"),
+      face: p("M42 112 Q100 140 158 112 L160 126 Q100 158 40 126 Z", "#FFFDF6", O3) + spots([[56, 122], [74, 132], [94, 138], [114, 138], [134, 132], [150, 122]], "#2B2230", 1.8),
+      top: p("M60 46 L56 6 L74 24 L86 -6 L100 18 L114 -6 L126 24 L144 6 L140 46 Q100 36 60 46 Z", GD.c) + '<path d="M126 24 L144 6 L140 46 Q132 44 124 43 Z" fill="' + GD.s + '"/>' +
+        p("M58 36 Q100 26 142 36 L141 48 Q100 38 59 48 Z", GD.s, O3) + gem(100, 39, 11, 11, ["#E0484A", "#9C2A22"]) + gem(76, 41, 8, 8, ["#3FA7E0", "#2378B0"]) + gem(124, 41, 8, 8, ["#3FA7E0", "#2378B0"]) +
+        dot(56, 6, 3.4, GD.h) + dot(86, -6, 3.4, GD.h) + dot(114, -6, 3.4, GD.h) + dot(144, 6, 3.4, GD.h) + hi("M66 30 L64 12", 2.6, .7),
+      say: ["ModuPro Gold! A crown on a tooth. The other kind of crown.", "Long live the molars.", "A full gold crown takes less tooth away than most crowns. Royalty is efficient."]
+    },
+    "rank-modu-diamond-outfit": {
+      note: "A clear crystal face shield on a band, and a big diamond bur held up in his hand",
+      /* the bur stands up from his right hand: a steel shank with its latch notch, a gold ring, and a tapered head of diamond grit */
+      face: line("M172 150 L172 108", INK, 10) + line("M172 150 L172 108", STEEL.c, 6) + line("M170 146 V114", WHITE, 1.6) +
+        p("M167.6 142 h8.8 v6 h-8.8 z", STEEL.s, thin) + p("M165 104 h14 v8 h-14 z", GD.c, O3) + line("M167 106.6 h10", GD.h, 1.4) +
+        p("M164 104 L166 56 Q172 44 178 56 L180 104 Z", DI.c, O3) + '<path d="M172 46 Q178 50 178 56 L180 104 L173 104 Z" fill="' + DI.s + '" opacity=".6"/>' +
+        spots([[169, 98, 1.4], [175, 92, 1.3], [168, 86, 1.4], [174, 80, 1.3], [169, 72, 1.3], [174, 64, 1.2], [171, 92, 1], [176, 100, 1.1], [171, 58, 1]], WHITE) +
+        hi("M168 96 L169 62", 2, .7) + star4(184, 52, 5, WHITE) + star4(160, 70, 3.4, WHITE),
+      /* a headband with a diamond, and a clear shield hanging from it in front of his face, its edge and shine showing it's there */
+      top: '<path d="M44 58 Q100 42 156 58 L160 104 Q158 120 140 122 L60 122 Q42 120 40 104 Z" fill="#BFE9FF" fill-opacity=".28"/>' +
+        '<path d="M44 58 Q100 42 156 58 L160 104 Q158 120 140 122 L60 122 Q42 120 40 104 Z" fill="none" stroke="' + DI.s + '" stroke-width="2.6"/>' +
+        hi("M50 70 L46 110", 3.4, .85) + hi("M58 66 L56 82", 2.4, .7) + hi("M146 92 L148 110", 2.6, .6) +
+        p("M40 50 Q100 32 160 50 L160 60 Q100 42 40 60 Z", "#3A4658", O3) + line("M44 52 Q100 35 156 52", DI.c, 1.6) +
+        dot(40, 55, 3.4, SV.s) + dot(160, 55, 3.4, SV.s) + gem(100, 44, 13, 12, [DI.c, DI.s]) + star4(124, 40, 3.6, WHITE) + star4(150, 76, 4.4, WHITE),
+      say: ["ModuPro Diamond! Shield down, burs ready.", "Diamond burs: the sparkliest way to prep a tooth.", "Face shield on. Aerosols, not today."]
+    },
+    "rank-modu-dark-outfit": {
+      note: "A cape swirling with a pink and teal nebula, and a little ringed planet circling over his head",
+      /* the nebula's clouds sit on the cape's edges, where it shows beside him */
+      back: cape("#1B1240", "#120A2A") + '<path d="M3 200 Q8 168 26 160 Q42 172 36 196 Q22 212 3 200 Z M197 200 Q192 168 174 160 Q158 172 164 196 Q178 212 197 200 Z" fill="' + NEB[0] + '" opacity=".55"/>' +
+        '<path d="M14 132 Q22 112 38 108 Q46 124 36 142 Q22 148 14 132 Z M186 132 Q178 112 162 108 Q154 124 164 142 Q178 148 186 132 Z" fill="' + NEB[1] + '" opacity=".45"/>' +
+        '<path d="M8 176 Q20 164 34 172 Q26 186 10 186 Z M192 176 Q180 164 166 172 Q174 186 190 186 Z" fill="' + NEB[2] + '" opacity=".5"/>' + cloakStars([[18, 150, 4.4], [24, 190, 3, NEB[1]], [182, 150, 4.4, DM.h], [180, 194, 3.4], [30, 120, 2.6], [170, 122, 2.6, NEB[1]]]),
+      face: '<circle cx="100" cy="132" r="7.4" fill="' + NEB[0] + '" ' + O3 + "/>" + star4(100, 132, 4.4, WHITE),
+      top: '<g transform="rotate(-14 100 8)"><path d="M70 8 A30 8 0 0 1 130 8" fill="none" stroke="' + INK + '" stroke-width="6"/><path d="M70 8 A30 8 0 0 1 130 8" fill="none" stroke="' + K.dmTeal + '" stroke-width="3"/>' +
+        '<circle cx="100" cy="8" r="15" fill="' + DM.v + '" ' + O3 + '/><path d="M90 0 Q104 -2 112 8 Q100 6 88 10 Z" fill="' + NEB[2] + '" opacity=".8"/><path d="M88 14 Q100 18 112 14" fill="none" stroke="' + DM.s + '" stroke-width="2"/>' +
+        '<path d="M70 8 A30 8 0 0 0 130 8" fill="none" stroke="' + INK + '" stroke-width="6"/><path d="M70 8 A30 8 0 0 0 130 8" fill="none" stroke="' + K.dmTeal + '" stroke-width="3"/></g>' +
+        '<circle cx="140" cy="22" r="3.4" fill="' + NEB[1] + '" ' + O2 + "/>" + star4(62, 0, 3.4, WHITE) + star4(134, -12, 2.6, NEB[0]),
+      say: ["ModuPro Dark Matter! Two journeys down.", "I have my own planet now. It's mostly enamel.", "In a nebula, stars are born. In the sim lab, dentists."]
+    },
+    /* the Loupes: everything keeps off his face and above the loupes' headlight */
+    "rank-loupes-stone-outfit": {
+      note: "A stone-gray explorer's pith helmet and a red neckerchief",
+      /* the neckerchief ties below the mouth */
+      face: p("M52 112 Q100 134 148 112 L146 124 Q100 146 54 124 Z", "#D9483B", O3) + p("M95 132 L85 154 L100 146 L115 154 L105 132 Z", "#B5382E", O2) + '<circle cx="100" cy="133" r="4.4" fill="#B5382E" ' + O2 + "/>",
+      top: '<ellipse cx="100" cy="42" rx="68" ry="10" fill="' + ST.s + '" ' + O4 + "/>" +
+        p("M54 42 C50 8 74 -10 100 -10 C126 -10 150 8 146 42 Q100 50 54 42 Z", ST.c) + '<path d="M122 -6 C142 4 150 22 146 42 Q138 45 128 46 C134 26 132 8 122 -6 Z" fill="' + ST.s + '"/>' +
+        p("M55 32 Q100 42 145 32 L146 42 Q100 50 54 42 Z", "#6B5A48", O3) + line("M100 -10 V30", ST.s, 2) + dot(100, -10, 3.4, ST.h) + hi("M64 22 Q68 4 86 -4", 3, .45),
+      say: ["Loupes Stone! Every expedition starts at the bottom.", "Exploring the posterior. Bring a light.", "Pith helmet on. The jungle is the third molar region."]
+    },
+    "rank-loupes-antique-outfit": {
+      note: "A navigator's tricorn with brass trim, and a brass spyglass",
+      back: line("M166 132 L192 74", INK, 11) + line("M166 132 L192 74", BR.c, 7) + line("M178 106 L192 74", INK, 13) + line("M178 106 L192 74", BR.s, 9) + line("M168 126 L174 112", BR.h, 2),
+      top: p("M30 44 Q60 30 100 34 Q140 30 170 44 Q150 2 120 10 Q100 -10 80 10 Q50 2 30 44 Z", "#2E3A5C") + '<path d="M120 10 Q150 2 170 44 Q156 38 140 36 Q140 18 120 10 Z" fill="#1F2840"/>' +
+        line("M32 42 Q60 28 100 32 Q140 28 168 42", BR.c, 3) + p("M30 44 Q60 30 100 34 Q140 30 170 44 Q150 2 120 10 Q100 -10 80 10 Q50 2 30 44 Z", "none") + dot(100, 22, 4.6, BR.h) + line("M96 22 h8 M100 18 v8", BR.s, 1.4),
+      say: ["Loupes Antique! Land ho. Or is that a molar?", "A spyglass sees far. Loupes see close. I've got both.", "Navigating by the stars and the tooth chart."]
+    },
+    "rank-loupes-bronze-outfit": {
+      note: "A lamplighter's flat cap with a bronze button, and a bronze lantern",
+      /* the lantern hangs from his hand, in front of him */
+      face: line("M31 114 V126", INK, 2.4) + p("M24 133 Q31 120 38 133", "none", O3) + p("M18 132 L44 132 L42 138 L20 138 Z", BZ.c, O3) + p("M21 138 L41 138 L39 160 L23 160 Z", "#FFE48A", O3) +
+        line("M27 139 V159 M35 139 V159", BZ.s, 2.2) + '<path d="M31 144 q-4 6 0 12 q4 -6 0 -12 Z" fill="#F28C28"/>' + p("M20 160 L42 160 L44 166 L18 166 Z", BZ.c, O3) + dot(31, 132, 1.8, BZ.h),
+      /* a puffy flat cap, its short brim at the front stopping above the headlight */
+      top: p("M38 44 C30 16 66 -2 100 -2 C134 -2 170 16 162 44 Q100 30 38 44 Z", "#9C5C28") + '<path d="M126 2 C152 10 168 26 162 44 Q152 41 142 39 C146 24 140 10 126 2 Z" fill="#7A4520"/>' +
+        line("M58 30 Q100 14 142 28 M76 6 Q92 16 96 34", "#7A4520", 1.6) + p("M66 38 Q100 28 134 38 Q130 48.5 100 48.5 Q70 48.5 66 38 Z", "#7A4520", O3) + line("M74 41 Q100 35 126 41", "#9C5C28", 1.4) +
+        dot(100, 0, 4, BZ.h) + hi("M48 30 Q56 16 74 8", 2.6, .35),
+      say: ["Loupes Bronze! Lamps lit, street by street. Tooth by tooth.", "A lantern for the dark corners of the mouth.", "Light first, then look. That's the loupes' rule."]
+    },
+    "rank-loupes-silver-outfit": {
+      note: "A silver-striped bobble hat and silver binoculars on a strap",
+      /* the strap runs from behind his neck to binoculars resting on the gums, well below the mouth */
+      face: line("M50 118 Q66 146 80 152 M150 118 Q134 146 120 152", INK, 4) + line("M50 118 Q66 146 80 152 M150 118 Q134 146 120 152", "#3F7EB8", 2.2) +
+        p("M72 144 Q72 138 80 138 L94 138 Q98 138 98 144 L98 168 Q98 174 90 174 L78 174 Q70 174 70 168 Z", SV.c, O3) +
+        p("M102 144 Q102 138 106 138 L120 138 Q128 138 128 144 L130 168 Q130 174 122 174 L110 174 Q102 174 102 168 Z", SV.c, O3) +
+        '<path d="M118 140 L120 138 Q128 138 128 144 L130 168 Q130 174 122 174 L120 174 Z" fill="' + SV.s + '"/>' +
+        p("M96 148 h8 v14 h-8 z", "#3A4047", O2) + dot(100, 145, 3, SV.h) +
+        p("M71 160 h28 v14 h-28 z M101 160 h29 v14 h-29 z", "#3A4047", O2) +
+        '<circle cx="85" cy="167" r="5" fill="#9FD8F0" ' + O2 + '/><circle cx="115.5" cy="167" r="5" fill="#9FD8F0" ' + O2 + "/>" + hi("M83 165 l2 -1.4", 1.6, .95) + hi("M113.5 165 l2 -1.4", 1.6, .95) + hi("M76 144 v10", 2, .8),
+      top: p("M42 50 C38 14 68 -4 100 -4 C132 -4 162 14 158 50 Q100 40 42 50 Z", SV.c) + '<path d="M126 0 C150 10 162 28 158 50 Q150 47 140 46 C144 30 138 12 126 0 Z" fill="' + SV.s + '"/>' +
+        line("M48 30 Q100 14 152 30", "#3F7EB8", 5) + line("M44 42 Q100 28 156 42", "#3F7EB8", 5) + p("M42 50 Q100 40 158 50 L158 60 Q100 48 42 60 Z", "#E4E9EE", O3) +
+        line("M54 52 v6 M70 49 v6 M86 47 v6 M102 46 v6 M118 47 v6 M134 49 v6 M150 52 v6", SV.s, 1.4) + '<circle cx="100" cy="-10" r="11" fill="#FFFFFF" ' + O3 + "/>" + spots([[96, -14], [104, -8], [98, -4], [106, -14]], SV.s, 1.4),
+      say: ["Loupes Silver! Binoculars for far, loupes for near.", "Bobble hat on. Ready for a long clinic day.", "I can spot a missed margin from across the room."]
+    },
+    "rank-loupes-gold-outfit": {
+      note: "A crown of golden sun rays, and a gold sash with a sun on it",
+      /* a wide pageant sash across the gums, from his left shoulder to his right hip, with a sun medallion */
+      face: p("M40 122 L54 112 L164 168 L156 186 Z", GD.c, O3) + '<path d="M116 150 L164 168 L156 186 L110 162 Z" fill="' + GD.s + '"/>' + p("M40 122 L54 112 L164 168 L156 186 Z", "none", O3) +
+        line("M48 120 L160 176", GD.h, 1.8) +
+        (function(){ var s = "", i, a; for (i = 0; i < 12; i++){ a = i * 30 * Math.PI / 180; s += p("M" + f(104 + Math.cos(a - .2) * 9) + " " + f(152 + Math.sin(a - .2) * 9) + " L" + f(104 + Math.cos(a) * 16) + " " + f(152 + Math.sin(a) * 16) + " L" + f(104 + Math.cos(a + .2) * 9) + " " + f(152 + Math.sin(a + .2) * 9) + " Z", "#F28C28", thin); } return s; })() +
+        '<circle cx="104" cy="152" r="10" fill="' + GD.c + '" ' + O3 + '/><circle cx="104" cy="152" r="5" fill="#F28C28"/>' + hi("M99 147 l3 -2", 1.8, .9),
+      /* long and short rays fanning from behind a gold band, all above the loupes' headlight */
+      top: (function(){ var s = "", i, a, L; for (i = 0; i < 11; i++){ a = (-155 + i * 13) * Math.PI / 180; L = i % 2 ? 60 : 74;
+          s += p("M" + f(100 + Math.cos(a - .075) * 44) + " " + f(52 + Math.sin(a - .075) * 44) + " L" + f(100 + Math.cos(a) * L) + " " + f(52 + Math.sin(a) * L) + " L" + f(100 + Math.cos(a + .075) * 44) + " " + f(52 + Math.sin(a + .075) * 44) + " Z", i % 2 ? GD.h : GD.c, O2); }
+        return s; })() + p("M44 42 Q100 22 156 42 L156 54 Q100 34 44 54 Z", GD.c, O3) + '<path d="M128 30 Q144 34 156 42 L156 54 Q146 48 130 44 Z" fill="' + GD.s + '"/>' + p("M44 42 Q100 22 156 42 L156 54 Q100 34 44 54 Z", "none", O3) +
+        line("M50 44 Q100 26 150 44", GD.h, 1.6) + '<circle cx="100" cy="36" r="7.4" fill="#F28C28" ' + O2 + "/>" + hi("M96 33 l3 -2", 1.6, .9),
+      say: ["Loupes Gold! I'm practically a light source now.", "Good light, good loupes, good margins.", "Sun's out, loupes on."]
+    },
+    "rank-loupes-diamond-outfit": {
+      note: "A cape of crystal facets with a rainbow along its hem, and a prism brooch",
+      back: (function(){ var RB = ["#E0484A", "#F28C28", "#F2C230", "#5E8A3A", "#3FA7E0", "#7A3CFF"], s = cape(DI.c, DI.s), i;
+        for (i = 0; i < 6; i++){ var dx = 4 + i * 3.6; s += '<path d="M' + (34 + dx) + " 96 C" + (20 + dx) + " 128 " + (6 + dx) + " 168 " + (3 + dx) + " 208 M" + (166 - dx) + " 96 C" + (180 - dx) + " 128 " + (194 - dx) + " 168 " + (197 - dx) + ' 208" fill="none" stroke="' + RB[i] + '" stroke-width="3.6"/>'; }
+        return s + line("M30 110 L52 140 L24 168 M170 110 L148 140 L176 168 M52 140 L44 196 M148 140 L156 196", "#5BB4D9", 1.6) + p(CAPE, "none") + star4(20, 130, 5, WHITE) + star4(182, 150, 4.4, WHITE); })(),
+      face: p("M100 126 L112 146 L88 146 Z", DI.c, O3) + '<path d="M100 126 L112 146 L100 146 Z" fill="' + DI.s + '"/>' + p("M100 126 L112 146 L88 146 Z", "none", O3) + line("M112 142 l10 4 M112 144 l9 7", "#F2C230", 1.6) + line("M112 146 l7 9", "#7A3CFF", 1.6),
+      say: ["Loupes Diamond! Every color, all at once.", "White light in, rainbow out. Very refracting of me.", "Diamonds bend light more than glass. So do I."]
+    },
+    "rank-loupes-dark-outfit": {
+      note: "A violet robe drawn with teal constellations, and a silver crescent moon on a circlet",
+      back: cape("#2A0F5C", "#1B0840") + (function(){ var C = [[[22, 128], [36, 150], [28, 176], [46, 196]], [[176, 120], [166, 148], [184, 172]], [[150, 196], [168, 206], [184, 196]]], s = "";
+        C.forEach(function(c){ s += '<path d="M' + c.map(function(q){ return q.join(" "); }).join(" L") + '" fill="none" stroke="' + K.dmTeal + '" stroke-width="1.4" opacity=".8"/>'; c.forEach(function(q){ s += star4(q[0], q[1], 3.2, WHITE); }); }); return s; })(),
+      face: p("M44 116 Q100 140 156 116 L158 126 Q100 154 42 126 Z", DM.c, O3) + cloakStars([[64, 126, 2.6], [100, 136, 3.4, DM.teal], [136, 126, 2.6]]),
+      top: line("M40 46 Q100 26 160 46", INK, 6) + line("M40 46 Q100 26 160 46", SV.c, 3) +
+        p("M100 2 A16 16 0 1 0 116 24 A12 12 0 1 1 100 2 Z", SV.c, O3) + hi("M92 10 Q88 16 90 22", 2, .9) + star4(124, 6, 3.4, DM.teal) + star4(76, 14, 2.6, WHITE),
+      say: ["Loupes Dark Matter. Every journey, finished.", "The handpiece, the ModuPro, the loupes. And now the stars.", "Three journeys. One tooth. Very well studied."]
+    }
+  };
+  Object.keys(laterOutfits).forEach(function(k){ outfits[k] = laterOutfits[k]; });
 
   return { k: "ranks", yard: yard, outfits: outfits };
 },
@@ -10487,4 +11108,4 @@ function pack(T){
 
   return { k: "rockshow", homes: homes, scenes: scenes, yard: yard, outfits: outfits };
 }
-], {"seasons":[{"k":"halloween","n":"Halloween","when":"October","gift":true,"items":[{"id":"haunted-manor","n":"Haunted manor","kind":"home","rarity":"legendary","price":6500},{"id":"pumpkin-patch","n":"Pumpkin patch at dusk","kind":"scene","rarity":"legendary","price":5000},{"id":"floss-mummy","n":"Floss mummy","kind":"outfit","rarity":"rare","price":800},{"id":"bedsheet-ghost","n":"Bedsheet ghost","kind":"outfit","rarity":"epic","price":1800},{"id":"skeleton-suit","n":"Skeleton suit","kind":"outfit","rarity":"legendary","price":4500},{"id":"pumpkin-lantern","n":"Pumpkin lanterns","kind":"yard","rarity":"rare","price":700},{"id":"bubbling-cauldron","n":"Bubbling cauldron","kind":"yard","rarity":"epic","price":1800},{"id":"haunted-tree","n":"Haunted tree","kind":"yard","rarity":"legendary","price":4200}]},{"k":"thanksgiving","n":"Thanksgiving","when":"November 1 to the day after Thanksgiving","gift":false,"items":[{"id":"harvest-barn","n":"Harvest barn","kind":"home","rarity":"legendary","price":6000},{"id":"harvest-fields","n":"Harvest fields","kind":"scene","rarity":"legendary","price":5000},{"id":"scarecrow-hat","n":"Scarecrow hat","kind":"outfit","rarity":"rare","price":700},{"id":"football-helmet","n":"Football helmet","kind":"outfit","rarity":"epic","price":1800},{"id":"parade-marshal","n":"Parade grand marshal","kind":"outfit","rarity":"legendary","price":4500},{"id":"hay-bales","n":"Hay bales","kind":"yard","rarity":"rare","price":700},{"id":"harvest-table","n":"Harvest table","kind":"yard","rarity":"epic","price":2000},{"id":"turkey-balloon","n":"Turkey parade balloon","kind":"yard","rarity":"legendary","price":4500}]},{"k":"winter","n":"Winter holidays","when":"After Thanksgiving to December 26","gift":false,"items":[{"id":"log-cabin","n":"Snowy log cabin","kind":"home","rarity":"legendary","price":6500},{"id":"aurora-lake","n":"Frozen lake under the northern lights","kind":"scene","rarity":"legendary","price":5500},{"id":"ugly-sweater","n":"Holiday sweater","kind":"outfit","rarity":"rare","price":700},{"id":"elf-suit","n":"Elf suit","kind":"outfit","rarity":"epic","price":1800},{"id":"nutcracker","n":"Nutcracker uniform","kind":"outfit","rarity":"legendary","price":4800},{"id":"snow-globe","n":"Snow globe","kind":"yard","rarity":"rare","price":800},{"id":"ice-rink","n":"Ice rink","kind":"yard","rarity":"epic","price":2200},{"id":"holiday-tree","n":"Decorated tree","kind":"yard","rarity":"legendary","price":4500}]},{"k":"newyear","n":"New Year","when":"December 27 to January 2","gift":false,"items":[{"id":"clock-tower","n":"Clock tower","kind":"home","rarity":"legendary","price":7000},{"id":"midnight-rooftops","n":"Midnight rooftops","kind":"scene","rarity":"legendary","price":5500},{"id":"sparkle-bow-tie","n":"Sparkly bow tie","kind":"outfit","rarity":"rare","price":700},{"id":"tuxedo","n":"Tuxedo","kind":"outfit","rarity":"epic","price":2000},{"id":"father-time","n":"Father Time","kind":"outfit","rarity":"legendary","price":4500},{"id":"confetti-cannon","n":"Confetti cannon","kind":"yard","rarity":"rare","price":800},{"id":"countdown-clock","n":"Countdown clock","kind":"yard","rarity":"epic","price":2000},{"id":"ball-drop","n":"Midnight ball drop","kind":"yard","rarity":"legendary","price":4500}]},{"k":"mardigras","n":"Mardi Gras","when":"The week through Fat Tuesday","gift":false,"items":[{"id":"french-quarter","n":"French Quarter townhouse","kind":"home","rarity":"legendary","price":7000},{"id":"parade-street","n":"Parade street","kind":"scene","rarity":"legendary","price":5000},{"id":"bead-necklaces","n":"Parade beads","kind":"outfit","rarity":"rare","price":700},{"id":"jester","n":"Jester","kind":"outfit","rarity":"epic","price":1800},{"id":"carnival-king","n":"Carnival king","kind":"outfit","rarity":"legendary","price":4500},{"id":"bead-tree","n":"Bead tree","kind":"yard","rarity":"rare","price":700},{"id":"jazz-stand","n":"Jazz stand","kind":"yard","rarity":"epic","price":1800},{"id":"parade-float","n":"Parade float","kind":"yard","rarity":"legendary","price":4500}]},{"k":"valentine","n":"Valentine's Day","when":"February 8 to 14","gift":false,"items":[{"id":"heart-cottage","n":"Heart cottage","kind":"home","rarity":"legendary","price":6000},{"id":"rose-garden","n":"Rose garden","kind":"scene","rarity":"legendary","price":5000},{"id":"mail-cap","n":"Love-letter mail cap","kind":"outfit","rarity":"rare","price":700},{"id":"knight-of-hearts","n":"Knight of hearts","kind":"outfit","rarity":"epic","price":1800},{"id":"masquerade","n":"Masquerade mask and cape","kind":"outfit","rarity":"legendary","price":4500},{"id":"heart-balloon","n":"Heart balloons","kind":"yard","rarity":"rare","price":700},{"id":"swing-for-two","n":"Swing for two","kind":"yard","rarity":"epic","price":1800},{"id":"swan-pond","n":"Swan pond","kind":"yard","rarity":"legendary","price":4500}]},{"k":"toothfairy","n":"Tooth Fairy week","when":"February 22 to 28","gift":false,"items":[{"id":"pillow-palace","n":"Pillow palace","kind":"home","rarity":"legendary","price":7000},{"id":"fairy-glen","n":"Moonlit fairy glen","kind":"scene","rarity":"legendary","price":5500},{"id":"fairy-wand","n":"Wand and tiara","kind":"outfit","rarity":"rare","price":800},{"id":"fairy-wings","n":"Fairy wings","kind":"outfit","rarity":"epic","price":2000},{"id":"tooth-fairy","n":"The Tooth Fairy","kind":"outfit","rarity":"legendary","price":5000},{"id":"coin-pile","n":"Pile of shiny coins","kind":"yard","rarity":"rare","price":800},{"id":"tooth-pillow","n":"Tooth pillow","kind":"yard","rarity":"epic","price":1800},{"id":"fairy-ring","n":"Fairy ring","kind":"yard","rarity":"legendary","price":4500}]},{"k":"dentist","n":"Dentist's Day","when":"February 28 to March 6","gift":false,"items":[{"id":"dental-office","n":"Dental office","kind":"home","rarity":"legendary","price":7000},{"id":"main-street","n":"Main Street","kind":"scene","rarity":"legendary","price":5000},{"id":"gold-mirror","n":"Golden mouth mirror","kind":"outfit","rarity":"rare","price":900},{"id":"surgical-scrubs","n":"Surgical scrubs and mask","kind":"outfit","rarity":"epic","price":1800},{"id":"dr-timmy","n":"Dr. Timmy's long white coat","kind":"outfit","rarity":"legendary","price":4500},{"id":"dental-chair","n":"Dental chair","kind":"yard","rarity":"rare","price":900},{"id":"operatory-light","n":"Operatory light and tray","kind":"yard","rarity":"epic","price":1800},{"id":"molar-monument","n":"Molar monument","kind":"yard","rarity":"legendary","price":4500}]},{"k":"stpatrick","n":"St. Patrick's Day","when":"March 11 to 17","gift":false,"items":[{"id":"thatched-cottage","n":"Thatched cottage","kind":"home","rarity":"legendary","price":6000},{"id":"emerald-hills","n":"Emerald hills","kind":"scene","rarity":"legendary","price":5000},{"id":"flat-cap","n":"Tweed flat cap","kind":"outfit","rarity":"rare","price":700},{"id":"bagpiper","n":"Bagpiper","kind":"outfit","rarity":"epic","price":1800},{"id":"gold-buckle-suit","n":"Gold-buckle suit","kind":"outfit","rarity":"legendary","price":4500},{"id":"clover-patch","n":"Clover patch","kind":"yard","rarity":"rare","price":700},{"id":"wishing-well","n":"Wishing well","kind":"yard","rarity":"epic","price":1800},{"id":"pot-of-gold","n":"Pot of gold","kind":"yard","rarity":"legendary","price":4500}]},{"k":"easter","n":"Easter","when":"The week of Easter","gift":false,"items":[{"id":"egg-house","n":"Painted egg house","kind":"home","rarity":"legendary","price":6000},{"id":"tulip-meadow","n":"Tulip meadow","kind":"scene","rarity":"legendary","price":5000},{"id":"easter-bonnet","n":"Easter bonnet","kind":"outfit","rarity":"rare","price":700},{"id":"egg-painter","n":"Egg painter's smock","kind":"outfit","rarity":"epic","price":1800},{"id":"bunny-suit","n":"Bunny suit","kind":"outfit","rarity":"legendary","price":4500},{"id":"egg-basket","n":"Giant egg basket","kind":"yard","rarity":"rare","price":700},{"id":"carrot-patch","n":"Carrot patch","kind":"yard","rarity":"epic","price":1800},{"id":"chick-coop","n":"Chick coop","kind":"yard","rarity":"legendary","price":4200}]},{"k":"spring","n":"Spring","when":"March 20 to May 31","gift":false,"items":[{"id":"flowerpot-house","n":"Flowerpot house","kind":"home","rarity":"legendary","price":6000},{"id":"cherry-blossoms","n":"Cherry blossom grove","kind":"scene","rarity":"legendary","price":5000},{"id":"rain-slicker","n":"Raincoat and boots","kind":"outfit","rarity":"rare","price":700},{"id":"beekeeper","n":"Beekeeper","kind":"outfit","rarity":"epic","price":1800},{"id":"butterfly-wings","n":"Butterfly wings","kind":"outfit","rarity":"legendary","price":4500},{"id":"birdbath","n":"Birdbath","kind":"yard","rarity":"rare","price":700},{"id":"beehives","n":"Beehives","kind":"yard","rarity":"epic","price":1800},{"id":"greenhouse","n":"Glass greenhouse","kind":"yard","rarity":"legendary","price":4500}]},{"k":"july4","n":"Fourth of July","when":"June 28 to July 4","gift":false,"items":[{"id":"a-frame-cabin","n":"A-frame cabin","kind":"home","rarity":"legendary","price":6000},{"id":"fairgrounds","n":"Fairgrounds","kind":"scene","rarity":"legendary","price":5000},{"id":"stars-top-hat","n":"Stars-and-stripes top hat","kind":"outfit","rarity":"rare","price":700},{"id":"drum-major","n":"Drum major","kind":"outfit","rarity":"epic","price":1800},{"id":"lady-liberty","n":"Lady Liberty","kind":"outfit","rarity":"legendary","price":4500},{"id":"picnic-blanket","n":"Picnic blanket","kind":"yard","rarity":"rare","price":700},{"id":"fireworks-launcher","n":"Fireworks launcher","kind":"yard","rarity":"epic","price":1800},{"id":"ferris-wheel","n":"Little Ferris wheel","kind":"yard","rarity":"legendary","price":4500}]},{"k":"summer","n":"Summer","when":"June 1 to September 21","gift":false,"items":[{"id":"camper-van","n":"Camper van","kind":"home","rarity":"legendary","price":6500},{"id":"summer-lake","n":"Summer lake","kind":"scene","rarity":"legendary","price":5000},{"id":"snorkel","n":"Snorkel and flippers","kind":"outfit","rarity":"rare","price":700},{"id":"lifeguard","n":"Lifeguard","kind":"outfit","rarity":"epic","price":1800},{"id":"deep-sea-diver","n":"Deep-sea diver","kind":"outfit","rarity":"legendary","price":4500},{"id":"lawn-sprinkler","n":"Lawn sprinkler","kind":"yard","rarity":"rare","price":700},{"id":"barbecue-grill","n":"Barbecue grill","kind":"yard","rarity":"epic","price":1800},{"id":"water-slide","n":"Water slide","kind":"yard","rarity":"legendary","price":4500}]},{"k":"fall","n":"Fall","when":"September 22 to November 30","gift":false,"items":[{"id":"acorn-house","n":"Acorn house","kind":"home","rarity":"legendary","price":6000},{"id":"autumn-woods","n":"Autumn woods","kind":"scene","rarity":"legendary","price":5000},{"id":"flannel","n":"Flannel and scarf","kind":"outfit","rarity":"rare","price":700},{"id":"fox-hood","n":"Fox hood","kind":"outfit","rarity":"epic","price":1800},{"id":"tweed-professor","n":"Tweed professor","kind":"outfit","rarity":"legendary","price":4500},{"id":"leaf-pile","n":"Leaf pile","kind":"yard","rarity":"rare","price":700},{"id":"cider-stand","n":"Apple cider stand","kind":"yard","rarity":"epic","price":1800},{"id":"apple-tree","n":"Apple tree with a swing","kind":"yard","rarity":"legendary","price":4200}]}],"ranks":[{"gtier":1,"rank":"Antique","outfit":["rank-antique-outfit","Brass monocle and bowler","rare"],"yard":["rank-antique-yard","Treadle dental engine","rare"]},{"gtier":2,"rank":"Bronze","outfit":["rank-bronze-outfit","Bronze gladiator helmet","rare"],"yard":["rank-bronze-yard","Bronze bell","rare"]},{"gtier":3,"rank":"Silver","outfit":["rank-silver-outfit","Silver knight's helm","epic"],"yard":["rank-silver-yard","Silver trophy cup","epic"]},{"gtier":4,"rank":"Gold","outfit":["rank-gold-outfit","Golden laurels and toga","epic"],"yard":["rank-gold-yard","Golden tooth statue","epic"]},{"gtier":5,"rank":"Diamond","outfit":["rank-diamond-outfit","Diamond shades and ice cape","legendary"],"yard":["rank-diamond-yard","Diamond geode","legendary"]},{"gtier":6,"rank":"Dark Matter","outfit":["rank-dark-outfit","Dark Matter cloak","legendary"],"yard":["rank-dark-yard","Dark Matter orb","legendary"]}],"collections":[{"k":"dino","n":"Dino valley","note":"Giant ferns, a volcano smoking far off, and fossils with all their teeth","items":[{"id":"stone-den","n":"Stone-age den","kind":"home","rarity":"legendary","price":6000},{"id":"volcano-valley","n":"Volcano valley","kind":"scene","rarity":"epic","price":2400},{"id":"field-hat","n":"Fossil hunter's hat","kind":"outfit","rarity":"common","price":150},{"id":"fossil-vest","n":"Dig-site vest and brush","kind":"outfit","rarity":"uncommon","price":350},{"id":"stego-hood","n":"Stegosaurus hood","kind":"outfit","rarity":"rare","price":900},{"id":"dino-nest","n":"Dino egg nest","kind":"yard","rarity":"uncommon","price":400},{"id":"fossil-dig","n":"Fossil dig","kind":"yard","rarity":"rare","price":900},{"id":"trex-skeleton","n":"T. rex skeleton","kind":"yard","rarity":"epic","price":2200}]},{"k":"moonbase","n":"Moon base","note":"Craters, a dome with an airlock, and the Earth hanging in a black sky","items":[{"id":"moon-dome","n":"Moon base dome","kind":"home","rarity":"legendary","price":6500},{"id":"lunar-plains","n":"Lunar plains","kind":"scene","rarity":"epic","price":2600},{"id":"antenna-headband","n":"Antenna headband","kind":"outfit","rarity":"common","price":150},{"id":"space-visor","n":"Space visor","kind":"outfit","rarity":"uncommon","price":400},{"id":"jetpack","n":"Jetpack","kind":"outfit","rarity":"rare","price":1000},{"id":"moon-rover","n":"Moon rover","kind":"yard","rarity":"uncommon","price":450},{"id":"satellite-dish","n":"Satellite dish","kind":"yard","rarity":"rare","price":1000},{"id":"rocket","n":"Rocket on its pad","kind":"yard","rarity":"epic","price":2400}]},{"k":"reef","n":"Coral reef","note":"The bottom of a sunlit sea: kelp, coral, fish and a house in a shell","items":[{"id":"conch-house","n":"Conch shell house","kind":"home","rarity":"legendary","price":6000},{"id":"sunlit-reef","n":"Sunlit reef","kind":"scene","rarity":"epic","price":2600},{"id":"starfish-clip","n":"Starfish clip","kind":"outfit","rarity":"common","price":120},{"id":"octopus-hat","n":"Octopus hat","kind":"outfit","rarity":"uncommon","price":400},{"id":"mer-tail","n":"Mer-tail","kind":"outfit","rarity":"rare","price":950},{"id":"coral-garden","n":"Coral garden","kind":"yard","rarity":"uncommon","price":350},{"id":"giant-clam","n":"Giant clam","kind":"yard","rarity":"rare","price":900},{"id":"sunken-chest","n":"Sunken treasure chest","kind":"yard","rarity":"epic","price":2000}]},{"k":"desert","n":"Desert ranch","note":"Red rock mesas, cactus, a windmill and the widest sky there is","items":[{"id":"adobe-ranch","n":"Adobe ranch house","kind":"home","rarity":"legendary","price":5500},{"id":"red-rocks","n":"Red rock desert","kind":"scene","rarity":"epic","price":2200},{"id":"bandana","n":"Bandana","kind":"outfit","rarity":"common","price":120},{"id":"cowboy-hat","n":"Cowboy hat","kind":"outfit","rarity":"uncommon","price":350},{"id":"sheriff-vest","n":"Sheriff's vest and star","kind":"outfit","rarity":"rare","price":800},{"id":"cactus-garden","n":"Cactus garden","kind":"yard","rarity":"uncommon","price":300},{"id":"windmill-pump","n":"Windmill","kind":"yard","rarity":"rare","price":800},{"id":"covered-wagon","n":"Covered wagon","kind":"yard","rarity":"epic","price":1900}]},{"k":"arcade","n":"Retro arcade","note":"Pixel hills, a neon tooth over the door and a high score to beat","items":[{"id":"arcade-hall","n":"Arcade hall","kind":"home","rarity":"legendary","price":6500},{"id":"pixel-hills","n":"Pixel hills","kind":"scene","rarity":"epic","price":2400},{"id":"gamer-headset","n":"Gamer headset","kind":"outfit","rarity":"common","price":180},{"id":"pixel-shades","n":"Pixel shades","kind":"outfit","rarity":"uncommon","price":300},{"id":"high-score-jacket","n":"High-score jacket","kind":"outfit","rarity":"rare","price":850},{"id":"arcade-cabinet","n":"Arcade cabinet","kind":"yard","rarity":"uncommon","price":450},{"id":"pinball","n":"Pinball machine","kind":"yard","rarity":"rare","price":1000},{"id":"claw-machine","n":"Giant claw machine","kind":"yard","rarity":"epic","price":2200}]},{"k":"rockshow","n":"Rock show","note":"A record shop, a festival field and a stage with the lights up","items":[{"id":"record-shop","n":"Record shop","kind":"home","rarity":"legendary","price":6000},{"id":"festival-field","n":"Festival field","kind":"scene","rarity":"epic","price":2400},{"id":"band-tee","n":"Band tee","kind":"outfit","rarity":"common","price":120},{"id":"leather-jacket","n":"Leather jacket","kind":"outfit","rarity":"uncommon","price":450},{"id":"electric-guitar","n":"Electric guitar","kind":"outfit","rarity":"rare","price":1000},{"id":"amp-stack","n":"Amp stack","kind":"yard","rarity":"uncommon","price":400},{"id":"drum-kit","n":"Drum kit","kind":"yard","rarity":"rare","price":1000},{"id":"tour-stage","n":"Little stage and lights","kind":"yard","rarity":"epic","price":2400}]}]});
+], {"seasons":[{"k":"halloween","n":"Halloween","when":"October","gift":true,"items":[{"id":"haunted-manor","n":"Haunted manor","kind":"home","rarity":"legendary","price":6500},{"id":"pumpkin-patch","n":"Pumpkin patch at dusk","kind":"scene","rarity":"legendary","price":5000},{"id":"floss-mummy","n":"Floss mummy","kind":"outfit","rarity":"rare","price":800},{"id":"bedsheet-ghost","n":"Bedsheet ghost","kind":"outfit","rarity":"epic","price":1800},{"id":"skeleton-suit","n":"Skeleton suit","kind":"outfit","rarity":"legendary","price":4500},{"id":"pumpkin-lantern","n":"Pumpkin lanterns","kind":"yard","rarity":"rare","price":700},{"id":"bubbling-cauldron","n":"Bubbling cauldron","kind":"yard","rarity":"epic","price":1800},{"id":"haunted-tree","n":"Haunted tree","kind":"yard","rarity":"legendary","price":4200}]},{"k":"thanksgiving","n":"Thanksgiving","when":"November 1 to the day after Thanksgiving","gift":false,"items":[{"id":"harvest-barn","n":"Harvest barn","kind":"home","rarity":"legendary","price":6000},{"id":"harvest-fields","n":"Harvest fields","kind":"scene","rarity":"legendary","price":5000},{"id":"scarecrow-hat","n":"Scarecrow hat","kind":"outfit","rarity":"rare","price":700},{"id":"football-helmet","n":"Football helmet","kind":"outfit","rarity":"epic","price":1800},{"id":"parade-marshal","n":"Parade grand marshal","kind":"outfit","rarity":"legendary","price":4500},{"id":"hay-bales","n":"Hay bales","kind":"yard","rarity":"rare","price":700},{"id":"harvest-table","n":"Harvest table","kind":"yard","rarity":"epic","price":2000},{"id":"turkey-balloon","n":"Turkey parade balloon","kind":"yard","rarity":"legendary","price":4500}]},{"k":"winter","n":"Winter holidays","when":"After Thanksgiving to December 26","gift":false,"items":[{"id":"log-cabin","n":"Snowy log cabin","kind":"home","rarity":"legendary","price":6500},{"id":"aurora-lake","n":"Frozen lake under the northern lights","kind":"scene","rarity":"legendary","price":5500},{"id":"ugly-sweater","n":"Holiday sweater","kind":"outfit","rarity":"rare","price":700},{"id":"elf-suit","n":"Elf suit","kind":"outfit","rarity":"epic","price":1800},{"id":"nutcracker","n":"Nutcracker uniform","kind":"outfit","rarity":"legendary","price":4800},{"id":"snow-globe","n":"Snow globe","kind":"yard","rarity":"rare","price":800},{"id":"ice-rink","n":"Ice rink","kind":"yard","rarity":"epic","price":2200},{"id":"holiday-tree","n":"Decorated tree","kind":"yard","rarity":"legendary","price":4500}]},{"k":"newyear","n":"New Year","when":"December 27 to January 2","gift":false,"items":[{"id":"clock-tower","n":"Clock tower","kind":"home","rarity":"legendary","price":7000},{"id":"midnight-rooftops","n":"Midnight rooftops","kind":"scene","rarity":"legendary","price":5500},{"id":"sparkle-bow-tie","n":"Sparkly bow tie","kind":"outfit","rarity":"rare","price":700},{"id":"tuxedo","n":"Tuxedo","kind":"outfit","rarity":"epic","price":2000},{"id":"father-time","n":"Father Time","kind":"outfit","rarity":"legendary","price":4500},{"id":"confetti-cannon","n":"Confetti cannon","kind":"yard","rarity":"rare","price":800},{"id":"countdown-clock","n":"Countdown clock","kind":"yard","rarity":"epic","price":2000},{"id":"ball-drop","n":"Midnight ball drop","kind":"yard","rarity":"legendary","price":4500}]},{"k":"mardigras","n":"Mardi Gras","when":"The week through Fat Tuesday","gift":false,"items":[{"id":"french-quarter","n":"French Quarter townhouse","kind":"home","rarity":"legendary","price":7000},{"id":"parade-street","n":"Parade street","kind":"scene","rarity":"legendary","price":5000},{"id":"bead-necklaces","n":"Parade beads","kind":"outfit","rarity":"rare","price":700},{"id":"jester","n":"Jester","kind":"outfit","rarity":"epic","price":1800},{"id":"carnival-king","n":"Carnival king","kind":"outfit","rarity":"legendary","price":4500},{"id":"bead-tree","n":"Bead tree","kind":"yard","rarity":"rare","price":700},{"id":"jazz-stand","n":"Jazz stand","kind":"yard","rarity":"epic","price":1800},{"id":"parade-float","n":"Parade float","kind":"yard","rarity":"legendary","price":4500}]},{"k":"valentine","n":"Valentine's Day","when":"February 8 to 14","gift":false,"items":[{"id":"heart-cottage","n":"Heart cottage","kind":"home","rarity":"legendary","price":6000},{"id":"rose-garden","n":"Rose garden","kind":"scene","rarity":"legendary","price":5000},{"id":"mail-cap","n":"Love-letter mail cap","kind":"outfit","rarity":"rare","price":700},{"id":"knight-of-hearts","n":"Knight of hearts","kind":"outfit","rarity":"epic","price":1800},{"id":"masquerade","n":"Masquerade mask and cape","kind":"outfit","rarity":"legendary","price":4500},{"id":"heart-balloon","n":"Heart balloons","kind":"yard","rarity":"rare","price":700},{"id":"swing-for-two","n":"Swing for two","kind":"yard","rarity":"epic","price":1800},{"id":"swan-pond","n":"Swan pond","kind":"yard","rarity":"legendary","price":4500}]},{"k":"toothfairy","n":"Tooth Fairy week","when":"February 22 to 28","gift":false,"items":[{"id":"pillow-palace","n":"Pillow palace","kind":"home","rarity":"legendary","price":7000},{"id":"fairy-glen","n":"Moonlit fairy glen","kind":"scene","rarity":"legendary","price":5500},{"id":"fairy-wand","n":"Wand and tiara","kind":"outfit","rarity":"rare","price":800},{"id":"fairy-wings","n":"Fairy wings","kind":"outfit","rarity":"epic","price":2000},{"id":"tooth-fairy","n":"The Tooth Fairy","kind":"outfit","rarity":"legendary","price":5000},{"id":"coin-pile","n":"Pile of shiny coins","kind":"yard","rarity":"rare","price":800},{"id":"tooth-pillow","n":"Tooth pillow","kind":"yard","rarity":"epic","price":1800},{"id":"fairy-ring","n":"Fairy ring","kind":"yard","rarity":"legendary","price":4500}]},{"k":"dentist","n":"Dentist's Day","when":"February 28 to March 6","gift":false,"items":[{"id":"dental-office","n":"Dental office","kind":"home","rarity":"legendary","price":7000},{"id":"main-street","n":"Main Street","kind":"scene","rarity":"legendary","price":5000},{"id":"gold-mirror","n":"Golden mouth mirror","kind":"outfit","rarity":"rare","price":900},{"id":"surgical-scrubs","n":"Surgical scrubs and mask","kind":"outfit","rarity":"epic","price":1800},{"id":"dr-timmy","n":"Dr. Timmy's long white coat","kind":"outfit","rarity":"legendary","price":4500},{"id":"dental-chair","n":"Dental chair","kind":"yard","rarity":"rare","price":900},{"id":"operatory-light","n":"Operatory light and tray","kind":"yard","rarity":"epic","price":1800},{"id":"molar-monument","n":"Molar monument","kind":"yard","rarity":"legendary","price":4500}]},{"k":"stpatrick","n":"St. Patrick's Day","when":"March 11 to 17","gift":false,"items":[{"id":"thatched-cottage","n":"Thatched cottage","kind":"home","rarity":"legendary","price":6000},{"id":"emerald-hills","n":"Emerald hills","kind":"scene","rarity":"legendary","price":5000},{"id":"flat-cap","n":"Tweed flat cap","kind":"outfit","rarity":"rare","price":700},{"id":"bagpiper","n":"Bagpiper","kind":"outfit","rarity":"epic","price":1800},{"id":"gold-buckle-suit","n":"Gold-buckle suit","kind":"outfit","rarity":"legendary","price":4500},{"id":"clover-patch","n":"Clover patch","kind":"yard","rarity":"rare","price":700},{"id":"wishing-well","n":"Wishing well","kind":"yard","rarity":"epic","price":1800},{"id":"pot-of-gold","n":"Pot of gold","kind":"yard","rarity":"legendary","price":4500}]},{"k":"easter","n":"Easter","when":"The week of Easter","gift":false,"items":[{"id":"egg-house","n":"Painted egg house","kind":"home","rarity":"legendary","price":6000},{"id":"tulip-meadow","n":"Tulip meadow","kind":"scene","rarity":"legendary","price":5000},{"id":"easter-bonnet","n":"Easter bonnet","kind":"outfit","rarity":"rare","price":700},{"id":"egg-painter","n":"Egg painter's smock","kind":"outfit","rarity":"epic","price":1800},{"id":"bunny-suit","n":"Bunny suit","kind":"outfit","rarity":"legendary","price":4500},{"id":"egg-basket","n":"Giant egg basket","kind":"yard","rarity":"rare","price":700},{"id":"carrot-patch","n":"Carrot patch","kind":"yard","rarity":"epic","price":1800},{"id":"chick-coop","n":"Chick coop","kind":"yard","rarity":"legendary","price":4200}]},{"k":"spring","n":"Spring","when":"March 20 to May 31","gift":false,"items":[{"id":"flowerpot-house","n":"Flowerpot house","kind":"home","rarity":"legendary","price":6000},{"id":"cherry-blossoms","n":"Cherry blossom grove","kind":"scene","rarity":"legendary","price":5000},{"id":"rain-slicker","n":"Raincoat and boots","kind":"outfit","rarity":"rare","price":700},{"id":"beekeeper","n":"Beekeeper","kind":"outfit","rarity":"epic","price":1800},{"id":"butterfly-wings","n":"Butterfly wings","kind":"outfit","rarity":"legendary","price":4500},{"id":"birdbath","n":"Birdbath","kind":"yard","rarity":"rare","price":700},{"id":"beehives","n":"Beehives","kind":"yard","rarity":"epic","price":1800},{"id":"greenhouse","n":"Glass greenhouse","kind":"yard","rarity":"legendary","price":4500}]},{"k":"july4","n":"Fourth of July","when":"June 28 to July 4","gift":false,"items":[{"id":"a-frame-cabin","n":"A-frame cabin","kind":"home","rarity":"legendary","price":6000},{"id":"fairgrounds","n":"Fairgrounds","kind":"scene","rarity":"legendary","price":5000},{"id":"stars-top-hat","n":"Stars-and-stripes top hat","kind":"outfit","rarity":"rare","price":700},{"id":"drum-major","n":"Drum major","kind":"outfit","rarity":"epic","price":1800},{"id":"lady-liberty","n":"Lady Liberty","kind":"outfit","rarity":"legendary","price":4500},{"id":"picnic-blanket","n":"Picnic blanket","kind":"yard","rarity":"rare","price":700},{"id":"fireworks-launcher","n":"Fireworks launcher","kind":"yard","rarity":"epic","price":1800},{"id":"ferris-wheel","n":"Little Ferris wheel","kind":"yard","rarity":"legendary","price":4500}]},{"k":"summer","n":"Summer","when":"June 1 to September 21","gift":false,"items":[{"id":"camper-van","n":"Camper van","kind":"home","rarity":"legendary","price":6500},{"id":"summer-lake","n":"Summer lake","kind":"scene","rarity":"legendary","price":5000},{"id":"snorkel","n":"Snorkel and flippers","kind":"outfit","rarity":"rare","price":700},{"id":"lifeguard","n":"Lifeguard","kind":"outfit","rarity":"epic","price":1800},{"id":"deep-sea-diver","n":"Deep-sea diver","kind":"outfit","rarity":"legendary","price":4500},{"id":"lawn-sprinkler","n":"Lawn sprinkler","kind":"yard","rarity":"rare","price":700},{"id":"barbecue-grill","n":"Barbecue grill","kind":"yard","rarity":"epic","price":1800},{"id":"water-slide","n":"Water slide","kind":"yard","rarity":"legendary","price":4500}]},{"k":"fall","n":"Fall","when":"September 22 to November 30","gift":false,"items":[{"id":"acorn-house","n":"Acorn house","kind":"home","rarity":"legendary","price":6000},{"id":"autumn-woods","n":"Autumn woods","kind":"scene","rarity":"legendary","price":5000},{"id":"flannel","n":"Flannel and scarf","kind":"outfit","rarity":"rare","price":700},{"id":"fox-hood","n":"Fox hood","kind":"outfit","rarity":"epic","price":1800},{"id":"tweed-professor","n":"Tweed professor","kind":"outfit","rarity":"legendary","price":4500},{"id":"leaf-pile","n":"Leaf pile","kind":"yard","rarity":"rare","price":700},{"id":"cider-stand","n":"Apple cider stand","kind":"yard","rarity":"epic","price":1800},{"id":"apple-tree","n":"Apple tree with a swing","kind":"yard","rarity":"legendary","price":4200}]}],"ranks":[{"gtier":1,"rank":"Antique","outfit":["rank-antique-outfit","Brass monocle and bowler","rare"],"yard":["rank-antique-yard","Treadle dental engine","rare"]},{"gtier":2,"rank":"Bronze","outfit":["rank-bronze-outfit","Bronze gladiator helmet","rare"],"yard":["rank-bronze-yard","Bronze bell","rare"]},{"gtier":3,"rank":"Silver","outfit":["rank-silver-outfit","Silver knight's helm","epic"],"yard":["rank-silver-yard","Silver trophy cup","epic"]},{"gtier":4,"rank":"Gold","outfit":["rank-gold-outfit","Golden laurels and toga","epic"],"yard":["rank-gold-yard","Golden tooth statue","epic"]},{"gtier":5,"rank":"Diamond","outfit":["rank-diamond-outfit","Diamond shades and ice cape","legendary"],"yard":["rank-diamond-yard","Diamond geode","legendary"]},{"gtier":6,"rank":"Dark Matter","outfit":["rank-dark-outfit","Dark Matter cloak","legendary"],"yard":["rank-dark-yard","Dark Matter orb","legendary"]},{"gtier":7,"rank":"ModuPro Stone","outfit":["rank-modu-stone-outfit","Sculptor's beret and smock","epic"],"yard":["rank-modu-stone-yard","Half-carved stone molar","epic"]},{"gtier":8,"rank":"ModuPro Antique","outfit":["rank-modu-antique-outfit","Lab visor and brass-buttoned coat","epic"],"yard":["rank-modu-antique-yard","Brass articulator","epic"]},{"gtier":9,"rank":"ModuPro Bronze","outfit":["rank-modu-bronze-outfit","Foundry cap and casting tongs","epic"],"yard":["rank-modu-bronze-yard","Bronze casting machine","epic"]},{"gtier":10,"rank":"ModuPro Silver","outfit":["rank-modu-silver-outfit","Head mirror and scrub cap","epic"],"yard":["rank-modu-silver-yard","Silver instrument tray","epic"]},{"gtier":11,"rank":"ModuPro Gold","outfit":["rank-modu-gold-outfit","Gold crown and velvet cape","legendary"],"yard":["rank-modu-gold-yard","Golden dental chair","legendary"]},{"gtier":12,"rank":"ModuPro Diamond","outfit":["rank-modu-diamond-outfit","Crystal face shield and diamond bur","legendary"],"yard":["rank-modu-diamond-yard","Giant diamond bur","legendary"]},{"gtier":13,"rank":"ModuPro Dark Matter","outfit":["rank-modu-dark-outfit","Nebula cape and ringed planet","legendary"],"yard":["rank-modu-dark-yard","Nebula in a bell jar","legendary"]},{"gtier":14,"rank":"Loupes Stone","outfit":["rank-loupes-stone-outfit","Explorer's pith helmet","legendary"],"yard":["rank-loupes-stone-yard","Stone sundial","legendary"]},{"gtier":15,"rank":"Loupes Antique","outfit":["rank-loupes-antique-outfit","Navigator's tricorn and spyglass","legendary"],"yard":["rank-loupes-antique-yard","Brass telescope","legendary"]},{"gtier":16,"rank":"Loupes Bronze","outfit":["rank-loupes-bronze-outfit","Lamplighter's cap and lantern","legendary"],"yard":["rank-loupes-bronze-yard","Bronze armillary sphere","legendary"]},{"gtier":17,"rank":"Loupes Silver","outfit":["rank-loupes-silver-outfit","Bobble hat and binoculars","legendary"],"yard":["rank-loupes-silver-yard","Silver microscope","legendary"]},{"gtier":18,"rank":"Loupes Gold","outfit":["rank-loupes-gold-outfit","Sun crown and golden sash","legendary"],"yard":["rank-loupes-gold-yard","Golden lighthouse","legendary"]},{"gtier":19,"rank":"Loupes Diamond","outfit":["rank-loupes-diamond-outfit","Prism cape","legendary"],"yard":["rank-loupes-diamond-yard","Crystal prism","legendary"]},{"gtier":20,"rank":"Loupes Dark Matter","outfit":["rank-loupes-dark-outfit","Constellation robe and crescent moon","legendary"],"yard":["rank-loupes-dark-yard","Dark Matter observatory","legendary"]}],"collections":[{"k":"dino","n":"Dino valley","note":"Giant ferns, a volcano smoking far off, and fossils with all their teeth","items":[{"id":"stone-den","n":"Stone-age den","kind":"home","rarity":"legendary","price":6000},{"id":"volcano-valley","n":"Volcano valley","kind":"scene","rarity":"epic","price":2400},{"id":"field-hat","n":"Fossil hunter's hat","kind":"outfit","rarity":"common","price":150},{"id":"fossil-vest","n":"Dig-site vest and brush","kind":"outfit","rarity":"uncommon","price":350},{"id":"stego-hood","n":"Stegosaurus hood","kind":"outfit","rarity":"rare","price":900},{"id":"dino-nest","n":"Dino egg nest","kind":"yard","rarity":"uncommon","price":400},{"id":"fossil-dig","n":"Fossil dig","kind":"yard","rarity":"rare","price":900},{"id":"trex-skeleton","n":"T. rex skeleton","kind":"yard","rarity":"epic","price":2200}]},{"k":"moonbase","n":"Moon base","note":"Craters, a dome with an airlock, and the Earth hanging in a black sky","items":[{"id":"moon-dome","n":"Moon base dome","kind":"home","rarity":"legendary","price":6500},{"id":"lunar-plains","n":"Lunar plains","kind":"scene","rarity":"epic","price":2600},{"id":"antenna-headband","n":"Antenna headband","kind":"outfit","rarity":"common","price":150},{"id":"space-visor","n":"Space visor","kind":"outfit","rarity":"uncommon","price":400},{"id":"jetpack","n":"Jetpack","kind":"outfit","rarity":"rare","price":1000},{"id":"moon-rover","n":"Moon rover","kind":"yard","rarity":"uncommon","price":450},{"id":"satellite-dish","n":"Satellite dish","kind":"yard","rarity":"rare","price":1000},{"id":"rocket","n":"Rocket on its pad","kind":"yard","rarity":"epic","price":2400}]},{"k":"reef","n":"Coral reef","note":"The bottom of a sunlit sea: kelp, coral, fish and a house in a shell","items":[{"id":"conch-house","n":"Conch shell house","kind":"home","rarity":"legendary","price":6000},{"id":"sunlit-reef","n":"Sunlit reef","kind":"scene","rarity":"epic","price":2600},{"id":"starfish-clip","n":"Starfish clip","kind":"outfit","rarity":"common","price":120},{"id":"octopus-hat","n":"Octopus hat","kind":"outfit","rarity":"uncommon","price":400},{"id":"mer-tail","n":"Mer-tail","kind":"outfit","rarity":"rare","price":950},{"id":"coral-garden","n":"Coral garden","kind":"yard","rarity":"uncommon","price":350},{"id":"giant-clam","n":"Giant clam","kind":"yard","rarity":"rare","price":900},{"id":"sunken-chest","n":"Sunken treasure chest","kind":"yard","rarity":"epic","price":2000}]},{"k":"desert","n":"Desert ranch","note":"Red rock mesas, cactus, a windmill and the widest sky there is","items":[{"id":"adobe-ranch","n":"Adobe ranch house","kind":"home","rarity":"legendary","price":5500},{"id":"red-rocks","n":"Red rock desert","kind":"scene","rarity":"epic","price":2200},{"id":"bandana","n":"Bandana","kind":"outfit","rarity":"common","price":120},{"id":"cowboy-hat","n":"Cowboy hat","kind":"outfit","rarity":"uncommon","price":350},{"id":"sheriff-vest","n":"Sheriff's vest and star","kind":"outfit","rarity":"rare","price":800},{"id":"cactus-garden","n":"Cactus garden","kind":"yard","rarity":"uncommon","price":300},{"id":"windmill-pump","n":"Windmill","kind":"yard","rarity":"rare","price":800},{"id":"covered-wagon","n":"Covered wagon","kind":"yard","rarity":"epic","price":1900}]},{"k":"arcade","n":"Retro arcade","note":"Pixel hills, a neon tooth over the door and a high score to beat","items":[{"id":"arcade-hall","n":"Arcade hall","kind":"home","rarity":"legendary","price":6500},{"id":"pixel-hills","n":"Pixel hills","kind":"scene","rarity":"epic","price":2400},{"id":"gamer-headset","n":"Gamer headset","kind":"outfit","rarity":"common","price":180},{"id":"pixel-shades","n":"Pixel shades","kind":"outfit","rarity":"uncommon","price":300},{"id":"high-score-jacket","n":"High-score jacket","kind":"outfit","rarity":"rare","price":850},{"id":"arcade-cabinet","n":"Arcade cabinet","kind":"yard","rarity":"uncommon","price":450},{"id":"pinball","n":"Pinball machine","kind":"yard","rarity":"rare","price":1000},{"id":"claw-machine","n":"Giant claw machine","kind":"yard","rarity":"epic","price":2200}]},{"k":"rockshow","n":"Rock show","note":"A record shop, a festival field and a stage with the lights up","items":[{"id":"record-shop","n":"Record shop","kind":"home","rarity":"legendary","price":6000},{"id":"festival-field","n":"Festival field","kind":"scene","rarity":"epic","price":2400},{"id":"band-tee","n":"Band tee","kind":"outfit","rarity":"common","price":120},{"id":"leather-jacket","n":"Leather jacket","kind":"outfit","rarity":"uncommon","price":450},{"id":"electric-guitar","n":"Electric guitar","kind":"outfit","rarity":"rare","price":1000},{"id":"amp-stack","n":"Amp stack","kind":"yard","rarity":"uncommon","price":400},{"id":"drum-kit","n":"Drum kit","kind":"yard","rarity":"rare","price":1000},{"id":"tour-stage","n":"Little stage and lights","kind":"yard","rarity":"epic","price":2400}]}]});

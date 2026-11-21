@@ -994,7 +994,7 @@ function lint(hub, A){
         /* all of Desert ranch (migration_v65's collection), for the Collections view below */
         inventory: ['garden', 'mailbox', 'bowling-lane', 'castle', 'cowboy-hat', 'floss-mummy', 'adobe-ranch', 'red-rocks', 'bandana', 'sheriff-vest', 'cactus-garden', 'windmill-pump', 'covered-wagon']
           .map(id => ({ id, at: '2026-11-01', how: 'bought' })).concat([{ id: 'rank-antique-outfit', at: '2026-11-02', how: 'rank' }]),
-        locked: [{ id: 'rank-bronze-outfit', name: 'Bronze outfit', kind: 'outfit', rarity: 'rare', rank_tier: 2 }], equipped: Object.assign({}, equipped) });
+        locked: [{ id: 'rank-bronze-outfit', name: 'Bronze outfit', kind: 'outfit', rarity: 'rare', rank_tier: 2 }, { id: 'rank-modu-gold-outfit', name: 'Gold crown and velvet cape', kind: 'outfit', rarity: 'legendary', rank_tier: 11 }], equipped: Object.assign({}, equipped) });
       await page.route(/supabase\.co\/rest\/v1\/rpc\/get_widget_bootstrap_v2/, route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ rank, mastery: [], shop: shop() }) }));
       await page.route(/supabase\.co\/rest\/v1\/rpc\/get_my_shop/, route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(shop()) }));
       await page.route(/supabase\.co\/rest\/v1\/rpc\/equip_item/, route => {
@@ -1070,6 +1070,9 @@ function lint(hub, A){
             const rk = await page.$('dialog.tpv [data-src="rank"]'); if (rk) { await rk.click(); await page.waitForTimeout(300); }
             const lk = await page.evaluate(() => { const l = document.querySelector('dialog.tpv .tpv-card.is-locked'); return l ? l.textContent : ''; });
             if (!/Reach Bronze/.test(lk)) problems.push(`${name} (${label}): a rank outfit not reached yet should show locked, with the rank that gives it (${lk})`);
+            /* a later journey's piece (migration_v91) names its journey: "Reach ModuPro Gold" */
+            const lk2 = await page.evaluate(() => [...document.querySelectorAll('dialog.tpv .tpv-card.is-locked')].map(l => l.textContent).join(' | '));
+            if (!/Reach ModuPro Gold/.test(lk2)) problems.push(`${name} (${label}): a ModuPro rank outfit not reached yet should show locked with "Reach ModuPro Gold" (${lk2})`);
             const names = await page.$$eval('dialog.tpv button, dialog.tpv [role="button"]', bs => bs.filter(b => !(b.getAttribute('aria-label') || b.textContent || '').trim()).length);
             if (names) problems.push(`${name} (${label}): ${names} button(s) in the place's full view have no name`);
           }
