@@ -52,18 +52,21 @@
 .dc-film .xr-lam{fill:#cfcfcf}.dc-film .xr-pdl{fill:#2a2a2a}.dc-film .xr-dentin{fill:#b2b2b2}.dc-film .xr-enamel{fill:#ececec}.dc-film .xr-pulp{fill:#4f4f4f}
 .dc-film .xr-metal{fill:#fbfbfb}.dc-film .xr-crown{fill:#e4e4e4;stroke:#fff;stroke-width:1.2}.dc-film .xr-bore{fill:#3c3c3c}
 .dc-film .xr-dot{fill:#f3f3f3}
-/* Patient Box v2 on a film: composite a little less radiopaque than enamel with a crisp edge; caries and a periapical lesion
+/* Patient Box v2 on a film: composite about as radiopaque as enamel or a little more, with a crisp edge (Hitij and Fidler 2013:
+   every composite above dentin, most above enamel; v2.1's answers, 2026-11-21); caries and a periapical lesion
    dark but not as dark as soft tissue (the lesion in three soft layers); a root-filled tooth's chamber filled with its core */
-.dc-film .xr-comp{fill:#d8d8d8}.dc-film .xr-core{fill:#dedede}
-/* Patient Box v2.1 on a film: crowns by material (gold and a PFM's coping as bright as metal; porcelain a little under enamel's;
-   zirconia between enamel and metal, hiding the preparation almost entirely; lithium disilicate about enamel's, the preparation
-   and the pulp seen through it, outlined by its brighter resin cement; a stainless steel shell brightest at its edges), ceramic
-   inlays and veneers, an open margin's gap, calculus, endodontic detail and fractures */
-.dc-film .xr-porc{fill:#d2d2d2}.dc-film .xr-zr{fill:#f3f3f3}.dc-film .xr-zr-in{fill:#e9e9e9;opacity:.95}
-.dc-film .xr-li{fill:#dadada}.dc-film .xr-cement{fill:none;stroke:#f2f2f2;stroke-width:1.1;stroke-linejoin:round;stroke-linecap:round}
+.dc-film .xr-comp{fill:#f0f0f0}.dc-film .xr-core{fill:#dedede}
+/* Patient Box v2.1 on a film: crowns by material, ceramic inlays and veneers, an open margin's gap, calculus, endodontic detail
+   and fractures. Radiopacity (v2.1's answers, 2026-11-21, from mm-Al studies: Pekkan 2011, Atala 2019, Erzurumlu 2021, Hitij and
+   Fidler 2013): gold, amalgam and a PFM's metal brightest; zirconia close to them (Pekkan: about a base metal's), hiding the
+   preparation almost entirely; enamel and most composites next; lithium disilicate between dentin and enamel, nearer dentin, so
+   the preparation and the pulp show through it and its brighter resin cement outlines it; feldspathic porcelain (a PFM's, a
+   ceramic inlay's) about dentin's; a veneer a faint extra layer over the enamel; a stainless steel shell brightest at its edges */
+.dc-film .xr-porc{fill:#bcbcbc}.dc-film .xr-zr{fill:#f7f7f7}.dc-film .xr-zr-in{fill:#f2f2f2;opacity:.95}
+.dc-film .xr-li{fill:#c6c6c6}.dc-film .xr-cement{fill:none;stroke:#f2f2f2;stroke-width:1.1;stroke-linejoin:round;stroke-linecap:round}
 .dc-film .xr-ssc{fill:#f4f4f4;opacity:.55}.dc-film .xr-ssc-rim{fill:none;stroke:#fbfbfb;stroke-width:1.6;stroke-linejoin:round}
-.dc-film .xr-cer{fill:#d2d2d2}
-.dc-film .xr-veneer{fill:#e4e4e4;opacity:.4}.dc-film .xr-gap{fill:#262626}
+.dc-film .xr-cer{fill:#c2c2c2}
+.dc-film .xr-veneer{fill:#fff;opacity:.2}.dc-film .xr-gap{fill:#262626}
 .dc-film .xr-calc{fill:#d2d2d2;stroke:#d2d2d2;stroke-width:.4;stroke-linejoin:round}
 .dc-film .xr-sealer{fill:#f2f2f2;opacity:.9}.dc-film .xr-void{fill:#5a5a5a}.dc-film .xr-file{fill:#fff;stroke:#fff;stroke-width:.4}
 .dc-film .xr-fiber{fill:#c2c2c2;stroke:#8e8e8e;stroke-width:.8;stroke-linejoin:round}

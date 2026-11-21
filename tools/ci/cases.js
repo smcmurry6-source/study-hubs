@@ -53,6 +53,27 @@ for (const hub of fs.readdirSync(path.join(root, 'hubs')).sort()) {
   catch (e) { console.error(`${hub}: core.json's pcases do not load: ${e.message}`); bad++; continue; }
   checkSet(hub, K, PCASES, named, pfigs, qs);
 }
+/* the clinical calls v2.1's answers settled from outside sources (2026-11-21; the sources are in widget/cases.js's header):
+   each record must pass or fail validate() as written */
+{
+  const { K } = load('var PCASES = {};');
+  const base = { age: 50, sex: 'man', smoke: 0 };
+  const calls = [
+    ['a root-filled incisor with only a veneer (the lingual access open)', false, ['8'], [{ m: 'endo', tooth: '8', fill: 'adequate' }, { m: 'restoration', tooth: '8', surfaces: 'F', material: 'ceramic', type: 'veneer' }]],
+    ['a root-filled incisor with a veneer and its lingual access composite', true, ['8'], [{ m: 'endo', tooth: '8', fill: 'adequate' }, { m: 'restoration', tooth: '8', surfaces: 'F', material: 'ceramic', type: 'veneer' }, { m: 'restoration', tooth: '8', surfaces: 'L', material: 'composite' }]],
+    ['a root-filled molar with only a buccal Class V', false, ['19'], [{ m: 'endo', tooth: '19', fill: 'adequate' }, { m: 'restoration', tooth: '19', surfaces: 'B', material: 'composite' }]],
+    ['a root-filled molar with an occlusal composite', true, ['19'], [{ m: 'endo', tooth: '19', fill: 'adequate' }, { m: 'restoration', tooth: '19', surfaces: 'O', material: 'composite' }]],
+    ['a stainless steel crown on a premolar', false, ['20'], [{ m: 'restoration', tooth: '20', material: 'crown', crown: 'ssc' }]],
+    ['a stainless steel crown on a permanent molar', true, ['19'], [{ m: 'restoration', tooth: '19', material: 'crown', crown: 'ssc' }]],
+    ['a vertical root fracture on an untreated, unrestored premolar', false, ['20'], [{ m: 'fracture', tooth: '20', type: 'vrf', side: 'm' }]],
+    ['a vertical root fracture on an untreated molar not marked vital', false, ['19'], [{ m: 'fracture', tooth: '19', type: 'vrf', side: 'm', root: 'mesial' }]],
+    ['a vertical root fracture on an attrited, untreated molar marked vital', true, ['19'], [{ m: 'fracture', tooth: '19', type: 'vrf', side: 'm', root: 'mesial', vital: true }]],
+  ];
+  for (const [what, ok, teeth, modules] of calls) {
+    const p = K.validate(Object.assign({ teeth, modules }, base));
+    if (ok !== !p.length) { bad++; console.error(`✗ the kit's rules: ${what} should ${ok ? 'pass' : 'fail'} validate()` + (p.length ? ': ' + p.join('; ') : '')); }
+  }
+}
 /* the example cases (not on any page), checked like a hub's */
 {
   const ex = JSON.parse(fs.readFileSync(path.join(root, 'tools', 'cases', 'examples.json'), 'utf8'));

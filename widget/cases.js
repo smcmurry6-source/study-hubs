@@ -13,9 +13,34 @@
    material, inlays, onlays and veneers, posts and cores and root canal fillings by quality, fractures, recurrent caries,
    overhangs, open margins and fixed bridges, on every view, from Rosenstiel's Contemporary Fixed Prosthodontics, Cohen's
    Pathways of the Pulp, Andreasen's Textbook and Color Atlas of Traumatic Injuries (crown and root fractures) and White and
-   Pharoah (how each looks on a film: metal brightest, zirconia close to it, lithium disilicate and porcelain a shade under
-   enamel, a fiber post barely brighter than dentin; a vertical root fracture's J-shaped radiolucency; a crack that no film
-   shows). Everything drawn is original SVG. */
+   Pharoah (a vertical root fracture's J-shaped radiolucency; a crack that no film shows; a fiber post barely brighter than
+   dentin). Everything drawn is original SVG.
+   v2.1's clinical calls, settled from outside sources (Sam, 2026-11-21: "Use outside sources to determine answers"):
+   - radiopacity, from mm-Al studies: Pekkan et al., J Prosthet Dent 2011;106:109 (zirconia about as radiopaque as base metals and
+     above enamel; IPS e.max Press and feldspathic porcelains not different from dentin), Atala et al., J Esthet Restor Dent
+     2019;31:88 (e.max CAD equal to dentin), Erzurumlu et al., Clin Oral Investig 2021;25:5735 (e.max CAD and Vita Mark II above
+     dentin; resin cements above enamel), Hitij and Fidler, Clin Oral Investig 2013;17:1167 (every composite above dentin, most above
+     enamel), Balci et al., Oper Dent 2023;48:337 (amalgam highest; enamel about 2 mm Al per mm, dentin about 1): so gold, amalgam
+     and a PFM's metal brightest, zirconia close to them, then enamel and composite, lithium disilicate between dentin and enamel,
+     feldspathic porcelain about dentin's (cases.css);
+   - the access cavity of an uncrowned root-filled tooth: the whole chamber roof removed, its walls flaring a little to the occlusal
+     (Cohen's), on the lingual of an incisor or canine (directly over the chamber, as ADEX's endodontic criteria have it) and the
+     occlusal of a premolar or molar; restored with a bonded composite (amalgam under an amalgam), and needed: Ray and Trope, Int
+     Endod J 1995;28:12 (the coronal restoration's quality matters to the periapex as much as the filling's). A veneer doesn't
+     seal a lingual access (validate());
+   - a filling counts as short more than 2 mm from the radiographic apex (Sjogren et al., J Endod 1990;16:498; Schaeffer, White and
+     Walton, J Endod 2005;31:271: 0-1 mm best, over the apex worst); 4-5 mm of gutta-percha left under a post (Rahimi et al., J Oral
+     Sci 2008;50:435: the seal improves with each mm kept from 4 to 6);
+   - a stainless steel crown on a permanent tooth is for a molar (AAPD, Pediatric restorative dentistry, Reference Manual 2026:
+     primary teeth and permanent molars);
+   - a vertical root fracture without root canal treatment or a restoration is rare but real (Liao et al., J Endod 2017;43:687 and J
+     Pers Med 2021;11:1375: mostly attrited first molars of older patients, the mandibular mesial root): allowed on a molar marked
+     vital:true, an error elsewhere;
+   - calculus on a film kept as drawn (a spur about 0.5 mm proud, 1-2.5 mm long, just apical to the CEJ): films show only the
+     thicker, more extensive proximal deposits (Buchanan et al., J Periodontol 1987;58:747: 44% of surfaces; Hyer et al., J
+     Periodontol 2021;92:419: about half);
+   - the odontogram's bridge: the units joined by a bar, a pontic's crown drawn and its root crossed out (the usual charting
+     convention for a pontic: an X through the missing tooth's roots, the crowns outlined, a line joining the units). */
 (function(){
   'use strict';
   var I = {};
@@ -155,7 +180,7 @@
         if(md.widened) re.apdl = true;
         if(md.lesion) re.lesion = md.lesion; }
       else if(md.m === 'fracture'){ var rf = ensure(t, md.tooth), fx = { type:md.type };
-        ['depth', 'side', 'cusp', 'at', 'root', 'surface', 'pd'].forEach(function(k){ if(md[k] != null) fx[k] = md[k]; });
+        ['depth', 'side', 'cusp', 'at', 'root', 'surface', 'pd', 'vital'].forEach(function(k){ if(md[k] != null) fx[k] = md[k]; });
         if(md.type === 'vrf'){ var sf = md.surface === 'l' ? 'l' : 'f', dep = md.pd || 8; fx.surface = sf; fx.pd = dep;
           rf.pd = rf.pd || {}; rf.pd[sf] = (rf.pd[sf] || [2, 2, 2]).slice(); rf.pd[sf][1] = dep;
           rf.bop = rf.bop || {}; rf.bop[sf] = (rf.bop[sf] || [0, 0, 0]).slice(); rf.bop[sf][1] = 1; }
@@ -291,13 +316,13 @@
      the bone crest must agree: in a suprabony pocket the crest sits 0-3 mm apical to the pocket base, and a pocket
      base more than 1.5 mm apical to the crest needs a declared vertical defect that reaches it. */
   /* Patient Box v2.1's rules for one present tooth: crown materials and margins, indirect restorations, endodontic detail,
-     fractures and bridges. Every one is an error (validate() has no warnings): a vertical root fracture on a vital, unrestored
-     tooth is one too, because it is rare enough that a teaching case should not show it (Cohen's: most follow root canal
-     treatment, a post or a large restoration). */
+     fractures and bridges. Every one is an error (validate() has no warnings). A vertical root fracture on a tooth with no root
+     canal treatment or restoration is allowed only on a molar the case marks vital:true: most follow root canal treatment, a post
+     or a large restoration (Cohen's), and the untreated ones are nearly all attrited first molars (Liao et al. 2017, 2021). */
   function v21(t, w, cat, bad){
     var post = cat.pos >= 4, molar = cat.pos >= 6, fr = filmRoots(t.n), sides = function(v){ return /^(m|d|md|dm)$/.test(String(v)); };
     if(t.crownMat && CROWNS.indexOf(t.crownMat) < 0) bad(w + 'crown must be true or one of ' + CROWNS.join(', '));
-    if(t.crownMat === 'ssc' && !post) bad(w + 'a stainless steel crown is for a molar or premolar');
+    if(t.crownMat === 'ssc' && !molar) bad(w + 'a stainless steel crown on a permanent tooth is for a molar (AAPD: primary teeth and permanent molars)');
     if(t.crownMat === 'lithium' && molar && t.abut) bad(w + 'a lithium disilicate bridge is for the front of the mouth or premolars, not a molar abutment');
     Object.keys(t.margin).forEach(function(k){ if(['open', 'overhang'].indexOf(k) < 0) bad(w + 'margin.' + k + ' is not open or overhang'); else if(!sides(t.margin[k])) bad(w + 'margin.' + k + ' must be m, d or md'); });
     if((t.margin.open || t.margin.overhang) && !t.crown) bad(w + 'a crown margin (open, overhang) on a tooth with no crown');
@@ -335,7 +360,7 @@
       if(ty === 'cusp'){ if(cuspsOf(t.n).indexOf(f.cusp) < 0) bad(w + 'cusp must be one of ' + (cuspsOf(t.n).join(', ') || 'a premolar\'s or molar\'s')); if(t.crown) bad(w + 'a fractured cusp under a full crown'); }
       if(ty === 'crack' && t.crown) bad(w + 'a cracked tooth under a full crown');
       if(ty === 'vrf'){ if(f.root && fr.indexOf(f.root) < 0) bad(w + 'vrf root must be one the film shows (' + fr.join(', ') + ')'); if(f.side && f.side !== 'm' && f.side !== 'd') bad(w + 'vrf side must be m or d');
-        if(!t.endo && !t.resto.length && !t.crown && !t.amalgam) bad(w + 'a vertical root fracture on a vital, unrestored tooth: it follows root canal treatment, a post or a large restoration');
+        if(!t.endo && !t.resto.length && !t.crown && !t.amalgam && !(molar && f.vital === true)) bad(w + (molar ? 'a vertical root fracture on an untreated, unrestored molar is rare: mark it vital:true (an attrited molar, Liao 2017) or give the tooth its root canal treatment or restoration' : 'a vertical root fracture on a vital, unrestored ' + (post ? 'premolar' : 'anterior tooth') + ': it follows root canal treatment, a post or a large restoration (untreated ones are nearly all molars)'));
         if(f.pd != null){ num(f.pd, 5, 12, w + 'vrf pocket'); } }
       if(ty === 'hrf'){ if(cat.roots.length > 1) bad(w + 'a horizontal root fracture is drawn on a single-rooted tooth'); if(HRF_AT.indexOf(f.at) < 0) bad(w + 'hrf at must be ' + HRF_AT.join(', ')); }
     });
@@ -458,7 +483,8 @@
         if(t.furcX > fmax) bad(w + 'the film shows more furcation loss (furcX ' + t.furcX + ') than the probe found (' + fmax + ')');
         if((fcs[0] === 3) !== (fcs[1] === 3) && !t.d.pal) bad(w + 'a Class III furcation is through and through: both surfaces');
       }
-      if(t.endo && !(t.crown || t.amalgam || t.resto.length)) bad(w + 'a root-filled tooth needs a restoration (a crown, or a restoration over the access)');
+      if(t.endo && !t.implant && !(t.crown || t.amalgam || t.resto.some(function(r){ return r.type !== 'veneer' && (cat.pos <= 3 ? /L/.test(r.s) : (/O/.test(r.s) || r.type === 'onlay' || (/M/.test(r.s) && /D/.test(r.s)))); })))
+        bad(w + 'a root-filled tooth needs its access restored: a crown, or a restoration over the access (' + (cat.pos <= 3 ? 'L on an incisor or canine: a veneer alone leaves the lingual access open' : 'one with O') + '; Ray and Trope 1995)');
     });
     if(ts.some(function(t){ return t.pontic || t.abut; }) || toothKeys(spec.t).some(function(n){ return spec.t[n].pontic || spec.t[n].abut; })) bridgeCheck(spec, bad);
     return P;
@@ -609,7 +635,9 @@
     if(o.eo && o.crown) s += coreSVG(g);
     if(o.caries && !o.crown) s += cariesSVG(g, true);
     /* restorations by surface (Patient Box v2's resto); a v1 tooth with only amalgam:true keeps its occlusal restoration */
-    if(o.resto && o.resto.length) s += o.resto.map(function(r){ return restoSVG(g, r, C); }).join('');
+    /* an incisor's or canine's lingual restoration on a root-filled tooth is its access restoration: accessSVG draws it, where
+       the access is (a film projects it over the middle of the crown), not as a cervical Class V */
+    if(o.resto && o.resto.length) s += o.resto.map(function(r){ return o.endo && !o.crown && posOf(o.n || 4) <= 3 && r.s === 'L' && (r.type || 'direct') === 'direct' ? '' : restoSVG(g, r, C); }).join('');
     else if(o.amalgam) s += amalgamSVG(g);
     if(o.caries) s += cariesSVG(g, false, C);
     if(o.crownMat) s += crownMatSVG(g);
@@ -689,7 +717,7 @@
   function rootName(g, i){ var c = CAT(g.o.n); return c ? (c.pos >= 6 ? c.roots[i] : c.roots[0]) : ''; }
   /* a root canal filling: radiopaque gutta-percha down each canal to just short of the apex (v1: endo:true). The detail
      (Cohen's Pathways of the Pulp; White and Pharoah): adequate ends 0.5-2 mm short of the radiographic apex; short more than
-     2 mm short, the canal dark beyond it; long past the apex with a puff of sealer; voids dark gaps in a poorly condensed
+     2 mm short (Sjogren 1990), the canal dark beyond it; long past the apex with a puff of sealer; voids dark gaps in a poorly condensed
      filling; a separated instrument a thin, brighter fragment in the apical third with the filling stopping on it; a missed
      canal no filling at all; a post down the coronal two thirds, leaving 4-5 mm of gutta-percha: cast (as bright as metal,
      tapered, one piece with its core), prefabricated metal (parallel, serrated) or fiber (barely more radiopaque than dentin,
@@ -762,19 +790,20 @@
     return lo == null ? null : [lo, hi];
   }
   /* a root-filled tooth without a crown: the access cavity, opened through the occlusal surface (an incisor's or canine's
-     lingual, which a film projects over the middle of the crown) into the unroofed chamber and filled with the chamber's
-     material, so a restoration over it meets the gutta-percha with no dentin bridge between (Cohen) */
+     lingual, which a film projects over the middle of the crown) into the unroofed chamber, as wide as the chamber with its walls
+     flaring a little toward the occlusal (the roof removed whole, no overhang: Cohen's), and filled with the chamber's material, so
+     a restoration over it meets the gutta-percha with no dentin bridge between */
   function accessSVG(g, C){
     var d = g.d, k = g.k, ch = TL.pulpPts(d, g.X, k, g.cej, g.roots)[0], ant = posOf(g.o.n || 4) <= 3;
     var yb = g.cej - (d.tr ? .5 : .2) * k, sp = spanAt(ch, yb); if(!sp) return '';
-    var cx = (sp[0] + sp[1]) / 2, hw = (sp[1] - sp[0]) / 2, ht = d.tr ? hw * .85 : hw * 1.1 + .25 * k;
+    var cx = (sp[0] + sp[1]) / 2, hw = (sp[1] - sp[0]) / 2, ht = d.tr ? hw * 1.08 : hw * 1.1 + .25 * k;
     var yt = ant ? g.cej - d.ch * .62 * k : g.cej - (d.ch - 1.5) * k, yd = yb + .5 * k;
     var pts = TL.filletClosed([[cx - hw, yd], [cx - ht, yt], [cx + ht, yt], [cx + hw, yd]], (ant ? .7 : .45) * k);
     return path(accessCls(g), C ? C(pts) : pts);
   }
   /* a restoration's outline by its surfaces (the library's restoParts): metal for amalgam and gold, crisp and bright; composite a
-     little less radiopaque than enamel; a ceramic inlay or onlay about as radiopaque as enamel, outlined on the tooth's side by
-     its radiopaque resin cement (a line along the preparation's walls and floors, never past the tooth's surface); a veneer a
+     about as radiopaque as enamel or a little more; a ceramic inlay or onlay about as radiopaque as dentin (feldspathic or
+     lithium disilicate: Pekkan 2011, Atala 2019), outlined on the tooth's side by its radiopaque resin cement (a line along the preparation's walls and floors, never past the tooth's surface); a veneer a
      faint shell over the labial face. An open margin's gap is dark, drawn under the restoration. Over an occlusal restoration
      the cusps project, so the crown above it is enamel (occCap) */
   function restoSVG(g, r, C){
@@ -856,9 +885,10 @@
   }
   /* a crown by its material (v2.1; White and Pharoah, Rosenstiel's preparations). Full gold: the whole crown as bright as metal,
      nothing of the tooth showing through. Porcelain-fused-to-metal: the metal coping as bright as metal over the whole
-     preparation, a metal collar at the margin, and the porcelain over it a layer less radiopaque, about enamel's. Zirconia:
-     between enamel and metal (several times enamel's radiopacity), the preparation barely seen through it. Lithium disilicate:
-     about enamel's radiopacity, the preparation and the pulp seen through it, outlined by the brighter resin cement. Stainless steel: a thin
+     preparation, a metal collar at the margin, and the porcelain over it much less radiopaque, about dentin's (Pekkan 2011).
+     Zirconia: nearly as bright as metal (Pekkan: like a base metal's), the preparation barely seen through it. Lithium
+     disilicate: between dentin and enamel, nearer dentin (Pekkan, Atala, Erzurumlu), the preparation and the pulp seen through it,
+     outlined by the brighter resin cement. Stainless steel: a thin
      metal shell, brightest at its edges where the beam meets it side on, its margin crimped in just below the cervical line. */
   function crownMatSVG(g){
     var m = g.o.crownMat, P = TL.prepMM(g.o.t, m), L = P.L, all = mmPx(g, L.C), s = '';
@@ -884,7 +914,8 @@
   /* calculus on a film (White and Pharoah, Newman and Carranza): a radiopaque spur on each proximal root surface just apical to
      the CEJ, seen tangentially where the deposit rings the root: about half a millimeter proud at its coronal end, tapering
      apically onto the root over 1-2.5 mm, never below the bone crest (it sits in the pocket); its outer edge irregular and
-     crusty (small points, not smooth lobes); a little less radiopaque than enamel. On the outer side of the leftmost and the
+     crusty (small points, not smooth lobes); a little less radiopaque than enamel. Films show only the thicker, more extensive
+     deposits (Buchanan 1987: 44% of proximal surfaces with calculus; Hyer 2021: half), so a drawn one is a clear one. On the outer side of the leftmost and the
      rightmost root, so it never sits in a furcation. */
   function calcSVG(g){
     var k = g.k, s = '', a = g.roots[0], b = g.roots[g.roots.length - 1], r0 = a.a0 <= b.a0 ? a : b, rN = r0 === a ? b : a, c = crestLR(g);
@@ -1216,8 +1247,10 @@
     if(t.missing && t.pontic){
       ['O', 'F', 'L', 'M', 'D'].forEach(function(x){ out += path('dc-osurf dc-o-crowned' + (cm === 'gold' ? ' dc-o-gold' : ''), P[x]); });
       out += '<rect class="dc-o-crown" x="' + f1(cx - r - 2) + '" y="' + f1(cy - r - 2) + '" width="' + (2 * r + 4) + '" height="' + (2 * r + 4) + '" rx="3.5"/>' + txt(cx, cy + 2.6, LET[cm] || '', 'dc-olet', 'middle');
-      var py = edge + dir * 6;
-      return out + '<path class="dc-ox dc-o-nroot" d="M' + f1(cx - 3) + ' ' + f1(py - 3) + 'l6 6m0 -6l-6 6"/>';
+      /* the charting convention for a pontic: its crown drawn (the box, crowned and lettered) and its root crossed out, an X from
+         the box to where the root would end */
+      var py0 = edge + dir * 1.5, py1 = edge + dir * 13;
+      return out + '<path class="dc-ox dc-o-nroot" d="M' + f1(cx - 4) + ' ' + f1(py0) + 'L' + f1(cx + 4) + ' ' + f1(py1) + 'M' + f1(cx + 4) + ' ' + f1(py0) + 'L' + f1(cx - 4) + ' ' + f1(py1) + '"/>';
     }
     if(t.missing){
       ['O', 'F', 'L', 'M', 'D'].forEach(function(x){ out += path('dc-osurf dc-o-gone', P[x]); });
@@ -1305,7 +1338,7 @@
       (has.ven ? k(path('dc-osurf dc-o-ceramic dc-o-ven', sq), 'veneer') : '') +
       (has.rec ? k(path('dc-osurf dc-o-amalgam', sq) + hatch(sq, 3.2).replace('dc-o-hatch', 'dc-o-hatch dc-o-hatch-r'), 'recurrent caries') : '') +
       (has.letters ? '<span class="dc-ok dc-ok-t">crown letters: G gold, P porcelain-fused-to-metal, Z zirconia, L lithium disilicate, S stainless steel</span>' : '') +
-      (has.bridge ? k('<path class="dc-o-bar" d="M1 8H15"/>', 'bridge (pontic: crowned box, no root)') : '') +
+      (has.bridge ? k('<path class="dc-o-bar" d="M1 8H15"/>', 'bridge (a bar joins its units)') + k(path('dc-osurf dc-o-crowned', [[4, 1.5], [12, 1.5], [12, 7.5], [4, 7.5]]) + '<path class="dc-ox dc-o-nroot" d="M5.5 9L10.5 15M10.5 9L5.5 15"/>', 'pontic (crown drawn, root crossed out: the tooth is missing)') : '') +
       (has.post ? k('<path class="dc-o-endo" d="M8 1.5V14.5"/><path class="dc-o-post" d="M8 1.5V7"/>', 'post') : '') +
       (has.sep ? k('<path class="dc-o-endo" d="M8 1.5V14.5"/><path class="dc-o-sep" d="M5 11H11"/>', 'separated instrument') : '') +
       (has.fx ? k('<path class="dc-o-fx" d="M1.5 9l3 -3l3 4l3 -4l3.5 3.5"/>', 'fracture') : '') +

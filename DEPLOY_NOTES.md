@@ -32,6 +32,20 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-21 (Patient Box v2.1's clinical calls settled from outside sources, Claude Code)** — Sam: "Use outside sources to
+  determine answers" to the questions v2.1's review left. Radiopacity on a film now follows mm-Al studies (Pekkan 2011, Atala
+  2019, Erzurumlu 2021, Hitij and Fidler 2013, Balci 2023): zirconia nearly as bright as metal, composite about enamel's or a
+  little more, lithium disilicate between dentin and enamel (nearer dentin), feldspathic porcelain (a PFM's, a ceramic inlay's)
+  about dentin's, a veneer a faint extra layer (`widget/cases.css`). A molar's access cavity flares to the occlusal instead of
+  narrowing, and an incisor's `L` composite on a root-filled tooth is drawn as its access, not a Class V. `validate()`: a
+  root-filled tooth needs its access restored (a crown, or a restoration with O on a posterior tooth or L on an anterior one; a
+  veneer alone fails: Ray and Trope 1995); a stainless steel crown only on a molar (AAPD 2026); a vertical root fracture on an
+  untreated, unrestored tooth only on a molar marked `vital: true` (Liao 2017, 2021). A gold onlay's cusps are reduced 1.5 mm,
+  a ceramic one's 1.8 (`widget/teeth.js`). The odontogram's pontic: its root crossed out with a full-length X, and a key entry
+  for it. Kept, with sources: short fill > 2 mm, 4-5 mm of gutta-percha under a post, calculus's size, the box floor, no
+  horizontal root fracture on the view. `tools/ci/cases.js` checks the new rules; the four examples and Perio's eleven old cases
+  still pass. Sources in `widget/cases.js`'s header and [draw-a-patient-box-case](vault/how-to/draw-a-patient-box-case.md).
+  `sw.js` VERSION sh-v71.
 - **2026-11-21 (A name changed on one linked device shows on the other, BUG-196, Claude Code)** — Sam: "When you change
   your name on one device it doesnt change on the other linked device. Its still saying 'welcome count plaqula'". Linked
   devices share one id, so the server already had the new name, but each device kept its own copy (`sh_display_name`) and
