@@ -2157,7 +2157,7 @@
      What each prize pays in XP, with as many Shiny Gold Crowns (study XP pays 5 crowns per 10). The server's sh_prizes()
      says the same and tools/release/xp.js checks the two match. ring is per question of the daily goal; streak and row
      are [reached, pays]; medal is Bronze to Crown. The cards that offer a prize read it from here (window.shGame.prizes). */
-  var PRIZES = { name: 500, ring: 5, boss: 500, nuke: 10000, alltime: 20000, notes: 50, trophy: 200, visit: 50, game: 100, pb: 50, top: 250, report: 100, collection: 1000, dark: 5000, modupro: 20000, loupes: 30000, streak: [[3, 100], [7, 300], [14, 700], [30, 1500], [60, 3000], [100, 5000]], row: [[10, 25], [25, 100], [50, 250]], medal: [250, 500, 750, 1000] };
+  var PRIZES = { name: 500, ring: 5, boss: 500, nuke: 10000, alltime: 20000, notes: 50, trophy: 200, visit: 50, game: 100, pb: 50, top: 250, report: 100, collection: 1000, dark: 5000, modupro: 20000, loupes: 30000, fairy: 250, goldfairy: 500, probe: 300, perfect: 750, misses: 100, idea: 500, back: 200, streak: [[3, 100], [7, 300], [14, 700], [30, 1500], [60, 3000], [100, 5000]], row: [[10, 25], [25, 100], [50, 250]], medal: [250, 500, 750, 1000] };
   function fmtN(n){ return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ","); }
   /* what a prize is called ("Daily goal done"), for the engine's reward card (widget/hub-rewards.js), and what it says
      when it's paid: "Daily goal done: +100 XP and 100 crowns" */
@@ -2168,7 +2168,9 @@
       alltime: "New all-time record, " + (d.n || "") + " right in a row", notes: "Notes read to the end", trophy: won > 1 ? won + " new trophies" : "New trophy",
       visit: "Visiting a classmate's Timmy", game: "First game today", pb: "New personal best", top: "Top score in this hub", report: "Report fixed",
       row: (d.n || "") + " right in a row", streak: (d.n || "") + " days in a row", medal: "Hub medal", "pod-done": "Timmy Time finished",
-      collection: won > 1 ? won + " collections finished" : "Collection finished" }[src] || "Bonus";
+      collection: won > 1 ? won + " collections finished" : "Collection finished",
+      fairy: "First Tooth Fairy caught", goldfairy: "First Golden Tooth Fairy caught", probe: "Today's Golden Probe", perfect: "A perfect mock",
+      misses: "Yesterday's misses, all right", idea: "Your idea shipped", back: "Welcome back" }[src] || "Bonus";
   }
   function prizeText(src, xp, d){
     return prizeName(src, d) + ": +" + fmtN(xp) + " XP and " + fmtN(xp) + (xp === 1 ? " crown" : " crowns");
@@ -2251,7 +2253,7 @@
   function finishPaid(id, info, r){
     if (!r || !r.ok) return;
     try { document.dispatchEvent(new CustomEvent("sh:session-paid", { detail: { session: id, kind: info.kind || "mock", game: info.game || null, res: r } })); } catch (e) {}
-    setCrowns(r.crowns); prizeWon("game", r.game, r); prizeWon("pb", r.pb, r); prizeWon("top", r.top, r);
+    setCrowns(r.crowns); prizeWon("game", r.game, r); prizeWon("pb", r.pb, r); prizeWon("top", r.top, r); prizeWon("perfect", r.perfect, r);
   }
   /* ---------- a session's finish held behind its answers (2026-11-19) ----------
      The server counts a mock's answers when it is finished (its score, and its +50 from 10 answers), so a finish must
