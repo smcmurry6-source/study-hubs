@@ -88,7 +88,7 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   instead, at any hour (`admin_cache`'s `quality`, first worked out at 1:41 am that night; the query in `tools/lessons-refresh.md`
   step 1; refreshed nightly for a week, and every 15 minutes while the admin page is in use). Tick this when it's read. (Not run again on 2026-11-19 at 5 pm either, the
   Heme & Endo Exam 3 eve; that audit found test runs in the data by reading the clicks, BUG-192.)
-- [ ] **More ways to earn crowns, if Sam wants them** (2026-11-17; Sam, with the prizes of `migration_v68.sql`: "im open to
+- [x] **More ways to earn crowns, if Sam wants them** (done 2026-11-20: Sam, "Yes and backpay"; seven prizes in `migration_v92.sql`, [game-server](../reference/game-server.md)) (#514) (2026-11-17; Sam, with the prizes of `migration_v68.sql`: "im open to
   other ways too"). Ideas offered, none built: catching the Tooth Fairy or the Golden Probe, a perfect mock, Yesterday's
   misses all right, an idea of yours marked done on the idea board, the first day back after a week away. Each would be one
   `xp_awards` row with a key that pays once and an amount in `sh_prizes()` ([game-server](../reference/game-server.md)).
