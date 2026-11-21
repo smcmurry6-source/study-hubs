@@ -32,6 +32,10 @@ systems. they do indicate higher yield content, however"): its topics and hints 
 the same way but never called a prediction of this hub's exam. Set `"hintsFrom": "courses"` in its `core.json`: the engine and Ask
 Timmy then say High yield and High-yield points instead of High likelihood and Exam hints.
 
+**The boards hub has none for now** (Sam, 2026-11-21: "I have no idea so maybe just take it out for now", asked what should rank
+a board exam's topics): its `LIKELY_TOPICS` stays empty, and once its first unit is published the CI check skips boards instead of
+asking for ranked topics ([boards](../hubs/boards.md)).
+
 **They also write the High yield notes** (Sam, 2026-11-12): on the engine (every hub since the redesign's release), each lecture's
 notes have a third reading level, **High yield**, built from its topics in this order, each with the notes' paragraphs its
 questions point to and the Exam Hints' takeaways (`tools/hub-next/high-yield.mjs`, run by `tools/hub-next/build.mjs`). So a
