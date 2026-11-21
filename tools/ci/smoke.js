@@ -1636,7 +1636,11 @@ function lint(hub, A){
       const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Chicago' }).format(new Date());
       /* widget/pet.js by itself (a live page) or inside the bundle the redesign's pages load it from */
       const petFrom = async page => page.route(/\/widget\/(pet|rest\.bundle)\.js(\?.*)?$/, async route => {
-        const r = await route.fetch(), t = await r.text(), from = /var FULL_FROM = "\d{4}-\d{2}-\d{2}";/;
+        /* the test's own file server can reset a reused connection (BUG-195): try twice, then say which file and go on */
+        let r, t, err;
+        for (let i = 0; i < 2 && !t; i++) try { r = await route.fetch(); t = await r.text(); } catch (e) { err = e; }
+        if (!t) { problems.push(`widget/${widgetFile(route.request().url())} (${label}): the test's file server failed it twice (${(err && err.message || '').split('\n')[0]})`); return route.abort().catch(() => {}); }
+        const from = /var FULL_FROM = "\d{4}-\d{2}-\d{2}";/;
         if (!from.test(t)) problems.push(`widget/${widgetFile(route.request().url())} (${label}): no \`var FULL_FROM = "yyyy-mm-dd";\` line (tools/preview/transform.js looks for it to point it at a preview's start)`);
         return route.fulfill({ response: r, body: t.replace(from, `var FULL_FROM = "${today}";`) });
       });
