@@ -50,7 +50,7 @@ the course the student is in** ("Let's do your recommendation to have Timmy only
 - [ ] MSK & GI: MG-2's foregut and abdominal wall decks (`2-Anatomy of the Foregut - Herr.pptx`, 81 MB;
       `4-Anatomy of the Anterolateral and Posterior Abdominal Wall - Herr.pptx`, 94 MB) could not be read: need a PDF
       or smaller copy
-- [ ] MSK & GI: MG-3 (GI pathology and drugs) against the slides
+- [x] MSK & GI: MG-3 (GI pathology and drugs) against the slides (Dr. Kmeid's, Dr. Reid's, Dr. Wilborn's and Dr. Taylor's decks)
 - [ ] Fundamentals I: F1-1 to F1-9 against the slides
 - [ ] Fundamentals II: F2-1 to F2-8 against the slides
 - [x] Ask Timmy reads one course first (`supabase/functions/timmy/core.js`, `widget/hub-timmy.js`, the tests)
