@@ -112,4 +112,8 @@ Rules:
 - Title: `Lessons refresh YYYY-MM-DD`. Body, in plain student-facing language: what changed on the live hubs, then
   the `LESSONS.md` highlights, the report verdicts, and "For Sam" (proposals and anything that needs a decision).
 - Add a line to "Recent major changes" in `DEPLOY_NOTES.md` only when live hubs changed.
+- Trim the change log in the same PR (2026-11-22, [the sustainability task](../vault/tasks/2026-11-22-sustainable-for-years.md)):
+  `node tools/deploy-notes/trim.mjs` moves every entry more than a week old, unchanged, to its month's
+  `DEPLOY_NOTES-<yyyy-mm>.md`; commit what it changes. Run it after bringing `main` in, so the entries other sessions just
+  added at the top stay where they are.
 - Watch the PR until CI is green, and merge only when Sam says so.

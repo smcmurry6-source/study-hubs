@@ -31,6 +31,8 @@ python tools/podcast/produce.py /tmp/stems hubs/msk-exam4/audio/timmy-time.mp3 \
 ```
 
 Then copy `duration` and `chapters` from `timmy-time.mp3.json` into the hub's `window.SH_PODCAST` (don't commit the json).
+The mp3 itself is never committed (Sam, 2026-11-22, [no-narration-in-the-repo](../../vault/rules/no-narration-in-the-repo.md)):
+`.gitignore` leaves it out and CI's public-repo check fails one added anyway.
 Stems are cached: after editing one segment, re-render it with `--only N --force` and run `produce.py` again.
 
 ## The sound

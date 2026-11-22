@@ -1,0 +1,473 @@
+# Deploy Notes, September 2026: the change log's older entries
+
+Entries of [DEPLOY_NOTES.md](DEPLOY_NOTES.md)'s "Recent major changes" dated September 2026, moved here unchanged by
+`node tools/deploy-notes/trim.mjs` once they were more than a week old, newest first. New entries go at the top of
+`DEPLOY_NOTES.md`, never here. Search the whole log with `grep -n "<hub or feature>" DEPLOY_NOTES*.md`.
+
+## Entries
+
+- **2026-09-30 (bronze without patina, Claude Code)** — The green patina specks are gone from the Bronze handpiece
+  medallion too (`filters()` in `widget/ranks.js`); Sam found them ugly. Accent tiles were already clean.
+- **2026-09-30 (accent textures fixed + Stone/Antique, Claude Code)** — The metal accents are now **pre-rendered PNGs**
+  (`assets/tex/<key>.png`, made by `tools/make-accent-tex.js` from `shRanks.accentSvg()`; bump `TEX_V` in
+  `widget/ranks.js` when you regenerate): the SVG-filter data URIs didn't show up for students (Safari/phones). Bronze
+  lost its green patina specks; new **Stone** (everyone) and **Antique** accents with quieter grain than the medallions.
+  The texture also covers the ribbon's exam countdown pill, and the **dashboard** now applies the accent to its primary
+  buttons (it never applied it before).
+- **2026-09-30 (luck moves to the dashboard + metal accents, Claude Code)** — The hubs' exam "luck wall" pop-up
+  (`widget/eggs.js`) is gone (#35: it got in the way of last-minute studying). The dashboard's next-exam card now has a
+  **Send luck** row the day before and the morning (before 2 pm) of the exam: one per person per exam, with the class
+  count and the latest names (`exam_luck`, `get_exam_luck`, `send_exam_luck`; `migration_v27.sql`, applied via the
+  connector). **Unlocked accents are now metals**: `widget/ranks.js` `accentTex(key)` draws the medallions' own
+  gradient + texture filter on a stretchable SVG tile, and `applyAccent` sets `data-sh-accent` and `--sh-tex` on
+  `<html>`; `widget/v3.css` paints it on primary buttons, switches, multi-answer boxes, untagged progress bars and the
+  drill badge (text/borders keep the flat `--accent`). Settings swatches (hub widget and dashboard) show the metal.
+  **A new hub gets the textures if its primary buttons use `.btn.primary` / `.qs-btn.primary` and its bars `.bar i`.**
+- **2026-09-30 (second lessons refresh, Claude Code)** — `LESSONS.md` refreshed with all data to date (last refresh's
+  fixes checked: `q2-03` 30% → 61%, `q4-L27` 20% → 44%, perio under-5-minute visits 40% → 17% on midterm eve). New
+  standing lesson: ordering questions over 4-5 steps and select-all questions with many options barely work.
+  Explanations now name the favourite wrong answer on MSK `h-dr-hypoCa` (hyporeflexia), `h-tu-gct-arthritis`
+  (osteochondroma), `h-ai-sle-ab` (anti-Ro/La) and perio `q3-M01` (UniFe inputs). No reading text changed, so no
+  narration regenerated. **Perio and MSK Projects: carry these into the split sources.**
+- **2026-09-29 (first lessons refresh, Claude Code)** — `LESSONS.md` refreshed from all data since 09-25 (Live signals
+  written; new lessons on duplicate matching answers, explanations that name the favourite wrong answer, exam harder
+  than hub + Patient Box questions). Perio: matching questions now grade by answer text in practice and mock
+  (`q4-L27` listed "4-6 weeks" twice, so the other copy was marked wrong); `q2-03` and `q4-15` explanations cover the
+  most-picked wrong answer. MSK: `sl-calcitriol` explanation covers cholecalciferol; a wrong ordering question now
+  says "Not quite: k of n in the right spot". Perio Course Home gets a **quick-start row** at the very top (`.quick-start`:
+  Practice questions (midterm scope until the midterm, with an untried count), Daily drill, Lecture notes), because
+  23 of 58 visitors left within 5 minutes of landing there; clicks show as `practice=`, `sh-drill=quick`. Widget Search
+  stays (Sam, 2026-09-29) though nobody has opened it yet. No reading text changed, so no narration regenerated.
+  **Perio and MSK Projects: carry these into the split sources, or the next single-file build reverts them.**
+- **2026-09-30 (one inbox, Claude Code)** — The Inbox is now the same on every hub and the dashboard: notices are no
+  longer filtered by hub (`site_notices.hub` only labels which hub a notice is about), and pop-ups go out on whichever
+  page someone opens first. Read state was already shared (server for replies, `sh_notice_seen` for notices).
+  An **Inbox button now sits in each hub's top bar** beside the name (`.sh-ribbon-inbox`, added by `widget/v3.js`
+  before `#themeBtn`), so it's reachable from every page. **Text size fix:** the size setting zooms `<html>`, and
+  `vh`/`vw` inside a zoomed page overshoot the screen, so the inbox now sizes inside its fixed `inset:0` layer and the
+  pop-up measures the real viewport (`fitViewport`); only the pop-up's message scrolls, so its buttons stay visible.
+  `sw.js` → `sh-v9`. **Any new fixed overlay: don't size it with `vh`/`vw`.**
+- **2026-09-29 (student inbox, Claude Code)** — Replies to your reports/suggestions (90 days) and notices to everyone
+  (60 days) now stay in an **Inbox**: an item in the hub widget menu (unread count; a dot on the desktop launcher and the
+  phone More tab) and an inbox button in the dashboard top bar (`[data-sh-inbox]` opens it, `.sh-inbox-badge` shows
+  unread). Opening it marks everything read. The one-time pop-up moved from top-center to the **bottom-right** (above
+  the phone bar). `get_my_inbox` (`migration_v26.sql`, applied via the connector). Admin Inbox: "Tell everyone" now has
+  its own title + message box, started from the reply so it can be reworded for the class. `sw.js` → `sh-v8`.
+- **2026-09-29 (replies to reports + notices to everyone, Claude Code, #29)** — Reports and suggestions now store the
+  sender's `visitor_id`, and resolving one can carry a `reply`. `widget/replies.js` (loaded by v3.js and the dashboard)
+  shows it to the sender once on their next visit (`get_my_replies`, `mark_reply_seen`). **Always write the reply when
+  resolving** (for a question report: what was wrong and what changed). Admin Inbox: reply box, "Resolve & notify", and
+  "Tell everyone", which posts a **notice** every visitor sees once (`site_notices`, `get_notices`, `admin_post_notice`;
+  hub null = every page, 14 days; seen per device in `sh_notice_seen`). The student insert policies now refuse a
+  reply/resolved row. Rows from before today have no sender, so only a notice reaches them. `migration_v25.sql` (applied
+  via the connector). First notice: the `cw-osteosarcoma` fix (report #7; its stem now says "Malignant", Osteoma →
+  Ewing sarcoma). `sw.js` → `sh-v7`. **MSK Project: carry the `cw-osteosarcoma` change into the split sources.**
+- **2026-09-29 (daily lessons refresh, Claude Code)** — New routine "Daily lessons refresh" (fresh cloud session
+  each day) runs `tools/lessons-refresh.md`: queries in `tools/lessons-daily.sql` (every report, suggestion, check-in,
+  survey answer and zero-result search since the last run, use per hub, hardest/easiest questions, popular wrong
+  answers, mocks, drill), rewrites `LESSONS.md`'s new "Live signals" section and "Last refreshed" date, and opens a
+  draft PR with small data-backed fixes to live hubs (bigger ideas go to Sam in the PR). New hubs: refresh first if
+  the date isn't today. No site change by itself.
+- **2026-09-29 (automatic archiving, Claude Code)** — The dashboard (`index.html`) archives a hub by itself at 10 pm on
+  the day of its last exam (`ARCHIVE_HOUR`) and removes the archived card 10 days later (`CARD_DAYS`; `hideCardOn`
+  overrides; GI Exam 2's goes 2026-10-06). "Check in" buttons show from 8 am on exam day (`CHECKIN_HOUR`); the pop-up
+  goes out from 10 pm, or an exam's `promptHour` (perio midterm: 10 am), and still reaches first visits up to
+  `DEBRIEF_DAYS` (60) after. `widget/v3.js` shows an "This hub is archived" notice once per visit on a hub page opened
+  after that time (from `SH_EXPORT.exams`). Retrospective and removing the hub folder are still manual.
+- **2026-09-29 (MSK exam review set, Claude Code)** — The 23 PollEv exam-review questions (Sam: the professor said six
+  are verbatim on Exam 3 and the rest very similar) added to `hubs/msk-exam3` as `rv-*` with a new source `review`
+  ("Exam review (PollEv)"), stems/choices as given (typos fixed only). Question Bank has an "Exam review set" callout
+  with a one-tap filter; the Daily Drill counts them as high-yield (`DRILL_HY.review`). They overlap older `sl-*` Slido
+  items on purpose (the wording matters). Bank 264 → 287. No reading text changed, so no narration regenerated.
+  **MSK Project: carry these into the split sources, or the next single-file build drops them.**
+- **2026-09-29 (Anki deck vetting, Claude Code)** — Vetted the class Anki decks (Drive: 7 "MSK & GI Exam 3" decks + last
+  year's Exam 3 practice deck; the D2 Perio Midterm and Practice Questions decks) card by card against each bank and the
+  lecture notes; only real gaps were added, nothing imported wholesale. MSK +5 (`h-jt-oa-case`, `h-nut-vitA-epith`,
+  `h-nut-iron-us`, `h-ai-sjogren-lymph`, `h-dr-teri-limit`), perio +2 (`q1-31` Stage 3 vs 4, `q1-32` grading vs staging).
+  PerioChip corrected from 1.5 mg to **2.5 mg** chlorhexidine (review table, `q8-11`, arcade clue). The D2 Perio Final
+  Exam deck (S5-S9) is on hold until those sessions are taught. No reading text changed, so no narration regenerated.
+  **MSK and Perio Projects: carry these into the split sources, or the next single-file build reverts them.**
+- **2026-09-29 (retrospectives + new tracking, Claude Code)** — New standing rule: archiving a hub includes a
+  retrospective from all its data; `LESSONS.md` (standing lessons + a GI Exam 2 retro written from its data) and
+  `tools/retro.sql` (the queries). Two new data sources (`migration_v23.sql`, applied via the connector):
+  **exam check-ins** (how ready they felt, how it went, hub vs exam, what the hub missed, with a line saying answers
+  go to the AI that builds the hubs), stored in `exam_debriefs` via `submit_exam_debrief`. Pop-up once on a person's
+  first dashboard visit after an exam they studied for, however late (`sh_debrief_<hub>_<date>` = shown; replaces that
+  visit's survey). Every hub card with an exam in the last 60 days (`DEBRIEF_DAYS`) has a **Check in** button, and
+  people can send several (up to 10 per exam, `migration_v24.sql`, applied). **Archived hubs** now go into
+  `ARCHIVED_HUBS` in `index.html` (move the `HUBS` entry, keep `exams` + `stateKey`): a greyed "Archived" card with
+  the check-in button, shown for 60 days after its last exam. GI Exam 2 is the first one. **Search terms** — the widget's Search sends the term (lowercased, 3-60 chars, 1.5 s
+  after typing stops, once per term per page load) and its result count to `record_search` → `search_terms`.
+  Admin page Surveys tab shows both (`get_exam_debriefs`, `get_search_terms`, admin only).
+- **2026-09-29 (perio: ordering-question feedback + q4-49, Claude Code)** — From student report #6. Finished sequence
+  questions never showed right/wrong: `.qcard-seq-steps .qcard-choice[data-picked]` out-ranked the `data-state` colours.
+  Now the steps re-sort into the tapped order, turn green/red, wrong ones say "Belongs in step N", and a verdict line
+  ("Correct" / "Not quite: k of n in the right spot") sits under them. `q4-49` (a trivial 4-step disclosing-tablet order)
+  is now an MCQ on why the rinse is brief (same id, so its old `question_stats` rows were a sequence). **Perio Project:
+  carry both into the split sources, or the next single-file build reverts them.**
+- **2026-09-29 (MSK mock exam blueprint, Claude Code, #21)** — `MOCK_BLUEPRINT` in `hubs/msk-exam3` now uses the official
+  Exam 3 question counts per lecture: L19 4, L20 4, L21 6, L22 4, L23 4, L24 5, L25 4, L26 5, L27 4 (40). Intro text updated.
+  **MSK Project: carry this into the split sources, or the next single-file build reverts it.**
+- **2026-09-29 (answer choices that gave the answer away, Claude Code)** — From a student report on perio `q2-02` (wrong
+  choices were labeled "(… monofilament)" while the stem asked for the braided suture). Audited all 499 MCQ/multi items in
+  both hubs for the same kind of giveaway: labels on choices that rule themselves out, stem wording echoed only by the
+  answer, and wrong choices nobody would pick. Fixed 16 perio items (`q1-12`, `q1-14`, `q1-19` (stem reworded), `q1-27`,
+  `q2-02`, `q2-21`, `q2-22`, `q7-01`, `q7-04`, `q7-06`, `q7-09`, `q8-01`, `q8-07`, `q8-10`, `q9-02`, `q9-04`) and 8 MSK
+  items (`dq-ckd`, `h-jt-gout-chronic`, `h-ca-stickler`, `h-bo-oi-ar`, `h-bd-ccd`, `h-tu-alveolar`, `h-he-paget-tx`,
+  `h-jt-reactive-time`). Where a label was removed, the explanation now says it instead. Answer positions are unchanged;
+  `question_choices` rows recorded before today for these ids refer to the old wording. **Perio and MSK Projects: carry
+  these into the split sources, or the next single-file build reverts them.**
+- **2026-09-28 (Daily Drill, Claude Code)** — From a survey answer ("a daily drill of questions I missed + high-yield so
+  they stay fresh"); the old "Due today" list in Weak Spots had 1 click per hub. `widget/drill.js` (loaded by v3.js) picks
+  10 questions a day per hub, frozen for the day in `sh_drill_<hub>`: spaced-review items due (`sh_srs_<hub>`, up to 6),
+  older misses (latest try wrong, up to 8 with those), then high-yield ones from lectures you've studied (lowest class
+  accuracy in `question_stats` with 5+ attempts, plus the hub's own flag), max 3 per lecture; shortfalls filled from the
+  rest. **Spaced review gaps shortened** (hubs are live ~a week before the exam): right answers come back after 1, 2, 4,
+  then 7 days (was 1/3/7/14/30), never later than the day before the hub's next exam (`SH_EXPORT.exams`), and only the
+  first right answer of a day moves a question along (`t` = last day); a one-time pass (`sh_srs_<hub>_v` = 2) pulls in
+  reviews scheduled under the old gaps. One question at a time in a full-screen sheet with a reason tag ("You missed this last time", "High-yield: the class
+  gets this right 41%..."), a done screen with results, **10 more**, and a drill streak (`sh_drill_days`, any hub). Hubs
+  provide `window.SH_DRILL = { pool(), render(el, qid), scope }` (just before `SH_EXPORT`); answers go through the hub's own
+  handler, so class stats, SRS, XP and Weak Spots update as usual. Entry points: a Drill tab in the phone bar (badge = due
+  count or progress), a desktop chip beside the launcher (hidden once done), `[data-sh-drill]` buttons (perio Course Home
+  and both Weak Spots tabs, where it replaces "Due today"), and `hubs/<id>/#drill`, which the dashboard's new drill row on
+  each hub card and the hero's "Daily drill" button link to. Time in it logs as `drill/daily`. Perio stays in midterm scope
+  until Oct 1 and flags `exam-review` questions; MSK flags `quiz`/`lecture-quiz`/`slido`. Perio's `markExplain` now reveals
+  the answered card's own explanation (the same question can be on screen twice). `sw.js` → `sh-v6`. No schema change.
+  **A new hub gets the drill by defining `SH_DRILL`. Perio and MSK Projects: carry the `SH_DRILL` block, the Daily drill
+  buttons, the `bolt` icon (MSK) and `explainOf` (perio) into the split sources, or the next single-file build drops them.**
+- **2026-09-28 (perio: two student reports fixed, Claude Code, #15)** — Self-graded cards (recall questions via
+  `qCardHTML`, and Active Recall) now keep the tapped grade button highlighted (`data-picked`, `--good-soft`/`--bad-soft`),
+  dim the other and add a "Saved as right / missed" note (`markGraded()`). The grade was always saved, but the buttons
+  looked unchanged, so it read as broken (report #3). `q3-47`'s explanation now states the 10% "resistant" figure and
+  separates it from the slide's 10-15% / 20-25% numbers; unused choice "About 35%" → "About 25%" (report #4). Both reports
+  marked resolved. **Perio Project: carry these into the split sources, or the next single-file build reverts them.**
+- **2026-09-28 (hub recap slideshow, Claude Code)** — Published recaps play on the dashboard in a **Hub recaps** section
+  (after Hubs; hidden until one is published): image on the left, title/summary, prev/next, Save image, and a list whose
+  active item's bar times the 8 s autoplay (pauses on hover/focus/hidden tab; swipe and arrow keys; slide + fade
+  transition, opacity-only under reduced motion). The Recap tab's **Publish to dashboard** stores a snapshot
+  (`shRecap.snapshot`: only the fields `draw()` reads, names dropped when unticked) via `admin_publish_recap`;
+  `admin_unpublish_recap` removes it; the dashboard reads `get_published_recaps()` (public) and draws each with the same
+  renderer, lazily loading it plus Fraunces/Work Sans only when there's something to show. `migration_v22.sql` (table
+  `hub_recaps`, applied via the connector). **`review/recap.js` moved to `widget/recap.js`.** GI Exam 2 published
+  2026-09-28 (names on).
+- **2026-09-28 (recap awards + saved mock scores, Claude Code)** — The Recap image gains an **Awards** panel: Question
+  machine (most answers), Unbreakable (longest correct streak), Bookworm (most time in lecture notes: sections ending in
+  `notes`/`lecture-notes`), Arcade champion (most time in `arcade/*`) and Mock exam ace (best score on a 20+ question mock,
+  up to the exam day). Each only shows when the data exists; the image height grows with the number of awards
+  (~1,970 px with all five). New `mock_scores` table + public `record_mock_score` (validated, one per person per hub per
+  minute), called from `widget/ranks.js` on `sh:mock-done`, so mock scores are saved from 2026-09-28 on (none before).
+  `migration_v21.sql` (applied via the connector) also replaces `get_hub_recap` to return `awards` and `mocks_taken`.
+- **2026-09-26 (hub recap, dashboard rank + settings, Claude Code)** — **Recap tab** on `review/`: pick a hub (live or
+  archived) and it draws a 1080x1640 shareable image (`review/recap.js`, canvas; Download PNG, or Share on phones) with
+  hours studied, classmates, answers, class accuracy, hours per day up to the exam, the day before the exam, peak hour,
+  people studying after midnight, regulars (3+ days), the hardest multiple-choice question with its answer, and a hall of
+  fame (most answers, longest correct streak). Data from `get_hub_recap(p_secret, p_hub, p_exam)` (`migration_v20.sql`,
+  admin-gated via `sh_admin_ok`, applied via the connector). Pings before 2026-09-25 count only the first 3 h of each
+  visit (no idle rule back then). Question text: `ARCHIVE_BANK` → `question-banks/*.json` for archived hubs, `SH_EXPORT`
+  for live ones. **Dashboard**: a "your rank" card under the greeting (handpiece, XP, animated bar to the next level,
+  `get_rank_profile`); a Settings sheet (gear in the top bar) that edits the same localStorage keys as the hub widget's
+  Settings (theme, font, size, accent, music, surprises, nuke alerts; font/size also apply on the dashboard). "Add exams
+  to my calendar" removed (everyone has them already). `widget/ranks.js` exposes `ACCENTS` and re-applies the chosen
+  accent once the rank loads.
+- **2026-09-26 (easier name change, Claude Code)** — The hub top-bar name badge now always shows (your custom name, or
+  the random class name like "Gleaming Molar") with a pencil; tapping it opens a small editor (`window.shEditName()` in
+  `widget/v3.js`) that explains where the name shows, saves on Enter, and offers "Go back to a random name"
+  (`clear_display_name`, `migration_v19.sql`, applied via the connector). The rank card in Stats has a "Shown as NAME ·
+  change" link and the dashboard greeting a "Pick your name / Change name" button. One save path (`saveName`/`resetName`)
+  keeps the Settings and Stats name boxes in sync and fires `sh:name`. Before this only 1 of 77 visitors had set a name.
+- **2026-09-26 (home-screen icon, Claude Code)** — App icons are now the Gold handpiece medallion (rendered from
+  `widget/ranks.js`) on a solid dark ground: `assets/apple-touch-icon.png` (180), `icon-192/512.png`, `icon-maskable-512.png`
+  (extra safe-zone margin), `favicon-32/64.png`. All opaque; the old ones had transparent corners, and iPhones were
+  showing a generic "S" tile. Every page links them with `?v=2` (bump it when the art changes, phones cache icons hard) and
+  sets `apple-mobile-web-app-title` = "Study Hubs". `assets/icon.svg` (the old bars) is no longer linked.
+- **2026-09-25 (nuke countdown key fix, Claude Code, #5)** — `runNukeCountdownKeyCanvas` in `widget/v3.js` now keys each
+  frame against its own background (sampled at the crop's four corners; falls back to the fixed green if they disagree)
+  instead of one fixed green. The countdown clip whites out on its own from ~12.25 s, so the fixed key left a pale green
+  square around the icon until the 13 s blast; now the icon swells into a soft white disc as the clip whitens. Timing
+  and `nuke-countdown.mp3` unchanged (its build-up peaks ~12-12.5 s, which is why the blast stays at 13 s).
+- **2026-09-26 (perio: midterm format, Perio Project/Cowork)** — From Dr. Abou-Arraj's midterm email (Oct 1,
+  10:00 am, rooms 220/222, ~40 questions: mostly MCQ, a few Patient Box cases, a few multiple-answer with
+  partial credit, matching, no essays). `hubs/perio` gains a `pbox` question field (case table rendered
+  above the stem) and a `multi` type (`correct:[...]`, Canvas-style partial credit: +1/n per right pick,
+  −1/n per wrong pick, floor 0). 29 new items (13 Patient Box, 19 multiple-answer, some overlap). Mock Exam
+  gets a 40-question exam-format option (5 Patient Box, 5 multi, 3 matching, rest MCQ, spread across
+  sessions); matching is scored per pair; `sh:mock-done` counts full-credit items. Course Home has a
+  "Midterm day" card. Arcade bank games skip `pbox` items. Three-way merged onto the 28 commits since
+  6f97c09 (explanations, Report button, CLASS_ROW, choice tracking); CI smoke + lint pass locally.
+  No reading text changed, so no narration was regenerated.
+- **2026-09-25 (rank order + phone panel, Claude Code)** — Stone is now the first rank (0 XP) and Antique the second
+  (300 XP): only the order of the first two `TIERS` entries in `widget/ranks.js` changed; server tier numbers are the same.
+  Dashboard ranks panel fits phones (grid columns `minmax(0,1fr)`).
+- **2026-09-25 (rank numerals, Claude Code)** — Every handpiece icon shows its level: large medallions get an engraved
+  I/II/III plaque on the rim (replacing the pips), small ones a text tag in the corner (`shRanks.mini(tier, level)`,
+  `.sh-rank-lv`), and the name badge appends the numeral. `migration_v18.sql` (applied via the connector) adds `level`
+  to `get_leaderboard`, `get_correct_streak_stats` and `get_arcade_leaderboard`.
+- **2026-09-25 (easter-egg clues, Claude Code)** — Hints for the hidden extras live in the trophy case: three new secret
+  trophies (`konami` Cheat Code, `floss` Floss Boss, `prof` Office Hours; `migration_v17.sql` adds them to
+  `record_achievement`'s whitelist, applied via the connector), every secret `TROPHIES` entry in `widget/ranks.js` has a
+  `clue`, trophies are buttons (tap to read; a secret shows its clue), and a "Psst" line under the grid shows a random
+  clue for a secret you haven't found. 17 trophies total. The Surprises setting points at the clues.
+- **2026-09-25 (idle rule for study time, Claude Code)** — `widget/v3.js` activity tracking now stops banking time after
+  15 minutes without input (pointerdown/keydown/wheel/touchstart/scroll/mousemove; `IDLE_MS`), unless
+  `shTTS.listening()` is true (narration or browser TTS playing). Before this, any visible tab counted, so time from a hub
+  left open on a desk inflated `activity_pings`. Minutes before 2026-09-25 were recorded under the old rule; compare trends
+  across that date with care.
+- **2026-09-25 (rank scale, nuke audio, card edge, Claude Code)** — **Ranks rescaled** (`migration_v16.sql`, applied via
+  the connector): tier floors 0 / 300 / 1,500 / 5,000 / 12,000 / 25,000 / 50,000, each split into levels I-III
+  (`sh_step`, `sh_step_floor`; Dark Matter I-III at 50k/75k/100k). v15's scale let a daily studier pass Dark Matter in
+  ~5 weeks. `get_rank_profile` adds `level`/`step`/`step_at` (next_at is now the next level); `get_rank_board` adds
+  `level`. The medallions show 1-3 pips on the rim; a level-up is a toast, a new tier keeps the full celebration.
+  **Nuke countdown audio**: the countdown video's soundtrack only existed in its muted .mp4 (the .webm Chrome plays has
+  no audio), so it's now `widget/sfx/nuke-countdown.mp3` (first 13 s of that track), played by `shNukeSfx` with the
+  countdown and stopped at the blast. **Dashboard hub cards**: the colour stripe is now a full-card `::before` with
+  `border-radius:inherit` painting only the left 7px, so it follows the card's corners.
+- **2026-09-25 (handpiece ranks, trophies, link devices, Claude Code)** — `widget/ranks.js` (loaded by v3.js and the
+  dashboard) draws seven tiers of handpiece medallions in inline SVG (Antique, Stone, Bronze, Silver, Gold, Diamond,
+  Dark Matter; textures are SVG filters, the glint/sparkles animate only at large sizes) and mounts the rank card,
+  per-hub mastery bar (Bronze 50 / Silver 75 / Gold 90 / Crown 100% of the bank right on the latest try), a 14-trophy
+  case (6 secret ones read "???" until earned), unlockable accent colours in Settings (`sh_pref_accent`; injects
+  `--accent/--accent-ink/--accent-soft` for light + dark) and **Link my devices** into the hub widget. XP is computed
+  on the server from `personal_answers` (`sh_visitor_xp`, private): 10 first-time right, 2 repeat right, 1 miss, 600/day
+  cap on answer XP, +20 per study day; tiers at 150/600/1500/3000/6000/12000 (`sh_tier`). Public RPCs:
+  `get_rank_profile`, `get_rank_board`, `get_hub_mastery`, `record_achievement` (whitelisted kinds: boss, owl,
+  rootcanal, mock90, mastery-*), `create_link_code`/`redeem_link_code` (6-char, 10 min, 10 tries/hour; redeeming moves
+  the device's rows onto the code maker's id, `visitor_links` records it). `get_leaderboard`,
+  `get_correct_streak_stats` and `get_arcade_leaderboard` gained a `tier` column (dropped + recreated). Hubs fire
+  `sh:mock-done {correct,total}` when a mock is submitted. Dashboard: "Handpiece ranks" panel (top 10 + ladder) and tier
+  icons on every board. `migration_v15.sql` **applied 2026-09-25 via the connector**. First dashboard survey
+  ("Help shape the hubs") published live the same day.
+- **2026-09-25 (Atlas retired; clicks + surveys, Claude Code)** — **Perio Atlas mode removed** at Sam's request (the
+  diagrams were inaccurate; it had ~2 minutes of use from 5 people in two weeks). Removed from `hubs/perio/index.html`
+  (tab, panel, `ATLAS_VIEWS`, `ATLAS_RENDERERS`, CSS) and the dashboard card. **Perio Project: drop Atlas from the split
+  sources too, or the next single-file build brings it back.** Click analytics: `widget/clicks.js` (loaded by v3.js and
+  the dashboard) batches clicks as `{section, target, count}` into `record_clicks` → `ui_clicks`/`ui_click_reach`;
+  targets are named from `id`, the first `data-*` attribute (question-level ones skipped, numbers collapsed) or the
+  label, and answer choices are grouped by class. Dashboard survey card: `get_active_survey`/`submit_survey`, one survey
+  live at a time, shown once per visitor (answer or "No thanks" both count, plus `sh_survey_done_<id>` locally).
+  Admin page gained **Clicks** and **Surveys** tabs (results, on/off, publish form). `migration_v14.sql` **applied
+  2026-09-25 via the connector**; its admin functions call `sh_admin_ok()`, which copies the secret check from
+  `get_nuke_summary` at migration time, so no secret is in the repo.
+- **2026-09-25 (audit batch 2 + easter eggs, Claude Code)** — Widget: new launcher/menu (desktop) and a 3-item bottom
+  bar with a "More" sheet (phones), redrawn icons, **full-content search** over each hub's `SH_EXPORT.sections` (notes
+  paragraphs, review rows, hints, cram lines) that jumps to the spot via the hub's `window.SH_GOTO(go)`; a **Report**
+  button on every question (`window.shOpenFlag(qid)`); `record_choice` stores which option was picked
+  (`question_choices`, migration_v12, applied) and `review/` shows question text + the most-picked wrong answer (it
+  reads each hub's `SH_EXPORT` through a hidden `?sh_export=1` iframe). Listen player: seek, ±15 s, speed, resume,
+  lock-screen controls. Spaced review (`sh_srs_<hub>`, `window.shSrsDue()`) feeds a "due today" drill in both hubs'
+  Weak Spots tab (new in MSK). Dashboard "Add exams to my calendar" (.ics). PWA: `manifest.webmanifest`, `sw.js`
+  (network-first; bump `VERSION` when you change what it precaches), icons/OG images in `assets/`. 136 explanations
+  added and distractors rebalanced in both banks. CI: `.github/workflows/check.yml`. `supabase/schema.sql` is a full
+  schema snapshot (admin secret as a `<ADMIN_SECRET>` placeholder) — refresh it with every migration.
+  **Easter eggs** live in `widget/eggs.js` (loaded by v3.js, which hands it `window.shEggHooks`): Golden Probe (one
+  taught question per hub per Central-time day; `claim_golden_probe`/`get_golden_today`, shown on the dashboard),
+  Tooth Fairy (`record_fairy`/`get_fairy_board`, board in the Stats panel) — both in `migration_v13.sql`, **applied
+  2026-09-25 via the connector**; Plaque Boss (5+ online, shared HP over the `presence:<hub>` channel's `egg`
+  broadcast), exam luck wall (evening before / morning of each date in `SH_EXPORT.exams`), professor quotes (tap a
+  name 5x; `SH_EXPORT.lectures[].who` + `SH_EXPORT.hints`), Night Owl, Through the Root Canal, Konami 8-bit mode (phones: swipe ↑↑↓↓←→←→ then tap twice),
+  "floss". Off via Settings → Surprises (`sh_pref_eggs`) and never during a mock exam (section matching `mock`). A new
+  hub gets them for free if its `SH_EXPORT` carries `who`/`status` on lectures, `hints` and `exams`.
+- **2026-09-25 (exam-week fixes, Claude Code)** — Dashboard `HUBS` entries now take `exams:[{name,label,date,code}]`
+  (several per hub; perio has midterm + final) instead of `examDate`/`examName`; the hero lists every exam in the next
+  14 days and has a real "no exams" state. Perio accuracy on the dashboard uses each question's latest try (perio's
+  `totalCorrect` counts unique questions). supabase-js is **self-hosted and pinned** at
+  `widget/vendor/supabase-2.117.2.js`, loaded with `defer` everywhere (no jsdelivr dependency); hubs call `boot()`
+  directly instead of waiting for DOMContentLoaded, and the class-stats wiring runs on DOMContentLoaded. The widget no
+  longer returns early without Supabase (search, settings, mind maps keep working) and exposes `window.shSupabase`,
+  which the arcades reuse. Light/dark is one shared key, `sh_theme` (old per-page keys still read). Phones: mode tabs
+  get their own labeled row in both hubs; MSK lecture chips wrap. Perio's class % now sits inside the explanation
+  (hidden until answered). MSK mock exam is exam-style (pick all, submit, review; `STATE.mock.picks/order/submitted`).
+  The dashboard no longer groups hubs by term (`TERMS` and each class's `term` field are gone); every class with a
+  live hub shows in one grid, since old exams get archived.
+- **2026-09-25** — Added `CLAUDE.md` (imports this file) so Claude Code sessions
+  start with the repo rules; Claude Code deploys go through branches + PRs.
+  Kokoro model re-hosted as release `kokoro-model-v1.0`. No site changes.
+- **2026-09-25 (perio: midterm date + Session 4 lectured)** — Midterm set to **Thu Oct 1** (sessions 1-4):
+  `MIDTERM_DATE = '2026-10-01'` in the perio hub (ribbon countdown, course home, course map) and
+  `examDate:"2026-10-01"` on the dashboard's perio HUBS entry (it now leads the next-exam hero, a day
+  before MSK Exam 3). Session 4 (Phase I) flipped from `preview` to `taught` from the class recording:
+  both reading levels rewritten, 42 lecture questions (`q4-L01`-`q4-L42`), 17 verbatim exam hints, 6
+  new review tables (Glickman furcations, CAL/Salud trap, tissue modifiers, prophy vs D4346 vs SRP vs
+  maintenance vs debridement, healing timeline, radiograph reads + SRP limits), new cram sheet and mind
+  map, 8 arcade terms and 3 Quadrants groups. Both `phase1-therapy` narration files regenerated.
+  Midterm scope from Dr. Kaur's email (no instruments/ultrasonics/polishing; slides up to failure of
+  therapy): 31 S4 questions carry `mid:false` (a "Not on midterm" chip; excluded from the midterm mock
+  exam and from the new "Midterm scope" question-bank filter), and the matching notes sections, review
+  tables, cram lines, mind-map branch and Atlas diagram are labeled.
+- **2026-09-24 (perio revamp + Pocket Arcade)** — `hubs/perio/index.html` rebuilt (Perio Project) to
+  match the revamped site: compact one-row ribbon (back, title, icon mode pills, countdown, progress,
+  theme toggle), inline-SVG icon set (no emoji), Instrument Serif/Sans + IBM Plex Mono. Modes are now
+  **Compendium · Review · Atlas · Arcade**; the Understory game + cutscenes were retired at Sam's
+  request (replaced by the Arcade). Reference tables moved to a Review mode (data-driven `REF_SECTIONS`,
+  search + hide-answers). New content: Session 4 (Phase I, Dr. Kaur slide deck, status `preview`) and
+  the Session 3 in-class case review; bank 150 → 216. **Pocket Arcade**: nine new games (flappy,
+  crusher, probe, quadrants, perdle, planer, smile, sweeper, cross) posting to `arcade_scores` with
+  `p_hub='perio'`; `migration_v11.sql` (whitelists those ids) **was applied 2026-09-24 via the
+  connector**. Bank-based games call `recordAnswer`, so they fire `perio:answered`. The state key and
+  `answered/totalSeen/activeDates` shape are unchanged (dashboard `readProgress` still works); new
+  `STATE.ui`/`STATE.arcade` sub-objects. The hub was then built from split sources in the Perio Project
+  session (no longer: since 2026-11-03 the single file is the source; see "Perio: the single file is the source" above). Lecture Notes now have an **As taught / Plain English** toggle (`READINGS_PLAIN`, `STATE.ui.level`); each level has
+  its own narration file, `audio/<id>-full.mp3` and `audio/<id>-plain.mp3` (all 9 plain files new; full regenerated for
+  `phase1-therapy` and `risk-assessment`) — **edit either level's text and you must regenerate that file**. The Listen
+  button is re-skinned with hub tokens in `hubs/perio` (the widget's `var(--card,#fff)` fallback made it white-on-white
+  in dark mode; any hub without a `--card` token has the same issue). Dashboard: perio `HUBS` entry updated, and the arcade
+  high-score panel is now data-driven by an `ARCADES` array (Bone Zone + Pocket Arcade, hub switcher).
+- **2026-09-24** — msk-exam3: Listen button on Lecture Notes (shared `window.shTTS`, same
+  markup as perio) plus Kokoro narration `hubs/msk-exam3/audio/<lec>-full.mp3` for all 9
+  lectures (af_heart). **msk-exam3 now has pre-generated audio: any READINGS text edit must
+  regenerate that lecture's mp3** (text-and-audio-must-not-drift rule).
+- **2026-09-24 (later)** — msk-exam3: As Taught / Plain English toggle on Lecture Notes
+  (`READINGS_PLAIN`, `STATE.ui.level`), each level with its own narration
+  (`audio/<lec>-full.mp3`, `audio/<lec>-plain.mp3`). Edits to either text need that level's mp3 remade.
+- **2026-09-23 (dashboard revamp)** — `index.html` rebuilt (hub index Project). Hub cards
+  are now rendered from a `HUBS` array (+ `CLASSES`, `TERMS`) near the top of the script:
+  **to add or archive a hub on the dashboard, edit that array, not markup.** Each entry's
+  `examDate` drives the hero countdown and card "Exam in N days"; `stateKey` is the hub's own
+  localStorage key, read-only, used to show personal progress (supports the msk-style
+  `seen/totalAnswered/days` and perio-style `answered/totalSeen/activeDates` shapes; if a
+  hub changes its state shape or key, update `readProgress()`). New: next-exam hero, personal
+  14-day activity strip (`get_personal_stats` across live hubs), greeting via
+  `sh_display_name`/`get_display_name`, light/dark/system toggle (`sh_dash_theme`), arcade
+  high-score panel (`get_arcade_leaderboard`, hub `msk-exam3`), changelog as a timeline.
+  Hub links now open in the same tab (hubs have their own back button). Fonts: Instrument
+  Sans/Serif. Kept: presence count, busiest hours, streak boards, update-available prompt,
+  changelog-driven "Updated" labels, class easter eggs, collapse state keys.
+- **2026-09-23 (latest)** — msk-exam3: arcade grows to nine games (Clast Blaster shooter,
+  Bone Search word search, Whack-a-Clast). `migration_v10.sql` updated in place to accept the
+  new game ids (`blaster`, `search`, `whack`). **migration_v10 was applied to Supabase on
+  2026-09-23 via the Supabase connector**; arcade leaderboards are live for all nine games.
+- **2026-09-23 (later)** — msk-exam3: 40-question Mock Exam; emoji replaced by a
+  hub-local inline-SVG icon set (`ICON_PATHS`/`icon()`); compact one-row
+  ribbon; Arcade grew to six games (added Marrow Match, Bone to Pick, Fact or
+  Fracture) with a fullscreen toggle and an easier Snake. **Class-wide arcade
+  leaderboards** via `migration_v10.sql` (`arcade_scores` table,
+  `submit_arcade_score`, `get_arcade_leaderboard`): run it once in the Supabase
+  SQL editor. Until then the hub shows "leaderboard warming up" and keeps
+  working. Other hubs can reuse the same two RPCs with their own `p_hub`.
+- **2026-09-23** — Archived GI Exam 2 (`hubs/hepatobiliary/`, incl. its
+  narration audio) off the live site after the exam, same pattern as GI
+  Exam 1: the full 404-question bank + lecture list was saved first to
+  `question-banks/gi2-question-bank.json` (hub's own field names; see
+  `question-banks/README.md`, regenerate with `extract_gi2.js`). Dashboard
+  card removed; `hepatobiliary` stays in `HUB_LABEL` so old changelog/stats
+  rows still label correctly. **Widget time tracking is now per section:**
+  `record_activity_ping`'s `p_section` is `"<mode>/<sub-view>"` (e.g.
+  `compendium/bank`, `review/drugs`, `compendium/exam-hints`) instead of
+  only the top-level mode. Mode detection accepts `aria-selected="true"` OR
+  an `is-active`/`active` class (hepatobiliary only set the class, so all of
+  its ~12k minutes had logged as `(unspecified)`); sub-view = first visible
+  active element outside `#modeSwitch` carrying `data-view|sub|ctab|gtab|
+  dtab|tab|group|section|pane|panel`. A hub can override with
+  `window.SH_SECTION = () => "mode/sub"`. Time is banked per section each
+  second and a ping only fires once a section has earned a full 25s, so
+  switching mid-interval no longer credits the wrong section. No schema
+  change. `review/` rebuilt as a tabbed admin (Overview / Time by section /
+  Questions / Engagement / Inbox) with a 7/30/90-day range, an "include
+  archived hubs" toggle (archived list is `ARCHIVED` in `review/index.html`
+  — add a hub there when you archive it), and "active time per visit"
+  (total ping minutes ÷ visits) replacing the old span-based average, which
+  counted hours of backgrounded tabs.
+- **2026-09-23** — New hub: `hubs/msk-exam3/` ("Musculoskeletal Exam 3 Hub", widget
+  `data-hub="msk-exam3"`, event `msk3:answered`, localStorage `msk3-state-v1`),
+  built from the GI 3 Claude Project (L19-L27; L26 drugs and L27 tumors are
+  slides-only until their recordings are uploaded). Modes: Compendium, Review
+  (grouped reference: drugs, hormones, cells, matrix, genes, diseases, tumors,
+  processes, superlatives; with a recall/blur toggle), and an Arcade that
+  REPLACES the illustrated-scene game pattern at Sam's request: three
+  cool-math-games-style mini games (Sort Storm, Osteo Snake, Stack Attack).
+  Osteo Snake answers go through the normal answered event, so they count in
+  class stats. Hub source is built from split files (css/js) in that Project's
+  session; the deployed `index.html` is the single-file build. Added the hub to
+  the dashboard GI group, `HUB_LABEL`/`ALL_HUBS`, and `review/` `HUB_LABEL`.
+- **2026-09-18** — Tactical nuke: raised the streak requirement from 50 to
+  100 correct answers in a row, per request. Also replaced the generic
+  "Someone has called in a tactical strike" banner with the visitor's
+  actual resolved name — the same deterministic name (e.g. "Gleaming
+  Molar") the leaderboard and nuke/streak analytics already fall back to
+  when a visitor hasn't set a custom display name, instead of a generic
+  placeholder word. Added `get_display_name(p_visitor)` (`migration_v9.sql`,
+  public, no secret) so the client can resolve it once on load; degrades
+  gracefully back to "Someone" if the RPC isn't reachable.
+- **2026-09-18** — Wired up analytics that had been silently no-op-ing:
+  `widget/v3.js` was already calling `record_nuke_launch` on every tactical-
+  nuke strike (since the feature shipped 2026-09-17), but the backing
+  Supabase table/function never existed, so every call failed silently and
+  the review page showed nothing. `migration_v8.sql` adds `nuke_launches` +
+  `record_nuke_launch`/`get_nuke_summary`/`get_nuke_by_hub`/`get_nuke_recent`,
+  and a new "Tactical nuke" section on the review page (launches, unique
+  launchers, by hub, recent activity). Also added persisted correct-answer
+  streak tracking (`correct_streaks` table + `record_correct_streak`, called
+  from the same answered-question handler as `record_answer` — separate from
+  the in-page-only counter that gates the nuke badge, which still resets on
+  reload by design) and `get_correct_streak_stats()` (public, no secret,
+  same pattern as `get_leaderboard`) showing the longest streak currently
+  still standing and the all-time record. Shown in two places per request:
+  a "Correct-answer streaks" section on the review page, and a matching
+  card on the public dashboard (`index.html`) next to Study Streaks.
+- **2026-09-16** — Perio: Session 3 (Risk Assessment, Dr. Geisinger) ingested
+  from its lecture recording transcript + slide deck — flipped from
+  exam-review-guide-only to fully lectured (new reading, 2 reference tables,
+  17 new lecture-sourced questions, rewritten cram-sheet entry and mind map).
+  Session 2 (Incisions/Flaps/Sutures) enriched with a supplementary in-class
+  Q&A transcript (sub-marginal incisions, flap-thickness-by-procedure,
+  palatal graft harvesting) — 9 new questions, 1 new incision type, 1 new
+  reference table, 3 new exam hints. Question bank grew from 124 to 150.
+  Regenerated Kokoro narration (`audio/risk-assessment-full.mp3`,
+  `audio/incisions-flaps-sutures-full.mp3`) to match, per the
+  text-and-audio-must-not-drift rule above. Also fixed two pre-existing bugs
+  surfaced by testing against the larger bank (neither introduced by this
+  content work — both date from the earlier Game-mode/gameplay-progress-split
+  change, and both are general fixes in the shared `qCardHTML`/
+  `wireQuestionContainer` pattern, not perio-specific): `recordGameAnswer`
+  never dispatched the event the cutscene-trigger listener watches for, so
+  clearing a lecture by actually playing through Understory never played its
+  reward cutscene; and `SEQ_STATE`/`MATCH_STATE` (sequence/match
+  click-tracking) were keyed globally by question id instead of per-render,
+  so a sequence or match question could only ever be completed once per page
+  load, in whichever mode/view reached it first — re-encountering the same
+  question in a second context (Question Bank, then a Game encounter)
+  silently could never be completed there. Worth checking other hubs that
+  share this rendering pattern for the same two issues.
+- **2026-09-16** — Added data-driven lecture mind maps: a new shared
+  `window.shMindMap.render()` renderer in `widget/v3.js` (generic
+  hierarchical tree layout, inline SVG, horizontally scrollable) plus a
+  `MINDMAPS` data object per hub (10 hepatobiliary lectures, 9 perio
+  sessions, content grounded in each hub's own lecture notes/reading
+  text). A "Show mind map" toggle now appears under the lecture-notes
+  reading pane in both hubs, following the same shared-renderer/
+  hub-local-data pattern as `shGetClassStats`/`qCardHTML` — a future hub
+  only needs its own `MINDMAPS` object, not new rendering code. Also
+  fixed a spacing bug in the renderer itself: `layout()` was assigning
+  leaf rows a fixed height while `nodeBoxHTML()` sized each box to its
+  actual wrapped-line count, so any 2-3-line label produced a box taller
+  than its row and visually spilled into the node below it. **Follow-up
+  fix, same day:** the first deploy of this feature shipped
+  `widget/v3.js` and both hub HTML files but forgot `widget/v3.css` —
+  the mind maps went live as unstyled black SVG silhouettes (no fill/
+  stroke/font rules) until a second deploy an hour later added the
+  missing CSS file. Lesson: when a change touches both `widget/v3.js`
+  and `widget/v3.css`, double-check FILES in `deploy_rollout.py`
+  includes both before running it — it's easy to edit both files and
+  only remember to list one.
+- **2026-09-16** — Hub index: integrated the universal back button into each
+  live hub's own sticky ribbon instead of a separate fixed bar above it
+  (perio, hepatobiliary); removed a redundant duplicate background-music
+  system inside Hepatobiliary's own Lounge panel; converted all 60
+  originally free-recall questions in the archived GI Exam 1 question bank
+  (question-banks/gi1-question-bank.json) to multiple-choice with curated
+  distractors, so all 89 GI1 questions are now MCQ, and expanded
+  Hepatobiliary Mock Exam's embedded EXAM1_REVIEW_POOL from a 27-question
+  curated subset to the full 89.
+- **2026-09-15** — Hepatobiliary: GI Pharmacology + Clinical Applications for
+  Dentistry lecture transcripts mined into Lecture Notes/Exam Hints/Questions
+  (now 10/10 lectures, 363 questions), reconciled via 3-way merge with a
+  parallel session's Active Recall tab + `widget/v3.js` integration work,
+  republished to the Claude Artifact and deployed to GitHub Pages.
+- **2026-09-12** *(approx, from widget history)* — Active Recall flashcard
+  mode added (hide-and-reveal cards pulled from Cram Sheet/reference content,
+  deliberately excluding direct-quote Exam Hints cards since a raw quote makes
+  a weak recall prompt); `widget/v3.js` v3 rollout across all 5 hubs.
+- **2026-09-09** *(approx, from Supabase changelog)* — Study streaks, live
+  class activity pulse, opt-in leaderboard, question flag/suggest-fix; search
+  across every hub; class-wide correctness shown automatically; Listen
+  (text-to-speech) button with word-by-word highlighting; mobile redesign.

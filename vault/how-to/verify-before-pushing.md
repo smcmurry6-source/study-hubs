@@ -18,7 +18,7 @@ in more than 40% of MCQs, statement keys that form a pattern (a two-statement ch
 numbered key in one position over 45%, a statement number true in over 90%), and question ids against `tools/question-ids/<hub>.txt`: a renamed or deleted id fails,
 and a local run adds new ids to the file, so commit it; see [question-ids-are-permanent](../rules/question-ids-are-permanent.md)).
 Since 2026-11-04 it also runs `node tools/release/secrets.js` (no keys, course material or
-data files), `node tools/release/rls.js` (database permissions on a throwaway copy of `supabase/schema.sql`; needs
+data files, and since 2026-11-22 no narration or Timmy Time recording: [no-narration-in-the-repo](../rules/no-narration-in-the-repo.md)), `node tools/release/rls.js` (database permissions on a throwaway copy of `supabase/schema.sql`; needs
 PostgreSQL's server binaries), `node tools/release/admin-ops.js` (the admin page's database functions on the same kind of
 throwaway copy: who's studying now, archive overrides, newest-first check-ins), `node tools/release/retention.js` (the
 nightly retention job's deletes on the same kind of copy: the hourly totals, device linking and the recap survive them), `node tools/release/xp.js`

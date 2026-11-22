@@ -17,7 +17,7 @@ session does each step.
   `number, title, draft, head, base, updated_at`). Read a PR's body (`pull_request_read`) only when its title doesn't say
   which item it covers. Without the GitHub tools: `gh api -X GET search/issues -f q='repo:smcmurry6-source/study-hubs is:pr is:open'`.
 - `TZ=America/Chicago date`, and the exam dates in `hubs.js` (`grep -n "exam\|date" hubs.js`, not the whole file).
-- Read the task notes and inbox lines you need in full; grep, never read `DEPLOY_NOTES.md` or the bug log whole.
+- Read the task notes and inbox lines you need in full; grep, never read the change log (`DEPLOY_NOTES*.md`) or the bug log whole.
 - Don't use subagents for this: it is a few minutes of reading.
 
 ## Show the list (steps 3 and 4)

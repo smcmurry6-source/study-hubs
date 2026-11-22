@@ -270,6 +270,6 @@ do:** its retrospective and its recap ([inbox](../tasks/inbox.md)). To bring the
 
 ## History
 
-Grep "Recent major changes" in `DEPLOY_NOTES.md` for `heme-endo-exam2`. Retrospective (once archived): `LESSONS.md`.
+Grep the change log (`DEPLOY_NOTES*.md`, its monthly archives included) for `heme-endo-exam2`. Retrospective (once archived): `LESSONS.md`.
 
 Related: [home](../home.md) · [heme-endo-exam1](heme-endo-exam1.md) · [high-likelihood-topics](../rules/high-likelihood-topics.md)

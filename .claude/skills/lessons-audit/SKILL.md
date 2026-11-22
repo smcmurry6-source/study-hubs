@@ -168,7 +168,8 @@ For each item under ~45% with 12+ tries, read the stem, choices, key and explana
 - `LESSONS.md`: "Last refreshed" = today (Central); rewrite **Live signals** (replace, don't append): last refresh's
   results, then per live hub the numbers that matter and what to do; fold anything durable into **Standing lessons**
   or the reports section, with the evidence. Use they/them for students and for Sam.
-- `DEPLOY_NOTES.md` "Recent major changes": one entry if live hubs changed.
+- `DEPLOY_NOTES.md` "Recent major changes": one entry if live hubs changed; then `node tools/deploy-notes/trim.mjs`, which
+  moves the entries more than a week old to `DEPLOY_NOTES-<yyyy-mm>.md` unchanged (`tools/lessons-refresh.md`).
 - The vault ([repo-is-the-vault](../../../vault/rules/repo-is-the-vault.md)): a call Sam made goes in
   `vault/decisions.md`; a proposal Sam approves becomes a task note in `vault/tasks/`; a hub archived and retrospected
   moves to Archived in `vault/home.md`, and its hub note links its retrospective; a quirk the next agent needs goes in

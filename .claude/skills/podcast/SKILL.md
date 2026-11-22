@@ -127,7 +127,10 @@ result: `ffprobe` duration under the limit Sam gave, `<mp3>.json` chapters in or
 
 ## 7. Ship
 
-Commit the script, lexicon, mp3 (tens of MB is fine; never commit stems or the json), hub, dashboard, About page,
+**Never commit the mp3** (Sam, 2026-11-22: `vault/rules/no-narration-in-the-repo.md`; `.gitignore` leaves it out and CI's
+public-repo check fails one added anyway): until the audio repo that rule describes exists, an episode is for a local listen,
+and wiring it into a hub waits for that repo (package 5 of `vault/tasks/2026-11-22-sustainable-for-years.md`). Never commit
+stems or the json either. Commit the script, lexicon, hub, dashboard, About page,
 LORE.md, the hub's vault note and DEPLOY_NOTES.md. Push, open a draft PR (student-facing summary, the length, the chapters, the lore added,
 the pronunciation fixes), subscribe to it, and fix CI until green. Merge only if Sam said to; otherwise Sam merges.
 For the site changelog, add a line to `tools/after-merge/changelog.txt` in the PR (`<hub> | <message>`); the After merge

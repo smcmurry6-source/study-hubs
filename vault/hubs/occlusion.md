@@ -282,6 +282,6 @@ marks, the TMJ view) stay as they are; use the kit for any new perio chart or ra
   central fossa (Okeson), and the notes don't say from which end; the contact map's distal band (c..d) against the sheet's
   "oblique ridge to distal fossa"; case `sda` says "flared and worn ... see the chart", which a perio chart can't show.
 
-History: grep `Occlusion` in "Recent major changes" (`DEPLOY_NOTES.md`). Data: `LESSONS.md` → Live signals.
+History: grep `Occlusion` in the change log (`DEPLOY_NOTES*.md`, its monthly archives included). Data: `LESSONS.md` → Live signals.
 
 Related: [home](../home.md) · [diagrams-anima](../rules/diagrams-anima.md) · [perio](perio.md) (same final day)

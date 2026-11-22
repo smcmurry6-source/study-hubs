@@ -125,7 +125,7 @@ audit). Its recap is on the dashboard since 2026-11-10 (`review/` → Recap → 
   **Closed 2026-11-16** (Sam: "close the check ins for implants"; `checkinClosed:true` on the exam in `hubs.js`): no new
   answers come in, so the next audit reads the final set.
 
-History: grep `PCD Implants` in "Recent major changes" (`DEPLOY_NOTES.md`).
+History: grep `PCD Implants` in the change log (`DEPLOY_NOTES*.md`, its monthly archives included).
 
 **Audio off (2026-11-12):** its narration and Timmy Time came off the site when it was archived, to keep the site under GitHub Pages' 1 GB limit ([archived-hubs-drop-their-audio](../rules/archived-hubs-drop-their-audio.md)). The widget tag says `data-audio="off"`, so Listen reads in the device's voice and its Timmy Time card and links are hidden (the script stays in `tools/podcast/pcd-implants-exam1/`). To bring it back: `git checkout <the commit before> -- hubs/pcd-implants-exam1/audio` and take the attribute out.
 

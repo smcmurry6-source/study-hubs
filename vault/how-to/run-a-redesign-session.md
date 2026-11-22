@@ -19,7 +19,7 @@ and the phase notes it links.
    [the open calls](../tasks/done/2026-11-11-redesign-open-calls.md), all answered and made, 2026-11-11). Show new art as
    contact sheets (`tools/figures/site/pack-preview.mjs`, the design page) and get Sam's yes before it goes into the engine:
    a round that changes something already built costs a rebuild, the tests and new screenshots.
-4. **Never read a big file whole.** `widget/hub.js`, `widget/v3.js`, a hub's `index.html` and `DEPLOY_NOTES.md` are tens of
+4. **Never read a big file whole.** `widget/hub.js`, `widget/v3.js`, a hub's `index.html` and the change log (`DEPLOY_NOTES*.md`) are tens of
    thousands of tokens each: grep for the function, read its lines. The engine is four files since 2026-11-12 (the first
    step of [phase 4](../tasks/done/2026-11-05-redesign-phase-4-game-layer.md)): work in the part your session changes
    (`widget/hub-bank.js`, the question card and the bank; `widget/hub-rewards.js`, the answer path, XP, rank and recap;

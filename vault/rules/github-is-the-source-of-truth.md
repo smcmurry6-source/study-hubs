@@ -20,7 +20,8 @@ sessions. Before editing or publishing anything in `hubs/` (a hub's page or its 
 3. After merging, verify before publishing ([verify-before-pushing](../how-to/verify-before-pushing.md)): the fast
    checks, structural counts (question/lecture counts match what you expect), a duplicate-id check, a check that
    the feature you were adding is actually present, and the smoke test before it goes out.
-4. Check the change log ("Recent major changes" in `DEPLOY_NOTES.md`) for anything recent before you
+4. Check the change log ("Recent major changes" in `DEPLOY_NOTES.md`, the last week; older entries are in its monthly
+   archives, `DEPLOY_NOTES-<yyyy-mm>.md`, so grep `DEPLOY_NOTES*.md`) for anything recent before you
    deploy (the site's own changelog, the Supabase `changelog` table, only drives each hub's "Updated" label and the
    admin page since the redesign) — if someone else's change isn't reflected in your working copy yet,
    that's your signal to go back to step 1.

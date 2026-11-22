@@ -217,7 +217,7 @@ students; `tools/data-fixes/2026-11-19-test-runs.sql` takes them out after its P
 
 ## History
 
-Grep "Recent major changes" in `DEPLOY_NOTES.md` for `heme-endo-exam3`. Retrospective: `LESSONS.md`, "Hub retrospectives",
+Grep the change log (`DEPLOY_NOTES*.md`, its monthly archives included) for `heme-endo-exam3`. Retrospective: `LESSONS.md`, "Hub retrospectives",
 Heme & Endo Exam 3 (2026-11-20).
 
 Related: [home](../home.md) · [heme-endo-exam2](heme-endo-exam2.md) · [heme-endo-exam1](heme-endo-exam1.md)

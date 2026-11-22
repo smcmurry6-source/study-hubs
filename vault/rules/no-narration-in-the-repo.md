@@ -21,7 +21,9 @@ Sam's call: leave the history as it is, and stop the growth.
 
 - **Until narration comes back,** a hub ships without recordings, as Review of Systems does: Listen reads with the
   device's own voice and there is no Timmy Time. `tools/narrate.py` and `tools/podcast/` still work for a local listen;
-  their output stays out of git.
+  their output stays out of git: `.gitignore` leaves out `hubs/*/audio/` and `timmy-time.mp3`, and CI's public-repo check
+  (`node tools/release/secrets.js`, in "Check hubs") fails a change that adds a file under `hubs/<hub>/audio/` or a
+  `timmy-time.mp3` anywhere, even one added with `git add -f` (2026-11-22).
 - **When narration comes back,** it lives in a second repo whose Pages site the hubs fetch it from (a project site under
   the same account is served from the same address, `smcmurry6-source.github.io/<repo>/`, so the page can fetch its words
   files without any cross-site setup). Nothing points at that repo's history, so it can be wiped at every archiving.

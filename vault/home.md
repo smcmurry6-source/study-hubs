@@ -120,7 +120,8 @@ Hub building
 - [Ask Timmy's server](reference/ask-timmy.md): the `timmy` Edge Function, how a question is answered from a hub's content
   with every quote checked, the limits and cost, the Report button, the eval (migration_v55, applied at the redesign's release).
 - `LESSONS.md`: what the data and archived hubs taught. Read it before building or restructuring a hub.
-- `DEPLOY_NOTES.md`: the change log, newest first. Grep it for a hub or feature.
+- `DEPLOY_NOTES.md`: the change log, newest first, the last week of it; older entries in `DEPLOY_NOTES-<yyyy-mm>.md`. Grep
+  `DEPLOY_NOTES*.md` for a hub or feature.
 - `supabase/schema.sql` and `migration_v*.sql`: the database; `supabase/pending-migrations.txt` lists the ones written and
   tested but not applied yet.
 
