@@ -32,6 +32,23 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-22 (Smoother scrolling, and nothing you can see pauses, Claude Code)** — Sam: "Is there a way that we can make the
+  performance better for the dashboard when scrolling and in timmys shop and such?", then "I also hate that animations
+  pause". The 2026-11-14 fix (BUG-147) made the drawings rest: 8 s of motion, frozen while scrolling or touching, the shop's
+  frames 6 s at a time, the place's stage holding while its window scrolled. Measured on a slowed browser, the resting
+  was most of the jitter left: each rest and wake restyled every shape in a drawing (`.is-rest svg *`, up to 3,700 shapes,
+  40-150 ms each time). Now **nothing on screen pauses**; only a part off the screen, or behind a window that covers it,
+  stops, through a rule that names the moving classes (`.is-away :is(...)` in `widget/dash.css`; `lifeWatch` in
+  `widget/dash.js`, which now also notices a window that opens after it loads). The **stage** is two stills with its
+  beams and sparkles between them and its crown and confetti over them, each in a box the compositor moves (`fx()` and
+  `stage({ part })` in `tools/figures/site/stage.mjs`; `stageSvg`/`stageFx` in `widget/dash.js`). The **shop's** frames,
+  storefront and mystery box are drawn in the page, not as moving images (`live()`/`watch()` in `widget/shop.js`; `shopLife` is
+  gone). The **place card's** moving picture is its own layer (`widget/place.css`), the place's stage no longer holds
+  (`stageLife` is gone), and the hot-air balloon lost an empty moving group that redrew the page on every frame
+  (`tools/figures/site/place.mjs`; the art build now fails on one). Under a 4x slower processor a second scroll of the
+  dashboard with everything moving takes about what `main` took with everything frozen (20/24 ms a frame on phone/laptop,
+  `main` 19/20). This cloud browser has no graphics card, so the compositor's share couldn't be measured: check on a real
+  phone. [motion-cost](vault/reference/motion-cost.md), [decisions](vault/decisions.md).
 - **2026-11-22 (The exam-eve boss, the Midnight Plaque, idea board #4, Claude Code)** — Sam set the idea Planned ("This could
   be fun. Maybe have an xp + gold crowns reward"), then, on the PR's numbers: "open it from 3pm to midntight, hp is good, pay
   is good, he can also have a card below the today card on the question bank". The night before every exam in `hubs.js`, 3 pm to midnight Central, one
