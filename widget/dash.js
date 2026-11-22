@@ -594,7 +594,7 @@
     }, (n || 0) * 450);
   }
   /* nobody walks while the room rests (off screen, mid-scroll, behind a window): they are just there, or gone */
-  function roomResting(){ var n = $("now"); return !!n && (n.classList.contains("is-rest") || n.classList.contains("is-away")); }
+  function roomResting(){ var n = $("now"); return !!n && n.classList.contains("is-away"); }
   function arrive(p, i, quiet, n){
     function sit(){
       var el = seatEl(i); if (!rm || rm.at[p.key] !== i || !el) return;
@@ -2000,17 +2000,40 @@
      hidden from screen readers; a tap on a winner's Timmy is a tap on their name's button under the stage (visiting) */
   function stageSvg(w, rows, fits){
     var S = CA.stage, h = w < 480 ? 262 : 300, fl = h - 44, cx = w / 2, k = w < 480 ? .74 : 1, pw = Math.min(150, w * .3), gap = Math.min(170, w * .31);
-    var s = S.stage({ w: w, h: h }), fla = (A.flame || {})[5] || (A.flame || {})[3] || "";
+    /* with the kit's fx() (class.js from 2026-11-22) the set is two stills, its backdrop and the rest in front, with what
+       moves drawn between them and over them (stageFx); an older class.js draws it as one picture that moves inside */
+    var fx = S.fx ? S.fx({ w: w, h: h }) : null, crown = "", fla = (A.flame || {})[5] || (A.flame || {})[3] || "";
+    var s = fx ? S.stage({ w: w, h: h, fx: false, part: "front" }) : S.stage({ w: w, h: h });
     if (w > 560) [-1, 1].forEach(function(d){ s += S.G(cx + d * (gap + pw / 2 + 44), fl + 8, 1, S.torch(74) + '<svg x="-20" y="-108" width="40" height="48" viewBox="0 0 40 48" overflow="visible">' + fla + "</svg>"); });
     [{ p: 2, x: cx - gap, h: 74 * k, tw: 68 * k }, { p: 1, x: cx, h: 108 * k, tw: 82 * k }, { p: 3, x: cx + gap, h: 54 * k, tw: 64 * k }].forEach(function(b){
       var th = b.tw * 1.31, top = fl + 10 - b.h;
       s += S.G(b.x, fl + 10, 1, S.pedestal(b.p, pw, b.h));
       if (window.shPet && window.shPet.art && rows[b.p - 1]) s += '<g class="st-win st-win' + b.p + (visitKey(rows[b.p - 1]) ? " can-visit" : "") + '" data-p="' + b.p + '"><svg x="' + (b.x - b.tw / 2).toFixed(1) + '" y="' + (top - th * (256 / 262) + 2).toFixed(1) + '" width="' + b.tw.toFixed(1) + '" height="' + th.toFixed(1) +
         '" viewBox="0 -30 200 262" overflow="visible">' + timmyArt(fits[b.p - 1] || "", "happy") + "</svg></g>";
-      if (b.p === 1) s += '<g class="st-crown">' + S.G(b.x, top - th - 6, .78 * k, S.crown()) + "</g>" + S.spark(b.x - 62 * k, top - 52, 7) + S.spark(b.x + 66 * k, top - 76, 9) + S.spark(b.x + 52 * k, top - 12, 5, "#fff");
+      if (b.p !== 1) return;
+      /* first place's crown bobs: over the set with the confetti when the set is a still */
+      if (fx) crown = { k: "crown", x: b.x, y: top - th - 6, d: 0, b: Math.ceil(64 * .78 * k) + 4, svg: S.G(0, 0, .78 * k, S.crown()) };
+      else s += '<g class="st-crown">' + S.G(b.x, top - th - 6, .78 * k, S.crown()) + "</g>";
+      s += S.spark(b.x - 62 * k, top - 52, 7) + S.spark(b.x + 66 * k, top - 76, 9) + S.spark(b.x + 52 * k, top - 12, 5, "#fff");
     });
-    s += '<g class="st-confetti">' + S.confetti({ w: w, h: h }) + "</g>";
-    return '<svg class="dx-set" viewBox="0 0 ' + w + " " + h + '" width="' + w + '" height="' + h + '" aria-hidden="true" focusable="false">' + s + "</svg>";
+    var svg = function(cls, body){ return '<svg class="' + cls + '" viewBox="0 0 ' + w + " " + h + '" width="' + w + '" height="' + h + '" aria-hidden="true" focusable="false">' + body + "</svg>"; };
+    if (!fx) return svg("dx-set", s + '<g class="st-confetti">' + S.confetti({ w: w, h: h }) + "</g>");
+    var tw = fx.pieces.filter(function(p){ return p.k === "tw"; }), top = [crown].concat(fx.pieces.filter(function(p){ return p.k !== "tw"; }));
+    return '<div class="dx-setbox">' + svg("dx-set", S.stage({ w: w, h: h, fx: false, part: "back" })) +
+      svg("dx-setlights", fx.lights) + stageFx(tw, w, h) + svg("dx-set dx-setfront", s) + stageFx(top, w, h) + "</div>";
+  }
+  /* What moves on the stage is drawn between and over its two stills (Sam, 2026-11-22: "I also hate that animations
+     pause"): the lights' beams as one picture that pulses, and each sparkle, piece of confetti and the crown as its own
+     small box that twinkles, falls or bobs. A box that moves or fades is moved by the browser's compositor, so the set is
+     drawn once and never again while they move, and nothing needs to stop while the page scrolls
+     (vault/reference/motion-cost.md). */
+  function stageFx(pieces, w, h){
+    var pct = function(v, of){ return (v / of * 100).toFixed(2) + "%"; };
+    return '<div class="dx-setfx" aria-hidden="true">' + pieces.filter(Boolean).map(function(p){
+      var b = p.b;
+      return '<i class="st-' + p.k + '" style="left:' + pct(p.x - b / 2, w) + ";top:" + pct(p.y - b / 2, h) + ";width:" + pct(b, w) + ";height:" + pct(b, h) + ";animation-delay:" + p.d + 's">' +
+        '<svg viewBox="' + (-b / 2) + " " + (-b / 2) + " " + b + " " + b + '" width="100%" height="100%" focusable="false">' + p.svg + "</svg></i>";
+    }).join("") + "</div>";
   }
   function boardMsg(msg){ boardData = null; $("visitRand").hidden = true; $("board").innerHTML = '<p class="note">' + esc(msg || "Couldn't reach the class data just now. Reload to try again.") + "</p>"; }
   var boardData = null;      /* the board as last loaded: { which, rows, fits } (painted again when the page's width changes) */
@@ -2664,72 +2687,59 @@
     loadScriptOnce(WIDGET + "rest.bundle.js").then(one, one);
     loadScriptOnce(WIDGET + "hub-art/class.js").then(one, one);
   }
-  /* The drawn pictures move when you arrive at them, not all the time (Sam, 2026-11-14: "scrolling and things are kind
-     of sluggish and jittery"). Anything that moves inside a drawing (the stage's confetti and lights, the classroom's
-     Timmys, the road, the board's Timmy, the picture of Timmy's place) makes the browser redraw that picture and
-     rebuild the page's layers on every frame, and about 130 of them ran the whole time, wherever the page was
-     scrolled. So each such part of the page rests (.is-rest: dash.css and place.css hold what moves inside it) and
-     comes alive for LIFE ms when it comes on screen, when a scroll ends on it and under a mouse. It rests at once when
-     a scroll or a touch starts, while a window is open over the page and when it leaves the screen. What costs
-     nothing keeps moving while it is on screen: the Timmy Time card, the rays, the rank bar's shine and a crown's glint
-     are moved by the compositor. Off screen (.is-away) nothing moves at all. */
-  var LIFE = 8000, life = { io: null, parts: [], scrolling: false, st: 0, tt: 0, stage: null };
-  function lifeCovered(){ return !!q('dialog[open], [aria-modal="true"]'); }
-  /* the picture of Timmy's place is drawn in a shadow root, which a rule out here can't reach: it is told by itself */
-  function lifeMark(p, rest){
-    p.el.classList.toggle("is-rest", rest);
-    if (p.el.id === "you") [].forEach.call(p.el.querySelectorAll(".tpc-live"), function(x){ x.classList.toggle("is-rest", rest); });
+  /* What moves on the page keeps moving while you can see it (Sam, 2026-11-22: "I also hate that animations pause"),
+     scrolling included. Until then each drawn part rested 8 s after you arrived and froze while the page scrolled
+     (2026-11-14), and every rest and wake restyled every shape in its drawing: up to 3,700 of them, 40 to 150 ms on a
+     slowed phone each time a part came on or went off the screen, which was most of the jitter. Now only a part that is
+     off the screen stops (.is-away, which you never see), and dash.css's .is-away rule names just the shapes that move, so
+     the browser restyles those few and not the whole drawing. Behind a window that covers the whole screen (a phone's
+     shop or Timmy's place) the page is out of sight, so it stops too; behind a smaller one it keeps moving. Moving cheaply
+     is the drawings' job: the stage's confetti, sparkles and lights are drawn over it, not in it (stageFx). The rules:
+     vault/reference/motion-cost.md. */
+  var life = { io: null, on: new Map(), covered: false, stage: null };
+  function lifeApply(el){
+    var away = life.covered || life.on.get(el) === false;
+    if (el.classList.contains("is-away") !== away) el.classList.toggle("is-away", away);
+    /* the picture of Timmy's place is drawn in a shadow root, which a rule out here can't reach: its moving layer goes */
+    if (el.id === "you") [].forEach.call(el.querySelectorAll(".tpc-live"), function(x){ if (x.classList.contains("is-away") !== away) x.classList.toggle("is-away", away); });
   }
-  function lifeRest(p){ clearTimeout(p.t); p.t = 0; lifeMark(p, true); }
-  function lifeWake(p){
-    if (!p.on || life.scrolling || lifeCovered()) return;
-    clearTimeout(p.t); lifeMark(p, false);
-    p.t = setTimeout(function(){ lifeRest(p); }, LIFE);
+  function lifeCovered(){
+    var vw = window.innerWidth, vh = window.innerHeight;
+    return [].some.call(document.querySelectorAll('dialog[open], [aria-modal="true"]'), function(d){
+      var r = d.getBoundingClientRect(); return r.left <= 1 && r.top <= 1 && r.right >= vw - 1 && r.bottom >= vh - 1;
+    });
   }
-  function lifeHold(){ life.parts.forEach(function(p){ if (p.t) lifeRest(p); }); }
-  function lifePart(el){
-    var p = { el: el, on: false, t: 0 };
-    el.classList.add("is-rest"); life.parts.push(p); life.io.observe(el);
-    el.addEventListener("mouseenter", function(){ lifeWake(p); });
-    return p;
+  function lifeCover(){
+    var c = lifeCovered(); if (c === life.covered) return;
+    life.covered = c; life.on.forEach(function(v, el){ if (el.isConnected) lifeApply(el); });
   }
   function lifeWatch(){
     if (!window.IntersectionObserver) return;
+    /* a part starts moving a little before it comes into view */
     life.io = new IntersectionObserver(function(es){
-      es.forEach(function(e){
-        e.target.classList.toggle("is-away", !e.isIntersecting);
-        var p = life.parts.filter(function(x){ return x.el === e.target; })[0]; if (!p) return;
-        p.on = e.isIntersecting; if (p.on) lifeWake(p); else lifeRest(p);
-      });
-    });
-    ["you", "now", "road", "ideas", "past"].forEach(function(id){ var el = $(id); if (el) lifePart(el); });
-    /* these two have nothing that rests, only what stops off screen (.is-away): the Timmy Time card, the board's rows */
-    ["hubs", "board"].forEach(function(id){ var el = $(id); if (el) life.io.observe(el); });
+      es.forEach(function(e){ life.on.set(e.target, e.isIntersecting); lifeApply(e.target); });
+    }, { rootMargin: "120px 0px" });
+    ["hubs", "you", "now", "board", "ideas", "past"].forEach(function(id){ var el = $(id); if (el) life.io.observe(el); });
     lifeStage();
-    window.addEventListener("scroll", function(){
-      if (!life.scrolling) { life.scrolling = true; lifeHold(); }
-      clearTimeout(life.st);
-      life.st = setTimeout(function(){ life.scrolling = false; life.parts.forEach(lifeWake); }, 220);
-    }, { passive: true });
-    document.addEventListener("touchstart", lifeHold, { passive: true });
-    /* a tap that scrolled nothing: the pictures come back */
-    document.addEventListener("touchend", function(){
-      clearTimeout(life.tt); life.tt = setTimeout(function(){ if (!life.scrolling) life.parts.forEach(lifeWake); }, 500);
-    }, { passive: true });
-    /* a window opened over the page (most open on a click; one that had to be fetched first is added to the body
-       later) or closed */
-    document.addEventListener("click", function(){ setTimeout(function(){ if (lifeCovered()) lifeHold(); }, 80); }, true);
-    if (window.MutationObserver) new MutationObserver(function(){ if (lifeCovered()) lifeHold(); }).observe(document.body, { childList: true });
-    document.addEventListener("close", function(){ setTimeout(function(){ life.parts.forEach(lifeWake); }, 320); }, true);
+    /* a window opened over the page (most open on a click; one that had to be fetched first, Timmy's place or the
+       shop, opens later: its open attribute is watched, and looked at again once it has grown to its size) or closed */
+    document.addEventListener("click", function(){ setTimeout(lifeCover, 80); }, true);
+    if (window.MutationObserver) {
+      new MutationObserver(function(){ lifeCover(); }).observe(document.body, { childList: true });
+      new MutationObserver(function(){ lifeCover(); setTimeout(lifeCover, 320); }).observe(document.body, { subtree: true, attributes: true, attributeFilter: ["open", "aria-modal"] });
+    }
+    document.addEventListener("close", function(){ setTimeout(lifeCover, 320); }, true);
+    window.addEventListener("resize", function(){ if (life.covered) lifeCover(); }, { passive: true });
   }
   /* the stage is drawn again with every board, so its picture is watched by itself (the list under it is tall: the
      stage is often off screen while the list is on it) */
   function lifeStage(){
     if (!life.io) return;
-    var el = q(".dx-set", $("board"));
-    if (life.stage && life.stage.el === el) return;
-    if (life.stage) { life.io.unobserve(life.stage.el); clearTimeout(life.stage.t); life.parts = life.parts.filter(function(x){ return x !== life.stage; }); }
-    life.stage = el ? lifePart(el) : null;
+    var el = q(".dx-setbox", $("board")) || q(".dx-set", $("board"));
+    if (life.stage === el) return;
+    if (life.stage) { life.io.unobserve(life.stage); life.on.delete(life.stage); }
+    life.stage = el || null;
+    if (el) { if (life.covered) el.classList.add("is-away"); life.io.observe(el); }
   }
   function afterDraw(){
     lifeWatch();
