@@ -649,7 +649,7 @@
      The dashboard's Settings (index.html, EXTRAS) keeps the same list and keys; keep the two in step.
      sh_pref_eggs ("Hidden secrets") now covers only the easter eggs that have no switch of their own. ---------- */
   var EXTRAS = [
-    { key: "sh_pref_boss", label: "Plaque bosses", hint: "A boss the whole class fights with right answers when 5+ people are online." },
+    { key: "sh_pref_boss", label: "Plaque bosses", hint: "A boss the whole class fights with right answers when 5+ people are online, and the Midnight Plaque on an exam's eve, 6 pm to midnight." },
     { key: "sh_pref_fairy", label: "Tooth Fairy", hint: "Flies across the page now and then. Catch her for the fairy board." },
     { key: "sh_pref_probe", label: "Golden Probe", hint: "One question a day is golden. First to get it right wins." },
     { key: "sh_pref_nuke", label: "Tactical nukes", opts: [["on", "On"], ["mine", "Mine only"], ["off", "Off"]],
@@ -2203,7 +2203,8 @@
       row: (d.n || "") + " right in a row", streak: (d.n || "") + " days in a row", medal: "Hub medal", "pod-done": "Timmy Time finished",
       collection: won > 1 ? won + " collections finished" : "Collection finished",
       fairy: "First Tooth Fairy caught", goldfairy: "First Golden Tooth Fairy caught", probe: "Today's Golden Probe", perfect: "A perfect mock",
-      misses: "Yesterday's misses, all right", idea: "Your idea shipped", back: "Welcome back" }[src] || "Bonus";
+      misses: "Yesterday's misses, all right", idea: "Your idea shipped", back: "Welcome back",
+      eve: "The class beat the Midnight Plaque" + (d.n ? ": your " + d.n + (d.n === 1 ? " hit" : " hits") : "") }[src] || "Bonus";
   }
   function prizeText(src, xp, d){
     return prizeName(src, d) + ": +" + fmtN(xp) + " XP and " + fmtN(xp) + (xp === 1 ? " crown" : " crowns");

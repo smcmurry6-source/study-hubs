@@ -653,6 +653,8 @@
            the grid above keeps its shape; Perio's Stage & Grade game (2026-11-17) */
         (X.links && X.links.length ? '<nav class="quick-more" aria-label="More to do">' + X.links.map(function(l){ return q(l.href, l.icon || "arcade", l.title, l.sub || "", "ql-wide"); }).join("") + "</nav>" : "") +
       "</div>" +
+      /* the exam-eve boss's card (widget/eggs.js fills it on an exam's eve; migration_v97). Not a part: a redraw leaves it be */
+      '<div class="eve-slot" data-eveslot hidden></div>' +
       (X.notice ? '<p class="notice">' + icon("notes", 20) + "<span><b>" + esc(X.notice[0]) + "</b> " + esc(X.notice[1]) + "</span></p>" : "") +
       '<div class="home-grid">' +
         hp("next", '<section class="panel next" aria-labelledby="hnH" data-hp="next"><h2 id="hnH">Where to next</h2>' + nextHTML(rows, mis, examWeek) + "</section>") +
@@ -668,6 +670,7 @@
     var tp = $("[data-today]", el); if (tp) tp._hxH = today;   /* paintMeters leaves it be until its numbers change */
     wireHome(el);
     paintLive();
+    if (window.shEggs && window.shEggs.eveSlot) window.shEggs.eveSlot();
     homeTimer = setInterval(function(){ var c = $("#hxCount"); if (!c || !c.isConnected || view !== "home") { clearInterval(homeTimer); return; } c.innerHTML = countHTML(); }, 30000);
     tip(el, "home", "Your daily goal is the ring in the bar: " + HX.goal() + " questions a day. The flame counts the days in a row you study. Change the goal in More, Settings.");
   }
@@ -1663,7 +1666,7 @@
   var EXTRAS = [
     ["sh_pref_pet", "Timmy Tooth", "Your cartoon tooth buddy, on the bar: tap him to ask about the notes. He hides during mock exams. Off, an Ask button takes his place.", [["on", "On"], ["dash", "Dashboard only"], ["off", "Off"]]],
     ["sh_pref_eggs", "Hidden secrets", "Holidays, magic words and the other easter eggs. Clues are in the trophy case."],
-    ["sh_pref_boss", "Plaque bosses", "A boss the whole class fights with right answers when 5+ people are online."],
+    ["sh_pref_boss", "Plaque bosses", "A boss the whole class fights with right answers when 5+ people are online, and the Midnight Plaque on an exam's eve, 6 pm to midnight."],
     ["sh_pref_fairy", "Tooth Fairy", "Flies across the page now and then. Catch her for the fairy board."],
     ["sh_pref_probe", "Golden Probe", "One question a day is golden. First to get it right wins."],
     ["sh_pref_nuke", "Tactical nukes", "100 right in a row unlocks a strike. Mine only: you won't see classmates' strikes.", [["on", "On"], ["mine", "Mine only"], ["off", "Off"]]],

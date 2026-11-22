@@ -577,6 +577,8 @@
 
   /* ================= Plaque Boss ================= */
   var boss = null, bossHidden = false, lastHitSend = 0;
+  /* the exam-eve boss's state (below), here so the regular boss's band can make way for it */
+  var EVE = { data: null, at: 0, skew: 0, pend: [], el: null, hidden: false, timer: 0, asking: false, done: false, test: false };
   function bossId(){ var c = centralParts(); return HUB + "|" + c.day + "|" + Math.floor(c.hour / 2); }
   function bossDown(id){ return ls("sh_egg_boss_down") === id; }
   /* The boss docks as a slim strip at the bottom of the hub's sticky top bar, so it never sits over a question (Sam,
@@ -613,13 +615,14 @@
   /* while the band is up, hub.css moves what sticks under the bar (the lecture list, the bank's side panel, the mock's
      clock, a pinned figure) down by its height */
   function bossSpace(){
-    var el = boss && boss.el, up = !!(el && el.isConnected && el.classList.contains("is-band") && el.classList.contains("is-shown"));
+    var el = EVE.el && EVE.el.classList.contains("is-shown") ? EVE.el : boss && boss.el, up = !!(el && el.isConnected && el.classList.contains("is-band") && el.classList.contains("is-shown"));
     var st = document.documentElement.style;
     if (up) st.setProperty("--boss-h", el.getBoundingClientRect().height + "px"); else st.removeProperty("--boss-h");
   }
-  window.addEventListener("resize", function(){ if (boss) { placeBoss(boss.el); bossSpace(); } });
+  window.addEventListener("resize", function(){ if (boss) placeBoss(boss.el); if (EVE.el && EVE.el.isConnected) placeBoss(EVE.el); bossSpace(); });
   function spawnBoss(hp, test){
     var id = bossId();
+    if (!test && eveUp()) return;   /* the exam-eve boss has the band tonight (below) */
     if (!test && boss && boss.id === id) return;
     if (!test && bossDown(id)) return;
     if (boss) boss.el.remove();
@@ -702,10 +705,210 @@
     drawBoss();
   }, 15000);
 
+  /* ================= the exam-eve boss (migration_v97; idea board #4) =================
+     The night before an exam, from 6 pm to midnight Central, the whole class fights one giant boss, the Midnight Plaque:
+     every right answer anyone gives in this hub takes 1 HP off it. If it falls before midnight, everyone who landed a hit
+     gets XP and crowns (250, plus 25 a hit, up to 1,000), paid once by the server, which counts the hits from the answers
+     it already saves (the answer save does nothing new). Which nights: the exam dates in hubs.js, which the After merge
+     workflow writes into eve_bosses. The page asks get_eve_boss only on an eve (an exam tomorrow in SH_EXPORT.exams), or
+     until noon on the exam's day for last night's result: once a few seconds after it opens, then every 30 s or so while
+     the boss is up and the page is in view; at 6 pm when it opened before; never in a mock, with the boss switch off (Focus
+     mode turns it off) or in a quiet spell (shDb). Between asks it adds your own right answers. It has the band under the
+     bar (the regular boss stays away tonight) and a card on Home ([data-eveslot], widget/hub.js). Its art is a kit,
+     widget/hub-art/eveboss.js (tools/figures/site/eveboss.mjs), fetched the first time it's drawn. */
+  function fmtN(n){ return String(n | 0).replace(/\B(?=(\d{3})+(?!\d))/g, ","); }
+  function addDay(day, n){ var p = day.split("-"); return new Date(Date.UTC(+p[0], +p[1] - 1, +p[2] + n)).toISOString().slice(0, 10); }
+  /* the night this page's boss belongs to: tonight's (an exam tomorrow) or, until noon on an exam's day, last night's */
+  function eveDay(){
+    var c = centralParts(), t = addDay(c.day, 1), out = null;
+    (exp().exams || []).forEach(function(x){
+      if (!x || !x.date) return;
+      if (x.date === t) out = c.day; else if (!out && x.date === c.day && c.hour < 12) out = addDay(c.day, -1);
+    });
+    return out;
+  }
+  function eveArt(){ return window.SH_EVE_ART || null; }
+  var eveArtWait = null;
+  function eveLoadArt(){
+    if (!eveArtWait) eveArtWait = new Promise(function(done){
+      var tag = [].filter.call(document.scripts, function(x){ return /\/widget\/[^\/?#]+\.js([?#]|$)/.test(x.src); })[0];
+      if (eveArt() || !tag) { done(); return; }
+      var s = document.createElement("script"); s.async = true; s.src = new URL("hub-art/eveboss.js", tag.src).href;
+      s.onload = s.onerror = function(){ done(); }; document.head.appendChild(s);
+    });
+    return eveArtWait;
+  }
+  function eveHat(){ return HOLIDAY && HOLIDAY.id === "winter" ? "santa" : null; }
+  function eveNow(){ return Date.now() + EVE.skew; }
+  /* the boss as the server last said, with your right answers since: the class's after its last count, yours after the ask */
+  function eveState(){
+    var d = EVE.data, b = d && d.boss; if (!b) return null;
+    var P = d.prize || {}, y = d.you || {}, up = b.state === "up", cAt = Date.parse(b.counted_at || b.starts) || 0, asked = Date.parse(b.now) || 0;
+    var cls = up ? EVE.pend.filter(function(t){ return t > cAt; }).length : 0, me = up ? EVE.pend.filter(function(t){ return t > asked; }).length : 0;
+    var hp = Math.max(1, b.hp | 0), hits = Math.min(hp, (b.hits | 0) + cls), mine = (y.hits | 0) + me;
+    return { state: b.state, day: b.day, exam: b.exam, hp: hp, hits: hits, left: Math.max(0, hp - hits), people: b.people | 0,
+      starts: Date.parse(b.starts) || 0, ends: Date.parse(b.ends) || 0, fell: Date.parse(b.fell_at || "") || 0,
+      mine: mine, pay: mine > 0 ? Math.min(P.max || 1000, (P.base | 0) + (P.per | 0) * mine) : 0, paid: y.paid | 0, prize: P };
+  }
+  function eveUp(){ var s = eveState(); return !!s && s.state === "up" && feat("boss"); }
+  function eveClock(t){
+    try { return new Intl.DateTimeFormat("en-US", { timeZone: "America/Chicago", hour: "numeric", minute: "2-digit" }).format(new Date(t)).replace(":00 ", " ").replace(" AM", " am").replace(" PM", " pm"); }
+    catch (e) { return ""; }
+  }
+  function eveLeft(ms){
+    var m = Math.max(1, Math.round(ms / 60000)), h = Math.floor(m / 60);
+    return h ? h + " h" + (m % 60 ? " " + (m % 60) + " min" : "") : m + " min";
+  }
+  function eveExam(s){ var x = (exp().exams || []).filter(function(e){ return e && e.date === s.exam; })[0]; return x && x.label ? x.label : "the exam"; }
+  function pl(n, w){ return fmtN(n) + " " + (n === 1 ? w : w === "person" ? "people" : w + "s"); }
+  /* the band under the bar (placeBoss and bossSpace, as the regular boss's) */
+  function eveBand(){
+    if (EVE.el) return EVE.el;
+    var el = document.createElement("div");
+    el.className = "sh-egg sh-egg-boss sh-egg-eve";
+    el.style.setProperty("--boss", "#C9AE4F");
+    el.title = "Every right answer from anyone in this hub hits it, until midnight";
+    el.innerHTML = '<span class="sh-egg-boss-face"></span><span class="sh-egg-boss-body"><b>The Midnight Plaque</b><small><span class="sh-egg-boss-hp"></span>' +
+      '<span class="sh-egg-boss-say"></span></small><span class="sh-egg-boss-bar"><i></i></span></span>' +
+      '<button type="button" class="sh-egg-x" aria-label="Hide the exam-eve boss">×</button>';
+    el.querySelector(".sh-egg-x").addEventListener("click", function(){ EVE.hidden = true; eveDraw(); });
+    return (EVE.el = el);
+  }
+  function eveDraw(){
+    var s = eveState(), A = eveArt(), show = !!s && s.state === "up" && feat("boss") && !EVE.hidden;
+    if (show && !A) { eveLoadArt().then(eveDraw); show = false; }
+    if (show) {
+      if (boss && !boss.test) { boss.el.remove(); boss = null; }
+      var el = eveBand(), f = s.left / s.hp;
+      placeBoss(el);
+      el.querySelector(".sh-egg-boss-face").innerHTML = A.icon(A.pick("up", f), { hat: eveHat() });
+      el.querySelector(".sh-egg-boss-bar i").style.width = (100 * f) + "%";
+      el.querySelector(".sh-egg-boss-hp").textContent = fmtN(s.left) + " / " + fmtN(s.hp) + " HP";
+      el.querySelector(".sh-egg-boss-say").textContent = " · " + (s.mine ? "your " + pl(s.mine, "hit") + ": +" + fmtN(s.pay) + " XP and crowns if it falls"
+        : "falls by midnight and everyone who hit it gets XP and crowns");
+      el.classList.toggle("is-low", f <= .25);
+      el.classList.add("is-shown");
+    } else if (EVE.el) EVE.el.classList.remove("is-shown");
+    bossSpace();
+    eveCard();
+  }
+  /* Home's card: the night scene and where the fight stands */
+  function eveCard(){
+    var slot = document.querySelector("[data-eveslot]"); if (!slot) return;
+    var s = eveState(), A = eveArt();
+    if (!s || !feat("boss")) { if (!slot.hidden) { slot.hidden = true; slot.innerHTML = ""; } return; }
+    if (!A) { eveLoadArt().then(eveCard); return; }
+    var now = eveNow(), st = s.state, f = s.left / s.hp, P = s.prize, after = s.day !== centralParts().day, html;
+    var kick, title, line, hpRow = "", stats = "", you = "", go = "";
+    var rule = "Every right answer from anyone in this hub takes 1 HP off its " + fmtN(s.hp) + ". Beat it by midnight and everyone who landed a hit gets XP and crowns: " +
+      fmtN(P.base || 250) + ", plus " + fmtN(P.per || 25) + " a hit, up to " + fmtN(P.max || 1000) + ".";
+    if (st === "soon") {
+      kick = "Tonight, " + eveClock(s.starts) + " to midnight"; title = "The Midnight Plaque";
+      line = "The night before " + esc(eveExam(s)) + ", the whole class fights one giant boss. " + rule;
+      stats = "It wakes up in " + eveLeft(s.starts - now) + ".";
+      go = '<a class="eve-go" href="#questions">Warm up</a>';
+    } else if (st === "up") {
+      kick = "Exam eve · until midnight"; title = "The Midnight Plaque is up"; line = rule;
+      hpRow = '<div class="eve-hp"><span class="eve-bar" role="img" aria-label="' + fmtN(s.left) + " of " + fmtN(s.hp) + ' HP left"><i style="width:' + (100 * f).toFixed(1) + '%"></i></span><b>' +
+        fmtN(s.left) + " of " + fmtN(s.hp) + " HP left</b></div>";
+      stats = (s.people ? pl(s.people, "person") + " landed " + pl(s.hits, "hit") : "No hits yet") + " · " + eveLeft(s.ends - now) + " to go";
+      you = s.mine ? "You: " + pl(s.mine, "hit") + ", <em>+" + fmtN(s.pay) + " XP and crowns</em> when it falls" : "Answer one right to join the fight.";
+      go = '<a class="eve-go" href="#questions">Hit it: practice questions</a>';
+    } else if (st === "down") {
+      kick = after ? "Last night" : "Exam eve"; title = "The class beat the Midnight Plaque!";
+      line = "It fell at " + eveClock(s.fell) + ": " + pl(s.people, "person") + " landed its " + fmtN(s.hp) + " hits.";
+      you = s.paid ? "You landed " + pl(s.mine, "hit") + ": <em>+" + fmtN(s.paid) + " XP and crowns</em>." : "You didn't land a hit this time.";
+      if (after) stats = "Good luck on " + esc(eveExam(s)) + "!";
+    } else {
+      kick = after ? "Last night" : "Exam eve"; title = "The Midnight Plaque got away";
+      line = "Midnight came with " + fmtN(s.left) + " of its " + fmtN(s.hp) + " HP left: " + pl(s.hits, "hit") + " from " + pl(s.people, "person") + ".";
+      stats = "Good luck on " + esc(eveExam(s)) + "!";
+    }
+    html = '<section class="eve-card is-' + st + '" aria-labelledby="eveH"><figure class="eve-art">' +
+      A.scene(st === "up" ? A.pick("up", f) : A.pick(st, f), { hat: eveHat(), label: title.replace(/!$/, "") }) + "</figure>" +
+      '<div class="eve-text"><p class="eve-kick">' + kick + '</p><h2 id="eveH">' + title + '</h2><p class="eve-line">' + line + "</p>" + hpRow +
+      (stats ? '<p class="eve-stats">' + stats + "</p>" : "") + (you ? '<p class="eve-you">' + you + "</p>" : "") + go + "</div></section>";
+    if (slot._eve !== html) { slot._eve = html; slot.innerHTML = html; }
+    slot.hidden = false;
+  }
+  /* the moment: confetti and a toast when it falls (once per boss on this device), and the reward card for what it paid you
+     on the day it fell; a toast when it gets away while you watch */
+  function eveMoment(s, was){
+    var key = HUB + "|" + s.day;
+    if (s.state === "down" && ls("sh_eve_won") !== key) {
+      ls("sh_eve_won", key);
+      if (!feat("boss")) return;
+      var A = eveArt(), ic = A ? '<span class="sh-egg-eve-ic">' + A.icon("down", { hat: eveHat() }) + "</span>" : "";
+      if (was === "up" || s.day === centralParts().day) { H.confetti(); setTimeout(H.confetti, 350); setTimeout(H.confetti, 700); }
+      announce("boss", { kind: "eve" });
+      /* what it paid you: the reward card on the day it fell (the day's XP), else a toast that says so */
+      var G = window.shGame, y = EVE.data.you || {}, card = s.paid > 0 && s.day === centralParts().day && G && G.prizeText;
+      if (G && G.setCrowns && typeof y.crowns === "number") G.setCrowns(y.crowns);
+      if (card) try {
+        document.dispatchEvent(new CustomEvent("sh:prize", { detail: { src: "eve", xp: s.paid, text: G.prizeText("eve", s.paid, { n: s.mine }), res: { n: s.mine } } }));
+      } catch (e) {}
+      else toast(row(ic, "The class beat the Midnight Plaque!", s.paid ? "Your " + pl(s.mine, "hit") + " paid +" + fmtN(s.paid) + " XP and crowns." : "Everyone who landed a hit got XP and crowns."), 7000, "is-gold");
+    } else if (s.state === "lost" && was === "up" && ls("sh_eve_lost") !== key) {
+      ls("sh_eve_lost", key);
+      if (feat("boss")) toast(row("", "The Midnight Plaque got away", "Midnight came with " + fmtN(s.left) + " HP left. Good luck tomorrow!"), 6000);
+    }
+  }
+  function eveGot(d){
+    var was = EVE.data && EVE.data.boss && EVE.data.boss.state;
+    EVE.data = d;
+    if (d.boss && d.boss.now) EVE.skew = (Date.parse(d.boss.now) || Date.now()) - Date.now();
+    EVE.pend = EVE.pend.filter(function(t){ return t > (Date.parse(d.boss && d.boss.counted_at || "") || 0); });
+    var s = eveState();
+    if (s && (s.state === "down" || s.state === "lost")) { EVE.done = true; eveLoadArt().then(function(){ eveMoment(s, was); eveDraw(); }); }
+    eveDraw();
+  }
+  function eveNext(ms){ clearTimeout(EVE.timer); EVE.timer = setTimeout(function(){ EVE.timer = 0; eveAsk(); }, Math.max(1000, ms)); }
+  function eveAsk(){
+    if (EVE.test || EVE.done || EVE.asking || !SB || !eveDay()) return;
+    if (!feat("boss") || document.hidden) return;   /* the clock below starts it again */
+    if (window.shDb && window.shDb.busy && window.shDb.busy()) { eveNext(30000); return; }
+    EVE.asking = true;
+    rpc("get_eve_boss", { p_hub: HUB, p_visitor: VISITOR }).then(function(d){
+      EVE.asking = false; EVE.at = Date.now();
+      if (!d || d.ok !== true) { eveNext(EVE.data ? 60000 : 300000); return; }
+      if (!d.boss) { EVE.done = true; EVE.data = null; eveDraw(); return; }   /* no boss for this hub tonight */
+      eveGot(d);
+      var b = d.boss, now = eveNow(), en = Date.parse(b.ends) || 0;
+      if (b.state === "soon") eveNext((Date.parse(b.starts) || 0) - now + 2000 + Math.random() * 20000);
+      else if (b.state === "up") eveNext(Math.min(30000 + Math.random() * 8000, en - now + 3000 + Math.random() * 15000));
+    });
+  }
+  /* a right answer while it's up: a hit on the band now, counted by the server from the answer itself */
+  function eveHit(){
+    var s = eveState(); if (!s || s.state !== "up" || EVE.test) return;
+    EVE.pend.push(eveNow()); if (EVE.pend.length > 400) EVE.pend.shift();
+    var el = EVE.el;
+    if (el && el.classList.contains("is-shown")) {
+      el.classList.remove("is-hit"); void el.offsetWidth; el.classList.add("is-hit");
+      var pop = document.createElement("span"); pop.className = "sh-egg-boss-dmg"; pop.textContent = "-1";
+      pop.style.left = (18 + Math.random() * 16) + "px"; el.appendChild(pop); setTimeout(function(){ pop.remove(); }, 900);
+    }
+    eveDraw();
+    if (s.left <= 1 && !EVE.asking) eveNext(4000);   /* it may have just fallen: ask soon */
+  }
+  /* the clock: redraws the times every 30 s, and asks again after a mock, a hidden tab or the switch turned back on */
+  if (eveDay()) {
+    setTimeout(eveAsk, 3000 + Math.random() * 5000);
+    setInterval(function(){
+      if (!EVE.data && !EVE.test) { if (!EVE.done && !EVE.timer && Date.now() - EVE.at > 30000) eveAsk(); return; }
+      var s = eveState();
+      if (s && !EVE.timer && !EVE.done && Date.now() - EVE.at > 30000) eveAsk();
+      eveDraw();
+    }, 30000);
+    document.addEventListener("visibilitychange", function(){ if (!document.hidden && !EVE.timer && Date.now() - EVE.at > 30000) eveAsk(); });
+    /* into a mock or out of it: put the band away or back now */
+    window.addEventListener("hashchange", function(){ setTimeout(function(){ if (EVE.data) eveDraw(); }, 60); });
+  }
+
   /* switched off in Settings → Extras: put them away now instead of on the next tick */
   document.addEventListener("sh:pref", function(e){
     var k = e.detail && e.detail.key;
-    if (k === "sh_pref_boss") drawBoss();
+    if (k === "sh_pref_boss") { drawBoss(); eveDraw(); if (feat("boss") && !EVE.timer) eveAsk(); }
   });
 
   /* ================= broadcasts from classmates ================= */
@@ -731,6 +934,7 @@
     rightRun = correct ? rightRun + 1 : 0;
     if (correct && feat("probe")) checkGolden(String(d.qid || ""));
     if (correct && feat("boss")) hitBoss(rightRun);
+    if (correct) eveHit();
     if (feat("fairy")) maybeFairy();
     if (!ok()) return;
     if (correct && sh8bit) blip();
@@ -1057,12 +1261,25 @@
       });
     }, 60);
   });
+  /* the exam-eve boss as it would look tonight: shEggs.preview("eve", "up", .4) (soon, up, down or lost; HP left as a
+     share). Made up, asks nothing and pays nothing. */
+  function evePreview(st, frac){
+    var now = Date.now(), c = centralParts(), hp = 3000, f = typeof frac === "number" ? frac : .55, left = st === "down" ? 0 : Math.round(hp * f), mine = 12;
+    var start = st === "soon" ? now + 2.2 * 3600000 : now - 3 * 3600000, end = st === "lost" ? now - 60000 : now + 2.5 * 3600000;
+    EVE.test = true; EVE.done = true; EVE.hidden = false; EVE.pend = []; EVE.skew = 0;
+    EVE.data = { ok: true, prize: { hour: 18, hp: hp, base: 250, per: 25, max: 1000 }, you: { hits: st === "soon" ? 0 : mine, pay: 550, paid: st === "down" ? 550 : 0 },
+      boss: { day: c.day, exam: addDay(c.day, 1), state: st || "up", hp: hp, hits: st === "soon" ? 0 : hp - left, left: left, people: st === "soon" ? 0 : 41,
+        starts: new Date(start).toISOString(), ends: new Date(end).toISOString(), now: new Date(now).toISOString(), counted_at: new Date(now).toISOString(),
+        fell_at: st === "down" ? new Date(now - 600000).toISOString() : null } };
+    eveLoadArt().then(eveDraw);
+  }
   /* try them from the console: shEggs.preview("fairy", 5, "loop") (look 0-5, 5 = golden), shEggs.preview("boss", 3) (0-7),
      shEggs.preview("golden"). Previews record nothing and never broadcast. Seasonal versions: set
      localStorage.sh_egg_holiday_test = "winter" (any holiday id, or "none" for the regular ones) and reload. */
-  window.shEggs = { BOSSES: BOSSES, FAIRY_LOOKS: FAIRY_LOOKS, preview: function(kind, a, b){
+  window.shEggs = { BOSSES: BOSSES, FAIRY_LOOKS: FAIRY_LOOKS, eveSlot: eveCard, preview: function(kind, a, b){
     if (kind === "fairy") maybeFairy({ look: a, path: b });
     else if (kind === "boss") { bossHidden = false; spawnBoss(0, { k: BOSSES[(a | 0) % BOSSES.length] }); }
+    else if (kind === "eve") evePreview(a, b);
     else if (kind === "golden") toast(row(IC.probe, "You found today's Golden Probe!", "Preview. First in the class to answer it right gets their name on the dashboard."), 7000, "is-gold");
   } };
 })();

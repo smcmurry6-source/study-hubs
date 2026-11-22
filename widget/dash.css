@@ -169,6 +169,9 @@ html.sh-dash { scroll-behavior: smooth; scroll-padding-top: 80px; }
 .dx-livehub { display: flex; align-items: center; gap: 6px; font-size: var(--fs-label); color: var(--muted); }
 .dx-livehub:empty { display: none; }
 .dx-livehub b { color: var(--text); }
+/* the exam-eve boss's line (dash.js eveHTML): the Midnight Plaque's night sky, in both themes */
+.dx-eve { margin-top: 2px; padding: 8px 12px; border-radius: var(--r-row); background: #2b2550; color: #f4f0fa; font-size: var(--fs-meta); line-height: 1.4; }
+.dx-eve b { color: #e6d68c; }
 /* what to do next: your progress ring, Start studying in the hub's color, the Daily drill */
 .dx-go { display: grid; gap: 14px; min-width: 280px; }
 .dx-ring { display: flex; align-items: center; gap: 14px; }
