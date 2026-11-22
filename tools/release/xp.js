@@ -1676,6 +1676,106 @@ try {
     notes.push('more ways to earn crowns (migration_v92): the first Tooth Fairy and the first Golden one, a Golden Probe won, a perfect mock, yesterday\'s misses all right, an idea shipped, a day back after a week away, and the back pay, each once');
   }
 
+  /* ---------- 14f. the exam-eve boss (migration_v97; idea board #4, Sam: "This could be fun. Maybe have an xp + gold crowns
+     reward"): from 3 pm to midnight Central the night before an exam, every right answer in the hub from anyone takes a hit;
+     it falls at its HP-th right answer and everyone who landed a hit is paid once, on the server, 250 + 25 a hit up to 1,000;
+     a boss still up at midnight got away. Counted on demand from personal_answers (kept 20 seconds), never in the answer save ---------- */
+  if (one(`select to_regprocedure('get_eve_boss(text,text)') is not null`) === 't') {
+    const EP = json(`sh_eve_prize()`);
+    eq(EP, { hp: 3000, max: 1000, per: 25, base: 250, hour: 15 }, 'sh_eve_prize(): 3 pm, 3,000 HP, 250 + 25 a hit up to 1,000');
+    eq(rows(`select hub, day::text, exam_date::text, hp from eve_bosses where hub = 'review-of-systems' order by day`),
+      [{ hub: 'review-of-systems', day: '2026-12-02', exam_date: '2026-12-03', hp: 3000 }, { hub: 'review-of-systems', day: '2026-12-09', exam_date: '2026-12-10', hp: 3000 }],
+      'Review of Systems\' two eves are in');
+    // a made-up eve after every made-up answer above, so its answers are the newest (as they are on the live database), and
+    // more than 30 days before section 16's clock (2031-01-01), which packs every answer
+    const ED = '2030-11-10', at = (hm, s) => `('${ED} ${hm}:${String(s || 0).padStart(2, '0')}'::timestamp at time zone 'America/Chicago')`;
+    const at2 = (d, hm) => `('${d} ${hm}:00'::timestamp at time zone 'America/Chicago')`;
+    const eve = (hub, t, v) => json(`sh_eve_boss(${t}, ${q(hub)}, ${v ? q(v) : 'null'})`);
+    sql(`insert into eve_bosses (hub, day, exam_date, hp) values ('xe', '${ED}', '2030-11-11', 100), ('xl', '${ED}', '2030-11-11', 100);
+         insert into visitor_links (alias_id, primary_id) values ('xp-EVa', 'xp-EVp');`);
+    const put = (v, hub, n, hm, right, s0) => sql(`insert into personal_answers (visitor_id, hub, qid, correct, answered_at)
+      select ${q(v)}, ${q(hub)}, 'e' || g, ${right ? 'true' : 'false'}, ${at(hm)} + make_interval(secs => ${s0 || 0} + g) from generate_series(1, ${n}) g`);
+    const soon = eve('xe', at('14:00'), 'xp-EVA');
+    eq([soon.ok, soon.boss.state, soon.boss.hp, soon.boss.hits, soon.you.hits, soon.you.pay, soon.prize.max], [true, 'soon', 100, 0, 0, 0, 1000], 'before 3 pm: soon, full HP');
+    put('xp-EVA', 'xe', 5, '14:30', true);            // before 3 pm: not a hit
+    put('xp-EVA', 'xother', 10, '18:05', true);        // another hub: not a hit
+    put('xp-EVA', 'xe', 7, '18:10', false);            // wrong: not a hit
+    put('xp-EVA', 'xe', 40, '18:20', true);
+    put('xp-EVa', 'xe', 15, '18:30', true); put('xp-EVp', 'xe', 15, '18:40', true);   // one person, two linked devices: 30
+    put('xp-EVC', 'xe', 20, '18:50', true); put('xp-EVD', 'xe', 5, '19:00', true);
+    const sid = num(`select sh_answer_id_at(${at('15:00')})`), first = num(`select min(id) from personal_answers where hub = 'xother'`);
+    ok(sid <= first && sid > num(`select max(id) from personal_answers where hub = 'xe' and answered_at < ${at('15:00')}`), `the first answer at 3 pm is found by the binary search (${sid}, ${first})`);
+    // the real answer path counts too: two right through sh_answer
+    anon(`select admin_load_question_keys(${S}, 'xe', ${q(JSON.stringify([{ id: 'k1', kind: 'one', answer: [2] }, { id: 'k2', kind: 'one', answer: [0] }]))}::jsonb)`);
+    json(`sh_answer(${at('19:10')}, 'xp-EVE', 'xe', 'k1', 2, null, null, null, 'bank', null, null, null)`);
+    json(`sh_answer(${at('19:10', 30)}, 'xp-EVE', 'xe', 'k2', 0, null, null, null, 'bank', null, null, null)`);
+    const up = eve('xe', at('20:00'), 'xp-EVA'), upB = eve('xe', at('20:00', 1), 'xp-EVa');
+    eq([up.boss.state, up.boss.hits, up.boss.left, up.boss.people, up.you.hits, up.you.pay, up.you.paid], ['up', 97, 3, 5, 40, 1000, 0], 'at 8 pm: 97 hits from 5 people; 40 of them yours, worth the full 1,000 if it falls');
+    eq([upB.you.hits, upB.you.pay], [30, 1000], 'a linked device counts the person\'s hits together (15 + 15)');
+    eq(eve('xe', at('20:00', 2), 'xp-EVD').you.pay, 375, 'five hits: 250 + 5 × 25');
+    const none = eve('xe', at('20:00', 3), 'xp-NONE').you;
+    eq([none.hits, none.pay, none.paid], [0, 0, 0], 'no hits: nothing to win');
+    const cnt = one(`select counted_at::text from eve_bosses where hub = 'xe'`);
+    put('xp-EVD', 'xe', 1, '20:00', true, 4);
+    eq([eve('xe', at('20:00', 10)).boss.hits, one(`select counted_at::text from eve_bosses where hub = 'xe'`)], [97, cnt], 'a count under 20 seconds old is kept');
+    eq(eve('xe', at('20:00', 30)).boss.hits, 98, 'and done again after 20 seconds');
+    ok(anonJson(`get_eve_boss('xe', 'xp-EVA')`).boss === null, 'the live call on any other day: no boss');
+    // it falls at its 100th right answer; everyone who landed a hit before it is paid once, to the linked id
+    put('xp-EVF', 'xe', 4, '20:10', true);
+    put('xp-EVA', 'xe', 3, '20:15', true);             // after the fall: no more hits
+    const w0 = json(`sh_wallet('xp-EVA')`), down = eve('xe', at('20:20'), 'xp-EVA');
+    const fall = one(`select (answered_at at time zone 'America/Chicago')::text from personal_answers where visitor_id = 'xp-EVF' and hub = 'xe' order by id offset 1 limit 1`);
+    eq([down.boss.state, down.boss.hits, down.boss.left, down.boss.people, down.you.hits, down.you.paid, typeof down.you.crowns],
+      ['down', 100, 0, 6, 40, 1000, 'number'], 'it falls at its 100th hit (the second of the last four): 6 people paid, you 1,000, with your balance');
+    eq(one(`select (fell_at at time zone 'America/Chicago')::text from eve_bosses where hub = 'xe'`), fall, 'the fall is the time of its 100th right answer');
+    eq(rows(`select visitor_id, base, xp, src, hub from xp_awards where key = 'eve:xe:${ED}' order by visitor_id`), [
+      { visitor_id: 'xp-EVA', base: 1000, xp: 1000, src: 'boss', hub: 'xe' }, { visitor_id: 'xp-EVC', base: 750, xp: 750, src: 'boss', hub: 'xe' },
+      { visitor_id: 'xp-EVD', base: 400, xp: 400, src: 'boss', hub: 'xe' }, { visitor_id: 'xp-EVE', base: 300, xp: 300, src: 'boss', hub: 'xe' },
+      { visitor_id: 'xp-EVF', base: 300, xp: 300, src: 'boss', hub: 'xe' }, { visitor_id: 'xp-EVp', base: 1000, xp: 1000, src: 'boss', hub: 'xe' }],
+      'each paid 250 + 25 a hit up to 1,000, once, never boosted; the linked device\'s hits paid to its primary id, the alias nothing');
+    eq(json(`sh_wallet('xp-EVA')`).prizes - w0.prizes, 1000, 'as many crowns as XP (a boss\'s prize)');
+    eq([eve('xe', at('21:00'), 'xp-EVA').you.paid, num(`select count(*) from xp_awards where key = 'eve:xe:${ED}'`)], [1000, 6], 'asked again: nothing paid twice');
+    eq(eve('xe', at2('2030-11-11', '09:00'), 'xp-EVp').boss.state, 'down', 'on the exam day, last night\'s boss: down');
+    eq(eve('xe', at2('2030-11-12', '09:00'), 'xp-EVp').boss, null, 'the day after: none');
+    // a boss still up at midnight got away: nobody is paid
+    put('xp-EVA', 'xl', 60, '21:00', true);
+    eq(eve('xl', at('23:30'), 'xp-EVA').boss.state, 'up', 'xl at 11:30 pm: still up');
+    put('xp-EVA', 'xl', 30, '23:59', true);            // 23:59:01 to 23:59:30, before midnight
+    const lost = eve('xl', at2('2030-11-11', '00:10'), 'xp-EVA');
+    eq([lost.boss.state, lost.boss.hits, lost.boss.left, lost.you.hits, lost.you.paid], ['lost', 90, 10, 90, 0], 'after midnight, 90 of 100: it got away; no pay');
+    eq(num(`select count(*) from xp_awards where key like 'eve:xl:%'`), 0, 'nobody paid for a boss that got away');
+    put('xp-EVA', 'xl', 20, '23:59', true, 40);        // answers saved after it's settled never count
+    eq(eve('xl', at2('2030-11-11', '00:20'), 'xp-EVA').boss.hits, 90, 'settled: never counted again');
+    // the job: counts every boss whose window has begun (on the real clock: none here are due) and answers its count
+    ok(Number(one(`select sh_eve_tick()`)) >= 0, 'sh_eve_tick runs');
+    sql(`insert into eve_bosses (hub, day, exam_date, hp) values ('xt', (now() at time zone 'America/Chicago')::date - 1, (now() at time zone 'America/Chicago')::date, 100)`);
+    one(`select sh_eve_tick()`);
+    ok(one(`select settled_at is not null and fell_id is null from eve_bosses where hub = 'xt'`) === 't', 'the job settles last night\'s boss after midnight with no page asking');
+    // the After merge workflow's eves step (tools/after-merge/run.js): the eves still to come follow hubs.js; one that has
+    // started, or a past one, never moves
+    const AM = require('../after-merge/run.js'), cday = one(`select (now() at time zone 'America/Chicago')::date::text`);
+    const plus = n => { const d = new Date(cday + 'T12:00:00Z'); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
+    sql(`insert into eve_bosses (hub, day, exam_date, hp) values ('xs', ${q(plus(3))}, ${q(plus(4))}, 3000), ('xs', ${q(plus(5))}, ${q(plus(6))}, 3000), ('xs', ${q(plus(-3))}, ${q(plus(-2))}, 3000);
+         update eve_bosses set start_id = 1 where hub = 'xs' and day = ${q(plus(5))}`);
+    sql(AM.examEvesSql(AM.examEves({ hubs: [{ id: 'xs', exams: [{ date: plus(8), eveBoss: 2500 }, { date: plus(6), eveBoss: 9000 }] }, { id: 'xs2', exams: [{ date: plus(2) }] }] })));
+    eq(rows(`select hub, day::text, hp from eve_bosses where hub in ('xs', 'xs2') order by hub, day`), [
+      { hub: 'xs', day: plus(-3), hp: 3000 }, { hub: 'xs', day: plus(5), hp: 3000 }, { hub: 'xs', day: plus(7), hp: 2500 }, { hub: 'xs2', day: plus(1), hp: 3000 }],
+      'the eves step: a dropped exam\'s eve comes out, a new one goes in (its own HP, or 3,000), a started or past boss is left as it was');
+    sql(AM.examEvesSql([]));
+    eq(rows(`select hub, day::text from eve_bosses where hub in ('xs', 'xs2') order by day`), [{ hub: 'xs', day: plus(-3) }, { hub: 'xs', day: plus(5) }], 'no exams in hubs.js: the eves to come come out, the started one stays');
+    // bad input; anon can't read the table
+    eq([eve('Bad Hub', at('20:00')).error, eve('xe', at('20:00'), 'x'.repeat(81)).error], ['bad', 'bad'], 'a bad hub or visitor is refused');
+    raises(() => anon(`select count(*) from eve_bosses`), '42501', 'anon can\'t read eve_bosses');
+    raises(() => anon(`select sh_eve_count(now(), 'xe', '${ED}'::date, true)`), '42501', 'anon can\'t run the count');
+    // every poll calls these, so none is a SQL function (it couldn't be inlined and would be planned again on every call)
+    eq(rows(`select p.proname, l.lanname from pg_proc p join pg_language l on l.oid = p.prolang join pg_namespace n on n.oid = p.pronamespace
+             where n.nspname = 'public' and (p.proname like 'sh\\_eve\\_%' or p.proname in ('get_eve_boss', 'sh_answer_id_at')) and l.lanname <> 'plpgsql'`), [],
+      'every function of the exam-eve boss is PL/pgSQL');
+    eq(num(`select count(*) from pg_proc where pronamespace = 'public'::regnamespace and (proname like 'sh\\_eve\\_%' or proname in ('get_eve_boss', 'sh_answer_id_at'))`), 7,
+      'the seven functions of the exam-eve boss are there');
+    notes.push('the exam-eve boss (migration_v97): soon, up, down and lost; hits counted from the answers (linked devices together), kept 20 s; the fall at its HP-th right answer pays everyone who hit once; midnight settles it; the job settles it with no page asking');
+  }
+
   /* ---------- 14g. the weekly class challenge (migration_v98, idea board #6): 100 answers Monday to Sunday (Central;
      Sam, 2026-11-22: "lets do 100"), in any hub and any part of it, give that week's pennant, once, and pay `week`; the Monday sweep makes the ones the page missed;
      the class count shows only from 5; a linked device counts and is paid under its main id ---------- */

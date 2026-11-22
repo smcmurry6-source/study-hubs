@@ -762,6 +762,13 @@
     box._ends = ends; ends();
   }
   window.addEventListener("resize", function(){ qa("[data-news]").forEach(function(b){ if (b._ends) b._ends(); }); });
+  /* the exam-eve boss (widget/eggs.js, migration_v97): the day before an exam, a line under the live count, from the dates
+     alone (nothing is asked of the database here). Gone with the boss switch off (Focus mode turns it off) */
+  function eveHTML(x, d){
+    if (!x || d !== 1 || x.eveBoss === false || ls("sh_pref_boss") === "off") return "";
+    var h = 0; try { h = +new Intl.DateTimeFormat("en-US", { timeZone: "America/Chicago", hour: "2-digit", hourCycle: "h23" }).format(new Date()); } catch (e) {}
+    return '<p class="dx-eve"><b>' + (h >= 15 ? "Now until midnight:" : "Tonight, 3 pm to midnight:") + "</b> the class fights the Midnight Plaque. Every right answer in this hub hits it.</p>";
+  }
   function checkinButtonsHTML(hub){
     return pastExams(hub, false).map(function(x){
       return '<button type="button" class="btn dx-checkin" data-checkin="' + esc(hub.id) + '" data-exam="' + esc(x.date) + '">' + icon("comment", 18) + "Check in on " + esc(x.name || hub.title) + "</button>";
@@ -786,7 +793,7 @@
                  : '<p class="dx-count dx-count-none"><span>' + esc(opened ? "You last opened this " + opened : "No exam ahead in this hub") + "</span></p>") +
               trackHTML(hub, x, d) +
             "</div>" +
-            '<p class="dx-livehub" id="hubLive">' + liveLine(hub) + "</p>" +
+            '<p class="dx-livehub" id="hubLive">' + liveLine(hub) + "</p>" + eveHTML(x, d) +
             /* the hub's other exams, under the countdown (they were on the card under the stage until 2026-11-19) */
             (others.length ? '<ul class="dx-exams">' + others.map(function(e){ var dd = daysUntil(e.date); return "<li><b>" + esc(e.label || "Exam") + "</b> " + esc(shortDate(e.date)) + " · " + (dd < 0 ? "done" : esc(daysText(dd))) + "</li>"; }).join("") + "</ul>" : "") +
           "</div>" +
@@ -1452,7 +1459,7 @@
   var EXTRAS = [
     ["sh_pref_pet", "Timmy Tooth", "Your cartoon tooth buddy: ask him about the notes. Right answers and study streaks keep him healthy. Off, an Ask button takes his place.", [["on", "Everywhere"], ["dash", "Dashboard only"], ["off", "Off"]]],
     ["sh_pref_eggs", "Hidden secrets", "Holidays, magic words and the other easter eggs. Clues are in each hub's trophy case."],
-    ["sh_pref_boss", "Plaque bosses", "A boss the whole class fights with right answers when 5+ people are online."],
+    ["sh_pref_boss", "Plaque bosses", "A boss the whole class fights with right answers when 5+ people are online, and the Midnight Plaque on an exam's eve, 3 pm to midnight."],
     ["sh_pref_fairy", "Tooth Fairy", "Flies across the page now and then. Catch her for the fairy board."],
     ["sh_pref_probe", "Golden Probe", "One question a day is golden. First to get it right wins."],
     ["sh_pref_nuke", "Tactical nukes", "100 right in a row unlocks a strike. Mine only: you won't see classmates' strikes.", [["on", "On"], ["mine", "Mine only"], ["off", "Off"]]],

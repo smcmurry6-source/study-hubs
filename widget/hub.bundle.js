@@ -619,7 +619,7 @@ var wr = d.res || {}, wc = wr["class"] >= 5 ? " · " + fmt(wr["class"]) + " in t
 prizeCard([{ t: "This week’s pennant", xp: d.xp, c: d.xp, src: "week", sub: fmt(wr.n || 100) + " questions since Monday. It’s flying at Timmy’s place" + wc }]);
 HX.say("A new pennant for my place!", "do-hop");
 } else prizeCard([{ t: prizeName(d.src, d.res || {}), xp: d.xp, c: d.xp, src: d.src }]);
-if (d.src === "nuke" || d.src === "boss" || d.src === "top") HX.say(d.src === "nuke" ? "Ten thousand! Go spend it." : "Nice hit!", "do-hop");
+if (d.src === "nuke" || d.src === "boss" || d.src === "eve" || d.src === "top") HX.say(d.src === "nuke" ? "Ten thousand! Go spend it." : "Nice hit!", "do-hop");
 paintMeters();
 });
 function calmNow(){ return reduced || document.documentElement.classList.contains("hx-still"); }
@@ -1561,7 +1561,9 @@ el.innerHTML = '<div class="hx-page bank"><div class="bank-head"><h1>' + esc(tit
 (cuspGame ? '<div class="cg-host" data-cusp-game></div>' : "") +
 (studying ? '<div class="qsum" aria-live="polite"></div><div class="qlist" id="qlist"></div><h2 class="bank-which">Which questions</h2>' + panelHTML(preset)
 : panelHTML(preset) + '<div class="qsum" aria-live="polite"></div><nav class="qsets" aria-label="Which questions" hidden></nav><div class="qlist" id="qlist"></div>') + "</div>" +
-'<aside class="bank-side" aria-label="Today">' + HX.todayPanel() + "</aside></div></div>";
+'<aside class="bank-side" aria-label="Today">' + HX.todayPanel() +
+(preset === "mock" ? "" : '<div class="eve-slot" data-eveslot="side" hidden></div>') + "</aside></div></div>";
+if (preset !== "mock" && window.shEggs && window.shEggs.eveSlot) window.shEggs.eveSlot();
 wirePanel(el, preset);
 if (cuspGame) {
 var cgHost = $("[data-cusp-game]", el);
@@ -2563,6 +2565,7 @@ q("#more/cram", "cram", "Cram sheet", "Every lecture on one page") +
 "</nav>") +
 (X.links && X.links.length ? '<nav class="quick-more" aria-label="More to do">' + X.links.map(function(l){ return q(l.href, l.icon || "arcade", l.title, l.sub || "", "ql-wide"); }).join("") + "</nav>" : "") +
 "</div>" +
+'<div class="eve-slot" data-eveslot hidden></div>' +
 (X.notice ? '<p class="notice">' + icon("notes", 20) + "<span><b>" + esc(X.notice[0]) + "</b> " + esc(X.notice[1]) + "</span></p>" : "") +
 '<div class="home-grid">' +
 hp("next", '<section class="panel next" aria-labelledby="hnH" data-hp="next"><h2 id="hnH">Where to next</h2>' + nextHTML(rows, mis, examWeek) + "</section>") +
@@ -2578,6 +2581,7 @@ el.innerHTML = html; HOME_HP.page = el.firstElementChild;
 var tp = $("[data-today]", el); if (tp) tp._hxH = today;
 wireHome(el);
 paintLive();
+if (window.shEggs && window.shEggs.eveSlot) window.shEggs.eveSlot();
 homeTimer = setInterval(function(){ var c = $("#hxCount"); if (!c || !c.isConnected || view !== "home") { clearInterval(homeTimer); return; } c.innerHTML = countHTML(); }, 30000);
 tip(el, "home", "Your daily goal is the ring in the bar: " + HX.goal() + " questions a day. The flame counts the days in a row you study. Change the goal in More, Settings.");
 }
@@ -3430,7 +3434,7 @@ return h;
 var EXTRAS = [
 ["sh_pref_pet", "Timmy Tooth", "Your cartoon tooth buddy, on the bar: tap him to ask about the notes. He hides during mock exams. Off, an Ask button takes his place.", [["on", "On"], ["dash", "Dashboard only"], ["off", "Off"]]],
 ["sh_pref_eggs", "Hidden secrets", "Holidays, magic words and the other easter eggs. Clues are in the trophy case."],
-["sh_pref_boss", "Plaque bosses", "A boss the whole class fights with right answers when 5+ people are online."],
+["sh_pref_boss", "Plaque bosses", "A boss the whole class fights with right answers when 5+ people are online, and the Midnight Plaque on an exam's eve, 3 pm to midnight."],
 ["sh_pref_fairy", "Tooth Fairy", "Flies across the page now and then. Catch her for the fairy board."],
 ["sh_pref_probe", "Golden Probe", "One question a day is golden. First to get it right wins."],
 ["sh_pref_nuke", "Tactical nukes", "100 right in a row unlocks a strike. Mine only: you won't see classmates' strikes.", [["on", "On"], ["mine", "Mine only"], ["off", "Off"]]],

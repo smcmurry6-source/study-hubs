@@ -81,6 +81,10 @@ check-in hours: its entry in `hubs.js`.
   grey-purple; one line in `widget/hub.css` (`:root[data-hx-hub="review-of-systems"]`) gives it its violet, the four values
   from `tools/figures/site/style.mjs`. A new hub on the engine needs the same line, or it draws in the default too.
 
+- **The exam-eve boss** (2026-11-22, idea board #4, migration_v97: [game-server](../reference/game-server.md)): the Midnight
+  Plaque comes up 3 pm to midnight on Wed Dec 2 and Wed Dec 9, the eves of the two mocks, at 3,000 HP each (Sam can set
+  either with `eveBoss` on its exam in `hubs.js`), on Home, in the band and, on a wide screen, under Today in the Question Bank. Read how the first went the morning after (inbox).
+
 ## Pending
 
 Open items for this hub are lines in [the inbox](../tasks/inbox.md) tagged Review of Systems, and

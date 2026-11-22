@@ -224,7 +224,7 @@
       prizeCard([{ t: "This week’s pennant", xp: d.xp, c: d.xp, src: "week", sub: fmt(wr.n || 100) + " questions since Monday. It’s flying at Timmy’s place" + wc }]);
       HX.say("A new pennant for my place!", "do-hop");
     } else prizeCard([{ t: prizeName(d.src, d.res || {}), xp: d.xp, c: d.xp, src: d.src }]);
-    if (d.src === "nuke" || d.src === "boss" || d.src === "top") HX.say(d.src === "nuke" ? "Ten thousand! Go spend it." : "Nice hit!", "do-hop");
+    if (d.src === "nuke" || d.src === "boss" || d.src === "eve" || d.src === "top") HX.say(d.src === "nuke" ? "Ten thousand! Go spend it." : "Nice hit!", "do-hop");
     paintMeters();
   });
 

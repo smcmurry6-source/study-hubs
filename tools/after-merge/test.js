@@ -2,7 +2,7 @@
 // Checks tools/after-merge/run.js's plan (what a push needs after it merges) on made-up pushes, with nothing sent
 // anywhere. Run by "Check hubs" (the fast job).   node tools/after-merge/test.js
 'use strict';
-const { plan, checkHub, closedCheckins, closedCheckinsSql, downSql, upSql, coverFrom } = require('./run.js');
+const { plan, checkHub, closedCheckins, closedCheckinsSql, examEves, examEvesSql, downSql, upSql, coverFrom } = require('./run.js');
 const fails = [];
 const eq = (name, got, want) => { const g = JSON.stringify(got), w = JSON.stringify(want); if (g !== w) fails.push(`${name}: got ${g}, want ${w}`); };
 const ch = (...a) => a.map(s => ({ status: s[0], path: s.slice(2) }));
@@ -80,6 +80,23 @@ threw = false; try { closedCheckins(undefined); } catch (e) { threw = true; }
 eq('no hubs.js data: nothing is reopened', threw, true);
 eq('the SQL', /values \('hepatobiliary', '2026-09-18'::date\), \('occlusion', '2026-10-21'::date\)/.test(closedCheckinsSql(closedCheckins(hd))), true);
 eq('none closed', closedCheckinsSql([]), 'delete from exam_checkins_closed');
+
+// the exam-eve bosses follow hubs.js's exams too (migration_v97): the day before each live hub's exam, across a month's end
+eq('eves when hubs.js changes', plan({ ...base, changes: ch('M hubs.js') }).eves, true);
+eq('no eves otherwise', plan({ ...base, changes: ch('M widget/eggs.js') }).eves, false);
+const he = { hubs: [{ id: 'review-of-systems', exams: [{ date: '2026-12-03' }, { date: '2026-12-10', eveBoss: 4000 }] }, { id: 'perio', exams: [{ date: '2026-12-01' }, { date: '2026-12-01' }, { date: '2026-12-05', eveBoss: false }] }],
+  archived: [{ id: 'hepatobiliary', exams: [{ date: '2026-12-04' }] }] };
+eq('exam eves', examEves(he), [{ hub: 'perio', day: '2026-11-30', exam: '2026-12-01', hp: null }, { hub: 'review-of-systems', day: '2026-12-02', exam: '2026-12-03', hp: null },
+  { hub: 'review-of-systems', day: '2026-12-09', exam: '2026-12-10', hp: 4000 }]);
+threw = false; try { examEves({ hubs: [{ id: 'perio', exams: [{ date: '2026-12-01', eveBoss: 'lots' }] }] }); } catch (e) { threw = true; }
+eq('an eveBoss that isn\'t an HP is refused', threw, true);
+threw = false; try { examEves({ hubs: [{ id: "x'); drop table y; --", exams: [{ date: '2026-12-01' }] }] }); } catch (e) { threw = true; }
+eq('an odd hub id never reaches the eves\' SQL', threw, true);
+const es = examEvesSql(examEves(he));
+eq('the eves\' SQL: future ones only, a started boss never moved', [/values \('perio', '2026-11-30'::date, '2026-12-01'::date, null::int\)/.test(es), /4000\)/.test(es),
+  /where v\.day >= \(now\(\) at time zone 'America\/Chicago'\)::date/.test(es), /e\.start_id is null and e\.settled_at is null/.test(es), /where eve_bosses\.start_id is null and eve_bosses\.settled_at is null/.test(es)], [true, true, true, true, true]);
+eq('no eves: only the ones to come come out', [/delete from eve_bosses e where e\.day >= \(now\(\) at time zone 'America\/Chicago'\)::date and e\.start_id is null and e\.settled_at is null;/.test(examEvesSql([])), /insert/.test(examEvesSql([]))], [true, false]);
+eq('nothing happens before migration_v97 is applied', [/^do \$eves\$ begin\n  if to_regclass\('public\.eve_bosses'\) is null then raise notice [^;]+; return; end if;/.test(es), /end \$eves\$$/.test(es)], [true, true]);
 
 // a canceled run's push is covered by the next push run: it starts where the last run that wasn't canceled ended
 // (#467's, 2026-11-19: waiting behind #469's, canceled when #472 merged). Commits a < b < c < d on main.

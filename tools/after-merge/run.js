@@ -12,6 +12,9 @@
 //   checkins   hubs.js changed → the server's closed check-ins (exam_checkins_closed, migration_v86) set to every exam with
 //              checkinClosed in hubs.js, so a closed check-in can't be sent and a reopened one can (Sam, 2026-11-19: "no
 //              one should be able to submit for any older exams")
+//   eves       hubs.js changed → the server's exam-eve bosses (eve_bosses, migration_v97) still to come set to the day before
+//              each exam of a live hub in hubs.js (an exam's eveBoss: false leaves it out, a number gives it that HP), so a
+//              new hub, a moved exam or a dropped one gets its boss right; one that has started is never changed
 //   down       a hub's page came down (hubs/<hub>/index.html deleted) → the day is recorded in hubs_down (migration_v95: the
 //              nightly retention job then rolls the hub's question health up into daily totals) and its "Good question?"
 //              thumbs are deleted (question_feedback; Sam, 2026-11-21: "Delete with the hub"; 2026-11-22: question health
@@ -41,7 +44,7 @@ const fs = require('fs'), path = require('path'), crypto = require('crypto'), vm
 const ROOT = path.resolve(__dirname, '../..');
 const REF = 'thytmzsgymydbzcqdnix', API = `https://${REF}.supabase.co`, LIVE = 'https://smcmurry6-source.github.io/study-hubs/';
 const ORIGIN = 'https://smcmurry6-source.github.io';
-const STEPS = ['keys', 'timmy', 'podcast', 'checkins', 'down', 'live', 'fixes', 'changelog', 'postcheck'];
+const STEPS = ['keys', 'timmy', 'podcast', 'checkins', 'eves', 'down', 'live', 'fixes', 'changelog', 'postcheck'];
 const CHANGELOG = 'tools/after-merge/changelog.txt';
 const SITE = ['index.html', 'hubs.js', 'about', 'review', 'hubs', 'widget', 'assets', 'manifest.webmanifest', 'sw.js'];   // tools/preview/transform.js SITE_ENTRIES
 const HUB_RE = /^[a-z0-9][a-z0-9-]{0,39}$/;
@@ -58,7 +61,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
    to the changelog file. Exported for tools/after-merge/test.js. */
 function plan({ changes, podcast, added, extraFixes, engineHubs }){
   const files = changes.map(c => c.path), touched = p => files.some(f => f === p || f.startsWith(p));
-  const out = { keys: [], timmy: false, timmyCode: false, podcast: [], checkins: false, down: [], up: [], site: [], fixes: [], changelog: [], warnings: [] };
+  const out = { keys: [], timmy: false, timmyCode: false, podcast: [], checkins: false, eves: false, down: [], up: [], site: [], fixes: [], changelog: [], warnings: [] };
   for (const hub of engineHubs) {
     const qf = `hubs/${hub}/content/questions.json`;
     /* a change to how keys are built (tools/xp/keys.js) reloads every engine hub's */
@@ -72,6 +75,7 @@ function plan({ changes, podcast, added, extraFixes, engineHubs }){
   /* the function's code, not only its site help (site.json changes with every About page edit, several times a day) */
   out.timmyCode = files.some(f => f.startsWith('supabase/functions/timmy/') && f !== 'supabase/functions/timmy/site.json');
   out.checkins = files.includes('hubs.js');
+  out.eves = out.checkins;   /* the exam eves follow hubs.js's exams too */
   /* a hub's page came down: its question-health thumbs go with it (question_feedback, read only while the hub is live) */
   const page = st => changes.map(c => c.status === st && (/^hubs\/([^/]+)\/index\.html$/.exec(c.path) || [])[1]).filter(h => h && HUB_RE.test(h)).sort();
   out.down = page('D');
@@ -179,6 +183,42 @@ function closedCheckinsSql(list){
   return `with want(hub, exam_date) as (values ${want}),
 gone as (delete from exam_checkins_closed c where not exists (select 1 from want w where w.hub = c.hub and w.exam_date = c.exam_date))
 insert into exam_checkins_closed (hub, exam_date) select hub, exam_date from want on conflict do nothing`;
+}
+/* The exam-eve bosses (migration_v97): the day before each exam of a live hub in hubs.js (archived hubs have no eves to come),
+   with the exam's own HP when its eveBoss is a number (100 to 100,000; otherwise sh_eve_prize()'s); eveBoss: false leaves the
+   exam out. Pure, for tools/after-merge/test.js. Throws on anything that isn't a hub id, a date or an HP. */
+function examEves(data){
+  if (!data || !Array.isArray(data.hubs)) throw new Error('hubs.js has no SH_DASH_DATA.hubs');
+  const out = [], seen = new Set();
+  for (const h of data.hubs) for (const x of h.exams || []) {
+    if (x.eveBoss === false) continue;
+    if (!HUB_RE.test(h.id || '') || !/^\d{4}-\d{2}-\d{2}$/.test(x.date || '')) throw new Error(`hubs.js: an exam that isn't a hub id and a date (${String(h.id).slice(0, 40)} ${String(x.date).slice(0, 20)})`);
+    const hp = x.eveBoss == null || x.eveBoss === true ? null : x.eveBoss;
+    if (hp !== null && !(Number.isInteger(hp) && hp >= 100 && hp <= 100000)) throw new Error(`hubs.js: ${h.id} ${x.date}'s eveBoss is neither false nor an HP from 100 to 100000`);
+    const d = new Date(x.date + 'T12:00:00Z'); d.setUTCDate(d.getUTCDate() - 1);
+    const day = d.toISOString().slice(0, 10), k = h.id + ' ' + day;
+    if (seen.has(k)) continue; seen.add(k);
+    out.push({ hub: h.id, day, exam: x.date, hp });
+  }
+  return out.sort((a, b) => (a.day < b.day ? -1 : a.day > b.day ? 1 : a.hub < b.hub ? -1 : 1));
+}
+/* Only eves still to come move: the ones hubs.js no longer lists come out, the others go in or take their exam and HP. A boss
+   that has started (its first count) or is settled is never changed or taken away. In a block that does nothing until
+   migration_v97 is applied, so a change to hubs.js before then doesn't turn the run red. */
+function examEvesSql(list){
+  const today = "(now() at time zone 'America/Chicago')::date";
+  const keep = list.length ? ` and (e.hub, e.day) not in (${list.map(e => `('${e.hub}', '${e.day}'::date)`).join(', ')})` : '';
+  const del = `delete from eve_bosses e where e.day >= ${today} and e.start_id is null and e.settled_at is null${keep};`;
+  const vals = list.map(e => `('${e.hub}', '${e.day}'::date, '${e.exam}'::date, ${e.hp == null ? 'null::int' : e.hp})`).join(', ');
+  const ins = list.length ? `
+  insert into eve_bosses (hub, day, exam_date, hp)
+  select v.hub, v.day, v.exam, coalesce(v.hp, (sh_eve_prize()->>'hp')::int) from (values ${vals}) v(hub, day, exam, hp) where v.day >= ${today}
+  on conflict (hub, day) do update set exam_date = excluded.exam_date, hp = excluded.hp
+    where eve_bosses.start_id is null and eve_bosses.settled_at is null;` : '';
+  return `do $eves$ begin
+  if to_regclass('public.eve_bosses') is null then raise notice 'eve_bosses is not there yet (migration_v97)'; return; end if;
+  ${del}${ins}
+end $eves$`;
 }
 /* A hub's page came down: the day (Central) goes in hubs_down, the first one kept if the step runs again (package 2 of
    vault/tasks/2026-11-22-sustainable-for-years.md counts its 30 days from it), and its thumbs go. Pure, for test.js. */
@@ -303,6 +343,11 @@ async function main(){
     await sql(closedCheckinsSql(list));
     return `${list.length} closed (hubs.js's checkinClosed): ${list.map(c => c.hub + ' ' + c.date).join(', ') || 'none'}`;
   });
+  if (P.eves || (arg('only') && ONLY.includes('eves'))) await step('eves', 'set the exam-eve bosses still to come on the server', ['SUPABASE_ACCESS_TOKEN'], async () => {
+    const list = examEves(dashData(to));
+    await sql(examEvesSql(list));
+    return `${list.length} exam eves in hubs.js (those still to come set): ${list.map(e => e.hub + ' ' + e.day).join(', ') || 'none'}`;
+  });
 
   for (const hub of P.down) await step('down', `record that ${hub}'s page came down and delete its "Good question?" thumbs`, ['SUPABASE_ACCESS_TOKEN'], async () => {
     await sql(downSql(hub));
@@ -343,5 +388,5 @@ async function main(){
   console.log('\n✓ after-merge steps done');
 }
 
-module.exports = { plan, isSite, checkHub, closedCheckins, closedCheckinsSql, downSql, upSql, coverFrom };
+module.exports = { plan, isSite, checkHub, closedCheckins, closedCheckinsSql, examEves, examEvesSql, downSql, upSql, coverFrom };
 if (require.main === module) main().catch(e => { console.error(scrub(String(e && e.stack || e))); process.exit(1); });

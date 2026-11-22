@@ -510,6 +510,50 @@ server says what's finished and pays the bonus.
   crowns, a year-round collection 12,000-14,500 and the costumes 24,500, so the bonus gives back 4-8% of what it took.
   All 20 that pay make 20,000 XP and crowns at most.
 
+## The exam-eve boss (migration_v97)
+
+Idea board #4 ("a giant Plaque Boss on exam eve"; Sam set it Planned: "This could be fun. Maybe have an xp + gold crowns
+reward"). The night before each exam in `hubs.js`, from 3 pm to midnight Central, one boss per hub, the Midnight Plaque:
+every right answer anyone gives in that hub is a hit. It falls at its HP; everyone who landed a hit is paid.
+
+- **The table**, `eve_bosses` (hub, day = the eve, exam_date, hp, the running count and how it ended): one row an eve, no
+  visitor ids, closed to anon. **The After merge workflow writes it** from `hubs.js` (the `eves` step, on every push that
+  changes `hubs.js`: [after-a-merge](../how-to/after-a-merge.md)): each live hub's exam's eve, HP from `sh_eve_prize()`
+  (3,000) unless the exam says `eveBoss: <hp>` (100 to 100,000); `eveBoss: false` skips that exam. Only eves still to come
+  move: a boss that has started or is settled is never changed. The migration seeds Review of Systems' two (Dec 2, Dec 9).
+- **No hot row, nothing new in the answer save.** `record_answer_v2` is untouched: the hits are the answers it already
+  writes (`personal_answers`, right, that hub, in the window). `sh_eve_count` counts them from an id found by a binary
+  search on the primary key (`sh_answer_id_at`: answers are stamped in order, so ids and times agree), under an advisory
+  try-lock, at most once every 20 s, by whichever page asks first (`get_eve_boss`) and every 10 minutes by pg_cron's
+  `sh-eve-boss` (`sh_eve_tick`, which also settles it after midnight when nobody asks). The rest of the asks read one row
+  plus the asker's own right answers in the window (the `(visitor_id, answered_at)` index).
+- **The fall and the pay**: when the count reaches the HP, the fall is the HP-th right answer (`fell_id`, `fell_at`), and
+  everyone with a right answer up to it gets one `xp_awards` row, key `eve:<hub>:<day>`, src `boss` (a prize: as many crowns
+  as XP), `sh_eve_prize()`'s 250 + 25 a hit, at most 1,000 (30 hits and up), dated at the fall, to a linked device's primary id
+  (its devices' hits added). In the same transaction, once: the key pays once, a second count finds the row settled.
+  Midnight first: `settled_at` with no fall, nothing paid.
+- **`get_eve_boss(p_hub, p_visitor)`** (anon): `{ ok, prize, you: { hits, pay, paid, crowns }, boss: { day, exam, state
+  (soon, up, down, lost), starts, ends, hp, hits, left, people, fell_at, counted_at, now } }`, the eve's boss or, the day
+  after, last night's; `boss: null` when the hub has none. Nothing per person but the caller's own.
+- **The page** (`widget/eggs.js`, "the exam-eve boss"): asks only on an eve (an exam tomorrow in `SH_EXPORT.exams`) or, for
+  the result, until noon on the exam's day; a few seconds after it opens, then every 30-38 s while it's up and the page is in
+  view, at 3 pm when it opened before; never in a mock, with the boss switch off (Focus mode) or in a quiet spell (`shDb`).
+  Between asks it adds its own right answers. The band under the bar (the regular boss stays away that night), Home's card
+  (`[data-eveslot]` in `widget/hub.js`), a smaller card under Today in the Question Bank's side column while you answer
+  (`[data-eveslot="side"]` in `widget/hub-bank.js`; Sam, 2026-11-22; not in a mock, and the column isn't drawn on a phone,
+  where the band shows it), the moment when it falls (confetti, the reward card `sh:prize` src `eve` on the day
+  it fell, once per device) or gets away. The dashboard's line under the live count is from the dates alone (`dash.js`
+  `eveHTML`, no call). The art is `widget/hub-art/eveboss.js` (`window.SH_EVE_ART`, from `tools/figures/site/eveboss.mjs`;
+  its contact sheet: `eveboss-sheet.mjs`), fetched on first use.
+- **Every function is PL/pgSQL**, the two small ones every poll calls included (`sh_eve_prize`, `sh_eve_window`): a SQL
+  function with its own `search_path` can't be inlined and is planned again on every call ([shared-infrastructure](shared-infrastructure.md),
+  migration_v76). `tools/release/xp.js` 14f checks it.
+- **Sized from the data** (2026-11-22, the 11 eves of exams since September): right answers in a hub from 3 pm to midnight
+  on its eve, median 5,921 (2,971 to 12,974). At 3,000, 10 of the 11 would have fallen, the middle one at about 8 pm (the
+  earliest 4:34 pm, on the Perio final's eve; the latest 11:45 pm). By the fall, most of the people who had hit it had 30 or
+  more hits, so most would take the 1,000. The window, the HP and the pay are Sam's (2026-11-22: "open it from 3pm to
+  midntight, hp is good, pay is good"); the building session had proposed 6 pm, when 8 of the 11 would have fallen.
+
 ## The weekly pennant (migration_v98)
 
 Idea board #6 (a starter idea): "a weekly class challenge: answer 50 questions by Sunday and your Timmy gets that week's
@@ -557,6 +601,7 @@ looks good", [decisions](../decisions.md)).
 - `tools/release/xp.js` section 14g checks the week across the clock change, 99 and the 100th (a mock's), one prize, the
   class count from 5, two linked devices as one week (claimed from either, paid once under the main id), the sweep (a linked
   device's answers under its main id), Link my devices and the two page calls; `rls.js` the table and helpers closed.
+
 ## The mystery box, Studying now and the Crowns board (migration_v99)
 
 From the idea board's "Drip for Timmy" (a classmate's idea, set Planned by Sam with the note: you can already visit other
@@ -623,12 +668,12 @@ pg_cron job; no function replaced. Sam approved the box's numbers, its tail as i
 ## Tests
 
 `node tools/release/xp.js` builds a throwaway database from `supabase/schema.sql` with made-up history, applies the pending
-migrations as the release will, and checks all of the above (about 750 checks, the prizes of migration_v68 in section 14c, the mystery box, Studying now and the Crowns board of migration_v99 in section 18, the collections of migration_v75 in 14d, the shop's client in section 13b and Learn and Flashcards' in 14b: a replayed call, a double tap and a linked device
+migrations as the release will, and checks all of the above (about 750 checks, the prizes of migration_v68 in section 14c, the mystery box, Studying now and the Crowns board of migration_v99 in section 18, the collections of migration_v75 in 14d, the exam-eve boss of migration_v97 in 14f, the shop's client in section 13b and Learn and Flashcards' in 14b: a replayed call, a double tap and a linked device
 among them, the rebuild against the live calls, the catalog against `tools/figures/site/sets.mjs`, three years of shelves
 day by day, a place opened from a board row, and a random visit going through the whole class, in 14a). `node tools/release/rls.js` applies the pending migrations too, seeds
 the new tables and calls every function a visitor can run with one visitor's id, failing if another visitor's id comes back;
 `rls-expectations.json` also lists what must be closed to anon altogether (`anonNone`: `visit_secret`, `card_reviews`;
-`anonNoRun`: `sh_visit_key`, `sh_card`, `sh_cards_on_link`), and it checks that a place, a random place and the boards give a key, never an id, and that every board row has one.
+`anonNoRun`: `sh_visit_key`, `sh_card`, `sh_cards_on_link`; `eve_bosses` and the eve boss's internal functions), and it checks that a place, a random place and the boards give a key, never an id, and that every board row has one.
 `admin-ops.js` and `retention.js` run with them in place. CI runs all four. `tools/release/rls-audit.sql` checks the same
 two lists on the live database once the migration is applied.
 

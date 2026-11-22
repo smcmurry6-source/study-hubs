@@ -418,7 +418,10 @@
         (cuspGame ? '<div class="cg-host" data-cusp-game></div>' : "") +
         (studying ? '<div class="qsum" aria-live="polite"></div><div class="qlist" id="qlist"></div><h2 class="bank-which">Which questions</h2>' + panelHTML(preset)
           : panelHTML(preset) + '<div class="qsum" aria-live="polite"></div><nav class="qsets" aria-label="Which questions" hidden></nav><div class="qlist" id="qlist"></div>') + "</div>" +
-      '<aside class="bank-side" aria-label="Today">' + HX.todayPanel() + "</aside></div></div>";
+      '<aside class="bank-side" aria-label="Today">' + HX.todayPanel() +
+        /* on an exam's eve, the Midnight Plaque under Today while you answer (widget/eggs.js fills it; not in a mock) */
+        (preset === "mock" ? "" : '<div class="eve-slot" data-eveslot="side" hidden></div>') + "</aside></div></div>";
+    if (preset !== "mock" && window.shEggs && window.shEggs.eveSlot) window.shEggs.eveSlot();
     wirePanel(el, preset);
     if (cuspGame) {
       var cgHost = $("[data-cusp-game]", el);
