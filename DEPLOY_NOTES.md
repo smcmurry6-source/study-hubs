@@ -32,6 +32,13 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-22 (No printing on the one-page sheet, Sam, Claude Code)** — Sam: "lets take away the print/pdf download option".
+  `widget/sheet.js` draws the sheet on screen only: the Print or save as PDF button, its "Fits on one sheet of paper" line, the
+  printed copy (`body > .shp`, `fit()`, `sheet:print`) and `widget/sheet.css`'s `@page` and print rules are gone; Practice is
+  now the sheet's main button, the toolbar's One-page sheet button has the cram sheet's icon (the `print` icon is out of
+  `tools/figures/site/icons.mjs`), and More's wording no longer says "to print". `tools/ci/smoke.js` checks every sheet's cram
+  lines on screen and fails if printing comes back. About page and Ask Timmy's site help, event taxonomy, retention, repo
+  map, hub note and [decisions](vault/decisions.md). Same PR as Review of Systems' violet (#537).
 - **2026-11-22 (Review of Systems in its own violet, BUG-198, Claude Code)** — the hub had drawn in the engine's default
   grey-purple (`--hub: #6b5a68`) since it was built: `widget/hub.css` never had its tint line, and #523 had taken out the
   archived hubs' lines. One line adds it (ink `#6b46a8`, mid `#a58ad6`, light `#e8e0f5`, dark `#b9a2ec`, as in
