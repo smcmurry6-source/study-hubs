@@ -74,12 +74,12 @@ check-in hours: its entry in `hubs.js`.
   for it is about 170-200k tokens by length, which is why Timmy moved to Haiku 5.5 ([decisions](../decisions.md),
   [ask-timmy](../reference/ask-timmy.md)) and `tools/timmy/test.mjs`'s guard is 200k.
 
-- **One-page sheets** (2026-11-22, every hub on the engine: `widget/sheet.js`): every part has one, and all 70 fit one
-  Letter page at the largest type (10.5 pt), most with room to spare; it says High-yield topics and High-yield points here.
-  A part's cram lines decide most of its length: with 24 it still fits at 10.5 pt, 36 shrink it to 9.75 pt, and past about
-  60 it needs two pages (measured on hn-neck's lines repeated).
-- **Its tint isn't on the page** ([BUG-198](../release/bug-log.md)): the hub draws in the engine's default grey-purple, not
-  its violet; a one-line fix in `widget/hub.css` waits for Sam's look.
+- **One-page sheets** (2026-11-22, every hub on the engine: `widget/sheet.js`): every part has one, on screen; it says
+  High-yield topics and High-yield points here. It shipped with a Print or save as PDF button (all 70 fit one Letter page),
+  which Sam took out the same day ([decisions](../decisions.md)).
+- **Its tint on the page** ([BUG-198](../release/bug-log.md), 2026-11-22): until then the hub drew in the engine's default
+  grey-purple; one line in `widget/hub.css` (`:root[data-hx-hub="review-of-systems"]`) gives it its violet, the four values
+  from `tools/figures/site/style.mjs`. A new hub on the engine needs the same line, or it draws in the default too.
 
 ## Pending
 
