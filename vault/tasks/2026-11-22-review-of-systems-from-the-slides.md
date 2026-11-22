@@ -66,7 +66,7 @@ the course the student is in** ("Let's do your recommendation to have Timmy only
 - [x] Fundamentals I: F1-7's mucosal immunity from Dr. Bruns's tolerance and hypersensitivity decks (none of the adaptive
       decks teach it; the F1-8 reviewer found IgM also crossing the gut lining on the poly-Ig receptor, oral tolerance, and
       the slides' "do not memorize" figure notes)
-- [ ] Fundamentals II: F2-1 to F2-8 against the slides (F2-1 to F2-5 and F2-7 done)
+- [ ] Fundamentals II: F2-1 to F2-8 against the slides (F2-1 to F2-7 done)
 - [ ] Fundamentals II: F2-1's `Cellular Adaptation` deck (Dr. Novakova, 53 MB) could not be read (adaptations,
       accumulations and calcification checked only against her review deck and facts list): needs a PDF or smaller copy
 - [ ] Fundamentals II: F2-3's `Bacterial Structure` deck (Dr. Hamm, 69 MB) could not be read (the bacterial envelope still

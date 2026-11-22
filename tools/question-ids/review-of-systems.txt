@@ -1355,3 +1355,10 @@ f2-painrx-22
 f2-painrx-23
 f2-painrx-24
 f2-painrx-25
+
+f2-autonomic-18
+f2-autonomic-19
+f2-autonomic-20
+f2-autonomic-21
+f2-autonomic-22
+f2-autonomic-23
