@@ -246,8 +246,10 @@ export function buildCorpus(hub, data, prefix){
   lines.push("<cram_sheet>");
   for (const l of lectures) ((study.cram || {})[l.id] || []).forEach((b, j) => {
     const t = clean(typeof b === "string" ? b : textOf(parseHTML(String(b))));
+    at = "cram:" + l.id;
     if (t) lines.push(`[${unit(`C${l.n}.${j + 1}`, { kind: "cram", lec: l.id, text: safe(t), go: { v: "cram", lec: l.id }, label: `${l.label} cram sheet` })}] (${prefix}L${l.n}) ${safe(t)}`);
   });
+  at = "";
   lines.push("</cram_sheet>");
 
   // Exam Hints: what the professors said about the exam, word for word, and the hub's take on it. A hub that reviews earlier
@@ -280,8 +282,9 @@ export function buildCorpus(hub, data, prefix){
   /* a part of the content (Sam, 2026-11-19: the first question after an idle hour, "Limits and money" in
      vault/reference/ask-timmy.md): everything but the notes and review tables of the lectures not in `lecs`, each of those
      lectures left as one line with its title, so he knows what the hub has. Unit ids are the full content's.
-     `scoped` (a hub of courses, below): the Exam Hints and topics of those lectures only, so a course's part stays under
-     the 100k-token prompt where Haiku's price goes up fivefold; every lecture's cram sheet stays. */
+     `scoped` (a hub of courses, below): the Exam Hints, topics and cram sheet of those lectures only, so a course's part
+     stays under the 100k-token prompt where Haiku's price goes up fivefold; with no lectures, every lecture's cram sheet.
+     Unscoped, every lecture's cram sheet stays. */
   const part = (lecs, o) => {
     const keep = new Set(lecs || []), scoped = !!(o && o.scoped), out = [];
     for (const [k, t] of parts) {
@@ -289,6 +292,7 @@ export function buildCorpus(hub, data, prefix){
       const kind = k.slice(0, k.indexOf(":")), id = k.slice(k.indexOf(":") + 1);
       if (keep.has(id)) { out.push(t); continue; }
       if (kind === "hint" || kind === "likely") { if (!scoped || !id) out.push(t); continue; }
+      if (kind === "cram") { if (!scoped || !keep.size) out.push(t); continue; }
       if (kind === "notes" && t.startsWith("<lecture ")) out.push(t.replace(/>$/, ` notes="not sent"/>`));
     }
     return out.join("\n");
@@ -749,11 +753,13 @@ function siteOf(site){ if (!siteCache || siteCache.src !== site) siteCache = { s
    answer he says "not_covered" and handle() asks again with the whole content, as every question did before. */
 export const PART_NOTE = `<partial_content>Only part of this hub's content is below, to save time: the exam facts, the cram sheet, the Exam Hints, the High likelihood topics, and the notes and review tables of the lectures listed with their units. A lecture marked notes="not sent" has notes that aren't below. If the answer needs anything that isn't below (another lecture's notes or review tables, a detail the cram sheet only touches on), or you can't tell whether the full notes say more, reply with kind "not_covered" and nothing else: you'll be asked again with the whole content. Never tell the student the content is partial.</partial_content>`;
 /* a hub of courses (Review of Systems): every question gets one course's part (handle(), below) */
-export const COURSE_NOTE = `<partial_content>Only part of this hub's content is below, to save time: the exam facts, every course's cram sheet, and for the course the student is studying now, its notes, review tables, high-yield points and High yield topics (its lectures are the ones listed with their units). A lecture marked notes="not sent" belongs to another course: its notes, review tables, high-yield points and topics aren't below. If the answer needs anything that isn't below (another course's notes, a detail the cram sheet only touches on), or you can't tell whether the full notes say more, reply with kind "not_covered" and nothing else: you'll be asked again with the whole content. Never tell the student the content is partial.</partial_content>`;
+export const COURSE_NOTE = `<partial_content>Only part of this hub's content is below, to save time: the exam facts and, for the course the student is studying now, its notes, review tables, cram sheet, high-yield points and High yield topics (its lectures are the ones listed with their units). A lecture marked notes="not sent" belongs to another course: none of its notes, review tables, cram sheet, high-yield points or topics are below. If the answer needs anything that isn't below (another course, a detail the notes only touch on), or you can't tell whether the full content says more, reply with kind "not_covered" and nothing else: you'll be asked again with the whole content. Never tell the student the content is partial.</partial_content>`;
+/* a hub of courses when it isn't known which course the student is studying: every course's cram sheet */
+export const CRAM_NOTE = `<partial_content>Only part of this hub's content is below, to save time: the exam facts and the cram sheet of every course. Every lecture is marked notes="not sent": its notes, review tables, high-yield points and topics aren't below. If the answer needs anything that isn't below (a lecture's notes, a detail the cram sheet only touches on), or you can't tell whether the full content says more, reply with kind "not_covered" and nothing else: you'll be asked again with the whole content. Never tell the student the content is partial.</partial_content>`;
 export const WARM_MS = 55 * 60 * 1000;    // the content's 1-hour cache, read within this long, is taken as still there
 export const MARK_MS = 5 * 60 * 1000;     // and its time is marked again only this often
 export function buildRequest(corpora, site, history, sent, part){
-  const content = part ? [part.course ? COURSE_NOTE : PART_NOTE, ...corpora.map(c => c.part(part.lecs || [], { scoped: !!part.course }))].join("\n\n") : corpora.map(c => c.text).join("\n\n");
+  const content = part ? [part.course ? (part.course.length ? COURSE_NOTE : CRAM_NOTE) : PART_NOTE, ...corpora.map(c => c.part(part.lecs || [], { scoped: !!part.course }))].join("\n\n") : corpora.map(c => c.text).join("\n\n");
   const messages = [];
   /* earlier turns, as they were sent and answered; a turn with no stored answer (it failed) is left out */
   for (let i = 0; i < history.length; i++) {
@@ -821,8 +827,8 @@ export async function handle(body, deps){
   if (one && one.groupOf.size) {
     /* a hub of courses (Review of Systems, 14 courses, about 245k tokens; Sam, 2026-11-22: "have Timmy only read the course
        the student is in"): every question gets a part, the notes and review tables of the course of the answered question
-       or of the lecture on screen, else the course the page says the student is in (context.course), with every lecture's
-       cram sheet and the course's own high-yield points and topics (COURSE_NOTE); no course known, the cram sheet alone.
+       or of the lecture on screen, else the course the page says the student is in (context.course), with the course's own
+       cram sheet, high-yield points and topics (COURSE_NOTE); no course known, every course's cram sheet (CRAM_NOTE).
        Cached for an hour (one entry per course).
        Not in it: asked again with the whole content, as below. timmy_cache isn't asked. */
     const gs = [];

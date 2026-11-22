@@ -51,9 +51,14 @@ the course the student is in** ("Let's do your recommendation to have Timmy only
       `4-Anatomy of the Anterolateral and Posterior Abdominal Wall - Herr.pptx`, 94 MB) could not be read: need a PDF
       or smaller copy
 - [x] MSK & GI: MG-3 (GI pathology and drugs) against the slides (Dr. Kmeid's, Dr. Reid's, Dr. Wilborn's and Dr. Taylor's decks)
-- [ ] Fundamentals I: F1-1 to F1-9 against the slides (F1-1 done)
+- [ ] Fundamentals I: F1-1 to F1-9 against the slides (F1-1 to F1-7 done)
 - [ ] Fundamentals I: F1-1's `DOF-Lecture-1-Protein_structure(1).pptx` could not be read (amino acids, pKa values,
       secondary structure still rest on standard references): needs a PDF or smaller copy
+- [ ] Fundamentals I: F1-3's `Eukaryotic Transcription` (.ppt, 31 MB) and `Translation 2024` (.pptx, 67 MB) could not be
+      read (those two sections still rest on the class guides): need a PDF or smaller copy
+- [ ] Fundamentals I: F1-4's `Introduction to Endocrinology` (.ppt) would not open ("unsupported mime type"): hormone
+      basics, G-protein pathways, insulin and the calcium hormones are checked only against the study guides; a PDF or
+      .pptx copy would do
 - [ ] Fundamentals II: F2-1 to F2-8 against the slides
 - [x] Ask Timmy reads one course first (`supabase/functions/timmy/core.js`, `widget/hub-timmy.js`, the tests)
 - [ ] Ask Timmy's eval on the real model for the `rs-` cases (`node tools/timmy/eval.mjs --only review-of-systems`,
@@ -68,6 +73,9 @@ this pass.
 - 2026-11-22: 29 reviewers set going. The first 13 proposals merged (CR-1 to CR-5, RN-1 to RN-5, MG-1, MG-2), with
   Ask Timmy's course mode, in the PR below. The content passed Timmy's 200k-token limit (about 245k), which led to Sam's
   two calls above.
+- 2026-11-22: F1-1 to F1-7 merged (the cells, molecular biology, enzymes and metabolism, and immunity decks). Fundamentals
+  I's prompt passed 95k tokens with every course's cram sheet in it, so a course's part now carries only its own cram sheet
+  (every course's when no course is known): every course's prompt fell by about 25k.
 
 ## Outcome
 

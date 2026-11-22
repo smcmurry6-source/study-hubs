@@ -43,8 +43,8 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   `tools/question-ids/review-of-systems.txt`). Content grew to about 245k tokens for Ask Timmy, past his 200k limit; Sam: "I
   dont want to sacrifice the quality of the material just so we can have ask timmy", then "have Timmy only read the course
   the student is in". **Ask Timmy's course mode** (`supabase/functions/timmy/core.js`): on a hub with `groups`, every
-  question gets one course's notes, tables, High-yield points and topics with every course's cram sheet (`COURSE_NOTE`,
-  `part(lecs, { scoped: true })`), about 61-88k tokens with the rules and site help (under the 100k prompt where Haiku 5.5's
+  question gets one course's notes, tables, cram sheet, High-yield points and topics (`COURSE_NOTE`,
+  `part(lecs, { scoped: true })`; no course known, every course's cram sheet, `CRAM_NOTE`), about 36-80k tokens with the rules and site help (under the 100k prompt where Haiku 5.5's
   price goes up fivefold), cached an hour per course, the whole content only on "not covered". The course is the answered
   question's, the lecture on screen's, or what the page names (`context.course`, `askCourse()` in `widget/hub-timmy.js`:
   the Question Bank's course when one is picked, else the notes last opened). `tools/timmy/test.mjs` checks each course's

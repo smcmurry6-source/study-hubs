@@ -80,8 +80,8 @@ check-in hours: its entry in `hubs.js`.
   [ask-timmy](../reference/ask-timmy.md)). Checked against the professors' slides and recordings (2026-11-22) it passed
   200k, and Sam put the material first ("I dont want to sacrifice the quality of the material just so we can have ask
   timmy"): **Timmy reads the course the student is in** (Sam: "have Timmy only read the course the student is in"), one
-  course's notes with every course's cram sheet, about 61-88k tokens a question, and the whole hub only when that isn't
-  enough ([ask-timmy](../reference/ask-timmy.md), "Limits and money"). `tools/timmy/test.mjs` fails a course whose prompt
+  course's notes, tables, cram sheet and High yield, about 36-80k tokens a question (every course's cram sheet when no
+  course is known), and the whole hub only when that isn't enough ([ask-timmy](../reference/ask-timmy.md), "Limits and money"). `tools/timmy/test.mjs` fails a course whose prompt
   reaches 95,000 tokens (Haiku 5.5 costs five times as much past a 100k prompt): a course that grows past it needs its
   notes looked at, or the check moved, with Sam.
 

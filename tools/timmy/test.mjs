@@ -104,15 +104,16 @@ for (const c of corpora) {
      A hub of courses (core.json's groups; Sam, 2026-11-22: "I dont want to sacrifice the quality of the material just so we
      can have ask timmy") reads one course's part first and the whole content only when that part doesn't have the answer, so
      its whole content may run to 400,000; each course's prompt (the rules, the site help and the part, by the function's 3.6
-     characters a token) stays under 95,000, below the 100k-token prompt where Haiku 5.5's price goes up fivefold, with room
+     characters a token), and the one with every course's cram sheet for a question from no course, stays under 95,000, below the 100k-token prompt where Haiku 5.5's price goes up fivefold, with room
      for the conversation. */
   if (c.groupOf.size) {
     const siteLen = T.buildSite(SITE).text.length + T.RULES.length + T.COURSE_NOTE.length;
     const courses = [...new Set(c.groupOf.values())].map(g => [g, Math.round((siteLen + c.part(c.course([g]), { scoped: true }).length) / 3.6)]);
+    courses.push(["no course", Math.round((T.buildSite(SITE).text.length + T.RULES.length + T.CRAM_NOTE.length + c.part([], { scoped: true }).length) / 3.6)]);
     const over = courses.filter(x => x[1] >= 95000);
     ok(!over.length, `${c.hub}: a course's prompt is 95,000 tokens or more (${over.map(x => x[0] + " " + x[1]).join(", ")})`);
     ok(c.text.length / 4 < 400000, `${c.hub}: about ${Math.round(c.text.length / 4)} tokens of content (budget 400,000 for a hub of courses)`);
-    notes.push(`${c.hub}: a course's prompt about ${Math.min(...courses.map(x => x[1])).toLocaleString("en-US")}-${Math.max(...courses.map(x => x[1])).toLocaleString("en-US")} tokens (${courses.length} courses)`);
+    notes.push(`${c.hub}: a course's prompt about ${Math.min(...courses.map(x => x[1])).toLocaleString("en-US")}-${Math.max(...courses.map(x => x[1])).toLocaleString("en-US")} tokens (${courses.length - 1} courses, and every course's cram sheet for none)`);
   } else ok(c.text.length / 4 < 200000, `${c.hub}: about ${Math.round(c.text.length / 4)} tokens of content (budget 200,000)`);
   ok(!/<(?!\/?(hub|exam_facts|lecture|review_tables|table|cram_sheet|exam_hints|high_likelihood_topics)[ >])[A-Za-z\/!?]/.test(c.text), `${c.hub}: nothing in the content looks like a tag but the section tags`);
   notes.push(`${c.hub}: ${c.units.size} units, about ${Math.round(c.text.length / 4).toLocaleString("en-US")} tokens`);
@@ -381,7 +382,7 @@ if (DATA[HUB].core.groups && DATA[HUB].core.groups.length) {
   const nc = answer([{ text: "The notes don't cover that.", cites: [] }], { kind: "not_covered", closest: "L1" });
   const good = answer([{ text: "It means the thing.", cites: [{ id: realUnit.id, quote: realQuote }] }]);
   const hintOf = g => (DATA[HUB].study.hints || []).findIndex(h => gOf(h.lec) === g), likelyOf = g => (DATA[HUB].core.likelyTopics || []).findIndex(k => gOf(k.lec) === g);
-  // in the notes: the course of the lecture on screen, its notes, hints and topics, every course's cram sheet; no timmy_cache
+  // in the notes: the course of the lecture on screen, its notes, hints, topics and cram sheet; no timmy_cache
   let marks = 0, db = Object.assign(fakeDb(), { cache: async () => { marks++; return null; } }), m = fakeModel(good), logs = [];
   let out = await T.handle(base, gdeps(m, db, { log: (e, d) => logs.push([e, d]) }));
   let sys = m.calls[0].system, txt = sys[2].text;
@@ -389,8 +390,8 @@ if (DATA[HUB].core.groups && DATA[HUB].core.groups.length) {
   eq([sys[1].cache_control.ttl, sys[2].cache_control.ttl], ["1h", "1h"], "a hub of courses: the site help and the course's part each cached an hour");
   ok(sameG.every(id => { const l = C.lectures.find(x => x.id === id); return !txt.includes(`<lecture id="L${l.n}" title="${T.safe(l.label + " " + l.title)}"${l.who ? ` by="${T.safe(l.who)}"` : ""}${l.status && l.status !== "taught" ? ` status="${T.safe(l.status)}"` : ""} notes="not sent"/>`); })
     && txt.includes(`[${realUnit.id}]`) && txt.includes(`<lecture id="L${otherL.n}" title=`) && !txt.includes(`[N${otherL.n}.0]`), "a hub of courses: every lecture of the course's notes, another course's lectures one line each");
-  const cramOther = [...G.units.values()].find(u => u.kind === "cram" && gOf(u.lec) === otherG);
-  ok(cramOther && txt.includes(`[${cramOther.id}]`), "a hub of courses: another course's cram sheet is in the part");
+  const cramOther = [...G.units.values()].find(u => u.kind === "cram" && gOf(u.lec) === otherG), cramSame = [...G.units.values()].find(u => u.kind === "cram" && gOf(u.lec) === lecG);
+  ok(cramOther && cramSame && !txt.includes(`[${cramOther.id}]`) && txt.includes(`[${cramSame.id}]`), "a hub of courses: the course's own cram sheet is in the part, not another course's");
   const hO = hintOf(otherG), kO = likelyOf(otherG), hS = hintOf(lecG), kS = likelyOf(lecG);
   ok((hO < 0 || !txt.includes(`[H${hO + 1}]`)) && (kO < 0 || !txt.includes(`[K${kO + 1}]`)) && (hS < 0 || txt.includes(`[H${hS + 1}]`)) && (kS < 0 || txt.includes(`[K${kS + 1}]`)), "a hub of courses: the course's own high-yield points and topics, not another course's");
   ok(out.body.kind === "answer" && out.body.paragraphs[0].cites.length === 1 && (logs.find(x => x[0] === "turn") || [])[1].content === "course" && logs.find(x => x[0] === "turn")[1].course === lecG, "a hub of courses: answered from the part, its quote checks out, the log says course and which");
@@ -404,7 +405,8 @@ if (DATA[HUB].core.groups && DATA[HUB].core.groups.length) {
   ok(!m.calls[0].system[2].text.includes(`[${realUnit.id}]`) && m.calls[0].system[2].text.includes(`<lecture id="L${otherL.n}" title=`) && !m.calls[0].system[2].text.includes(`<lecture id="L${otherL.n}" title="${T.safe(otherL.label + " " + otherL.title)}"${otherL.who ? ` by="${T.safe(otherL.who)}"` : ""}${otherL.status && otherL.status !== "taught" ? ` status="${T.safe(otherL.status)}"` : ""} notes="not sent"/>`), "a hub of courses, no lecture on screen: the course the page named");
   m = fakeModel(good); await T.handle(Object.assign({}, base, { context: { view: "home", course: "not-a-course" } }), gdeps(m, fakeDb()));
   txt = m.calls[0].system[2].text;
-  ok(txt.startsWith(T.COURSE_NOTE) && txt.includes("<cram_sheet>") && !/\[N\d+\./.test(txt) && !/\[H\d+\]/.test(txt), "a hub of courses, no course known (or an unknown one): the cram sheet and the lecture list alone");
+  ok(txt.startsWith(T.CRAM_NOTE) && txt.includes("<cram_sheet>") && !/\[N\d+\./.test(txt) && !/\[H\d+\]/.test(txt)
+    && [...new Set(G.groupOf.values())].every(g => { const u = [...G.units.values()].find(x => x.kind === "cram" && gOf(x.lec) === g); return !u || txt.includes(`[${u.id}]`); }), "a hub of courses, no course known (or an unknown one): every course's cram sheet and the lecture list alone");
   eq(T.readInput(Object.assign({}, base, { context: { view: "x", course: "c".repeat(80) } })).context.course.length, 40, "context.course is kept short");
   // not in the course: asked again with the whole content, both calls counted; on the dashboard, no course mode
   let n = 0; const two = async p => { n++; return n === 1 ? fakeModel(nc)(p) : fakeModel(good)(p); };
