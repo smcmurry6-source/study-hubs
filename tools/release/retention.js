@@ -160,6 +160,30 @@ try {
     insert into personal_answers (visitor_id, hub, qid, correct, answered_at) values
       ('dn-E', 'ret-down', 'd1', true, now() - interval '5 days'), ('dn-E', 'ret-live', 'l1', true, now() - interval '5 days');
   `);
+  /* v96: a hub down 40 days ('ret-gone'): pk-K's answers 45 and 44 days old (the release's kind, with their awards) and one
+     on a live hub, pk-H's 50 days old with a Bronze medal; pk-G's like pk-K's but with one sent 10 days ago, so all of
+     pk-G's wait (a person's answers on a hub are packed together); a hub down only 10 days ('ret-soon') isn't due yet */
+  sql(`
+    insert into hubs_down (hub, day) values ('ret-gone', current_date - 40), ('ret-soon', current_date - 10);
+    insert into personal_answers (visitor_id, hub, qid, correct, answered_at)
+      select v, 'ret-gone', 'g' || (g % 7), g % 3 <> 0, now() - interval '45 days' + g * interval '40 seconds' from generate_series(1, 30) g, unnest(array['pk-G', 'pk-K']) v;
+    insert into personal_answers (visitor_id, hub, qid, correct, answered_at)
+      select v, 'ret-gone', 'g' || (g % 5), g % 2 = 0, now() - interval '44 days' + g * interval '40 seconds' from generate_series(1, 12) g, unnest(array['pk-G', 'pk-K']) v;
+    insert into personal_answers (visitor_id, hub, qid, correct, answered_at)
+      select 'pk-H', 'ret-gone', 'h' || g, true, now() - interval '50 days' + g * interval '50 seconds' from generate_series(1, 22) g;
+    insert into personal_answers (visitor_id, hub, qid, correct, answered_at) values
+      ('pk-G', 'ret-gone', 'g1', true, now() - interval '10 days'), ('pk-K', 'ret-live', 'l1', true, now() - interval '45 days' + interval '1 hour'),
+      ('pk-H', 'ret-soon', 's1', true, now() - interval '50 days');
+    insert into answer_xp (answer_id, ctx, kind) select id, 'bank', 'one' from personal_answers where visitor_id in ('pk-G', 'pk-H', 'pk-K');
+    select sh_xp_rebuild(array['pk-G', 'pk-H', 'pk-K']);
+    insert into achievements (visitor_id, kind, hub, created_at) values ('pk-H', 'mastery-bronze', 'ret-gone', now() - interval '45 days');
+  `);
+  const packView = v => one(`select concat_ws(' | ', (select row(x.*)::text from xp_visitors x where x.visitor_id = '${v}'), sh_wallet('${v}')::text,
+      get_rank_profile_v2('${v}')::text, first_seen('${v}')::text, anon_name('${v}'),
+      (select string_agg(row(m.*)::text, ',' order by m.hub) from get_hub_mastery('${v}') m),
+      (select string_agg(row(d.*)::text, ',' order by d.d) from get_pet_days_v2('${v}') d),
+      (select string_agg(src || ':' || base || ':' || xp, ',' order by src) from xp_award_totals where visitor_id = '${v}'))`);
+  const pack0 = ['pk-G', 'pk-H', 'pk-K'].map(packView);
   const wallets = () => one(`select string_agg(v || ':' || sh_wallet(v)::text, ' | ' order by v) from unnest(array['ret-A', 'ret-B', 'yr-C', 'yr-D', 'dn-E', 'dn-F']) v`);
   const wallets0 = wallets();
   const crowns = () => one(`select sh_time_crowns('yr-C') || '/' || sh_time_crowns('yr-D')`);
@@ -171,7 +195,7 @@ try {
   const testHours = Number(one(`select count(*) from activity_hourly where hub = 'zz-test'`));   /* 1 or 2: the 10 pings may cross an hour */
   const want = { activity_pings: 430, ui_click_reach: 4, feature_events: 4, activity_hourly_test: testHours, ui_clicks_test: 0, question_flags_ids: 1,
     hub_suggestions_ids: 1, exam_debriefs_ids: 1, survey_declines: 1, survey_answer_ids: 1, ideas_hidden: 1, link_attempts: 1,
-    activity_hourly_year: 4, activity_visits_year: 2, question_events_year: 4, question_events_down: 5 };
+    activity_hourly_year: 4, activity_visits_year: 2, question_events_year: 4, question_events_down: 5, answers_packed: 64 };
   for (const k of Object.keys(want)) expect(`dry run counts ${k}`, dry.counts[k], want[k]);
   expect('dry run left the raw pings', one(`select count(*) from activity_pings`), 610);
   expect('dry run logged nothing', one(`select count(*) from retention_runs`), 0);
@@ -249,6 +273,25 @@ try {
   notes.push(`a down hub's ${done.counts.question_events_down} question events into daily totals, the live hub's kept; ${done.counts.ui_click_reach} click-reach rows past 30 days rolled up; XP and crowns the same before and after`);
   notes.push(`the school year's collapse: ${done.counts.activity_hourly_year} hours, ${done.counts.activity_visits_year} visits, ${done.counts.question_events_year} question events into totals; time crowns ${crowns0} before and after`);
 
+  /* v96: the hub down 40 days packed; nobody's numbers move; a rebuild (Link my devices) gives the same */
+  expect('the packed people', done.counts.answers_packed_people, 2);
+  expect('answers left on the packed hub (all of pk-G\'s: one is 10 days old)', one(`select string_agg(distinct visitor_id, ',') || '/' || count(*) from personal_answers where hub = 'ret-gone'`), 'pk-G/43');
+  expect('the hub down 10 days is untouched', one(`select count(*) from personal_answers where hub = 'ret-soon'`), 1);
+  expect('the summaries', one(`select string_agg(concat_ws('/', visitor_id, answers, correct, questions, days, medal, xp > 0, crowns = base / 2), ',' order by visitor_id) from answers_packed`), 'pk-H/22/22/22/1/1/t/t,pk-K/42/26/7/2/0/t/t');
+  expect('the answers\' awards: one row a person', one(`select string_agg(visitor_id || ':' || key, ',' order by visitor_id) from xp_awards where src = 'answer' and hub = 'ret-gone' and visitor_id <> 'pk-G'`), 'pk-H:pack:ret-gone:pk-H,pk-K:pack:ret-gone:pk-K');
+  expect('their answer_xp rows went with them', one(`select count(*) from answer_xp x join personal_answers a on a.id = x.answer_id where a.visitor_id in ('pk-H', 'pk-K')`), 2);
+  expect('xp_seen: the packed hub gone for pk-K, pk-G\'s kept', one(`select string_agg(visitor_id || ':' || count, ',' order by visitor_id) from (select visitor_id, count(*) from xp_seen where hub = 'ret-gone' group by 1) x`), 'pk-G:14');
+  ['pk-G', 'pk-H', 'pk-K'].forEach((v, i) => expect(`${v}: XP, crowns, rank, first answer, name, mastery, Timmy's days, award totals the same after the pack`, packView(v), pack0[i]));
+  sql(`select sh_xp_rebuild(array['pk-G', 'pk-H', 'pk-K'])`);
+  ['pk-G', 'pk-H', 'pk-K'].forEach((v, i) => expect(`${v}: the same after a rebuild too`, packView(v), pack0[i]));
+  expect('answers_packed has row-level security', one(`select relrowsecurity from pg_class where oid = 'public.answers_packed'::regclass`), 't');
+  expect('anon can\'t read answers_packed', one(`select has_table_privilege('anon', 'public.answers_packed', 'select')`), 'f');
+  expect('anon can\'t execute sh_pack_answers', one(`select has_function_privilege('anon', 'public.sh_pack_answers(text, timestamptz, integer, boolean)', 'execute')`), 'f');
+  let refusedPack = '';
+  try { sql(`select sh_pack_answers('ret-live', now() - interval '30 days', 100, true)`); } catch (e) { refusedPack = e.message; }
+  expect('packing a hub whose page is up is refused', /is not in hubs_down/.test(refusedPack), true);
+  notes.push(`packed ${done.counts.answers_packed} answers of a hub down 40 days into ${done.counts.answers_packed_people} summaries (a person with an answer under 30 days old waits); XP, crowns, rank, names, mastery and Timmy's days the same, and after a rebuild`);
+
   /* a second run removes nothing */
   const again = JSON.parse(one(`select sh_retention_run(true)::text`));
   const left = Object.keys(want).filter(k => Number(again.counts[k]) !== 0);
@@ -263,6 +306,14 @@ try {
   expect('B\'s old visit moved to A', one(`select count(*) from activity_visits where visit_id = 'visit-B-old' and visitor_id = 'ret-A'`), 1);
   expect('B\'s raw pings moved to A', one(`select count(*) from activity_pings where visitor_id = 'ret-B'`), 0);
   notes.push('linking devices after a trim kept every hour (moved, not rebuilt)');
+
+  /* v96: linking moves the summary: H's packed hub joins K's, and K's XP is the two added (no day in common) */
+  const xpKH = one(`select sum(xp) from xp_visitors where visitor_id in ('pk-K', 'pk-H')`);
+  const code3 = one(`select create_link_code('pk-K')`);
+  expect('packed devices linked', one(`select redeem_link_code('${code3}', 'pk-H')`), 'pk-K');
+  expect('the summary moved and added up', one(`select string_agg(concat_ws('/', visitor_id, answers, correct, days, medal), ',') from answers_packed`), 'pk-K/64/48/3/1');
+  expect('the pack awards moved, both kept', one(`select count(*) from xp_awards where visitor_id = 'pk-K' and key like 'pack:%'`), 2);
+  expect('XP after linking: the two added', one(`select xp from xp_visitors where visitor_id = 'pk-K'`), xpKH);
 
   /* v93: linking moves the kept crowns too */
   const code2 = one(`select create_link_code('yr-C')`);

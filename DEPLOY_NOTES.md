@@ -32,6 +32,19 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-22 (An archived hub's answers packed away, `migration_v96.sql`, Claude Code)** — Package 2 of
+  [the plan for years](vault/tasks/2026-11-22-sustainable-for-years.md) (Sam's D). 30 days after a hub's page comes down
+  (`hubs_down`), the nightly retention job (`sh_pack_answers`, about 20,000 answers a night, oldest hub first) replaces each
+  person's `personal_answers`, `answer_xp`, per-answer `xp_awards` and `xp_seen` rows for it with one `answers_packed` row
+  (answers, right, questions, first tries right, latest right, days, first and last answer, medal, XP and crowns, each
+  day's share, the retries report's counts) and one award row `pack:<hub>:<id>` with the same XP. A person's answers on a
+  hub go together, once the newest is over 30 days old. Nobody's XP, crowns, rank, trophies, medals or board place moves:
+  `sh_xp_rebuild` adds the packed days and keeps the pack rows and their days' 20th-answer awards; `first_seen` (the class
+  name), `get_hub_mastery` and the admin page's Insights, retries, drift check and check-ins read the summary; Link my
+  devices moves it (a trigger on `visitor_links`). Tested in `tools/release/xp.js` section 16 (every made-up visitor
+  before and after, a rebuild, a second run, a link) and `retention.js`. About page: what is kept. Waiting: applying it and
+  the first pack (Genetics and Hepatobiliary, about 12,000 answers), then `VACUUM FULL`; most hubs come due about 2026-12-19.
+
 - **2026-11-22 (Shorter windows for the analytics, `migration_v95.sql`, Claude Code)** — Package 1 of
   [the plan for years](vault/tasks/2026-11-22-sustainable-for-years.md) (Sam: "Okay all that is good to me"). `hubs_down`
   (hub, the Central day its page came down) is written by the After merge workflow's `down` step (`tools/after-merge/run.js`;

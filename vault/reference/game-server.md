@@ -87,6 +87,16 @@ the home of the details: read `migration_v54.sql` (its sections are numbered as 
   sums after all its scenarios, and the query at the end of `migration_v79.sql` does the same on the live database.
   Since migration_v80 an answer's `answer_xp` row is inserted once, at the end of `sh_answer`, with its reply.
 - XP itself (`xp_visitors.xp`) is today's capped XP for the answers recorded the old way plus the sum of the award rows.
+- **A down hub's answers are packed** (migration_v96, Sam's D of 2026-11-22: [the task](../tasks/2026-11-22-sustainable-for-years.md)):
+  30 days after a hub's page comes down (`hubs_down`), the nightly job (`sh_pack_answers`) replaces each person's
+  `personal_answers`, `answer_xp`, per-answer `xp_awards` and `xp_seen` rows for it with one `answers_packed` row and one
+  award row keyed `pack:<hub>:<id>` (`src` `answer`, the same base and paid XP, so `xp_award_totals` and the wallet don't
+  move). A person's answers on a hub go together, once the newest is over 30 days old. `xp_visitors` and `xp_days` aren't
+  touched; `sh_xp_rebuild` adds each packed day's share (`day_rows`) to `xp_days` and keeps the `pack:` rows and the `goal20`
+  of every packed day, so a rebuild after the pack gives what it gave before (or keeps what the packed answers paid, where
+  a replay would have differed). `first_seen` (the class name's order) and `get_hub_mastery` read the summary too; the
+  delete trigger skips the rebuild while `sh.packing` is on. `tools/release/xp.js` section 16 checks every made-up visitor's
+  totals, the boards and the admin page's numbers before and after, a rebuild, a second run, and Link my devices.
 
 ## The ladder
 
