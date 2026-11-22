@@ -1320,3 +1320,10 @@ f2-bacteria-20
 f2-bacteria-21
 f2-bacteria-22
 f2-bacteria-23
+
+f2-fungi-20
+f2-fungi-21
+f2-fungi-22
+f2-fungi-23
+f2-fungi-24
+f2-fungi-25
