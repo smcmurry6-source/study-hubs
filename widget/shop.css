@@ -93,6 +93,40 @@
 .tsh-showbuy .tsh-big .tsh-coin { width: 40px; height: 40px; } .tsh-showbuy .tsh-big b { font-size: 40px; }
 .tsh-showwhen { display: inline-flex; align-items: center; gap: 6px; font-size: var(--fs-meta, 13px); font-weight: 700; color: #5A4130; }
 
+/* ---------- the mystery box (migration_v99): a violet crate under the showcase, its odds in the open ---------- */
+.tsh-mbox { position: relative; display: grid; grid-template-columns: minmax(130px, 210px) minmax(0, 1fr); align-items: center; gap: 10px 24px; margin: 7px; padding: 16px 24px 18px; border-radius: 16px; border: 2px solid #3B2E3A; color: #3B2E3A; overflow: hidden;
+  background: radial-gradient(circle at 15% 52%, rgba(255, 255, 255, .85) 0 16%, transparent 44%), linear-gradient(135deg, #F1EAFE, #DCCDF8); box-shadow: 0 0 0 5px #9B7BE0, 0 0 0 7px #3B2E3A; }
+.tsh-mbart { display: grid; width: 100%; justify-self: center; animation: tsh-float 4.4s ease-in-out infinite; }
+.tsh-mbart > img { grid-area: 1 / 1; display: block; width: 100%; height: auto; }
+.tsh-mbinfo { display: grid; justify-items: start; gap: 10px; min-width: 0; }
+.tsh-mbox .tsh-tagsign { margin: 0; box-shadow: 0 3px 0 #3B2E3A, inset 8px 0 0 #9479E0; }
+.tsh-mbdesc { max-width: 54ch; font-size: var(--fs-label, 15px); font-weight: 600; line-height: 1.45; }
+.tsh-mbodds { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.tsh-mbodds li { display: inline-flex; align-items: center; gap: 5px; padding: 2px 9px 2px 3px; border-radius: 999px; border: 1.5px solid #3B2E3A; background: #fff; font-size: 13px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.tsh-mbodds li.is-none { background: #EFEAF3; color: #5F5162; }
+.tsh-mbodds .tsh-rar { font-size: 11.5px; }
+.tsh-mbbuy { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; }
+.tsh-mbleft { display: inline-flex; align-items: center; gap: 6px; font-size: var(--fs-meta, 13px); font-weight: 800; color: #4E3492; }
+.tsh-mbleft.s-short { color: #8A2B1E; } .tsh-mbleft.s-today, .tsh-mbleft.s-empty { color: #5A4658; }
+.tsh-store .tsh-mbox .tsh-buy { color: #3B2E3A; }
+/* its sheet: the box in a violet case, the odds as a table */
+.tsh-ipiece.k-box { width: min(86%, 290px); }
+.tsh-ipiece.k-box img { filter: none; }
+.tsh-ipiece.is-shake { animation: tsh-bshake .7s ease-in-out infinite; transform-origin: 50% 88%; }
+.tsh-ipiece.is-open { animation: tsh-bopen 380ms cubic-bezier(.2, 1.5, .4, 1) both; }
+@keyframes tsh-bshake { 0%, 100% { transform: rotate(0); } 15% { transform: rotate(-7deg) translateY(-2px); } 30% { transform: rotate(6deg); } 45% { transform: rotate(-5deg) translateY(-3px); } 60% { transform: rotate(4deg); } 75% { transform: rotate(-2deg); } }
+@keyframes tsh-bopen { 0% { transform: scale(.92); } 60% { transform: scale(1.08); } 100% { transform: scale(1); } }
+.tsh-odds { width: 100%; border-collapse: collapse; font-size: var(--fs-label, 15px); font-variant-numeric: tabular-nums; }
+.tsh-odds caption { text-align: left; padding-bottom: 4px; font-size: var(--fs-meta, 13px); font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: #4E3492; }
+.tsh-odds th { padding: 0 6px 4px; border-bottom: 2px solid #3B2E3A; text-align: left; font-size: var(--fs-meta, 13px); font-weight: 800; color: #5A4658; }
+.tsh-odds td { padding: 5px 6px; border-bottom: 1px dashed rgba(59, 46, 58, .3); }
+.tsh-odds th:not(:first-child), .tsh-odds td:not(:first-child) { text-align: right; }
+.tsh-odds td:nth-child(2) { font-weight: 900; }
+.tsh-odds tr.is-none td { color: #6B5A68; }
+.tsh-odds tr.is-none .tsh-rar { opacity: .6; }
+.tsh-item .tsh-oddsnote { color: #5A4658; }
+.tsh-again { justify-self: start; min-height: 44px; font-size: 15px; }
+
 /* ---------- the shelves: each a cabinet let into the wall, its name on a plaque, the cards on a board ---------- */
 .tsh-aisle { display: grid; }
 .tsh-seasonbody { display: grid; gap: 16px; }
@@ -268,6 +302,9 @@ dialog.tsh-sheet::backdrop { background: rgba(20, 14, 20, .55); }
   .tsh-wallet { right: auto; left: 50%; bottom: 5px; transform: translateX(-50%); padding: 2px 14px 3px 7px; gap: 7px; } .tsh-wallet .tsh-coin { width: 28px; height: 28px; } .tsh-wallet b { font-size: 19px; } .tsh-wallet small { font-size: 11px; }
   .tsh-show { grid-template-columns: 1fr; margin: 7px 4px; } .tsh-showcase { min-height: 236px; border-right: 0; border-bottom: 2px solid #3B2E3A; } .tsh-showinfo { padding: 16px 16px 18px; }
   .tsh-shelf { padding: 14px 11px 16px; margin: 7px 4px; }
+  .tsh-mbox { grid-template-columns: 92px minmax(0, 1fr); align-items: start; gap: 10px 14px; margin: 7px 4px; padding: 14px 14px 16px; }
+  .tsh-mbart { margin-top: 30px; }
+  .tsh-mbbuy .tsh-buy { flex: 1 1 auto; }
   .tsh-shelf header { grid-template-columns: 1fr; } .tsh-when { justify-self: start; }
   .tsh-shelf .tsh-rcards { display: flex; gap: 12px; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x proximity; padding: 4px 8px 20px; margin: 0 -6px; }
   .tsh-shelf .tsh-card { flex: 0 0 136px; scroll-snap-align: start; }
@@ -275,7 +312,9 @@ dialog.tsh-sheet::backdrop { background: rgba(20, 14, 20, .55); }
   dialog.tsh-dlg { width: calc(100% - 12px); max-height: calc(100% - 12px); }
   .tsh-dlgin > .tsh-x { right: 10px; top: 54px; width: 40px; height: 40px; }
   dialog.tsh-sheet { width: calc(100% - 32px); }
-  .tsh-item { grid-template-columns: 1fr; }
+  /* rows of their own height, so a long story scrolls the sheet instead of squeezing the case shut */
+  .tsh-item { grid-template-columns: 1fr; grid-auto-rows: max-content; }
+  .tsh-ipiece.k-box { width: min(60%, 220px); }
   .tsh-icase { min-height: 0; padding: 20px 16px 56px; border-right: 0; border-bottom: 3px solid #3B2E3A; }
   .tsh-ipiece { width: min(64%, 250px); }
   .tsh-iinfo { padding: 18px 16px 16px; } .tsh-iinfo h2 { font-size: 24px; }
@@ -284,7 +323,7 @@ dialog.tsh-sheet::backdrop { background: rgba(20, 14, 20, .55); }
   .tsh-ibuy { position: sticky; bottom: 0; z-index: 2; margin: 6px -16px -16px; padding: 12px 16px 14px; background: #FFF9EE; gap: 8px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .tsh-irays, .tsh-ipiece, .tsh-keeper, .tsh-showpiece, .tsh-showtw, .tsh-iown.is-new, .tsh-icoll { animation: none !important; }
+  .tsh-irays, .tsh-ipiece, .tsh-keeper, .tsh-showpiece, .tsh-showtw, .tsh-iown.is-new, .tsh-icoll, .tsh-mbart { animation: none !important; }
   .tsh-plank button.tsh-card:hover, .tsh-plank button.tsh-card:hover::before, .tsh-card:active { transform: none; }
 }
-.tsh-still .tsh-keeper, .tsh-still .tsh-showpiece, .tsh-still .tsh-showtw, .tsh-still .tsh-irays { animation: none !important; }
+.tsh-still .tsh-keeper, .tsh-still .tsh-showpiece, .tsh-still .tsh-showtw, .tsh-still .tsh-irays, .tsh-still .tsh-mbart { animation: none !important; }
