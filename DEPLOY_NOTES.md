@@ -32,6 +32,16 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-22 (Shorter windows for the analytics, `migration_v95.sql`, Claude Code)** — Package 1 of
+  [the plan for years](vault/tasks/2026-11-22-sustainable-for-years.md) (Sam: "Okay all that is good to me"). `hubs_down`
+  (hub, the Central day its page came down) is written by the After merge workflow's `down` step (`tools/after-merge/run.js`;
+  a page added back takes its row out) and filled in for the 12 hubs already down. The nightly retention job now rolls a
+  down hub's question health into `question_events_daily` (`sh_retention_hub_down`, a hub at a time), keeps who tapped what
+  30 days (90 before) with a daily roll-up first (`ui_click_reach_daily`, people, no ids), and rolls feature events up at 60
+  days (180 before). `tools/retro.sql` and `tools/lessons-daily.sql` read the roll-ups; `tools/release/retention.js` checks
+  every step (XP and crowns the same before and after); the About page's "How long it's kept" says the new windows. Applied
+  at night by the session handling the merging, with its first run as a backfill (about 130,000 question-health rows,
+  about 19,000 click rows), then the tables compacted.
 - **2026-11-21 (Patient Box: decay seen from the buccal, Claude Code)** — Sam's "Yes" to the drawn cheek-side view showing
   fillings and decay ([decisions](vault/decisions.md)). `widget/cases.js` draws a buccal lesion where the chart puts the gingival
   margin: a cervical crescent (a chalky white spot, or a brown cavity in a chalky rim), arrested lesions brown and rimless, root

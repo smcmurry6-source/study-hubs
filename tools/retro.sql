@@ -31,11 +31,18 @@ from activity_hourly where hub = :hub group by 1 order by 2 desc limit 40;
 -- clicks per button/tab/link and distinct people (tracked from 2026-09-25; perio and msk-exam3 are the first hubs with
 -- full click data). Lots of time + few clicks = being read; nobody clicks it = candidate to cut or move.
 -- (The people are counted in one pass over the hub's reach, not once a row: 0.3 s to 0.03 s on a throwaway copy, the same list.)
-with r as (select target, count(distinct visitor_id) people from ui_click_reach where hub = :hub group by 1)
-select c.section, c.target, sum(c.clicks) clicks, coalesce(max(r.people), 0) people
-from ui_clicks c left join r using (target) where c.hub = :hub group by c.section, c.target order by 3 desc, 1, 2 limit 60;
--- features almost nobody found: widget tools and mode tabs with fewer than 3 people
-select target, count(distinct visitor_id) people from ui_click_reach where hub = :hub group by 1 having count(distinct visitor_id) < 3 order by 1;
+-- Who tapped what is kept per person 30 days (migration_v95); older days are in ui_click_reach_daily, people per day with
+-- no ids. So `people` is distinct over the last 30 days, and `older_most_in_a_day` is the most people on one older day (a
+-- floor for how many found it then); a hub studied for more than 30 days reads both.
+with r as (select target, count(distinct visitor_id) people from ui_click_reach where hub = :hub group by 1),
+     o as (select target, max(people) most from ui_click_reach_daily where hub = :hub group by 1)
+select c.section, c.target, sum(c.clicks) clicks, coalesce(max(r.people), 0) people, coalesce(max(o.most), 0) older_most_in_a_day
+from ui_clicks c left join r using (target) left join o using (target) where c.hub = :hub
+group by c.section, c.target order by 3 desc, 1, 2 limit 60;
+-- features almost nobody found: widget tools and mode tabs with fewer than 3 people (both windows)
+with t as (select target, count(distinct visitor_id) people from ui_click_reach where hub = :hub group by 1
+           union all select target, max(people) from ui_click_reach_daily where hub = :hub group by 1)
+select target, max(people) people from t group by 1 having max(people) < 3 order by 1;
 -- time per section per study day before the exam (what people switch to as the exam nears)
 select :exam::date - (h at time zone 'America/Chicago')::date days_before, split_part(coalesce(nullif(section, ''), '(none)'), '/', 1) mode,
   sum(n) * 25 / 60 mins from activity_hourly where hub = :hub group by 1, 2 order by 1 desc, 3 desc;
