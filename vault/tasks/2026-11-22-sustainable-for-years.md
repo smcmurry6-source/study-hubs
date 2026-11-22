@@ -60,21 +60,24 @@ they can.
 
 ### 2. Pack away an archived hub's answers (`migration_v96.sql`)
 
-- [ ] **30 days after a hub's page comes down** (Sam's D), the nightly job replaces each person's per-answer rows for that
+- [x] **30 days after a hub's page comes down** (Sam's D), the nightly job replaces each person's per-answer rows for that
       hub (`personal_answers`, `answer_xp`, the per-answer `xp_awards`, `xp_seen`) with one summary row per person per hub.
       The summary keeps generously, so later back pay and the retrospective's check-in comparison still work: answers,
       right, first-try right, days studied, first and last day, the medal reached, and the XP and crowns the hub's answers
       paid.
-- [ ] **Nobody's numbers move:** XP, crowns, rank and journey, trophies, medals and leaderboard places read the banked
+- [x] **Nobody's numbers move:** XP, crowns, rank and journey, trophies, medals and leaderboard places read the banked
       totals (as v93 banked time crowns in `activity_time_kept`). One-time award keys stay, so nothing pays twice. The
       `personal_answers_xp_*` triggers don't take XP away for these deletes.
-- [ ] Linked devices move the summary (a trigger on `visitor_links`), and a student's own deletion includes it.
-- [ ] `tools/release/xp.js` proves it on a throwaway copy with the live schema: for every made-up visitor, every total
+- [x] Linked devices move the summary (a trigger on `visitor_links`), and a student's own deletion includes it.
+- [x] `tools/release/xp.js` proves it on a throwaway copy with the live schema: for every made-up visitor, every total
       before equals every total after, and a second run changes nothing.
-- [ ] On the live database, at 1-5 am Central in batches, with the same before/after check over the real totals (counts
-      only, nothing per person leaves the database), then `VACUUM FULL`. Most pages came down on 2026-11-19, so the first
-      big pack is around 2026-12-19 (about 150 MB). The size before and after in the Log.
-- [ ] [analytics-retention](../reference/analytics-retention.md)'s "keep, revisit when the class graduates" rows and the
+- [x] On the live database, with the same before/after check over the real totals (counts only, nothing per person
+      leaves the database), then `VACUUM FULL`; the size before and after in the Log. Applied and Genetics and
+      Hepatobiliary packed on 2026-11-22 (8:20 pm Central on 2026-11-21, Sam's call: nobody studying).
+- [ ] After the nightly job packs the hubs that come due about 2026-12-19 (about 224,000 answers at 20,000 a night, so
+      until about the end of December): `VACUUM (FULL, ANALYZE)` on `personal_answers`, `answer_xp`, `xp_awards` and
+      `xp_seen` at 1-5 am Central, one at a time, and the sizes in the Log.
+- [x] [analytics-retention](../reference/analytics-retention.md)'s "keep, revisit when the class graduates" rows and the
       About page ("Your answers, XP, rank and trophies are kept") say what is kept now.
 - Given up, as Sam agreed: the answer-by-answer detail of a hub nobody can open; if a hub ever came back, people keep
   their XP but start its question progress over.
@@ -134,6 +137,40 @@ they can.
   one-time pg_cron job (01:06 UTC, 3.3 s), then unscheduled. **Sizes:** the database 360 MB → 319 MB; `question_events`
   38 MB → 72 kB; `ui_click_reach` 27 MB → 19 MB; the new `question_events_daily` 3.2 MB and `ui_click_reach_daily` 568 kB.
   The migration file stays as applied (its header says 1-5 am; it went in early on Sam's say-so). Package 1 done.
+- 2026-11-22: package 2 written (Claude Code): `migration_v96.sql` (`answers_packed`, `sh_pack_due`, `sh_pack_answers`,
+  `sh_pack_merge`, the `visitor_links_answers_packed` trigger; `sh_xp_on_delete`, `sh_xp_rebuild`, `first_seen`,
+  `get_hub_mastery`, `sh_exam_debriefs`, `sh_insights`, `sh_insight_retries`, `sh_data_quality` with the summary;
+  `sh_retention_run`'s pack step, about 20,000 answers a night), `tools/release/xp.js` section 16 and `retention.js`, the
+  notes and the About page. How each number is kept: the migration's header. A person's answers on a hub are packed all
+  together once the newest is over 30 days old (so nothing reads half of them). On the copy, every made-up visitor's XP,
+  days, answers, best run, crowns, rank, journey, trophies, medals, first answer and class name, mastery, Timmy's days
+  and award totals, the boards and the admin page's numbers were the same after the pack, after rebuilding everyone (as a
+  rebuild left them before, or at what the packed answers paid where a replay differs) and after a second run, which
+  packed nothing; Link my devices after the pack gave the same XP and crowns as before it. Measured first (read-only):
+  `personal_answers` 84 MB, `xp_seen` 33 MB, `answer_xp` 27 MB, `xp_awards` 27 MB; 236,000 answers on the 12 hubs down, of
+  which Genetics' 1,907 (29 people) and Hepatobiliary's 9,974 (51) are due at once; 70,646 answer awards on down hubs.
+  Applying it, the first pack and the compaction are the session handling the merging's (the sizes after go here).
+- 2026-11-22 (about 02:20 UTC, 8:20 pm Central on 2026-11-21, Sam's call: nobody studying, so not the quiet hours):
+  `migration_v96.sql` applied by the session handling the merging through apply_migration (the file's statements, without
+  its long header and trailing check comments). Before, all 9 replaced functions' `md5(prosrc)` matched the PR's "live
+  now" list; after, all 13 match its "expected" list, and `answers_packed` has RLS on and no select for anon. **Trials on
+  the live data first**, each in a DO block that raised at the end so nothing was kept: (a) Genetics and Hepatobiliary
+  packed for 64 people: the rebuild's `xp_days` from the answers before against the answers left plus `day_rows` after,
+  1,090 person-days, 0 differ; `sh_wallet` earned, `get_hub_mastery`, `first_seen` and `xp_award_totals`, 0 people differ;
+  the two hubs' retries counts (first tries, first right, retries, retries of right) equal the summaries' sums. (b) The
+  real `sh_xp_rebuild` before and after packing, for 4 of them: `xp_visitors` and every award row identical. (c) The
+  award path on Perio (due about 2026-12-19), `sh_pack_answers('perio', now(), 2000, true)`: 4 people, 2,341 answers,
+  1,342 answer awards folded; after a rebuild `xp_visitors`, `sh_wallet` earned, mastery, every other award row, the
+  answer awards' base and XP sums and `xp_award_totals` were identical; 0 people moved. **The real pack**, a call each:
+  Genetics 29 people, 1,907 answers (0.3 s); Hepatobiliary 51 people, 9,974 answers (0.8 s); no awards in either (all
+  from before the release). `answers_packed` sums match the dry run; 0 answers and 0 `xp_seen` rows left on both hubs;
+  v79's award running totals equal their sums (0 rows off). **Compaction:** the trials' rolled-back rebuilds left about
+  38,000 dead rows each in `xp_seen` and `personal_answers` and 10,000 in `xp_awards` (the database 319 → 345 MB), so
+  `VACUUM (FULL, ANALYZE)` on `xp_seen`, `xp_awards` and `personal_answers` ran as a one-time pg_cron job (02:28 UTC,
+  10.5 s), then unscheduled. **Sizes:** the database 293 MB; `personal_answers` 84 → 69 MB; `xp_seen` 33 (58 after the
+  trials) → 31 MB; `xp_awards` 27 → 19 MB; `answer_xp` 27 MB (nothing to free: no answers from after the release were
+  packed); `answers_packed` 128 kB. The rest of the down hubs pack by themselves from about 2026-12-19; their compaction
+  is the open box above. A lead for the inbox: `sh_xp_rebuild`'s time on the live database.
 - 2026-11-22: package 5's CI check and change-log trim (Claude Code). The trim kept a week, not a month (above), and is
   rerun by every lessons audit. The podcast skill and `tools/podcast/README.md` said to commit the episode's mp3; they now
   say never to. The third box (the audio repo) stays open.
