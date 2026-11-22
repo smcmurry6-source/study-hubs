@@ -42,8 +42,10 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   `sh_xp_rebuild` adds the packed days and keeps the pack rows and their days' 20th-answer awards; `first_seen` (the class
   name), `get_hub_mastery` and the admin page's Insights, retries, drift check and check-ins read the summary; Link my
   devices moves it (a trigger on `visitor_links`). Tested in `tools/release/xp.js` section 16 (every made-up visitor
-  before and after, a rebuild, a second run, a link) and `retention.js`. About page: what is kept. Waiting: applying it and
-  the first pack (Genetics and Hepatobiliary, about 12,000 answers), then `VACUUM FULL`; most hubs come due about 2026-12-19.
+  before and after, a rebuild, a second run, a link) and `retention.js`. About page: what is kept. Applied 2026-11-22 (8:20 pm
+  Central on 2026-11-21, Sam's call), md5-checked, with trials on the live data first; Genetics (1,907 answers) and
+  Hepatobiliary (9,974) packed, then compacted: the database 293 MB, `personal_answers` 84 → 69 MB, `xp_awards` 27 → 19 MB
+  (the task's Log). Most hubs come due about 2026-12-19; their compaction is a box in the task.
 
 - **2026-11-22 (Shorter windows for the analytics, `migration_v95.sql`, Claude Code)** — Package 1 of
   [the plan for years](vault/tasks/2026-11-22-sustainable-for-years.md) (Sam: "Okay all that is good to me"). `hubs_down`
