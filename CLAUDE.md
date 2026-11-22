@@ -71,6 +71,8 @@ applies here too, except where a note says how a Claude Code session does it dif
 
 @vault/rules/archived-hubs-drop-their-audio.md
 
+@vault/rules/no-narration-in-the-repo.md
+
 @vault/rules/secrets.md
 
 @vault/rules/graded-coursework.md

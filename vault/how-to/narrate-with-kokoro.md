@@ -7,6 +7,10 @@ tags: [audio]
 
 Why this matters: [text-and-audio-never-drift](../rules/text-and-audio-never-drift.md).
 
+**Don't commit what it writes** (Sam, 2026-11-22: [no-narration-in-the-repo](../rules/no-narration-in-the-repo.md)): until
+the audio repo exists ([the task](../tasks/2026-11-22-sustainable-for-years.md), package 5), a hub ships without
+recordings.
+
 **Kokoro installs itself.** `tools/narrate.py` and `tools/podcast/render_podcast.py` run `tools/kokoro-setup.sh`
 the first time they find it missing: `pip install kokoro-onnx soundfile`, then the model files into `/tmp/kokoro`
 (or `$KOKORO_DIR`), about a minute, once per machine. Sessions don't install it at start (Sam, 2026-11-06: most never
