@@ -1313,3 +1313,10 @@ f2-genpath-22
 f2-genpath-23
 f2-genpath-24
 f2-genpath-25
+
+f2-bacteria-18
+f2-bacteria-19
+f2-bacteria-20
+f2-bacteria-21
+f2-bacteria-22
+f2-bacteria-23
