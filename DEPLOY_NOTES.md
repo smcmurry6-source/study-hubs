@@ -32,6 +32,25 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-22 (Review of Systems against the professors' slides and recordings; Ask Timmy reads one course, Claude Code)** —
+  Sam uploaded the courses' slides and some recordings' transcripts. One reviewer per part checked it and wrote a proposal
+  (exact edits, new questions, hints, retirements, calls for Sam), merged in order, slides before recordings:
+  Cardio & Respiratory (CR-1 to CR-5), Renal (RN-1 to RN-5; RN-1 and RN-2 also against Dr. Herr's recordings) and MSK & GI's
+  MG-1 and MG-2 so far, the rest following in the same PR ([the task](vault/tasks/2026-11-22-review-of-systems-from-the-slides.md)).
+  Errors fixed against the slides, gaps filled at both note levels with cram lines, new questions with every choice's why,
+  the professors' "know this" as High-yield points with their words, what they said to skip as deemphasize hints, sources
+  named in each part's `from` and questions' `src`. Questions only added, none retired (ids in
+  `tools/question-ids/review-of-systems.txt`). Content grew to about 245k tokens for Ask Timmy, past his 200k limit; Sam: "I
+  dont want to sacrifice the quality of the material just so we can have ask timmy", then "have Timmy only read the course
+  the student is in". **Ask Timmy's course mode** (`supabase/functions/timmy/core.js`): on a hub with `groups`, every
+  question gets one course's notes, tables, High-yield points and topics with every course's cram sheet (`COURSE_NOTE`,
+  `part(lecs, { scoped: true })`), about 61-88k tokens with the rules and site help (under the 100k prompt where Haiku 5.5's
+  price goes up fivefold), cached an hour per course, the whole content only on "not covered". The course is the answered
+  question's, the lecture on screen's, or what the page names (`context.course`, `askCourse()` in `widget/hub-timmy.js`:
+  the Question Bank's course when one is picked, else the notes last opened). `tools/timmy/test.mjs` checks each course's
+  prompt under 95,000 and the mode itself; the smoke test checks the chat names the course; the eval has 8 `rs-` cases.
+  Deploys itself after the merge (After merge: Ask Timmy's function changed).
+
 - **2026-11-22 (The exam-eve boss, the Midnight Plaque, idea board #4, Claude Code)** — Sam set the idea Planned ("This could
   be fun. Maybe have an xp + gold crowns reward"), then, on the PR's numbers: "open it from 3pm to midntight, hp is good, pay
   is good, he can also have a card below the today card on the question bank". The night before every exam in `hubs.js`, 3 pm to midnight Central, one

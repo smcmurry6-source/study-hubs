@@ -47,6 +47,11 @@ check-in hours: its entry in `hubs.js`.
   have no professor slides there, so the notes rest on classmates' guides checked against standard references; where
   sources disagreed and how it was settled, per course: [the task](../tasks/done/2026-11-19-review-of-systems-hub.md). Not read: Anki decks (`.apkg`) and HEIC photos. Commercial review material
   (DAT Bootcamp, Dental Decks and the like) was never copied.
+  **From 2026-11-22 the professors' slides** (and, for Renal, Dr. Herr's recordings' transcripts), which Sam uploaded then:
+  each part checked against them is listed with what is still unread in
+  [the slides task](../tasks/2026-11-22-review-of-systems-from-the-slides.md), and its `from` in `core.json` names the
+  decks. Where a slide disagrees with a standard reference the hub keeps the standard fact and the PR lists the slide's
+  version for Sam; a deck over 10 MB that the Drive connector returns empty needs a PDF or smaller copy.
 - **Graded work, "topic check only"** (Sam, 2026-11-19; [decisions](../decisions.md)): the earlier courses' quizzes,
   crosswords and exams were read only to check that every topic they test is covered by the hub's own questions. No question
   was copied or reworded from one, and nothing in the hub says a topic was on one. **This course's own 8 quizzes are never
@@ -71,8 +76,14 @@ check-in hours: its entry in `hubs.js`.
   suite's slowed phone (Heme & Endo Exam 3: 300-370 ms), nearly all of it the background work after Home has drawn (parsing the
   JSON, the search index of every part's notes). Its budget in `tools/release/budgets.json` is set from that (2026-11-20);
   chunking the search index is on the [inbox](../tasks/inbox.md). Ask Timmy's content
-  for it is about 170-200k tokens by length, which is why Timmy moved to Haiku 5.5 ([decisions](../decisions.md),
-  [ask-timmy](../reference/ask-timmy.md)) and `tools/timmy/test.mjs`'s guard is 200k.
+  for it was about 170-200k tokens by length, which is why Timmy moved to Haiku 5.5 ([decisions](../decisions.md),
+  [ask-timmy](../reference/ask-timmy.md)). Checked against the professors' slides and recordings (2026-11-22) it passed
+  200k, and Sam put the material first ("I dont want to sacrifice the quality of the material just so we can have ask
+  timmy"): **Timmy reads the course the student is in** (Sam: "have Timmy only read the course the student is in"), one
+  course's notes with every course's cram sheet, about 61-88k tokens a question, and the whole hub only when that isn't
+  enough ([ask-timmy](../reference/ask-timmy.md), "Limits and money"). `tools/timmy/test.mjs` fails a course whose prompt
+  reaches 95,000 tokens (Haiku 5.5 costs five times as much past a 100k prompt): a course that grows past it needs its
+  notes looked at, or the check moved, with Sam.
 
 - **One-page sheets** (2026-11-22, every hub on the engine: `widget/sheet.js`): every part has one, on screen; it says
   High-yield topics and High-yield points here. It shipped with a Print or save as PDF button (all 70 fit one Letter page),
