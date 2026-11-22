@@ -743,12 +743,12 @@
     }).catch(function(){ el.innerHTML = offlineHTML("the notes"); });
   }
   /* a lecture's one-page sheet (#notes/<lecture>/sheet): its cram sheet, High likelihood topics and Exam hints together, to
-     print on one page or read on screen (idea board #5, 2026-11-22). widget/sheet.js + sheet.css draw it, fetched the first
+     read on screen (idea board #5, 2026-11-22; no printing, Sam). widget/sheet.js + sheet.css draw it, fetched the first
      time one opens; here are the route, the buttons that open it (the notes' toolbar, the cram sheet) and section()'s name */
   var SHT = null;
   function needSheet(){ return SHT ? SHT.ready : loadScript(WIDGET + "sheet.js").then(function(){ SHT = window.SH_SHEET(HX); return SHT.ready; }); }
   function hasSheet(id){ return !!(((STUDY || {}).cram || {})[id] || []).length || (CORE.likelyTopics || []).some(function(t){ return t.lec === id; }); }
-  function sheetBtn(id, where, cls){ return hasSheet(id) ? '<a class="btn' + (cls ? " " + cls : "") + '" href="#notes/' + esc(id) + '/sheet" data-sheet-open="' + where + '">' + icon("print", 18) + "One-page sheet</a>" : ""; }
+  function sheetBtn(id, where, cls){ return hasSheet(id) ? '<a class="btn' + (cls ? " " + cls : "") + '" href="#notes/' + esc(id) + '/sheet" data-sheet-open="' + where + '">' + icon("cram", 18) + "One-page sheet</a>" : ""; }
   /* a hub's study guide (study.json's guide): widget/guide.js + guide.css draw it, fetched the first time Notes opens on a hub
      that has one, so no other hub downloads them; the search entries and their jump stay here (exportSections, SH_GOTO) */
   var GD = null;
@@ -1351,7 +1351,7 @@
   var MORE = [
     ["timmy", "podcast", "Timmy Time", "The audio review, with likes and comments"],
     ["hints", "hints", "Exam hints", "What the professor said would be tested, and the most likely questions"],
-    ["cram", "cram", "Cram sheet", "Every lecture's bullets, and a one-page sheet of each to print"],
+    ["cram", "cram", "Cram sheet", "Every lecture's bullets, and a one-page sheet of each"],
     ["side", "sidebyside", "Side by side", "The charts that compare across lectures"],
     ["arcade", "arcade", "Arcade", "Games built on the material, with class high scores"],
     ["place", "home", "Timmy’s place", "His home and yard, the medals you’ve earned, and what he wears"],
@@ -1506,7 +1506,7 @@
   }
   function moreCram(body){
     needStudy().then(function(){
-      body.innerHTML = '<p class="note cram-lede">Each lecture also has a <b>one-page sheet</b>: its lines with its ' + (courses() ? "high-yield topics and points" : "High likelihood topics and Exam hints") + ", to print or keep open.</p>" +
+      body.innerHTML = '<p class="note cram-lede">Each lecture also has a <b>one-page sheet</b>: its lines with its ' + (courses() ? "high-yield topics and points" : "High likelihood topics and Exam hints") + ", all on one page.</p>" +
         '<div class="cram-grid">' + LECS.map(function(l){ var c = (STUDY.cram || {})[l.id] || []; if (!c.length) return "";
         return '<section class="panel cram' + lc(l.id) + '" id="cram-' + esc(l.id) + '" aria-labelledby="cr' + esc(l.id) + '"><h2 id="cr' + esc(l.id) + '">' + lecHead(l) + "</h2><ul>" + c.map(function(b){ return "<li>" + esc(b) + "</li>"; }).join("") + "</ul>" +
           '<p class="cram-sheet">' + sheetBtn(l.id, "cram", "btn-text") + "</p></section>"; }).join("") + "</div>";

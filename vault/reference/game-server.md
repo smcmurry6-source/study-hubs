@@ -551,6 +551,54 @@ every right answer anyone gives in that hub is a hit. It falls at its HP; everyo
   more hits, so most would take the 1,000. The window, the HP and the pay are Sam's (2026-11-22: "open it from 3pm to
   midntight, hp is good, pay is good"); the building session had proposed 6 pm, when 8 of the 11 would have fallen.
 
+## The weekly pennant (migration_v98)
+
+Idea board #6 (a starter idea): "a weekly class challenge: answer 50 questions by Sunday and your Timmy gets that week's
+pennant". Built 2026-11-22; Sam set the goal at 100, the prize at 500 and no pennant on a visit ("lets do 100, the rest
+looks good", [decisions](../decisions.md)).
+
+- **The week** is Monday 00:00 to Sunday 23:59:59 Central (`sh_week_of`: `date_trunc('week', <Central day>)`). **What counts**
+  is every saved answer, in any hub and any part of it (practice, the drill, a mock, the arcade, Learn): `xp_days.n`, which
+  `sh_xp_on_insert` adds to on every `personal_answers` insert, summed over the week's seven rows (`sh_week_n`). A flashcard
+  isn't an answer. Linked devices count as one: Link my devices moves a device's answers to the main id, and the claim, the
+  read and the sweep all resolve the main id first (`sh_week_me`) and also count any rows still under a device linked to
+  it (a tab left open through the link), so the week is counted, made and paid under the main id.
+- **The goal** is 100 (`sh_week_goal`, `WEEK_GOAL` in `widget/pet.js`, `GOAL` in `pennant.mjs`; Sam, 2026-11-22: "lets do
+  100", over the idea's 50, [decisions](../decisions.md)). In the class's data for the 10 full weeks from Sep 7 to Nov 15
+  (recounted 2026-11-22, totals only: 569 person-weeks of 159 people, linked devices as one), 64% of the weeks someone
+  studied reached 100 and 77% reached 50; the median week was 192 answers. Busy weeks ran 69-78% at 100, quiet ones 23-48%,
+  so the pennant is a stretch in a quiet week and a given in an exam week.
+- **`week_pennants`** (`visitor_id`, `week` the Monday, `n` the answers when it was made, `at`, `how` `claim` or `sweep`),
+  one row per person per week, closed to visitors. **`claim_week_v2(p_visitor)`** counts again under the main id's lock: under
+  100 it answers `why: 'short'` with `n`; at 100 it makes the row and pays `week` (`sh_prizes()`: 500, `PRIZES` in
+  `widget/v3.js` the same), once, key `week:<monday>`, as many crowns (`sh_is_prize`), never boosted, and answers
+  `sh_prize_reply` with `week`, `n`, `pennant`, `class` and `have` (pennants in all). **`get_my_week_v2(p_visitor)`** answers
+  `week`, `goal`, `n`, `done`, `class` and `pennants` (Mondays, newest first, at most 260) and `pays`. `class` is how many
+  have that week's pennant, null under 5: the class challenge is each person's own 100 in one shared week, and the class sees
+  only that total.
+- **Monday's sweep** (`sh_week_sweep`, pg_cron `sh-week-pennants`, `17 7 * * 1` UTC: 1:17 am Central in winter): last week's
+  people with 100 and no pennant (the tab closed on the 100th answer, an answer kept on the device and sent later) get it,
+  dated Sunday 23:59:59 Central, `how` `sweep`, and its prize, under the main id (a linked device's rows are summed with
+  it). One read of last week's
+  `xp_days` rows, once a week.
+- **Link my devices** moves the alias's pennants to the primary id (`visitor_links_pennants`); a week both had stays once.
+  The prize of each device's pennant stays paid, as every prize two devices earned before they were linked.
+- **Visiting** (`get_place`) is unchanged: a classmate's place shows no pennant, since which weeks someone reached 100 is a
+  record of their studying.
+- **On the page** the count is Timmy's days (`shPet.week()` in `widget/pet.js`: the bootstrap's `pet_days`, which are
+  `xp_days`, with this device's log), so it costs no request. After an answer's reply (`sh:answer-paid`) or once the days
+  are in, a page at 100 with no pennant asks `claim_week_v2` through `shGame.claim` (the reward card, the balance); a
+  `short` reply waits three more answers. `get_my_week_v2` is asked at most every 30 minutes, and only by a page that shows
+  the pennant (Home's Today card, Timmy's place, the dashboard after its first scroll or tap); its answer and a claim's are
+  kept on the device (`sh_week`) and go out as `sh:week`. The art is `window.SH_PENNANT` (`tools/figures/site/pennant.mjs`,
+  in `widget/hub-art.js`, so in both pages' bundles): the month's felt and badge, the week of the month as stars, the school
+  year's sleeve; the newest flies from the lamp post at your own place (the place kit's `pennant` option).
+- Every function is PL/pgSQL, the two the page calls included (`get_my_week_v2`, `claim_week_v2`), so their plans are kept
+  ([shared-infrastructure](shared-infrastructure.md), migration_v76).
+- `tools/release/xp.js` section 14g checks the week across the clock change, 99 and the 100th (a mock's), one prize, the
+  class count from 5, two linked devices as one week (claimed from either, paid once under the main id), the sweep (a linked
+  device's answers under its main id), Link my devices and the two page calls; `rls.js` the table and helpers closed.
+
 ## The mystery box, Studying now and the Crowns board (migration_v99)
 
 From the idea board's "Drip for Timmy" (a classmate's idea, set Planned by Sam with the note: you can already visit other

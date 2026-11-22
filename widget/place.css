@@ -282,6 +282,23 @@ button.tpv-card.is-framed:hover { background: none; transform: translateY(-3px) 
 .tpv-mcard svg { display: block; }
 
 .tpv-overin { box-shadow: 0 0 0 2px rgba(255, 224, 138, .45), 0 24px 60px rgba(0, 0, 0, .5); }
+
+/* the weekly pennants (migration_v98): this week's, then every one earned, like the medal board */
+.tpn-now { display: flex; align-items: center; gap: 16px; margin: 14px 0 0; padding: 14px 16px; border-radius: var(--r-row); background: var(--panel); }
+.tpn-now.is-got { box-shadow: inset 0 0 0 1px rgba(255, 224, 138, .5); background: linear-gradient(90deg, rgba(255, 224, 138, .2), rgba(255, 224, 138, .05)); }
+.tpn-now .shpn { flex: none; }
+.tpn-nowt { display: grid; gap: 6px; min-width: 0; flex: 1; }
+.tpn-nowt b { font-size: var(--fs-card); font-weight: var(--w-head); color: #fff; }
+.tpn-nowt span { font-size: var(--fs-meta); color: var(--muted); }
+.tpn-nowt .tpn-class { color: var(--ar-gold); }
+.tpn-nowt .tpv-meter { margin: 0; }
+.tpn-nowt .tpv-meter i { background: var(--ar-gold); }
+.tpn-grid { grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); }
+.tpn-side .tpn-row { display: flex; align-items: center; gap: 12px; }
+.tpn-side .tpn-row p { margin: 0; font-size: var(--fs-meta); color: var(--muted); }
+.tpn-side .tpn-row b { display: block; font-size: var(--fs-label); color: #fff; font-weight: var(--w-head); }
+.tpn-side .shpn { flex: none; }
+@media (max-width: 520px) { .tpn-now .shpn { width: 64px; height: auto; } }
 .tpv-mhead h3 { color: var(--ar-gold); }
 
 /* Collections (migration_v75): every season's set, year-round collection and the rare costumes, with what you own of

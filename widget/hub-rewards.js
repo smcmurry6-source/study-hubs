@@ -218,6 +218,11 @@
       ringShown = Date.now();
       if (goalWait) { clearTimeout(goalWait); goalWait = 0; }
       prizeCard([{ t: "Today's goal met", xp: d.xp, c: d.xp, src: "ring" }], { sub: goalSub(), kind: "goal" });
+    } else if (d.src === "week") {
+      /* the weekly pennant (migration_v98): what it was for, and how many in the class have theirs (from 5) */
+      var wr = d.res || {}, wc = wr["class"] >= 5 ? " · " + fmt(wr["class"]) + " in the class have theirs" : "";
+      prizeCard([{ t: "This week’s pennant", xp: d.xp, c: d.xp, src: "week", sub: fmt(wr.n || 100) + " questions since Monday. It’s flying at Timmy’s place" + wc }]);
+      HX.say("A new pennant for my place!", "do-hop");
     } else prizeCard([{ t: prizeName(d.src, d.res || {}), xp: d.xp, c: d.xp, src: d.src }]);
     if (d.src === "nuke" || d.src === "boss" || d.src === "eve" || d.src === "top") HX.say(d.src === "nuke" ? "Ten thousand! Go spend it." : "Nice hit!", "do-hop");
     paintMeters();
@@ -237,6 +242,7 @@
   /* what fills the badge: a streak's flame, else the coin (it paid crowns) or the star */
   function badgeArt(kind, c){
     if (kind === "streak") return flame(Math.max(3, streakDays()), "");
+    if (kind === "week" && window.SH_PENNANT) return window.SH_PENNANT.svg(weekNow().week, 38) || starSvg();
     return c > 0 ? coinSvg() : starSvg();
   }
   var prizeBatch = null, ringShown = 0, goalWait = 0;
@@ -521,6 +527,25 @@
       '<circle class="t-track" cx="60" cy="60" r="' + r + '"/><circle class="t-arc" cx="60" cy="60" r="' + r + '" stroke-dasharray="' + c.toFixed(2) + '" stroke-dashoffset="' + (c * (1 - (of ? Math.min(1, done / of) : 0))).toFixed(2) + '"/>' +
       out + "</svg>";
   }
+  /* ---------- the weekly pennant (idea board #6, migration_v98): 100 questions from Monday to Sunday, in any hub, and Timmy
+     gets that week's pennant. The count and what the server last said are widget/pet.js's (shPet.week), its drawing
+     window.SH_PENNANT (in this bundle's hub-art.js), so the row costs no request; shPet asks the server at most every
+     30 minutes for the class count and the pennants earned. A tap opens Timmy's place, where the newest one flies. ---------- */
+  function weekNow(){ var P = window.shPet; return P && P.week ? P.week() : { week: day(0), n: 0, goal: 100, done: false, cls: null, pennants: [], pays: 0, ends: day(0) }; }
+  document.addEventListener("sh:week", function(){ paintMeters(); });
+  function weekRow(){
+    var P = window.shPet, K = window.SH_PENNANT; if (!P || !P.week || !K) return "";
+    var w = P.week(true), g = w.goal, n = Math.min(w.n, 999), got = w.done, left = Math.max(0, g - w.n), d = K.design(w.week);
+    var ends = dateLabel(w.ends, { weekday: "long" }), pct = Math.round(Math.min(1, w.n / g) * 100);
+    var head = got ? "This week’s pennant is yours" : w.n >= g ? "Your pennant is on its way" : fmt(n) + " of " + g + " this week";
+    var sub = got ? fmt(n) + " questions since Monday. It’s flying at Timmy’s place." :
+      w.n >= g ? fmt(n) + " questions since Monday." :
+      left + " more by " + ends + " for " + (d ? d.name + "’s " : "this week’s ") + "pennant" + (w.pays ? ", +" + fmt(w.pays) + " XP and crowns." : ".");
+    var cls = w.cls ? '<small class="tw-class">' + fmt(w.cls) + " in the class have theirs this week</small>" : "";
+    return '<a class="today-week' + (got ? " is-got" : "") + '" href="#more/place" data-tw>' + K.svg(w.week, 44, { dim: !got }) +
+      '<span class="tw-txt"><b class="num">' + esc(head) + "</b><small>" + esc(sub) + "</small>" +
+      (got ? "" : '<span class="tw-bar" aria-hidden="true"><i style="width:' + pct + '%"></i></span>') + cls + "</span></a>";
+  }
   function todayPanel(){
     var t = todayRec(), g = goal(), n = streakDays(), dn = doneToday(t), left = Math.max(0, g - dn), hp = HX.petHp(), T = AH.tint || { ink: "#6B5A68", light: "#ECE6EA" }, w = HX.wallet ? HX.wallet() : null;
     var cap = dn >= g ? "Goal met for today." : left === g ? "Your goal today: " + g + " questions or flashcards. One keeps your streak going." : left + " more meets today's goal.";
@@ -539,7 +564,7 @@
            reply (migration_v68), and what this page saw you earn today: a tap opens the shop */
         (w ? '<li class="ts-crowns"><a href="#more/shop"' + (w.earned ? ' title="' + fmt(w.earned) + ' Shiny Gold Crowns earned in all"' : "") + ">" + HX.shopCoin(30) + '<span><b class="num">' + fmt(w.balance) + "</b><small>" + (w.balance === 1 ? "Gold crown" : "Gold crowns") + '<span class="sr"> to spend in Timmy’s shop</span></small>' +
           (t.c > 0 ? '<small class="ts-plus">+' + fmt(t.c) + " today</small>" : "") + "</span></a></li>" : "") +
-      "</ul>" +
+      "</ul>" + weekRow() +
       (hp !== null ? '<p class="today-pet">' + icon("tooth", 18) + "<span>Timmy has <b class=\"num\">" + hp + " HP</b></span></p>" : "") + "</div>";
   }
   /* the session recap: when you leave the questions with 5 or more answered since the last one (Sam, 2026-11-06: never

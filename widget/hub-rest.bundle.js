@@ -4879,7 +4879,7 @@ if (res && !res.error) try { localStorage.setItem("sh_bowl_trophy_sent", "1"); i
 }
 document.addEventListener("sh:bowl-trophy", sendBowlTrophy);
 setTimeout(sendBowlTrophy, 5000);
-var PRIZES = { name: 500, ring: 5, boss: 500, nuke: 10000, alltime: 20000, notes: 50, trophy: 200, visit: 50, game: 100, pb: 50, top: 250, report: 100, collection: 1000, dark: 5000, modupro: 20000, loupes: 30000, fairy: 250, goldfairy: 500, probe: 300, perfect: 750, misses: 100, idea: 500, back: 200, streak: [[3, 100], [7, 300], [14, 700], [30, 1500], [60, 3000], [100, 5000]], row: [[10, 25], [25, 100], [50, 250]], medal: [250, 500, 750, 1000] };
+var PRIZES = { name: 500, ring: 5, boss: 500, nuke: 10000, alltime: 20000, notes: 50, trophy: 200, visit: 50, game: 100, pb: 50, top: 250, report: 100, collection: 1000, dark: 5000, modupro: 20000, loupes: 30000, fairy: 250, goldfairy: 500, probe: 300, perfect: 750, misses: 100, idea: 500, back: 200, week: 500, streak: [[3, 100], [7, 300], [14, 700], [30, 1500], [60, 3000], [100, 5000]], row: [[10, 25], [25, 100], [50, 250]], medal: [250, 500, 750, 1000] };
 function fmtN(n){ return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ","); }
 function prizeName(src, d){
 d = d || {};
@@ -4890,7 +4890,7 @@ visit: "Visiting a classmate's Timmy", game: "First game today", pb: "New person
 row: (d.n || "") + " right in a row", streak: (d.n || "") + " days in a row", medal: "Hub medal", "pod-done": "Timmy Time finished",
 collection: won > 1 ? won + " collections finished" : "Collection finished",
 fairy: "First Tooth Fairy caught", goldfairy: "First Golden Tooth Fairy caught", probe: "Today's Golden Probe", perfect: "A perfect mock",
-misses: "Yesterday's misses, all right", idea: "Your idea shipped", back: "Welcome back",
+misses: "Yesterday's misses, all right", idea: "Your idea shipped", back: "Welcome back", week: "This week's pennant",
 eve: "The class beat the Midnight Plaque" + (d.n ? ": your " + d.n + (d.n === 1 ? " hit" : " hits") : "") }[src] || "Bonus";
 }
 function prizeText(src, xp, d){
