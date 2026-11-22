@@ -40,6 +40,16 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   dated before 2026-11-15, unchanged and in order, to `DEPLOY_NOTES-2026-11.md`, `DEPLOY_NOTES-2026-10.md` and
   `DEPLOY_NOTES-2026-09.md` (593 KB → 192 KB here). Grep `DEPLOY_NOTES*.md` for the whole log; every note that said to grep
   this file says so now. The lessons audit runs the trim again.
+- **2026-11-22 (Shorter windows for the analytics, `migration_v95.sql`, Claude Code)** — Package 1 of
+  [the plan for years](vault/tasks/2026-11-22-sustainable-for-years.md) (Sam: "Okay all that is good to me"). `hubs_down`
+  (hub, the Central day its page came down) is written by the After merge workflow's `down` step (`tools/after-merge/run.js`;
+  a page added back takes its row out) and filled in for the 12 hubs already down. The nightly retention job now rolls a
+  down hub's question health into `question_events_daily` (`sh_retention_hub_down`, a hub at a time), keeps who tapped what
+  30 days (90 before) with a daily roll-up first (`ui_click_reach_daily`, people, no ids), and rolls feature events up at 60
+  days (180 before). `tools/retro.sql` and `tools/lessons-daily.sql` read the roll-ups; `tools/release/retention.js` checks
+  every step (XP and crowns the same before and after); the About page's "How long it's kept" says the new windows. Applied
+  2026-11-22 at 01:03 UTC (7 pm Central, Sam's call with nobody studying) by the session handling the merging: its first
+  run rolled up 129,939 question-health rows and 19,358 click rows, then the tables were compacted (360 MB → 319 MB).
 - **2026-11-21 (Patient Box: decay seen from the buccal, Claude Code)** — Sam's "Yes" to the drawn cheek-side view showing
   fillings and decay ([decisions](vault/decisions.md)). `widget/cases.js` draws a buccal lesion where the chart puts the gingival
   margin: a cervical crescent (a chalky white spot, or a brown cavity in a chalky rim), arrested lesions brown and rimless, root

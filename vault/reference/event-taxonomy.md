@@ -50,9 +50,10 @@ privacy rule). Written by = the RPC and the client file that calls it.
 | `presence_hourly` | hub × hour of day, ping count | no | `record_presence_ping` | early | "Who's studying now" on the dashboard |
 | `mode_stats` | hub × mode, opens | no | `record_mode_open` | early | All-time counter, no date: can't be split by period |
 | `ui_clicks` | day × hub × section × target, `clicks` | no | `record_clicks`, `widget/clicks.js` | 2026-09-25 | Batched once a minute; max 80 targets a batch. Since `migration_v82` (2026-11-19) a hub's clicks, events and question health's rows go in one `record_analytics` call, which hands each to its own function: the same rows (the dashboard's clicks and events too, since 2026-11-19: `widget/dash.js` hands `widget/clicks.js` a client that joins them) |
-| `ui_click_reach` | day × hub × target × visitor | yes | same | 2026-09-25 | Distinct people per button per day; kept 90 days |
-| `feature_events` | day × hub × kind × visitor, `n` summed | yes | `record_events`, `window.shTrack` in `widget/clicks.js` | 2026-10-20 | Kept 180 days, then collapsed into `feature_daily`. `hub` is a page: a hub id, `dashboard` or `about`. Kinds below |
-| `feature_daily` | day × hub × kind: `people`, `n` | no | `sh_retention_run` (v52) | rows older than 180 days | `feature_events` after 180 days; `people` is the distinct ids that day |
+| `ui_click_reach` | day × hub × target × visitor | yes | same | 2026-09-25 | Distinct people per button per day; kept 30 days (90 until `migration_v95`), then rolled into `ui_click_reach_daily` |
+| `ui_click_reach_daily` | day × hub × target: `people` | no | `sh_retention_run` (v95) | rows older than 30 days | `ui_click_reach` after 30 days; `people` is the distinct ids that day |
+| `feature_events` | day × hub × kind × visitor, `n` summed | yes | `record_events`, `window.shTrack` in `widget/clicks.js` | 2026-10-20 | Kept 60 days (180 until `migration_v95`), then collapsed into `feature_daily`. `hub` is a page: a hub id, `dashboard` or `about`. Kinds below |
+| `feature_daily` | day × hub × kind: `people`, `n` | no | `sh_retention_run` (v52) | rows older than 60 days (180 until v95) | `feature_events` after 60 days; `people` is the distinct ids that day |
 | `search_terms` | day × hub × term, searches, last hit count | no | `record_search`, `widget/v3.js` | 2026-09-29 | The widget's Search only; terms trimmed to 3-60 characters, no visitor |
 
 **Not a table: who has a hub open** (Supabase Realtime presence, channel `presence:<hub>`, `widget/v3.js`). While a hub

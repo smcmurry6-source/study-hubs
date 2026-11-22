@@ -12,8 +12,11 @@
 //   checkins   hubs.js changed → the server's closed check-ins (exam_checkins_closed, migration_v86) set to every exam with
 //              checkinClosed in hubs.js, so a closed check-in can't be sent and a reopened one can (Sam, 2026-11-19: "no
 //              one should be able to submit for any older exams")
-//   down       a hub's page came down (hubs/<hub>/index.html deleted) → its "Good question?" thumbs are deleted
-//              (question_feedback; Sam, 2026-11-21: "Delete with the hub", vault/reference/analytics-retention.md)
+//   down       a hub's page came down (hubs/<hub>/index.html deleted) → the day is recorded in hubs_down (migration_v95: the
+//              nightly retention job then rolls the hub's question health up into daily totals) and its "Good question?"
+//              thumbs are deleted (question_feedback; Sam, 2026-11-21: "Delete with the hub"; 2026-11-22: question health
+//              "when its page comes down", vault/reference/analytics-retention.md). A page that comes back (added again)
+//              takes its hubs_down row out, so a live hub's rows are never rolled up
 //   live       wait until GitHub Pages serves the push (up to 15 minutes), so what follows meets the new pages
 //   fixes      a data fix added under tools/data-fixes/ → run it once on the live database (Supabase's management API)
 //   changelog  a line added to tools/after-merge/changelog.txt → log_changelog for its hub (the hub's "Updated" label)
@@ -55,7 +58,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
    to the changelog file. Exported for tools/after-merge/test.js. */
 function plan({ changes, podcast, added, extraFixes, engineHubs }){
   const files = changes.map(c => c.path), touched = p => files.some(f => f === p || f.startsWith(p));
-  const out = { keys: [], timmy: false, timmyCode: false, podcast: [], checkins: false, down: [], site: [], fixes: [], changelog: [], warnings: [] };
+  const out = { keys: [], timmy: false, timmyCode: false, podcast: [], checkins: false, down: [], up: [], site: [], fixes: [], changelog: [], warnings: [] };
   for (const hub of engineHubs) {
     const qf = `hubs/${hub}/content/questions.json`;
     /* a change to how keys are built (tools/xp/keys.js) reloads every engine hub's */
@@ -70,7 +73,10 @@ function plan({ changes, podcast, added, extraFixes, engineHubs }){
   out.timmyCode = files.some(f => f.startsWith('supabase/functions/timmy/') && f !== 'supabase/functions/timmy/site.json');
   out.checkins = files.includes('hubs.js');
   /* a hub's page came down: its question-health thumbs go with it (question_feedback, read only while the hub is live) */
-  out.down = changes.map(c => c.status === 'D' && (/^hubs\/([^/]+)\/index\.html$/.exec(c.path) || [])[1]).filter(h => h && HUB_RE.test(h)).sort();
+  const page = st => changes.map(c => c.status === st && (/^hubs\/([^/]+)\/index\.html$/.exec(c.path) || [])[1]).filter(h => h && HUB_RE.test(h)).sort();
+  out.down = page('D');
+  /* a page added (back): a new hub, or one restored from git; its hubs_down row (if any) comes out */
+  out.up = page('A');
   out.site = changes.filter(c => c.status !== 'D' && isSite(c.path)).map(c => c.path);
   out.fixes = changes.filter(c => c.status === 'A' && /^tools\/data-fixes\/[^/]+\.sql$/.test(c.path)).map(c => c.path).sort();
   for (const f of extraFixes || []) if (!out.fixes.includes(f)) out.fixes.push(f);
@@ -173,6 +179,17 @@ function closedCheckinsSql(list){
   return `with want(hub, exam_date) as (values ${want}),
 gone as (delete from exam_checkins_closed c where not exists (select 1 from want w where w.hub = c.hub and w.exam_date = c.exam_date))
 insert into exam_checkins_closed (hub, exam_date) select hub, exam_date from want on conflict do nothing`;
+}
+/* A hub's page came down: the day (Central) goes in hubs_down, the first one kept if the step runs again (package 2 of
+   vault/tasks/2026-11-22-sustainable-for-years.md counts its 30 days from it), and its thumbs go. Pure, for test.js. */
+function downSql(hub){
+  if (!HUB_RE.test(hub)) throw new Error('not a hub id');   // so no quote can reach the SQL
+  return `insert into hubs_down (hub, day) values ('${hub}', (now() at time zone 'America/Chicago')::date) on conflict (hub) do nothing;
+delete from question_feedback where hub = '${hub}'`;
+}
+function upSql(hub){
+  if (!HUB_RE.test(hub)) throw new Error('not a hub id');
+  return `delete from hubs_down where hub = '${hub}'`;
 }
 function dashData(sha){
   const src = show(sha, 'hubs.js'); if (!src) throw new Error(`no hubs.js at ${sha.slice(0, 7)}`);
@@ -287,9 +304,13 @@ async function main(){
     return `${list.length} closed (hubs.js's checkinClosed): ${list.map(c => c.hub + ' ' + c.date).join(', ') || 'none'}`;
   });
 
-  for (const hub of P.down) await step('down', `delete ${hub}'s "Good question?" thumbs (its page came down)`, ['SUPABASE_ACCESS_TOKEN'], async () => {
-    await sql(`delete from question_feedback where hub = '${hub}'`);   // hub: HUB_RE, so no quote can reach the SQL
-    return `${hub}: its question_feedback rows deleted`;
+  for (const hub of P.down) await step('down', `record that ${hub}'s page came down and delete its "Good question?" thumbs`, ['SUPABASE_ACCESS_TOKEN'], async () => {
+    await sql(downSql(hub));
+    return `${hub}: its day in hubs_down (kept if already there), its question_feedback rows deleted`;
+  });
+  for (const hub of P.up) await step('down', `${hub}'s page is up: no hubs_down row for it`, ['SUPABASE_ACCESS_TOKEN'], async () => {
+    await sql(upSql(hub));
+    return `${hub}: not in hubs_down`;
   });
 
   let live = !P.site.length;
@@ -322,5 +343,5 @@ async function main(){
   console.log('\n✓ after-merge steps done');
 }
 
-module.exports = { plan, isSite, checkHub, closedCheckins, closedCheckinsSql, coverFrom };
+module.exports = { plan, isSite, checkHub, closedCheckins, closedCheckinsSql, downSql, upSql, coverFrom };
 if (require.main === module) main().catch(e => { console.error(scrub(String(e && e.stack || e))); process.exit(1); });
