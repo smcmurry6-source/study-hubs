@@ -10,6 +10,14 @@ this folder (deleting the line: the note carries it) or just does it, if it's sm
 (`- [x] ... (#123)`); ticked lines are cleared the next time someone goes through the inbox. Anything left to do from a chat
 lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the-vault.md)). See [README](README.md).
 
+- [ ] **Sam's calls on the weekly pennant** (2026-11-22, idea board #6, `migration_v98.sql`): built with the proposals in its
+  PR's "For Sam": (1) the prize, `week` 500 XP and crowns (about half a median study day; 250 or 1,000 are one number in
+  `sh_prizes()` and `PRIZES`); (2) the goal, 50 answers a week (about three in four person-weeks of the people studying reach
+  it); (3) visiting shows no pennant (a count only, "12 pennants", would need a `get_place` change). Record each answer in
+  `vault/decisions.md`; a changed number is a small migration.
+- [ ] **The weekly pennant's first week, read after a Monday sweep** (2026-11-22): once `migration_v98` has run a week, how
+  many pennants were made and how many by the sweep (`select how, count(*) from week_pennants group by 1`, totals only): a
+  large sweep share means the page's claim is missing them (`widget/pet.js` `weekClaim`).
 - [ ] **The boards order people tied on a place by chance** (2026-11-22, #533's CI): `get_rank_board_v2`,
   `get_leaderboard_v2` and the others end `order by rnk` alone, so tied people can trade places between loads (and at a
   board's limit, who shows can change). Cosmetic and older than v96: add a stable second key (the name, then the id) when

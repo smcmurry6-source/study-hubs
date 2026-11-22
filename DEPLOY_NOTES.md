@@ -32,6 +32,20 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-22 (The weekly pennant: idea board #6, `migration_v98.sql`, pending, Claude Code)** — Answer 50 questions from
+  Monday to Sunday (Central), in any hub and any part of it (xp_days.n: practice, drill, mock, arcade, Learn; not
+  flashcards), and Timmy gets that week's pennant, with `week` 500 XP and as many crowns (proposed, Sam's call). Server:
+  `week_pennants` (a row per person per week, made once), `claim_week_v2` (the page asks after the 50th answer's reply; the
+  server counts again), `get_my_week_v2` (this week, the class count from 5, the pennants earned), `sh_week_sweep` (pg_cron
+  `sh-week-pennants`, Mondays 1:17 am Central: the ones the page didn't claim), a `visitor_links` trigger; `sh_prizes`,
+  `sh_is_prize` and the `xp_awards` src check gain `week`. Nothing in the answer path changes. Page: the count is
+  `shPet.week()` in `widget/pet.js` (Timmy's days, so no request), the server read at most every 30 minutes (`sh_week` on
+  the device); Home's Today card (`weekRow`, `widget/hub-rewards.js`), the dashboard's You card (`pennantStat`, asked only
+  after the first scroll or tap), the reward card's pennant badge, and Timmy's place (`widget/place.js`): the newest flies
+  from the lamp post (own place only, never a visit), a Pennants view, a panel row. Art: `tools/figures/site/pennant.mjs`
+  (`window.SH_PENNANT` in `widget/hub-art.js`: the month's felt and badge, the week of the month as stars, the school year's
+  sleeve; 209 Mondays checked by the build; `pennant-sheet.mjs` draws a contact sheet), the lamp's pennant in `place.mjs`.
+  Tested: `tools/release/xp.js` 14f, `rls.js`. About page entry. The migration waits for the merging session.
 - **2026-11-22 (A one-page sheet for every lecture, idea board #5, #536, Claude Code)** — Sam's note on the idea ("do you actually
   want to print this or just have the cram sheet and likely topics/hints all together?") is answered with one thing that does
   both. **`#notes/<lecture>/sheet`** on every hub on the engine: the lecture's cram lines, its High likelihood topics

@@ -510,6 +510,44 @@ server says what's finished and pays the bonus.
   crowns, a year-round collection 12,000-14,500 and the costumes 24,500, so the bonus gives back 4-8% of what it took.
   All 20 that pay make 20,000 XP and crowns at most.
 
+## The weekly pennant (migration_v98)
+
+Idea board #6 (a starter idea): "a weekly class challenge: answer 50 questions by Sunday and your Timmy gets that week's
+pennant". Built 2026-11-22; its amounts are proposed in the PR for Sam.
+
+- **The week** is Monday 00:00 to Sunday 23:59:59 Central (`sh_week_of`: `date_trunc('week', <Central day>)`). **What counts**
+  is every saved answer, in any hub and any part of it (practice, the drill, a mock, the arcade, Learn): `xp_days.n`, which
+  `sh_xp_on_insert` adds to on every `personal_answers` insert, summed over the week's seven rows (`sh_week_n`). A flashcard
+  isn't an answer. Linked devices count as one, because their answers move to the primary id.
+- **The goal** is 50 (`sh_week_goal`). In the class's data for the weeks before (2026-11-22, totals over 5+ people), about
+  three in four person-weeks of the people studying reached 50; exam weeks more, quiet weeks about half.
+- **`week_pennants`** (`visitor_id`, `week` the Monday, `n` the answers when it was made, `at`, `how` `claim` or `sweep`),
+  one row per person per week, closed to visitors. **`claim_week_v2(p_visitor)`** counts again under the visitor's lock: under
+  50 it answers `why: 'short'` with `n`; at 50 it makes the row and pays `week` (`sh_prizes()`: 500, `PRIZES` in
+  `widget/v3.js` the same), once, key `week:<monday>`, as many crowns (`sh_is_prize`), never boosted, and answers
+  `sh_prize_reply` with `week`, `n`, `pennant`, `class` and `have` (pennants in all). **`get_my_week_v2(p_visitor)`** answers
+  `week`, `goal`, `n`, `done`, `class` and `pennants` (Mondays, newest first, at most 260) and `pays`. `class` is how many
+  have that week's pennant, null under 5: the class challenge is each person's own 50 in one shared week, and the class sees
+  only that total.
+- **Monday's sweep** (`sh_week_sweep`, pg_cron `sh-week-pennants`, `17 7 * * 1` UTC: 1:17 am Central in winter): last week's
+  people with 50 and no pennant (the tab closed on the 50th answer, an answer kept on the device and sent later) get it,
+  dated Sunday 23:59:59 Central, `how` `sweep`, and its prize. An alias id is left to its primary. One read of last week's
+  `xp_days` rows, once a week.
+- **Link my devices** moves the alias's pennants to the primary id (`visitor_links_pennants`); a week both had stays once.
+  The prize of each device's pennant stays paid, as every prize two devices earned before they were linked.
+- **Visiting** (`get_place`) is unchanged: a classmate's place shows no pennant, since which weeks someone reached 50 is a
+  record of their studying.
+- **On the page** the count is Timmy's days (`shPet.week()` in `widget/pet.js`: the bootstrap's `pet_days`, which are
+  `xp_days`, with this device's log), so it costs no request. After an answer's reply (`sh:answer-paid`) or once the days
+  are in, a page at 50 with no pennant asks `claim_week_v2` through `shGame.claim` (the reward card, the balance); a
+  `short` reply waits three more answers. `get_my_week_v2` is asked at most every 30 minutes, and only by a page that shows
+  the pennant (Home's Today card, Timmy's place, the dashboard after its first scroll or tap); its answer and a claim's are
+  kept on the device (`sh_week`) and go out as `sh:week`. The art is `window.SH_PENNANT` (`tools/figures/site/pennant.mjs`,
+  in `widget/hub-art.js`, so in both pages' bundles): the month's felt and badge, the week of the month as stars, the school
+  year's sleeve; the newest flies from the lamp post at your own place (the place kit's `pennant` option).
+- `tools/release/xp.js` section 14f checks the week across the clock change, 49 and the 50th (a mock's), one prize, the
+  class count from 5, the sweep, Link my devices and the two page calls; `rls.js` the table and helpers closed.
+
 ## Tests
 
 `node tools/release/xp.js` builds a throwaway database from `supabase/schema.sql` with made-up history, applies the pending
