@@ -46,3 +46,12 @@ Living record of what Sam decided while this hub is being planned and built. New
 - **Codex is connected to the repo** (Sam). Interim mode ends for building and drafting: Codex takes briefs from
   `docs/boards/tasks/T-NN.md` and opens PRs into `claude/boards-hub`; Claude writes the briefs, reviews the PRs and
   keeps the independent checking. Still no OpenRouter key, so the first-pass checker stays a separate Claude subagent.
+
+## 2026-11-22
+
+- **Boards moves onto the hub engine** before it ships (Sam on `main`, `vault/decisions.md`: "Yes to 2 and 3"). The plan,
+  `ENGINE_PLAN.md`: **"Sounds good except for getting rid of chairside. I want to keep it."** So the plan is approved as
+  recommended (engine changes go to `main`, off by default; `tools/build-boards.js` becomes a converter into
+  `hubs/boards/content/`; one answer path with a rolling per-item store for boards; the open PRs as section 6 says), and
+  **Chairside stays**: it is built as boards' arcade game on the engine (briefs T-16 and T-17), and #95 and #101 land
+  through them.

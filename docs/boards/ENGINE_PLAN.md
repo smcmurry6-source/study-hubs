@@ -1,9 +1,10 @@
 # Boards hub: the move onto the engine (plan, 2026-11-22)
 
-**Status: draft, waiting for Sam's approval.** Nothing in this plan is built yet. Written for the first Done when box of
+**Status: approved by Sam, 2026-11-22**, with one change: **Chairside stays** ("Sounds good except for getting rid of
+chairside. I want to keep it"; `DECISIONS.md`). Nothing in this plan is built yet. Written for the first Done when box of
 `vault/tasks/2026-11-22-boards-onto-the-engine.md` (on `main`): Sam said yes to moving boards onto the hub engine
-(2026-11-22, `vault/decisions.md` on `main`). When Sam approves it, the briefs in `docs/boards/tasks/T-07.md` to `T-15.md`
-are built in order, one PR each.
+(2026-11-22, `vault/decisions.md` on `main`). The briefs in `docs/boards/tasks/T-07.md` to `T-17.md` are built in order, one
+PR each.
 
 Sam's calls that still hold and shape this plan:
 
@@ -13,8 +14,8 @@ Sam's calls that still hold and shape this plan:
   time** (2026-11-22, package 3 of `vault/tasks/2026-11-22-sustainable-for-years.md`); **no narration or Timmy Time
   recording in the repo** (`vault/rules/no-narration-in-the-repo.md`).
 
-Once approved, this plan **supersedes `BUILD_SPEC.md` 1.2-1.7 and 2.1-2.3** (modes, globals, the dashboard entry,
-spaced review, migration v33, the page build) where they disagree; the item rules (section 4), the curriculum (3) and the
+This plan **supersedes `BUILD_SPEC.md` 1.2-1.7, 2.1-2.3 and 6.3** (modes, globals, the dashboard entry,
+spaced review, migration v33, the page build, Chairside's adapter) where they disagree; the item rules (section 4), the curriculum (3) and the
 quality pipeline (7, with PLAN_V2) stand. T-15 marks those sections in BUILD_SPEC.
 
 ## 1. What changes, in one paragraph
@@ -47,7 +48,7 @@ them into `content/`.
 | Bank: Practice, Cases, Missed, filters (unit, section, exam tag, standalone/case, new, hard) | The engine's bank and panel: lecture = unit, `#questions/misses`, `weak`, `drill`; **new**: the `cases` set (above) and an **exam filter** ("INBDE and ADEX" / "INBDE only") in the panel when the hub has two exams with `exam` tags. Section comes from the notes' button | exam filter: any multi-exam hub |
 | Cards (#81: full card, Rounds, cover the options) | The engine's question card. "Cover the options" (answer before the choices show) is Learn's recall step today; a per-hub setting isn't needed for R1. #81's walk-through findings become acceptance tests for the case-set brief | none new |
 | Home (`app/60-home.js`) | The engine's Home ([hub-home-page](../../vault/rules/hub-home-page.md) on `main`): masthead, exam card (no date: "~Aug 2028" and "Dates aren't announced yet"), quick links, Where to next, Today, progress by unit, the course timeline left out (no `courseDates`) | — |
-| Clinic / Chairside (`app/80-clinic.js` placeholder; #95 game core, #101 art) | **Parked** (question 2): More's Arcade on the engine with boards' own skin ([arcade-skins](../../vault/rules/arcade-skins.md)) when boards gets games; Chairside, if kept, becomes an engine arcade game reading the bank through the engine, its save in the place's or a game's server row | — |
+| Clinic / Chairside (`app/80-clinic.js` placeholder; #95 game core, #101 art; BUILD_SPEC 6) | **Kept** (Sam, 2026-11-22). Chairside becomes **boards' arcade game on the engine**: More's Arcade lists it (`SH_HUB.arcade.games`, `arcade.first: "chairside"`), `content/arcade.js` is a thin skin that loads `hubs/boards/game/chairside.js` (built from `src/boards/game/` by the converter, under BUILD_SPEC's 110 KB gzip budget) on first start, with the boards look ([arcade-skins](../../vault/rules/arcade-skins.md)). BUILD_SPEC 6.1-6.2's rules stand. What changes: the adapter (6.3) is built on the engine (`HX`: the bank, the card, case sets from T-10, the answer path with `ctx: "game"` and `conf`); Today's shift is the Daily Drill's set from `shPlan` (T-12); the long-term frame (readiness windows, practice days) is worked out from answers and `item_state` (T-13), so **no `game_saves` table**: a shift in progress is kept on the device for the day. Answers pay as answers, and a finished shift pays the engine's game bonus. T-16 and T-17 | boards (the engine's arcade API gains a game that answers bank questions) |
 | `app/00-util.js`, `10-state.js`, `20-card.js`, `30-notes.js`, `40-bank.js`, `90-boot.js`, `99-export.js`, `css/*`, `shell.html` | **Retired**: the engine does each of them. The state key and shape (`boards-state-v1`, perio's shape) are what the engine keeps anyway | — |
 | `SH_SECTION` strings (`notes/medcx/core`, `bank/practice`) | The engine's (`notes/<lec>`, `questions/...`); nothing is live yet, so no history to keep | — |
 | Fact records (`src/boards/facts/`), `tools/boards/check-quotes.mjs`, `lint-items.mjs`, `lint-core.cjs`, `bench.mjs`, the bench | **Stay** where they are; the converter runs `lint-core.cjs` before it writes anything | boards |
@@ -142,7 +143,7 @@ the shared fold first if package 2 hasn't landed.
 | #102 | Exam blocks | **Close**: the engine's mock with block presets replaces it (T-14). Its timing rules become T-14's acceptance |
 | #100 | Perio chart figure | **Close**: `widget/cases.js` already draws periodontal charts for the engine; a boards case with a chart uses it |
 | #97 | Migration v34 draft (`game_saves`, `srs_state`, `upsert_srs`) | **Close**: replaced by T-13 (`item_state`), with its `>=` lesson kept in T-13's brief |
-| #95, #101 | Chairside game core and art | **Park** (left open, not merged) until Sam's call on Chairside (question 2); closed if Chairside is dropped |
+| #95, #101 | Chairside game core and art | **Kept, landed through T-16 and T-17**: T-16 brings in #95's core (`src/boards/game/core/`, its tests), T-17 #101's art and sound, each rebased onto the engine move; then they close as landed |
 
 None of them should merge `main` in on their own; content and tool PRs touch only `src/boards/`, `tools/boards/` or
 `docs/boards/` and merge without a page rebuild once T-07 has landed (the page is no longer generated from them).
@@ -159,22 +160,28 @@ None of them should merge `main` in on their own; content and tool PRs touch onl
 | T-12 | `widget/plan.js` (with #111), per-hub `srs` in `widget/v3.js`, Today's 12 and readiness per unit | see question 1 | #111, T-07 |
 | T-13 | Database: `rolling_hubs`, `item_state`, `xp_daily`, the nightly fold; the bootstrap hands back the review schedule | `main` (database work is shared; see question 1) | package 2 (`migration_v96`) or built with it |
 | T-14 | Engine: mock block presets | see question 1 | T-10 |
+| T-16 | Chairside, slice 1: the shift loop on the engine (lock-in, Care and Flow with their tests, Today's shift, walk-in, recall, callback and booked patients with Rounds) | `claude/boards-hub` | T-07, T-10, T-12, #95 |
+| T-17 | Chairside, slice 2: day sheet, attending's case, protocols, the clinic facade, portraits and sound, practice days, trophies, About | `claude/boards-hub` | T-16, T-13, #101 |
 | T-15 | Boards' art, the wiring (`hubs.js`, `sw.js`, ranks, `review/`, budgets), About page, the hub note says it's on the engine | `claude/boards-hub` | T-07 to T-14; art shown to Sam |
 
-T-08 to T-12 and T-14 are independent of each other after T-07 and can run in parallel sessions. Content work (items,
+T-08 to T-12 and T-14 are independent of each other after T-07 and can run in parallel sessions; T-16 and T-17 follow
+their dependencies, and T-15 goes last. Content work (items,
 notes, facts) goes on alongside on its own briefs; the next content brief takes the next free number after T-15 (the
-`items-pharm` brief Session 7 called T-07 becomes T-16).
+`items-pharm` brief Session 7 called T-07 becomes T-18).
 
 The release itself (unit by unit, BUILD_SPEC 8.2 and PLAN_V2's release 1) is unchanged, except that its "Before shipping"
 list is the engine's ([build-a-hub](../../vault/how-to/build-a-hub.md) on `main`).
 
-## 8. Sam's questions (each with a recommendation)
+## 8. Sam's questions, and the answers (2026-11-22)
+
+Sam: "Sounds good except for getting rid of chairside. I want to keep it." So 1, 3, 4 and 5 as recommended (5 with
+#95 and #101 kept and landed through T-16 and T-17), and Chairside kept (2).
 
 1. **Where do the engine changes land?** Recommended: every change to the shared engine or the database (T-08 to T-14)
    goes to `main` in its own PR, off by default, so it ships now and nothing drifts; boards-only work (T-07, T-15, the
    content) stays on `claude/boards-hub`, which brings `main` in after each. The other way is to build them all on
    `claude/boards-hub`, where they reach other hubs only when boards ships.
-2. **Chairside: keep it, or park it?** Recommended: park it. Boards ships first with the engine's game layer (XP, crowns,
+2. **Chairside: keep it, or park it?** Answered: **keep it** (T-16, T-17). Recommended had been: park it. Boards ships first with the engine's game layer (XP, crowns,
    ranks, Timmy, the shop, Learn, Flashcards, the mock), and its own arcade games come later with their own brief. #95
    and #101 stay open but unmerged.
 3. **`tools/build-boards.js`: converter, or retire it?** Recommended: converter (section 4). The questions, notes and
