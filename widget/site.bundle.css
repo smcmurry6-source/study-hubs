@@ -53,6 +53,7 @@ color-scheme: dark;
 --float-shadow: 0 4px 14px rgba(0, 0, 0, .4);
 }
 }
+:root[data-hx-hub="review-of-systems"], .hx[data-hub="review-of-systems"] { --hub: #6b46a8; --hub-mid: #a58ad6; --hub-light: #e8e0f5; --hub-dark: #b9a2ec; }
 :root { --hub-text: var(--hub); --hub-soft: var(--hub-light); }
 .hx { --hub-text: var(--hub); --hub-soft: var(--hub-light); }
 :root[data-theme="dark"], :root[data-theme="dark"] .hx { --hub-text: var(--hub-dark); --hub-soft: color-mix(in srgb, var(--hub) 34%, #1c1b1c); }

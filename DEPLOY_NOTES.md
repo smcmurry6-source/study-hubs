@@ -32,6 +32,14 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-22 (Review of Systems in its own violet, BUG-198, Claude Code)** — the hub had drawn in the engine's default
+  grey-purple (`--hub: #6b5a68`) since it was built: `widget/hub.css` never had its tint line, and #523 had taken out the
+  archived hubs' lines. One line adds it (ink `#6b46a8`, mid `#a58ad6`, light `#e8e0f5`, dark `#b9a2ec`, as in
+  `tools/figures/site/style.mjs`): buttons, the active tab, the countdown, icons, course headings and the one-page sheet's
+  accent are violet, as its emblem, masthead and dashboard card already were. Contrast: ink 5.35:1 on its light, dark 7.72:1
+  on the dark panel. `widget/site.bundle.css` rebuilt; no `sw.js` bump (styles are network-first). Found while building #536;
+  shown to Sam before and after (Home, Notes, a sheet, light and dark). [build-a-hub](vault/how-to/build-a-hub.md) and the hub note say a new engine hub needs
+  its own line.
 - **2026-11-22 (A one-page sheet for every lecture, idea board #5, #536, Claude Code)** — Sam's note on the idea ("do you actually
   want to print this or just have the cram sheet and likely topics/hints all together?") is answered with one thing that does
   both. **`#notes/<lecture>/sheet`** on every hub on the engine: the lecture's cram lines, its High likelihood topics
