@@ -51,7 +51,7 @@ the course the student is in** ("Let's do your recommendation to have Timmy only
       `4-Anatomy of the Anterolateral and Posterior Abdominal Wall - Herr.pptx`, 94 MB) could not be read: need a PDF
       or smaller copy
 - [x] MSK & GI: MG-3 (GI pathology and drugs) against the slides (Dr. Kmeid's, Dr. Reid's, Dr. Wilborn's and Dr. Taylor's decks)
-- [ ] Fundamentals I: F1-1 to F1-9 against the slides (F1-1 to F1-7 done)
+- [ ] Fundamentals I: F1-1 to F1-9 against the slides (F1-1 to F1-7 and F1-9 done)
 - [ ] Fundamentals I: F1-1's `DOF-Lecture-1-Protein_structure(1).pptx` could not be read (amino acids, pKa values,
       secondary structure still rest on standard references): needs a PDF or smaller copy
 - [ ] Fundamentals I: F1-3's `Eukaryotic Transcription` (.ppt, 31 MB) and `Translation 2024` (.pptx, 67 MB) could not be
@@ -59,6 +59,10 @@ the course the student is in** ("Let's do your recommendation to have Timmy only
 - [ ] Fundamentals I: F1-4's `Introduction to Endocrinology` (.ppt) would not open ("unsupported mime type"): hormone
       basics, G-protein pathways, insulin and the calcium hormones are checked only against the study guides; a PDF or
       .pptx copy would do
+- [ ] Fundamentals I: F1-9's `Latimer_Histology4` (96 MB) could not be read (the salivary ducts, serous and mucous cells
+      still rest on the study guides): needs a PDF or smaller copy
+- [ ] Fundamentals I: F1-6 (innate immunity) from Dr. Bruns's `Cells & Tissues` deck too: its CD markers and lymph's
+      return through the subclavian veins aren't in the part yet (the tissues reviewer read it; M1 and M2 are in)
 - [ ] Fundamentals II: F2-1 to F2-8 against the slides
 - [x] Ask Timmy reads one course first (`supabase/functions/timmy/core.js`, `widget/hub-timmy.js`, the tests)
 - [ ] Ask Timmy's eval on the real model for the `rs-` cases (`node tools/timmy/eval.mjs --only review-of-systems`,
