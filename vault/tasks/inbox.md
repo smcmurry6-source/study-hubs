@@ -10,6 +10,20 @@ this folder (deleting the line: the note carries it) or just does it, if it's sm
 (`- [x] ... (#123)`); ticked lines are cleared the next time someone goes through the inbox. Anything left to do from a chat
 lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the-vault.md)). See [README](README.md).
 
+- [ ] **Scroll the dashboard and the shop on a real phone** (2026-11-22, the no-pausing change): an iPhone in Safari and an
+  Android phone in Chrome, a long scroll of the dashboard top to bottom and of the shop's shelves, then Timmy's place at
+  night. The cloud browser draws without a graphics card, so the compositor's part (the stage's sparkles and confetti, the
+  place card's layer) couldn't be measured there ([motion-cost](../reference/motion-cost.md)). Jitter that is left goes in
+  the bug log with what was on screen.
+- [ ] **Timmy's place at night: about 60 stars twinkle one by one inside the stage's drawing** (2026-11-22): the open
+  place view keeps a slowed phone's main thread about half busy (`main` about nine-tenths, so not new). Draw the night sky's
+  stars as a layer over the scene, the way the leaderboard's stage does its sparkles (`tools/figures/site/place.mjs`,
+  `widget/place.js`), or twinkle them in a few groups, and measure again ([motion-cost](../reference/motion-cost.md)).
+- [ ] **What else moves inside a dashboard drawing** (2026-11-22): the classroom's Timmys bob (`rm-bob`, up to 10), the
+  hub card's megaphone waves (`dx-wn-wave`, `dx-wn-spark`), the idea board's and the recap's Timmys blink. Each is small;
+  lift one out of its drawing like the stage if a real phone shows it.
+- [ ] **The shop takes about 4 s to open on a slowed phone** (2026-11-22, measured at 4x): the dashboard draws itself again
+  on `sh:shop`, a set's art file loads, and the room's size is worked out again. Find which of the three is most of it.
 - [x] **After migration_v97 is applied: check the exam-eve boss's two rows and its job** (2026-11-22, idea board #4): read-only,
   one query at a time under `statement_timeout = '5s'`: `select hub, day, exam_date, hp, settled_at from eve_bosses` (Review
   of Systems' Dec 2 and Dec 9, 3,000 HP) and `select jobname, schedule from cron.job where jobname = 'sh-eve-boss'`

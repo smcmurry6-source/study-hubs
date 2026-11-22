@@ -795,7 +795,7 @@ setTimeout(function(){ if (rm === my) doorOpen(-1); }, leaving ? total + 200 : 7
 el.animate(frames, { duration: total, easing: "linear", fill: "forwards" }).onfinish = function(){ el.remove(); if (done) done(); };
 }, (n || 0) * 450);
 }
-function roomResting(){ var n = $("now"); return !!n && (n.classList.contains("is-rest") || n.classList.contains("is-away")); }
+function roomResting(){ var n = $("now"); return !!n && n.classList.contains("is-away"); }
 function arrive(p, i, quiet, n){
 function sit(){
 var el = seatEl(i); if (!rm || rm.at[p.key] !== i || !el) return;
@@ -1977,17 +1977,32 @@ return '<li class="p' + (i + 1) + (r.is_me ? " me" : "") + '"' + visitAttr(r) + 
 }
 function stageSvg(w, rows, fits){
 var S = CA.stage, h = w < 480 ? 262 : 300, fl = h - 44, cx = w / 2, k = w < 480 ? .74 : 1, pw = Math.min(150, w * .3), gap = Math.min(170, w * .31);
-var s = S.stage({ w: w, h: h }), fla = (A.flame || {})[5] || (A.flame || {})[3] || "";
+var fx = S.fx ? S.fx({ w: w, h: h }) : null, crown = "", fla = (A.flame || {})[5] || (A.flame || {})[3] || "";
+var s = fx ? S.stage({ w: w, h: h, fx: false, part: "front" }) : S.stage({ w: w, h: h });
 if (w > 560) [-1, 1].forEach(function(d){ s += S.G(cx + d * (gap + pw / 2 + 44), fl + 8, 1, S.torch(74) + '<svg x="-20" y="-108" width="40" height="48" viewBox="0 0 40 48" overflow="visible">' + fla + "</svg>"); });
 [{ p: 2, x: cx - gap, h: 74 * k, tw: 68 * k }, { p: 1, x: cx, h: 108 * k, tw: 82 * k }, { p: 3, x: cx + gap, h: 54 * k, tw: 64 * k }].forEach(function(b){
 var th = b.tw * 1.31, top = fl + 10 - b.h;
 s += S.G(b.x, fl + 10, 1, S.pedestal(b.p, pw, b.h));
 if (window.shPet && window.shPet.art && rows[b.p - 1]) s += '<g class="st-win st-win' + b.p + (visitKey(rows[b.p - 1]) ? " can-visit" : "") + '" data-p="' + b.p + '"><svg x="' + (b.x - b.tw / 2).toFixed(1) + '" y="' + (top - th * (256 / 262) + 2).toFixed(1) + '" width="' + b.tw.toFixed(1) + '" height="' + th.toFixed(1) +
 '" viewBox="0 -30 200 262" overflow="visible">' + timmyArt(fits[b.p - 1] || "", "happy") + "</svg></g>";
-if (b.p === 1) s += '<g class="st-crown">' + S.G(b.x, top - th - 6, .78 * k, S.crown()) + "</g>" + S.spark(b.x - 62 * k, top - 52, 7) + S.spark(b.x + 66 * k, top - 76, 9) + S.spark(b.x + 52 * k, top - 12, 5, "#fff");
+if (b.p !== 1) return;
+if (fx) crown = { k: "crown", x: b.x, y: top - th - 6, d: 0, b: Math.ceil(64 * .78 * k) + 4, svg: S.G(0, 0, .78 * k, S.crown()) };
+else s += '<g class="st-crown">' + S.G(b.x, top - th - 6, .78 * k, S.crown()) + "</g>";
+s += S.spark(b.x - 62 * k, top - 52, 7) + S.spark(b.x + 66 * k, top - 76, 9) + S.spark(b.x + 52 * k, top - 12, 5, "#fff");
 });
-s += '<g class="st-confetti">' + S.confetti({ w: w, h: h }) + "</g>";
-return '<svg class="dx-set" viewBox="0 0 ' + w + " " + h + '" width="' + w + '" height="' + h + '" aria-hidden="true" focusable="false">' + s + "</svg>";
+var svg = function(cls, body){ return '<svg class="' + cls + '" viewBox="0 0 ' + w + " " + h + '" width="' + w + '" height="' + h + '" aria-hidden="true" focusable="false">' + body + "</svg>"; };
+if (!fx) return svg("dx-set", s + '<g class="st-confetti">' + S.confetti({ w: w, h: h }) + "</g>");
+var tw = fx.pieces.filter(function(p){ return p.k === "tw"; }), top = [crown].concat(fx.pieces.filter(function(p){ return p.k !== "tw"; }));
+return '<div class="dx-setbox">' + svg("dx-set", S.stage({ w: w, h: h, fx: false, part: "back" })) +
+svg("dx-setlights", fx.lights) + stageFx(tw, w, h) + svg("dx-set dx-setfront", s) + stageFx(top, w, h) + "</div>";
+}
+function stageFx(pieces, w, h){
+var pct = function(v, of){ return (v / of * 100).toFixed(2) + "%"; };
+return '<div class="dx-setfx" aria-hidden="true">' + pieces.filter(Boolean).map(function(p){
+var b = p.b;
+return '<i class="st-' + p.k + '" style="left:' + pct(p.x - b / 2, w) + ";top:" + pct(p.y - b / 2, h) + ";width:" + pct(b, w) + ";height:" + pct(b, h) + ";animation-delay:" + p.d + 's">' +
+'<svg viewBox="' + (-b / 2) + " " + (-b / 2) + " " + b + " " + b + '" width="100%" height="100%" focusable="false">' + p.svg + "</svg></i>";
+}).join("") + "</div>";
 }
 function boardMsg(msg){ boardData = null; $("visitRand").hidden = true; $("board").innerHTML = '<p class="note">' + esc(msg || "Couldn't reach the class data just now. Reload to try again.") + "</p>"; }
 var boardData = null;
@@ -2534,56 +2549,44 @@ done();
 loadScriptOnce(WIDGET + "rest.bundle.js").then(one, one);
 loadScriptOnce(WIDGET + "hub-art/class.js").then(one, one);
 }
-var LIFE = 8000, life = { io: null, parts: [], scrolling: false, st: 0, tt: 0, stage: null };
-function lifeCovered(){ return !!q('dialog[open], [aria-modal="true"]'); }
-function lifeMark(p, rest){
-p.el.classList.toggle("is-rest", rest);
-if (p.el.id === "you") [].forEach.call(p.el.querySelectorAll(".tpc-live"), function(x){ x.classList.toggle("is-rest", rest); });
+var life = { io: null, on: new Map(), covered: false, stage: null };
+function lifeApply(el){
+var away = life.covered || life.on.get(el) === false;
+if (el.classList.contains("is-away") !== away) el.classList.toggle("is-away", away);
+if (el.id === "you") [].forEach.call(el.querySelectorAll(".tpc-live"), function(x){ if (x.classList.contains("is-away") !== away) x.classList.toggle("is-away", away); });
 }
-function lifeRest(p){ clearTimeout(p.t); p.t = 0; lifeMark(p, true); }
-function lifeWake(p){
-if (!p.on || life.scrolling || lifeCovered()) return;
-clearTimeout(p.t); lifeMark(p, false);
-p.t = setTimeout(function(){ lifeRest(p); }, LIFE);
+function lifeCovered(){
+var vw = window.innerWidth, vh = window.innerHeight;
+return [].some.call(document.querySelectorAll('dialog[open], [aria-modal="true"]'), function(d){
+var r = d.getBoundingClientRect(); return r.left <= 1 && r.top <= 1 && r.right >= vw - 1 && r.bottom >= vh - 1;
+});
 }
-function lifeHold(){ life.parts.forEach(function(p){ if (p.t) lifeRest(p); }); }
-function lifePart(el){
-var p = { el: el, on: false, t: 0 };
-el.classList.add("is-rest"); life.parts.push(p); life.io.observe(el);
-el.addEventListener("mouseenter", function(){ lifeWake(p); });
-return p;
+function lifeCover(){
+var c = lifeCovered(); if (c === life.covered) return;
+life.covered = c; life.on.forEach(function(v, el){ if (el.isConnected) lifeApply(el); });
 }
 function lifeWatch(){
 if (!window.IntersectionObserver) return;
 life.io = new IntersectionObserver(function(es){
-es.forEach(function(e){
-e.target.classList.toggle("is-away", !e.isIntersecting);
-var p = life.parts.filter(function(x){ return x.el === e.target; })[0]; if (!p) return;
-p.on = e.isIntersecting; if (p.on) lifeWake(p); else lifeRest(p);
-});
-});
-["you", "now", "road", "ideas", "past"].forEach(function(id){ var el = $(id); if (el) lifePart(el); });
-["hubs", "board"].forEach(function(id){ var el = $(id); if (el) life.io.observe(el); });
+es.forEach(function(e){ life.on.set(e.target, e.isIntersecting); lifeApply(e.target); });
+}, { rootMargin: "120px 0px" });
+["hubs", "you", "now", "board", "ideas", "past"].forEach(function(id){ var el = $(id); if (el) life.io.observe(el); });
 lifeStage();
-window.addEventListener("scroll", function(){
-if (!life.scrolling) { life.scrolling = true; lifeHold(); }
-clearTimeout(life.st);
-life.st = setTimeout(function(){ life.scrolling = false; life.parts.forEach(lifeWake); }, 220);
-}, { passive: true });
-document.addEventListener("touchstart", lifeHold, { passive: true });
-document.addEventListener("touchend", function(){
-clearTimeout(life.tt); life.tt = setTimeout(function(){ if (!life.scrolling) life.parts.forEach(lifeWake); }, 500);
-}, { passive: true });
-document.addEventListener("click", function(){ setTimeout(function(){ if (lifeCovered()) lifeHold(); }, 80); }, true);
-if (window.MutationObserver) new MutationObserver(function(){ if (lifeCovered()) lifeHold(); }).observe(document.body, { childList: true });
-document.addEventListener("close", function(){ setTimeout(function(){ life.parts.forEach(lifeWake); }, 320); }, true);
+document.addEventListener("click", function(){ setTimeout(lifeCover, 80); }, true);
+if (window.MutationObserver) {
+new MutationObserver(function(){ lifeCover(); }).observe(document.body, { childList: true });
+new MutationObserver(function(){ lifeCover(); setTimeout(lifeCover, 320); }).observe(document.body, { subtree: true, attributes: true, attributeFilter: ["open", "aria-modal"] });
+}
+document.addEventListener("close", function(){ setTimeout(lifeCover, 320); }, true);
+window.addEventListener("resize", function(){ if (life.covered) lifeCover(); }, { passive: true });
 }
 function lifeStage(){
 if (!life.io) return;
-var el = q(".dx-set", $("board"));
-if (life.stage && life.stage.el === el) return;
-if (life.stage) { life.io.unobserve(life.stage.el); clearTimeout(life.stage.t); life.parts = life.parts.filter(function(x){ return x !== life.stage; }); }
-life.stage = el ? lifePart(el) : null;
+var el = q(".dx-setbox", $("board")) || q(".dx-set", $("board"));
+if (life.stage === el) return;
+if (life.stage) { life.io.unobserve(life.stage); life.on.delete(life.stage); }
+life.stage = el || null;
+if (el) { if (life.covered) el.classList.add("is-away"); life.io.observe(el); }
 }
 function afterDraw(){
 lifeWatch();

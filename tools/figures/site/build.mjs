@@ -208,9 +208,14 @@ if (placeKit) {
     combos.push({ home: h.k, scene: sc.k, night, tier: 1, yard: fill(i), pennant: PENNANT.flag(PENNANT.mondays("2026-11-23", "2027-12-31")[i * 5 % 50], { edge: i % 2 === 0 }) })));
   ["", "halloween", "thanksgiving", "winter", "newyear", "valentine", "dentist", "stpatrick", "easter"].forEach((hol) => ["", "fall", "spring"].forEach((season) =>
     K.HOMES.filter(builtIn).forEach((h) => combos.push({ home: h.k, scene: "hill", holiday: hol, season, tier: 3, yard: fill(1) }))));
+  /* a group that moves must draw something: an empty one costs as much as a big one, and the place card's balloon carried
+     one that redrew the whole page around it on every frame (2026-11-22, vault/reference/motion-cost.md) */
+  const moves = new Set([...(K.CSS || "").matchAll(/\.(tp-[a-z0-9-]+)[^{,]*\{[^}]*animation\s*:/g)].map((m) => m[1]));
+  const stillEmpty = (w, svg) => { for (const m of svg.matchAll(/<g class="([^"]+)"[^>]*>\s*<\/g>/g)) if (m[1].split(/\s+/).some((x) => moves.has(x))) { bad.push(w + ": an empty group that moves (" + m[1] + ")"); return; } };
   for (const c of combos) {
     const r = K.render(c), body = r.svg.replace(/^<svg[^>]*>/, "").replace(/<\/svg>$/, "");
     if (/NaN|undefined|Infinity/.test(r.svg)) bad.push("place " + JSON.stringify(c) + ": NaN or undefined in the drawing");
+    stillEmpty("place " + [c.home, c.scene, c.night ? "night" : "day"].join(" "), body);
     add("place " + [c.home, c.scene, c.night ? "night" : "day", c.holiday || "", c.season || "", c.journey ? "journey " + c.journey : ""].join(" "), body);
     placeCount++;
   }
@@ -370,7 +375,7 @@ outs.push([path.join(root, "widget/hub-art/dash.js"), engineHead + "window.SH_DA
     for (const n of [0, 1, 9, 27, 60]) { const st = room.seats(Object.assign({ n }, o)); if (!st.length || st.some((q) => !(q.x > 0 && q.x < o.w && q.y > 0 && q.y <= o.h && q.s > 0))) throw new Error("classroom.mjs: a desk is off the floor at " + o.w + " x " + o.h + " with " + n); }
   }
   if (bad(room.desk("perio", 2)) || bad(room.desk(null, null)) || bad(room.chair())) throw new Error("classroom.mjs: a desk doesn't draw");
-  for (const o of [{ w: 720, h: 300 }, { w: 330, h: 262 }]) if (bad(stage.stage(o)) || bad(stage.confetti(o))) throw new Error("stage.mjs: the stage doesn't draw at " + o.w);
+  for (const o of [{ w: 720, h: 300 }, { w: 330, h: 262 }]) if (bad(stage.stage(o)) || bad(stage.confetti(o)) || bad(stage.stage(Object.assign({ fx: false }, o))) || bad(stage.stage(Object.assign({ fx: false, part: "back" }, o))) || bad(stage.stage(Object.assign({ fx: false, part: "front" }, o))) || bad(stage.fx(o).lights) || stage.fx(o).pieces.some(function(p){ return bad(p.svg); })) throw new Error("stage.mjs: the stage doesn't draw at " + o.w);
   for (const p of [1, 2, 3]) if (bad(stage.pedestal(p, 150, [108, 74, 54][p - 1])) ) throw new Error("stage.mjs: block " + p + " doesn't draw");
   if (bad(stage.crown()) || bad(stage.torch(74))) throw new Error("stage.mjs: the crown or the torch doesn't draw");
   if (bad(recap.bars({ w: 400, h: 150, days: [3, 5, 0, 9, 28], tint: TINTS.perio }).svg) || bad(recap.crowd({ n: 58, w: 236, tint: TINTS.perio }).svg)) throw new Error("recap.mjs: the columns or the crowd don't draw");
