@@ -1,13 +1,13 @@
 ---
 type: task
-status: open
+status: in-progress
 hub: boards
 created: 2026-11-22
 requested-by: Sam
 due:
 waiting-on:
-agent:
-pr:
+agent: Claude Code
+pr: https://github.com/smcmurry6-source/study-hubs/pull/532 (the plan, merged into claude/boards-hub)
 ---
 
 # Move the boards hub onto the engine
@@ -41,13 +41,13 @@ engine reach it without a second copy.
 
 ## Done when
 
-- [ ] **A plan, before any code**, in `docs/boards/ENGINE_PLAN.md` on `claude/boards-hub`, in one PR into that branch:
+- [x] **A plan, before any code**, in `docs/boards/ENGINE_PLAN.md` on `claude/boards-hub`, in one PR into that branch:
       how each part of `src/boards/` maps onto the engine (units across two exams, Core and Deep notes, the fact citations,
       the readiness plan, the mock, the clinic, cards), what the engine lacks and would gain for every hub vs. for boards
       only, what `tools/build-boards.js` becomes (a converter into `content/`, or retired), what happens to the 16 open PRs,
       how package 3's storage bound fits the answer path, and the order of the build as task briefs
       (`docs/boards/tasks/T-NN.md`), each one PR. Sam's questions in one message.
-- [ ] Sam approves the plan.
+- [x] Sam approves the plan (2026-11-22, keeping Chairside).
 - [ ] The build, brief by brief, into `claude/boards-hub`.
 - [ ] `tools/ci/smoke.js` and the bank lint walk boards as an engine hub (its separate walk comes out), and the hub note
       says it's on the engine.
@@ -56,6 +56,12 @@ engine reach it without a second copy.
 ## Log
 
 - 2026-11-22: written by the session handling the merging, from Sam's answer.
+- 2026-11-22: the plan, `docs/boards/ENGINE_PLAN.md`, with briefs T-07 to T-17, merged into `claude/boards-hub` (#532).
+  Sam: "Sounds good except for getting rid of chairside. I want to keep it." So: engine changes go to `main` in their own
+  PRs, off by default; `tools/build-boards.js` becomes a converter into `hubs/boards/content/`; one answer path with a
+  rolling per-item store for boards (T-13, with package 3); Chairside is built on the engine (T-16, T-17), with #95 and
+  #101 landing through them; #81, #97, #100 and #102 closed as replaced by the engine; the other ten open PRs finished and
+  merged as they are. Next: T-07.
 
 ## Outcome
 
