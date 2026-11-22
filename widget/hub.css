@@ -1060,6 +1060,8 @@ button.likely[aria-expanded="true"] .chev .ic { transform: rotate(90deg); }
 .likely-lec ol .note { display: block; }
 .likely-lec .btn { align-self: flex-start; }
 .cram-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(340px, 100%), 1fr)); gap: var(--gap); }
+.cram-lede { max-width: 72ch; }
+.cram .cram-sheet { margin: 10px 0 -8px -10px; }   /* a lecture's one-page sheet (widget/sheet.js) */
 .cram ul { margin-top: 10px; padding-left: 20px !important; list-style: disc !important; display: grid; gap: 6px; font-size: var(--fs-label); line-height: 1.5; }
 .cram li::marker { color: var(--hub-text); }
 /* these lists are grids: one column the list's width, so a long word breaks in it (BUG-168) */

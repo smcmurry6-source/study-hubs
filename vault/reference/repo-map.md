@@ -82,6 +82,9 @@ tags: [map]
   no other hub downloads it (its search entries stay in `hub.js`; the first was Heme & Endo Exam 3's, whose page came down 2026-11-20: [the hub note](../hubs/heme-endo-exam3.md)).
   Its narration is `hubs/<hub>/audio/guide.mp3`, spoken from the page's readable part as `tools/hub-next/guide.mjs` writes it
   (`python3 tools/narrate.py <hub> --level guide`), offered while `notes.json`'s `guideAudio` says it matches.
+  A lecture's one-page sheet (`#notes/<lecture>/sheet`: its cram lines, High likelihood topics and Exam hints together, to
+  print on one Letter page; 2026-11-22) is `widget/sheet.js` + `widget/sheet.css` (`window.SH_SHEET`), fetched by `hub.js`
+  the first time one opens; its printed copy is `body > .shp`, sized by `fit()`, and `tools/ci/smoke.js` prints one to a PDF.
   The bowling egg ([the task](../tasks/done/2026-11-06-redesign-bowling-egg.md)) is `widget/bowling.js` (`window.shBowl`, its
   styles inside), with its eight clips in `widget/hub-art/bowling.js` (`window.SH_BOWL`, built from
   `tools/figures/site/bowling.mjs`): `hub-rewards.js` counts the run and fetches it at a strike, and the place's bowling

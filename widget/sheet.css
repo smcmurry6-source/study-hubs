@@ -1,0 +1,63 @@
+/* ============ a lecture's one-page sheet (widget/sheet.js): fetched with it, the first time a sheet opens ============
+   .sheet-page is the page on screen, in the engine's design system (hub.css's panels, the cram sheet's list and the hints'
+   quotes); .shp is the printed copy, a child of <body>, out of sight on screen and the only thing on the paper. */
+.sheet-page .back { margin: -6px 0 8px -10px; }
+.sheet .sht-kick { display: inline-flex; align-items: center; gap: 6px; margin-bottom: 6px; font-size: var(--fs-label); font-weight: var(--w-strong); color: var(--hub-text); }
+.sheet .rd-title + .sub { margin-top: 4px; color: var(--muted); }
+.sheet > .note { margin-top: 6px; }
+.sheet .sht-bar { margin-bottom: 0; }
+.sheet .sht-fit:empty { display: none; }
+.sheet .sht-from { margin-top: 12px; max-width: 72ch; }
+/* the parts: one column on a phone, two from a laptop's width, each kept whole */
+.sheet .sht-cols { margin-top: 20px; columns: 2 400px; column-gap: var(--gap); }
+.sheet .sht-cols > .panel { break-inside: avoid; margin-bottom: var(--gap); }
+.sheet .sht-cols > .panel:last-child { margin-bottom: 0; }
+.sheet.lc .sht-cols > .panel { box-shadow: inset 0 4px 0 var(--lc); }
+.sheet.lc .cram li::marker { color: var(--lc); }
+.sheet .sht-topics ol { margin-top: 10px; padding-left: 22px !important; list-style: decimal !important; display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; overflow-wrap: anywhere; }
+.sheet .sht-topics li::marker { color: var(--lc, var(--hub-text)); font-weight: var(--w-head); }
+.sheet .sht-topics li .note { display: block; }
+.sheet .sht-hints .hint:first-of-type, .sheet .sht-skip .hint:first-of-type { margin-top: 12px; }
+.sheet .notice { margin-top: 20px; }
+.sheet .sht-nav { margin-top: 28px; }
+
+/* ---------- the printed copy: Letter paper, half-inch margins, its type size set by fit() ---------- */
+.shp { position: fixed; left: 0; top: 0; z-index: -1; width: 7.5in; visibility: hidden; pointer-events: none;
+  font-family: var(--font); font-size: var(--shp-fs, 10pt); line-height: 1.32; color: #1f1a1e; background: #fff;
+  -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.shp-ruler { position: absolute; left: 0; top: 0; width: 1px; height: 10in; }
+.shp h1, .shp h2, .shp p, .shp ol, .shp ul, .shp li { margin: 0; padding: 0; }
+.shp-head { display: flex; justify-content: space-between; align-items: flex-start; gap: .25in; padding-bottom: .5em; border-bottom: 2px solid var(--hub); }
+.shp-t { display: flex; align-items: flex-start; gap: .6em; min-width: 0; }
+.shp-lb { flex: none; padding: .2em .5em; border-radius: .35em; background: var(--hub); color: #fff; font-weight: 800; font-size: 1.05em; line-height: 1.3; }
+.shp h1 { font-size: 1.65em; line-height: 1.12; font-weight: 800; letter-spacing: -0.01em; }
+.shp-sub { margin-top: .15em; font-size: 1em; color: #5a5258; }
+.shp-meta { flex: none; max-width: 2.6in; text-align: right; font-size: .82em; line-height: 1.35; color: #5a5258; }
+.shp-meta b { color: #1f1a1e; }
+.shp h2 { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0 .6em; margin-bottom: .35em; font-size: .82em; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--hub); break-after: avoid; }
+.shp h2 small { font-size: .95em; font-weight: 600; letter-spacing: 0; text-transform: none; color: #5a5258; }
+.shp-topics { margin-top: .7em; padding: .55em .75em .6em; border-radius: .4em; background: color-mix(in srgb, var(--hub) 9%, #fff); }
+.shp-topics ol { list-style: none; counter-reset: shp; display: grid; gap: .22em; }
+.shp-topics li { counter-increment: shp; position: relative; padding-left: 1.6em; }
+.shp-topics li::before { content: counter(shp); position: absolute; left: 0; top: .05em; width: 1.2em; height: 1.2em; border-radius: 50%; background: var(--hub); color: #fff;
+  font-size: .85em; font-weight: 800; line-height: 1.2em; text-align: center; }
+.shp-topics i { font-style: normal; font-size: .85em; color: #6a6168; white-space: nowrap; }
+.shp-topics i::before { content: "· "; }
+.shp-cols { margin-top: .75em; column-count: 2; column-gap: .3in; column-rule: 1px solid #e4dde2; }
+.shp-cols section + section { margin-top: .7em; }
+.shp-cols ul { list-style: none; }
+.shp-cols li { position: relative; padding-left: .95em; margin-bottom: .28em; break-inside: avoid; }
+.shp-cols li::before { content: ""; position: absolute; left: .1em; top: .52em; width: .38em; height: .38em; border-radius: 50%; background: var(--hub); }
+.shp-skip li::before { background: #b5adb3; }
+.shp-q { font-style: italic; color: #3d353b; }
+.shp-foot { display: flex; justify-content: space-between; gap: .3in; margin-top: .9em; padding-top: .4em; border-top: 1px solid #e4dde2; font-size: .72em; color: #6a6168; overflow-wrap: anywhere; }
+.shp-foot span:last-child { flex: none; }
+
+@page { margin: .5in; }
+@media print {
+  html.sh-sheet-on { zoom: 1 !important; color-scheme: light !important; }
+  html.sh-sheet-on, html.sh-sheet-on body { background: #fff !important; color: #1f1a1e !important; }
+  html.sh-sheet-on body > :not(.shp) { display: none !important; }
+  html.sh-sheet-on body > .shp { position: static; z-index: auto; width: auto; visibility: visible; }
+  .shp-ruler { display: none; }
+}
