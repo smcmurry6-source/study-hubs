@@ -37,7 +37,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   is good, he can also have a card below the today card on the question bank". The night before every exam in `hubs.js`, 3 pm to midnight Central, one
   boss per hub with 3,000 HP: every right answer anyone gives in the hub is a hit; if it falls before midnight, everyone who
   landed a hit gets 250 + 25 a hit, up to 1,000, XP and crowns (one `xp_awards` row, key `eve:<hub>:<day>`, src `boss`).
-  **`migration_v97.sql`** (pending, `supabase/pending-migrations.txt`; **replaces no function**): the table `eve_bosses`
+  **`migration_v97.sql`** (applied by the merging session on 2026-11-22 at about 11:46 am Central; **replaces no function**): the table `eve_bosses`
   (closed to anon), `get_eve_boss`, the count (`sh_eve_count`: the answers `record_answer_v2` already writes, from an id
   found by a binary search on the primary key, at most once every 20 s, under a try-lock: no hot row and nothing new in the
   answer save) and pg_cron's `sh-eve-boss` every 10 minutes, which settles it after midnight. Seeded with Review of

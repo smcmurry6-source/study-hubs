@@ -10,11 +10,12 @@ this folder (deleting the line: the note carries it) or just does it, if it's sm
 (`- [x] ... (#123)`); ticked lines are cleared the next time someone goes through the inbox. Anything left to do from a chat
 lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the-vault.md)). See [README](README.md).
 
-- [ ] **After migration_v97 is applied: check the exam-eve boss's two rows and its job** (2026-11-22, idea board #4): read-only,
+- [x] **After migration_v97 is applied: check the exam-eve boss's two rows and its job** (2026-11-22, idea board #4): read-only,
   one query at a time under `statement_timeout = '5s'`: `select hub, day, exam_date, hp, settled_at from eve_bosses` (Review
   of Systems' Dec 2 and Dec 9, 3,000 HP) and `select jobname, schedule from cron.job where jobname = 'sh-eve-boss'`
   (`*/10 * * * *`). Then append the migration to `supabase/schema.sql` and take its line out of
-  `supabase/pending-migrations.txt` ([game-server](../reference/game-server.md)).
+  `supabase/pending-migrations.txt` ([game-server](../reference/game-server.md)). Done 2026-11-22 (#539): both rows,
+  3,000 HP, open; the job active every 10 minutes; all seven functions PL/pgSQL.
 - [ ] **Read how the first Midnight Plaque went, the morning of Dec 3** (2026-11-22, idea board #4): `select * from
   eve_bosses where day = '2026-12-02'` (fell or not, when, how many people, what it paid), and the pg_cron runs of
   `sh-eve-boss` that night (any over a second, any failed). If it fell before 6 pm (from 3 pm, the past eves' middle one would have fallen about 8 pm) or got away with over a quarter left,
