@@ -74,7 +74,9 @@ check-in hours: its entry in `hubs.js`.
 - **Size:** the biggest bank on the site, about 1.2 MB over the wire on a first visit (200 KB before the page has drawn: the
   content JSON loads behind it), against Heme & Endo Exam 3's 780 KB, and about 850 ms of blocking time on the performance
   suite's slowed phone (Heme & Endo Exam 3: 300-370 ms), nearly all of it the background work after Home has drawn (parsing the
-  JSON, the search index of every part's notes). Its budget in `tools/release/budgets.json` is set from that (2026-11-20);
+  JSON, the search index of every part's notes). Its budget in `tools/release/budgets.json` is set from that (2026-11-20),
+  and raised from 1,500 to 1,800 KB on 2026-11-22, when the professors' slides took it to about 1.5 MB and up (Sam: "I dont
+  want to sacrifice the quality of the material"; the page still draws by about 2.5 s, the rest loading behind it);
   chunking the search index is on the [inbox](../tasks/inbox.md). Ask Timmy's content
   for it was about 170-200k tokens by length, which is why Timmy moved to Haiku 5.5 ([decisions](../decisions.md),
   [ask-timmy](../reference/ask-timmy.md)). Checked against the professors' slides and recordings (2026-11-22) it passed
