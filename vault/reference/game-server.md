@@ -545,6 +545,9 @@ every right answer anyone gives in that hub is a hit. It falls at its HP; everyo
   it fell, once per device) or gets away. The dashboard's line under the live count is from the dates alone (`dash.js`
   `eveHTML`, no call). The art is `widget/hub-art/eveboss.js` (`window.SH_EVE_ART`, from `tools/figures/site/eveboss.mjs`;
   its contact sheet: `eveboss-sheet.mjs`), fetched on first use.
+- **Every function is PL/pgSQL**, the two small ones every poll calls included (`sh_eve_prize`, `sh_eve_window`): a SQL
+  function with its own `search_path` can't be inlined and is planned again on every call ([shared-infrastructure](shared-infrastructure.md),
+  migration_v76). `tools/release/xp.js` 14f checks it.
 - **Sized from the data** (2026-11-22, the 11 eves of exams since September): right answers in a hub from 3 pm to midnight
   on its eve, median 5,921 (2,971 to 12,974). At 3,000, 10 of the 11 would have fallen, the middle one at about 8 pm (the
   earliest 4:34 pm, on the Perio final's eve; the latest 11:45 pm). By the fall, most of the people who had hit it had 30 or

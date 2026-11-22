@@ -53,8 +53,10 @@ revoke all on table public.eve_bosses from public, anon, authenticated;
 -- when it's up (from `hour` to midnight, Central), its HP unless hubs.js gives an exam its own (eveBoss), and what it pays:
 -- base + per a hit, up to max
 create or replace function public.sh_eve_prize()
-returns jsonb language sql immutable set search_path = public as $$
-  select jsonb_build_object('hour', 15, 'hp', 3000, 'base', 250, 'per', 25, 'max', 1000);
+returns jsonb language plpgsql immutable set search_path = public as $$
+begin
+  return jsonb_build_object('hour', 15, 'hp', 3000, 'base', 250, 'per', 25, 'max', 1000);
+end;
 $$;
 revoke all on function public.sh_eve_prize() from public;
 grant execute on function public.sh_eve_prize() to anon, authenticated;
@@ -85,11 +87,15 @@ end;
 $$;
 revoke all on function public.sh_answer_id_at(timestamptz) from public, anon, authenticated;
 
--- the window of an eve: 3 pm to midnight, Central
+-- the window of an eve: 3 pm to midnight, Central. This and sh_eve_prize() are PL/pgSQL, not SQL, because every poll calls
+-- them (get_eve_boss, the count, the tick): a SQL function with its own search_path can't be inlined and is planned again
+-- on every call, while a PL/pgSQL one keeps its plan for the connection (shared-infrastructure, migration_v76)
 create or replace function public.sh_eve_window(p_day date)
-returns tstzrange language sql stable set search_path = public as $$
-  select tstzrange((p_day::timestamp + make_interval(hours => (sh_eve_prize()->>'hour')::int)) at time zone 'America/Chicago',
+returns tstzrange language plpgsql stable set search_path = public as $$
+begin
+  return tstzrange((p_day::timestamp + make_interval(hours => (sh_eve_prize()->>'hour')::int)) at time zone 'America/Chicago',
                    ((p_day + 1)::timestamp) at time zone 'America/Chicago', '[)');
+end;
 $$;
 revoke all on function public.sh_eve_window(date) from public, anon, authenticated;
 

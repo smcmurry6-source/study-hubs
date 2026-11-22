@@ -1767,6 +1767,12 @@ try {
     eq([eve('Bad Hub', at('20:00')).error, eve('xe', at('20:00'), 'x'.repeat(81)).error], ['bad', 'bad'], 'a bad hub or visitor is refused');
     raises(() => anon(`select count(*) from eve_bosses`), '42501', 'anon can\'t read eve_bosses');
     raises(() => anon(`select sh_eve_count(now(), 'xe', '${ED}'::date, true)`), '42501', 'anon can\'t run the count');
+    // every poll calls these, so none is a SQL function (it couldn't be inlined and would be planned again on every call)
+    eq(rows(`select p.proname, l.lanname from pg_proc p join pg_language l on l.oid = p.prolang join pg_namespace n on n.oid = p.pronamespace
+             where n.nspname = 'public' and (p.proname like 'sh\\_eve\\_%' or p.proname in ('get_eve_boss', 'sh_answer_id_at')) and l.lanname <> 'plpgsql'`), [],
+      'every function of the exam-eve boss is PL/pgSQL');
+    eq(num(`select count(*) from pg_proc where pronamespace = 'public'::regnamespace and (proname like 'sh\\_eve\\_%' or proname in ('get_eve_boss', 'sh_answer_id_at'))`), 7,
+      'the seven functions of the exam-eve boss are there');
     notes.push('the exam-eve boss (migration_v97): soon, up, down and lost; hits counted from the answers (linked devices together), kept 20 s; the fall at its HP-th right answer pays everyone who hit once; midnight settles it; the job settles it with no page asking');
   }
 
