@@ -33,8 +33,9 @@ nothing else. A new kind of delete needs Sam's OK first.
 
 **The shorter windows Sam approved on 2026-11-22** ([the task](../tasks/2026-11-22-sustainable-for-years.md), package 1;
 [decisions](../decisions.md)) are `migration_v95.sql`: `question_events` roll up when the hub's page comes down (not after the
-year), `ui_click_reach` 30 days with a daily roll-up, `feature_events` at 60 days. The rows below say so; until v95 is
-applied (`supabase/pending-migrations.txt` lists it while it waits) the job still runs v93's 90 and 180 days.
+year), `ui_click_reach` 30 days with a daily roll-up, `feature_events` at 60 days. The rows below say so. Applied on 2026-11-22
+(01:03 UTC): the first run rolled up 129,939 question-health rows of the hubs already down and 19,358 click rows, and the
+database went from 360 MB to 319 MB after compacting ([the task's Log](../tasks/2026-11-22-sustainable-for-years.md)).
 **Approved, not built yet** (package 2, `migration_v96`): 30 days after a hub's page comes down, its answers and their XP
 rows packed into one summary row per person per hub.
 
