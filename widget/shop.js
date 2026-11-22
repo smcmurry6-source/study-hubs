@@ -18,7 +18,13 @@
    it is the server's (the bootstrap, get_my_shop, buy_item's reply).
 
    Every button carries a fixed data-shop name first, so click counts (widget/clicks.js) never pick up an item's name;
-   names from the catalog are always drawn as text. Feature events: shop:open, shop:buy:<kind> (never the item).
+   names from the catalog are always drawn as text. Feature events: shop:open, shop:buy:<kind> (never the item),
+   shop:box:<rarity> (a mystery box opened: the rarity it gave, never the piece).
+
+   The mystery box (migration_v99, the idea board's "Drip for Timmy"): a piece of the everyday shop you don't own yet,
+   at random, for crowns; three a Central day. get_mystery_box says its price, the day's limit and the odds for you
+   (asked when the shop opens and after each box); open_mystery_box rolls on the server, idempotent on the request id the
+   way buy_item is. Before the migration (the functions missing) the box isn't drawn.
    ============ */
 (function(){
   "use strict";
@@ -82,6 +88,16 @@
     return S.sb.rpc("get_my_shop", { p_visitor: S.visitor }).then(function(r){ if (r && !r.error) take(r.data); return !!S.shop; }, function(){ return !!S.shop; });
   }
   function canBuy(){ return !!(S.sb && S.visitor && S.shop && S.shop.wallet); }
+  /* the mystery box's rules and odds for you (get_mystery_box); a database without the function hides the box for good */
+  function missing(r){ var e = r && r.error; return !!e && (e.code === "PGRST202" || e.code === "42883" || r.status === 404 || /could not find the function|does not exist/i.test(e.message || "")); }
+  function boxRead(){
+    if (!S.sb || !S.visitor || S.boxGone) return Promise.resolve(S.box);
+    return S.sb.rpc("get_mystery_box", { p_visitor: S.visitor }).then(function(r){
+      if (missing(r)) { S.boxGone = true; S.box = null; }
+      else if (r && !r.error && r.data && typeof r.data.price === "number" && Array.isArray(r.data.odds)) S.box = r.data;
+      return S.box;
+    }, function(){ return S.box; });
+  }
 
   /* ---------- Central time: the shop changes at midnight there, the weekly shelf on Monday ---------- */
   function central(){
@@ -295,6 +311,7 @@
         '<div class="tsh-showbuy"><span class="tsh-big">' + coin() + '<b class="num">' + num(star.price) + '</b></span><button type="button" class="tsh-buy" data-shop="showcase" data-item="' + esc(star.id) + '" data-shelf="' + esc(star.shelf) + '">Take a closer look</button></div>' +
         '<p class="tsh-showwhen">' + IC.clock + esc(whenOf(star.shelf)) + "</p></div></section>";
     }
+    if (S.box) html += boxSection(lvl);
     var cards = function(list, k){ return list.map(function(it){ return card(it, k); }).join(""); };
     var today = on("daily"), week = on("weekly"), back = on("throwback");
     if (today.length) html += shelf("today", lvl, "Today’s picks", "New in " + untilMidnight(), IC.clock, "Four pieces, the same for everyone, new at midnight (Central time).", cards(today, "daily"), today.length, "day");
@@ -328,6 +345,7 @@
   }
   function wire(root){
     $$('[data-shop="item"], [data-shop="showcase"]', root).forEach(function(b){ b.addEventListener("click", function(){ var it = find(b.getAttribute("data-item")); if (it) sheet(it); }); });
+    var bb = $('[data-shop="box"]', root); if (bb) bb.addEventListener("click", boxSheet);
     var eb = $('[data-shop="earn"]', root);
     if (eb) eb.addEventListener("click", function(){ var p = eb.nextElementSibling, o = p.hidden; p.hidden = !o; eb.setAttribute("aria-expanded", String(o)); });
   }
@@ -348,7 +366,7 @@
     S.tick = setInterval(function(){
       S.roots = S.roots.filter(function(x){ return x.el.isConnected; });
       if (!S.roots.length) { clearInterval(S.tick); return; }
-      if (S.shop && S.shop.day && central().day && String(S.shop.day).slice(0, 10) !== central().day) { read().then(redraw); return; }
+      if (S.shop && S.shop.day && central().day && String(S.shop.day).slice(0, 10) !== central().day) { Promise.all([read(), boxRead()]).then(redraw); return; }
       $$("[data-when=day] > span").forEach(function(s){ s.textContent = "New in " + untilMidnight(); });
       $$("[data-when=week] > span").forEach(function(s){ s.textContent = daysLeft(); });
     }, 30000);
@@ -368,8 +386,8 @@
       var ent = { el: el, o: o }; S.roots = S.roots.filter(function(x){ return x.el !== el && x.el.isConnected; }); S.roots.push(ent);
       page(el, o); clock();
       /* then what the server has now (drawn again only if it differs) */
-      var was = JSON.stringify(S.shop);
-      read().then(function(){ return packs((S.shop.items || []).map(function(it){ return it.id; })); }).then(function(){ if (el.isConnected && JSON.stringify(S.shop) !== was) page(el, o); });
+      var was = JSON.stringify([S.shop, S.box]);
+      Promise.all([read(), boxRead()]).then(function(){ return packs((S.shop.items || []).map(function(it){ return it.id; })); }).then(function(){ if (el.isConnected && JSON.stringify([S.shop, S.box]) !== was) page(el, o); });
       try { D.dispatchEvent(new CustomEvent("sh:shop", { detail: { shop: S.shop, opened: true } })); } catch (e) {}
       return true;
     }, function(){ if (el.isConnected) el.innerHTML = '<p class="tsh-note">The shop couldn’t be opened just now. Try again in a moment.</p>'; return false; });
@@ -398,15 +416,18 @@
   /* ---------- an item's sheet: the piece large, what it is, its price against your balance, and Buy ---------- */
   var SH = null;
   function rid(){ var s = ""; try { var a = new Uint8Array(12); crypto.getRandomValues(a); for (var i = 0; i < a.length; i++) s += (a[i] % 36).toString(36); } catch (e) { s = Math.random().toString(36).slice(2, 14); } return "shop-" + Date.now().toString(36) + "-" + s; }
-  function sheet(it){
+  function sheet(it, box){
     if (SH) closeSheet();
     var dlg = D.createElement("dialog"); dlg.className = "tsh-sheet"; dlg.setAttribute("aria-labelledby", "tshI");
     D.body.appendChild(dlg);
-    SH = { dlg: dlg, it: it, rid: rid(), busy: false, done: false, back: D.activeElement };
+    SH = { dlg: dlg, it: it, box: !!box, rid: rid(), busy: false, done: false, back: D.activeElement };
     dlg.addEventListener("close", function(){ var s = SH; if (s && s.dlg === dlg) SH = null; if (dlg.parentNode) dlg.parentNode.removeChild(dlg); try { if (s && s.back && s.back.isConnected) s.back.focus(); } catch (e) {} });
     dlg.addEventListener("click", function(e){ if (e.target === dlg) closeSheet(); });
     drawSheet();
     try { dlg.showModal(); } catch (e) { dlg.setAttribute("open", ""); }
+    /* opening a dialog scrolls its focused button into view: on a phone, Buy is stuck to the sheet's foot, so the sheet
+       would open scrolled past the piece */
+    var ib = $(".tsh-item", dlg); if (ib) ib.scrollTop = 0;
   }
   function closeSheet(){ if (SH) { try { SH.dlg.close(); } catch (e) {} } }
   /* a boost bought while double XP is on (a medal's 24 hours or another boost) waits its turn: the server adds its time on the
@@ -425,8 +446,9 @@
   }
   function drawSheet(msg){
     if (!SH) return;
+    if (SH.box) { drawBox(msg); return; }
     var it = SH.it, r = rarityOf(it), w = words(it), se = seasonOf(it), st = stateOf(it), bal = balance(), d = does(it), done = SH.done;
-    var kind = w.kind + setTag(it) + (it.shelf === "throwback" ? " · Back for today" : "");
+    var kind = w.kind + setTag(it) + (it.shelf === "throwback" ? " · Back for today" : SH.fromBox ? " · From the mystery box" : "");
     var buy;
     if (done) buy = doneHtml(it);
     else if (st.k === "owned") buy = '<p class="tsh-iown">' + IC.check + (it.gift ? "Yours: everyone has this set." : "Yours. It’s in your things at Timmy’s place for good.") + "</p>" + placeBtn(it);
@@ -449,6 +471,7 @@
     $$('[data-shop="close-item"], [data-shop="cancel"], [data-shop="back"]', SH.dlg).forEach(function(b){ b.addEventListener("click", closeSheet); });
     var cb = $('[data-shop="confirm"]', SH.dlg); if (cb) cb.addEventListener("click", confirm);
     var pb = $('[data-shop="place"], [data-shop="wear"]', SH.dlg); if (pb) pb.addEventListener("click", toPlace);
+    var ab = $('[data-shop="box-again"]', SH.dlg); if (ab) ab.addEventListener("click", boxAgain);
     var f = $('[data-shop="confirm"]:not([disabled])', SH.dlg) || $('[data-shop="place"], [data-shop="wear"]', SH.dlg) || $('[data-shop="close-item"]', SH.dlg);
     try { f.focus({ preventScroll: true }); } catch (e) {}
   }
@@ -458,12 +481,14 @@
     var R = SH.res || {}, line;
     if (it.kind === "snack") line = "Timmy ate it. +" + (R.hp || it.hp || 0) + " HP.";
     else if (it.kind === "boost") line = "Double XP is on" + (R.boost_until ? " until " + new Date(R.boost_until).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }) : "") + ".";
+    else if (SH.fromBox) line = "It’s yours! New out of the box, and in your things at Timmy’s place for good.";
     else line = "It’s yours! It stays in your things at Timmy’s place for good.";
-    var won = SH.won && SH.won.length ? SH.won : null;
+    var won = SH.won && SH.won.length ? SH.won : null, B = S.box, again = SH.fromBox && B && B.left_today > 0 && B.left > 0 && !(balance() < B.price);
     return '<p class="tsh-iown is-new" role="status">' + IC.check + esc(line) + "</p>" +
       (won ? '<p class="tsh-icoll" role="status"><b>' + esc(won.join(" and ")) + (won.length > 1 ? " collections" : "") + " finished!</b> Bonus: +" + num(SH.wonXp) + " XP and " + num(SH.wonXp) + " crowns</p>" : "") +
       '<p class="tsh-ihave">You have ' + num(balance()) + " gold crowns left.</p>" +
-      (placeable(it) ? placeBtn(it) : '<div class="tsh-iacts"><button type="button" class="tsh-buy" data-shop="back">Back to the shop</button></div>');
+      (placeable(it) ? placeBtn(it) : '<div class="tsh-iacts"><button type="button" class="tsh-buy" data-shop="back">Back to the shop</button></div>') +
+      (again ? '<button type="button" class="tsh-ghost tsh-again" data-shop="box-again">Open another box · ' + B.left_today + " left today</button>" : "");
   }
   /* "Put it on" / "Place it": the customizer opens on the piece's own tab (a yard piece on the first empty spot) */
   function toPlace(){
@@ -548,15 +573,137 @@
       redraw();
     }, 900);
   }
+  /* ---------- the mystery box: on the page under the showcase, its sheet with the odds, and the opening ---------- */
+  var BOXRE = /ts-b-|ts-box|@keyframes ts-r-tw|prefers-reduced/;
+  function boxArt(open, cls, still){ var s = SA.box(!!open); return img(reduced || still ? s : moving(s, BOXRE), "", cls); }
+  function pct(c){ var p = (+c || 0) * 100; return (p >= 10 || p === 0 ? Math.round(p) : Math.round(p * 10) / 10) + "%"; }
+  function boxState(){
+    var B = S.box || {}, bal = balance();
+    if (!(B.left > 0)) return { k: "empty", t: "You have every piece it could give" };
+    if (!(B.left_today > 0)) return { k: "today", t: "That’s today’s " + (B.per_day || 3) + ". More at midnight" };
+    if (bal !== null && B.price > bal) return { k: "short", t: num(B.price - bal) + " more to go" };
+    return { k: "buy", t: (B.left_today) + " of " + (B.per_day || 3) + " left today" };
+  }
+  function boxSection(lvl){
+    var B = S.box, st = boxState();
+    var odds = (B.odds || []).map(function(o){ var r = cap(o.rarity); return '<li class="' + (o.chance ? "" : "is-none") + '">' + rarTag(r) + "<span>" + (o.chance ? pct(o.chance) : "none left") + "</span></li>"; }).join("");
+    return '<section class="tsh-mbox"><div class="tsh-mbart" aria-hidden="true">' + boxArt(false, "", true) + (reduced ? "" : boxArt(false, "tsh-live")) + "</div>" +
+      '<div class="tsh-mbinfo"><h' + lvl + ' class="tsh-tagsign">Mystery box</h' + lvl + ">" +
+        '<p class="tsh-mbdesc">A piece from the everyday shop you don’t have yet, at random. Never a seasonal piece, a rare costume or a rank piece.</p>' +
+        '<ul class="tsh-mbodds" aria-label="The odds for you">' + odds + "</ul>" +
+        '<div class="tsh-mbbuy"><span class="tsh-big">' + coin() + '<b class="num">' + num(B.price) + '</b><span class="sr"> gold crowns</span></span><button type="button" class="tsh-buy" data-shop="box">See the odds</button>' +
+        '<span class="tsh-mbleft s-' + st.k + '">' + (st.k === "empty" ? IC.check : IC.clock) + esc(st.t) + "</span></div></div></section>";
+  }
+  function boxSheet(){ if (S.box) sheet(null, true); }
+  function drawBox(msg){
+    var B = S.box || {}, st = boxState(), bal = balance(), after = bal === null ? null : bal - B.price, busy = SH.busy;
+    var rows = (B.odds || []).map(function(o){ var r = cap(o.rarity); return '<tr class="' + (o.chance ? "" : "is-none") + '"><td>' + rarTag(r) + "</td><td>" + (o.chance ? pct(o.chance) : "–") + "</td><td>" + (o.of ? num(o.left) + " of " + num(o.of) : "–") + "</td></tr>"; }).join("");
+    var buy;
+    if (st.k === "empty") buy = '<p class="tsh-iown">' + IC.check + "You already have every piece the box could give: all " + num(B.of) + " of them. Nothing to open!</p>" +
+      '<div class="tsh-iacts"><button type="button" class="tsh-buy" data-shop="back">Back to the shop</button></div>';
+    else buy = '<div class="tsh-iprice"><span class="tsh-big">' + coin() + '<b class="num">' + num(B.price) + '</b><span class="sr"> gold crowns</span></span>' +
+        '<span class="tsh-ihave">' + (bal === null ? "" : "You have " + num(bal) + (after >= 0 ? ". After: " + num(after) + "." : ".")) + "</span>" +
+        (st.k === "short" ? '<span class="tsh-ibar" aria-hidden="true"><i style="width:' + Math.max(3, Math.min(100, Math.round(bal / B.price * 100))) + '%"></i></span><span class="tsh-ishort">' + esc(st.t) + ". Keep studying: every 10 XP is one more.</span>" : "") + "</div>" +
+      '<p class="tsh-msg' + (!msg && st.k === "today" ? " is-note" : "") + '" role="status" aria-live="polite">' + esc(msg || (st.k === "today" ? "That’s today’s " + (B.per_day || 3) + " boxes. The box is back at midnight (Central time)." : "")) + "</p>" +
+      '<div class="tsh-iacts"><button type="button" class="tsh-buy" data-shop="box-open"' + (st.k === "buy" && canBuy() && !busy ? "" : " disabled") + ">" + (busy ? "Opening…" : "Open for " + num(B.price)) + '</button><button type="button" class="tsh-ghost" data-shop="cancel">Not now</button></div>';
+    SH.dlg.className = "tsh-sheet";
+    SH.dlg.innerHTML = '<div class="tsh-item tsh-boxsheet r-Epic" style="' + rarVars("Epic") + '"><button type="button" class="tsh-x tsh-ix" data-shop="close-item" aria-label="Back to the shop">' + IC.x + "</button>" +
+      '<div class="tsh-icase">' + rays() + '<i class="tsh-icorner a"></i><i class="tsh-icorner b"></i><div class="tsh-ipiece k-box' + (busy && !reduced ? " is-shake" : "") + '">' + boxArt(false, "") + "</div>" +
+        '<span class="tsh-ido">' + (B.left_today > 0 ? B.left_today + " of " + (B.per_day || 3) + " left today" : "Back at midnight") + "</span></div>" +
+      '<div class="tsh-iinfo"><p class="tsh-ikind">From the everyday shop</p><h2 id="tshI">Mystery box</h2>' +
+        '<p class="tsh-idesc">Inside is one piece you don’t have yet: an outfit, a home, a scene, a yard piece or something for the house. Never a seasonal piece, a rare costume or a rank piece, and never one you already own. Up to ' + (B.per_day || 3) + " a day.</p>" +
+        '<table class="tsh-odds"><caption>The odds for you</caption><thead><tr><th scope="col">Rarity</th><th scope="col">Chance</th><th scope="col">Left for you</th></tr></thead><tbody>' + rows + "</tbody></table>" +
+        '<p class="tsh-note tsh-oddsnote">Everyone gets the same odds. When you own every piece of a rarity, its chance is shared out over the rest.</p>' +
+        '<div class="tsh-ibuy">' + buy + "</div></div></div>";
+    $$('[data-shop="close-item"], [data-shop="cancel"], [data-shop="back"]', SH.dlg).forEach(function(b){ b.addEventListener("click", closeSheet); });
+    var ob = $('[data-shop="box-open"]', SH.dlg); if (ob) ob.addEventListener("click", openBox);
+    var f = $('[data-shop="box-open"]:not([disabled])', SH.dlg) || $('[data-shop="cancel"], [data-shop="back"]', SH.dlg) || $('[data-shop="close-item"]', SH.dlg);
+    try { f.focus({ preventScroll: true }); } catch (e) {}
+  }
+  function boxRefusal(d){
+    var e = d && d.error, B = S.box || {};
+    return e === "today" ? "That’s today’s " + (d.per_day || B.per_day || 3) + " boxes. The box is back at midnight (Central time)."
+      : e === "empty" ? "You have every piece the box could give, so nothing was charged."
+      : e === "balance" ? "You need " + num((d.price || B.price) - (d.balance || 0)) + " more gold crowns for a box."
+      : e === "dup" ? "That didn’t go through. Try once more."
+      : "Something about that didn’t look right, so nothing was charged.";
+  }
+  /* what a refusal tells us about the box now */
+  function boxNoted(d){
+    var B = S.box; if (!B || !d) return;
+    if (d.error === "today") B.left_today = 0;
+    if (d.error === "empty") B.left = 0;
+    if (d.error === "balance" && typeof d.balance === "number" && S.shop && S.shop.wallet) S.shop.wallet.balance = d.balance;
+  }
+  var FAIL = "That didn’t go through, and nothing was charged. Check your connection and try again.";
+  /* Open: the box shakes while the server rolls (at least most of a second, so it reads as a shake), then its lid flies
+     off, and the piece comes out with its rarity's party (fx) */
+  function openBox(){
+    if (!SH || !SH.box || SH.busy || SH.done || !canBuy() || boxState().k !== "buy") return;
+    var s = SH, t0 = Date.now(); s.busy = true;
+    var b = $('[data-shop="box-open"]', s.dlg); if (b) { b.disabled = true; b.textContent = "Opening…"; }
+    var pc = $(".tsh-ipiece", s.dlg); if (pc && !reduced) pc.classList.add("is-shake");
+    /* a phone may have scrolled down to the odds: back up to the box, so the opening is seen */
+    var ib = $(".tsh-item", s.dlg); if (ib && ib.scrollTop) try { ib.scrollTo({ top: 0, behavior: reduced ? "auto" : "smooth" }); } catch (e) { ib.scrollTop = 0; }
+    var land = function(r){
+      var d = r && !r.error && r.data && typeof r.data === "object" ? r.data : null;
+      if (SH !== s) { if (d && d.ok) { Promise.all([read(), boxRead()]).then(redraw); } return; }
+      s.busy = false;
+      if (!d) { drawSheet(FAIL); return; }
+      if (!d.ok) { if (d.error === "dup") s.rid = rid(); boxNoted(d); drawSheet(boxRefusal(d)); redraw(); return; }
+      boxWon(s, d);
+    };
+    S.sb.rpc("open_mystery_box", { p_visitor: S.visitor, p_request: s.rid }).then(function(r){
+      setTimeout(function(){ land(r); }, reduced ? 0 : Math.max(0, 800 - (Date.now() - t0)));
+    }, function(){ land(null); });
+  }
+  function boxWon(s, d){
+    var sh = S.shop, B = S.box, it = (sh.items || []).filter(function(q){ return q.id === d.item; })[0];
+    var won = { id: d.item, name: d.name || (it && it.name) || d.item, kind: d.kind || (it && it.kind), rarity: d.rarity || (it && it.rarity), price: it ? it.price : 0, shelf: "box", owned: true };
+    if (typeof d.balance === "number" && sh.wallet) { sh.wallet.balance = d.balance; if (!d.repeat) sh.wallet.spent = (sh.wallet.spent || 0) + (d.price || (B && B.price) || 0); }
+    (sh.items || []).forEach(function(q){ if (q.id === d.item) q.owned = true; });
+    if (!(sh.inventory || []).some(function(x){ return x.id === d.item; })) (sh.inventory = sh.inventory || []).push({ id: d.item, at: new Date().toISOString(), how: "bought" });
+    if (B) { ["today", "left_today", "left"].forEach(function(k){ if (typeof d[k] === "number") B[k] = d[k]; }); if (typeof d.balance === "number") B.balance = d.balance; }
+    if (!d.repeat) track("shop:box:" + String(won.rarity || "common").toLowerCase());
+    var after = function(){
+      redraw();
+      Promise.all([read(), boxRead()]).then(function(){
+        if (W.shPlace) { W.shPlace.setup({ sb: S.sb, visitor: S.visitor, shop: S.shop }); W.shPlace.repaint(); }
+        if (SH === s) drawSheet();
+        redraw();
+        if (!d.repeat && inColl(won)) collCheck(s);
+      });
+      if (S.onBought) try { S.onBought(d, { id: won.id, kind: won.kind, box: true }); } catch (e) {}
+    };
+    var reveal = function(){
+      if (SH !== s) { after(); return; }
+      s.box = false; s.fromBox = true; s.it = won; s.res = d; s.done = true;
+      drawSheet();
+      fx(s, rarityOf(won), after, true);
+    };
+    packs([won.id]).then(function(){
+      if (SH !== s || reduced) { reveal(); return; }
+      var pc = $(".tsh-ipiece", s.dlg);
+      if (pc) { pc.classList.remove("is-shake"); pc.classList.add("is-open"); pc.innerHTML = boxArt(true, ""); }
+      setTimeout(reveal, 720);
+    });
+  }
+  /* "Open another box": the same sheet, a new request id */
+  function boxAgain(){
+    if (!SH || SH.busy) return;
+    SH.box = true; SH.done = false; SH.fromBox = false; SH.it = null; SH.res = null; SH.won = null; SH.rid = rid();
+    drawSheet();
+  }
   /* buying: coins fly into the piece, it pops, and the rarity sets how big the party is (still under reduced motion) */
   var FX = { Common: { n: 10, rings: 0, t: 900, pal: ["#8A847E", "#C9C2BA", "#FFD23F"] }, Uncommon: { n: 16, rings: 1, t: 1050, pal: ["#1C6E52", "#7FD6AE", "#FFD23F", "#FFFFFF"] },
     Rare: { n: 24, rings: 2, t: 1250, word: "Rare!", flash: 1, pal: ["#1C5C88", "#7CC4F2", "#FFD23F", "#FFFFFF"] }, Epic: { n: 38, rings: 3, t: 1550, word: "Epic!", flash: 1, spin: 1, pal: ["#4E3492", "#B79BFF", "#FF8BD0", "#FFD23F", "#FFFFFF"] },
     Legendary: { n: 70, rings: 3, t: 2300, word: "Legendary!", flash: 2, spin: 1, charge: 750, pal: ["#F2C230", "#FFE27A", "#FF8B7B", "#7CC4F2", "#B79BFF", "#FFFFFF"] } };
-  function fx(s, r, done){
+  function fx(s, r, done, quick){
     var box = $(".tsh-item", s.dlg), cs = $(".tsh-icase", s.dlg);
     if (reduced || !box || !cs) { done(); return; }
     var f = FX[r] || FX.Common, wait = f.charge || 0, html = "", i;
-    for (i = 0; i < 5; i++) html += '<span class="tsh-fxcoin" style="--i:' + i + ";--sx:" + (60 + i * 26) + "px;--sy:" + (150 - (i % 2) * 30) + 'px">' + coin("") + "</span>";
+    /* out of the mystery box: no coins fly in (they went into the box), the party starts at once */
+    for (i = 0; i < (quick ? 0 : 5); i++) html += '<span class="tsh-fxcoin" style="--i:' + i + ";--sx:" + (60 + i * 26) + "px;--sy:" + (150 - (i % 2) * 30) + 'px">' + coin("") + "</span>";
     cs.insertAdjacentHTML("beforeend", '<div class="tsh-fx" aria-hidden="true">' + html + "</div>");
     if (wait) box.classList.add("is-charging");
     setTimeout(function(){
@@ -568,10 +715,10 @@
       if (layer) layer.innerHTML = (f.flash ? '<i class="tsh-fxflash"></i>' : "") + out + '<div class="tsh-iburst">' + (TP.burst ? TP.burst(r) : "") + "</div>" + (f.word ? '<b class="tsh-fxword">' + f.word + "</b>" : "");
       box.classList.remove("is-charging"); box.classList.add("is-bought"); if (f.spin) box.classList.add("is-spin"); if (f.flash > 1) box.classList.add("is-gold");
       setTimeout(done, f.t);
-    }, 430 + wait);
+    }, (quick ? 60 : 430) + wait);
   }
 
   var api = W.shShop = { setup: setup, mount: mount, open: open, close: close, balance: balance, read: read, ready: ready,
     /* for the tests: what the shop has now */
-    state: function(){ var sh = S.shop || {}; return { balance: balance(), items: (sh.items || []).length, owned: (sh.inventory || []).length, sheet: SH ? { item: SH.it.id, rid: SH.rid, done: SH.done, busy: SH.busy } : null, open: !!DLG, mounted: S.roots.length }; } };
+    state: function(){ var sh = S.shop || {}; return { balance: balance(), items: (sh.items || []).length, owned: (sh.inventory || []).length, sheet: SH ? { item: SH.it ? SH.it.id : null, box: !!SH.box, rid: SH.rid, done: SH.done, busy: SH.busy } : null, open: !!DLG, mounted: S.roots.length, box: S.box }; } };
 })();

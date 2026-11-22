@@ -4100,7 +4100,7 @@ nameDlg.className = "sh-name-dlg";
 nameDlg.innerHTML = '<div class="sh-name-card" role="dialog" aria-modal="true" aria-labelledby="sh-name-h">' +
 '<button class="sh-name-x" type="button" aria-label="Close">&times;</button>' +
 '<h4 id="sh-name-h">Your name</h4>' +
-'<p>This is how classmates see you on the leaderboards, streak boards and ranks, in every hub.' +
+'<p>This is how classmates see you on the leaderboards, streak boards and ranks, in every hub. A name you picked also shows under Studying now while you have a hub open; a random one doesn’t.' +
 (custom ? '' : (resolvedAnonName ? ' Right now you have a random one: <b>' + esc(resolvedAnonName) + '</b>.' : '')) + '</p>' +
 '<form class="sh-name-form"><input type="text" maxlength="24" autocomplete="nickname" enterkeyhint="done" placeholder="Pick a name" value="' + esc(custom) + '">' +
 '<button type="submit">Save</button></form>' +
