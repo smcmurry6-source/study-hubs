@@ -523,8 +523,10 @@ looks good", [decisions](../decisions.md)).
   read and the sweep all resolve the main id first (`sh_week_me`) and also count any rows still under a device linked to
   it (a tab left open through the link), so the week is counted, made and paid under the main id.
 - **The goal** is 100 (`sh_week_goal`, `WEEK_GOAL` in `widget/pet.js`, `GOAL` in `pennant.mjs`; Sam, 2026-11-22: "lets do
-  100", over the idea's 50, [decisions](../decisions.md)). In the class's data for the weeks before (2026-11-22, totals over
-  5+ people), about half of the person-weeks of the people studying reached 100 (about three in four reached 50).
+  100", over the idea's 50, [decisions](../decisions.md)). In the class's data for the 10 full weeks from Sep 7 to Nov 15
+  (recounted 2026-11-22, totals only: 569 person-weeks of 159 people, linked devices as one), 64% of the weeks someone
+  studied reached 100 and 77% reached 50; the median week was 192 answers. Busy weeks ran 69-78% at 100, quiet ones 23-48%,
+  so the pennant is a stretch in a quiet week and a given in an exam week.
 - **`week_pennants`** (`visitor_id`, `week` the Monday, `n` the answers when it was made, `at`, `how` `claim` or `sweep`),
   one row per person per week, closed to visitors. **`claim_week_v2(p_visitor)`** counts again under the main id's lock: under
   100 it answers `why: 'short'` with `n`; at 100 it makes the row and pays `week` (`sh_prizes()`: 500, `PRIZES` in
