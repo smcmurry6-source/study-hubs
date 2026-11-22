@@ -112,6 +112,9 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   2026-11-20): pings, clicks, feature events and question health (about a third of the requests, over half the storage) move
   to their own free project; answers, XP and the shop stay. Due once the database nears about 420 MB of its 500 MB (every
   lessons audit reads the size, `tools/lessons-refresh.md` step 1; 323 MB on 2026-11-19).
+  **2026-11-22:** Sam plans to make it; it is package 4 of [the sustainability task](2026-11-22-sustainable-for-years.md),
+  and after packages 1 and 2 (shorter analytics windows, archived hubs' answers packed away) it's about load more than room
+  (359 MB on 2026-11-21).
 - [ ] **Bring the 16 open boards PRs up to date** (2026-11-20, after the catch-up of `claude/boards-hub` with `main`): #81, #87,
   #91, #94, #95, #97-#104, #106, #110, #111 each need `origin/claude/boards-hub` merged in, `node tools/build-boards.js`
   rerun (never resolve `hubs/boards/index.html` by hand) and their checks rerun; then the fixes `docs/boards/reviews/session-7b.md`

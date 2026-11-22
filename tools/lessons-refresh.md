@@ -36,6 +36,12 @@ its narration and Timmy Time off the site ([archived-hubs-drop-their-audio](../v
   ([shared-infrastructure](../vault/reference/shared-infrastructure.md)):
   `select pg_size_pretty(sum(pg_database_size(datname))) total, (select json_agg(x) from (select relname, pg_size_pretty(pg_total_relation_size(c.oid)) sz from pg_class c join pg_namespace n on n.oid = c.relnamespace where n.nspname = 'public' and c.relkind = 'r' order by pg_total_relation_size(c.oid) desc limit 5) x) biggest from pg_database;`
   (catalog reads only: well under a second).
+  **With it, the repo's and the site's** (2026-11-22, [the sustainability task](../vault/tasks/2026-11-22-sustainable-for-years.md)),
+  all three on one line of Live signals, each beside its limit: the database against 500 MB (the analytics move is due near
+  420), the repo as GitHub counts it, `gh api -X GET search/repositories -f q='repo:smcmurry6-source/study-hubs' --jq '.items[0].size'`
+  (KB; GitHub recommends under 1 GB for a site's repo and "strongly" under 5 GB; 2.4 GB on 2026-11-21, nearly all old mp3s), and
+  the published site from `node tools/ci/size.js` against 1 GB (40 MB on 2026-11-21). A jump since the last audit, or the repo
+  growing past 3 GB, goes to Sam with what caused it.
 - Read the data-quality report first (`tools/analytics-quality.sql`): if tracking stopped, a test hub or a new event
   family shows up, fix or note it before trusting the rest ([analytics-data-quality](../vault/reference/analytics-data-quality.md)).
   Read the admin page's kept copy, `select computed_at, body from admin_cache where key = 'quality';` (migration_v83:

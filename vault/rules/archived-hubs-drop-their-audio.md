@@ -6,6 +6,9 @@ since: 2026-11-12
 
 # An archived hub's audio comes off the site
 
+Since 2026-11-22 no new recording goes into this repo at all ([no-narration-in-the-repo](no-narration-in-the-repo.md)); no
+hub on `main` carries audio now, so this rule is for the steps below if one ever does again.
+
 Sam's standing rule, 2026-11-12: **when a hub is archived, its narration and Timmy Time come off the site.** Its page
 stays up, as decided 2026-10-20 ([decisions](../decisions.md)): notes, questions, the mock, the arcade and everything else
 stay, Listen reads with the device's own voice, and Timmy Time is gone.

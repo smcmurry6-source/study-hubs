@@ -5,6 +5,9 @@ tags: [audio, notes]
 
 # Text and audio must never drift
 
+Since 2026-11-22 no new recording is committed to this repo ([no-narration-in-the-repo](no-narration-in-the-repo.md)): this
+rule holds wherever a hub's recordings live.
+
 Hubs with pre-generated narration (see `hubs/*/audio/`): editing a lecture's
 text at any level (As taught / Plain English / High yield) means regenerating that
 level's mp3 in the same PR.

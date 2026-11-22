@@ -31,6 +31,12 @@ nothing else. A new kind of delete needs Sam's OK first.
 
 ## The schedule
 
+**Approved 2026-11-22, not built yet** ([the task](../tasks/2026-11-22-sustainable-for-years.md), packages 1 and 2;
+[decisions](../decisions.md)): `question_events` roll up when the hub's page comes down (not after the year),
+`ui_click_reach` 30 days with a daily roll-up, `feature_events` at 60 days, and 30 days after a hub's page comes down its
+answers and their XP rows packed into one summary row per person per hub. Until those migrations ship, the table below is
+what runs.
+
 | Data | Keep per-person rows | Then | Done by | Why |
 |---|---|---|---|---|
 | `activity_pings` (raw pings) | 3 days (Sam, 2026-11-18: "do 3 days"; 30 before, `migration_v74.sql`) | delete; `activity_hourly` and `activity_visits` keep the same time at hour level | the nightly job | Every reader uses the hourly rollup; the raw pings are read only for who is studying now (15 minutes), the admin page's newest-write check, and a repair after an outage (3 days covers one found after a weekend: [the outage's](../../tools/data-fixes/2026-11-18-outage-time.sql)). They were 166 MB of the 419 MB database on 2026-11-18 |

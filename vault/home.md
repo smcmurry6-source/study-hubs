@@ -65,6 +65,8 @@ Hub building
 - [Earning XP and crowns stays enjoyable](rules/earn-rates-stay-enjoyable.md): every lessons audit reads the earn rates against the shop's prices, in study days *(on demand)*.
 - [An archived hub's audio comes off the site](rules/archived-hubs-drop-their-audio.md): narration and Timmy Time, to stay under
   GitHub Pages' 1 GB limit; the page stays and Listen uses the device's voice.
+- [No narration or Timmy Time in this repo](rules/no-narration-in-the-repo.md): git keeps every mp3 for good; when narration
+  comes back it lives in a second repo served from the same address.
 
 ## How-tos
 
