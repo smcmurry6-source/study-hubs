@@ -43,8 +43,8 @@ the course the student is in** ("Let's do your recommendation to have Timmy only
 - [ ] Cardio & Respiratory: the heart anatomy deck (`4-Anatomy of the Heart and Cardiovascular System.pptx`, 75 MB) could
       not be read, so CR-1's anatomy (pericardium, chambers, valves) is unchecked: needs a PDF or smaller copy from Sam
 - [x] Renal: RN-1 to RN-5 against the slides, and RN-1 and RN-2 against Dr. Herr's recordings (lectures 0-9)
-- [ ] Renal: RN-3 to RN-5 against the recordings of lectures 10-16
-- [ ] Renal: the CKD lecture's "I'm not going to test you on reference ranges" applied to RN-4 (a deemphasize hint; no
+- [x] Renal: RN-3 to RN-5 against the recordings of lectures 10-16 (and the July 21 dental lecture)
+- [x] Renal: the CKD lecture's "I'm not going to test you on reference ranges" applied to RN-4 (a deemphasize hint; no
       question asking a reference range)
 - [x] MSK & GI: MG-1 (GI physiology) and MG-2 (GI anatomy and histology) against the slides
 - [ ] MSK & GI: MG-2's foregut and abdominal wall decks (`2-Anatomy of the Foregut - Herr.pptx`, 81 MB;
