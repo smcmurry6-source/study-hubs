@@ -537,7 +537,7 @@ root.innerHTML =
 "</div>" +
 '<div class="dx-classhead"><h3 id="boardH">Leaderboard</h3>' +
 '<span class="seg" role="group" aria-label="Leaderboard" id="boardSeg">' +
-[["ranks", "Ranks"], ["streaks", "Study streaks"]].map(function(b, i){ return '<button type="button" data-board="' + b[0] + '" aria-pressed="' + (i === 0) + '">' + b[1] + "</button>"; }).join("") +
+[["ranks", "Ranks"], ["crowns", "Crowns"], ["now", "Studying now"]].map(function(b, i){ return '<button type="button" data-board="' + b[0] + '" aria-pressed="' + (i === 0) + '">' + b[1] + "</button>"; }).join("") +
 "</span></div>" +
 '<p class="note" id="boardNote"></p>' +
 '<div id="board" aria-live="polite"><p class="note">Loading…</p></div>' +
@@ -1482,7 +1482,7 @@ setTimeout(go, 200);
 function openNameEditor(){
 surveyVisitor();
 var dlg = dialog("nameH",
-'<h2 id="nameH">Your name</h2><p class="note">This is how classmates see you on the leaderboards, streak boards and ranks, in every hub.' +
+'<h2 id="nameH">Your name</h2><p class="note">This is how classmates see you on the leaderboards, streak boards and ranks, in every hub. A name you picked also shows under Studying now while you have a hub open; a random one doesn’t.' +
 (!localName && randomName ? " Right now you have a random one: <b>" + esc(randomName) + "</b>." : "") + "</p>" +
 '<form class="dx-nameform"><input type="text" maxlength="24" autocomplete="nickname" enterkeyhint="done" aria-label="Your name" placeholder="Pick a name" value="' + esc(localName) + '"><button class="btn btn-primary" type="submit">Save</button></form>' +
 '<p class="note dx-namemsg" aria-live="polite"></p>' +
@@ -1949,7 +1949,8 @@ panel.addEventListener("focusin", open); panel.addEventListener("pointerdown", o
 var boardSb = null, boardNow = "ranks", boardOpen = false;
 var BOARD_NOTE = {
 ranks: "XP from every hub: 10 for a new question right, 2 for a repeat, 1 for trying, 20 per day studied. Every rank has levels I, II and III.",
-streaks: "Days in a row with at least one answer."
+crowns: "Shiny Gold Crowns on hand: everything earned, minus what was spent in Timmy’s shop. Worked out every few minutes; yours is always up to date.",
+now: "Classmates with a hub open right now, under the names they chose for the boards. Tap one to visit their Timmy. You show here too while you study, if you’ve picked a name."
 };
 function rankMini(r){ return window.shRanks && r.tier != null ? jMini(r, r.level) : ""; }
 function nameFlair(r, extra){
@@ -1987,19 +1988,62 @@ function boardMsg(msg){ boardData = null; $("visitRand").hidden = true; $("board
 var boardData = null;
 function paintBoard(){
 var d = boardData, R = window.shRanks; if (!d || d.which !== boardNow) return;
+if (d.which === "now") { paintNowBoard(d); return; }
 var rows = d.rows, ranks = d.which === "ranks", pod = rows.length >= 3, rest = pod ? rows.slice(3) : rows, w = Math.round($("board").clientWidth);
-var first = Math.max(1, ranks ? +rows[0].xp || 0 : +rows[0].streak || 0);
+var first = Math.max(1, ranks ? +rows[0].xp || 0 : +rows[0].crowns || 0), lv = function(r){ return jName(r, r.level || R.levelFor(r.xp)); };
 var set = pod && CA && CA.stage && w >= 240 ? stageSvg(w, rows, d.fits || []) : "";
 $("board").innerHTML = '<div class="dx-arena' + (set ? " has-set" : "") + (still() ? " is-still" : "") + '" data-w="' + w + '">' + set +
 (pod ? (ranks ? podiumHTML(rows, function(r){ return jArt(r, 72, { animate: false, level: r.level || R.levelFor(r.xp) }); }, function(r){ return num(r.xp) + "<small>XP</small>"; }, function(r){ return jName(r, r.level || R.levelFor(r.xp)); })
-: podiumHTML(rows, function(r){ return flame(r.streak); }, function(r){ return r.streak + "<small>" + (r.streak === 1 ? "day" : "days") + "</small>"; })) : "") +
+: podiumHTML(rows, function(){ return coinSvg(40); }, function(r){ return num(r.crowns) + "<small>crowns</small>"; }, lv)) : "") +
 (rest.length ? '<ol class="dx-board"' + (pod ? ' start="4"' : "") + ">" + rest.map(function(r, i){
 return ranks ? rowHTML(r, r.rnk, jName(r, r.level || R.levelFor(r.xp)), num(r.xp), "XP", (+r.xp || 0) / first)
-: rowHTML(r, i + (pod ? 4 : 1), "", r.streak, r.streak === 1 ? "day" : "days", (+r.streak || 0) / first);
+: rowHTML(r, r.rnk, lv(r), num(r.crowns), coinSvg(16) + '<span class="sr"> crowns</span>', (+r.crowns || 0) / first);
 }).join("") + "</ol>" : "") + "</div>";
 lifeStage();
 if (d.say) visitSay(d.say.key, d.say.msg, true);
 $("visitRand").hidden = !visitList().length; visitEarn();
+}
+var nowT = 0;
+function nowOf(p){
+if (!p || typeof p !== "object" || typeof p.name !== "string" || !p.name || !VISIT_RE.test(p.visit || "")) return null;
+var rk = p.rank && typeof p.rank === "object" ? p.rank : {};
+return { display_name: p.name, visit: p.visit, journey: +rk.journey || 0, tier: +rk.tier || 0, level: +rk.level || 1, flair: typeof p.flair === "string" ? p.flair : "" };
+}
+function nowRow(r){
+return "<li" + visitAttr(r) + '><span class="rk" aria-hidden="true"><i class="dx-pulse"></i></span><span class="nm">' + rankMini(r) + nameFlair(r) + "</span>" +
+'<span class="lvl">' + esc(jName(r, r.level || 1)) + '</span><span class="val dx-nowgo" aria-hidden="true">Visit</span></li>';
+}
+function nPeople(n){ return n === 1 ? "1 person is" : num(n) + " people are"; }
+function paintNowBoard(d){
+var rows = d.rows, more = Math.max(0, d.others - rows.length);
+$("board").innerHTML = '<div class="dx-arena dx-nowarena">' + (rows.length ? '<ul class="dx-board dx-nowlist">' + rows.map(nowRow).join("") + "</ul>" +
+(more ? '<p class="dx-nowmore">And ' + (more === 1 ? "1 more person" : num(more) + " more people") + " without a name on the boards.</p>" : "")
+: '<p class="dx-nowmore">' + (d.others ? nPeople(d.others) + " studying right now, none of them under a name on the boards." : "Nobody else is studying right now. Check back in a bit.") + "</p>") + "</div>";
+if (d.say) visitSay(d.say.key, d.say.msg, true);
+$("visitRand").hidden = !visitList().length; visitEarn();
+}
+function tabGone(which){
+if (which === "now") clearInterval(nowT);
+var b = q('[data-board="' + which + '"]', $("boardSeg")); if (b) b.hidden = true;
+if (boardNow === which) { boardNow = "ranks"; qa("[data-board]", $("boardSeg")).forEach(function(x){ x.setAttribute("aria-pressed", String(x.getAttribute("data-board") === "ranks")); }); drawBoard(); }
+}
+function drawNow(sb){
+sb.rpc("get_studying_now", { p_visitor: VISITOR || null }).then(function(res){
+if (boardNow !== "now") return;
+var e = res && res.error;
+if (e && (e.code === "PGRST202" || e.code === "42883" || res.status === 404 || /could not find the function/i.test(e.message || ""))) { tabGone("now"); return; }
+var dd = res && !e ? res.data : null;
+if (!dd || typeof dd !== "object" || Array.isArray(dd)) { boardMsg(); return; }
+var rows = (Array.isArray(dd.people) ? dd.people : []).map(nowOf).filter(Boolean);
+boardData = { which: "now", rows: rows, fits: [], others: Math.max(0, Math.floor(+dd.others || 0)) }; paintBoard();
+jNeed(rows, function(){ if (boardData && boardData.rows === rows) paintBoard(); });
+}, function(){ if (boardNow === "now") boardMsg(); });
+clearInterval(nowT);
+nowT = setInterval(function(){
+if (boardNow !== "now") { clearInterval(nowT); return; }
+if (document.hidden || visiting || $("board").contains(document.activeElement) || q("dialog[open]")) return;
+drawNow(sb);
+}, 60000);
 }
 function loadFits(sb, d){
 if (!sb) return;
@@ -2060,7 +2104,7 @@ function visitList(){ return (boardData && boardData.rows || []).filter(function
 function visitNav(key){
 var rows = visitList(), keys = rows.map(visitKey), at = keys.indexOf(key), R = window.shRanks;
 if (at < 0) return null;
-return { at: at, keys: keys,
+return { at: at, keys: keys, what: boardData && boardData.which === "now" ? "studying now" : "",
 list: rows.map(function(r){ return { name: String(r.display_name == null ? "" : r.display_name), rank: { journey: +r.journey || 0, tier: +r.tier || 0, level: +r.level || (R && R.levelFor ? R.levelFor(r.xp) : 1) } }; }),
 load: function(i){ return keys[i] ? placeTop(keys[i]) : Promise.reject(new Error("key")); } };
 }
@@ -2082,7 +2126,7 @@ return;
 }
 Promise.all([placeTop(key), placeLoad()]).then(function(a){
 if (!a[0] || !window.shPlace) { fail(); return; }
-done(); window.shPlace.open({ place: a[0], onClose: back, nav: nav ? { at: nav.at, list: nav.list, load: nav.load } : null });
+done(); window.shPlace.open({ place: a[0], onClose: back, nav: nav ? { at: nav.at, list: nav.list, load: nav.load, what: nav.what } : null });
 visitPaid(key);
 }, fail);
 }
@@ -2146,16 +2190,18 @@ boardData = { which: which, rows: rows, fits: [] }; TOP = topFrom(rows); paintBo
 var me = rows.filter(function(r){ return r.is_me; })[0];
 jNeed(rows, function(){ if (boardData && boardData.rows === rows) paintBoard(); });
 }, function(){ if (boardNow === which) boardMsg(); });
-} else if (which === "streaks") {
-rpc2(sb, "get_leaderboard", { p_limit: 8 }).then(function(res){
+} else if (which === "crowns") {
+rpc2(sb, "get_crowns_board", { p_visitor: VISITOR || null, p_limit: 10 }).then(function(res){
 if (boardNow !== which) return;
-if (!res || res.error) { boardMsg(); return; }
-var rows = res.data || [];
-if (!rows.length){ boardMsg("No streaks yet. Answer questions two days in a row to start one."); return; }
+var e = res && res.error;
+if (e && (e.code === "PGRST202" || e.code === "42883" || res.status === 404 || /could not find the function/i.test(e.message || ""))) { tabGone("crowns"); return; }
+if (!res || e || !Array.isArray(res.data)) { boardMsg(); return; }
+var rows = res.data.filter(function(r){ return r && typeof r === "object" && isFinite(+r.crowns); });
+if (!rows.length){ boardMsg("No crowns counted yet. Answer a question in any hub to start earning them."); return; }
 boardData = { which: which, rows: rows, fits: [] }; paintBoard(); loadFits(sb, boardData);
 jNeed(rows, function(){ if (boardData && boardData.rows === rows) paintBoard(); });
 }, function(){ if (boardNow === which) boardMsg(); });
-}
+} else if (which === "now") drawNow(sb);
 }
 $("boardSeg").addEventListener("click", function(e){
 var b = e.target.closest("[data-board]"); if (!b || b.getAttribute("data-board") === boardNow) return;
@@ -2362,7 +2408,7 @@ S.push({ el: ".dx-stage", title: "The next exam", body: "<p>The countdown with a
 S.push({ el: ".dx-wn", title: "What's new", body: "<p>The latest changes to this hub and to every hub, newest first. The ones since your last visit say <b>New</b>. <b>About this hub</b> opens what the hub covers.</p>" });
 }
 S.push({ el: "#you", title: "You", body: "<p>The name classmates see, your handpiece rank and XP from every hub, your mastery medals and your study streak." + (petOn() ? " Timmy Tooth lives here once you've met him: study and he stays healthy." : "") + "</p>" });
-S.push({ el: "#class", title: "The class", body: "<p>How many classmates have a hub open this minute and which hubs they're in. Under it, the top ten by XP or the longest study streaks, the first three on the podium, with every rank from Stone to Dark Matter folded underneath.</p>" });
+S.push({ el: "#class", title: "The class", body: "<p>How many classmates have a hub open this minute and which hubs they're in. Under it, the top ten by XP or by Shiny Gold Crowns on hand, the first three on the podium, with every rank from Stone to Dark Matter folded underneath.</p>" });
 if (o.visible($("ideas"))) S.push({ el: "#ideas", title: "The idea board", body: "<p>Ideas for the hubs, from the class. Vote the ones you'd use up or down, or post your own: it shows right away under your name, with the hub it's for and what kind of idea it is.</p>" });
 if (o.visible($("past"))) S.push({ el: "#past", title: "Past hubs", body: "<p>How the class studied for each exam that's done: the hours, the people, the busiest day. <b>Save image</b> keeps a picture of it. A hub that just closed keeps its check-in here.</p>" });
 S.push({ el: "#inboxBtn", title: "Inbox", body: "<p>Replies to your reports and suggestions, notices to the whole class and the occasional short survey. A number on it means something new.</p>" });

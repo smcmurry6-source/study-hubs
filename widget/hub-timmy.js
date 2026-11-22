@@ -55,8 +55,10 @@
             if (!body.isConnected) return;
             P.setup({ sb: sb, visitor: ls("sh_visitor_id"), shop: d && d.shop, profile: HX.RANK.p });
             body.innerHTML = '<div class="place-card"></div><p class="note">Tap the picture to step in. Timmy hops over to what you tap, and his health shows in how he moves.</p>' +
-              (d && d.shop ? '<p><button type="button" class="btn" data-place-coll>Your collections</button></p>' : "");
+              (d && d.shop ? '<p><button type="button" class="btn" data-place-coll>Your collections</button></p>' : "") +
+              '<section class="hx-now" aria-labelledby="hxNowH" hidden></section>';
             P.card(body.firstChild, { onFail: shut });
+            moreNow(body.querySelector(".hx-now"), sb);
             /* Collections (migration_v75): the place opens on it, and closing it comes back here */
             var cb = body.querySelector("[data-place-coll]");
             if (cb) cb.addEventListener("click", function(){ P.open({ collections: true, onClose: function(){ if (cb.isConnected) cb.focus(); } }); });
@@ -76,7 +78,7 @@
      the dashboard keeps). window.shVisitPlace(key, { onClose }) answers true once the place is open, false when it couldn't
      be (the row then says so), null while another visit is on its way; a hub's arcade (content/arcade.js) calls it. Only the name, the slots, the rank and the
      medals are kept, as text and numbers. ---------- */
-  var VISIT_RE = /^[0-9a-f]{24}$/, visiting = false;
+  var VISIT_RE = /^[0-9a-f]{24}$/, visiting = false, NOW = [];
   function placeOf(d){
     if (!d || typeof d !== "object" || Array.isArray(d)) return null;
     var eq = {}, e = d.equipped && typeof d.equipped === "object" ? d.equipped : {}, rk = d.rank && typeof d.rank === "object" ? d.rank : null;
@@ -100,7 +102,7 @@
       var P = window.shPlace, boot = window.shBootstrap, d = boot && boot.data;
       if (!a[0] || !a[1] || !P) return false;
       P.setup({ sb: sb, visitor: ls("sh_visitor_id"), shop: d && d.shop, profile: HX.RANK && HX.RANK.p });
-      P.open({ place: a[0], onClose: opt.onClose });
+      P.open({ place: a[0], onClose: opt.onClose, nav: opt.nav || null });
       visitPaid(key);
       return true;
     });
@@ -112,13 +114,48 @@
     G.claim("claim_visit_v2", { p_visitor: me, p_key: key }, "visit").then(function(r){ if (!r || r.missing || r.ok === false) ls("sh_visit_paid", null); }, function(){ ls("sh_visit_paid", null); });
   }
   window.shVisitPlace = visitPlace;
+  /* ---------- Studying now (migration_v99, the idea board's "Drip for Timmy"), under the place's card in More: the
+     classmates with a hub open right now (a ping in the last 3 minutes, in any hub) who show on the boards under a name
+     they chose, to visit. get_studying_now gives each one's name, visit key, rank and medals, never a hub, a time or an id,
+     and how many others are studying, as a number. A row is a [data-sh-visit] button (below), with data-sh-now="row" first so a click count records "sh-now=row", never the name in its label; the place's arrows go
+     through the list. Asked each time the page opens. Without the function (before the migration) nothing is drawn. ---------- */
+  function moreNow(host, sb){
+    if (!host || !sb) return;
+    sb.rpc("get_studying_now", { p_visitor: ls("sh_visitor_id") || null }).then(function(res){
+      var d = res && !res.error ? res.data : null, R = window.shRanks, esc = HX.esc;
+      if (!host.isConnected || !d || typeof d !== "object" || Array.isArray(d)) return;
+      NOW = (Array.isArray(d.people) ? d.people : []).filter(function(p){ return p && typeof p.name === "string" && p.name && VISIT_RE.test(p.visit || ""); }).map(function(p){
+        var rk = p.rank && typeof p.rank === "object" ? p.rank : {};
+        return { name: p.name, key: p.visit, rank: { journey: +rk.journey || 0, tier: Math.max(0, Math.min(6, +rk.tier || 0)), level: +rk.level || 1 }, flair: typeof p.flair === "string" ? p.flair : "" };
+      });
+      var others = Math.max(0, Math.floor(+d.others || 0)), more = Math.max(0, others - NOW.length);
+      var mini = function(p){ try { return R ? (R.miniOf && p.rank.journey > 0 ? R.miniOf(p.rank.journey, p.rank.tier, p.rank.level) : R.mini ? R.mini(p.rank.tier, p.rank.level) : "") : ""; } catch (e) { return ""; } };
+      var row = function(p){ var f = R && R.flair ? R.flair(p.flair, { who: p.name }) : "";
+        /* no aria-label: the button's name is its visible text ("Ada Visit"), so a voice command that says what's on it works;
+           the rank badge's numeral is decoration here, hidden from it */
+        return '<li><button type="button" class="hx-nowbtn" data-sh-now="row" data-sh-visit data-key="' + p.key + '"><i class="hx-nowdot" aria-hidden="true"></i><span class="hx-nowrk" aria-hidden="true">' + mini(p) + "</span>" +
+          '<span class="hx-nownm">' + esc(p.name) + '</span><span class="hx-nowgo">Visit</span></button>' + f + "</li>"; };
+      host.innerHTML = '<h2 id="hxNowH">Studying now</h2>' +
+        (NOW.length ? '<p class="note">Classmates with a hub open right now, under the names they chose for the boards. Tap one to visit their Timmy.</p><ul class="hx-nowlist">' + NOW.map(row).join("") + "</ul>" +
+          (more ? '<p class="note">And ' + (more === 1 ? "1 more person" : more + " more people") + " without a name on the boards.</p>" : "")
+          : '<p class="note">' + (others ? (others === 1 ? "1 person is" : others + " people are") + " studying right now, none of them under a name on the boards." : "Nobody else is studying right now. Check back in a bit.") + "</p>");
+      host.hidden = false;
+    }, function(){});
+  }
+  /* the place's arrows through the list: names and ranks go to the place, the keys stay here */
+  function nowNav(key){
+    var keys = NOW.map(function(p){ return p.key; }), at = keys.indexOf(key), sb = window.shSupabase;
+    if (at < 0 || keys.length < 2 || !sb) return null;
+    return { at: at, what: "studying now", list: NOW.map(function(p){ return { name: p.name, rank: p.rank }; }),
+      load: function(i){ return keys[i] ? sb.rpc("get_place", { p_key: keys[i] }).then(function(res){ var p = res && !res.error ? placeOf(res.data) : null; if (!p) throw new Error("place"); return p; }) : Promise.reject(new Error("key")); } };
+  }
   /* every [data-sh-visit] button on the page (a hub's board rows) opens its data-key's place; closing gives focus back */
   document.addEventListener("click", function(e){
     var b = e.target.closest && e.target.closest("button[data-sh-visit]"); if (!b) return;
     var key = b.getAttribute("data-key") || "", row = b.closest("li") || b.parentNode, old = row && row.querySelector(".sh-visit-msg");
     if (old) old.parentNode.removeChild(old);
     b.setAttribute("aria-busy", "true");
-    visitPlace(key, { onClose: function(){ if (b.isConnected) try { b.focus(); } catch (x) {} } }).then(function(ok){
+    visitPlace(key, { nav: b.hasAttribute("data-sh-now") ? nowNav(key) : null, onClose: function(){ if (b.isConnected) try { b.focus(); } catch (x) {} } }).then(function(ok){
       b.removeAttribute("aria-busy");
       if (ok !== false || !row || !b.isConnected) return;
       var line = document.createElement("span"); line.className = "sh-visit-msg"; line.setAttribute("role", "status"); row.appendChild(line);

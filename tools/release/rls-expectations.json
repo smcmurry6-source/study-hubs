@@ -27,7 +27,7 @@
     "xp_award_totals",
     "shop_days",
     "admin_cache",
-    "exam_checkins_closed",
+    "exam_checkins_closed", "crowns_board",
     "week_pennants"
   ],
   "anonNoRun": [
@@ -54,6 +54,12 @@
     "sh_week_sweep(timestamptz)",
     "sh_claim_week(timestamptz, text)",
     "sh_my_week(timestamptz, text)",
-    "sh_pennants_on_link()"
+    "sh_pennants_on_link()",
+    "sh_box_rules()",
+    "sh_box_pool(text)",
+    "sh_box_odds(text)",
+    "sh_box_info(date, text)",
+    "sh_box_open(date, text, text, double precision, double precision)",
+    "sh_crowns_refresh(integer)"
   ]
 }

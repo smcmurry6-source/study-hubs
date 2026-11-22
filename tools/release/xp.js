@@ -1918,6 +1918,139 @@ try {
     notes.push(`an archived hub's answers packed (migration_v96): ${n0} answers of ${s0.people.length} made-up visitors into ${num(`select count(*) from answers_packed`)} summaries, every total the same, after a rebuild too, and a second run packs nothing`);
   }
 
+  /* ---------- 18. the mystery box and studying now (migration_v99) ---------- */
+  if (one(`select to_regproc('public.open_mystery_box')`)) {
+    const BD = `'2030-05-06'::date`, BD2 = `'2030-05-07'::date`;
+    const info = (v, d) => json(`sh_box_info(${d || BD}, ${v == null ? 'null' : q(v)})`);
+    const open = (v, req, r1, r2, d) => json(`sh_box_open(${d || BD}, ${q(v)}, ${q(req)}, ${r1}, ${r2 == null ? 0 : r2})`);
+    const bal = v => json(`sh_wallet(${q(v)})`).balance;
+    const boxes = v => num(`select count(*) from pet_purchases where visitor_id = ${q(v)} and kind = 'box'`);
+    const ROT = `select id from shop_items where active and rotates and not shelf and not gift and season is null and rank_tier is null and kind in ('outfit', 'home', 'scene', 'yard', 'upgrade')`;
+    const rules = json(`sh_box_rules()`), W = {}; rules.odds.forEach(o => { W[o.rarity] = o.w; });
+    // what it can give: the everyday rotation, never a seasonal piece, a rare costume, a rank piece, a gift, a snack or a boost
+    const i0 = info(null);
+    eq([i0.price, i0.per_day, i0.of, i0.left], [750, 3, num(`select count(*) from (${ROT}) x`), num(`select count(*) from (${ROT}) x`)], 'the box: 750 crowns, 3 a day, every piece of the everyday rotation');
+    eq(num(`select count(*) from sh_box_pool(null) b join shop_items i on i.id = b.item_id where i.season is not null or i.kind in ('costume', 'snack', 'boost') or i.gift or i.rank_tier is not null or not i.active`), 0,
+      'never a seasonal piece, a rare costume, a rank piece, a gift, a snack or a boost');
+    ok(i0.of > 50 && i0.odds.every(o => o.of > 0 && Math.abs(o.chance - W[o.rarity] / 100) < 1e-4), `with nothing owned the odds are the rules' (${i0.odds.map(o => o.rarity + ' ' + o.chance).join(', ')})`);
+    // the roll: the rarity from the first number, at the rules' edges (40 / 30 / 18 / 9 / 3)
+    const RV = 'xp-BOX-roll';
+    award(RV, 'box-funds', 200000);
+    const edges = [[0, 'common'], [0.3999, 'common'], [0.4, 'uncommon'], [0.6999, 'uncommon'], [0.7, 'rare'], [0.8799, 'rare'], [0.88, 'epic'], [0.9699, 'epic'], [0.97, 'legendary'], [0.9999, 'legendary']];
+    const got = edges.map(([r1], i) => open(RV, `box-roll-${String(i).padStart(4, '0')}`, r1, 0.5, `${BD} + ${i}`).rarity);
+    eq(got, edges.map(e => e[1]), 'the rarity follows the rules at every edge');
+    // a box: one new piece, owned, 750 crowns spent, one purchase row of kind box
+    const BX = 'xp-BOX';
+    award(BX, 'box-funds', 100000);
+    const b0 = bal(BX), had = rows(`select item_id from pet_inventory where visitor_id = ${q(BX)}`).length;
+    const o1 = open(BX, 'box-open-0001', 0.5, 0.3);
+    ok(o1.ok && o1.box && o1.rarity === 'uncommon' && /^[a-z0-9-]+$/.test(o1.item) && o1.price === 750 && o1.balance === b0 - 750 && bal(BX) === b0 - 750,
+      `a box gives a piece and costs 750 (${JSON.stringify(o1).slice(0, 160)})`);
+    eq([num(`select count(*) from pet_inventory where visitor_id = ${q(BX)} and item_id = ${q(o1.item)}`), boxes(BX), had + 1, o1.today, o1.left_today, o1.left],
+      [1, 1, rows(`select item_id from pet_inventory where visitor_id = ${q(BX)}`).length, 1, 2, i0.of - 1], 'the piece is owned, one box row, two left today, one fewer in the box');
+    eq(json(`sh_wallet(${q(BX)})`).spent, 750, 'the wallet counts the box as spending');
+    const inv = json(`sh_my_shop(${BD}, ${q(BX)})`).inventory.filter(x => x.id === o1.item);
+    eq(inv.map(x => x.how), ['bought'], 'the piece is in the shop\'s inventory as bought');
+    // a replayed call opens nothing; another visitor's request id is refused
+    const o1b = open(BX, 'box-open-0001', 0.99, 0.99);
+    ok(o1b.repeat === true && o1b.item === o1.item && boxes(BX) === 1 && bal(BX) === b0 - 750, 'the same request again gives the first answer and opens nothing');
+    eq(open('xp-BOX-other', 'box-open-0001', 0.5, 0.5).error, 'dup', 'another visitor\'s request id is refused');
+    // three a day, then a new day
+    open(BX, 'box-open-0002', 0.1, 0.1); open(BX, 'box-open-0003', 0.2, 0.9);
+    const o4 = open(BX, 'box-open-0004', 0.1, 0.1);
+    ok(o4.ok === false && o4.error === 'today' && boxes(BX) === 3 && info(BX).left_today === 0, 'the fourth box of a day is refused');
+    ok(open(BX, 'box-open-0005', 0.1, 0.1, BD2).ok === true && info(BX, BD2).left_today === 2, 'the next day it sells again');
+    // never a piece you already own, whatever the rolls
+    const owned0 = new Set(rows(`select item_id from pet_inventory where visitor_id = ${q(BX)}`).map(r => r.item_id));
+    const won = [];
+    for (let i = 0; i < 24; i++) { const r = open(BX, `box-many-${String(i).padStart(4, '0')}`, (i * 0.137) % 1, (i * 0.291) % 1, `${BD} + ${10 + Math.floor(i / 3)}`); if (r.ok) won.push(r.item); }
+    ok(won.length === 24 && new Set(won).size === 24 && won.every(x => !owned0.has(x)), `24 boxes: 24 different pieces, none owned before (${won.length}, ${new Set(won).size})`);
+    // a rarity you own all of: its share goes to the rest, and the odds say so
+    sql(`insert into pet_inventory (visitor_id, item_id) select ${q(BX)}, b.item_id from sh_box_pool(null) b where b.rarity = 'common' on conflict do nothing`);
+    const i2 = info(BX), com = i2.odds.find(o => o.rarity === 'common'), unc = i2.odds.find(o => o.rarity === 'uncommon');
+    ok(com.chance === null && com.left === 0 && Math.abs(unc.chance - 30 / 60) < 1e-4 && Math.abs(i2.odds.reduce((a, o) => a + (o.chance || 0), 0) - 1) < 1e-3,
+      `every Common owned: no Common chance, the rest spread over 60 (${i2.odds.map(o => o.rarity + ' ' + o.chance).join(', ')})`);
+    eq(open(BX, 'box-renorm-001', 0, 0, `${BD} + 30`).rarity, 'uncommon', 'a first number that would have been Common gives an Uncommon');
+    // everything owned: the box sells nothing
+    sql(`insert into pet_inventory (visitor_id, item_id) select ${q(BX)}, b.item_id from sh_box_pool(null) b on conflict do nothing`);
+    const b5 = bal(BX), e5 = open(BX, 'box-empty-0001', 0.5, 0.5, `${BD} + 31`);
+    ok(e5.error === 'empty' && info(BX).left === 0 && info(BX).odds.every(o => o.chance === null) && bal(BX) === b5, 'with every piece owned the box sells nothing');
+    // too few crowns: nothing bought
+    const lo = open('xp-BOX-poor', 'box-poor-0001', 0.5, 0.5);
+    ok(lo.error === 'balance' && lo.price === 750 && boxes('xp-BOX-poor') === 0, 'too few crowns buys nothing');
+    eq(['bad', 'bad', 'bad'], [open('', 'box-bad-0001', 0, 0).error, open(BX, 'short', 0, 0).error, open(BX, 'bad id with spaces', 0, 0).error], 'a malformed visitor or request id is refused');
+    // the page's calls: anon can, and the roll is the server's
+    const ra = anonJson(`open_mystery_box('xp-BOX-roll', 'box-anon-0001')`);
+    ok(ra.ok === true && anonJson(`get_mystery_box('xp-BOX-roll')`).today >= 1, `anon opens a box with its own id (${ra.rarity})`);
+    ok(anonJson(`get_mystery_box(null)`).balance === null, 'with no visitor: the box, no balance');
+    for (const f of [`sh_box_open(null, 'xp-BOX', 'box-anon-0002', 0, 0)`, `sh_box_info(null, 'xp-BOX')`, `sh_box_pool('xp-BOX')`, `sh_box_odds('xp-BOX')`, `sh_box_rules()`])
+      raises(() => anon(`select ${f}`), '42501', `anon runs ${f.split('(')[0]}`);
+
+    // studying now: a ping in the last 3 minutes, in a hub, under a name the person picked
+    const P = (v, ago, hub) => sql(`insert into activity_pings (visitor_id, visit_id, hub, section, pinged_at) values (${q(v)}, ${q(v + '-visit')}, ${q(hub || 'xh')}, 'bank', now() - make_interval(secs => ${ago}))`);
+    const NAMED = { 'xp-SN-a': 'Zelda Molar', 'xp-SN-b': 'amy enamel', 'xp-SN-old': 'Late Larry', 'xp-SN-noxp': 'No Rank Nora', 'xp-SN-me': 'Me Myself', 'xp-SN-prim': 'Linked Lin', 'xp-SN-zz': 'Test Tess' };
+    for (const v of Object.keys(NAMED)) { sql(`insert into visitor_names (visitor_id, display_name) values (${q(v)}, ${q(NAMED[v])}) on conflict (visitor_id) do update set display_name = excluded.display_name`); if (v !== 'xp-SN-noxp') award(v, 'sn-xp', 3000); }
+    award('xp-SN-anon', 'sn-xp', 3000);
+    sql(`insert into visitor_links (alias_id, primary_id) values ('xp-SN-alias', 'xp-SN-prim'), ('xp-SN-mine2', 'xp-SN-me') on conflict do nothing`);
+    P('xp-SN-a', 30); P('xp-SN-a', 90, 'xm'); P('xp-SN-b', 100); P('xp-SN-old', 300); P('xp-SN-noxp', 20); P('xp-SN-anon', 40);
+    P('xp-SN-alias', 50); P('xp-SN-prim', 10); P('xp-SN-mine2', 15); P('xp-SN-zz', 5, 'zz-test');
+    const sn = anonJson(`get_studying_now('xp-SN-me')`), text = JSON.stringify(sn);
+    eq(sn.people.map(p => p.name), ['amy enamel', 'Linked Lin', 'Zelda Molar'], 'studying now: the people with a ping in 3 minutes under a name they picked, by name, each once (a linked device under the id that remains), never you');
+    eq([sn.others, sn.you, sn.minutes], [5, true, 3], 'others counts everyone else studying now, named or not; you: your linked device is studying');
+    ok(sn.people.every(p => Object.keys(p).sort().join(',') === 'flair,name,rank,visit' && /^[0-9a-f]{24}$/.test(p.visit) && Object.keys(p.rank).sort().join(',') === 'journey,level,tier'),
+      'each person: the name, the visit key, the rank and the flair, nothing else');
+    ok(!/xp-SN|bank|xh|xm|visit"?:"?xp/.test(text.replace(/"visit":"[0-9a-f]{24}"/g, '')), `no id, hub, section or time in the answer (${text.slice(0, 140)})`);
+    ok(sn.people.every(p => anonJson(`get_place(${q(p.visit)})`).name === p.name), 'each key opens that person\'s place, under the same name');
+    eq(sn.people.find(p => p.name === 'Linked Lin').visit, one(`select sh_visit_key('xp-SN-prim')`), 'a linked device shows under the id that remains, with its key');
+    const sn0 = anonJson(`get_studying_now(null)`);
+    eq([sn0.people.map(p => p.name), sn0.others, sn0.you], [['amy enamel', 'Linked Lin', 'Me Myself', 'Zelda Molar'], 6, false], 'with no visitor: everyone named, nobody left out');
+    eq(anonJson(`coalesce(get_studying_now(${q('x'.repeat(81))}), 'null'::jsonb)`), null, 'a malformed visitor id gets nothing');
+    anon(`select clear_display_name('xp-SN-a')`);
+    ok(!anonJson(`get_studying_now('xp-SN-me')`).people.some(p => p.name === 'Zelda Molar'), 'back to a random name: off the list');
+
+    // the Crowns board (Sam, 2026-11-22: "Replace study streaks with crowns balance"): sh_wallet's balances worked out ahead
+    // into crowns_board a few at a time (the job), the caller's own worked out live
+    sql(`delete from crowns_board`);
+    const nAll = num(`select count(*) from xp_visitors v where not exists (select 1 from visitor_links l where l.alias_id = v.visitor_id)`);
+    let filled = 0, passes = 0;
+    while (filled < nAll && passes++ < 60) { sql(`select sh_crowns_refresh(200)`); filled = num(`select count(*) from crowns_board`); }
+    eq(filled, nAll, 'the refresh works out everyone with XP, a linked device only under the id that remains');
+    eq(num(`select count(*) from crowns_board b where b.balance <> (sh_wallet(b.visitor_id)->>'balance')::int`), 0, 'every balance on the board is the wallet\'s');
+    eq(num(`select sh_crowns_refresh(8)`), 0, 'with nothing moved and nothing an hour old, a refresh works out nobody');
+    award('xp-SN-a', 'cb-xp', 500); award('xp-SN-b', 'cb-xp', 900);
+    sql(`update crowns_board set spent = spent - 1 where visitor_id = 'xp-SN-old'`);
+    const atOf = v => one(`select at from crowns_board where visitor_id = ${q(v)}`);
+    const before = ['xp-SN-a', 'xp-SN-b', 'xp-SN-old'].map(atOf);
+    eq(num(`select sh_crowns_refresh(1)`), 1, 'a refresh takes the number it is given');
+    const hi = num(`select xp from xp_visitors where visitor_id = 'xp-SN-a'`) >= num(`select xp from xp_visitors where visitor_id = 'xp-SN-b'`) ? 'xp-SN-a' : 'xp-SN-b';
+    eq(['xp-SN-a', 'xp-SN-b', 'xp-SN-old'].map(atOf).map((t, i) => t !== before[i]), ['xp-SN-a', 'xp-SN-b', 'xp-SN-old'].map(v => v === hi), 'someone whose XP moved goes first, the higher XP first');
+    sql(`select sh_crowns_refresh(8)`);
+    eq(num(`select count(*) from crowns_board b where b.balance <> (sh_wallet(b.visitor_id)->>'balance')::int`), 0, 'after XP and spending moved, the next refresh catches up');
+    sql(`update crowns_board set at = now() - interval '2 hours' where visitor_id = 'xp-SN-prim'`);
+    eq(num(`select sh_crowns_refresh(8)`), 1, 'a balance over an hour old is worked out again (study time pays crowns too)');
+    sql(`insert into crowns_board (visitor_id, balance, xp, spent) values ('xp-SN-alias', 99999, 1, 0), ('xp-CB-gone', 99999, 1, 0) on conflict (visitor_id) do update set balance = 99999`);
+    sql(`select sh_crowns_refresh(1)`);
+    eq(num(`select count(*) from crowns_board where visitor_id in ('xp-SN-alias', 'xp-CB-gone')`), 0, 'a linked device and someone with no XP row are taken off');
+    // the board as a page reads it
+    const cbRows = v => anonJson(`(select coalesce(json_agg(b), '[]'::json) from get_crowns_board_v2(${v === null ? 'null' : q(v)}, 10) b)`);
+    const cb0 = cbRows(null), cbText = JSON.stringify(cb0);
+    const want = sql(`select balance from crowns_board where balance > 0 order by balance desc`).map(r => +r[0]);
+    const cut = want.length > 10 ? want[9] : -1;
+    eq(cb0.map(r => r.crowns), want.filter(c => c >= cut), 'the board: the top 10 by crowns on hand (ties share a place), from crowns_board');
+    ok(cb0.every((r, i) => r.rnk === 1 + cb0.filter(x => x.crowns > r.crowns).length), 'each row\'s place is one more than the people above it');
+    ok(cb0.every(r => /^[0-9a-f]{24}$/.test(r.visit) && Object.keys(r).sort().join(',') === 'crowns,display_name,flair,is_me,journey,level,rnk,step,tier,visit,xp'), 'each row: the name, the crowns, the rank, the flair and the visit key');
+    ok(!/xp-[A-Za-z]/.test(cbText.replace(/"visit":"[0-9a-f]{24}"/g, '')) && !cb0.some(r => r.is_me), `no id in the board, and no "you" without a visitor (${cbText.slice(0, 120)})`);
+    sql(`update crowns_board set balance = 1 where visitor_id = 'xp-SN-me'`);
+    const meLive = num(`select (sh_wallet('xp-SN-me')->>'balance')::int`), cbMe = cbRows('xp-SN-mine2'), mine = cbMe.filter(r => r.is_me);
+    eq([mine.length, mine[0] && mine[0].crowns, mine[0] && mine[0].display_name], [1, meLive, 'Me Myself'], 'your own row is worked out now (not the board\'s older figure), from a linked device too');
+    sql(`delete from crowns_board where visitor_id = 'xp-SN-me'`);
+    eq(cbRows('xp-SN-me').filter(r => r.is_me).map(r => r.crowns), [meLive], 'before the job reaches you, your row is there anyway');
+    eq(cbRows('x'.repeat(81)).filter(r => r.is_me).length, 0, 'a malformed visitor id is no one');
+    raises(() => anon(`select count(*) from public.crowns_board`), '42501', 'anon reads crowns_board directly');
+    raises(() => anon(`select sh_crowns_refresh(1)`), '42501', 'anon runs sh_crowns_refresh');
+    notes.push(`the mystery box and studying now (migration_v99): ${i0.of} pieces in the box, the roll at every rarity's edge, ${won.length + 6} boxes opened; studying now names only the named, never an id; the Crowns board matches every wallet`);
+  }
+
   /* ---------- 15. the private parts stay private ---------- */
   for (const t of ['xp_awards', 'xp_award_totals', 'xp_boosts', 'xp_sessions', 'answer_xp', 'question_keys', 'game_baseline', 'pet_purchases', 'pet_inventory', 'pet_equipped', 'ideas', 'idea_votes', 'shop_items', 'visit_secret', 'card_reviews'])
     raises(() => anon(`select count(*) from public.${t}`), '42501', `anon reads ${t} directly`);

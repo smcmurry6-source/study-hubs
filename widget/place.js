@@ -356,7 +356,8 @@
      With reduced motion there are no clouds.
      A random trip (Sam, 2026-11-13: "i want random to be for the whole class") also has more(), which asks the server for
      someone else and resolves to their place in the list: the list is the trip so far, Previous goes back through it (not
-     past the first), and Next past the last rolls the die again. ---------- */
+     past the first), and Next past the last rolls the die again.
+     nav.what names the list in the line under the place ("Place 2 of 5 studying now"; "on the board" without it). ---------- */
   var HOME_SVG = '<svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true" focusable="false"><path d="M3 9.5L10 3.5l7 6M5 8.5V16.5h10V8.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   var NAV_SVG = { prev: '<svg viewBox="0 0 20 20" width="22" height="22" aria-hidden="true" focusable="false"><path d="M12.5 4.5L7 10l5.5 5.5" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
     next: '<svg viewBox="0 0 20 20" width="22" height="22" aria-hidden="true" focusable="false"><path d="M7.5 4.5L13 10l-5.5 5.5" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg>' };
@@ -1057,7 +1058,7 @@
         : '<p class="tpv-gnone">No hub medals yet</p>') + "</div>" +
       '<p class="tpv-gtip">Tap Timmy and he waves. The sun, the house and the things in the yard each do something too.</p>' +
       (V.nav && V.nav.more ? '<p class="tpv-gnav">Picked at random from the class<span>Next: ' + (navNext(V.nav) === "more" ? "someone else at random" : esc(V.nav.list[navNext(V.nav)].name)) + "</span></p>"
-        : V.nav && V.nav.list.length > 1 ? '<p class="tpv-gnav">Place ' + (V.nav.at + 1) + " of " + V.nav.list.length + " on the board<span>Next: " + esc(V.nav.list[navStep(V.nav, 1)].name) + "</span></p>" : "") + "</div>";
+        : V.nav && V.nav.list.length > 1 ? '<p class="tpv-gnav">Place ' + (V.nav.at + 1) + " of " + V.nav.list.length + " " + esc(V.nav.what || "on the board") + "<span>Next: " + esc(V.nav.list[navStep(V.nav, 1)].name) + "</span></p>" : "") + "</div>";
     var mb = $('[data-tp="mastery"]', el); if (mb) mb.addEventListener("click", openMastery);
   }
   /* your own place's panel (Sam, 2026-11-14: "way more epic and better buttons/ui"): Timmy as he is today with his
