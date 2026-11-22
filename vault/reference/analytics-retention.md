@@ -43,7 +43,7 @@ rows packed into one summary row per person per hub.
 Central day its page came down), `noted_at`. The After merge workflow's `down` step writes it when a push deletes
 `hubs/<hub>/index.html` (the first day is kept if the step runs again) and deletes the row when a push adds the page back,
 so a live hub's rows are never rolled up ([after-a-merge](../how-to/after-a-merge.md)). v95 filled in the hubs already down
-from the hub notes and `DEPLOY_NOTES.md` (Genetics left no record: its day is its last saved answer, 2026-09-10). A hub
+from the hub notes and the change log (`DEPLOY_NOTES*.md`) (Genetics left no record: its day is its last saved answer, 2026-09-10). A hub
 taken down or brought back without a push (by hand): add or delete its row by hand. Package 2 counts its 30 days from it.
 
 | Data | Keep per-person rows | Then | Done by | Why |
