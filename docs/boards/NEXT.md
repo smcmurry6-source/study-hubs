@@ -1,4 +1,20 @@
-# Boards hub: what the next session does (handoff, updated 2026-10-14 after Session 7)
+# Boards hub: what the next session does (handoff, updated 2026-11-22: the move onto the engine)
+
+## First: the move onto the engine (2026-11-22)
+
+Sam said yes to moving boards onto the hub engine before it ships (`vault/decisions.md` on `main`, 2026-11-22; the task is
+`vault/tasks/2026-11-22-boards-onto-the-engine.md` on `main`). **The plan is `ENGINE_PLAN.md`** (this folder): how every
+part of `src/boards/` maps onto `widget/hub.js` and `hubs/boards/content/`, what the engine gains, what
+`tools/build-boards.js` becomes (a converter into `content/`), the storage bound, what becomes of the 16 open PRs, and the
+build as briefs `tasks/T-07.md` to `tasks/T-17.md`, one PR each. **Sam approved it on 2026-11-22, keeping Chairside**
+(T-16 and T-17 build it on the engine). Order: T-07 first, then T-08 to T-12 and T-14 in any order, T-13 with package 2
+of the sustainability task, T-16 and T-17 once their dependencies are in, T-15 last.
+Content work (items, notes, facts) goes on alongside; the next content brief is T-18 (the `items-pharm` brief Session 7's
+step 5 called T-07).
+
+What follows is the earlier handoff (2026-10-14, after Session 7); where it talks about rebuilding
+`hubs/boards/index.html`, the generated page, that ends with T-07.
+
 
 Start here. Branch `claude/boards-hub`, draft PR #70. Read, in order: `DECISIONS.md`, `PLAN_V2.md` (approved), then
 only the parts of `BUILD_SPEC.md` and `research/*.md` the current step needs (grep headings; never read big files
