@@ -49,6 +49,10 @@ Since the redesign's release (2026-11) every hub runs on the shared engine (`wid
   `node tools/figures/site/build.mjs`, which writes `widget/hub-art/<hub-id>.js` once `hubs/<hub-id>/index.html` exists,
   and deletes it when the page comes down). Never another hub's art, a recolored
   copy or the generic placeholder; Sam sees it in screenshots (and the hub's preview, if Sam asks for one).
+  **The page takes the tint from `widget/hub.css`**, not from the art: add the hub's line beside Review of Systems'
+  (`:root[data-hx-hub="<hub-id>"], .hx[data-hub="<hub-id>"]` with its `--hub`, `--hub-mid`, `--hub-light`, `--hub-dark` from
+  `style.mjs`; the ink 4.5:1 or more on its light, or a deeper `--hub-text`), then the bundles. Without it the page draws in
+  the default grey-purple, as Review of Systems did for its first three days ([BUG-198](../release/bug-log.md)).
 - **Questions:** every choice with its why ([every-choice-gets-a-why](../rules/every-choice-gets-a-why.md)),
   `likelyTopics` ([high-likelihood-topics](../rules/high-likelihood-topics.md)), and per taught lecture about 5
   two-statement, 8 true/false and 3-5 numbered-statement items

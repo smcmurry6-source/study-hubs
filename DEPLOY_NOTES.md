@@ -32,7 +32,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
-- **2026-11-22 (The weekly pennant: idea board #6, `migration_v98.sql`, pending, Claude Code)** — Answer 100 questions from
+- **2026-11-22 (The weekly pennant: idea board #6, `migration_v98.sql`, applied, Claude Code)** — Answer 100 questions from
   Monday to Sunday (Central), in any hub and any part of it (xp_days.n: practice, drill, mock, arcade, Learn; not
   flashcards), and Timmy gets that week's pennant, with `week` 500 XP and as many crowns (Sam: "lets do 100, the rest looks good"; the idea said 50). Server:
   `week_pennants` (a row per person per week, made once), `claim_week_v2` (the page asks after the 100th answer's reply; the
@@ -46,7 +46,22 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   (`window.SH_PENNANT` in `widget/hub-art.js`: the month's felt and badge, the week of the month as stars, the school year's
   sleeve; 209 Mondays checked by the build; `pennant-sheet.mjs` draws a contact sheet), the lamp's pennant in `place.mjs`.
   Linked devices are one person: the claim, the read and the sweep count and pay under the main id. Every function is
-  PL/pgSQL. Tested: `tools/release/xp.js` 14g, `rls.js`. About page entry. The migration waits for the merging session.
+  PL/pgSQL. Tested: `tools/release/xp.js` 14g, `rls.js`. About page entry. The merging session applied the migration on 2026-11-22 at about 11:15 am Central.
+- **2026-11-22 (No printing on the one-page sheet, Sam, Claude Code)** — Sam: "lets take away the print/pdf download option".
+  `widget/sheet.js` draws the sheet on screen only: the Print or save as PDF button, its "Fits on one sheet of paper" line, the
+  printed copy (`body > .shp`, `fit()`, `sheet:print`) and `widget/sheet.css`'s `@page` and print rules are gone; Practice is
+  now the sheet's main button, the toolbar's One-page sheet button has the cram sheet's icon (the `print` icon is out of
+  `tools/figures/site/icons.mjs`), and More's wording no longer says "to print". `tools/ci/smoke.js` checks every sheet's cram
+  lines on screen and fails if printing comes back. About page and Ask Timmy's site help, event taxonomy, retention, repo
+  map, hub note and [decisions](vault/decisions.md). Same PR as Review of Systems' violet (#537).
+- **2026-11-22 (Review of Systems in its own violet, BUG-198, Claude Code)** — the hub had drawn in the engine's default
+  grey-purple (`--hub: #6b5a68`) since it was built: `widget/hub.css` never had its tint line, and #523 had taken out the
+  archived hubs' lines. One line adds it (ink `#6b46a8`, mid `#a58ad6`, light `#e8e0f5`, dark `#b9a2ec`, as in
+  `tools/figures/site/style.mjs`): buttons, the active tab, the countdown, icons, course headings and the one-page sheet's
+  accent are violet, as its emblem, masthead and dashboard card already were. Contrast: ink 5.35:1 on its light, dark 7.72:1
+  on the dark panel. `widget/site.bundle.css` rebuilt; no `sw.js` bump (styles are network-first). Found while building #536;
+  shown to Sam before and after (Home, Notes, a sheet, light and dark). [build-a-hub](vault/how-to/build-a-hub.md) and the hub note say a new engine hub needs
+  its own line.
 - **2026-11-22 (a mystery box in Timmy's shop, Studying now to visit, and the Crowns board, idea board #9, Claude Code)** — From the idea board's "Drip for Timmy", which Sam set Planned. **The box** (`migration_v99.sql`, applied live by the merging session at about 16:45 UTC that day and appended to `supabase/schema.sql`): `get_mystery_box` and `open_mystery_box` (one call, idempotent on its request id, under the per-visitor lock); 750 crowns for a random piece you don't have from the everyday rotation, up to 3 a Central day, the odds by rarity on the box before you open it (40/30/18/9/3, a finished rarity's share shared out over the rest), nothing charged when nothing is left. It writes a `pet_purchases` row of kind `box`, so the wallet is unchanged. `widget/shop.js` draws it above Today's picks with its odds, a sheet with the odds table, and the opening (the box shakes, the lid comes off, the piece and its rarity's burst); new art in `tools/figures/site/shop.mjs` (contact sheet from `shop-sheets.mjs`). **Studying now**: `get_studying_now` (a ping in the last 3 minutes, any hub; only people who picked their own name for the boards; name, visit key, rank and medals; a count of the rest; about 2 ms a call) behind a third leaderboard tab on the dashboard (refreshed every minute while shown) and a list under Timmy's place in a hub's More; a visit from either goes through the list with the place's arrows. **The Crowns board** (Sam: "Replace study streaks with crowns balance"): the dashboard leaderboard's Study streaks tab is now Crowns, the top 10 by Shiny Gold Crowns on hand; `get_crowns_board_v2` reads a new cache, `crowns_board`, filled by the pg_cron job `sh-crowns-board` (every 2 minutes, `sh_crowns_refresh(8)`, at most 2 s a run; the whole class in about 45 minutes after the migration), and works out the caller's own balance live. No function replaced. Smoke checks for all three, `tools/release/xp.js` section 18, the preview's fake server, the About page, the event taxonomy (`shop:box:<rarity>`, `dash:board=now|crowns`) and [game-server](vault/reference/game-server.md). Sam approved the price, the odds, the limit, the tail and who shows as built.
 - **2026-11-22 (A one-page sheet for every lecture, idea board #5, #536, Claude Code)** — Sam's note on the idea ("do you actually
   want to print this or just have the cram sheet and likely topics/hints all together?") is answered with one thing that does

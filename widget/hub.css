@@ -66,6 +66,9 @@
     --float-shadow: 0 4px 14px rgba(0, 0, 0, .4);
   }
 }
+/* each live hub's own tint (its ink, mid, light and dark in tools/figures/site/style.mjs); a hub with no line here draws in
+   the default above. Review of Systems' ink is 5.35:1 on its light, and its dark 7.72:1 on the dark panel (BUG-198) */
+:root[data-hx-hub="review-of-systems"], .hx[data-hub="review-of-systems"] { --hub: #6b46a8; --hub-mid: #a58ad6; --hub-light: #e8e0f5; --hub-dark: #b9a2ec; }
 /* the tint is on the page root too (hub.js sets data-hx-hub), so the shared widget's tokens below (--accent and the rest,
    declared on :root) resolve to this hub's color, not the default, in its panels and in the player (BUG-056) */
 :root { --hub-text: var(--hub); --hub-soft: var(--hub-light); }
