@@ -1,11 +1,11 @@
 ---
 type: task
-status: in-progress
+status: review
 hub: review-of-systems
 created: 2026-11-22
 requested-by: Sam
 due: 2026-12-03
-waiting-on:
+waiting-on: Sam (the decks below as PDFs or smaller copies, the eval's OK, the calls in the PR)
 agent: Claude Code
 pr: https://github.com/smcmurry6-source/study-hubs/pull/541
 ---
@@ -73,6 +73,8 @@ the course the student is in** ("Let's do your recommendation to have Timmy only
 - [ ] Fundamentals II: F2-3's `Bacterial Structure` deck (Dr. Hamm, 69 MB) could not be read (the bacterial envelope still
       rests on the study guides): needs a PDF or smaller copy
 - [x] Ask Timmy reads one course first (`supabase/functions/timmy/core.js`, `widget/hub-timmy.js`, the tests)
+- [ ] Fundamentals II: none of F2-4's six decks teaches Chlamydia, Neisseria or syphilis beyond a mention (those sections
+      and f2-fungi-15 to -17 rest on the study guides): a deck for them, if the course had one
 - [ ] Ask Timmy's eval on the real model for the `rs-` cases (`node tools/timmy/eval.mjs --only review-of-systems`,
       about $1): waiting on Sam's OK to spend it
 - [ ] Sam's calls from the reviewers (the PR lists them)
@@ -89,6 +91,14 @@ this pass.
   I's prompt passed 95k tokens with every course's cram sheet in it, so a course's part now carries only its own cram sheet
   (every course's when no course is known): every course's prompt fell by about 25k.
 
+- 2026-11-22: F1-8, F1-9, the F1-6 and F1-7 follow-up (Dr. Bruns's mucosal immunity and Cells & Tissues decks) and F2-1
+  to F2-8 merged. The page's download passed its 1,500 KB budget (about 1,590 KB); raised to 1,800 in the same PR.
+
 ## Outcome
 
-(At the end.)
+Every part of Cardio & Respiratory, Renal, MSK & GI's GI parts, Fundamentals I and Fundamentals II checked against the
+professors' slides (Renal also against Dr. Herr's recordings) by one reviewer each, merged in
+[#541](https://github.com/smcmurry6-source/study-hubs/pull/541): 1,126 questions to 1,352 (none retired), High-yield points
+18 to 211 (161 to know, 50 to skip), High yield topics 316 to 379, 519 questions now resting on the slides. Ask Timmy reads
+the course the student is in (36-89k tokens a question). Left, above: ten decks the Drive connector couldn't read, the
+real-model eval and Sam's calls; the note stays here until they are done.

@@ -75,14 +75,14 @@ check-in hours: its entry in `hubs.js`.
   content JSON loads behind it), against Heme & Endo Exam 3's 780 KB, and about 850 ms of blocking time on the performance
   suite's slowed phone (Heme & Endo Exam 3: 300-370 ms), nearly all of it the background work after Home has drawn (parsing the
   JSON, the search index of every part's notes). Its budget in `tools/release/budgets.json` is set from that (2026-11-20),
-  and raised from 1,500 to 1,800 KB on 2026-11-22, when the professors' slides took it to about 1.5 MB and up (Sam: "I dont
+  and raised from 1,500 to 1,800 KB on 2026-11-22, when the professors' slides took it to about 1.6 MB (Sam: "I dont
   want to sacrifice the quality of the material"; the page still draws by about 2.5 s, the rest loading behind it);
   chunking the search index is on the [inbox](../tasks/inbox.md). Ask Timmy's content
   for it was about 170-200k tokens by length, which is why Timmy moved to Haiku 5.5 ([decisions](../decisions.md),
   [ask-timmy](../reference/ask-timmy.md)). Checked against the professors' slides and recordings (2026-11-22) it passed
   200k, and Sam put the material first ("I dont want to sacrifice the quality of the material just so we can have ask
   timmy"): **Timmy reads the course the student is in** (Sam: "have Timmy only read the course the student is in"), one
-  course's notes, tables, cram sheet and High yield, about 36-80k tokens a question (every course's cram sheet when no
+  course's notes, tables, cram sheet and High yield, about 36-89k tokens a question (every course's cram sheet when no
   course is known), and the whole hub only when that isn't enough ([ask-timmy](../reference/ask-timmy.md), "Limits and money"). `tools/timmy/test.mjs` fails a course whose prompt
   reaches 95,000 tokens (Haiku 5.5 costs five times as much past a 100k prompt): a course that grows past it needs its
   notes looked at, or the check moved, with Sam.
