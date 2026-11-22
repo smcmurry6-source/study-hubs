@@ -297,6 +297,6 @@ Nothing: the page came down 2026-11-19. What follows was pending when it did, ke
   forsythus, S8's cephalosporin claim), in [the audit's note](../tasks/done/2026-11-15-perio-bank-audit.md): Sam said
   leave them (2026-11-15, [decisions](../decisions.md)). No question turns on any of them; don't re-propose them for this final.
 
-History: grep `perio` in "Recent major changes" (`DEPLOY_NOTES.md`).
+History: grep `perio` in the change log (`DEPLOY_NOTES*.md`, its monthly archives included).
 
 Related: [home](../home.md) · [occlusion](occlusion.md) (same final day)

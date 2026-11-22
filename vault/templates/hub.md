@@ -24,6 +24,6 @@ Open tasks for this hub: `vault/tasks/` notes with `hub: {{title}}`.
 
 ## History
 
-Grep "Recent major changes" in `DEPLOY_NOTES.md` for `{{title}}`. Retrospective (once archived): `LESSONS.md`.
+Grep the change log (`DEPLOY_NOTES*.md`, its monthly archives included) for `{{title}}`. Retrospective (once archived): `LESSONS.md`.
 
 Related: [home](../home.md)

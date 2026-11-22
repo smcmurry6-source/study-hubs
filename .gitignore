@@ -17,10 +17,12 @@ tools/figures/*/dist/
 # Working files the taste skill's scripts write (draw sheets, inspector screenshots, downloaded pictures)
 .taste-skill/
 
-# Timmy Time build byproducts (tools/podcast/produce.py): chapters json and the temporary mix, never committed;
-# copy duration and chapters into the hub's SH_PODCAST instead
-hubs/*/audio/*.mp3.json
-hubs/*/audio/*.mix.wav
+# A hub's narration and Timmy Time (tools/narrate.py, tools/podcast/produce.py) are never committed since 2026-11-22
+# (vault/rules/no-narration-in-the-repo.md): a local listen stays on your machine, and the public-repo check
+# (tools/release/secrets.js) fails one that is added anyway
+hubs/*/audio/
+timmy-time.mp3
+timmy-time.mp3.json
 
 # Built previews (node tools/preview/build.js): never committed
 _preview/

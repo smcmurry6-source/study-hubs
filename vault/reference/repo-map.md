@@ -23,8 +23,10 @@ tags: [map]
   the shop's own art (`shop.mjs`: the Shiny Gold Crown coin, the snack and boost thumbnails, the rarity frames, built
   into `widget/hub-art/shop.js`, `window.SH_SHOP_ART`; `shop-sheets.mjs`, its contact sheets:
   [the shop](../tasks/done/2026-11-06-redesign-timmy-shop.md)).
-- `DEPLOY_NOTES.md` — the change log ("Recent major changes", newest first): what every session shipped. Grep it for a
-  hub or feature; don't read it whole.
+- `DEPLOY_NOTES.md` — the change log ("Recent major changes", newest first): what every session shipped, the last week of
+  it. Older entries are in `DEPLOY_NOTES-<yyyy-mm>.md` next to it, one file a month, moved there unchanged by
+  `node tools/deploy-notes/trim.mjs` (the lessons audit runs it; `--check` says what would move). New entries go at the top
+  of `DEPLOY_NOTES.md`. Grep all of them for a hub or feature (`grep -n "<hub>" DEPLOY_NOTES*.md`); don't read one whole.
 - `index.html` — the dashboard (the redesign's, since its release in 2026-11): a small page of settings
   (`window.SH_DASH`) drawn by `widget/dash.js` + `widget/dash.css` (loaded as `widget/dash.bundle.js` and
   `widget/site.bundle.css`: [bundles](bundles.md)) on the hub engine's design system (`widget/hub.css`), with

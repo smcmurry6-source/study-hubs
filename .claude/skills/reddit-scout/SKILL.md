@@ -66,7 +66,7 @@ This is what makes the report worth reading. For each shortlisted idea:
 
 1. **Do we have it already?** Grep `hubs/`, `widget/`, `tools/`, `about/index.html`, `.claude/`. Say "already have"
    with the file, rather than suggesting it.
-2. **Did Sam already decide?** `vault/decisions.md`, `log.md`, and grep `DEPLOY_NOTES.md`.
+2. **Did Sam already decide?** `vault/decisions.md`, `log.md`, and grep `DEPLOY_NOTES*.md` (the change log and its monthly archives).
 3. **Is it true?** Check a Claude Code claim in the docs (code.claude.com/docs, or the claude-code-guide agent); a web
    claim by trying it; a security claim against the real thing, read-only: the Supabase connector's `get_advisors`
    and `execute_sql` (read-only SQL), a grep of the shipped files. **Never print a secret** while checking: test a

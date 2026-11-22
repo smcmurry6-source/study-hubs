@@ -15,9 +15,11 @@ instead); `node tools/ci/vault.js` fails without them.
 
 @AGENTS.md
 
-**The change log is not loaded** (`DEPLOY_NOTES.md` is over 200 KB, about 50k tokens): before you change a hub or a
-shared file, read its first entries (`sed -n '1,120p' DEPLOY_NOTES.md`) and grep it for the hub or feature
-([github-is-the-source-of-truth](vault/rules/github-is-the-source-of-truth.md) step 4).
+**The change log is not loaded**: `DEPLOY_NOTES.md` holds the last week's entries, and older ones are in its monthly
+archives next to it, `DEPLOY_NOTES-<yyyy-mm>.md` (moved there unchanged by `node tools/deploy-notes/trim.mjs`). Before you
+change a hub or a shared file, read its first entries (`sed -n '1,120p' DEPLOY_NOTES.md`) and grep all of them for the hub
+or feature (`grep -n "<hub>" DEPLOY_NOTES*.md`; [github-is-the-source-of-truth](vault/rules/github-is-the-source-of-truth.md)
+step 4). New entries still go at the top of `DEPLOY_NOTES.md`.
 
 The notes above and below are shared with Cowork/Claude Project sessions and every other agent. Everything in them
 applies here too, except where a note says how a Claude Code session does it differently.

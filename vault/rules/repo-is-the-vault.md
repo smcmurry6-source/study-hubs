@@ -29,7 +29,7 @@ copy (or tell Sam to, for a claude.ai skill or a Project doc).
 | A call Sam made (approved, skipped, "leave it as it is") | one line in [vault/decisions.md](../decisions.md) |
 | Something to do | one note in `vault/tasks/` ([how tasks work](../tasks/README.md)) |
 | A quick idea, not yet a task | a line in [vault/tasks/inbox.md](../tasks/inbox.md) |
-| What shipped | "Recent major changes" in `DEPLOY_NOTES.md` (the change log) |
+| What shipped | "Recent major changes" in `DEPLOY_NOTES.md` (the change log; older entries in `DEPLOY_NOTES-<yyyy-mm>.md`) |
 | A bug found in testing or after a release (never an unfixed security hole) | a row in [the bug log](../release/bug-log.md) |
 | A release test report too long for its PR | `vault/release/reports/<yyyy-mm-dd>-<what>.md` ([template](../templates/release-test-report.md)) |
 | What the data taught | `LESSONS.md` (its own refresh process: `tools/lessons-refresh.md`) |

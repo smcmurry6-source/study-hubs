@@ -11,7 +11,7 @@ one line each, with where it applies and where it came from. Standing rules have
 
 **Add a line whenever Sam decides something** in a task, a PR or a chat ([repo-is-the-vault](rules/repo-is-the-vault.md)).
 This log was started on 2026-11-03 from the change log; older calls not listed here may still be in "Recent major
-changes" in `DEPLOY_NOTES.md` (grep it before re-proposing something).
+changes" in the change log (grep `DEPLOY_NOTES*.md`, the monthly archives included, before re-proposing something).
 
 | Date | Decision | Applies to | Source |
 |---|---|---|---|

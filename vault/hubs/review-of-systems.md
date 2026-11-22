@@ -81,7 +81,7 @@ Open items for this hub are lines in [the inbox](../tasks/inbox.md) tagged Revie
 
 ## History
 
-Grep "Recent major changes" in `DEPLOY_NOTES.md` for `review-of-systems`. Built:
+Grep the change log (`DEPLOY_NOTES*.md`, its monthly archives included) for `review-of-systems`. Built:
 [the task](../tasks/done/2026-11-19-review-of-systems-hub.md). Retrospective (once archived): `LESSONS.md`.
 
 Related: [home](../home.md) · [build-a-hub](../how-to/build-a-hub.md) · [heme-endo-exam3](heme-endo-exam3.md)

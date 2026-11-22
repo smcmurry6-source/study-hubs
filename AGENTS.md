@@ -23,7 +23,8 @@ Why and how: [vault/rules/repo-is-the-vault.md](vault/rules/repo-is-the-vault.md
 Don't read the big files whole. A hub's content is JSON in `hubs/<id>/content/` (a question or a lecture to a line),
 the engine that draws it is `widget/hub.js` and its parts, and an older hub is one large single-file
 `hubs/<id>/index.html`: grep for what you need.
-`DEPLOY_NOTES.md` is the change log: read its top entries and grep it for your hub or feature.
+`DEPLOY_NOTES.md` is the change log (the last week; older entries are in `DEPLOY_NOTES-<yyyy-mm>.md` next to it): read its
+top entries and grep all of them for your hub or feature (`grep -n "<hub>" DEPLOY_NOTES*.md`).
 
 ## 2. Doing a task
 

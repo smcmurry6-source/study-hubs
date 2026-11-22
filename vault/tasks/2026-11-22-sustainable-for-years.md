@@ -41,7 +41,7 @@ they can.
 
 - [ ] A record of when each hub's page came down (`hubs_down`: hub, the day), written by the After merge workflow's `down`
       step (`tools/after-merge/run.js`, where it already deletes the hub's "Good question?" thumbs), filled in for every hub
-      already down (the dates are in the hub notes and `DEPLOY_NOTES.md`). Package 2 uses it.
+      already down (the dates are in the hub notes and the change log, `DEPLOY_NOTES*.md`). Package 2 uses it.
 - [ ] **Question health rolled up when a hub's page comes down** (Sam's B; this replaces 2026-11-21's "after the year"):
       the nightly job collapses that hub's `question_events` into `question_events_daily` as v93 does, then deletes them.
       Its first run takes every hub already down (about 37 MB). Review of Systems stays as it is while it's live.
@@ -94,12 +94,16 @@ they can.
 ### 5. The repo
 
 - [x] The rule: [no-narration-in-the-repo](../rules/no-narration-in-the-repo.md) (Sam's A: the history stays as it is).
-- [ ] CI fails a change that adds a narration or Timmy Time recording (a file under `hubs/<hub>/audio/`, or
-      `timmy-time.mp3` anywhere); the widget's fixed sounds stay allowed.
+- [x] CI fails a change that adds a narration or Timmy Time recording (a file under `hubs/<hub>/audio/`, or
+      `timmy-time.mp3` anywhere); the widget's fixed sounds stay allowed. Done: `tools/release/secrets.js` (CI's public-repo check)
+      fails any tracked file under `hubs/<hub>/audio/` or named `timmy-time.mp3`, and `.gitignore` leaves both out.
 - [ ] When narration comes back: the audio repo the rule describes, `tools/narrate.py` and `tools/podcast/` writing to it,
       the engine fetching from it, and a way to wipe its history at each archiving.
-- [ ] `DEPLOY_NOTES.md` trimmed: entries older than about a month move to a dated archive file next to it, so a session
-      reads a few KB, not 200 (it costs every session about 50k tokens today).
+- [x] `DEPLOY_NOTES.md` trimmed: entries older than about a month move to a dated archive file next to it, so a session
+      reads a few KB, not 200 (it costs every session about 50k tokens today). Done with a week, not a month: the file was 593 KB and
+      November alone 414 KB, so a month would have left 457 KB. `node tools/deploy-notes/trim.mjs` moved 309 entries older
+      than 2026-11-15, unchanged, to `DEPLOY_NOTES-2026-11.md`, `-10.md` and `-09.md`; 133 stay (192 KB). The lessons
+      audit runs it again each time (`tools/lessons-refresh.md`). Even a week is not "a few KB": a busy day writes 40-50 KB.
 
 ### 6. A health line in every lessons audit
 
@@ -110,6 +114,9 @@ they can.
 
 - 2026-11-22: written from the chat (Claude Code, the session handling the merging), after measuring the repo, the site
   and the database; packages 5's rule and 6 done in the same PR.
+- 2026-11-22: package 5's CI check and change-log trim (Claude Code). The trim kept a week, not a month (above), and is
+  rerun by every lessons audit. The podcast skill and `tools/podcast/README.md` said to commit the episode's mp3; they now
+  say never to. The third box (the audio repo) stays open.
 
 ## Outcome
 
