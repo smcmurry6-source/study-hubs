@@ -1842,6 +1842,24 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
     return { s: egg("mastery", m.s, spark), lights: m.lights, z: at[0] + at[1] + .2 };
   }
 
+  /* the weekly pennant (the class challenge, migration_v98): your newest one hangs from the lamp post by the path, the way
+     a street lamp carries a banner, flying out over the path. Only the newest: the pennants a year brings (up to 52) live
+     in the Pennants view it opens, so the yard never fills up with them the way the old house's bunting did. The flag is
+     the pennant kit's drawing (tools/figures/site/pennant.mjs, window.SH_PENNANT.flag: hoist at 0 0, 60 x 36, flying
+     right), handed in by the page as markup, so this kit never needs the dates; here it is turned to fly left. The space
+     scene's crystal lamp has no post, so there the pennant gets a short staff of its own beside it. */
+  function lampPennant(flag, kind){
+    var b = P(FIX.lamp[0], FIX.lamp[1], 0), x = b[0], y = b[1], k = .36, top = y - 27.6, s = "";
+    if (kind === "crystal"){
+      x -= 6; top = y - 23;
+      s += ell(x, y - 1.4, 2.6, 1, "#000", 0, .14) + L("M" + f(x) + " " + f(y - 1.4) + " V" + f(top - 2), 3.4) + L("M" + f(x) + " " + f(y - 1.4) + " V" + f(top - 2), 1.6, "#B6BEC7") + circ(x, top - 3.4, 1.8, "#9B7BE0", 1);
+    }
+    s += L("M" + f(x - .4) + " " + f(top + .6) + " h-2.2 M" + f(x - .4) + " " + f(top + 36 * k - .6) + " h-2.2", 1.4);
+    s += '<g transform="translate(' + f(x - 1.6) + " " + f(top) + ") scale(" + (-k) + " " + k + ')">' + flag + "</g>";
+    var spark = dmStar(x - 24, top - 4, 3, "#FFFFFF", "") + dmStar(x - 10, top - 9, 2.4, "#FFE27A", "") + dmStar(x - 28, top + 12, 2.2, "#FFFFFF", "");
+    return egg("pennant", s, spark);
+  }
+
   /* ------------------------------------------------------------------ the fixed pieces ----------------------------- */
   function toothbrush(x, y, z){
     var b = P(x, y, z || 0);
@@ -1967,6 +1985,7 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
   /* ------------------------------------------------------------------ the render ----------------------------------- */
   /* o = { home, scene, night, yard: { left: "garden", ... }, up: { windows, porch, chimney, flag: true }, paint,
            tier 0-6 and level 1-3 (the rank: the statue's material and steps), flair [{ hub, lvl 1-4, tint }] (the medal board),
+           pennant (the newest weekly pennant's flag, as SH_PENNANT.flag() draws it: the lamp post by the path flies it),
            season "", "fall", "winter", "spring", holiday (holidayId()), marks (dash the empty spots: the full view),
            timmy: { g: markup, at: spot } (a still picture with Timmy in it), viewBox, bare (a yard item on its own) }
      returns { svg, spots (screen [x, y]), plot (yard [x, y, z]), slots { name: path d }, homeHit, eggs [keys] }        */
@@ -2002,7 +2021,7 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
       var st = home.statue || FIX.statue, stt = statue(st[0], st[1], st[2] || 0, tier, o.level || 1, so); items.push({ z: st[0] + st[1] + (st[2] ? 1.2 : .3), s: stt.s }); lights += stt.lights;
       var ma = mastery(home, flair, so); if (ma.s) { items.push({ z: ma.z, s: ma.s }); lights += ma.lights; }
       var br = home.brush || FIX.brush; items.push({ z: br[0] + br[1], s: toothbrush(br[0], br[1], up.porch && home.porchZ ? home.porchZ.brush : br[2] || 0) });
-      var lamp = lampFor(snow && sc.lamp === "post" ? "iron" : sc.lamp, so); items.push({ z: FIX.lamp[0] + FIX.lamp[1], s: lamp.s }); lights += lamp.lights;
+      var lamp = lampFor(snow && sc.lamp === "post" ? "iron" : sc.lamp, so); items.push({ z: FIX.lamp[0] + FIX.lamp[1], s: lamp.s + (o.pennant ? lampPennant(String(o.pennant), sc.lamp) : "") }); lights += lamp.lights;
       if (H && H !== "winter") items.push({ z: FIX.holiday[0] + FIX.holiday[1], s: holidayGround(H) });
       if (H === "winter" && !wet) items.push({ z: FIX.holiday[0] + FIX.holiday[1], s: snowman(FIX.holiday[0], FIX.holiday[1]) });
       sc.props(so).forEach(function(p){ items.push({ z: p.x + p.y, s: p.s }); });
@@ -2492,6 +2511,7 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
     statue: { n: "Your rank", does: "it gleams", say: "" },
     tree: { n: "The tree", does: "shakes", say: "Whoa, the tree is ticklish." },
     mastery: { n: "Your hub mastery", does: "it sparkles, and opens the big view of every medal", say: "One medal for every hub you've mastered. The ribbons are the hub's colors." },
+    pennant: { n: "Your weekly pennant", does: "it sparkles, and opens every pennant you've earned", say: "My newest pennant! Fifty questions, Monday to Sunday, and I get the next one." },
     garden: { n: "The garden", does: "a carrot pops up", say: "Carrots: crunchy, and they scrub your teeth." },
     pool: { n: "The pool", does: "a splash", say: "Cannonball!" },
     hammock: { n: "The hammock", does: "swings", say: "Five minutes. Then back to studying." },
@@ -2508,7 +2528,7 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
     timmy: { n: "Timmy", does: "waves hello; tap him again and he flips", say: "Wheee!" }
   };
   var EGG_ANIM = { sun: "tp-pop 2.6s", moon: "tp-cow 2.4s ease-in-out", cloud: "tp-pop 2.2s", stars: "tp-shoot 1.4s ease-out", neighbor: "tp-pop 2.6s", whale: "tp-peek 2.6s", yeti: "tp-peek 2.6s", alien: "tp-peek 2.6s", earth: "tp-pop 2.6s",
-    home: "tp-pop 1.8s", statue: "tp-pop 2s", mastery: "tp-pop 2s", tree: "tp-drop 2s ease-in", brush: "tp-pop 1.8s", garden: "tp-jump 1.8s", pool: "tp-splash 1.2s ease-out", fountain: "tp-geyser 2s", doghouse: "tp-pop 2.2s",
+    home: "tp-pop 1.8s", statue: "tp-pop 2s", mastery: "tp-pop 2s", pennant: "tp-pop 2s", tree: "tp-drop 2s ease-in", brush: "tp-pop 1.8s", garden: "tp-jump 1.8s", pool: "tp-splash 1.2s ease-out", fountain: "tp-geyser 2s", doghouse: "tp-pop 2.2s",
     mailbox: "tp-jump 2.2s", sandcastle: "tp-peek 2.4s", campfire: "tp-sparks 1.6s ease-out", hotspring: "tp-sparks 2s ease-out", telescope: "tp-pop 2.4s", studio: "tp-pop 2.6s" };
   /* ------------------------------------------------------------------ the sets (packs) ------------------------------
      A seasonal set or the rank sets: one function per set in tools/figures/site/packs/, handed this toolkit, returning

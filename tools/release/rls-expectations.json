@@ -27,7 +27,8 @@
     "xp_award_totals",
     "shop_days",
     "admin_cache",
-    "exam_checkins_closed"
+    "exam_checkins_closed",
+    "week_pennants"
   ],
   "anonNoRun": [
     "sh_visit_key(text)",
@@ -46,6 +47,11 @@
     "sh_admin_cache_tick()",
     "sh_qh_overlay(text, jsonb)",
     "sh_exam_debriefs()",
-    "sh_visitor_summary(integer)"
+    "sh_visitor_summary(integer)",
+    "sh_week_award(text, date, integer, timestamptz, text)",
+    "sh_week_sweep(timestamptz)",
+    "sh_claim_week(timestamptz, text)",
+    "sh_my_week(timestamptz, text)",
+    "sh_pennants_on_link()"
   ]
 }
