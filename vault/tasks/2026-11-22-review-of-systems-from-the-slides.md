@@ -61,9 +61,9 @@ the course the student is in** ("Let's do your recommendation to have Timmy only
       .pptx copy would do
 - [ ] Fundamentals I: F1-9's `Latimer_Histology4` (96 MB) could not be read (the salivary ducts, serous and mucous cells
       still rest on the study guides): needs a PDF or smaller copy
-- [ ] Fundamentals I: F1-6 (innate immunity) from Dr. Bruns's `Cells & Tissues` deck too: its CD markers and lymph's
+- [x] Fundamentals I: F1-6 (innate immunity) from Dr. Bruns's `Cells & Tissues` deck too: its CD markers and lymph's
       return through the subclavian veins aren't in the part yet (the tissues reviewer read it; M1 and M2 are in)
-- [ ] Fundamentals I: F1-7's mucosal immunity from Dr. Bruns's tolerance and hypersensitivity decks (none of the adaptive
+- [x] Fundamentals I: F1-7's mucosal immunity from Dr. Bruns's tolerance and hypersensitivity decks (none of the adaptive
       decks teach it; the F1-8 reviewer found IgM also crossing the gut lining on the poly-Ig receptor, oral tolerance, and
       the slides' "do not memorize" figure notes)
 - [ ] Fundamentals II: F2-1 to F2-8 against the slides (F2-1 to F2-5 done)
