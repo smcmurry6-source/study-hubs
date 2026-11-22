@@ -4,7 +4,10 @@
 // never reached Sam's screen, and apply_migration timed out twice). Sam, 2026-11-18: "i want to give you permission to
 // always be able to do these kinds of supabase actions. whatever you need." (vault/decisions.md)
 //
-// Wired in .claude/settings.json as an Elicitation hook on the Supabase server. It accepts only a plain confirmation:
+// Wired in .claude/settings.json as an Elicitation hook on the Supabase server, matched by its name ("Supabase") or, in
+// the cloud sessions where the connector is named by its id, by that id (c63257eb-1d94-419c-8868-716ff71ffcf6; Sam,
+// 2026-11-22, vault/decisions.md). A session that finds the connector under another id adds it to the matcher and the
+// permissions the same way, never a pattern that would match other servers. It accepts only a plain confirmation:
 // a form whose fields are all yes/no or a choice with an approving option (yes, approve, confirm, allow, accept, run,
 // proceed, continue, ok). A question that wants typed text, a login link (URL mode), or anything it can't read is left
 // to the person (it prints nothing, so the dialog shows as before). The vault's rules still decide what an agent may run:

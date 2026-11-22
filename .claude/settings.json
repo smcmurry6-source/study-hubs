@@ -1,19 +1,23 @@
 {
   "permissions": {
     "allow": [
-      "mcp__Supabase"
+      "mcp__Supabase",
+      "mcp__c63257eb-1d94-419c-8868-716ff71ffcf6"
     ],
     "ask": [
       "mcp__Supabase__pause_project",
       "mcp__Supabase__create_project",
-      "mcp__Supabase__create_branch"
+      "mcp__Supabase__create_branch",
+      "mcp__c63257eb-1d94-419c-8868-716ff71ffcf6__pause_project",
+      "mcp__c63257eb-1d94-419c-8868-716ff71ffcf6__create_project",
+      "mcp__c63257eb-1d94-419c-8868-716ff71ffcf6__create_branch"
     ]
   },
   "autoCompactWindow": 500000,
   "hooks": {
     "Elicitation": [
       {
-        "matcher": "Supabase|supabase",
+        "matcher": "Supabase|supabase|c63257eb-1d94-419c-8868-716ff71ffcf6",
         "hooks": [
           {
             "type": "command",
