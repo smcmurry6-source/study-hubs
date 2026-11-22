@@ -1772,6 +1772,82 @@ try {
     notes.push('fewer calls (migration_v82): class numbers in one call, the analytics in one call, the shop\'s day stored, the bootstrap built once, the answers, the class name by lookup');
   }
 
+  /* ---------- 16. an archived hub's answers packed away (migration_v96) ---------- */
+  {
+    // every made-up visitor of the suites above, and everything a page or a board shows them; before and after the pack
+    const ids = `(select visitor_id as v from xp_visitors union select visitor_id from personal_answers union select visitor_id from correct_streaks union select visitor_id from xp_awards)`;
+    const snapSql = `json_build_object(
+      'people', (select json_agg(json_build_object('v', i.v,
+          'xp', (select row_to_json(x) from xp_visitors x where x.visitor_id = i.v),
+          'wallet', sh_wallet(i.v), 'rank', get_rank_profile_v2(i.v), 'first', first_seen(i.v), 'name', anon_name(i.v),
+          'mastery', (select json_agg(m order by m.hub) from get_hub_mastery(i.v) m),
+          'pet', (select json_agg(d order by d.d) from get_pet_days_v2(i.v) d where d.d > (now() at time zone 'America/Chicago')::date - 61),
+          'awards', (select json_agg(json_build_array(t.src, t.base, t.xp) order by t.src) from xp_award_totals t
+                     where t.visitor_id = i.v and (t.base <> 0 or t.xp <> 0))) order by i.v) from ${ids} i),
+      -- each board's rows in a fixed order: the boards don't order people tied on a place, and the pack's deletes can
+      -- change the order the database hands ties back in (a CI run, 2026-11-22), which no page shows as a change
+      'boards', json_build_array((select json_agg(r order by r::text) from get_rank_board_v2(null, 500) r),
+        (select json_agg(r order by r::text) from get_leaderboard_v2(500) r),
+        (select json_agg(r order by r::text) from get_correct_streak_stats_v2() r), (select json_agg(r order by r::text) from get_trophy_stats_v2() r),
+        (select json_agg(r order by r::text) from get_arcade_leaderboard_v2('xh', 'board', 'xp-Q', 50) r)))`;
+    const snap = () => json(snapSql);
+    // and what rebuilding everyone gives before the pack (rolled back): a rebuild after it must give the same
+    const rebuilt = () => JSON.parse(sql(`begin; select sh_xp_rebuild(array(select v from ${ids} x)); select (${snapSql})::text; rollback;`).map(x => x.join('')).join('').replace(/^[^{]*/, ''));
+    const hubs = sql(`select distinct hub from personal_answers order by 1`).map(r => r[0]);
+    const n0 = num(`select count(*) from personal_answers`);
+    // Link my devices, before the pack, in a transaction that is rolled back: what linking two devices gives without packing
+    const pair = sql(`select a.visitor_id, b.visitor_id from (select visitor_id from personal_answers group by 1 order by count(*) desc limit 2) a,
+      (select visitor_id from personal_answers group by 1 order by count(*) desc limit 2) b where a.visitor_id < b.visitor_id`)[0];
+    const linkView = `(select row_to_json(x)::text from xp_visitors x where x.visitor_id = ${q(pair[0])}) || ' ' || sh_wallet(${q(pair[0])})::text`;
+    const linkSql = `begin; select 'R:' || coalesce(redeem_link_code(create_link_code(${q(pair[0])}), ${q(pair[1])}), 'refused'); select 'L:' || ${linkView}; rollback;`;
+    const linked = () => { const r = sql(linkSql).map(x => x.join('')).join('\n'); ok(r.includes('R:' + pair[0] + '\n'), `the link went through (${r.slice(0, 40)})`); return r.slice(r.indexOf('L:')); };
+    const linked0 = linked();
+    const s0 = snap(), r0 = rebuilt();
+    // the admin page: the Insights tab, the retries report, the drift check, the check-ins against each person's answers
+    const admin = () => json(`json_build_array(sh_insights('{}'::jsonb) - 'generated_at', sh_insight_retries(), sh_data_quality()->'stats_drift', sh_exam_debriefs())`);
+    sql(`insert into exam_debriefs (hub, exam, visitor_id, answers) select hub, '2030-03-01', visitor_id, '{}'::jsonb from (select distinct hub, visitor_id from personal_answers order by 1, 2 limit 6) x`);
+    const a0 = admin();
+    sql(`insert into hubs_down (hub, day) select h, '2000-01-01' from unnest(array[${hubs.map(q).join(',')}]::text[]) h on conflict (hub) do nothing`);
+    const dry = hubs.map(h => json(`sh_pack_answers(${q(h)}, '2031-01-01', 1000000000, false)`));
+    eq(dry.reduce((a, d) => a + d.answers, 0), n0, `a dry run counts every answer due (${n0} on ${hubs.length} hubs) and packs nothing`);
+    eq(num(`select count(*) from personal_answers`), n0, 'the dry run packed nothing');
+    // in small batches, as the first live pack runs
+    let calls = 0;
+    for (const h of hubs) for (let left = 1; left > 0 && calls < 500; calls++) left = json(`sh_pack_answers(${q(h)}, '2031-01-01', 50, true)`).left;
+    eq(num(`select count(*) from personal_answers`), 0, `every answer packed (${calls} calls of about 50 answers)`);
+    eq([num(`select coalesce(sum(answers), 0) from answers_packed`), num(`select count(*) from answer_xp`), num(`select count(*) from xp_seen`),
+        num(`select count(*) from xp_awards where src = 'answer' and key not like 'pack:%'`)], [n0, 0, 0, 0],
+      'the summaries hold every answer; answer_xp, xp_seen and the per-answer awards are gone');
+    const s1 = snap();
+    const a1 = admin();
+    ['the Insights tab', 'the retries report', 'the drift check', 'the check-ins against each person\'s answers'].forEach((w, i) => eq(a1[i], a0[i], `the admin page's numbers the same after the pack: ${w}`));
+    eq(s1.boards, s0.boards, 'the boards (rank, leaderboard, right in a row, trophies, the arcade) are the same after the pack');
+    const diff = (a, b) => a.people.filter((p, i) => JSON.stringify(p) !== JSON.stringify(b.people[i])).map(p => p.v);
+    eq([s1.people.length, diff(s0, s1)], [s0.people.length, []], `for every one of ${s0.people.length} made-up visitors: XP, days, answers, best run, crowns, rank and journey, trophies and medals, first answer and class name, mastery, Timmy's days and the award totals the same after the pack`);
+    const r1 = rebuilt();
+    // a rebuild works XP out again from the answers, which can differ from what the live calls paid (an outage catch-up's
+    // days with no answers, a boost moved after it paid); a packed hub keeps what its answers paid. So after the pack, a
+    // rebuild gives each visitor what it gave before the pack, or what they have now when their packed answers are the part
+    // that differed: never anything else
+    const odd = r1.people.filter((p, i) => { const j = JSON.stringify(p); return j !== JSON.stringify(r0.people[i]) && j !== JSON.stringify(s0.people[i]); }).map(p => p.v);
+    eq([r1.people.length, odd], [r0.people.length, []], `rebuilding everyone after the pack (Link my devices, a corrected answer): each visitor as a rebuild left them before the pack, or as they are (${diff(s0, r0).length} visitor(s) a rebuild changes either way, ${diff(r0, r1).length} kept at what their packed answers paid)`);
+    sql(`select sh_xp_rebuild(array(select v from ${ids} x))`);
+    const s2 = snap();
+    eq(hubs.map(h => json(`sh_pack_answers(${q(h)}, '2031-01-01', 1000000000, true)`).answers), hubs.map(() => 0), 'a second run packs nothing');
+    eq(diff(s2, snap()), [], 'and changes nothing');
+    eq(num(`select count(*) from (select visitor_id, src, count(*) n, sum(base) b, sum(xp) x from xp_awards group by 1, 2) s
+      full join (select * from xp_award_totals where n <> 0 or base <> 0 or xp <> 0) t using (visitor_id, src)
+      where s.n is distinct from t.n or s.b is distinct from t.base or s.x is distinct from t.xp`), 0, 'the awards\' running totals still equal their sums');
+    // linking two packed devices gives what linking them gave before the pack
+    eq(linked(), linked0, `Link my devices after the pack: the same XP and crowns as before it (${pair.join(' + ')})`);
+    one(`select redeem_link_code(create_link_code(${q(pair[0])}), ${q(pair[1])})`);
+    eq(num(`select count(*) from answers_packed where visitor_id = ${q(pair[1])}`), 0, 'the linked device\'s summaries moved to the kept id');
+    raises(() => one(`select sh_pack_answers('xp-not-down', '2031-01-01', 10, true)`), null, 'a hub whose page is up is refused');
+    for (const f of [`sh_pack_answers('xh', now(), 1, false)`, `sh_pack_due('xh', now())`, `sh_pack_merge('{}', '{}')`]) raises(() => anon(`select ${f}`), '42501', `anon runs ${f.split('(')[0]}`);
+    raises(() => anon(`select count(*) from public.answers_packed`), '42501', 'anon reads answers_packed directly');
+    notes.push(`an archived hub's answers packed (migration_v96): ${n0} answers of ${s0.people.length} made-up visitors into ${num(`select count(*) from answers_packed`)} summaries, every total the same, after a rebuild too, and a second run packs nothing`);
+  }
+
   /* ---------- 15. the private parts stay private ---------- */
   for (const t of ['xp_awards', 'xp_award_totals', 'xp_boosts', 'xp_sessions', 'answer_xp', 'question_keys', 'game_baseline', 'pet_purchases', 'pet_inventory', 'pet_equipped', 'ideas', 'idea_votes', 'shop_items', 'visit_secret', 'card_reviews'])
     raises(() => anon(`select count(*) from public.${t}`), '42501', `anon reads ${t} directly`);
