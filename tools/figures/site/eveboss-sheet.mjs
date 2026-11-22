@@ -15,7 +15,7 @@ let chromium; try { ({ chromium } = createRequire(import.meta.url)("playwright")
 const imp = (f) => import(pathToFileURL(path.join(here, f)).href + "?t=" + Date.now());
 const { INK, C } = await imp("style.mjs"), { evebossKit } = await imp("eveboss.mjs");
 const K = evebossKit(INK, C);
-const WHAT = { soon: "Soon: asleep until 6 pm", up: "Up: over 60% HP", hurt: "Hurt: 25 to 60%", low: "Low: 25% or less", down: "Down: the class won", away: "Away: midnight came first" };
+const WHAT = { soon: "Soon: asleep until 3 pm", up: "Up: over 60% HP", hurt: "Hurt: 25 to 60%", low: "Low: 25% or less", down: "Down: the class won", away: "Away: midnight came first" };
 function page(dark){
   const bg = dark ? "#17131c" : "#faf7f2", fg = dark ? "#efe9f2" : "#3B2E3A", card = dark ? "#231d2b" : "#fff";
   const cell = (st, hat) => `<figure><div class="sc">${K.scene(st, { hat })}</div><figcaption><b>${WHAT[st]}</b>${hat ? " · Santa hat" : ""}</figcaption></figure>`;

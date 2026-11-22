@@ -706,13 +706,13 @@
   }, 15000);
 
   /* ================= the exam-eve boss (migration_v97; idea board #4) =================
-     The night before an exam, from 6 pm to midnight Central, the whole class fights one giant boss, the Midnight Plaque:
+     The night before an exam, from 3 pm to midnight Central, the whole class fights one giant boss, the Midnight Plaque:
      every right answer anyone gives in this hub takes 1 HP off it. If it falls before midnight, everyone who landed a hit
      gets XP and crowns (250, plus 25 a hit, up to 1,000), paid once by the server, which counts the hits from the answers
      it already saves (the answer save does nothing new). Which nights: the exam dates in hubs.js, which the After merge
      workflow writes into eve_bosses. The page asks get_eve_boss only on an eve (an exam tomorrow in SH_EXPORT.exams), or
      until noon on the exam's day for last night's result: once a few seconds after it opens, then every 30 s or so while
-     the boss is up and the page is in view; at 6 pm when it opened before; never in a mock, with the boss switch off (Focus
+     the boss is up and the page is in view; at 3 pm when it opened before; never in a mock, with the boss switch off (Focus
      mode turns it off) or in a quiet spell (shDb). Between asks it adds your own right answers. It has the band under the
      bar (the regular boss stays away tonight) and a card on Home ([data-eveslot], widget/hub.js). Its art is a kit,
      widget/hub-art/eveboss.js (tools/figures/site/eveboss.mjs), fetched the first time it's drawn. */
@@ -792,13 +792,22 @@
     bossSpace();
     eveCard();
   }
-  /* Home's card: the night scene and where the fight stands */
+  /* Home's card (the night scene and where the fight stands) and, under Today in the Question Bank's side column, a smaller
+     one (data-eveslot="side"; Sam, 2026-11-22: "he can also have a card below the today card on the question bank") */
   function eveCard(){
-    var slot = document.querySelector("[data-eveslot]"); if (!slot) return;
+    var slots = [].slice.call(document.querySelectorAll("[data-eveslot]")); if (!slots.length) return;
     var s = eveState(), A = eveArt();
-    if (!s || !feat("boss")) { if (!slot.hidden) { slot.hidden = true; slot.innerHTML = ""; } return; }
+    if (!s || !feat("boss")) { slots.forEach(function(slot){ if (!slot.hidden) { slot.hidden = true; slot.innerHTML = ""; slot._eve = ""; } }); return; }
     if (!A) { eveLoadArt().then(eveCard); return; }
-    var now = eveNow(), st = s.state, f = s.left / s.hp, P = s.prize, after = s.day !== centralParts().day, html;
+    var home = null, side = null;
+    slots.forEach(function(slot){
+      var html = slot.getAttribute("data-eveslot") === "side" ? (side = side || eveSide(s, A)) : (home = home || eveHome(s, A));
+      if (slot._eve !== html) { slot._eve = html; slot.innerHTML = html; }
+      slot.hidden = false;
+    });
+  }
+  function eveHome(s, A){
+    var now = eveNow(), st = s.state, f = s.left / s.hp, P = s.prize, after = s.day !== centralParts().day;
     var kick, title, line, hpRow = "", stats = "", you = "", go = "";
     var rule = "Every right answer from anyone in this hub takes 1 HP off its " + fmtN(s.hp) + ". Beat it by midnight and everyone who landed a hit gets XP and crowns: " +
       fmtN(P.base || 250) + ", plus " + fmtN(P.per || 25) + " a hit, up to " + fmtN(P.max || 1000) + ".";
@@ -824,12 +833,35 @@
       line = "Midnight came with " + fmtN(s.left) + " of its " + fmtN(s.hp) + " HP left: " + pl(s.hits, "hit") + " from " + pl(s.people, "person") + ".";
       stats = "Good luck on " + esc(eveExam(s)) + "!";
     }
-    html = '<section class="eve-card is-' + st + '" aria-labelledby="eveH"><figure class="eve-art">' +
+    return '<section class="eve-card is-' + st + '" aria-labelledby="eveH"><figure class="eve-art">' +
       A.scene(st === "up" ? A.pick("up", f) : A.pick(st, f), { hat: eveHat(), label: title.replace(/!$/, "") }) + "</figure>" +
       '<div class="eve-text"><p class="eve-kick">' + kick + '</p><h2 id="eveH">' + title + '</h2><p class="eve-line">' + line + "</p>" + hpRow +
       (stats ? '<p class="eve-stats">' + stats + "</p>" : "") + (you ? '<p class="eve-you">' + you + "</p>" : "") + go + "</div></section>";
-    if (slot._eve !== html) { slot._eve = html; slot.innerHTML = html; }
-    slot.hidden = false;
+  }
+  /* the Question Bank's card: the band's drawing, the HP and your hits, in the side column's width */
+  function eveSide(s, A){
+    var now = eveNow(), st = s.state, f = s.left / s.hp, after = s.day !== centralParts().day, kick, title, line = "", hpRow = "", stats = "", you = "";
+    if (st === "soon") {
+      kick = "Tonight, " + eveClock(s.starts) + " to midnight"; title = "The Midnight Plaque";
+      line = "Every right answer in this hub takes 1 HP off its " + fmtN(s.hp) + ".";
+      stats = "It wakes up in " + eveLeft(s.starts - now) + ".";
+    } else if (st === "up") {
+      kick = "Exam eve · until midnight"; title = "The Midnight Plaque";
+      hpRow = '<div class="eve-hp"><span class="eve-bar" role="img" aria-label="' + fmtN(s.left) + " of " + fmtN(s.hp) + ' HP left"><i style="width:' + (100 * f).toFixed(1) + '%"></i></span><b>' +
+        fmtN(s.left) + " HP</b></div>";
+      stats = (s.people ? pl(s.people, "person") + " · " + pl(s.hits, "hit") : "No hits yet") + " · " + eveLeft(s.ends - now) + " to go";
+      you = s.mine ? "You: " + pl(s.mine, "hit") + ", <em>+" + fmtN(s.pay) + " XP and crowns</em> when it falls" : "Answer one right to join the fight.";
+    } else if (st === "down") {
+      kick = after ? "Last night" : "Exam eve"; title = "The class beat it!";
+      line = "The Midnight Plaque fell at " + eveClock(s.fell) + ".";
+      you = s.paid ? "You landed " + pl(s.mine, "hit") + ": <em>+" + fmtN(s.paid) + " XP and crowns</em>." : "You didn't land a hit this time.";
+    } else {
+      kick = after ? "Last night" : "Exam eve"; title = "It got away";
+      line = "Midnight came with " + fmtN(s.left) + " of the Midnight Plaque's " + fmtN(s.hp) + " HP left.";
+    }
+    return '<section class="eve-mini is-' + st + '" aria-labelledby="eveM"><div class="eve-mini-head"><span class="eve-mini-ic">' +
+      A.icon(st === "up" ? A.pick("up", f) : A.pick(st, f), { hat: eveHat() }) + '</span><div><p class="eve-kick">' + kick + '</p><h2 id="eveM">' + title + "</h2></div></div>" +
+      (line ? '<p class="eve-line">' + line + "</p>" : "") + hpRow + (stats ? '<p class="eve-stats">' + stats + "</p>" : "") + (you ? '<p class="eve-you">' + you + "</p>" : "") + "</section>";
   }
   /* the moment: confetti and a toast when it falls (once per boss on this device), and the reward card for what it paid you
      on the day it fell; a toast when it gets away while you watch */
@@ -1267,7 +1299,7 @@
     var now = Date.now(), c = centralParts(), hp = 3000, f = typeof frac === "number" ? frac : .55, left = st === "down" ? 0 : Math.round(hp * f), mine = 12;
     var start = st === "soon" ? now + 2.2 * 3600000 : now - 3 * 3600000, end = st === "lost" ? now - 60000 : now + 2.5 * 3600000;
     EVE.test = true; EVE.done = true; EVE.hidden = false; EVE.pend = []; EVE.skew = 0;
-    EVE.data = { ok: true, prize: { hour: 18, hp: hp, base: 250, per: 25, max: 1000 }, you: { hits: st === "soon" ? 0 : mine, pay: 550, paid: st === "down" ? 550 : 0 },
+    EVE.data = { ok: true, prize: { hour: 15, hp: hp, base: 250, per: 25, max: 1000 }, you: { hits: st === "soon" ? 0 : mine, pay: 550, paid: st === "down" ? 550 : 0 },
       boss: { day: c.day, exam: addDay(c.day, 1), state: st || "up", hp: hp, hits: st === "soon" ? 0 : hp - left, left: left, people: st === "soon" ? 0 : 41,
         starts: new Date(start).toISOString(), ends: new Date(end).toISOString(), now: new Date(now).toISOString(), counted_at: new Date(now).toISOString(),
         fell_at: st === "down" ? new Date(now - 600000).toISOString() : null } };

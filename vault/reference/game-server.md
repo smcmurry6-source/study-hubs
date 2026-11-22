@@ -513,7 +513,7 @@ server says what's finished and pays the bonus.
 ## The exam-eve boss (migration_v97)
 
 Idea board #4 ("a giant Plaque Boss on exam eve"; Sam set it Planned: "This could be fun. Maybe have an xp + gold crowns
-reward"). The night before each exam in `hubs.js`, from 6 pm to midnight Central, one boss per hub, the Midnight Plaque:
+reward"). The night before each exam in `hubs.js`, from 3 pm to midnight Central, one boss per hub, the Midnight Plaque:
 every right answer anyone gives in that hub is a hit. It falls at its HP; everyone who landed a hit is paid.
 
 - **The table**, `eve_bosses` (hub, day = the eve, exam_date, hp, the running count and how it ended): one row an eve, no
@@ -537,9 +537,11 @@ every right answer anyone gives in that hub is a hit. It falls at its HP; everyo
   after, last night's; `boss: null` when the hub has none. Nothing per person but the caller's own.
 - **The page** (`widget/eggs.js`, "the exam-eve boss"): asks only on an eve (an exam tomorrow in `SH_EXPORT.exams`) or, for
   the result, until noon on the exam's day; a few seconds after it opens, then every 30-38 s while it's up and the page is in
-  view, at 6 pm when it opened before; never in a mock, with the boss switch off (Focus mode) or in a quiet spell (`shDb`).
+  view, at 3 pm when it opened before; never in a mock, with the boss switch off (Focus mode) or in a quiet spell (`shDb`).
   Between asks it adds its own right answers. The band under the bar (the regular boss stays away that night), Home's card
-  (`[data-eveslot]` in `widget/hub.js`), the moment when it falls (confetti, the reward card `sh:prize` src `eve` on the day
+  (`[data-eveslot]` in `widget/hub.js`), a smaller card under Today in the Question Bank's side column while you answer
+  (`[data-eveslot="side"]` in `widget/hub-bank.js`; Sam, 2026-11-22; not in a mock, and the column isn't drawn on a phone,
+  where the band shows it), the moment when it falls (confetti, the reward card `sh:prize` src `eve` on the day
   it fell, once per device) or gets away. The dashboard's line under the live count is from the dates alone (`dash.js`
   `eveHTML`, no call). The art is `widget/hub-art/eveboss.js` (`window.SH_EVE_ART`, from `tools/figures/site/eveboss.mjs`;
   its contact sheet: `eveboss-sheet.mjs`), fetched on first use.

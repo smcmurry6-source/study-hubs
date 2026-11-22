@@ -1,4 +1,4 @@
-/* The exam-eve boss (migration_v97, idea board #4): the Midnight Plaque, a giant Plaque Boss that shows up from 6 pm to
+/* The exam-eve boss (migration_v97, idea board #4): the Midnight Plaque, a giant Plaque Boss that shows up from 3 pm to
    midnight the night before an exam, crowned in tartar and sitting on a molar under the night sky, the clock ticking toward
    midnight. Every right answer from anyone in the class takes a hit; the class wins if it falls before midnight.
    A kit, like the idea board's (board.mjs): the page (widget/eggs.js) draws it at its own size.
@@ -8,7 +8,7 @@
      icon(state, opts)   the boss alone, cropped for the band in the top bar (box 52 36 216 148; down: 60 112 200 82)
      pick(st, f)         which drawing a moment calls for: the server's state (soon, up, down, lost) and the HP left (0-1)
 
-   States: "soon" (asleep, before 6 pm), "up" (more than 60% HP: grinning, flexing), "hurt" (25-60%: a bandage, a squint),
+   States: "soon" (asleep, before 3 pm), "up" (more than 60% HP: grinning, flexing), "hurt" (25-60%: a bandage, a squint),
    "low" (25% or less: cracked and crumbling), "down" (it fell: a puddle with a toothbrush planted in it, the tooth shining)
    and "away" (midnight came first: it strolls off smirking). opts.hat: "santa" swaps the tartar crown for a Santa hat (the
    winter holidays, when the other bosses wear their costumes).

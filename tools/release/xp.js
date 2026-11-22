@@ -1677,12 +1677,12 @@ try {
   }
 
   /* ---------- 14f. the exam-eve boss (migration_v97; idea board #4, Sam: "This could be fun. Maybe have an xp + gold crowns
-     reward"): from 6 pm to midnight Central the night before an exam, every right answer in the hub from anyone takes a hit;
+     reward"): from 3 pm to midnight Central the night before an exam, every right answer in the hub from anyone takes a hit;
      it falls at its HP-th right answer and everyone who landed a hit is paid once, on the server, 250 + 25 a hit up to 1,000;
      a boss still up at midnight got away. Counted on demand from personal_answers (kept 20 seconds), never in the answer save ---------- */
   if (one(`select to_regprocedure('get_eve_boss(text,text)') is not null`) === 't') {
     const EP = json(`sh_eve_prize()`);
-    eq(EP, { hp: 3000, max: 1000, per: 25, base: 250, hour: 18 }, 'sh_eve_prize(): 6 pm, 3,000 HP, 250 + 25 a hit up to 1,000');
+    eq(EP, { hp: 3000, max: 1000, per: 25, base: 250, hour: 15 }, 'sh_eve_prize(): 3 pm, 3,000 HP, 250 + 25 a hit up to 1,000');
     eq(rows(`select hub, day::text, exam_date::text, hp from eve_bosses where hub = 'review-of-systems' order by day`),
       [{ hub: 'review-of-systems', day: '2026-12-02', exam_date: '2026-12-03', hp: 3000 }, { hub: 'review-of-systems', day: '2026-12-09', exam_date: '2026-12-10', hp: 3000 }],
       'Review of Systems\' two eves are in');
@@ -1695,16 +1695,16 @@ try {
          insert into visitor_links (alias_id, primary_id) values ('xp-EVa', 'xp-EVp');`);
     const put = (v, hub, n, hm, right, s0) => sql(`insert into personal_answers (visitor_id, hub, qid, correct, answered_at)
       select ${q(v)}, ${q(hub)}, 'e' || g, ${right ? 'true' : 'false'}, ${at(hm)} + make_interval(secs => ${s0 || 0} + g) from generate_series(1, ${n}) g`);
-    const soon = eve('xe', at('17:00'), 'xp-EVA');
-    eq([soon.ok, soon.boss.state, soon.boss.hp, soon.boss.hits, soon.you.hits, soon.you.pay, soon.prize.max], [true, 'soon', 100, 0, 0, 0, 1000], 'before 6 pm: soon, full HP');
-    put('xp-EVA', 'xe', 5, '17:30', true);            // before 6 pm: not a hit
+    const soon = eve('xe', at('14:00'), 'xp-EVA');
+    eq([soon.ok, soon.boss.state, soon.boss.hp, soon.boss.hits, soon.you.hits, soon.you.pay, soon.prize.max], [true, 'soon', 100, 0, 0, 0, 1000], 'before 3 pm: soon, full HP');
+    put('xp-EVA', 'xe', 5, '14:30', true);            // before 3 pm: not a hit
     put('xp-EVA', 'xother', 10, '18:05', true);        // another hub: not a hit
     put('xp-EVA', 'xe', 7, '18:10', false);            // wrong: not a hit
     put('xp-EVA', 'xe', 40, '18:20', true);
     put('xp-EVa', 'xe', 15, '18:30', true); put('xp-EVp', 'xe', 15, '18:40', true);   // one person, two linked devices: 30
     put('xp-EVC', 'xe', 20, '18:50', true); put('xp-EVD', 'xe', 5, '19:00', true);
-    const sid = num(`select sh_answer_id_at(${at('18:00')})`), first = num(`select min(id) from personal_answers where hub = 'xother'`);
-    ok(sid <= first && sid > num(`select max(id) from personal_answers where hub = 'xe' and answered_at < ${at('18:00')}`), `the first answer at 6 pm is found by the binary search (${sid}, ${first})`);
+    const sid = num(`select sh_answer_id_at(${at('15:00')})`), first = num(`select min(id) from personal_answers where hub = 'xother'`);
+    ok(sid <= first && sid > num(`select max(id) from personal_answers where hub = 'xe' and answered_at < ${at('15:00')}`), `the first answer at 3 pm is found by the binary search (${sid}, ${first})`);
     // the real answer path counts too: two right through sh_answer
     anon(`select admin_load_question_keys(${S}, 'xe', ${q(JSON.stringify([{ id: 'k1', kind: 'one', answer: [2] }, { id: 'k2', kind: 'one', answer: [0] }]))}::jsonb)`);
     json(`sh_answer(${at('19:10')}, 'xp-EVE', 'xe', 'k1', 2, null, null, null, 'bank', null, null, null)`);

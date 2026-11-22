@@ -822,7 +822,7 @@ window.addEventListener("resize", function(){ qa("[data-news]").forEach(function
 function eveHTML(x, d){
 if (!x || d !== 1 || x.eveBoss === false || ls("sh_pref_boss") === "off") return "";
 var h = 0; try { h = +new Intl.DateTimeFormat("en-US", { timeZone: "America/Chicago", hour: "2-digit", hourCycle: "h23" }).format(new Date()); } catch (e) {}
-return '<p class="dx-eve"><b>' + (h >= 18 ? "Now until midnight:" : "Tonight, 6 pm to midnight:") + "</b> the class fights the Midnight Plaque. Every right answer in this hub hits it.</p>";
+return '<p class="dx-eve"><b>' + (h >= 15 ? "Now until midnight:" : "Tonight, 3 pm to midnight:") + "</b> the class fights the Midnight Plaque. Every right answer in this hub hits it.</p>";
 }
 function checkinButtonsHTML(hub){
 return pastExams(hub, false).map(function(x){
@@ -1406,7 +1406,7 @@ document.addEventListener("sh:name", function(e){ if (nameTold) return; localNam
 var EXTRAS = [
 ["sh_pref_pet", "Timmy Tooth", "Your cartoon tooth buddy: ask him about the notes. Right answers and study streaks keep him healthy. Off, an Ask button takes his place.", [["on", "Everywhere"], ["dash", "Dashboard only"], ["off", "Off"]]],
 ["sh_pref_eggs", "Hidden secrets", "Holidays, magic words and the other easter eggs. Clues are in each hub's trophy case."],
-["sh_pref_boss", "Plaque bosses", "A boss the whole class fights with right answers when 5+ people are online, and the Midnight Plaque on an exam's eve, 6 pm to midnight."],
+["sh_pref_boss", "Plaque bosses", "A boss the whole class fights with right answers when 5+ people are online, and the Midnight Plaque on an exam's eve, 3 pm to midnight."],
 ["sh_pref_fairy", "Tooth Fairy", "Flies across the page now and then. Catch her for the fairy board."],
 ["sh_pref_probe", "Golden Probe", "One question a day is golden. First to get it right wins."],
 ["sh_pref_nuke", "Tactical nukes", "100 right in a row unlocks a strike. Mine only: you won't see classmates' strikes.", [["on", "On"], ["mine", "Mine only"], ["off", "Off"]]],

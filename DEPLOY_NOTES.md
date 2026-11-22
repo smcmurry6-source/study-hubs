@@ -33,7 +33,8 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 ## Recent major changes (newest first — add a line when you ship something)
 
 - **2026-11-22 (The exam-eve boss, the Midnight Plaque, idea board #4, Claude Code)** — Sam set the idea Planned ("This could
-  be fun. Maybe have an xp + gold crowns reward"). The night before every exam in `hubs.js`, 6 pm to midnight Central, one
+  be fun. Maybe have an xp + gold crowns reward"), then, on the PR's numbers: "open it from 3pm to midntight, hp is good, pay
+  is good, he can also have a card below the today card on the question bank". The night before every exam in `hubs.js`, 3 pm to midnight Central, one
   boss per hub with 3,000 HP: every right answer anyone gives in the hub is a hit; if it falls before midnight, everyone who
   landed a hit gets 250 + 25 a hit, up to 1,000, XP and crowns (one `xp_awards` row, key `eve:<hub>:<day>`, src `boss`).
   **`migration_v97.sql`** (pending, `supabase/pending-migrations.txt`; **replaces no function**): the table `eve_bosses`
@@ -44,7 +45,8 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   that changes `hubs.js` (`eveBoss: false` skips one, `eveBoss: <hp>` sets its HP). The page (`widget/eggs.js`): asks only
   on an eve (and the exam's morning, for the result), every 30-38 s while it's up and in view, never in a mock, with the
   boss switch off (Focus mode) or in a quiet spell; a band under the bar (the regular boss stays away that night), a card on
-  Home (`[data-eveslot]`, `widget/hub.js`), the win's confetti and reward card (`sh:prize` src `eve`) or the loss's toast; a
+  Home (`[data-eveslot]`, `widget/hub.js`) and a smaller one under Today in the Question Bank's side column
+  (`[data-eveslot="side"]`, `widget/hub-bank.js`; the column now scrolls on its own when it's taller than the window), the win's confetti and reward card (`sh:prize` src `eve`) or the loss's toast; a
   line on the dashboard's hub panel from the dates alone (`widget/dash.js`). New art: `tools/figures/site/eveboss.mjs` (six
   states, the Santa hat; `eveboss-sheet.mjs` draws its contact sheet) built into `widget/hub-art/eveboss.js`, fetched on
   first use. About page, the Extras switch's line, [game-server](vault/reference/game-server.md),

@@ -17,7 +17,7 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   `supabase/pending-migrations.txt` ([game-server](../reference/game-server.md)).
 - [ ] **Read how the first Midnight Plaque went, the morning of Dec 3** (2026-11-22, idea board #4): `select * from
   eve_bosses where day = '2026-12-02'` (fell or not, when, how many people, what it paid), and the pg_cron runs of
-  `sh-eve-boss` that night (any over a second, any failed). If it fell before 8 pm or got away with over a quarter left,
+  `sh-eve-boss` that night (any over a second, any failed). If it fell before 6 pm (from 3 pm, the past eves' middle one would have fallen about 8 pm) or got away with over a quarter left,
   tell Sam and suggest a new HP for Dec 9 (`eveBoss: <hp>` on mock2 in `hubs.js`, which the After merge step writes before
   the eve). Totals only, over 5 or more people ([learner-data-privacy](../rules/learner-data-privacy.md)).
 - [ ] **The boards order people tied on a place by chance** (2026-11-22, #533's CI): `get_rank_board_v2`,

@@ -1032,11 +1032,19 @@ bossSpace();
 eveCard();
 }
 function eveCard(){
-var slot = document.querySelector("[data-eveslot]"); if (!slot) return;
+var slots = [].slice.call(document.querySelectorAll("[data-eveslot]")); if (!slots.length) return;
 var s = eveState(), A = eveArt();
-if (!s || !feat("boss")) { if (!slot.hidden) { slot.hidden = true; slot.innerHTML = ""; } return; }
+if (!s || !feat("boss")) { slots.forEach(function(slot){ if (!slot.hidden) { slot.hidden = true; slot.innerHTML = ""; slot._eve = ""; } }); return; }
 if (!A) { eveLoadArt().then(eveCard); return; }
-var now = eveNow(), st = s.state, f = s.left / s.hp, P = s.prize, after = s.day !== centralParts().day, html;
+var home = null, side = null;
+slots.forEach(function(slot){
+var html = slot.getAttribute("data-eveslot") === "side" ? (side = side || eveSide(s, A)) : (home = home || eveHome(s, A));
+if (slot._eve !== html) { slot._eve = html; slot.innerHTML = html; }
+slot.hidden = false;
+});
+}
+function eveHome(s, A){
+var now = eveNow(), st = s.state, f = s.left / s.hp, P = s.prize, after = s.day !== centralParts().day;
 var kick, title, line, hpRow = "", stats = "", you = "", go = "";
 var rule = "Every right answer from anyone in this hub takes 1 HP off its " + fmtN(s.hp) + ". Beat it by midnight and everyone who landed a hit gets XP and crowns: " +
 fmtN(P.base || 250) + ", plus " + fmtN(P.per || 25) + " a hit, up to " + fmtN(P.max || 1000) + ".";
@@ -1062,12 +1070,34 @@ kick = after ? "Last night" : "Exam eve"; title = "The Midnight Plaque got away"
 line = "Midnight came with " + fmtN(s.left) + " of its " + fmtN(s.hp) + " HP left: " + pl(s.hits, "hit") + " from " + pl(s.people, "person") + ".";
 stats = "Good luck on " + esc(eveExam(s)) + "!";
 }
-html = '<section class="eve-card is-' + st + '" aria-labelledby="eveH"><figure class="eve-art">' +
+return '<section class="eve-card is-' + st + '" aria-labelledby="eveH"><figure class="eve-art">' +
 A.scene(st === "up" ? A.pick("up", f) : A.pick(st, f), { hat: eveHat(), label: title.replace(/!$/, "") }) + "</figure>" +
 '<div class="eve-text"><p class="eve-kick">' + kick + '</p><h2 id="eveH">' + title + '</h2><p class="eve-line">' + line + "</p>" + hpRow +
 (stats ? '<p class="eve-stats">' + stats + "</p>" : "") + (you ? '<p class="eve-you">' + you + "</p>" : "") + go + "</div></section>";
-if (slot._eve !== html) { slot._eve = html; slot.innerHTML = html; }
-slot.hidden = false;
+}
+function eveSide(s, A){
+var now = eveNow(), st = s.state, f = s.left / s.hp, after = s.day !== centralParts().day, kick, title, line = "", hpRow = "", stats = "", you = "";
+if (st === "soon") {
+kick = "Tonight, " + eveClock(s.starts) + " to midnight"; title = "The Midnight Plaque";
+line = "Every right answer in this hub takes 1 HP off its " + fmtN(s.hp) + ".";
+stats = "It wakes up in " + eveLeft(s.starts - now) + ".";
+} else if (st === "up") {
+kick = "Exam eve · until midnight"; title = "The Midnight Plaque";
+hpRow = '<div class="eve-hp"><span class="eve-bar" role="img" aria-label="' + fmtN(s.left) + " of " + fmtN(s.hp) + ' HP left"><i style="width:' + (100 * f).toFixed(1) + '%"></i></span><b>' +
+fmtN(s.left) + " HP</b></div>";
+stats = (s.people ? pl(s.people, "person") + " · " + pl(s.hits, "hit") : "No hits yet") + " · " + eveLeft(s.ends - now) + " to go";
+you = s.mine ? "You: " + pl(s.mine, "hit") + ", <em>+" + fmtN(s.pay) + " XP and crowns</em> when it falls" : "Answer one right to join the fight.";
+} else if (st === "down") {
+kick = after ? "Last night" : "Exam eve"; title = "The class beat it!";
+line = "The Midnight Plaque fell at " + eveClock(s.fell) + ".";
+you = s.paid ? "You landed " + pl(s.mine, "hit") + ": <em>+" + fmtN(s.paid) + " XP and crowns</em>." : "You didn't land a hit this time.";
+} else {
+kick = after ? "Last night" : "Exam eve"; title = "It got away";
+line = "Midnight came with " + fmtN(s.left) + " of the Midnight Plaque's " + fmtN(s.hp) + " HP left.";
+}
+return '<section class="eve-mini is-' + st + '" aria-labelledby="eveM"><div class="eve-mini-head"><span class="eve-mini-ic">' +
+A.icon(st === "up" ? A.pick("up", f) : A.pick(st, f), { hat: eveHat() }) + '</span><div><p class="eve-kick">' + kick + '</p><h2 id="eveM">' + title + "</h2></div></div>" +
+(line ? '<p class="eve-line">' + line + "</p>" : "") + hpRow + (stats ? '<p class="eve-stats">' + stats + "</p>" : "") + (you ? '<p class="eve-you">' + you + "</p>" : "") + "</section>";
 }
 function eveMoment(s, was){
 var key = HUB + "|" + s.day;
@@ -1464,7 +1494,7 @@ function evePreview(st, frac){
 var now = Date.now(), c = centralParts(), hp = 3000, f = typeof frac === "number" ? frac : .55, left = st === "down" ? 0 : Math.round(hp * f), mine = 12;
 var start = st === "soon" ? now + 2.2 * 3600000 : now - 3 * 3600000, end = st === "lost" ? now - 60000 : now + 2.5 * 3600000;
 EVE.test = true; EVE.done = true; EVE.hidden = false; EVE.pend = []; EVE.skew = 0;
-EVE.data = { ok: true, prize: { hour: 18, hp: hp, base: 250, per: 25, max: 1000 }, you: { hits: st === "soon" ? 0 : mine, pay: 550, paid: st === "down" ? 550 : 0 },
+EVE.data = { ok: true, prize: { hour: 15, hp: hp, base: 250, per: 25, max: 1000 }, you: { hits: st === "soon" ? 0 : mine, pay: 550, paid: st === "down" ? 550 : 0 },
 boss: { day: c.day, exam: addDay(c.day, 1), state: st || "up", hp: hp, hits: st === "soon" ? 0 : hp - left, left: left, people: st === "soon" ? 0 : 41,
 starts: new Date(start).toISOString(), ends: new Date(end).toISOString(), now: new Date(now).toISOString(), counted_at: new Date(now).toISOString(),
 fell_at: st === "down" ? new Date(now - 600000).toISOString() : null } };
@@ -3636,7 +3666,7 @@ try { localStorage.setItem(key, val); } catch (e) {}
 try { document.dispatchEvent(new CustomEvent("sh:pref", { detail: { key: key, val: val } })); } catch (e) {}
 }
 var EXTRAS = [
-{ key: "sh_pref_boss", label: "Plaque bosses", hint: "A boss the whole class fights with right answers when 5+ people are online, and the Midnight Plaque on an exam's eve, 6 pm to midnight." },
+{ key: "sh_pref_boss", label: "Plaque bosses", hint: "A boss the whole class fights with right answers when 5+ people are online, and the Midnight Plaque on an exam's eve, 3 pm to midnight." },
 { key: "sh_pref_fairy", label: "Tooth Fairy", hint: "Flies across the page now and then. Catch her for the fairy board." },
 { key: "sh_pref_probe", label: "Golden Probe", hint: "One question a day is golden. First to get it right wins." },
 { key: "sh_pref_nuke", label: "Tactical nukes", opts: [["on", "On"], ["mine", "Mine only"], ["off", "Off"]],

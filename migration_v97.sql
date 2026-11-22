@@ -7,12 +7,12 @@
 --      still to come equal to hubs.js's exams (tools/after-merge/run.js, the "eves" step); the two below are Review of
 --      Systems' (its mock boards are Thu Dec 3 and Thu Dec 10). Closed to anon altogether: the page reads it through
 --      get_eve_boss.
---   2. sh_eve_prize(): the numbers, in one place: the boss is up from 6 pm to midnight Central, has 3,000 HP, and pays everyone
---      who landed a hit 250 XP and crowns plus 25 a hit, up to 1,000 (30 hits), once, when it falls. Sized from the class's
---      right answers from 6 pm to midnight on the 11 exam eves since September (median 3,883, from 2,286 to 8,325): 8 of the
---      11 would have beaten it, most between 9:30 and 10 pm.
+--   2. sh_eve_prize(): the numbers, in one place: the boss is up from 3 pm to midnight Central, has 3,000 HP, and pays everyone
+--      who landed a hit 250 XP and crowns plus 25 a hit, up to 1,000 (30 hits), once, when it falls (Sam, 2026-11-22: "open it
+--      from 3pm to midntight, hp is good, pay is good"). On the 11 exam eves since September the class had a median of 5,921
+--      right answers from 3 pm to midnight (2,971 to 12,974): 10 of the 11 would have beaten it, the middle one at about 8 pm.
 --   3. The count, without slowing the answer save: nothing is added to record_answer_v2 and no shared row is touched by an
---      answer. The class's hits are counted from personal_answers on demand: the first answer id at 6 pm is found once (a
+--      answer. The class's hits are counted from personal_answers on demand: the first answer id at 3 pm is found once (a
 --      binary search on the primary key: answers are saved in time order), then each count is a range scan of the primary key
 --      from it (the evening's answers, every hub), filtered by hub, right and the time. A count is kept in the boss's row and
 --      done again at most every 20 seconds, by whichever call comes first (pg_try_advisory_xact_lock: the others read the row
@@ -35,7 +35,7 @@ create table if not exists public.eve_bosses (
   day date not null,                       -- the eve (Central): the day before the exam
   exam_date date not null,
   hp integer not null check (hp between 100 and 100000),
-  start_id bigint,                         -- the first personal_answers id from 6 pm on (found once, at the first count)
+  start_id bigint,                         -- the first personal_answers id from 3 pm on (found once, at the first count)
   hits integer not null default 0,         -- the class's right answers counted so far (up to hp)
   people integer not null default 0,       -- how many people landed one (linked devices as one)
   counted_at timestamptz,
@@ -54,7 +54,7 @@ revoke all on table public.eve_bosses from public, anon, authenticated;
 -- base + per a hit, up to max
 create or replace function public.sh_eve_prize()
 returns jsonb language sql immutable set search_path = public as $$
-  select jsonb_build_object('hour', 18, 'hp', 3000, 'base', 250, 'per', 25, 'max', 1000);
+  select jsonb_build_object('hour', 15, 'hp', 3000, 'base', 250, 'per', 25, 'max', 1000);
 $$;
 revoke all on function public.sh_eve_prize() from public;
 grant execute on function public.sh_eve_prize() to anon, authenticated;
@@ -85,7 +85,7 @@ end;
 $$;
 revoke all on function public.sh_answer_id_at(timestamptz) from public, anon, authenticated;
 
--- the window of an eve: 6 pm to midnight, Central
+-- the window of an eve: 3 pm to midnight, Central
 create or replace function public.sh_eve_window(p_day date)
 returns tstzrange language sql stable set search_path = public as $$
   select tstzrange((p_day::timestamp + make_interval(hours => (sh_eve_prize()->>'hour')::int)) at time zone 'America/Chicago',
@@ -150,7 +150,7 @@ $$;
 revoke all on function public.sh_eve_count(timestamptz, text, date, boolean) from public, anon, authenticated;
 
 -- ====================================================================== 4. the page's read
--- tonight's boss on this hub (or last night's, on the exam day): its state (soon: before 6 pm; up; down: it fell; lost: it
+-- tonight's boss on this hub (or last night's, on the exam day): its state (soon: before 3 pm; up; down: it fell; lost: it
 -- got away at midnight), HP, the class's hits and how many people landed one, and this visitor's hits and pay (with a linked
 -- device's). boss is null on any other day. A count older than 20 seconds is done again first (sh_eve_count).
 create or replace function public.sh_eve_boss(p_at timestamptz, p_hub text, p_visitor text)

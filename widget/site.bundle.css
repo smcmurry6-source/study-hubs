@@ -639,7 +639,8 @@ white-space: normal; text-align: left; }
 .foot-report { margin-top: 14px; }
 .foot-report .btn, .toolbar [data-report-notes] { color: var(--muted); }
 .bank-grid { margin-top: 20px; display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 24px; align-items: start; }
-.bank-side { position: sticky; top: calc(var(--bar-h) + var(--boss-h, 0px) + 24px); }
+.bank-side { position: sticky; top: calc(var(--bar-h) + var(--boss-h, 0px) + 24px); max-height: calc(100vh - var(--bar-h) - var(--boss-h, 0px) - 40px);
+overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; }
 .qbar { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
 .qbar-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
 .qbar .lab, .morefil .lab { font-size: var(--fs-label); font-weight: var(--w-head); color: var(--muted); min-width: 64px; }
@@ -1088,11 +1089,20 @@ border-radius: var(--r-panel); background: #2b2550; color: #f4f0fa; }
 background: #f2c14e; color: #2b2230; font-size: var(--fs-label); font-weight: var(--w-strong); text-decoration: none; }
 .eve-go:hover { filter: brightness(1.06); }
 .eve-go:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.bank-side .eve-slot { margin-top: 16px; }
+.eve-mini { padding: 14px 18px 16px; border-radius: var(--r-panel); background: #2b2550; color: #f4f0fa; }
+.eve-mini-head { display: flex; align-items: center; gap: 12px; }
+.eve-mini-ic { flex: none; width: 64px; height: 44px; }
+.eve-mini-ic svg { display: block; width: 100%; height: 100%; }
+.hx-page .eve-mini h2 { margin-top: 2px; font-size: var(--fs-body); line-height: 1.25; font-weight: var(--w-title); color: #fff; }
+.eve-mini .eve-line { margin-top: 8px; }
+.eve-mini .eve-hp { margin-top: 10px; }
+.eve-mini .eve-you { margin-top: 8px; }
 @media (max-width: 640px) {
 .eve-card { grid-template-columns: minmax(0, 1fr); gap: 12px; padding: 12px; }
 .eve-text { padding: 0 6px 6px; }
 }
-html.hx-still .eve-card *, html.hx-still .sh-egg-eve * { animation: none !important; transition: none !important; }
+html.hx-still .eve-card *, html.hx-still .eve-mini *, html.hx-still .sh-egg-eve * { animation: none !important; transition: none !important; }
 :root .sh-nj { margin-top: 14px; }
 :root .sh-nj-btn { font-family: var(--font); font-size: var(--fs-label); border-color: var(--control); background: var(--row); color: var(--text); min-height: var(--control-h); padding: 0 16px; }
 :root .sh-nj-btn svg { color: var(--hub-text); }
