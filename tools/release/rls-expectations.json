@@ -48,6 +48,8 @@
     "sh_qh_overlay(text, jsonb)",
     "sh_exam_debriefs()",
     "sh_visitor_summary(integer)",
+    "sh_week_me(text)",
+    "sh_week_n(text, date)",
     "sh_week_award(text, date, integer, timestamptz, text)",
     "sh_week_sweep(timestamptz)",
     "sh_claim_week(timestamptz, text)",

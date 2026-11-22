@@ -45,7 +45,8 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   from the lamp post (own place only, never a visit), a Pennants view, a panel row. Art: `tools/figures/site/pennant.mjs`
   (`window.SH_PENNANT` in `widget/hub-art.js`: the month's felt and badge, the week of the month as stars, the school year's
   sleeve; 209 Mondays checked by the build; `pennant-sheet.mjs` draws a contact sheet), the lamp's pennant in `place.mjs`.
-  Tested: `tools/release/xp.js` 14f, `rls.js`. About page entry. The migration waits for the merging session.
+  Linked devices are one person: the claim, the read and the sweep count and pay under the main id. Every function is
+  PL/pgSQL. Tested: `tools/release/xp.js` 14g, `rls.js`. About page entry. The migration waits for the merging session.
 - **2026-11-22 (A one-page sheet for every lecture, idea board #5, #536, Claude Code)** — Sam's note on the idea ("do you actually
   want to print this or just have the cram sheet and likely topics/hints all together?") is answered with one thing that does
   both. **`#notes/<lecture>/sheet`** on every hub on the engine: the lecture's cram lines, its High likelihood topics

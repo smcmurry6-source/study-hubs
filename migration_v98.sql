@@ -59,21 +59,40 @@ create index if not exists week_pennants_week on public.week_pennants (week);
 alter table public.week_pennants enable row level security;
 revoke all on public.week_pennants from anon, authenticated;
 
+-- PL/pgSQL throughout, like every function a page calls and what it calls (shared-infrastructure, migration_v76): a SQL
+-- function with its own search_path can't be inlined, so it would be planned again on every call
 create or replace function public.sh_week_goal()
-returns integer language sql immutable set search_path = public as $$ select 50 $$;
+returns integer language plpgsql immutable set search_path = public as $$ begin return 50; end; $$;
 
 -- the Monday (Central) of the week a moment falls in
 create or replace function public.sh_week_of(p_at timestamptz)
-returns date language sql immutable set search_path = public as $$
-  select date_trunc('week', (p_at at time zone 'America/Chicago')::date)::date;
+returns date language plpgsql immutable set search_path = public as $$
+begin
+  return date_trunc('week', p_at at time zone 'America/Chicago')::date;
+end;
 $$;
 
--- a person's answers in a week: at most seven xp_days rows, by its primary key
+-- a person's main id: a linked device's answers and pennants count for the id it was linked to (as sh_form_reward pays)
+create or replace function public.sh_week_me(p_visitor text)
+returns text language plpgsql stable security definer set search_path = public as $$
+begin
+  return coalesce((select l.primary_id from visitor_links l where l.alias_id = p_visitor), p_visitor);
+end;
+$$;
+
+-- a person's answers in a week, given their main id: its xp_days rows (at most seven, by the primary key) and any still
+-- under a device linked to it (Link my devices moves a device's answers to the main id, so normally none: a tab left open
+-- through the link can still save under the old one)
 create or replace function public.sh_week_n(p_visitor text, p_week date)
 returns integer language plpgsql stable security definer set search_path = public as $$
 declare k int;
 begin
-  select coalesce(sum(x.n), 0)::int into k from xp_days x where x.visitor_id = p_visitor and x.d between p_week and p_week + 6;
+  select coalesce(sum(z.n), 0)::int into k from (
+    select x.n from xp_days x where x.visitor_id = p_visitor and x.d between p_week and p_week + 6
+    union all
+    select x.n from visitor_links l join xp_days x on x.visitor_id = l.alias_id and x.d between p_week and p_week + 6
+    where l.primary_id = p_visitor and l.alias_id <> p_visitor
+  ) z;
   return k;
 end;
 $$;
@@ -102,12 +121,13 @@ $$;
 -- what the page shows: this week, how far along, the class count and every pennant earned (newest first)
 create or replace function public.sh_my_week(p_at timestamptz, p_visitor text)
 returns jsonb language plpgsql stable security definer set search_path = public as $$
-declare v_at timestamptz := coalesce(p_at, clock_timestamp()); wk date := sh_week_of(v_at); k int := 0; mine jsonb := '[]'::jsonb;
+declare v_at timestamptz := coalesce(p_at, clock_timestamp()); wk date := sh_week_of(v_at); k int := 0; mine jsonb := '[]'::jsonb; me text;
 begin
   if p_visitor is not null and length(p_visitor) between 1 and 80 then
-    k := sh_week_n(p_visitor, wk);
+    me := sh_week_me(p_visitor);
+    k := sh_week_n(me, wk);
     select coalesce(jsonb_agg(z.week order by z.week desc), '[]'::jsonb) into mine
-      from (select w.week from week_pennants w where w.visitor_id = p_visitor order by w.week desc limit 260) z;
+      from (select w.week from week_pennants w where w.visitor_id = me order by w.week desc limit 260) z;
   end if;
   return jsonb_build_object('ok', true, 'week', wk, 'goal', sh_week_goal(), 'n', k,
     'done', mine @> jsonb_build_array(to_jsonb(wk)), 'class', sh_week_class(wk), 'pennants', mine,
@@ -115,49 +135,57 @@ begin
 end;
 $$;
 create or replace function public.get_my_week_v2(p_visitor text)
-returns jsonb language sql stable security definer set search_path = public as $$
-  select sh_my_week(null, p_visitor);
+returns jsonb language plpgsql stable security definer set search_path = public as $$
+begin
+  return sh_my_week(null, p_visitor);
+end;
 $$;
 
 -- the page asks for this week's pennant once its count reaches 50; the server counts again, so the page's count is only a hint
 create or replace function public.sh_claim_week(p_at timestamptz, p_visitor text)
 returns jsonb language plpgsql security definer set search_path = public as $$
-declare v_at timestamptz := coalesce(p_at, clock_timestamp()); wk date := sh_week_of(v_at); k int; paid int; had int;
+declare v_at timestamptz := coalesce(p_at, clock_timestamp()); wk date := sh_week_of(v_at); k int; paid int; had int; me text;
 begin
   if p_visitor is null or length(p_visitor) not between 1 and 80 then return jsonb_build_object('ok', false, 'error', 'bad'); end if;
-  perform pg_advisory_xact_lock(hashtext('xp|' || p_visitor));
-  k := sh_week_n(p_visitor, wk);
+  -- counted and paid under the main id, so two linked devices make one week, and its pennant is the person's
+  me := sh_week_me(p_visitor);
+  perform pg_advisory_xact_lock(hashtext('xp|' || me));
+  k := sh_week_n(me, wk);
   if k < sh_week_goal() then
-    return sh_prize_reply(p_visitor, 'week', 0, jsonb_build_object('why', 'short', 'n', k, 'goal', sh_week_goal(), 'week', wk));
+    return sh_prize_reply(me, 'week', 0, jsonb_build_object('why', 'short', 'n', k, 'goal', sh_week_goal(), 'week', wk));
   end if;
-  paid := sh_week_award(p_visitor, wk, k, v_at, 'claim');
-  select count(*)::int into had from week_pennants w where w.visitor_id = p_visitor;
-  return sh_prize_reply(p_visitor, 'week', paid, jsonb_build_object('week', wk, 'n', k, 'goal', sh_week_goal(), 'pennant', true,
+  paid := sh_week_award(me, wk, k, v_at, 'claim');
+  select count(*)::int into had from week_pennants w where w.visitor_id = me;
+  return sh_prize_reply(me, 'week', paid, jsonb_build_object('week', wk, 'n', k, 'goal', sh_week_goal(), 'pennant', true,
     'class', sh_week_class(wk), 'have', had));
 end;
 $$;
 create or replace function public.claim_week_v2(p_visitor text)
-returns jsonb language sql volatile security definer set search_path = public as $$
-  select sh_claim_week(null, p_visitor);
+returns jsonb language plpgsql volatile security definer set search_path = public as $$
+begin
+  return sh_claim_week(null, p_visitor);
+end;
 $$;
 
 -- Monday's sweep: whoever reached 50 last week without the page claiming it (the tab closed on the 50th answer, an answer
--- saved later from the device) gets the pennant, dated the week's last second. Linked devices are swept under their primary
--- id only. Returns how many it made. One query over last week's xp_days rows (a few hundred), once a week.
+-- saved later from the device) gets the pennant, dated the week's last second. A linked device's answers count for its main
+-- id, as the claim counts them. Returns how many it made. One query over last week's xp_days rows (a few hundred), once a week.
 create or replace function public.sh_week_sweep(p_at timestamptz default null)
 returns integer language plpgsql security definer set search_path = public as $$
 declare v_at timestamptz := coalesce(p_at, clock_timestamp()); wk date := sh_week_of(v_at) - 7; t_end timestamptz; r record; made int := 0;
 begin
   t_end := ((wk + 7)::timestamp at time zone 'America/Chicago') - interval '1 second';
   for r in
-    select x.visitor_id, sum(x.n)::int as k from xp_days x
-    where x.d between wk and wk + 6
-      and not exists (select 1 from visitor_links l where l.alias_id = x.visitor_id and l.alias_id <> l.primary_id)
-      and not exists (select 1 from week_pennants w where w.visitor_id = x.visitor_id and w.week = wk)
-    group by x.visitor_id having sum(x.n) >= sh_week_goal()
+    select g.who, g.k from (
+      select coalesce(l.primary_id, x.visitor_id) as who, sum(x.n)::int as k
+      from xp_days x left join visitor_links l on l.alias_id = x.visitor_id and l.alias_id <> l.primary_id
+      where x.d between wk and wk + 6
+      group by 1 having sum(x.n) >= sh_week_goal()
+    ) g
+    where not exists (select 1 from week_pennants w where w.visitor_id = g.who and w.week = wk)
   loop
-    perform pg_advisory_xact_lock(hashtext('xp|' || r.visitor_id));
-    if sh_week_award(r.visitor_id, wk, r.k, t_end, 'sweep') > 0 then made := made + 1; end if;
+    perform pg_advisory_xact_lock(hashtext('xp|' || r.who));
+    if sh_week_award(r.who, wk, r.k, t_end, 'sweep') > 0 then made := made + 1; end if;
   end loop;
   return made;
 end;
@@ -198,6 +226,7 @@ $do$;
 revoke all on function public.sh_week_goal() from public, anon, authenticated;
 revoke all on function public.sh_week_of(timestamptz) from public, anon, authenticated;
 revoke all on function public.sh_week_n(text, date) from public, anon, authenticated;
+revoke all on function public.sh_week_me(text) from public, anon, authenticated;
 revoke all on function public.sh_week_class(date) from public, anon, authenticated;
 revoke all on function public.sh_week_award(text, date, integer, timestamptz, text) from public, anon, authenticated;
 revoke all on function public.sh_my_week(timestamptz, text) from public, anon, authenticated;
