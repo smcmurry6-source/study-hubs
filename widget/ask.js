@@ -306,6 +306,7 @@
     var c = { view: String(opt("section") || (isDash() ? "dashboard" : "")).slice(0, 60) };
     var pl = isDash() ? null : opt("place");
     if (pl && pl.lec) { c.lec = String(pl.lec); if (Number.isInteger(pl.k)) c.k = pl.k; }
+    if (pl && pl.course) c.course = String(pl.course).slice(0, 40);   // a hub of courses: the course the student is in
     return c;
   }
   /* "What should I study tonight?": the student's own progress, worked out here from each hub's saved state */

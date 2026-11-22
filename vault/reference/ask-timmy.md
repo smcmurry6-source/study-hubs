@@ -29,7 +29,9 @@ there and in [decisions](../decisions.md)); **deployed and applied at [the redes
    - `text`: up to 1,000 characters; `chat`: the chat id from the last answer (or null); `request`: a fresh random id per
      send (8-64 of `A-Za-z0-9_-`), **the same one on a retry**, so a retried send gets the stored answer and costs nothing;
    - `voice`: `timmy`, or `plain` when Timmy is turned off (the same rules, "the hub" with no character);
-   - `context`: `{ view: SH_SECTION(), lec, k }` (a view with `mock` in it gets "paused" without calling anything);
+   - `context`: `{ view: SH_SECTION(), lec, k, course }` (a view with `mock` in it gets "paused" without calling anything;
+     `course`, on a hub of courses away from the notes: the course the student is in, from `askCourse()` in
+     `widget/hub-timmy.js`, "Limits and money" below);
    - `ask` (Ask Timmy on a question card, after answering): `{ qid, right, picks }`, picks in **authored** order. The
      question's stem, key and whys are read from the hub's own `questions.json`, and only if the database has this
      visitor's answer to it (`personal_answers`), so the browser can't fish for a key. `w` is the version on screen
@@ -42,8 +44,8 @@ there and in [decisions](../decisions.md)); **deployed and applied at [the redes
 2. `timmy_begin` checks the limits, stores the question and returns the last 10 messages (the exact turn sent and the
    exact JSON answered, so the API's prompt cache hits on follow-ups).
 3. The request: the rules, then the hub's content (on the dashboard, every live hub's, in a fixed order), then the site
-   help (or, on the first question after an idle hour, the rules, the site help, then a part of the content: "Limits and
-   money" below), the content and the site help each with a 1-hour cache mark (the site help last since 2026-11-18, so an About
+   help (or, on the first question after an idle hour, the rules, the site help, then a part of the content; on a hub of
+   courses, every question, with one course's part: "Limits and money" below), the content and the site help each with a 1-hour cache mark (the site help last since 2026-11-18, so an About
    page change rewrites only its ~40k tokens, not the hub's 130-160k: "Limits and money" below); then the earlier turns; then this turn: `<page>` (hub, voice, today in Central time,
    view, lecture, paragraph), `<answered_question>` (its choices without letters, the student's pick by its words: the card
    shuffles the choices and shows no letters), `<progress>`, `<student>` (escaped: what a student types is data).
@@ -139,6 +141,22 @@ list, no limit on gap answers. they are uncommon" ([decisions](../decisions.md))
   and the site help came first in the cached prompt, so each of those deploys sent every hub's whole content to the cache
   again. Reusing answers wouldn't help: students almost never ask the same thing (a handful of repeats in their first 148
   questions, all "why is it ..." on a question card, whose answer depends on what they picked).
+- **A hub of courses reads one course first** (Review of Systems; Sam, 2026-11-22: "Let's do your recommendation to have
+  Timmy only read the course the student is in", after "I dont want to sacrifice the quality of the material just so we can
+  have ask timmy": its content passed 200k tokens as the professors' slides and recordings came in, about 245k by the
+  function's count). On a hub whose `core.json` has `groups`, `handle()` skips `timmy_cache` and sends every question a
+  part: `COURSE_NOTE`, the exam facts, **every course's cram sheet** (the net for a question on another course), and the
+  notes, review tables, high-yield points and High yield topics of **one course** (`part(lecs, { scoped: true })`): the
+  answered question's course, else the course of the lecture on screen, else the course the page names (`context.course`:
+  in the Question Bank, the course picked when it is one, otherwise the course of the notes last opened), else none (the
+  cram sheet alone). It is cached for an hour, one entry per course. If the answer is "not_covered" (or doesn't parse),
+  the function asks again with the whole content, as the idle-hour part does; the edge log's `turn` line says `content`
+  `course` or `course+full` and `course` (the course's id, or `none`). The points and topics are the course's own because
+  Haiku 5.5's price goes up fivefold on a prompt over 100k tokens (input $0.50 and output $2.50 a million, against $0.10
+  and $0.50): with the rules and the site help (about 26k), one course's prompt is about 61-88k tokens (Cardio &
+  Respiratory the biggest), and `tools/timmy/test.mjs` fails a course whose prompt reaches 95,000 by the function's count,
+  or whole content past 400,000 (200,000 for a hub without courses). On the dashboard the hub is read as before. The eval's
+  `rs-` cases are this mode (`rs-03` asks about another course, `rs-07` about nothing in the hub).
 - **The first question after an idle hour gets a part of the content** (Sam, 2026-11-19: yes, with the eval;
   [decisions](../decisions.md)). Before the model, the function asks `timmy_cache(key)` (`migration_v85.sql`; the key is the
   hub, or `dashboard`, and a hash of the model, the rules and the content, `cacheKey()` in `core.js`) when the whole content

@@ -1157,9 +1157,16 @@ core: function(){ return HX.CORE; }, state: function(){ return STATE; },
 go: askGo, archived: askArchived, sb: function(){ return window.shSupabase || null; } });
 }
 function askStart(){ askReady().catch(function(){}); }
+function askCourse(){
+if (!HX.GROUPS) return "";
+var v = STATE.ui.qlec, picked = Array.isArray(v) ? v : v && v !== "all" && HX.LBY[v] ? [v] : [], g = "";
+for (var i = 0; i < picked.length; i++) { var l = HX.LBY[picked[i]]; if (!l || !l.group || (g && l.group !== g)) { g = ""; break; } g = l.group; }
+return (HX.view === "questions" && g) || ((HX.LBY[STATE.ui.lec] || {}).group || "");
+}
 function askPlace(){
-if (HX.view !== "notes" || HX.sub === "guide") return null;
-var lec = HX.LBY[HX.sub] ? HX.sub : STATE.ui.lec; if (!HX.LBY[lec]) return null;
+var course = askCourse();
+if (HX.view !== "notes" || HX.sub === "guide") return course ? { course: course } : null;
+var lec = HX.LBY[HX.sub] ? HX.sub : STATE.ui.lec; if (!HX.LBY[lec]) return course ? { course: course } : null;
 var out = { lec: lec };
 if ((STATE.ui.level || "full") !== "full") return out;
 var prose = $(".reading-prose"); if (!prose || !prose.closest("#lec-" + lec)) return out;

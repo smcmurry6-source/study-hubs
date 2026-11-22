@@ -304,11 +304,22 @@
   }
   /* the chat comes with the shared widget (the core's startWidget), not with the first screen */
   function askStart(){ askReady().catch(function(){}); }
+  /* a hub of courses (core.json's groups, Review of Systems): the course the student is in, for when no lecture is on
+     screen, so Ask Timmy reads that course's notes first (Sam, 2026-11-22: "have Timmy only read the course the student is
+     in"). In the Question Bank, the course picked when every lecture picked is in one; otherwise the course of the notes
+     last opened. In the notes the server works it out from the lecture. */
+  function askCourse(){
+    if (!HX.GROUPS) return "";
+    var v = STATE.ui.qlec, picked = Array.isArray(v) ? v : v && v !== "all" && HX.LBY[v] ? [v] : [], g = "";
+    for (var i = 0; i < picked.length; i++) { var l = HX.LBY[picked[i]]; if (!l || !l.group || (g && l.group !== g)) { g = ""; break; } g = l.group; }
+    return (HX.view === "questions" && g) || ((HX.LBY[STATE.ui.lec] || {}).group || "");
+  }
   /* where the student is in the notes: the lecture, and (in the notes as taught) the paragraph at the top of the screen,
      counted the way exportSections and SH_GOTO count them, so it is the same address the server's quotes use */
   function askPlace(){
-    if (HX.view !== "notes" || HX.sub === "guide") return null;   // the study guide is no one lecture's notes
-    var lec = HX.LBY[HX.sub] ? HX.sub : STATE.ui.lec; if (!HX.LBY[lec]) return null;
+    var course = askCourse();
+    if (HX.view !== "notes" || HX.sub === "guide") return course ? { course: course } : null;   // the study guide is no one lecture's notes
+    var lec = HX.LBY[HX.sub] ? HX.sub : STATE.ui.lec; if (!HX.LBY[lec]) return course ? { course: course } : null;
     var out = { lec: lec };
     if ((STATE.ui.level || "full") !== "full") return out;
     var prose = $(".reading-prose"); if (!prose || !prose.closest("#lec-" + lec)) return out;
