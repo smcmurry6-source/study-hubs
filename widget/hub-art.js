@@ -96,9 +96,11 @@ window.SH_PENNANT = (function pennantKit(INK, C){
   /* the felt: a long pennant with a gentle wave in it, hoist at x 0 (the sleeve, 0-7), the tip at 60 18 */
   var FELT = "M6 .8 C20 -1.4 34 8 60 18 C36 25 22 38.4 6 35.2 Z";
   var FELT_SHADE = "M6 24 C22 26 38 21.4 60 18 C36 25 22 38.4 6 35.2 Z";
-  function flag(monday){
+  function flag(monday, o){
     var g = design(monday); if (!g) return "";
     var M = MONTHS[g.month - 1], s = "";
+    /* o.edge: a cream edge round it all, so it reads over whatever is behind it (Timmy's place flies it over the yard) */
+    if (o && o.edge) s += '<path d="' + FELT + ' M-.6 -1.2 H7.6 V37.2 H-.6 Z" fill="' + WHITE + '" stroke="' + WHITE + '" stroke-width="5.2" stroke-linejoin="round"/>';
     s += F(FELT, g.felt) + F(FELT_SHADE, g.shade) + P(FELT, "none", SW);
     s += L("M9.4 4.2 C19 3 27 6.4 36 10.2", 1.4, HIW, .55);
     /* the badge, on a round patch of the felt's shade so it reads on any felt */

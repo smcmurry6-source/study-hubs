@@ -2203,7 +2203,7 @@
       row: (d.n || "") + " right in a row", streak: (d.n || "") + " days in a row", medal: "Hub medal", "pod-done": "Timmy Time finished",
       collection: won > 1 ? won + " collections finished" : "Collection finished",
       fairy: "First Tooth Fairy caught", goldfairy: "First Golden Tooth Fairy caught", probe: "Today's Golden Probe", perfect: "A perfect mock",
-      misses: "Yesterday's misses, all right", idea: "Your idea shipped", back: "Welcome back" }[src] || "Bonus";
+      misses: "Yesterday's misses, all right", idea: "Your idea shipped", back: "Welcome back", week: "This week's pennant" }[src] || "Bonus";
   }
   function prizeText(src, xp, d){
     return prizeName(src, d) + ": +" + fmtN(xp) + " XP and " + fmtN(xp) + (xp === 1 ? " crown" : " crowns");

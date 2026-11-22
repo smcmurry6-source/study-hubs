@@ -1694,6 +1694,7 @@
     var woke = function(){
       ["scroll", "pointerdown", "keydown", "touchstart"].forEach(function(n){ window.removeEventListener(n, woke, true); });
       PLACE.wake = true; if (q("#petHome .shpet-scene")) placeLoad();
+      weekWake();
     };
     ["scroll", "pointerdown", "keydown", "touchstart"].forEach(function(n){ window.addEventListener(n, woke, { capture: true, passive: true }); });
   }
@@ -1729,6 +1730,13 @@
     placeLoad().then(function(){ if (!window.shPlace) throw new Error("no place"); window.shPlace.open({ collections: true, onClose: back }); })
       .then(null, function(){ toast("Your collections didn't open. Try again in a moment.", "err"); });
   }
+  /* the weekly pennants: Timmy's place opens on them (widget/place.js); closing it comes back here */
+  function openPennants(){
+    var back = function(){ var b = q('[data-dash="pennants"]'); if (b) b.focus({ preventScroll: true }); };
+    placeLoad().then(function(){ if (!window.shPlace) throw new Error("no place"); window.shPlace.open({ pennants: true, onClose: back }); })
+      .then(null, function(){ toast("Your pennants didn't open. Try again in a moment.", "err"); });
+  }
+  document.addEventListener("click", function(e){ var b = e.target.closest && e.target.closest('[data-dash="pennants"]'); if (b) { weekWake(); openPennants(); } });
   function openShop(){
     loadScriptOnce(WIDGET + "shop.js").then(function(){
       if (!window.shShop) throw new Error("no shop");
@@ -1849,6 +1857,25 @@
     HUBS.concat(ARCHIVED_HUBS).forEach(function(h){ var p = readProgress(h); if (p) p.days.forEach(function(d){ by[d] = by[d] || { a: 0, c: 0 }; }); });
     return by;
   }
+  /* the weekly pennant (idea board #6, migration_v98): 50 questions from Monday to Sunday, in any hub, and Timmy gets that
+     week's pennant. Where it stands is widget/pet.js's (shPet.week: his days from the bootstrap and this device), drawn with
+     window.SH_PENNANT (in this page's bundle, hub-art.js); the class count and the pennants earned come from the server,
+     asked once the page is first scrolled or tapped (weekWake), at most every 30 minutes. A tap opens Timmy's place. */
+  var weekWoke = false;
+  function pennantStat(){
+    var P = window.shPet, K = window.SH_PENNANT; if (!P || !P.week || !K || focusOn()) return "";
+    var w = P.week(weekWoke), got = w.done, d = K.design(w.week), n = Math.min(w.n, 999);
+    var all = w.pennants.length, what = got ? "This week’s is yours: " + num(n) + " questions since Monday" :
+      w.n >= w.goal ? "Your pennant is on its way" : (d ? d.name + "’s pennant" : "This week’s pennant") + ", " + Math.max(0, w.goal - w.n) + " to go by Sunday";
+    return '<li class="dx-stat s-pennant' + (got ? " is-got" : "") + '"><button type="button" data-dash="pennants">' + K.svg(w.week, 46, { dim: !got }) +
+      "<span>" + (got ? '<b class="num">' + num(all) + "</b> " + (all === 1 ? "pennant" : "pennants") : '<b class="num">' + num(Math.min(n, w.goal)) + "</b> of " + w.goal) + "<small>" + esc(what) + "</small>" +
+      (w.cls ? '<small class="dx-pclass">' + num(w.cls) + " in the class have theirs this week</small>" : "") + "</span></button></li>";
+  }
+  function weekWake(){
+    if (weekWoke) return; weekWoke = true;
+    if (window.shPet && window.shPet.week) window.shPet.week(true);
+  }
+  document.addEventListener("sh:week", function(){ if ($("youStats")) renderYouStats(); });
   function renderYouStats(){
     var by = weekBy || localDays(), today = dayStart(new Date()), keys = [], a7 = 0, c7 = 0;
     for (var i = 0; i < 60; i++){ var d = new Date(today); d.setDate(d.getDate() - i); keys.push(ymd(d)); }
@@ -1864,7 +1891,8 @@
         dots + '<span class="sr">You studied on ' + on7 + " of the last 7 days.</span></li>" +
       (weekSource === "server" ? '<li class="dx-stat s-week"><span><b class="num">' + num(a7) + "</b> " + (a7 === 1 ? "answer" : "answers") + "<small>This week" + (a7 ? ", " + pct7 + "% right" : "") + "</small></span>" +
         /* how many of the week's answers were right, as a ring */
-        (a7 ? '<span class="dx-wring" aria-hidden="true"><svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="18" class="t"/><circle cx="22" cy="22" r="18" class="v" pathLength="100" stroke-dasharray="' + pct7 + ' 100" transform="rotate(-90 22 22)"/></svg><b class="num">' + pct7 + "</b></span>" : "") + "</li>" : "");
+        (a7 ? '<span class="dx-wring" aria-hidden="true"><svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="18" class="t"/><circle cx="22" cy="22" r="18" class="v" pathLength="100" stroke-dasharray="' + pct7 + ' 100" transform="rotate(-90 22 22)"/></svg><b class="num">' + pct7 + "</b></span>" : "") + "</li>" : "") +
+      pennantStat();
     var m = $("dxStreak");
     /* read out in full whatever the bar has room to show (the words fold away on a phone) */
     m.innerHTML = '<span class="sr">Your study streak: ' + streak + (streak === 1 ? " day" : " days") + '</span><span class="dx-seen" aria-hidden="true">' + flame(streak) + '<b class="num">' + streak + '</b><span class="dx-fold">' + (streak === 1 ? "day" : "days") + "</span></span>";

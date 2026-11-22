@@ -1848,7 +1848,7 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
      right), handed in by the page as markup, so this kit never needs the dates; here it is turned to fly left. The space
      scene's crystal lamp has no post, so there the pennant gets a short staff of its own beside it. */
   function lampPennant(flag, kind){
-    var b = P(FIX.lamp[0], FIX.lamp[1], 0), x = b[0], y = b[1], k = .36, top = y - 27.6, s = "";
+    var b = P(FIX.lamp[0], FIX.lamp[1], 0), x = b[0], y = b[1], k = .4, top = y - 27.6, s = "";
     if (kind === "crystal"){
       x -= 6; top = y - 23;
       s += ell(x, y - 1.4, 2.6, 1, "#000", 0, .14) + L("M" + f(x) + " " + f(y - 1.4) + " V" + f(top - 2), 3.4) + L("M" + f(x) + " " + f(y - 1.4) + " V" + f(top - 2), 1.6, "#B6BEC7") + circ(x, top - 3.4, 1.8, "#9B7BE0", 1);

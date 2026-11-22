@@ -2519,6 +2519,53 @@ var t = by[today] || [0, 0];
 return { hp: Math.round(hp), streak: streak, missedYesterday: !(by[addDays(today, -1)] || [0])[0] && born < today,
 treat: treat, everZero: everZero, revived: revived, dipped: dipped, today: { a: t[0], c: t[1] }, born: born, away: miss };
 }
+var WEEK_GOAL = 50, WEEK_FOR = 30 * 60e3, DAY_RE = /^\d{4}-\d{2}-\d{2}$/, weekAsking = false, weekAskedAt = 0, weekClaimed = "", weekShort = 0;
+function mondayOf(day){ var p = day.split("-"), k = (new Date(Date.UTC(+p[0], +p[1] - 1, +p[2])).getUTCDay() + 6) % 7; return addDays(day, -k); }
+function weekKept(){ try { var w = JSON.parse(ls("sh_week") || "null"); return w && typeof w === "object" ? w : {}; } catch (e) { return {}; } }
+function weekSaid(){ try { document.dispatchEvent(new CustomEvent("sh:week")); } catch (e) {} }
+function weekKeep(w){ ls("sh_week", JSON.stringify(w)); weekSaid(); }
+function weekMine(list){ return (Array.isArray(list) ? list : []).map(String).filter(function(k){ return DAY_RE.test(k); }).sort().reverse().slice(0, 260); }
+function weekNow(){
+var today = centralDay(), mon = mondayOf(today), log = readLog(), by = {}, n = 0, kept = weekKept(), mine = weekMine(kept.pennants);
+((M && M.rows) || []).forEach(function(r){ var k = String(r.d).slice(0, 10); if (k >= mon && k <= today) by[k] = r.attempts | 0; });
+Object.keys(log).forEach(function(k){ if (k >= mon && k <= today) by[k] = Math.max(by[k] || 0, (log[k] || [0])[0] | 0); });
+Object.keys(by).forEach(function(k){ n += by[k]; });
+if (kept.week === mon && kept.n > n) n = kept.n | 0;
+var G = window.shGame;
+return { week: mon, n: n, goal: WEEK_GOAL, done: mine.indexOf(mon) > -1, cls: kept.week === mon && kept.cls >= 5 ? kept.cls | 0 : null,
+pennants: mine, pays: kept.pays > 0 ? kept.pays | 0 : G && G.prizes && G.prizes.week || 0, ends: addDays(mon, 6) };
+}
+function weekAsk(){
+var kept = weekKept(), mon = mondayOf(centralDay());
+if (weekAsking || !M || !M.sb || !M.visitor || window.shAutomated) return;
+if (kept.week === mon && Date.now() - (kept.at || 0) < WEEK_FOR && Date.now() >= (kept.at || 0)) return;
+if (Date.now() - weekAskedAt < 10 * 60e3 || (window.shDb && window.shDb.busy && window.shDb.busy())) return;
+weekAsking = true; weekAskedAt = Date.now();
+M.sb.rpc("get_my_week_v2", { p_visitor: M.visitor }).then(function(r){
+weekAsking = false;
+if (r && r.error && (r.error.code === "PGRST202" || r.error.status === 404)) weekAskedAt = Infinity;
+var d = r && !r.error ? r.data : null;
+if (!d || typeof d !== "object" || !d.ok || !DAY_RE.test(String(d.week))) return;
+weekKeep({ at: Date.now(), week: String(d.week), n: d.n | 0, cls: d["class"] == null ? null : d["class"] | 0, pennants: weekMine(d.pennants), pays: d.pays | 0 });
+}, function(){ weekAsking = false; });
+}
+function weekClaim(){
+var w = weekNow(), G = window.shGame;
+if (!M || !M.visitor || w.n < WEEK_GOAL || w.done || weekClaimed === w.week || w.n < weekShort || !G || !G.claim) return;
+weekClaimed = w.week;
+G.claim("claim_week_v2", { p_visitor: M.visitor }, "week").then(function(r){
+if (!r || r.missing) { if (!r) weekClaimed = ""; return; }
+if (r.ok === false || !DAY_RE.test(String(r.week))) return;
+var kept = weekKept(), mine = weekMine(kept.pennants);
+if (r.why === "short") {
+weekClaimed = ""; weekShort = w.n + 3;
+kept.week = String(r.week); kept.n = r.n | 0; weekKeep(kept); return;
+}
+if (mine.indexOf(String(r.week)) < 0) mine.unshift(String(r.week));
+weekKeep({ at: Date.now(), week: String(r.week), n: r.n | 0, cls: r["class"] == null ? null : r["class"] | 0, pennants: weekMine(mine), pays: kept.pays | 0 || r.xp | 0 });
+if (r.xp > 0 && visible()) setTimeout(function(){ talk("Fifty this week! A new pennant for my place. It's flying by the path.", "do-cheer", 5200); }, 2600);
+});
+}
 var JOKES = [
 "What time do you go to the dentist? Tooth-hurty.",
 "Why did the king go to the dentist? To get his teeth crowned.",
@@ -3359,6 +3406,7 @@ function update(quiet){
 var prev = M.st ? M.st.hp : null;
 M.st = simulate(M.rows);
 draw();
+if (quiet && M.rows) { weekSaid(); if (M.where === "hub") setTimeout(weekClaim, 4000); }
 var hp = M.st.hp;
 if (hp >= 100 && M.st.dipped && !ls("sh_pet_perfect")) { ls("sh_pet_perfect", "1"); award("pet-perfect"); if (!quiet) talk("100 HP! Pearly whites, baby. You earned a trophy for this.", "do-cheer"); }
 var day = new Date().toISOString().slice(0, 10);
@@ -3539,6 +3587,7 @@ else { var c = chat(); talk(esc(c) + "<br>" + askBtn() + '<button type="button" 
 }
 function wireHub(){
 var H = M.H;
+document.addEventListener("sh:answer-paid", function(){ weekSaid(); weekClaim(); });
 ["pointerdown", "keydown", "wheel", "touchstart"].forEach(function(t){ document.addEventListener(t, function(){ M.lastInput = Date.now(); }, { passive: true, capture: true }); });
 document.addEventListener(H.answeredEvent, function(e){
 var d = (e && e.detail) || {}, ok = !!d.correct;
@@ -3641,7 +3690,8 @@ if (b && !ls("sh_pet_born")) { ls("sh_pet_born", day || centralDay()); if (M) { 
 else if (b && day && ls("sh_pet_born") > day) { ls("sh_pet_born", day); if (M) { update(true); draw(); } }
 else if (!b && ls("sh_pet_born") && M && M.sb && M.visitor && !ls("sh_pet_adopt_sent")) { ls("sh_pet_adopt_sent", "1"); award("pet-adopt", ls("sh_pet_born")); }
 }
-window.shPet = { say: function(text, move, ms){ talk(text, move, ms); }, hp: function(){ return M.st && typeof M.st.hp === "number" ? M.st.hp : null; }, mount: mount, refresh: refresh, syncBadges: syncBadges, art: art, fit: fit, setOutfit: setOutfit, conditions: conditions, simulate: simulate, holidayId: holidayId, _jokes: JOKES };
+window.shPet = { say: function(text, move, ms){ talk(text, move, ms); }, hp: function(){ return M.st && typeof M.st.hp === "number" ? M.st.hp : null; }, mount: mount, refresh: refresh, syncBadges: syncBadges, art: art, fit: fit, setOutfit: setOutfit, conditions: conditions, simulate: simulate, holidayId: holidayId, _jokes: JOKES,
+week: function(ask){ if (ask) setTimeout(weekAsk, 2500); return weekNow(); } };
 })();
 }));
 /* ---- widget/timmy.js ---- */

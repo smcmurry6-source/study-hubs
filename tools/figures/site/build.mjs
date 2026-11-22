@@ -201,7 +201,7 @@ if (placeKit) {
     [false, true].forEach((night) => combos.push({ home: hm.k, scene: sc.k, night, tier: 2, yard: { [slots[i % slots.length]]: y.k, [slots[(i + 2) % slots.length]]: y.k } })); });
   /* the weekly pennant on the lamp post (every scene's lamp: the space scene's crystal lamp gets a staff), day and night */
   pairs.filter(([h]) => h.k === "cottage").forEach(([h, sc], i) => [false, true].forEach((night) =>
-    combos.push({ home: h.k, scene: sc.k, night, tier: 1, yard: fill(i), pennant: PENNANT.flag(PENNANT.mondays("2026-11-23", "2027-12-31")[i * 5 % 50]) })));
+    combos.push({ home: h.k, scene: sc.k, night, tier: 1, yard: fill(i), pennant: PENNANT.flag(PENNANT.mondays("2026-11-23", "2027-12-31")[i * 5 % 50], { edge: i % 2 === 0 }) })));
   ["", "halloween", "thanksgiving", "winter", "newyear", "valentine", "dentist", "stpatrick", "easter"].forEach((hol) => ["", "fall", "spring"].forEach((season) =>
     K.HOMES.filter(builtIn).forEach((h) => combos.push({ home: h.k, scene: "hill", holiday: hol, season, tier: 3, yard: fill(1) }))));
   for (const c of combos) {

@@ -489,6 +489,16 @@ html.hx-still .ql-pod *, html.hx-still .pod-x *, html.hx-still .teeth .tooth { a
 .today-stats .ts-plus { color: var(--gold-ink); font-weight: var(--w-strong); }
 .today-pet { margin-top: 12px; display: flex; align-items: center; gap: 8px; font-size: var(--fs-label); color: var(--muted); }
 .today-pet .ic { color: var(--sun-ink); }
+/* the weekly pennant's row (widget/hub-rewards.js weekRow, migration_v98): the pennant, dimmed until it's earned, and a bar */
+.today-week { margin-top: 12px; display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: var(--r-row); background: var(--row); color: inherit; text-decoration: none; }
+.today-week:hover b { color: var(--hub-text); }
+.today-week .shpn { flex: none; width: 48px; height: auto; }
+.today-week .tw-txt { min-width: 0; flex: 1; }
+.today-week b { display: block; font-size: 15px; font-weight: var(--w-head); line-height: 1.25; }
+.today-week small { display: block; font-size: var(--fs-meta); color: var(--muted); margin-top: 2px; }
+.today-week .tw-bar { display: block; height: 6px; margin-top: 7px; border-radius: 3px; background: var(--rule); overflow: hidden; }
+.today-week .tw-bar i { display: block; height: 100%; border-radius: inherit; background: var(--hub-text); }
+.today-week.is-got { background: color-mix(in srgb, var(--gold, #f2c94c) 16%, var(--row)); }
 .kv { display: grid; margin-top: 12px; }
 .kv div { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 9px 0; font-size: var(--fs-label); }
 .kv div + div { border-top: 1px solid var(--rule); }

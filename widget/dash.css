@@ -504,6 +504,16 @@ html.hx-still .dx-wn *, html.hx-still .dx-wn *::after { animation: none !importa
 .dx-stat { min-height: 76px; padding: 14px 16px; border-radius: var(--r-panel); }
 .dx-stat b { font-size: 30px; line-height: 1; font-weight: var(--w-title); }
 .dx-stat.s-week { justify-content: space-between; }
+/* the weekly pennant (migration_v98): the pennant, dimmed until it's earned; a tap opens Timmy's place on them */
+.dx-stat.s-pennant { padding: 0; }
+.dx-stat.s-pennant button { display: flex; align-items: center; gap: 14px; width: 100%; min-height: inherit; padding: 14px 16px; margin: 0; border: 0; border-radius: inherit;
+  background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.dx-stat.s-pennant button:focus-visible { outline: 2px solid var(--hub-text); outline-offset: 2px; }
+.dx-stat.s-pennant .shpn { flex: none; width: 54px; height: auto; }
+.dx-stat.s-pennant small { display: block; margin-top: 4px; font-size: var(--fs-meta); color: var(--muted); }
+.dx-stat.s-pennant .dx-pclass { margin-top: 2px; color: var(--gold-ink); }
+.dx-stat.s-pennant.is-got { background: var(--sun); }
+.dx-stat.s-pennant.is-got small { color: var(--sun-ink); }
 .dx-wring { position: relative; flex: none; display: grid; place-items: center; width: 52px; height: 52px; }
 .dx-wring svg { position: absolute; inset: 0; width: 100%; height: 100%; }
 .dx-wring circle { fill: none; stroke-width: 5; }
