@@ -541,7 +541,7 @@
   window.addEventListener("hashchange", function(){ route(); window.scrollTo(0, 0); });
   function section(){
     if (view === "home") return "home/dashboard";
-    if (view === "notes") return "compendium/notes";
+    if (view === "notes") return /\/sheet$/.test(sub) ? "compendium/cram/sheet" : "compendium/notes";   // a lecture's sheet counts with the cram sheet (sh_surface)
     if (view === "questions") {
       var p = HX.presetOf(), how = p !== "mock" && HX.qview ? HX.qview() : "questions";
       /* studied as Learn or Flashcards (the bank's "Study as", on any set but the mock): its own section, so time in each
@@ -731,11 +731,21 @@
 
   /* ======================= Notes ======================= */
   function renderNotes(el, s){
-    var lec = LBY[s] || LBY[STATE.ui.lec] || LECS[0];
+    var bits = String(s || "").split("/"), lec = LBY[bits[0]] || LBY[STATE.ui.lec] || LECS[0], sheet = bits[1] === "sheet";
     if (s !== "guide") { STATE.ui.lec = lec.id; saveState(); }
     el.innerHTML = '<div class="hx-page notes"><p class="note loading">Loading the notes…</p></div>';
-    Promise.all([needNotes(), needStudy(), needQuestions()]).then(needGuide).then(function(){ if (s === "guide" && GD) GD.draw(el); else drawNotes(el, lec); }).catch(function(){ el.innerHTML = offlineHTML("the notes"); });
+    Promise.all([needNotes(), needStudy(), needQuestions()]).then(needGuide).then(function(){
+      if (sheet) return needSheet().then(function(){ SHT.draw(el, lec); }, function(){ el.innerHTML = offlineHTML("this lecture's sheet"); });
+      if (s === "guide" && GD) GD.draw(el); else drawNotes(el, lec);
+    }).catch(function(){ el.innerHTML = offlineHTML("the notes"); });
   }
+  /* a lecture's one-page sheet (#notes/<lecture>/sheet): its cram sheet, High likelihood topics and Exam hints together, to
+     print on one page or read on screen (idea board #5, 2026-11-22). widget/sheet.js + sheet.css draw it, fetched the first
+     time one opens; here are the route, the buttons that open it (the notes' toolbar, the cram sheet) and section()'s name */
+  var SHT = null;
+  function needSheet(){ return SHT ? SHT.ready : loadScript(WIDGET + "sheet.js").then(function(){ SHT = window.SH_SHEET(HX); return SHT.ready; }); }
+  function hasSheet(id){ return !!(((STUDY || {}).cram || {})[id] || []).length || (CORE.likelyTopics || []).some(function(t){ return t.lec === id; }); }
+  function sheetBtn(id, where, cls){ return hasSheet(id) ? '<a class="btn' + (cls ? " " + cls : "") + '" href="#notes/' + esc(id) + '/sheet" data-sheet-open="' + where + '">' + icon("print", 18) + "One-page sheet</a>" : ""; }
   /* a hub's study guide (study.json's guide): widget/guide.js + guide.css draw it, fetched the first time Notes opens on a hub
      that has one, so no other hub downloads them; the search entries and their jump stay here (exportSections, SH_GOTO) */
   var GD = null;
@@ -788,6 +798,7 @@
           (hasHy ? '<button type="button" data-level="hy" aria-pressed="' + hy + '">High yield</button>' : "") + "</span>" : "") +
         foldBtn() +   // shown by foldTopics() when the notes have topics
         '<button type="button" class="btn" data-mmap aria-expanded="false">' + icon("mindmap", 18) + "Mind map</button>" +
+        sheetBtn(lec.id, "notes") +
         '<button type="button" class="btn btn-text" data-report-notes>' + icon("report", 18) + "Report a mistake</button>" +
         '<span class="note tool-tip">' + icon("highlight", 18) + "Select text to highlight it</span>" +
       "</div>" +
@@ -1174,7 +1185,7 @@
   /* time with the notes in view: counted every few seconds while this lecture's notes are open and the page is visible */
   setInterval(function(){
     var r = READ, now = Date.now(); if (!r) return;
-    if (view === "notes" && STATE.ui.lec === r.lec && document.visibilityState === "visible") r.active += Math.min(now - r.last, 6000);
+    if (view === "notes" && !/\/sheet$/.test(sub) && STATE.ui.lec === r.lec && document.visibilityState === "visible") r.active += Math.min(now - r.last, 6000);   // a lecture's sheet isn't its notes
     r.last = now;
     /* marked done before its time: it pays once the reading has caught up, if it's still marked */
     if (r.wait && r.active >= r.need && isRead(r.lec)) { if (LBY[r.lec]) readClaim(LBY[r.lec]); }
@@ -1337,7 +1348,7 @@
   var MORE = [
     ["timmy", "podcast", "Timmy Time", "The audio review, with likes and comments"],
     ["hints", "hints", "Exam hints", "What the professor said would be tested, and the most likely questions"],
-    ["cram", "cram", "Cram sheet", "Every lecture on one page, for the night before"],
+    ["cram", "cram", "Cram sheet", "Every lecture's bullets, and a one-page sheet of each to print"],
     ["side", "sidebyside", "Side by side", "The charts that compare across lectures"],
     ["arcade", "arcade", "Arcade", "Games built on the material, with class high scores"],
     ["place", "home", "Timmy’s place", "His home and yard, the medals you’ve earned, and what he wears"],
@@ -1492,8 +1503,10 @@
   }
   function moreCram(body){
     needStudy().then(function(){
-      body.innerHTML = '<div class="cram-grid">' + LECS.map(function(l){ var c = (STUDY.cram || {})[l.id] || []; if (!c.length) return "";
-        return '<section class="panel cram' + lc(l.id) + '" id="cram-' + esc(l.id) + '" aria-labelledby="cr' + esc(l.id) + '"><h2 id="cr' + esc(l.id) + '">' + lecHead(l) + "</h2><ul>" + c.map(function(b){ return "<li>" + esc(b) + "</li>"; }).join("") + "</ul></section>"; }).join("") + "</div>";
+      body.innerHTML = '<p class="note cram-lede">Each lecture also has a <b>one-page sheet</b>: its lines with its ' + (courses() ? "high-yield topics and points" : "High likelihood topics and Exam hints") + ", to print or keep open.</p>" +
+        '<div class="cram-grid">' + LECS.map(function(l){ var c = (STUDY.cram || {})[l.id] || []; if (!c.length) return "";
+        return '<section class="panel cram' + lc(l.id) + '" id="cram-' + esc(l.id) + '" aria-labelledby="cr' + esc(l.id) + '"><h2 id="cr' + esc(l.id) + '">' + lecHead(l) + "</h2><ul>" + c.map(function(b){ return "<li>" + esc(b) + "</li>"; }).join("") + "</ul>" +
+          '<p class="cram-sheet">' + sheetBtn(l.id, "cram", "btn-text") + "</p></section>"; }).join("") + "</div>";
     }).catch(function(){ body.innerHTML = "<p>Couldn't load the cram sheet.</p>"; });
   }
   function moreSide(body){

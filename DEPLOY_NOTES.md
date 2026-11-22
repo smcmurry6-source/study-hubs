@@ -32,6 +32,28 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-22 (A one-page sheet for every lecture, idea board #5, #536, Claude Code)** — Sam's note on the idea ("do you actually
+  want to print this or just have the cram sheet and likely topics/hints all together?") is answered with one thing that does
+  both. **`#notes/<lecture>/sheet`** on every hub on the engine: the lecture's cram lines, its High likelihood topics
+  (strongest evidence first, with each `basis`) and its Exam hints (a "You can skip" part for `deemphasize` ones), word for
+  word from `study.json`'s `cram` and `hints` and `core.json`'s `likelyTopics`; on a hub of courses (`hintsFrom: "courses"`,
+  Review of Systems) High-yield topics, High-yield points and "Said not needed". **Print or save as PDF** calls the browser's
+  own print window: the printed copy is its own block (`body > .shp`), Letter in two columns with half-inch margins, and
+  `fit()` sets its type from 10.5 pt down to 7 pt until it measures one page against a 10-inch ruler inside it (so the text
+  size setting's zoom doesn't change the answer), at draw time, once the fonts are in and on `beforeprint`; the print rules
+  hide the rest of the page and force light colors in dark mode. All 70 Review of Systems sheets fit at 10.5 pt; a made-up
+  lecture with 48 cram lines fits at 8.25 pt, and 72 goes to two pages at 7 pt, each matching a Letter PDF's page count.
+  **Not High yield:** High yield is the notes' third reading level, the paragraphs that teach each topic (about 6,000
+  characters a lecture, two printed pages or more); the sheet is the list that fits one page, and links to High yield for the
+  why. New files `widget/sheet.js` + `widget/sheet.css`, fetched the first time a sheet opens (precached in `sw.js`, `VERSION`
+  sh-v73); `widget/hub.js` keeps the route, the button in the notes' toolbar and under each lecture on More → Cram sheet (its
+  tile's line too), and `section()` sends `compendium/cram/sheet` (`sh_surface` → `cram`; no migration); time on a sheet
+  doesn't count toward the notes' "read it through" timer for Notes done. A printer icon in `tools/figures/site/icons.mjs`.
+  Events `sheet:open`, `sheet:print` (on `beforeprint`, so the browser's own Print counts too) and `sheet:hy`. Search is
+  unchanged: every line on a sheet was already in it. `tools/ci/smoke.js` checks every lecture's sheet on the laptop (its
+  cram lines all on the printed copy, no sideways scroll, gone after leaving) and prints the one with the smallest type to a
+  Letter PDF, which must be one page; a sheet that needs two even at 7 pt is a note. About page, Ask Timmy's site help.
+  Found on the way: Review of Systems' violet tint was never added to `widget/hub.css` (BUG-198, not fixed here).
 - **2026-11-22 (no new recordings; the change log split by month, Claude Code)** — Package 5 of
   [the sustainability task](vault/tasks/2026-11-22-sustainable-for-years.md). `tools/release/secrets.js` (CI's public-repo
   check) now fails any tracked file under `hubs/<hub>/audio/` or named `timmy-time.mp3`, and `.gitignore` leaves both out

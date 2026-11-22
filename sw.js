@@ -13,7 +13,7 @@
    single-file hubs' pages and the separate widget files they load by name are cached as they are used.
    Not here on purpose: widget/hub-art/outfits.js and the set files in widget/hub-art/place/ (fetched
    only when that outfit or set is drawn). */
-var VERSION = 'sh-v72';
+var VERSION = 'sh-v73';
 var HUBS = ['review-of-systems'];
 /* the hubs above with no drawn figures and no arcade (Review of Systems, Sam, 2026-11-19): no figures.js/css or arcade.js/css to keep */
 var TEXT_ONLY = ['review-of-systems'];
@@ -21,7 +21,7 @@ var PRECACHE = ['./', 'index.html', 'hubs.js', 'manifest.webmanifest', 'assets/i
   'widget/site.bundle.css', 'widget/dash.bundle.js', 'widget/hub.bundle.js', 'widget/rest.bundle.js', 'widget/hub-rest.bundle.js',
   'assets/fonts/nunito-sans-normal.woff2', 'assets/fonts/nunito-sans-italic.woff2', 'assets/fonts/vt323.woff2',
   'widget/hub-art/class.js', 'widget/hub-art/board.js',
-  'widget/study-modes.js', 'widget/study-modes.css', 'widget/guide.js', 'widget/guide.css', 'widget/journeys.js', 'widget/hub-art/journeys.js',
+  'widget/study-modes.js', 'widget/study-modes.css', 'widget/guide.js', 'widget/guide.css', 'widget/sheet.js', 'widget/sheet.css', 'widget/journeys.js', 'widget/hub-art/journeys.js',
   'widget/place.js', 'widget/place.css', 'widget/hub-art/place.js', 'widget/shop.js', 'widget/shop.css', 'widget/hub-art/shop.js',
   'widget/bowling.js', 'widget/hub-art/bowling.js', 'widget/trophies.js', 'widget/trophies.css', 'widget/hub-art/trophies.js',
   'widget/rankup.js', 'widget/prize.js', 'widget/tour.js', 'widget/games.js', 'widget/games.css', 'widget/teeth.js', 'widget/cases.js', 'widget/cases.css', 'widget/recap.js'];

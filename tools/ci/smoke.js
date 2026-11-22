@@ -870,6 +870,48 @@ function lint(hub, A){
           if (gs.w > 1) problems.push(`${name} (${label}): the study guide scrolls sideways by ${gs.w}px`);
         }
       }
+      /* a lecture's one-page sheet (#notes/<lecture>/sheet, widget/sheet.js, idea board #5, 2026-11-22): the notes' toolbar
+         offers it where the lecture has cram lines or topics; its printed copy holds each of them word for word; on the laptop
+         every lecture's, and the one with the smallest type printed to a Letter PDF must be one page (the print rules hide the
+         rest of the page, and fit()'s measure agrees with the printer); nothing scrolls sideways; leaving it takes the copy
+         away. A sheet that needs two pages even at 7 pt is a note, not a failure (its cram sheet is long). */
+      {
+        const rd = f => { try { return JSON.parse(fs.readFileSync(content(hub, f), 'utf8')); } catch (e) { return {}; } };
+        const cram = rd('study.json').cram || {}, topics = rd('core.json').likelyTopics || [];
+        const sheets = (rd('core.json').lectures || []).map(l => l.id).filter(id => (cram[id] || []).length || topics.some(t => t.lec === id));
+        const want = vp.isMobile ? sheets.slice(0, 1) : sheets, long = [];
+        let small = null;
+        if (sheets.length) {
+          await page.evaluate(h => { location.hash = h; }, 'notes/' + sheets[0]); await page.waitForTimeout(600);
+          if (!(await page.$(`.reading .toolbar a[href="#notes/${sheets[0]}/sheet"]`))) problems.push(`${name} (${label}): notes/${sheets[0]} has cram lines or topics but its toolbar offers no One-page sheet`);
+        }
+        for (const id of want) {
+          await page.evaluate(h => { location.hash = h; }, 'notes/' + id + '/sheet');
+          const ok = await page.waitForFunction(id => document.getElementById('sheet-' + id) && document.querySelector('body > .shp[data-fit][data-lec="' + id + '"]'), id, { timeout: 10000 }).then(() => true, () => false);
+          if (!ok) { problems.push(`${name} (${label}): notes/${id}/sheet draws no sheet, or no printed copy`); continue; }
+          await page.evaluate(() => document.fonts.ready); screens++;
+          const s = await page.evaluate(() => { const p = document.querySelector('body > .shp'), q = p.querySelector('.shp-cram'); return { fit: p.dataset.fit, fs: +p.dataset.fs, cram: q ? [...q.querySelectorAll('li')].map(li => li.textContent) : [], on: document.documentElement.classList.contains('sh-sheet-on'), print: !!document.querySelector('.sheet [data-sheet="print"]'), w: document.documentElement.scrollWidth - innerWidth }; });
+          const miss = (cram[id] || []).filter(b => !s.cram.includes(b));
+          if (miss.length) problems.push(`${name} (${label}): ${id}'s printed sheet is missing ${miss.length} of its cram lines (first: "${miss[0].slice(0, 60)}")`);
+          if (!s.on || !s.print) problems.push(`${name} (${label}): ${id}'s sheet has no Print button, or the page isn't marked for printing it`);
+          if (s.w > 1) problems.push(`${name} (${label}): ${id}'s sheet scrolls sideways by ${s.w}px`);
+          if (s.fit !== '1') long.push(id);
+          else if (!small || s.fs < small.fs) small = { id, fs: s.fs };
+        }
+        if (long.length) notes.push(`${name} (${label}): ${long.length} sheet${long.length === 1 ? '' : 's'} print on two pages even at 7 pt (${long.slice(0, 5).join(', ')}): a long cram sheet`);
+        if (small && !vp.isMobile && page.pdf) {
+          await page.evaluate(h => { location.hash = h; }, 'notes/' + small.id + '/sheet');
+          await page.waitForFunction(id => document.querySelector('body > .shp[data-fit][data-lec="' + id + '"]'), small.id, { timeout: 10000 }).catch(() => {});
+          const pdf = await page.pdf({ format: 'Letter', preferCSSPageSize: true, printBackground: true }).catch(e => { problems.push(`${name} (${label}): couldn't print ${small.id}'s sheet: ${e.message}`); return null; });
+          const pages = pdf ? (pdf.toString('latin1').match(/\/Type\s*\/Page[^s]/g) || []).length : 1;
+          if (pages !== 1) problems.push(`${name} (${label}): ${small.id}'s sheet measures one page at ${small.fs} pt but printed on ${pages}`);
+          else notes.push(`${name} (${label}): ${want.length} one-page sheets; the smallest type, ${small.id}'s at ${small.fs} pt, printed on one Letter page`);
+        }
+        if (sheets.length) {
+          await page.evaluate(() => { location.hash = 'notes'; }); await page.waitForTimeout(400);
+          if (await page.$('body > .shp') || await page.evaluate(() => document.documentElement.classList.contains('sh-sheet-on'))) problems.push(`${name} (${label}): leaving a sheet leaves its printed copy in the page, so printing the notes would print the sheet`);
+        }
+      }
       /* Ask Timmy (widget/ask.js): everyone has Timmy, so the Ask icon is in his corner only while he's turned off (Settings;
          put back after); the chat, then "Ask Timmy" on an answered question, which sends that question with the next
          message; no Ask icon during a mock */
