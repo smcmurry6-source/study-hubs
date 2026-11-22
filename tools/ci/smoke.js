@@ -676,7 +676,7 @@ function lint(hub, A){
         await sideways(`the ${t} tab`);
       }
       if (tabs.length && !(await page.$('#hubPanel .dx-stage .dx-ring'))) problems.push(`${name}: the open hub has no progress ring`);
-      for (const b of ['streaks', 'ranks']) { await page.click(`#boardSeg [data-board="${b}"]`); await page.waitForTimeout(200); if (!(await page.$('#board > *'))) problems.push(`${name}: the class board's ${b} list is empty`); await sideways(`the ${b} board`); }
+      for (const b of ['crowns', 'ranks']) { await page.click(`#boardSeg [data-board="${b}"]`); await page.waitForTimeout(200); if (!(await page.$('#board > *'))) problems.push(`${name}: the class board's ${b} list is empty`); await sideways(`the ${b} board`); }
       if (!(await page.$('#class #now #nowCount'))) problems.push(`${name}: the class panel has no "studying right now" count`);
       // the classroom in the studying-now tile, and the stage behind the top three (Sam, 2026-11-11). Eight made-up people at
       // once take their desks without the walk; an outfit that isn't one (here, markup) must come out as a plain Timmy.
@@ -1054,6 +1054,10 @@ function lint(hub, A){
       await page.route(/supabase\.co\/rest\/v1\/rpc\/get_my_collections/, route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true, pays: 1000, collections: [desert(claimed > 0)] }) }));
       await page.route(/supabase\.co\/rest\/v1\/rpc\/claim_collections_v2/, route => { claimed++;
         return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true, src: 'collection', xp: claimed > 1 ? 0 : 1000, won: claimed > 1 ? [] : ['desert'], crowns: 1000, pays: 1000, collections: [desert(true)] }) }); });
+      /* Studying now (migration_v99): two named classmates and one with a bad key (dropped), 4 others */
+      const nowAsk = [];
+      await page.route(/supabase\.co\/rest\/v1\/rpc\/get_studying_now/, route => { nowAsk.push(route.request().postData() || ''); return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ minutes: 3, you: true, others: 4,
+        people: [{ name: '<i>Ada</i>', visit: 'a'.repeat(24), rank: { journey: 0, tier: 2, level: 3 }, flair: '' }, { name: 'Bo', visit: 'b'.repeat(24), rank: { journey: 0, tier: 1, level: 1 }, flair: '' }, { name: 'Bad key', visit: 'nope', rank: {}, flair: '' }] }) }); });
       await page.goto(BASE() + `hubs/${hub}/index.html#more`); await page.waitForTimeout(2500);
       if (!(await page.$('a[href="#more/place"], [data-more="place"]')) && !(await page.evaluate(() => [...document.querySelectorAll('.menu .rows a, .menu .rows button')].some(x => /Timmy’s place/.test(x.textContent))))) problems.push(`${name} (${label}): More has no "Timmy's place" tile for an adopted Timmy`);
       if (asked.length) problems.push(`${name} (${label}): the place's files loaded with the page, before it was opened (${asked.join(', ')}): they load on first use`);
@@ -1066,6 +1070,18 @@ function lint(hub, A){
         if (!/Timmy’s place/.test(c.label) || !/garden/i.test(c.label) || !c.img) problems.push(`${name} (${label}): the place's card should be a labeled button with its picture (${JSON.stringify(c)})`);
         if (c.w > 1) problems.push(`${name} (${label}): Timmy's place scrolls sideways by ${c.w}px`);
         if (c.still !== '<svg') problems.push(`${name} (${label}): the place didn't keep a still on the device for the dashboard's card`);
+        /* Studying now under the card: the named ones only, names as text, a click count never holds a name (the first data-
+           attribute with a value is data-sh-now="row"), "and 2 more" for the rest, and nothing sent but the visitor id */
+        await page.waitForSelector('.hx-now:not([hidden]) .hx-nowbtn', { timeout: 8000 }).catch(() => null);
+        const nw = await page.evaluate(() => { const bs = [...document.querySelectorAll('.hx-now .hx-nowbtn')];
+          return { n: bs.length, names: bs.map(b => b.querySelector('.hx-nownm').textContent).join('|'), tags: document.querySelectorAll('.hx-now i:not(.hx-nowdot)').length,
+            first: bs.map(b => { const a = [...b.attributes].find(x => x.name.indexOf('data-') === 0 && x.value); return a ? a.name + '=' + a.value : ''; }).join('|'),
+            more: (document.querySelector('.hx-now') || {}).textContent || '', w: document.documentElement.scrollWidth - innerWidth }; });
+        if (nw.n !== 2 || nw.names !== '<i>Ada</i>|Bo' || nw.tags) problems.push(`${name} (${label}): More's Studying now should list the two named classmates, names as text (${JSON.stringify(nw)})`);
+        if (nw.first !== 'data-sh-now=row|data-sh-now=row') problems.push(`${name} (${label}): a Studying now button's click count should be "sh-now=row", never its label (${nw.first})`);
+        if (!/And 2 more people without a name/.test(nw.more)) problems.push(`${name} (${label}): Studying now should count the others without a name (${nw.more.slice(0, 120)})`);
+        if (nw.w > 1) problems.push(`${name} (${label}): Studying now scrolls sideways by ${nw.w}px`);
+        if (nowAsk.length !== 1 || Object.keys(JSON.parse(nowAsk[0] || '{}')).join() !== 'p_visitor') problems.push(`${name} (${label}): Studying now should ask once, with the visitor id only (${nowAsk.join(' / ')})`);
         await card.click();
         const dlg = await page.waitForSelector('dialog.tpv[open]', { timeout: 8000 }).catch(() => null);
         if (!dlg) problems.push(`${name} (${label}): tapping the place's card didn't open the full view`);
@@ -1328,6 +1344,20 @@ function lint(hub, A){
       await page.route(/supabase\.co\/rest\/v1\/rpc\/get_widget_bootstrap_v2/, route => json(route, { rank, mastery: [], shop: shop(), pet_days: fed }));
       await page.route(/supabase\.co\/rest\/v1\/rpc\/get_my_shop/, route => json(route, shop()));
       await page.route(/supabase\.co\/rest\/v1\/rpc\/get_pet_days_v2/, route => json(route, fed));
+      /* the mystery box (migration_v99): 25 crowns here, so it can be opened once the purchases below have spent the rest */
+      let boxN = 0; const boxAsks = [];
+      const boxInfo = () => ({ day: today, price: 25, per_day: 3, today: boxN, left_today: 3 - boxN, left: 40 - boxN, of: 40, balance: wallet.balance,
+        odds: [['common', .4], ['uncommon', .3], ['rare', .18], ['epic', .12], ['legendary', null]].map(o => ({ rarity: o[0], chance: o[1], left: o[1] ? 10 : 0, of: o[1] ? 10 : 0 })) });
+      await page.route(/supabase\.co\/rest\/v1\/rpc\/get_mystery_box/, route => json(route, boxInfo()));
+      await page.route(/supabase\.co\/rest\/v1\/rpc\/open_mystery_box/, route => {
+        let a = {}; try { a = JSON.parse(route.request().postData() || '{}'); } catch (e) {}
+        boxAsks.push(a.p_request);
+        if (seen.has(a.p_request)) return json(route, Object.assign({}, seen.get(a.p_request), { repeat: true }));
+        if (wallet.balance < 25) return json(route, { ok: false, error: 'balance', balance: wallet.balance, price: 25 });
+        wallet.balance -= 25; wallet.spent += 25; boxN++; inv.push({ id: 'mailbox', at: new Date().toISOString(), how: 'bought' });
+        const res = { ok: true, box: true, item: 'mailbox', kind: 'yard', rarity: 'common', name: 'Mail<b>box</b>', price: 25, balance: wallet.balance, today: boxN, left_today: 3 - boxN, left: 40 - boxN };
+        seen.set(a.p_request, res); return json(route, res);
+      });
       await page.route(/supabase\.co\/rest\/v1\/rpc\/buy_item/, route => {
         let a = {}; try { a = JSON.parse(route.request().postData() || '{}'); } catch (e) {}
         buys.push(a.p_request + ' ' + a.p_item);
@@ -1414,11 +1444,36 @@ function lint(hub, A){
                 await page.keyboard.press('Escape'); await page.waitForTimeout(400);
               }
             }
+            /* the mystery box (migration_v99): its odds in the open on the page and in its sheet (a rarity with nothing left
+               says so), a double tap on Open sends one request, the piece comes out as text and is yours, the balance and
+               the day's count follow the server, and with too few crowns there's no "Open another" */
+            if (await page.$('dialog.tsh-sheet[open]')) { await page.keyboard.press('Escape'); await page.waitForTimeout(300); }
+            if (await page.$('dialog.tpv[open]')) { await page.keyboard.press('Escape'); await page.waitForTimeout(400); }
+            const bx = await page.evaluate(() => { const m = document.querySelector('.tsh-store .tsh-mbox'); return m ? { odds: [...m.querySelectorAll('.tsh-mbodds li')].map(l => l.className + ':' + l.textContent), btn: !!m.querySelector('button[data-shop="box"]'), left: (m.querySelector('.tsh-mbleft') || {}).textContent || '' } : null; });
+            if (!bx || bx.odds.length !== 5 || !/^:Common40%$/.test(bx.odds[0]) || !/^is-none:Legendarynone left$/.test(bx.odds[4]) || !bx.btn) problems.push(`${name} (${label}): the shop should show the mystery box with its odds for every rarity, one with nothing left marked so (${JSON.stringify(bx)})`);
+            else {
+              await page.click('.tsh-store button[data-shop="box"]');
+              const bs = await page.waitForSelector('dialog.tsh-sheet[open] .tsh-boxsheet', { timeout: 5000 }).catch(() => null);
+              const rows = bs ? await page.$$eval('dialog.tsh-sheet .tsh-odds tbody tr', t => t.map(r => r.textContent)) : [];
+              if (!bs || rows.length !== 5 || !/^Common40%10 of 10$/.test(rows[0])) problems.push(`${name} (${label}): "See the odds" should open the box's sheet with the odds table (${JSON.stringify(rows)})`);
+              else {
+                await page.dblclick('dialog.tsh-sheet [data-shop="box-open"]'); await page.waitForTimeout(3200);
+                const bo = await page.evaluate(() => { const d = document.querySelector('dialog.tsh-sheet[open]'), h = d && d.querySelector('#tshI');
+                  return { txt: d ? d.innerText.replace(/\s+/g, ' ') : '', h: h ? h.textContent : '', hEls: h ? h.children.length : -1, again: !!(d && d.querySelector('[data-shop="box-again"]')), place: !!(d && d.querySelector('[data-shop="place"]')),
+                    bal: (document.querySelector('.tsh-store [data-shop-bal]') || {}).textContent, left: (document.querySelector('.tsh-store .tsh-mbleft') || {}).textContent || '',
+                    day: (() => { const b = window.shShop && window.shShop.state().box; return b ? b.today + '/' + b.left_today : ''; })() }; });
+                if (boxAsks.length !== 1 || !/^[A-Za-z0-9_-]{8,64}$/.test(boxAsks[0] || '')) problems.push(`${name} (${label}): a double tap on Open should send one request with a request id (${boxAsks.join(', ')})`);
+                if (!/New out of the box/.test(bo.txt) || bo.h !== 'Mail<b>box</b>' || bo.hEls || !bo.place) problems.push(`${name} (${label}): the box should give its piece, its name as text, with "Place it" (${JSON.stringify(bo)})`);
+                /* 5 crowns left and a 25-crown box: the box's line says what's missing, and the day's count (1 opened, 2 left) is kept for when it's affordable */
+                if (bo.bal !== '5' || !/^20 more to go/.test(bo.left.trim()) || bo.day !== '1/2' || bo.again) problems.push(`${name} (${label}): after a box the balance should read 5, the box "20 more to go" with 2 left today, and no "Open another" while a box costs more than you have (${JSON.stringify(bo)})`);
+                await page.keyboard.press('Escape'); await page.waitForTimeout(300);
+              }
+            }
           }
         }
       }
       errs.forEach(e => problems.push(`${name} (${label}): JavaScript error: ${e}`));
-      notes.push(`${name} (${label}): Timmy's shop, a purchase, a refusal and a dropped connection`);
+      notes.push(`${name} (${label}): Timmy's shop, a purchase, a refusal, a dropped connection and the mystery box`);
       await page.close();
     }
     /* Learn and Flashcards (widget/study-modes.js + .css, the "Study as" toggle above the Question Bank's panel): nothing of
@@ -1594,7 +1649,9 @@ function lint(hub, A){
       await page.addInitScript(() => { try { localStorage.setItem('sh_pet_born', '2026-10-01'); localStorage.setItem('sh_tour_done', '1'); localStorage.setItem('sh_rank_g', '4'); localStorage.setItem('sh_rank_tier', '1'); localStorage.setItem('sh_rank_step', '4'); } catch (e) {} });
       await page.route(/supabase\.co\/rest\/v1\/rpc\/get_widget_bootstrap_v2/, route => json(route, { rank, shop: { day: '2026-11-12', seasons: [], throwback: false, wallet: { balance: 0 }, items: [], inventory: [], locked: [], equipped: {}, costumes: [], snacks_today: [], boost: null } }));
       await page.route(/supabase\.co\/rest\/v1\/rpc\/get_rank_board_v2/, route => json(route, board));
-      await page.route(/supabase\.co\/rest\/v1\/rpc\/get_leaderboard_v2/, route => json(route, board.slice(0, 4).map(r => ({ display_name: r.display_name, streak: 10 - r.rnk, total_answered: 100, journey: 0, tier: 2, level: 1, step: 7, flair: null, visit: r.visit }))));
+      const casks = [];   /* the Crowns board (migration_v99, in the Study streaks tab's place): crowns on hand */
+      await page.route(/supabase\.co\/rest\/v1\/rpc\/get_crowns_board_v2/, route => { let a = {}; try { a = JSON.parse(route.request().postData() || '{}'); } catch (e) {} casks.push(a);
+        return json(route, board.slice(0, 4).map((r, i) => ({ rnk: r.rnk, display_name: r.display_name, crowns: 5000 - 1000 * i, xp: r.xp, journey: 0, tier: 2, level: 1, step: 7, is_me: false, flair: null, visit: r.visit }))); });
       await page.route(/supabase\.co\/rest\/v1\/rpc\/get_place/, route => { let a = {}; try { a = JSON.parse(route.request().postData() || '{}'); } catch (e) {} placeCalls[a.p_key] = (placeCalls[a.p_key] || 0) + 1; return json(route, places[a.p_key] || null); });
       await page.goto(BASE() + 'index.html'); await page.waitForTimeout(2000);
       if (asked.length) problems.push(`${name} (${label}): the place's files loaded with the dashboard (${asked.join(', ')}): a tap on a row is a first use`);
@@ -1739,12 +1796,43 @@ function lint(hub, A){
           if (t.n !== 1 || t.title !== 'Visit Alpha’s place' || !t.visit || !/^Place 1 of 4 on the board/.test(t.gnav) || gone) problems.push(`${name} (${label}): without the server's pick, a random visit should be the next of the board's rows with a place of their own, with the board's tour (${JSON.stringify(t)}, line ${JSON.stringify(gone)})`);
           await page.keyboard.press('Escape'); await page.waitForTimeout(500);
         }
-        await page.click('#boardSeg [data-board="streaks"]'); await page.waitForTimeout(800);
+        await page.click('#boardSeg [data-board="crowns"]'); await page.waitForTimeout(800);
         const sb = await page.$$eval('#board .dx-visit', bs => bs.map(b => b.getAttribute('aria-label')));
-        if (sb.length !== 4) problems.push(`${name} (${label}): the study streaks board's rows should be buttons too (${sb.join(' | ')})`);
+        const cv = await page.evaluate(() => ({ first: ((document.querySelector('#board .dx-podium .p1 .val') || {}).textContent || '').trim(), coin: !!document.querySelector('#board .dx-podium .p1 .survey-coin'),
+          note: (document.getElementById('boardNote') || {}).textContent || '', injected: !!window.__visit || !!document.querySelector('#board img') }));
+        const cid = await page.evaluate(() => localStorage.getItem('sh_visitor_id'));
+        if (sb.length !== 4) problems.push(`${name} (${label}): the Crowns board's rows should be buttons too (${sb.join(' | ')})`);
+        if (cv.first !== '5,000crowns' || !cv.coin || !/^Shiny Gold Crowns on hand/.test(cv.note) || cv.injected) problems.push(`${name} (${label}): the Crowns board should put the most crowns on hand first, with the coin, its note, and names as text (${JSON.stringify(cv)})`);
+        if (!casks.length || casks.some(a => Object.keys(a).sort().join() !== 'p_limit,p_visitor' || a.p_visitor !== cid || a.p_limit !== 10)) problems.push(`${name} (${label}): the Crowns board should send only the page's own id and the limit (${JSON.stringify(casks)})`);
+        /* before migration_v99 the function isn't there: the tab hides itself and the board goes back to Ranks */
+        await page.unroute(/supabase\.co\/rest\/v1\/rpc\/get_crowns_board_v2/);
+        await page.route(/supabase\.co\/rest\/v1\/rpc\/get_crowns_board_v2/, route => route.fulfill({ status: 404, contentType: 'application/json', body: JSON.stringify({ code: 'PGRST202', message: 'Could not find the function public.get_crowns_board_v2' }) }));
+        await page.click('#boardSeg [data-board="ranks"]'); await page.waitForTimeout(500); await page.click('#boardSeg [data-board="crowns"]'); await page.waitForTimeout(800);
+        const cg = await page.evaluate(() => ({ hidden: document.querySelector('#boardSeg [data-board="crowns"]').hidden, ranks: document.querySelector('#boardSeg [data-board="ranks"]').getAttribute('aria-pressed'), rows: document.querySelectorAll('#board .dx-visit').length }));
+        if (!cg.hidden || cg.ranks !== 'true' || !cg.rows) problems.push(`${name} (${label}): without the Crowns board's function the tab should hide and the board go back to Ranks (${JSON.stringify(cg)})`);
+        /* Studying now (migration_v99): the people studying now under a name they chose, each row a visit, the place's
+           arrows through the list ("Place 2 of 2 studying now"), the rest only counted; a name with markup in it is text, a
+           row without a good key is left out, and the page sends only its own id */
+        const nasks = [];
+        await page.route(/supabase\.co\/rest\/v1\/rpc\/get_studying_now/, route => { let a = {}; try { a = JSON.parse(route.request().postData() || '{}'); } catch (e) {} nasks.push(a);
+          return json(route, { minutes: 3, you: true, others: 5, people: [{ name: BAD, visit: K('b'), rank: { journey: 0, tier: 4, level: 1 }, flair: null }, { name: 'Cee', visit: K('c'), rank: { journey: 0, tier: 2, level: 3 }, flair: null }, { name: 'No key', visit: 'nope' }] }); });
+        await page.click('#boardSeg [data-board="now"]'); await page.waitForTimeout(1000);
+        const nw = await page.evaluate(() => ({ rows: [...document.querySelectorAll('#board .dx-nowlist li')].map(l => ({ key: l.getAttribute('data-visit'), label: l.querySelector('.dx-visit') ? l.querySelector('.dx-visit').getAttribute('aria-label') : '' })),
+          more: (document.querySelector('#board .dx-nowmore') || {}).textContent || '', injected: !!window.__visit || !!document.querySelector('#board img'), w: document.documentElement.scrollWidth - innerWidth }));
+        const nid = await page.evaluate(() => localStorage.getItem('sh_visitor_id'));
+        if (nw.rows.length !== 2 || nw.rows[0].key !== K('b') || nw.rows[1].label !== 'Visit Cee’s place') problems.push(`${name} (${label}): Studying now should list the two people with a good key, each a visit (${JSON.stringify(nw.rows)})`);
+        if (!/^And 3 more people without a name/.test(nw.more)) problems.push(`${name} (${label}): Studying now should count the others studying without a name (${JSON.stringify(nw.more)})`);
+        if (nw.injected) problems.push(`${name} (${label}): Studying now drew a name as markup`);
+        if (nw.w > 1) problems.push(`${name} (${label}): Studying now scrolls sideways by ${nw.w}px`);
+        if (nasks.length !== 1 || !nid || nasks[0].p_visitor !== nid || Object.keys(nasks[0]).join() !== 'p_visitor') problems.push(`${name} (${label}): Studying now should send only the page's own id (${JSON.stringify(nasks)})`);
+        if (nw.rows.length === 2) {
+          await page.click('#board .dx-nowlist .dx-visit[aria-label="Visit Cee’s place"]'); await page.waitForTimeout(3000); t = await tour();
+          if (t.n !== 1 || t.title !== 'Cee’s place' || !/^Place 2 of 2 studying now/.test(t.gnav) || !t.prev || t.prev.label !== 'Previous place: ' + BAD || t.injected) problems.push(`${name} (${label}): a visit from Studying now should go through that list (${JSON.stringify(t)})`);
+          await page.keyboard.press('Escape'); await page.waitForTimeout(500);
+        }
       }
       errs.forEach(e => problems.push(`${name} (${label}): JavaScript error: ${e}`));
-      notes.push(`${name} (${label}): rows as buttons, a visit, the plain line, focus back, the tour, a random visit from the whole class (and the board's rows before the release), both boards`);
+      notes.push(`${name} (${label}): rows as buttons, a visit, the plain line, focus back, the tour, a random visit from the whole class (and the board's rows before the release), both boards, Studying now`);
       await page.close();
     }
     /* Everyone has Timmy (Ask Timmy, part 4; the only behavior since the redesign's release). widget/pet.js

@@ -1,10 +1,12 @@
 /* Contact sheets of the shop's art, for Sam's look (needs Playwright; not part of the build or CI).
 
-     node tools/figures/site/shop-sheets.mjs <out-dir> [shelf|outfits|homes|ui]
+     node tools/figures/site/shop-sheets.mjs <out-dir> [shelf|box|outfits|homes|ui]
 
    Writes each sheet twice, on the light page and on the dark one (deviceScaleFactor 2):
      shop-shelf-{light,dark}.png     the Shiny Gold Crown at 16, 24 and 48 px, the four snacks and two boosts, and one
                                      sample card in each of the five rarity frames (shop.mjs);
+     shop-box-{light,dark}.png       the mystery box (migration_v99): closed at four sizes, open (the lid thrown back,
+                                     the light rising), and as the shop's card draws it, on its stand in each rarity;
      shop-outfits-{light,dark}.png   the five everyday outfits and every rare costume on Timmy, large, and each
                                      again with the Loupes journey's loupes (place.mjs: OUTFITS, NO_LOUPES);
      shop-homes-{light,dark}.png     every home (the everyday ones and each set's) as the card draws it: Timmy at the
@@ -53,6 +55,14 @@ if (SHOP) sheets.shelf = () => {
   }).join("");
   return `<h1>The shop's shelf art</h1><h2>The Shiny Gold Crown, beside a number</h2><div class="row coins">${coins}</div><h2>Always on the shelf: four snacks, two boosts</h2><div class="row items">${items}</div><h2>A card in each rarity's frame</h2><div class="row cards">${cards}</div>`;
 };
+/* (a2) the mystery box: four sizes closed, open, and on the shop's card */
+if (SHOP && SHOP.box) sheets.box = () => {
+  const sizes = [220, 120, 64, 40].map((px) => `<figure><div class="bx" style="width:${px}px">${SHOP.box(false)}</div><figcaption><span>${px} px</span></figcaption></figure>`).join("");
+  const open = [false, true].map((o) => `<figure><div class="bx" style="width:220px">${SHOP.box(o)}</div><figcaption><b>${o ? "Open" : "Closed"}</b><span>${o ? "The lid thrown back, the light of the piece rising" : "It shakes while the server rolls"}</span></figcaption></figure>`).join("");
+  const stands = SHOP.RARITIES.map((r) => `<figure><div class="bxs"><div class="bx" style="width:120px;margin:0 auto -14px">${SHOP.box(true)}</div>${SHOP.stand(r.k)}</div><figcaption><b>${esc(r.k)}</b><span>Its stand when the piece is ${esc(r.k)}</span></figcaption></figure>`).join("");
+  const card = `<figure class="cardfig"><div class="card">${SHOP.frame("Epic")}<span class="cprice">${coinSvg(16)}750</span><span class="cthumb">${SHOP.box(false)}</span><span class="ctext"><b>Mystery box</b><span>3 left today</span></span></div><figcaption><span>On the shelf (its card's frame is the shop's)</span></figcaption></figure>`;
+  return `<h1>The mystery box</h1><h2>Closed, at four sizes</h2><div class="row sizes">${sizes}</div><h2>Closed and open</h2><div class="row">${open}</div><h2>Opened, on the stand of the rarity it gave</h2><div class="row">${stands}</div><h2>On the shelf</h2><div class="row cards">${card}</div>`;
+};
 /* (b) the five everyday outfits and every rare costume, large, and each again with loupes */
 sheets.outfits = () => {
   const want = ["scrub-cap", "bow-tie", "safety-glasses", "white-coat", "graduation-cap"].concat(K.OUTFITS.filter((o) => o.costume).map((o) => o.k));
@@ -87,6 +97,7 @@ svg{display:block}
 .cthumb{position:absolute;left:14%;right:14%;top:9%;height:50%}.cthumb svg{width:100%;height:100%}
 .ctext{position:absolute;left:8%;right:8%;top:63%;bottom:7%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;text-align:center}.ctext b{font-size:13px;line-height:1.1}.ctext i{font-style:normal;font-size:11px;font-weight:800;color:#fff;border-radius:999px;padding:1px 7px}
 .tims figure{width:188px}.tim{background:${dark ? "#1d232a" : "#fff"};border-radius:12px;padding:6px}.tim svg{width:100%;height:auto}
+.bx svg{width:100%;height:auto;overflow:visible}.bxs{width:200px}.sizes{align-items:flex-end;gap:28px}
 .homes{gap:18px 24px}.homes figure{width:914px}.quad{display:flex;gap:6px}.pic{border-radius:10px;overflow:hidden;width:222px;flex:none}.pic svg{width:100%;height:auto}
 ${K.CSS}${SHOP && SHOP.CSS ? SHOP.CSS : ""}</style>${body}`;
 
