@@ -597,6 +597,50 @@
     save();
     return res;
   }
+  /* the mystery box (migration_v99: sh_box_rules, sh_box_info, sh_box_open): the everyday rotation's pieces this account
+     doesn't own yet, a rarity by its weight among the ones with pieces left, then one of that rarity's pieces; 750 crowns,
+     three a Central day, idempotent on the request id. A box is a purchase row (kind "box", the piece as its item), so the
+     wallet and what's owned follow from db.buys as they do on the server */
+  var BOX = { price: 750, per_day: 3, odds: [["common", 40], ["uncommon", 30], ["rare", 18], ["epic", 9], ["legendary", 3]] };
+  function boxPool(v){ var own = v ? placeOwned(v) : {}; return Object.keys(PLACE_CAT).filter(function(id){ var c = PLACE_CAT[id]; return everyday(c) && c.active !== false && !c.shelf && !own[id]; }).sort(); }
+  function boxInfo2(v){
+    var mine = !!v && v === db.visitor, all = boxPool(null), left = mine ? boxPool(v) : all, dd = day(now()), tot = 0;
+    var today = mine ? (db.buys || []).filter(function(b){ return b.kind === "box" && b.day === dd; }).length : 0;
+    var nOf = function(list, r){ return list.filter(function(id){ return PLACE_CAT[id].rarity === r; }).length; };
+    BOX.odds.forEach(function(o){ if (nOf(left, o[0])) tot += o[1]; });
+    return { day: dd, price: BOX.price, per_day: BOX.per_day, today: today, left_today: Math.max(0, BOX.per_day - today), left: left.length, of: all.length,
+      odds: BOX.odds.map(function(o){ var n = nOf(left, o[0]); return { rarity: o[0], chance: n && tot ? Math.round(o[1] / tot * 1e4) / 1e4 : null, left: n, of: nOf(all, o[0]) }; }),
+      balance: mine ? wallet2(v).balance : null };
+  }
+  function boxOpen2(v, req){
+    if (!v || String(v).length > 80 || !req || !/^[A-Za-z0-9_-]{8,64}$/.test(req)) return { ok: false, error: "bad" };
+    db.buys = db.buys || [];
+    var prev = db.buys.filter(function(p){ return p.req === req; })[0];
+    if (prev) return prev.v !== v ? { ok: false, error: "dup" } : Object.assign({}, prev.resp, { repeat: true });
+    if (v !== db.visitor) return { ok: false, error: "balance", balance: 0, price: BOX.price };
+    var info = boxInfo2(v), t = now(), r1 = Math.random(), tot = 0, acc = 0, pick = null;
+    if (info.today >= BOX.per_day) return { ok: false, error: "today", per_day: BOX.per_day };
+    info.odds.forEach(function(o, i){ if (o.left) tot += BOX.odds[i][1]; });
+    if (!tot) return { ok: false, error: "empty" };
+    info.odds.forEach(function(o, i){ if (!o.left || pick) return; acc += BOX.odds[i][1]; if (acc > r1 * tot) pick = o.rarity; });
+    var bal = wallet2(v).balance;
+    if (bal < BOX.price) return { ok: false, error: "balance", balance: bal, price: BOX.price };
+    var ids = boxPool(v).filter(function(id){ return PLACE_CAT[id].rarity === pick; }), id = ids[Math.min(ids.length - 1, Math.floor(Math.random() * ids.length))], c = PLACE_CAT[id];
+    var resp = { ok: true, box: true, item: id, kind: c.kind, rarity: c.rarity, name: c.name || id, price: BOX.price, balance: bal - BOX.price, today: info.today + 1, left_today: BOX.per_day - info.today - 1, left: info.left - 1 };
+    db.buys.push({ req: req, v: v, item: id, kind: "box", price: BOX.price, day: day(t), at: iso(t), resp: resp });
+    save();
+    return resp;
+  }
+  /* migration_v99's get_studying_now: the people studying right now (a ping in the last 3 minutes, in any hub) who chose a
+     name, each with a visit key, rank and medals and nothing else, and how many others are studying, named or not. Made
+     up here: some of the class, the same ones for five minutes at a time (never Dummy Dentin, whose place can't be read) */
+  function studyingNow2(v){
+    if (v != null && (!String(v).length || String(v).length > 80)) return null;
+    var slot = Math.floor(now() / 300000), on = FAKE_NAMES.filter(function(nm, i){ return i !== 4 && (hash(nm + "|now|" + slot) >>> 0) % 3 !== 0; })
+      .sort(function(a, b){ return a.toLowerCase() < b.toLowerCase() ? -1 : 1; });
+    return { minutes: 3, you: !!v && v === db.visitor, others: on.length + slot % 4,
+      people: on.map(function(nm){ var r = rank2(fakeXp(nm)); return { name: nm, visit: visitKeyOf(nm), rank: { journey: r.journey, tier: r.tier, level: r.level }, flair: FAKE_FLAIR[nm] || null }; }) };
+  }
   /* Collections (migration_v75: sh_collections, claim_collections_v2): each season's set, each year-round collection and
      the rare costumes, with what this account owns of each; a finished one pays 1,000 XP and 1,000 crowns once, and one
      whose every piece is a gift (Halloween 2026's) pays nothing */
@@ -1538,6 +1582,9 @@
     if (fn === "get_pet_days_v2") return { data: v === db.visitor ? petDays2(t) : [] };
     /* the shop (phase 4, part B): buying and the rare costumes' log */
     if (fn === "buy_item") return { write: v === db.visitor, data: buy2(v, a.p_item, a.p_request) };
+    if (fn === "get_mystery_box") return { data: boxInfo2(v) };
+    if (fn === "open_mystery_box") return { write: v === db.visitor, data: boxOpen2(v, a.p_request) };
+    if (fn === "get_studying_now") return { data: studyingNow2(v) };
     if (fn === "record_costume_sighting") return { write: v === db.visitor, data: sight2(v, a.p_costume) };
     if (fn === "get_my_collections") return { data: !v || String(v).length > 80 ? { ok: false, error: "bad" } : { ok: true, pays: 1000, collections: colls2(v) } };
     if (fn === "claim_collections_v2") return { write: v === db.visitor, data: claimColls2(v) };

@@ -814,8 +814,10 @@ var draw = function(d){
 if (!body.isConnected) return;
 P.setup({ sb: sb, visitor: ls("sh_visitor_id"), shop: d && d.shop, profile: HX.RANK.p });
 body.innerHTML = '<div class="place-card"></div><p class="note">Tap the picture to step in. Timmy hops over to what you tap, and his health shows in how he moves.</p>' +
-(d && d.shop ? '<p><button type="button" class="btn" data-place-coll>Your collections</button></p>' : "");
+(d && d.shop ? '<p><button type="button" class="btn" data-place-coll>Your collections</button></p>' : "") +
+'<section class="hx-now" aria-labelledby="hxNowH" hidden></section>';
 P.card(body.firstChild, { onFail: shut });
+moreNow(body.querySelector(".hx-now"), sb);
 var cb = body.querySelector("[data-place-coll]");
 if (cb) cb.addEventListener("click", function(){ P.open({ collections: true, onClose: function(){ if (cb.isConnected) cb.focus(); } }); });
 };
@@ -825,7 +827,7 @@ if (window.shPet) go(); else { if (window.shLoadPet) window.shLoadPet(); whenWid
 });
 }, shut);
 }
-var VISIT_RE = /^[0-9a-f]{24}$/, visiting = false;
+var VISIT_RE = /^[0-9a-f]{24}$/, visiting = false, NOW = [];
 function placeOf(d){
 if (!d || typeof d !== "object" || Array.isArray(d)) return null;
 var eq = {}, e = d.equipped && typeof d.equipped === "object" ? d.equipped : {}, rk = d.rank && typeof d.rank === "object" ? d.rank : null;
@@ -848,7 +850,7 @@ visiting = false;
 var P = window.shPlace, boot = window.shBootstrap, d = boot && boot.data;
 if (!a[0] || !a[1] || !P) return false;
 P.setup({ sb: sb, visitor: ls("sh_visitor_id"), shop: d && d.shop, profile: HX.RANK && HX.RANK.p });
-P.open({ place: a[0], onClose: opt.onClose });
+P.open({ place: a[0], onClose: opt.onClose, nav: opt.nav || null });
 visitPaid(key);
 return true;
 });
@@ -860,12 +862,39 @@ ls("sh_visit_paid", day);
 G.claim("claim_visit_v2", { p_visitor: me, p_key: key }, "visit").then(function(r){ if (!r || r.missing || r.ok === false) ls("sh_visit_paid", null); }, function(){ ls("sh_visit_paid", null); });
 }
 window.shVisitPlace = visitPlace;
+function moreNow(host, sb){
+if (!host || !sb) return;
+sb.rpc("get_studying_now", { p_visitor: ls("sh_visitor_id") || null }).then(function(res){
+var d = res && !res.error ? res.data : null, R = window.shRanks, esc = HX.esc;
+if (!host.isConnected || !d || typeof d !== "object" || Array.isArray(d)) return;
+NOW = (Array.isArray(d.people) ? d.people : []).filter(function(p){ return p && typeof p.name === "string" && p.name && VISIT_RE.test(p.visit || ""); }).map(function(p){
+var rk = p.rank && typeof p.rank === "object" ? p.rank : {};
+return { name: p.name, key: p.visit, rank: { journey: +rk.journey || 0, tier: Math.max(0, Math.min(6, +rk.tier || 0)), level: +rk.level || 1 }, flair: typeof p.flair === "string" ? p.flair : "" };
+});
+var others = Math.max(0, Math.floor(+d.others || 0)), more = Math.max(0, others - NOW.length);
+var mini = function(p){ try { return R ? (R.miniOf && p.rank.journey > 0 ? R.miniOf(p.rank.journey, p.rank.tier, p.rank.level) : R.mini ? R.mini(p.rank.tier, p.rank.level) : "") : ""; } catch (e) { return ""; } };
+var row = function(p){ var f = R && R.flair ? R.flair(p.flair, { who: p.name }) : "";
+return '<li><button type="button" class="hx-nowbtn" data-sh-now="row" data-sh-visit data-key="' + p.key + '" aria-label="' + esc("Visit " + p.name + "’s place") + '"><i class="hx-nowdot" aria-hidden="true"></i>' + mini(p) +
+'<span class="hx-nownm">' + esc(p.name) + '</span><span class="hx-nowgo" aria-hidden="true">Visit</span></button>' + f + "</li>"; };
+host.innerHTML = '<h2 id="hxNowH">Studying now</h2>' +
+(NOW.length ? '<p class="note">Classmates with a hub open right now, under the names they chose for the boards. Tap one to visit their Timmy.</p><ul class="hx-nowlist">' + NOW.map(row).join("") + "</ul>" +
+(more ? '<p class="note">And ' + (more === 1 ? "1 more person" : more + " more people") + " without a name on the boards.</p>" : "")
+: '<p class="note">' + (others ? (others === 1 ? "1 person is" : others + " people are") + " studying right now, none of them under a name on the boards." : "Nobody else is studying right now. Check back in a bit.") + "</p>");
+host.hidden = false;
+}, function(){});
+}
+function nowNav(key){
+var keys = NOW.map(function(p){ return p.key; }), at = keys.indexOf(key), sb = window.shSupabase;
+if (at < 0 || keys.length < 2 || !sb) return null;
+return { at: at, what: "studying now", list: NOW.map(function(p){ return { name: p.name, rank: p.rank }; }),
+load: function(i){ return keys[i] ? sb.rpc("get_place", { p_key: keys[i] }).then(function(res){ var p = res && !res.error ? placeOf(res.data) : null; if (!p) throw new Error("place"); return p; }) : Promise.reject(new Error("key")); } };
+}
 document.addEventListener("click", function(e){
 var b = e.target.closest && e.target.closest("button[data-sh-visit]"); if (!b) return;
 var key = b.getAttribute("data-key") || "", row = b.closest("li") || b.parentNode, old = row && row.querySelector(".sh-visit-msg");
 if (old) old.parentNode.removeChild(old);
 b.setAttribute("aria-busy", "true");
-visitPlace(key, { onClose: function(){ if (b.isConnected) try { b.focus(); } catch (x) {} } }).then(function(ok){
+visitPlace(key, { nav: b.hasAttribute("data-sh-now") ? nowNav(key) : null, onClose: function(){ if (b.isConnected) try { b.focus(); } catch (x) {} } }).then(function(ok){
 b.removeAttribute("aria-busy");
 if (ok !== false || !row || !b.isConnected) return;
 var line = document.createElement("span"); line.className = "sh-visit-msg"; line.setAttribute("role", "status"); row.appendChild(line);

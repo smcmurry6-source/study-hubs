@@ -314,6 +314,59 @@ window.SH_SHOP_ART = (function shopKit(INK, C){
       FO("M40 20 V30 C40 40 160 40 160 30 V20 Z", R.edge, 2.5) + F("M128 37.4 C146 35.6 160 34 160 30 V20 H150 V29 C150 33 140 35.6 128 37.4 Z", R.deep, .5) + ell(100, 20, 60, 8.4, R.fill, 2.5) +
       HI("M52 21 C60 16.6 76 14.6 92 14.2", 2));
   }
+  /* ------------------------------------------------------------------ the mystery box --------------------------
+     A gift box in violet (no rarity's color, so it reads as "any of them"), its ribbon and bow the Shiny Gold Crown's
+     gold, a gold seal on the front with a question mark drawn as a path (no <text>). The light from the top left: the
+     box's right side and the lid's underside are the shade. 120 x 120, standing on its shadow at 108.
+     Open, the lid is thrown back over the left (its pose is the attribute, so a still drawing is open too) and a fan of
+     warm light rises from the mouth; .ts-b-open's CSS flies the lid off from the closed pose and grows the light. */
+  var VIO = "#9479E0", VIOS = "#6F55BF", VIOL = "#B7A2F0", VIOD = "#5A43A6";
+  function qmark(x, y, k, fill){
+    var p = function(a, b){ return f(x + a * k) + " " + f(y + b * k); };
+    return '<path d="M' + p(-4.6, -3.4) + " C" + p(-4.6, -7.6) + " " + p(-1.6, -9.6) + " " + p(.9, -9.6) + " C" + p(4.2, -9.6) + " " + p(6, -7.2) + " " + p(6, -4.6) +
+      " C" + p(6, -1.6) + " " + p(3.4, -.6) + " " + p(2, .8) + " C" + p(1, 1.8) + " " + p(1, 2.8) + " " + p(1, 3.8) + '" fill="none" stroke="' + (fill || INK) + '" stroke-width="' + f(3.6 * k) + '"/>' +
+      circ(x + 1 * k, y + 8.4 * k, 2.3 * k, fill || INK);
+  }
+  function boxLid(){
+    return FO("M15 40.6 H105 V55.4 Q105 59 101.4 59 H18.6 Q15 59 15 55.4 Z", VIO, 2.5) +
+      F("M88 41.8 H103.8 V55.4 Q103.8 57.8 101.4 57.8 H88 Z", VIOS) + F("M16.2 53.6 H103.8 V55.4 Q103.8 57.8 101.4 57.8 H18.6 Q16.2 57.8 16.2 55.4 Z", VIOD, .55) +
+      FO("M52 40.6 H68 V59 H52 Z", C.gold, 2) + F("M62.6 41.8 H66.8 V57.8 H62.6 Z", C.goldShade) +
+      O("M15 40.6 H105 V55.4 Q105 59 101.4 59 H18.6 Q15 59 15 55.4 Z", 2.5) +
+      HI("M20.6 45 H44", 2.2) +
+      /* the bow: two loops, two tails, the knot */
+      FO("M57.4 39 C50 35.6 47.4 42.8 41.4 40 C35.2 37 36.4 25.4 44.4 25.8 C50.8 26.2 55.6 33 59 37.6 Z", C.gold, 2.2) +
+      FO("M62.6 39 C70 35.6 72.6 42.8 78.6 40 C84.8 37 83.6 25.4 75.6 25.8 C69.2 26.2 64.4 33 61 37.6 Z", C.gold, 2.2) +
+      F("M73 27.4 C78.6 27 82.6 31 81.6 35.6 C80.6 33 78 30.4 73 27.4 Z", C.goldShade) +
+      L("M45 30.6 C48.6 31.4 52.4 34.4 55.2 37", 1.3, C.goldShade) + L("M75 30.6 C71.4 31.4 67.6 34.4 64.8 37", 1.3, C.goldShade) +
+      FO("M55.6 39.6 Q60 35.6 64.4 39.6 Q64.8 43.4 60 44 Q55.2 43.4 55.6 39.6 Z", C.goldLight, 2) +
+      HI("M41.8 33.4 C42 30.2 43.6 28.4 45.6 28", 1.6);
+  }
+  function box(open){
+    var s = ell(60, 108, 44, 6.4, INK).replace("/>", ' opacity=".14"/>');
+    if (open) {
+      var rays = "", i;
+      for (i = 0; i < 9; i++){ var a0 = Math.PI + (i + .15) / 9 * Math.PI, a1 = a0 + Math.PI / 18; rays += "M60 58 L" + f(60 + Math.cos(a0) * 70) + " " + f(58 + Math.sin(a0) * 70) + " L" + f(60 + Math.cos(a1) * 70) + " " + f(58 + Math.sin(a1) * 70) + " Z"; }
+      s += '<g class="ts-b-glow">' + F(rays, "#FFE89A", .85) + ell(60, 50, 34, 20, "#FFF3C4").replace("/>", ' opacity=".7"/>') + "</g>";
+    }
+    /* the body, its right side in shade, the ribbon down the front and the seal */
+    s += FO("M21 56 H99 V101 Q99 106 94 106 H26 Q21 106 21 101 Z", VIO, 2.5) +
+      F("M84 57.2 H97.8 V101 Q97.8 104.8 94 104.8 H84 Z", VIOS) +
+      FO("M53 56 H67 V106 H53 Z", C.gold, 2) + F("M62.6 57.2 H65.8 V104.8 H62.6 Z", C.goldShade) +
+      O("M21 56 H99 V101 Q99 106 94 106 H26 Q21 106 21 101 Z", 2.5) +
+      HI("M26 63 V92", 2.2) +
+      circ(60, 80, 15.4, C.gold, 2.4) + F("M66.8 67.6 A15.4 15.4 0 0 1 66.8 92.4 A18 18 0 0 0 66.8 67.6 Z", C.goldShade) +
+      circ(60, 80, 11.6, C.goldLight, 1.4) + qmark(59.4, 80, 1, INK) +
+      star(96, 64, 3.4, "#FFFFFF", "ts-b-tw", .5);
+    if (open) {
+      /* the mouth: the box's dark inside with the light at its back, then the lid thrown back */
+      s += FO("M23 56 H97 L93 61 H27 Z", VIOD, 1.8) + F("M34 57.6 H86 L84 60 H36 Z", "#FFE89A", .9) +
+        '<g class="ts-b-lid" transform="translate(-6 -30) rotate(-20 16 59)">' + boxLid() + "</g>" +
+        star(30, 14, 5, "#FFFFFF", "ts-b-tw", 0) + star(92, 10, 4.2, "#FFF7D6", "ts-b-tw", .7) + star(104, 36, 3.4, "#FFFFFF", "ts-b-tw", 1.3);
+    } else {
+      s += boxLid() + star(16, 26, 4.4, "#FFFFFF", "ts-b-tw", 0) + star(103, 22, 3.6, "#FFF7D6", "ts-b-tw", 1.1);
+    }
+    return wrap("ts-box" + (open ? " ts-b-open" : ""), "0 0 120 120", s);
+  }
   var CSS = [
     ".ts-coin{display:inline-block;vertical-align:-.18em;flex:none}.ts-thumb,.ts-frame{display:block;width:100%;height:100%}",
     "@keyframes ts-spin{to{transform:rotate(360deg)}}",
@@ -330,8 +383,15 @@ window.SH_SHOP_ART = (function shopKit(INK, C){
     "@keyframes ts-s-sway{0%,100%{transform:rotate(-2.4deg)}50%{transform:rotate(2.4deg)}}.ts-s-sway{transform-box:fill-box;transform-origin:50% 0;animation:ts-s-sway 5.2s ease-in-out infinite}",
     ".ts-s-tw{transform-box:fill-box;transform-origin:center;animation:ts-r-tw 2.6s ease-in-out infinite}",
     "@media (prefers-reduced-motion: reduce){.ts-store *{animation:none!important}}",
-    ".ts-still .ts-store *{animation:none!important}"
+    ".ts-still .ts-store *{animation:none!important}",
+    ".ts-box{display:block;width:100%;height:auto;overflow:visible}.ts-b-tw{transform-box:fill-box;transform-origin:center;animation:ts-r-tw 2.4s ease-in-out infinite}",
+    "@keyframes ts-b-lid{from{transform:none}to{transform:translate(-6px,-30px) rotate(-20deg)}}.ts-b-open .ts-b-lid{transform-origin:16px 59px;animation:ts-b-lid .5s cubic-bezier(.25,1.5,.45,1) both}",
+    "@keyframes ts-b-glow{from{opacity:0;transform:scale(.3)}to{opacity:1;transform:scale(1)}}.ts-b-open .ts-b-glow{transform-origin:60px 58px;animation:ts-b-glow .6s .12s ease-out both}",
+    "@keyframes ts-b-shake{0%,100%{transform:rotate(0)}15%{transform:rotate(-7deg)}30%{transform:rotate(6deg)}45%{transform:rotate(-5deg)}60%{transform:rotate(4deg)}75%{transform:rotate(-2deg)}}",
+    ".ts-box.is-shake{transform-origin:50% 90%;animation:ts-b-shake .7s ease-in-out infinite}",
+    "@media (prefers-reduced-motion: reduce){.ts-box,.ts-box *{animation:none!important}}",
+    ".ts-still .ts-box,.ts-still .ts-box *{animation:none!important}"
   ].join("\n");
 
-  return { coin: coin, coinBody: coinBody, thumb: thumb, ITEMS: ITEMS, RARITIES: RARITIES, frame: frame, store: store, stand: stand, CSS: CSS };
+  return { coin: coin, coinBody: coinBody, thumb: thumb, ITEMS: ITEMS, RARITIES: RARITIES, frame: frame, store: store, stand: stand, box: box, CSS: CSS };
 })("#3B2E3A", {"enamel":"#FFFDF6","enamelShade":"#E9DFCC","gum":"#F78FA8","gumShade":"#E07090","gumLight":"#FFC0CD","pink":"#F7A3BA","metal":"#D5DBE1","metalShade":"#8E98A3","metalLight":"#EEF2F5","gold":"#F2C94C","goldShade":"#C9971C","goldLight":"#FFF0B3","bronze":"#D08A52","bronzeShade":"#9A5A2A","bronzeLight":"#F2C49A","silver":"#D9DFE5","silverShade":"#8E98A3","silverLight":"#F6F8FA","paper":"#FFFFFF","paperShade":"#ECE6EA","wood":"#C4915F","woodShade":"#8A5A3A","sky":"#CFEAF8","grass":"#A7DE93","grassShade":"#6CBB68","red":"#E5484D","blue":"#3FA7E0","yellow":"#FFE27A","green":"#3ECF7E","orange":"#F59A1E","plum":"#6B5A68","plumLight":"#ECE6EA"});

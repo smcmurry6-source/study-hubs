@@ -83,6 +83,8 @@ select rarity, lo, hi, round(lo / 700.0, 1) lo_median_days, round(hi / 700.0, 1)
 from b order by lo;
 
 -- E5. Spending: what sells (kind and rarity), by day, and how many people open the shop and the place
+-- (a mystery box, migration_v99, is a purchase of kind 'box' at the box's price, with the piece it gave as item_id, so its
+-- rarity here is the piece's; shop:box:<rarity> in the reach counts the openings)
 select json_build_object(
   'by_kind', (select json_agg(x) from (select p.kind, s.rarity, count(*) n, count(distinct p.visitor_id) people, sum(p.price) crowns
       from pet_purchases p left join shop_items s on s.id = p.item_id where p.day >= :since::date group by 1, 2 order by 5 desc) x),

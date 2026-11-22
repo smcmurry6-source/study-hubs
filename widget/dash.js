@@ -285,7 +285,7 @@
           "</div>" +
           '<div class="dx-classhead"><h3 id="boardH">Leaderboard</h3>' +
             '<span class="seg" role="group" aria-label="Leaderboard" id="boardSeg">' +
-              [["ranks", "Ranks"], ["streaks", "Study streaks"]].map(function(b, i){ return '<button type="button" data-board="' + b[0] + '" aria-pressed="' + (i === 0) + '">' + b[1] + "</button>"; }).join("") +
+              [["ranks", "Ranks"], ["streaks", "Study streaks"], ["now", "Studying now"]].map(function(b, i){ return '<button type="button" data-board="' + b[0] + '" aria-pressed="' + (i === 0) + '">' + b[1] + "</button>"; }).join("") +
             "</span></div>" +
           '<p class="note" id="boardNote"></p>' +
           '<div id="board" aria-live="polite"><p class="note">Loading…</p></div>' +
@@ -1408,7 +1408,7 @@
   function openNameEditor(){
     surveyVisitor();
     var dlg = dialog("nameH",
-      '<h2 id="nameH">Your name</h2><p class="note">This is how classmates see you on the leaderboards, streak boards and ranks, in every hub.' +
+      '<h2 id="nameH">Your name</h2><p class="note">This is how classmates see you on the leaderboards, streak boards and ranks, in every hub. A name you picked also shows under Studying now while you have a hub open; a random one doesn’t.' +
       (!localName && randomName ? " Right now you have a random one: <b>" + esc(randomName) + "</b>." : "") + "</p>" +
       '<form class="dx-nameform"><input type="text" maxlength="24" autocomplete="nickname" enterkeyhint="done" aria-label="Your name" placeholder="Pick a name" value="' + esc(localName) + '"><button class="btn btn-primary" type="submit">Save</button></form>' +
       '<p class="note dx-namemsg" aria-live="polite"></p>' +
@@ -1932,7 +1932,8 @@
   var boardSb = null, boardNow = "ranks", boardOpen = false;
   var BOARD_NOTE = {
     ranks: "XP from every hub: 10 for a new question right, 2 for a repeat, 1 for trying, 20 per day studied. Every rank has levels I, II and III.",
-    streaks: "Days in a row with at least one answer."
+    streaks: "Days in a row with at least one answer.",
+    now: "Classmates with a hub open right now, under the names they chose for the boards. Tap one to visit their Timmy. You show here too while you study, if you’ve picked a name."
   };
   function rankMini(r){ return window.shRanks && r.tier != null ? jMini(r, r.level) : ""; }
   /* a row's name with its mastery medals (`flair`). On a row with a visit key the name is the button that visits that
@@ -1979,6 +1980,7 @@
   var boardData = null;      /* the board as last loaded: { which, rows, fits } (painted again when the page's width changes) */
   function paintBoard(){
     var d = boardData, R = window.shRanks; if (!d || d.which !== boardNow) return;
+    if (d.which === "now") { paintNowBoard(d); return; }
     var rows = d.rows, ranks = d.which === "ranks", pod = rows.length >= 3, rest = pod ? rows.slice(3) : rows, w = Math.round($("board").clientWidth);
     var first = Math.max(1, ranks ? +rows[0].xp || 0 : +rows[0].streak || 0);
     var set = pod && CA && CA.stage && w >= 240 ? stageSvg(w, rows, d.fits || []) : "";
@@ -1993,6 +1995,54 @@
     if (d.say) visitSay(d.say.key, d.say.msg, true);
     $("visitRand").hidden = !visitList().length; visitEarn();
   }
+  /* ---------- Studying now (migration_v99, the idea board's "Drip for Timmy"): who has a hub open this minute, to visit.
+     get_studying_now gives the people with a ping in the last 3 minutes, in any hub, who show on the boards under a name
+     they chose: each one's name, visit key, rank and medals and nothing else (never a hub, a time or an id), and how many
+     others are studying, as a number. A row is a board row: a tap visits, and the place's arrows go through the list
+     ("Place 2 of 5 studying now"). Asked when the tab opens, and again each minute while it is shown and nobody is on it. */
+  var nowT = 0;
+  function nowOf(p){
+    if (!p || typeof p !== "object" || typeof p.name !== "string" || !p.name || !VISIT_RE.test(p.visit || "")) return null;
+    var rk = p.rank && typeof p.rank === "object" ? p.rank : {};
+    return { display_name: p.name, visit: p.visit, journey: +rk.journey || 0, tier: +rk.tier || 0, level: +rk.level || 1, flair: typeof p.flair === "string" ? p.flair : "" };
+  }
+  function nowRow(r){
+    return "<li" + visitAttr(r) + '><span class="rk" aria-hidden="true"><i class="dx-pulse"></i></span><span class="nm">' + rankMini(r) + nameFlair(r) + "</span>" +
+      '<span class="lvl">' + esc(jName(r, r.level || 1)) + '</span><span class="val dx-nowgo" aria-hidden="true">Visit</span></li>';
+  }
+  function nPeople(n){ return n === 1 ? "1 person is" : num(n) + " people are"; }
+  function paintNowBoard(d){
+    var rows = d.rows, more = Math.max(0, d.others - rows.length);
+    $("board").innerHTML = '<div class="dx-arena dx-nowarena">' + (rows.length ? '<ul class="dx-board dx-nowlist">' + rows.map(nowRow).join("") + "</ul>" +
+        (more ? '<p class="dx-nowmore">And ' + (more === 1 ? "1 more person" : num(more) + " more people") + " without a name on the boards.</p>" : "")
+      : '<p class="dx-nowmore">' + (d.others ? nPeople(d.others) + " studying right now, none of them under a name on the boards." : "Nobody else is studying right now. Check back in a bit.") + "</p>") + "</div>";
+    if (d.say) visitSay(d.say.key, d.say.msg, true);
+    $("visitRand").hidden = !visitList().length; visitEarn();
+  }
+  function nowGone(){
+    clearInterval(nowT);
+    var b = q('[data-board="now"]', $("boardSeg")); if (b) b.hidden = true;
+    if (boardNow === "now") { boardNow = "ranks"; qa("[data-board]", $("boardSeg")).forEach(function(x){ x.setAttribute("aria-pressed", String(x.getAttribute("data-board") === "ranks")); }); drawBoard(); }
+  }
+  function drawNow(sb){
+    sb.rpc("get_studying_now", { p_visitor: VISITOR || null }).then(function(res){
+      if (boardNow !== "now") return;
+      var e = res && res.error;
+      if (e && (e.code === "PGRST202" || e.code === "42883" || res.status === 404 || /could not find the function/i.test(e.message || ""))) { nowGone(); return; }
+      var dd = res && !e ? res.data : null;
+      if (!dd || typeof dd !== "object" || Array.isArray(dd)) { boardMsg(); return; }
+      var rows = (Array.isArray(dd.people) ? dd.people : []).map(nowOf).filter(Boolean);
+      boardData = { which: "now", rows: rows, fits: [], others: Math.max(0, Math.floor(+dd.others || 0)) }; paintBoard();
+      jNeed(rows, function(){ if (boardData && boardData.rows === rows) paintBoard(); });
+    }, function(){ if (boardNow === "now") boardMsg(); });
+    clearInterval(nowT);
+    nowT = setInterval(function(){
+      if (boardNow !== "now") { clearInterval(nowT); return; }
+      if (document.hidden || visiting || $("board").contains(document.activeElement) || q("dialog[open]")) return;
+      drawNow(sb);
+    }, 60000);
+  }
+
   /* what the top three's Timmys wear: each one's place says (get_place, migration_v54), through the visit key on their
      row. A place that can't be read gives a plain Timmy. The answer is kept
      for a visit (getPlace), so a tap on one of the top three doesn't ask again. */
@@ -2074,7 +2124,7 @@
   function visitNav(key){
     var rows = visitList(), keys = rows.map(visitKey), at = keys.indexOf(key), R = window.shRanks;
     if (at < 0) return null;
-    return { at: at, keys: keys,
+    return { at: at, keys: keys, what: boardData && boardData.which === "now" ? "studying now" : "",
       list: rows.map(function(r){ return { name: String(r.display_name == null ? "" : r.display_name), rank: { journey: +r.journey || 0, tier: +r.tier || 0, level: +r.level || (R && R.levelFor ? R.levelFor(r.xp) : 1) } }; }),
       load: function(i){ return keys[i] ? placeTop(keys[i]) : Promise.reject(new Error("key")); } };
   }
@@ -2097,7 +2147,7 @@
     }
     Promise.all([placeTop(key), placeLoad()]).then(function(a){
       if (!a[0] || !window.shPlace) { fail(); return; }
-      done(); window.shPlace.open({ place: a[0], onClose: back, nav: nav ? { at: nav.at, list: nav.list, load: nav.load } : null });
+      done(); window.shPlace.open({ place: a[0], onClose: back, nav: nav ? { at: nav.at, list: nav.list, load: nav.load, what: nav.what } : null });
       visitPaid(key);
     }, fail);
   }
@@ -2179,7 +2229,7 @@
         boardData = { which: which, rows: rows, fits: [] }; paintBoard(); loadFits(sb, boardData);
         jNeed(rows, function(){ if (boardData && boardData.rows === rows) paintBoard(); });
       }, function(){ if (boardNow === which) boardMsg(); });
-    }
+    } else if (which === "now") drawNow(sb);
   }
   $("boardSeg").addEventListener("click", function(e){
     var b = e.target.closest("[data-board]"); if (!b || b.getAttribute("data-board") === boardNow) return;
