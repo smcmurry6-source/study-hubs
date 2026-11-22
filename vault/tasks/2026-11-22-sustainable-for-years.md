@@ -1,6 +1,6 @@
 ---
 type: task
-status: open
+status: in-progress
 hub: site
 created: 2026-11-22
 requested-by: Sam
@@ -39,22 +39,22 @@ they can.
 
 ### 1. Shorter windows for the analytics (`migration_v95.sql`)
 
-- [ ] A record of when each hub's page came down (`hubs_down`: hub, the day), written by the After merge workflow's `down`
+- [x] A record of when each hub's page came down (`hubs_down`: hub, the day), written by the After merge workflow's `down`
       step (`tools/after-merge/run.js`, where it already deletes the hub's "Good question?" thumbs), filled in for every hub
       already down (the dates are in the hub notes and `DEPLOY_NOTES.md`). Package 2 uses it.
-- [ ] **Question health rolled up when a hub's page comes down** (Sam's B; this replaces 2026-11-21's "after the year"):
+- [x] **Question health rolled up when a hub's page comes down** (Sam's B; this replaces 2026-11-21's "after the year"):
       the nightly job collapses that hub's `question_events` into `question_events_daily` as v93 does, then deletes them.
       Its first run takes every hub already down (about 37 MB). Review of Systems stays as it is while it's live.
-- [ ] **Clicks kept 30 days, not 90** (Sam's C), with a daily roll-up first (day × page × target: people, no ids), so a
+- [x] **Clicks kept 30 days, not 90** (Sam's C), with a daily roll-up first (day × page × target: people, no ids), so a
       retrospective's reach still has a number for every day; `ui_clicks` keeps the counts as before.
-- [ ] **Feature events rolled up at 60 days, not 180** (Sam's C), into `feature_daily` as now.
-- [ ] `tools/retro.sql` and `tools/lessons-daily.sql` read the roll-ups where they read rows past the new windows.
-- [ ] `tools/release/retention.js` tests every new step on a throwaway copy: the right rows go, nothing else does, time
+- [x] **Feature events rolled up at 60 days, not 180** (Sam's C), into `feature_daily` as now.
+- [x] `tools/retro.sql` and `tools/lessons-daily.sql` read the roll-ups where they read rows past the new windows.
+- [x] `tools/release/retention.js` tests every new step on a throwaway copy: the right rows go, nothing else does, time
       crowns and XP don't move.
-- [ ] Applied by hand at 1-5 am Central in batches (its first run is a backfill:
+- [x] Applied by hand at 1-5 am Central in batches (its first run is a backfill:
       [run-sql-on-the-live-database](../how-to/run-sql-on-the-live-database.md)), then the shrunk tables compacted
       (`VACUUM FULL`, a few seconds each, at the same hour) so the space comes back; the size before and after in the Log.
-- [ ] The windows written where they live: [analytics-retention](../reference/analytics-retention.md),
+- [x] The windows written where they live: [analytics-retention](../reference/analytics-retention.md),
       [event-taxonomy](../reference/event-taxonomy.md) if it states them, and **the About page's "What the hubs record"**
       ("which buttons and tabs you tapped is kept for 90 days, and which features you used for 180 days").
 
@@ -110,6 +110,26 @@ they can.
 
 - 2026-11-22: written from the chat (Claude Code, the session handling the merging), after measuring the repo, the site
   and the database; packages 5's rule and 6 done in the same PR.
+- 2026-11-22: package 1 written (Claude Code): `migration_v95.sql` (`hubs_down`, `ui_click_reach_daily`,
+  `sh_retention_hub_down`, `sh_retention_run`'s new windows), the After merge `down` step writing `hubs_down`, the reports,
+  `tools/release/retention.js`, the notes and the About page. Measured first (read-only, 2026-11-22 afternoon): the database
+  360 MB; `question_events` 38 MB, 129,939 of its rows on hubs already down (into about 12,900 daily rows), Review of
+  Systems' 95 stay; `ui_click_reach` 27 MB, 19,358 of 108,995 rows past 30 days (into about 4,600 daily rows);
+  `feature_events` 17 MB, none past 60 days yet (the oldest is 2026-10-20, so the first go about 2026-12-19). Applying it
+  and compacting the tables wait for the session handling the merging, at 1-5 am Central; the sizes after go here.
+- 2026-11-22 (7 pm Central on 2026-11-21, Sam's call: nobody studying, so not the quiet hours): `migration_v95.sql`
+  applied by the session handling the merging at 01:03 UTC (apply_migration). Before, `sh_retention_run` was v93's
+  (`md5(pg_get_functiondef)` e9c278ed682a7047333691ac5305afcf); after, `sh_retention_run` 847e75ef9f4050d0d87f8f0c43f1d1b7
+  and `sh_retention_hub_down` f9f12cdf309b0f40bc569c5be6ab6e2e (`md5(prosrc)` 6aa3b0e2fa2cb5b28d46e7f097c64ca2 and
+  d8824f4ca629b51c3e8e0b981c3368fe, matching the file); `hubs_down` has its 12 rows. The dry run counted 129,939
+  question-health rows on down hubs, 19,358 click rows and no feature events, as measured. Backfilled a hub a call,
+  smallest first (Perio's 43,148 rows took 2.9 s, none longer): 129,939 rows became 12,892 `question_events_daily` rows,
+  with answers, right, first tries, views and picks matching the raw rows hub by hub; Review of Systems' 95 stay. Then one
+  `sh_retention_run(true)` (4.4 s): 19,358 click rows became 4,559 `ui_click_reach_daily` rows (people summing to 19,358),
+  and the night's old pings went. Compacted with `VACUUM (FULL, ANALYZE)` on `question_events` and `ui_click_reach` as a
+  one-time pg_cron job (01:06 UTC, 3.3 s), then unscheduled. **Sizes:** the database 360 MB → 319 MB; `question_events`
+  38 MB → 72 kB; `ui_click_reach` 27 MB → 19 MB; the new `question_events_daily` 3.2 MB and `ui_click_reach_daily` 568 kB.
+  The migration file stays as applied (its header says 1-5 am; it went in early on Sam's say-so). Package 1 done.
 
 ## Outcome
 

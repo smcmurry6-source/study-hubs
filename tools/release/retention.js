@@ -2,7 +2,8 @@
 // Retention test (migration_v52, vault/reference/analytics-retention.md): builds a throwaway PostgreSQL database from
 // supabase/schema.sql, seeds made-up rows of every age, and checks that sh_retention_run():
 //   - with p_apply false only counts, and changes nothing;
-//   - deletes exactly the approved rows (raw pings > 3 days since migration_v74, 30 before, click reach > 90 days, feature events > 180 days, test
+//   - deletes exactly the approved rows (raw pings > 3 days since migration_v74, 30 before, click reach > 30 days and feature events > 60 days
+//     since migration_v95 (90 and 180 before), with their daily roll-ups, a down hub's question health (hubs_down, v95), test
 //     hubs, old link attempts, an idea hidden for 90 days with its votes, reports and notes: migration_v58) and removes ids on schedule (reports, check-ins, closed surveys), and nothing else;
 //   - keeps every hour of study time: activity_hourly and activity_visits are the same before and after the trim,
 //     and get_hub_recap gives the same answer before and after;
@@ -82,10 +83,12 @@ try {
     insert into personal_answers (visitor_id, hub, qid, correct, answered_at)
       select 'ret-A', 'ret-hub', 'q' || g, g % 2 = 0, now() - interval '40 days' + g * interval '1 minute' from generate_series(1, 20) g;
     insert into ui_click_reach (day, hub, target, visitor_id) values
-      (current_date - 100, 'ret-hub', 'tab=old', 'ret-A'), (current_date - 10, 'ret-hub', 'tab=new', 'ret-A'), (current_date - 1, 'zz-test', 'x', 'ret-A');
+      (current_date - 100, 'ret-hub', 'tab=old', 'ret-A'), (current_date - 10, 'ret-hub', 'tab=new', 'ret-A'), (current_date - 1, 'zz-test', 'x', 'ret-A'),
+      (current_date - 40, 'ret-hub', 'tab=mid', 'ret-A'), (current_date - 40, 'ret-hub', 'tab=mid', 'ret-B'), (current_date - 29, 'ret-hub', 'tab=edge', 'ret-B');
     insert into feature_events (day, hub, kind, visitor_id, n) values
       (current_date - 200, 'ret-hub', 'tts:play', 'ret-A', 3), (current_date - 200, 'ret-hub', 'tts:play', 'ret-B', 2),
-      (current_date - 10, 'ret-hub', 'tts:play', 'ret-A', 1), (current_date - 1, 'zz-test', 'x', 'ret-A', 1);
+      (current_date - 10, 'ret-hub', 'tts:play', 'ret-A', 1), (current_date - 1, 'zz-test', 'x', 'ret-A', 1),
+      (current_date - 70, 'ret-hub', 'tour:start', 'ret-A', 1), (current_date - 59, 'ret-hub', 'tour:start', 'ret-B', 1);
     insert into question_flags (hub, note, created_at, resolved, visitor_id, reply, resolved_at) values
       ('ret-hub', 'old report', now() - interval '200 days', true, 'ret-A', 'fixed', now() - interval '130 days'),
       ('ret-hub', 'recent report', now() - interval '20 days', true, 'ret-A', 'fixed', now() - interval '10 days'),
@@ -142,6 +145,23 @@ try {
       (date_trunc('day', now() - interval '400 days') + interval '18 hours', 'ret-old', 'q1', 'v1', 'yr-D', 'yr-v2', 'view', null, null, null, 3500, null),
       (now() - interval '10 days', 'ret-old', 'q1', 'v1', 'yr-C', 'yr-v3', 'answer', 3, true, 2, 1500, 500);
   `);
+  /* v95: a hub whose page came down (in hubs_down) and a live one, both with recent question health and answers; dn-E
+     answered on both, so its XP and crowns are read before and after */
+  sql(`
+    insert into hubs_down (hub, day) values ('ret-down', current_date - 2);
+    insert into question_events (at, hub, qid, v, visitor_id, visit_id, kind, try, correct, choice, ms, expl_ms) values
+      (now() - interval '5 days', 'ret-down', 'd1', '', 'dn-E', 'dn-v1', 'answer', 1, false, 1, 3000, 2000),
+      (now() - interval '5 days', 'ret-down', 'd1', '', 'dn-E', 'dn-v1', 'answer', 2, true, 0, 1000, 1000),
+      (now() - interval '5 days', 'ret-down', 'd1', '', 'dn-F', 'dn-v2', 'answer', 1, true, 0, 5000, 4000),
+      (now() - interval '5 days', 'ret-down', 'd2', '', 'dn-F', 'dn-v2', 'view', null, null, null, 4000, null),
+      (now() - interval '1 day', 'ret-down', 'd1', '', 'dn-F', 'dn-v3', 'answer', 2, true, 0, 2000, 500),
+      (now() - interval '5 days', 'ret-live', 'l1', '', 'dn-E', 'dn-v1', 'answer', 1, true, 2, 3000, 2000),
+      (now() - interval '1 day', 'ret-live', 'l1', '', 'dn-F', 'dn-v3', 'answer', 1, false, 1, 3000, 2000);
+    insert into personal_answers (visitor_id, hub, qid, correct, answered_at) values
+      ('dn-E', 'ret-down', 'd1', true, now() - interval '5 days'), ('dn-E', 'ret-live', 'l1', true, now() - interval '5 days');
+  `);
+  const wallets = () => one(`select string_agg(v || ':' || sh_wallet(v)::text, ' | ' order by v) from unnest(array['ret-A', 'ret-B', 'yr-C', 'yr-D', 'dn-E', 'dn-F']) v`);
+  const wallets0 = wallets();
   const crowns = () => one(`select sh_time_crowns('yr-C') || '/' || sh_time_crowns('yr-D')`);
   const crowns0 = crowns();
   expect('time crowns before the collapse (yr-C 144+30+50 capped pings, yr-D 20; rounded)', crowns0, '156/14');
@@ -149,9 +169,9 @@ try {
   /* dry run: counts only */
   const dry = JSON.parse(one(`select sh_retention_run()::text`));
   const testHours = Number(one(`select count(*) from activity_hourly where hub = 'zz-test'`));   /* 1 or 2: the 10 pings may cross an hour */
-  const want = { activity_pings: 430, ui_click_reach: 2, feature_events: 3, activity_hourly_test: testHours, ui_clicks_test: 0, question_flags_ids: 1,
+  const want = { activity_pings: 430, ui_click_reach: 4, feature_events: 4, activity_hourly_test: testHours, ui_clicks_test: 0, question_flags_ids: 1,
     hub_suggestions_ids: 1, exam_debriefs_ids: 1, survey_declines: 1, survey_answer_ids: 1, ideas_hidden: 1, link_attempts: 1,
-    activity_hourly_year: 4, activity_visits_year: 2, question_events_year: 4 };
+    activity_hourly_year: 4, activity_visits_year: 2, question_events_year: 4, question_events_down: 5 };
   for (const k of Object.keys(want)) expect(`dry run counts ${k}`, dry.counts[k], want[k]);
   expect('dry run left the raw pings', one(`select count(*) from activity_pings`), 610);
   expect('dry run logged nothing', one(`select count(*) from retention_runs`), 0);
@@ -165,9 +185,15 @@ try {
   expect('visits unchanged after the trim', visits(), v0);
   expect('test-hub hours gone', one(`select count(*) from activity_hourly where hub = 'zz-test'`), 0);
   expect('recap unchanged after the trim', recap() === r0, true);
-  expect('click reach kept', one(`select string_agg(target, ',' order by target) from ui_click_reach`), 'tab=new');
-  expect('feature events kept', one(`select count(*) from feature_events`), 1);
+  expect('click reach kept (the last 30 days)', one(`select string_agg(target, ',' order by target) from ui_click_reach`), 'tab=edge,tab=new');
+  expect('click reach rolled up by day, page and target (people, no ids; the test hub left out)', one(`select string_agg(target || ':' || people, ',' order by target) from ui_click_reach_daily`), 'tab=mid:2,tab=old:1');
+  expect('feature events kept (the last 60 days)', one(`select string_agg(kind || ':' || visitor_id, ',' order by kind, visitor_id) from feature_events`), 'tour:start:ret-B,tts:play:ret-A');
   expect('feature_daily row', one(`select people || '/' || n from feature_daily where hub = 'ret-hub' and kind = 'tts:play'`), '2/5');
+  expect('feature_daily row at 70 days', one(`select people || '/' || n from feature_daily where hub = 'ret-hub' and kind = 'tour:start'`), '1/1');
+  for (const t of ['hubs_down', 'ui_click_reach_daily']) {
+    expect(`${t} has row-level security`, one(`select relrowsecurity from pg_class where oid = 'public.${t}'::regclass`), 't');
+    expect(`anon can't read ${t}`, one(`select has_table_privilege('anon', 'public.${t}', 'select')`), 'f');
+  }
   expect('old resolved report id removed', one(`select count(*) from question_flags where note = 'old report' and visitor_id is null`), 1);
   expect('recent report id kept', one(`select visitor_id from question_flags where note = 'recent report'`), 'ret-A');
   expect('open report id kept', one(`select visitor_id from question_flags where note = 'open report'`), 'ret-B');
@@ -201,6 +227,26 @@ try {
     expect(`${t} has row-level security`, one(`select relrowsecurity from pg_class where oid = 'public.${t}'::regclass`), 't');
     expect(`anon can't read ${t}`, one(`select has_table_privilege('anon', 'public.${t}', 'select')`), 'f');
   }
+  /* v95: the down hub's question health rolled up; the live hub's stays; nobody's XP or crowns move */
+  expect('the down hub\'s question events gone', one(`select count(*) from question_events where hub = 'ret-down'`), 0);
+  expect('the live hub\'s question events kept', one(`select count(*) from question_events where hub = 'ret-live'`), 2);
+  expect('the down hub\'s daily totals (d1, 5 days ago)', one(`select people || '/' || answers || '/' || correct || '/' || firsts || '/' || firsts_correct || '/' || retries || '/' || retries_correct || '/' || views || '/' || med_ms || '/' || choices::text from question_events_daily where hub = 'ret-down' and qid = 'd1' and day = ((now() - interval '5 days') at time zone 'America/Chicago')::date`), '2/3/2/2/1/1/1/0/3000/{"0": 2, "1": 1}');
+  expect('the down hub\'s unanswered read', one(`select views || '/' || answers || '/' || choices::text from question_events_daily where hub = 'ret-down' and qid = 'd2'`), '1/0/{}');
+  expect('the down hub in all (answers, rows)', one(`select sum(answers) || '/' || count(*) from question_events_daily where hub = 'ret-down'`), '4/3');
+  expect('no totals for the live hub', one(`select count(*) from question_events_daily where hub = 'ret-live'`), 0);
+  expect('answers untouched on both hubs', one(`select count(*) from personal_answers where visitor_id = 'dn-E'`), 2);
+  expect('XP, crowns and time crowns unchanged by the run', wallets() === wallets0, true);
+  let refused = '';
+  try { sql(`select sh_retention_hub_down('ret-live')`); } catch (e) { refused = e.message; }
+  expect('a hub not in hubs_down is refused', /is not in hubs_down/.test(refused), true);
+  expect('anon can\'t execute sh_retention_hub_down', one(`select has_function_privilege('anon', 'public.sh_retention_hub_down(text)', 'execute')`), 'f');
+  /* a row a down hub's page sends later (a kept answer) is rolled up the next night, into the same day's totals */
+  sql(`insert into question_events (at, hub, qid, v, visitor_id, visit_id, kind, try, correct, choice, ms, expl_ms) values
+         (now() - interval '1 day', 'ret-down', 'd1', '', 'dn-E', 'dn-v4', 'answer', 3, true, 0, 1000, 800)`);
+  expect('a late row is counted the next night', JSON.parse(one(`select sh_retention_run()::text`)).counts.question_events_down, 1);
+  expect('the late row rolls up with its day', one(`select sh_retention_hub_down('ret-down')`), 1);
+  expect('the late row joins its day (answers, people summed)', one(`select answers || '/' || people || '/' || choices::text from question_events_daily where hub = 'ret-down' and qid = 'd1' and day = ((now() - interval '1 day') at time zone 'America/Chicago')::date`), '2/2/{"0": 2}');
+  notes.push(`a down hub's ${done.counts.question_events_down} question events into daily totals, the live hub's kept; ${done.counts.ui_click_reach} click-reach rows past 30 days rolled up; XP and crowns the same before and after`);
   notes.push(`the school year's collapse: ${done.counts.activity_hourly_year} hours, ${done.counts.activity_visits_year} visits, ${done.counts.question_events_year} question events into totals; time crowns ${crowns0} before and after`);
 
   /* a second run removes nothing */

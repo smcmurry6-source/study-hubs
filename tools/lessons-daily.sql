@@ -55,6 +55,8 @@ where h >= :since::date and section like 'drill/%' group by 1;
 --    rise on their own, so a before/after alone says little). Replace :hub, :fixed_at (when the fixes went live, e.g.
 --    '2026-11-11 19:20-06') and the fixed ids. `try` counts a person's whole history (widget/qhealth.js), so a first try
 --    comes before they see an explanation: an explanation fix can only show in retries, mostly the 12+ hour ones.
+--    A hub whose page came down has no question_events rows (migration_v95 rolls them into question_events_daily when it
+--    comes down, and they're gone the next night): use the query after these two for it.
 with b as (select qid, count(*) n, count(*) filter (where correct) ok from question_events
            where hub = :hub and kind = 'answer' and try = 1 and at < :fixed_at::timestamptz group by 1),
      s as (select qid, count(*) n, count(*) filter (where correct) ok from question_events
@@ -68,3 +70,11 @@ select (at >= :fixed_at::timestamptz) since,
   round(100.0 * avg(correct::int)) pct
 from question_events where hub = :hub and kind = 'answer' and try > 1 and prev = false and qid in ('<fixed id>', '<fixed id>')
 group by 1, 2 order by 1, 2;
+-- the same first-try comparison for a hub whose page came down, from the daily totals (no ids; a day's first tries are
+-- whole, so :fixed_at is rounded to its Central day)
+with t as (select qid, (day >= (:fixed_at::timestamptz at time zone 'America/Chicago')::date) since, sum(firsts) n, sum(firsts_correct) ok
+           from question_events_daily where hub = :hub group by 1, 2),
+     b as (select qid, n, ok from t where not since), s as (select qid, n, ok from t where since)
+select case when b.qid in ('<fixed id>', '<fixed id>') then 'fixed' else 'not fixed' end grp, count(*) items,
+  round(100.0 * sum(b.ok) / sum(b.n)) before_pct, sum(s.n) since_n, round(100.0 * sum(s.ok) / nullif(sum(s.n), 0)) since_pct
+from b join s using (qid) where b.n >= 8 and b.ok::float / b.n < 0.40 and s.n >= 5 group by 1;

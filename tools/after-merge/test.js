@@ -2,7 +2,7 @@
 // Checks tools/after-merge/run.js's plan (what a push needs after it merges) on made-up pushes, with nothing sent
 // anywhere. Run by "Check hubs" (the fast job).   node tools/after-merge/test.js
 'use strict';
-const { plan, checkHub, closedCheckins, closedCheckinsSql, coverFrom } = require('./run.js');
+const { plan, checkHub, closedCheckins, closedCheckinsSql, downSql, upSql, coverFrom } = require('./run.js');
 const fails = [];
 const eq = (name, got, want) => { const g = JSON.stringify(got), w = JSON.stringify(want); if (g !== w) fails.push(`${name}: got ${g}, want ${w}`); };
 const ch = (...a) => a.map(s => ({ status: s[0], path: s.slice(2) }));
@@ -59,6 +59,14 @@ eq('changelog warnings', p.warnings.length, 2);
 eq('down when a hub page is deleted', plan({ ...base, changes: ch('D hubs/perio/index.html', 'D hubs/perio/content/notes.json', 'D hubs/occlusion/audio/x.mp3') }).down, ['perio']);
 eq('no down for an edited page', plan({ ...base, changes: ch('M hubs/perio/index.html') }).down, []);
 eq('no down for a page not directly in a hub', plan({ ...base, changes: ch('D hubs/perio/old/index.html') }).down, []);
+// the day it came down goes in hubs_down (migration_v95), the first day kept; a page added back takes its row out
+eq('no up for a deleted page', plan({ ...base, changes: ch('D hubs/perio/index.html') }).up, []);
+eq('up when a hub page is added', plan({ ...base, changes: ch('A hubs/perio/index.html', 'M hubs/occlusion/index.html') }).up, ['perio']);
+eq('down records the Central day and keeps the first', /insert into hubs_down \(hub, day\) values \('perio', \(now\(\) at time zone 'America\/Chicago'\)::date\) on conflict \(hub\) do nothing/.test(downSql('perio')), true);
+eq('down still deletes the thumbs', /delete from question_feedback where hub = 'perio'/.test(downSql('perio')), true);
+eq('up deletes the row', upSql('perio'), "delete from hubs_down where hub = 'perio'");
+let threwDown = false; try { downSql("x'; drop table y; --"); } catch (e) { threwDown = true; }
+eq('a hub id with a quote is refused', threwDown, true);
 
 // the closed check-ins follow hubs.js whenever it changes (migration_v86); its every closed exam, live hubs and archived
 eq('checkins when hubs.js changes', plan({ ...base, changes: ch('M hubs.js') }).checkins, true);
