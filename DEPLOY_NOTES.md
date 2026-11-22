@@ -32,7 +32,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
-- **2026-11-22 (A one-page sheet for every lecture, idea board #5, Claude Code)** — Sam's note on the idea ("do you actually
+- **2026-11-22 (A one-page sheet for every lecture, idea board #5, #536, Claude Code)** — Sam's note on the idea ("do you actually
   want to print this or just have the cram sheet and likely topics/hints all together?") is answered with one thing that does
   both. **`#notes/<lecture>/sheet`** on every hub on the engine: the lecture's cram lines, its High likelihood topics
   (strongest evidence first, with each `basis`) and its Exam hints (a "You can skip" part for `deemphasize` ones), word for
