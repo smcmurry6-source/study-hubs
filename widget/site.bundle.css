@@ -429,6 +429,15 @@ color: var(--lc-ink, var(--hub-text)); font-size: var(--fs-meta); font-weight: v
 .today-stats .ts-plus { color: var(--gold-ink); font-weight: var(--w-strong); }
 .today-pet { margin-top: 12px; display: flex; align-items: center; gap: 8px; font-size: var(--fs-label); color: var(--muted); }
 .today-pet .ic { color: var(--sun-ink); }
+.today-week { margin-top: 12px; display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: var(--r-row); background: var(--row); color: inherit; text-decoration: none; }
+.today-week:hover b { color: var(--hub-text); }
+.today-week .shpn { flex: none; width: 48px; height: auto; }
+.today-week .tw-txt { min-width: 0; flex: 1; }
+.today-week b { display: block; font-size: 15px; font-weight: var(--w-head); line-height: 1.25; }
+.today-week small { display: block; font-size: var(--fs-meta); color: var(--muted); margin-top: 2px; }
+.today-week .tw-bar { display: block; height: 6px; margin-top: 7px; border-radius: 3px; background: var(--rule); overflow: hidden; }
+.today-week .tw-bar i { display: block; height: 100%; border-radius: inherit; background: var(--hub-text); }
+.today-week.is-got { background: color-mix(in srgb, var(--gold, #f2c94c) 16%, var(--row)); }
 .kv { display: grid; margin-top: 12px; }
 .kv div { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 9px 0; font-size: var(--fs-label); }
 .kv div + div { border-top: 1px solid var(--rule); }
@@ -1802,6 +1811,15 @@ font-style: normal; font-size: 11px; line-height: 1; font-weight: var(--w-head);
 .dx-stat { min-height: 76px; padding: 14px 16px; border-radius: var(--r-panel); }
 .dx-stat b { font-size: 30px; line-height: 1; font-weight: var(--w-title); }
 .dx-stat.s-week { justify-content: space-between; }
+.dx-stat.s-pennant { padding: 0; }
+.dx-stat.s-pennant button { display: flex; align-items: center; gap: 14px; width: 100%; min-height: inherit; padding: 14px 16px; margin: 0; border: 0; border-radius: inherit;
+background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.dx-stat.s-pennant button:focus-visible { outline: 2px solid var(--hub-text); outline-offset: 2px; }
+.dx-stat.s-pennant .shpn { flex: none; width: 54px; height: auto; }
+.dx-stat.s-pennant small { display: block; margin-top: 4px; font-size: var(--fs-meta); color: var(--muted); }
+.dx-stat.s-pennant .dx-pclass { margin-top: 2px; color: var(--gold-ink); }
+.dx-stat.s-pennant.is-got { background: var(--sun); }
+.dx-stat.s-pennant.is-got small { color: var(--sun-ink); }
 .dx-wring { position: relative; flex: none; display: grid; place-items: center; width: 52px; height: 52px; }
 .dx-wring svg { position: absolute; inset: 0; width: 100%; height: 100%; }
 .dx-wring circle { fill: none; stroke-width: 5; }

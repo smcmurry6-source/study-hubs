@@ -407,6 +407,63 @@
       treat: treat, everZero: everZero, revived: revived, dipped: dipped, today: { a: t[0], c: t[1] }, born: born, away: miss };
   }
 
+  /* ================= the weekly pennant (idea board #6, migration_v98; vault/reference/game-server.md) =================
+     100 answers from Monday to Sunday (Central time), in any hub, and Timmy gets that week's pennant (its drawing is
+     window.SH_PENNANT, tools/figures/site/pennant.mjs). The count is his days' (the bootstrap's pet_days and this device's
+     log, as his HP reads them), so it costs no request. After the 100th answer's reply the page asks for the pennant
+     (claim_week_v2), and the server counts again. What only the server knows (how many in the class have theirs, the
+     pennants earned) comes from get_my_week_v2, asked at most every 30 minutes by a page that shows it, and kept on the
+     device (sh_week), as a claim's reply is. Each change goes out as sh:week. */
+  var WEEK_GOAL = 100, WEEK_FOR = 30 * 60e3, DAY_RE = /^\d{4}-\d{2}-\d{2}$/, weekAsking = false, weekAskedAt = 0, weekClaimed = "", weekShort = 0;
+  function mondayOf(day){ var p = day.split("-"), k = (new Date(Date.UTC(+p[0], +p[1] - 1, +p[2])).getUTCDay() + 6) % 7; return addDays(day, -k); }
+  function weekKept(){ try { var w = JSON.parse(ls("sh_week") || "null"); return w && typeof w === "object" ? w : {}; } catch (e) { return {}; } }
+  function weekSaid(){ try { document.dispatchEvent(new CustomEvent("sh:week")); } catch (e) {} }
+  function weekKeep(w){ ls("sh_week", JSON.stringify(w)); weekSaid(); }
+  function weekMine(list){ return (Array.isArray(list) ? list : []).map(String).filter(function(k){ return DAY_RE.test(k); }).sort().reverse().slice(0, 260); }
+  function weekNow(){
+    var today = centralDay(), mon = mondayOf(today), log = readLog(), by = {}, n = 0, kept = weekKept(), mine = weekMine(kept.pennants);
+    ((M && M.rows) || []).forEach(function(r){ var k = String(r.d).slice(0, 10); if (k >= mon && k <= today) by[k] = r.attempts | 0; });
+    Object.keys(log).forEach(function(k){ if (k >= mon && k <= today) by[k] = Math.max(by[k] || 0, (log[k] || [0])[0] | 0); });
+    Object.keys(by).forEach(function(k){ n += by[k]; });
+    if (kept.week === mon && kept.n > n) n = kept.n | 0;   /* another device's answers, as the server last counted them */
+    var G = window.shGame;
+    return { week: mon, n: n, goal: WEEK_GOAL, done: mine.indexOf(mon) > -1, cls: kept.week === mon && kept.cls >= 5 ? kept.cls | 0 : null,
+      pennants: mine, pays: kept.pays > 0 ? kept.pays | 0 : G && G.prizes && G.prizes.week || 0, ends: addDays(mon, 6) };
+  }
+  function weekAsk(){
+    var kept = weekKept(), mon = mondayOf(centralDay());
+    if (weekAsking || !M || !M.sb || !M.visitor || window.shAutomated) return;
+    if (kept.week === mon && Date.now() - (kept.at || 0) < WEEK_FOR && Date.now() >= (kept.at || 0)) return;
+    if (Date.now() - weekAskedAt < 10 * 60e3 || (window.shDb && window.shDb.busy && window.shDb.busy())) return;   /* one try in 10 minutes */
+    weekAsking = true; weekAskedAt = Date.now();
+    M.sb.rpc("get_my_week_v2", { p_visitor: M.visitor }).then(function(r){
+      weekAsking = false;
+      if (r && r.error && (r.error.code === "PGRST202" || r.error.status === 404)) weekAskedAt = Infinity;   /* no migration yet: not on this page */
+      var d = r && !r.error ? r.data : null;
+      if (!d || typeof d !== "object" || !d.ok || !DAY_RE.test(String(d.week))) return;
+      weekKeep({ at: Date.now(), week: String(d.week), n: d.n | 0, cls: d["class"] == null ? null : d["class"] | 0, pennants: weekMine(d.pennants), pays: d.pays | 0 });
+    }, function(){ weekAsking = false; });
+  }
+  /* after an answer's reply (so it is counted), or once the page's days are in: 100 this week and no pennant yet */
+  function weekClaim(){
+    var w = weekNow(), G = window.shGame;
+    if (!M || !M.visitor || w.n < WEEK_GOAL || w.done || weekClaimed === w.week || w.n < weekShort || !G || !G.claim) return;
+    weekClaimed = w.week;
+    G.claim("claim_week_v2", { p_visitor: M.visitor }, "week").then(function(r){
+      if (!r || r.missing) { if (!r) weekClaimed = ""; return; }   /* not asked (the next answer asks); no migration yet: not again */
+      if (r.ok === false || !DAY_RE.test(String(r.week))) return;
+      var kept = weekKept(), mine = weekMine(kept.pennants);
+      if (r.why === "short") {
+        /* the server counted fewer (an answer still on its way): ask again a few answers on */
+        weekClaimed = ""; weekShort = w.n + 3;
+        kept.week = String(r.week); kept.n = r.n | 0; weekKeep(kept); return;
+      }
+      if (mine.indexOf(String(r.week)) < 0) mine.unshift(String(r.week));
+      weekKeep({ at: Date.now(), week: String(r.week), n: r.n | 0, cls: r["class"] == null ? null : r["class"] | 0, pennants: weekMine(mine), pays: kept.pays | 0 || r.xp | 0 });
+      if (r.xp > 0 && visible()) setTimeout(function(){ talk("A hundred this week! A new pennant for my place. It's flying by the path.", "do-cheer", 5200); }, 2600);
+    });
+  }
+
   /* ================= words ================= */
   var JOKES = [
     "What time do you go to the dentist? Tooth-hurty.",
@@ -1289,6 +1346,7 @@
     var prev = M.st ? M.st.hp : null;
     M.st = simulate(M.rows);
     draw();
+    if (quiet && M.rows) { weekSaid(); if (M.where === "hub") setTimeout(weekClaim, 4000); }
     var hp = M.st.hp;
     /* trophies, recorded once */
     if (hp >= 100 && M.st.dipped && !ls("sh_pet_perfect")) { ls("sh_pet_perfect", "1"); award("pet-perfect"); if (!quiet) talk("100 HP! Pearly whites, baby. You earned a trophy for this.", "do-cheer"); }
@@ -1480,6 +1538,7 @@
   /* ---------- hub reactions ---------- */
   function wireHub(){
     var H = M.H;
+    document.addEventListener("sh:answer-paid", function(){ weekSaid(); weekClaim(); });
     ["pointerdown", "keydown", "wheel", "touchstart"].forEach(function(t){ document.addEventListener(t, function(){ M.lastInput = Date.now(); }, { passive: true, capture: true }); });
     document.addEventListener(H.answeredEvent, function(e){
       var d = (e && e.detail) || {}, ok = !!d.correct;
@@ -1595,5 +1654,8 @@
     else if (!b && ls("sh_pet_born") && M && M.sb && M.visitor && !ls("sh_pet_adopt_sent")) { ls("sh_pet_adopt_sent", "1"); award("pet-adopt", ls("sh_pet_born")); }
   }
 
-  window.shPet = { say: function(text, move, ms){ talk(text, move, ms); }, hp: function(){ return M.st && typeof M.st.hp === "number" ? M.st.hp : null; }, mount: mount, refresh: refresh, syncBadges: syncBadges, art: art, fit: fit, setOutfit: setOutfit, conditions: conditions, simulate: simulate, holidayId: holidayId, _jokes: JOKES };
+  window.shPet = { say: function(text, move, ms){ talk(text, move, ms); }, hp: function(){ return M.st && typeof M.st.hp === "number" ? M.st.hp : null; }, mount: mount, refresh: refresh, syncBadges: syncBadges, art: art, fit: fit, setOutfit: setOutfit, conditions: conditions, simulate: simulate, holidayId: holidayId, _jokes: JOKES,
+    /* the weekly pennant: where this week stands ({ week, n, goal, done, cls, pennants, pays, ends }); week(true) also asks
+       the server when what the device keeps is old */
+    week: function(ask){ if (ask) setTimeout(weekAsk, 2500); return weekNow(); } };
 })();

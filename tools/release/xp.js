@@ -1676,6 +1676,76 @@ try {
     notes.push('more ways to earn crowns (migration_v92): the first Tooth Fairy and the first Golden one, a Golden Probe won, a perfect mock, yesterday\'s misses all right, an idea shipped, a day back after a week away, and the back pay, each once');
   }
 
+  /* ---------- 14g. the weekly class challenge (migration_v98, idea board #6): 100 answers Monday to Sunday (Central;
+     Sam, 2026-11-22: "lets do 100"), in any hub and any part of it, give that week's pennant, once, and pay `week`; the Monday sweep makes the ones the page missed;
+     the class count shows only from 5; a linked device counts and is paid under its main id ---------- */
+  if (one(`select to_regprocedure('claim_week_v2(text)') is not null`) === 't') {
+    const P = json(`sh_prizes()`);
+    eq([P.week, one(`select sh_is_prize('week')`), num(`select sh_week_goal()`)], [500, 't', 100], 'sh_prizes() has week, 500, paid in crowns too; the goal is 100');
+    // the week: Monday 00:00 to Sunday 23:59:59 Central (2030-03-10 is the day the clocks change)
+    eq([one(`select sh_week_of(${T(0)})`), one(`select sh_week_of('2030-03-04 05:59:59+00')`), one(`select sh_week_of('2030-03-04 06:00:00+00')`),
+        one(`select sh_week_of('2030-03-11 04:59:59+00')`), one(`select sh_week_of('2030-03-11 05:00:00+00')`)],
+       [D0, '2030-02-25', D0, D0, '2030-03-11'], 'a week is Monday to Sunday, Central time, across the change to summer time');
+    const many = (v, k, at, hub, step) => sql(`insert into personal_answers (visitor_id, hub, qid, correct, answered_at)
+      select ${q(v)}, ${q(hub || 'xh')}, 'x' || (1 + g % 20), g % 3 > 0, ${typeof at === 'string' ? at : T(at)} + make_interval(secs => g * ${step || 20}) from generate_series(1, ${k}) g`);
+    // 5 late on the Sunday before (last week), 60 on Monday, 39 on Sunday in another hub: 99 this week
+    many('xp-WK', 5, -45000); many('xp-WK', 60, 0); many('xp-WK', 39, 6 * DAY, 'xm');
+    const c49 = json(`sh_claim_week(${T(6 * DAY + 900)}, 'xp-WK')`);
+    eq([c49.ok, c49.xp, c49.why, c49.n, c49.goal, c49.week, c49.src], [true, 0, 'short', 99, 100, D0, 'week'], '99 answers this week: not yet');
+    // the 100th is a mock's
+    const ms = one(`select sh_session_start(${T(6 * DAY + 1000)}, 'xp-WK', 'xh', 'mock', null)`);
+    ans('xp-WK', 'x2', { choice: 1, ctx: 'mock', session: ms, at: 6 * DAY + 1010 });
+    const w0 = json(`sh_wallet('xp-WK')`);
+    const c50 = json(`sh_claim_week(${T(6 * DAY + 1020)}, 'xp-WK')`), w1 = json(`sh_wallet('xp-WK')`);
+    eq([c50.xp, c50.pennant, c50.n, c50.week, c50.have, c50.class, w1.prizes - w0.prizes, c50.crowns], [500, true, 100, D0, 1, null, 500, w1.balance],
+       'the 100th answer (a mock\'s): the pennant, 500 XP and 500 crowns; the class count hidden under 5');
+    const again = json(`sh_claim_week(${T(6 * DAY + 1030)}, 'xp-WK')`);
+    eq([again.xp, again.repeat, num(`select count(*) from week_pennants where visitor_id = 'xp-WK'`), num(`select count(*) from xp_awards where visitor_id = 'xp-WK' and key = 'week:' || ${q(D0)} and xp = 500`)],
+       [0, true, 1, 1], 'asking again pays nothing: one pennant, one prize, never boosted');
+    const my = json(`sh_my_week(${T(6 * DAY + 1100)}, 'xp-WK')`);
+    eq([my.week, my.goal, my.n, my.done, my.class, my.pennants, my.pays], [D0, 100, 100, true, null, [D0], 500], 'this week as the page reads it');
+    const next = json(`sh_my_week(${T(7 * DAY)}, 'xp-WK')`);
+    eq([next.week, next.n, next.done, next.pennants], ['2030-03-11', 0, false, [D0]], 'the next Monday starts at 0 and keeps the pennant');
+    // the class: four have it, the count stays hidden; the fifth shows it
+    for (const v of ['xp-WC1', 'xp-WC2', 'xp-WC3', 'xp-WC4', 'xp-WC5', 'xp-WC6']) many(v, 100, 3600);
+    many('xp-WC7', 99, 3600);
+    const cl = ['xp-WC1', 'xp-WC2', 'xp-WC3'].map(v => json(`sh_claim_week(${T(2 * DAY)}, ${q(v)})`).class);
+    const c5 = json(`sh_claim_week(${T(2 * DAY)}, 'xp-WC4')`);
+    eq([cl, c5.class, json(`sh_my_week(${T(2 * DAY)}, 'xp-WC7')`).class], [[null, null, null], 5, 5], 'the class count shows from 5 people, to everyone');
+    // a linked device: 60 answers still under the device's own id (a tab open through the link), 40 under the main id
+    many('xp-WAa', 60, 3 * DAY); many('xp-WAp', 40, 3 * DAY + 1300);
+    sql(`insert into visitor_links (alias_id, primary_id) values ('xp-WAa', 'xp-WAp')`);
+    const wa = json(`sh_claim_week(${T(3 * DAY + 2200)}, 'xp-WAa')`), wp = json(`sh_claim_week(${T(3 * DAY + 2300)}, 'xp-WAp')`);
+    eq([wa.xp, wa.n, wp.xp, wp.repeat, num(`select count(*) from xp_awards where visitor_id = 'xp-WAp' and src = 'week'`), num(`select count(*) from xp_awards where visitor_id = 'xp-WAa' and src = 'week'`),
+        rows(`select visitor_id, n from week_pennants where visitor_id in ('xp-WAa', 'xp-WAp')`)],
+       [500, 100, 0, true, 1, 0, [{ visitor_id: 'xp-WAp', n: 100 }]], 'two linked devices make one week: claimed from either, counted and paid once, under the main id');
+    const ma = json(`sh_my_week(${T(3 * DAY + 2400)}, 'xp-WAa')`);
+    eq([ma.n, ma.done, ma.pennants], [100, true, [D0]], 'the linked device reads the main id\'s week');
+    // Monday's sweep: the one who got there without claiming (xp-WC5), dated the week's last second; a linked device's
+    // answers (xp-WC6, linked to xp-WCp, never claimed) go to its main id; 99 isn't enough
+    sql(`insert into visitor_links (alias_id, primary_id) values ('xp-WC6', 'xp-WCp')`);
+    eq([num(`select sh_week_sweep(${T(7 * DAY + 3600)})`), num(`select sh_week_sweep(${T(7 * DAY + 7200)})`)], [2, 0], 'the sweep makes the missed pennants once');
+    eq(rows(`select visitor_id, how, (at at time zone 'America/Chicago')::text as at, n from week_pennants where visitor_id in ('xp-WC5', 'xp-WCp') order by 1`),
+       [{ visitor_id: 'xp-WC5', how: 'sweep', at: '2030-03-10 23:59:59', n: 100 }, { visitor_id: 'xp-WCp', how: 'sweep', at: '2030-03-10 23:59:59', n: 100 }],
+       'a swept pennant is dated Sunday 23:59:59 Central, a linked device\'s under its main id');
+    eq([num(`select count(*) from week_pennants where visitor_id in ('xp-WC6', 'xp-WC7')`), num(`select count(*) from xp_awards where visitor_id = 'xp-WC5' and src = 'week' and d = '2030-03-10'`)],
+       [0, 1], 'nothing for 99 answers or under the linked device\'s own id; the sweep pays the prize on the week\'s Sunday');
+    // linking devices: the alias's pennants move to the primary id, a week both had kept once
+    sql(`insert into week_pennants (visitor_id, week, n, at) values ('xp-WLa', '2030-02-25', 51, now()), ('xp-WLa', ${q(D0)}, 52, now()), ('xp-WLp', ${q(D0)}, 60, now());
+         insert into visitor_links (alias_id, primary_id) values ('xp-WLa', 'xp-WLp')`);
+    eq([num(`select count(*) from week_pennants where visitor_id = 'xp-WLa'`), rows(`select week::text, n from week_pennants where visitor_id = 'xp-WLp' order by week`)],
+       [0, [{ week: '2030-02-25', n: 51 }, { week: D0, n: 60 }]], 'Link my devices moves the pennants to the primary id');
+    // from the page, on the real clock; refusals; no visitor id in a reply
+    many('xp-WN', 100, `now() - interval '1001 seconds'`, 'xh', 5);
+    const wn = anonJson(`claim_week_v2('xp-WN')`), gm = anonJson(`get_my_week_v2('xp-WN')`);
+    eq([wn.xp, wn.pennant, gm.done, gm.n, gm.pennants.length], [500, true, true, 100, 1], 'claim_week_v2 and get_my_week_v2 from the page');
+    eq([anonJson(`claim_week_v2('')`).error, anonJson(`claim_week_v2(null)`).error, anonJson(`get_my_week_v2(null)`).n, anonJson(`get_my_week_v2(null)`).pennants],
+       ['bad', 'bad', 0, []], 'a bad visitor is refused; no visitor reads an empty week');
+    ok(!/xp-/.test(JSON.stringify([c50, my, wn, gm])), 'no reply carries a visitor id');
+    raises(() => anon(`select * from week_pennants`), '42501', 'the pennants table is closed to visitors');
+    notes.push('the weekly class challenge (migration_v98): the week across the clock change, 99 not yet, a mock\'s 100th pays 500 once, the class count from 5, Monday\'s sweep once, linked devices as one person, Link my devices, the page\'s two calls');
+  }
+
   /* ---------- 14b. the awards' running totals (migration_v79): after everything above (answers, mocks, medals, cards,
      boosts, the rebuilds, Link my devices, deleted awards), each student's totals by kind are the sums of their awards ---------- */
   eq(rows(`select coalesce(a.visitor_id, t.visitor_id) as v, coalesce(a.src, t.src) as src, a.n as an, t.n as tn, a.base as ab, t.base as tb, a.xp as ax, t.xp as tx

@@ -145,8 +145,17 @@
     var lane = o.yard.side && (byK(TP.YARD, o.yard.side) || {}).wide; if (lane) delete o.yard.corner;
     UPS.forEach(function(u){ if (e[u]) o.up[u] = true; });
     if (!byK(TP.PAINTS, o.paint)) o.paint = "cream";
+    /* your newest weekly pennant flies from the lamp post (widget/pet.js's shPet.week, drawn by window.SH_PENNANT); a
+       visit shows none: get_place says nothing about which weeks someone studied */
+    if (!m.visiting) { var pw = pennants(); if (pw.list[0]) o.pennant = W.SH_PENNANT.flag(pw.list[0], { edge: true }); }
     if (extra) Object.keys(extra).forEach(function(k){ o[k] = extra[k]; });
     return o;
+  }
+  /* the weekly pennants earned (newest first) and where this week stands, or nothing without widget/pet.js or the art */
+  function pennants(ask){
+    var P = W.shPet, K = W.SH_PENNANT, w = null;
+    try { w = P && P.week && K ? P.week(ask) : null; } catch (e) { w = null; }
+    return w ? { w: w, list: w.pennants || [], K: K } : { w: null, list: [], K: null };
   }
   /* Timmy, as widget/pet.js draws him at this HP, in what he has on at his place, and nothing when nothing is on (Sam,
      2026-11-12: "if someone doesnt have a costume applied, they are naked. What you put wins"): never a holiday's
@@ -430,9 +439,10 @@
     first.then(function(){ if (V && !V.m.visiting) V.m = mine(); return ready(V && V.m); }).then(function(){
       if (!V) return;
       $(".tpv-wait", dlg).hidden = true;
-      build({ hello: !o.collections });
+      build({ hello: !o.collections && !o.pennants });
       if (o.customize && canChange()) setMode("customize");
       else if (o.collections && !V.m.visiting && S.game) openCollections({ only: true });
+      else if (o.pennants && !V.m.visiting) openPennants({ only: true });
       tripOut(dlg);
     }, function(){ if (V) { tripGone(dlg); var w = $(".tpv-wait", dlg); w.hidden = false; w.textContent = "Timmy’s place couldn’t be opened just now. Try again in a moment."; } });
     return api;
@@ -609,6 +619,7 @@
     if (k === "lane" && !eggsOff()) playLane(line); else say(line);
     V.lastTap = Date.now();
     if (k === "mastery") { clearTimeout(V.mt); V.mt = setTimeout(function(){ if (V) openMastery(); }, isStill() ? 0 : 650); }
+    if (k === "pennant") { clearTimeout(V.mt); V.mt = setTimeout(function(){ if (V) openPennants(); }, isStill() ? 0 : 650); }
     if (isStill()) return;
     var target = spotFor(n);
     if (H.stay) { lookAt(target); return; }
@@ -625,7 +636,7 @@
   function spotFor(n){
     var it = n.closest(".tp-item"), k = n.dataset.egg, sp = V.layout.spots;
     if (it && sp[it.dataset.slot]) return it.dataset.slot;
-    if (k === "home" || k === "statue" || k === "brush" || k === "mastery") return sp.deck && Math.random() < .4 ? "deck" : "door";
+    if (k === "home" || k === "statue" || k === "brush" || k === "mastery" || k === "pennant") return sp.deck && Math.random() < .4 ? "deck" : "door";
     var b; try { b = n.getBBox(); } catch (x) { return null; }
     var q = TP.unproject(b.x + b.width / 2, b.y + b.height);
     if (!(q[0] > -2 && q[1] > -2 && q[0] < 16.5 && q[1] < 16.5)) return null;
@@ -759,6 +770,37 @@
       (list.length ? '<ul class="tpv-mgrid">' + list.map(function(x, i){ return '<li class="tpv-mcard lvl-' + x.lvl + '" style="--i:' + i + '">' + medal(x, 72) + "<b>" + esc(name(x.hub)) + '</b><span>' + TP.MEDALS[x.lvl] + "</span></li>"; }).join("") + "</ul>" : "") +
       '<p class="tpv-note">These are the medals each hub gives, the same ones that pop up when one is earned. The board by the house hangs the best twenty.</p>');
   }
+  /* ---------- the weekly pennants (idea board #6, migration_v98): this week's, as far as it's got, and every one earned,
+     newest first. 100 questions from Monday to Sunday (Central), in any hub, earn the week's; the newest flies from the
+     lamp post. Asked of the server when it opens (shPet.week(true): at most every 30 minutes), and drawn again when
+     its answer comes (sh:week). ---------- */
+  function pennantsHTML(){
+    var p = pennants(), w = p.w, K = p.K; if (!w || !K) return "";
+    var d = K.design(w.week), got = w.done, left = Math.max(0, w.goal - w.n), pct = Math.round(Math.min(1, w.n / w.goal) * 100);
+    var day = function(k, o){ var q = String(k).split("-"); return new Date(+q[0], +q[1] - 1, +q[2], 12).toLocaleDateString("en-US", o || { month: "short", day: "numeric", year: "numeric" }); };
+    var now = '<div class="tpn-now' + (got ? " is-got" : "") + '">' + K.svg(w.week, 92, { dim: !got }) + '<div class="tpn-nowt"><p class="tpv-gk">This week, ' + esc(day(w.week, { month: "short", day: "numeric" })) + " to " + esc(day(w.ends, { month: "short", day: "numeric" })) + "</p>" +
+      "<b>" + (got ? "Yours! It’s flying by the path." : w.n >= w.goal ? "A hundred! Your pennant is on its way." : esc(Math.min(w.n, 999) + " of " + w.goal + " questions")) + "</b>" +
+      (got ? "" : '<div class="tpv-meter" aria-hidden="true"><i style="width:' + pct + '%"></i></div>') +
+      "<span>" + (got ? esc((d ? d.name + "’s, with " + d.badge : "This week’s") + ".") : esc(left ? left + " more by Sunday night, in any hub" + (w.pays ? ", for this pennant and +" + w.pays.toLocaleString() + " XP and crowns." : ", for this pennant.") : "")) + "</span>" +
+      (w.cls ? '<span class="tpn-class">' + w.cls.toLocaleString() + " in the class have theirs this week</span>" : "") + "</div></div>";
+    var list = p.list.map(function(k, i){ var g = K.design(k); return '<li class="tpv-mcard tpn-card" style="--i:' + i + '">' + K.svg(k, 64) + "<b>" + esc(day(k, { month: "short", day: "numeric" })) + "</b><span>" + esc(g ? g.name + " #" + g.nth : "") + "</span></li>"; }).join("");
+    return '<div class="tpv-mhead"><h3 id="tpvO">Your weekly pennants</h3><p>' + (p.list.length ? p.list.length + (p.list.length === 1 ? " pennant" : " pennants") + " earned" : "None yet: your first one flies by the path") + "</p></div>" + now +
+      (list ? '<ul class="tpv-mgrid tpn-grid">' + list + "</ul>" : "") +
+      '<p class="tpv-note">Answer 100 questions from Monday to Sunday, in any hub, and Timmy gets that week’s pennant. Each one is new: the felt and its badge are the month’s, the stars count which week of the month it is, and the sleeve is the school year’s color.</p>';
+  }
+  function openPennants(o){
+    if (!V || V.m.visiting) return;
+    o = o || {};
+    track("place:pennants");
+    pennants(true);
+    overOpen(pennantsHTML(), "is-pennants", o.only ? "Close pennants" : "Back to the place");
+    V.overOnly = !!o.only; V.penOpen = true;
+  }
+  D.addEventListener("sh:week", function(){
+    var ov = V && V.penOpen && $(".tpv-over", V.dlg), box = ov && !ov.hidden && $(".tpv-overin.is-pennants", ov); if (!box) return;
+    var x = $(".tpv-ox", box); Array.prototype.slice.call(box.childNodes).forEach(function(n){ if (n !== x) n.remove(); });
+    box.insertAdjacentHTML("beforeend", pennantsHTML());
+  });
   function overOpen(html, cls, xLabel){
     var ov = $(".tpv-over", V.dlg);
     ov.innerHTML = '<div class="tpv-overin' + (cls ? " " + cls : "") + '" role="dialog" aria-modal="true" aria-labelledby="tpvO"><button type="button" class="tpv-x tpv-ox" data-tp="over-close" aria-label="' + esc(xLabel || "Back to the place") + '">' + X_SVG + "</button>" + html + "</div>";
@@ -769,6 +811,7 @@
   function overClose(){
     if (!V) return;
     if (V.collIO) { V.collIO.disconnect(); V.collIO = null; }
+    V.penOpen = false;
     if (V.overOnly) { V.overOnly = false; close(); return; }   /* opened for Collections alone (the dashboard's button): closing it closes the place */
     var ov = $(".tpv-over", V.dlg); ov.hidden = true; ov.innerHTML = "";
     var b = V.overBack || $('[data-tp="close"]', V.dlg); try { b.focus(); } catch (e) {}
@@ -1037,12 +1080,20 @@
       '<div class="tpv-gmedals"><p class="tpv-gk">Hub mastery</p>' + (fl.length
         ? '<ul class="tpv-gml">' + fl.slice(0, 8).map(function(x){ var n = hub(x.hub); return '<li title="' + esc(n) + '"><span aria-hidden="true">' + medal(x) + '</span><span class="tpv-gmn">' + esc(n) + "</span></li>"; }).join("") + "</ul>" +
           '<div class="tpv-row"><button type="button" class="tpv-btn" data-tp="mastery">' + ICON.medal + "<span>See the medals</span></button></div>"
-        : '<p class="tpv-gnone">No hub medals yet: your first one hangs on the board by the house.</p>') + "</div>" +
+        : '<p class="tpv-gnone">No hub medals yet: your first one hangs on the board by the house.</p>') + "</div>" + pennantCard() +
       '<p class="tpv-gtip">Tap Timmy and he waves; tap him again while he’s waving. The sun, the house and the things in the yard each do something too.</p></div>';
     var mb = $('[data-tp="mastery"]', el); if (mb) mb.addEventListener("click", openMastery);
     var cb = $('[data-tp="customize2"]', el); if (cb) cb.addEventListener("click", function(){ setMode("customize"); });
     var sb = $('[data-tp="shop"]', el); if (sb) sb.addEventListener("click", toShop);
     var lb = $('[data-tp="collections"]', el); if (lb) lb.addEventListener("click", function(){ openCollections(); });
+    var pb = $('[data-tp="pennants"]', el); if (pb) pb.addEventListener("click", function(){ openPennants(); });
+  }
+  /* the panel's pennant row: this week's (dimmed until it's earned), how far along, and the button to all of them */
+  function pennantCard(){
+    var p = pennants(), w = p.w; if (!w) return "";
+    return '<div class="tpv-gmedals tpn-side"><p class="tpv-gk">Weekly pennant</p><div class="tpn-row">' + p.K.svg(w.week, 52, { dim: !w.done }) +
+      "<p><b>" + (w.done ? "This week’s is yours" : esc(Math.min(w.n, 999) + " of " + w.goal + " this week")) + "</b>" + (p.list.length ? p.list.length + " earned in all" : "100 questions by Sunday earns it") + "</p></div>" +
+      '<div class="tpv-row"><button type="button" class="tpv-btn" data-tp="pennants">' + ICON.medal + "<span>See the pennants</span></button></div></div>";
   }
   /* the customizer's cards sit in their rarity's frame, the shop's own card art (widget/hub-art/shop.js, SH_SHOP_ART.frame;
      Sam, 2026-11-14: "the things you have should reuse the rarity art instead of just having 'legendary' in yellow").
