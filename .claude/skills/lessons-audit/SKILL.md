@@ -59,10 +59,15 @@ source, and the hardest questions with their favorite wrong answer.
 ```sql
 select d.hub, d.exam, d.answers->>'ready' ready, d.answers->>'went' went, d.answers->>'match' match, d.answers->>'missed' missed,
   (select sum(p.n) * 25 / 60 from activity_hourly p where p.hub = d.hub and p.visitor_id = d.visitor_id) mins,
-  (select count(*) from personal_answers a where a.hub = d.hub and a.visitor_id = d.visitor_id) answers,
-  (select round(100.0 * avg(a.correct::int)) from personal_answers a where a.hub = d.hub and a.visitor_id = d.visitor_id) pct
+  (select count(*) from personal_answers a where a.hub = d.hub and a.visitor_id = d.visitor_id)
+    + coalesce((select p.answers from answers_packed p where p.hub = d.hub and p.visitor_id = d.visitor_id), 0) answers,
+  (select round(100.0 * (count(*) filter (where a.correct) + coalesce(max(p.correct), 0)) / nullif(count(a.id) + coalesce(max(p.answers), 0), 0))
+   from (select 1) one left join personal_answers a on a.hub = d.hub and a.visitor_id = d.visitor_id
+   left join answers_packed p on p.hub = d.hub and p.visitor_id = d.visitor_id) pct
 from exam_debriefs d order by d.hub, d.created_at;
 ```
+
+(A hub whose page has been down 30 days has its answers packed into `answers_packed`, migration_v96: the query adds them.)
 
 Group by `match` and `ready`: do the people who say "Hub was easier" or "Exam asked different things" study less, or
 the same? (First read, GI Exam 2: the three "About right" studied 631-980 min, the two "Hub was easier" 166-176 min;
