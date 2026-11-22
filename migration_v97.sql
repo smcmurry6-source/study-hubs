@@ -102,27 +102,38 @@ declare
   v_at timestamptz := coalesce(p_at, clock_timestamp()); b public.eve_bosses; w tstzrange; t0 timestamptz; t1 timestamptz; upto timestamptz;
   n int; ppl int; fid bigint; fat timestamptz; pr jsonb := sh_eve_prize(); r record; got int; npaid int := 0;
 begin
+  w := sh_eve_window(p_day); t0 := lower(w); t1 := upper(w);
+  if v_at < t0 then return; end if;
+  -- a fresh count (or a settled boss) needs nothing: read the row without a lock first, so the page's polls don't queue on it
+  select * into b from eve_bosses where hub = p_hub and day = p_day;
+  if not found or b.settled_at is not null then return; end if;
+  if not coalesce(p_force, false) and b.counted_at is not null and b.counted_at > v_at - interval '20 seconds' and v_at < t1 then return; end if;
   if not pg_try_advisory_xact_lock(hashtext('eve|' || p_hub || '|' || p_day)) then return; end if;
   select * into b from eve_bosses where hub = p_hub and day = p_day for update;
   if not found or b.settled_at is not null then return; end if;
-  w := sh_eve_window(p_day); t0 := lower(w); t1 := upper(w);
-  if v_at < t0 then return; end if;
   if not coalesce(p_force, false) and b.counted_at is not null and b.counted_at > v_at - interval '20 seconds' and v_at < t1 then return; end if;
   if b.start_id is null then b.start_id := sh_answer_id_at(t0 - interval '10 minutes'); end if;
   upto := least(v_at, t1);
 
-  select count(*)::int, count(distinct coalesce(l.primary_id, a.visitor_id))::int into n, ppl
-    from personal_answers a left join visitor_links l on l.alias_id = a.visitor_id
-    where a.id >= b.start_id and a.hub = p_hub and a.correct and a.answered_at >= t0 and a.answered_at < upto;
+  -- Each query below reads the evening's answers as a range of the primary key (id >= start_id, every hub) in a materialized
+  -- CTE, and filters hub, right and the time on that: with a.hub = p_hub next to the range, the planner took the
+  -- (visitor_id, hub) index for the hub alone and read every answer the hub ever had.
+  with ev as materialized (select a.id, a.visitor_id, a.hub, a.correct, a.answered_at from personal_answers a where a.id >= b.start_id)
+  select count(*)::int, count(distinct coalesce(l.primary_id, ev.visitor_id))::int into n, ppl
+    from ev left join visitor_links l on l.alias_id = ev.visitor_id
+    where ev.hub = p_hub and ev.correct and ev.answered_at >= t0 and ev.answered_at < upto;
 
   if n >= b.hp then
     -- it fell: the answer that took its last HP, and everyone who landed a hit up to it, paid once
-    select a.id, a.answered_at into fid, fat from personal_answers a
-      where a.id >= b.start_id and a.hub = p_hub and a.correct and a.answered_at >= t0 and a.answered_at < upto
-      order by a.id offset b.hp - 1 limit 1;
-    for r in select coalesce(l.primary_id, a.visitor_id) as who, count(*)::int as h
-               from personal_answers a left join visitor_links l on l.alias_id = a.visitor_id
-               where a.id >= b.start_id and a.id <= fid and a.hub = p_hub and a.correct and a.answered_at >= t0 and a.answered_at < upto
+    with ev as materialized (select a.id, a.hub, a.correct, a.answered_at from personal_answers a where a.id >= b.start_id)
+    select ev.id, ev.answered_at into fid, fat from ev
+      where ev.hub = p_hub and ev.correct and ev.answered_at >= t0 and ev.answered_at < upto
+      order by ev.id offset b.hp - 1 limit 1;
+    for r in with ev as materialized (select a.id, a.visitor_id, a.hub, a.correct, a.answered_at from personal_answers a
+                                       where a.id >= b.start_id and a.id <= fid)
+             select coalesce(l.primary_id, ev.visitor_id) as who, count(*)::int as h
+               from ev left join visitor_links l on l.alias_id = ev.visitor_id
+               where ev.hub = p_hub and ev.correct and ev.answered_at >= t0 and ev.answered_at < upto
                group by 1 order by 1 loop
       got := sh_award(r.who, 'eve:' || p_hub || ':' || p_day, 'boss', p_hub,
                       least((pr->>'max')::int, (pr->>'base')::int + (pr->>'per')::int * r.h), 1, fat);
@@ -162,10 +173,12 @@ begin
   if p_visitor is not null then
     me := coalesce((select l.primary_id from visitor_links l where l.alias_id = p_visitor), p_visitor);
     if st <> 'soon' then
+      -- visitor_id = any(array(...)) with the time range: an index scan of (visitor_id, answered_at) on both; written with
+      -- "or ... in (...)" the planner read every answer of the hub through the (visitor_id, hub) index
       select count(*)::int into mine from personal_answers a
-        where (a.visitor_id = me or a.visitor_id in (select l.alias_id from visitor_links l where l.primary_id = me))
-          and a.hub = p_hub and a.correct and a.answered_at >= lower(w) and a.answered_at < least(upper(w), v_at)
-          and (b.fell_id is null or a.id <= b.fell_id);
+        where a.visitor_id = any(array(select me union select l.alias_id from visitor_links l where l.primary_id = me))
+          and a.answered_at >= lower(w) and a.answered_at < least(upper(w), v_at)
+          and a.hub = p_hub and a.correct and (b.fell_id is null or a.id <= b.fell_id);
     end if;
     select x.base into got from xp_awards x where x.visitor_id = me and x.key = 'eve:' || p_hub || ':' || b.day;
     you := jsonb_build_object('hits', mine,
