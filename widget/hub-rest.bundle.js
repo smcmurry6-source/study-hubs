@@ -982,7 +982,7 @@ return eveArtWait;
 function eveHat(){ return HOLIDAY && HOLIDAY.id === "winter" ? "santa" : null; }
 function eveNow(){ return Date.now() + EVE.skew; }
 function eveState(){
-var d = EVE.data, b = d && d.boss; if (!b) return null;
+var d = EVE.data, b = d && d.boss; if (!b || ["soon", "up", "down", "lost"].indexOf(b.state) < 0) return null;
 var P = d.prize || {}, y = d.you || {}, up = b.state === "up", cAt = Date.parse(b.counted_at || b.starts) || 0, asked = Date.parse(b.now) || 0;
 var cls = up ? EVE.pend.filter(function(t){ return t > cAt; }).length : 0, me = up ? EVE.pend.filter(function(t){ return t > asked; }).length : 0;
 var hp = Math.max(1, b.hp | 0), hits = Math.min(hp, (b.hits | 0) + cls), mine = (y.hits | 0) + me;

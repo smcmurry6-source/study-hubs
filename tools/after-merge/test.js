@@ -95,7 +95,8 @@ eq('an odd hub id never reaches the eves\' SQL', threw, true);
 const es = examEvesSql(examEves(he));
 eq('the eves\' SQL: future ones only, a started boss never moved', [/values \('perio', '2026-11-30'::date, '2026-12-01'::date, null::int\)/.test(es), /4000\)/.test(es),
   /where v\.day >= \(now\(\) at time zone 'America\/Chicago'\)::date/.test(es), /e\.start_id is null and e\.settled_at is null/.test(es), /where eve_bosses\.start_id is null and eve_bosses\.settled_at is null/.test(es)], [true, true, true, true, true]);
-eq('no eves: only the ones to come come out', examEvesSql([]), "delete from eve_bosses e where e.day >= (now() at time zone 'America/Chicago')::date and e.start_id is null and e.settled_at is null");
+eq('no eves: only the ones to come come out', [/delete from eve_bosses e where e\.day >= \(now\(\) at time zone 'America\/Chicago'\)::date and e\.start_id is null and e\.settled_at is null;/.test(examEvesSql([])), /insert/.test(examEvesSql([]))], [true, false]);
+eq('nothing happens before migration_v97 is applied', [/^do \$eves\$ begin\n  if to_regclass\('public\.eve_bosses'\) is null then raise notice [^;]+; return; end if;/.test(es), /end \$eves\$$/.test(es)], [true, true]);
 
 // a canceled run's push is covered by the next push run: it starts where the last run that wasn't canceled ended
 // (#467's, 2026-11-19: waiting behind #469's, canceled when #472 merged). Commits a < b < c < d on main.

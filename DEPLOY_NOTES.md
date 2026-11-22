@@ -32,6 +32,25 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-22 (The exam-eve boss, the Midnight Plaque, idea board #4, Claude Code)** — Sam set the idea Planned ("This could
+  be fun. Maybe have an xp + gold crowns reward"). The night before every exam in `hubs.js`, 6 pm to midnight Central, one
+  boss per hub with 3,000 HP: every right answer anyone gives in the hub is a hit; if it falls before midnight, everyone who
+  landed a hit gets 250 + 25 a hit, up to 1,000, XP and crowns (one `xp_awards` row, key `eve:<hub>:<day>`, src `boss`).
+  **`migration_v97.sql`** (pending, `supabase/pending-migrations.txt`; **replaces no function**): the table `eve_bosses`
+  (closed to anon), `get_eve_boss`, the count (`sh_eve_count`: the answers `record_answer_v2` already writes, from an id
+  found by a binary search on the primary key, at most once every 20 s, under a try-lock: no hot row and nothing new in the
+  answer save) and pg_cron's `sh-eve-boss` every 10 minutes, which settles it after midnight. Seeded with Review of
+  Systems' Dec 2 and Dec 9; after that the After merge workflow's new **`eves`** step writes each exam's eve on every push
+  that changes `hubs.js` (`eveBoss: false` skips one, `eveBoss: <hp>` sets its HP). The page (`widget/eggs.js`): asks only
+  on an eve (and the exam's morning, for the result), every 30-38 s while it's up and in view, never in a mock, with the
+  boss switch off (Focus mode) or in a quiet spell; a band under the bar (the regular boss stays away that night), a card on
+  Home (`[data-eveslot]`, `widget/hub.js`), the win's confetti and reward card (`sh:prize` src `eve`) or the loss's toast; a
+  line on the dashboard's hub panel from the dates alone (`widget/dash.js`). New art: `tools/figures/site/eveboss.mjs` (six
+  states, the Santa hat; `eveboss-sheet.mjs` draws its contact sheet) built into `widget/hub-art/eveboss.js`, fetched on
+  first use. About page, the Extras switch's line, [game-server](vault/reference/game-server.md),
+  [after-a-merge](vault/how-to/after-a-merge.md), the hub note and two inbox lines (check the rows once applied; read the
+  first eve's result on Dec 3). `tools/release/xp.js` section 14f, `rls.js` and `tools/after-merge/test.js` cover it.
+
 - **2026-11-22 (A one-page sheet for every lecture, idea board #5, #536, Claude Code)** — Sam's note on the idea ("do you actually
   want to print this or just have the cram sheet and likely topics/hints all together?") is answered with one thing that does
   both. **`#notes/<lecture>/sheet`** on every hub on the engine: the lecture's cram lines, its High likelihood topics

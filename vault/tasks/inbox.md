@@ -10,6 +10,16 @@ this folder (deleting the line: the note carries it) or just does it, if it's sm
 (`- [x] ... (#123)`); ticked lines are cleared the next time someone goes through the inbox. Anything left to do from a chat
 lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the-vault.md)). See [README](README.md).
 
+- [ ] **After migration_v97 is applied: check the exam-eve boss's two rows and its job** (2026-11-22, idea board #4): read-only,
+  one query at a time under `statement_timeout = '5s'`: `select hub, day, exam_date, hp, settled_at from eve_bosses` (Review
+  of Systems' Dec 2 and Dec 9, 3,000 HP) and `select jobname, schedule from cron.job where jobname = 'sh-eve-boss'`
+  (`*/10 * * * *`). Then append the migration to `supabase/schema.sql` and take its line out of
+  `supabase/pending-migrations.txt` ([game-server](../reference/game-server.md)).
+- [ ] **Read how the first Midnight Plaque went, the morning of Dec 3** (2026-11-22, idea board #4): `select * from
+  eve_bosses where day = '2026-12-02'` (fell or not, when, how many people, what it paid), and the pg_cron runs of
+  `sh-eve-boss` that night (any over a second, any failed). If it fell before 8 pm or got away with over a quarter left,
+  tell Sam and suggest a new HP for Dec 9 (`eveBoss: <hp>` on mock2 in `hubs.js`, which the After merge step writes before
+  the eve). Totals only, over 5 or more people ([learner-data-privacy](../rules/learner-data-privacy.md)).
 - [ ] **The boards order people tied on a place by chance** (2026-11-22, #533's CI): `get_rank_board_v2`,
   `get_leaderboard_v2` and the others end `order by rnk` alone, so tied people can trade places between loads (and at a
   board's limit, who shows can change). Cosmetic and older than v96: add a stable second key (the name, then the id) when

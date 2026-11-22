@@ -203,18 +203,22 @@ function examEves(data){
   return out.sort((a, b) => (a.day < b.day ? -1 : a.day > b.day ? 1 : a.hub < b.hub ? -1 : 1));
 }
 /* Only eves still to come move: the ones hubs.js no longer lists come out, the others go in or take their exam and HP. A boss
-   that has started (its first count) or is settled is never changed or taken away. */
+   that has started (its first count) or is settled is never changed or taken away. In a block that does nothing until
+   migration_v97 is applied, so a change to hubs.js before then doesn't turn the run red. */
 function examEvesSql(list){
   const today = "(now() at time zone 'America/Chicago')::date";
   const keep = list.length ? ` and (e.hub, e.day) not in (${list.map(e => `('${e.hub}', '${e.day}'::date)`).join(', ')})` : '';
-  const del = `delete from eve_bosses e where e.day >= ${today} and e.start_id is null and e.settled_at is null${keep}`;
-  if (!list.length) return del;
+  const del = `delete from eve_bosses e where e.day >= ${today} and e.start_id is null and e.settled_at is null${keep};`;
   const vals = list.map(e => `('${e.hub}', '${e.day}'::date, '${e.exam}'::date, ${e.hp == null ? 'null::int' : e.hp})`).join(', ');
-  return `${del};
-insert into eve_bosses (hub, day, exam_date, hp)
-select v.hub, v.day, v.exam, coalesce(v.hp, (sh_eve_prize()->>'hp')::int) from (values ${vals}) v(hub, day, exam, hp) where v.day >= ${today}
-on conflict (hub, day) do update set exam_date = excluded.exam_date, hp = excluded.hp
-  where eve_bosses.start_id is null and eve_bosses.settled_at is null`;
+  const ins = list.length ? `
+  insert into eve_bosses (hub, day, exam_date, hp)
+  select v.hub, v.day, v.exam, coalesce(v.hp, (sh_eve_prize()->>'hp')::int) from (values ${vals}) v(hub, day, exam, hp) where v.day >= ${today}
+  on conflict (hub, day) do update set exam_date = excluded.exam_date, hp = excluded.hp
+    where eve_bosses.start_id is null and eve_bosses.settled_at is null;` : '';
+  return `do $eves$ begin
+  if to_regclass('public.eve_bosses') is null then raise notice 'eve_bosses is not there yet (migration_v97)'; return; end if;
+  ${del}${ins}
+end $eves$`;
 }
 /* A hub's page came down: the day (Central) goes in hubs_down, the first one kept if the step runs again (package 2 of
    vault/tasks/2026-11-22-sustainable-for-years.md counts its 30 days from it), and its thumbs go. Pure, for test.js. */

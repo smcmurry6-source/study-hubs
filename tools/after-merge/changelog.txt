@@ -93,3 +93,4 @@ all | More ways to earn crowns: a perfect mock, getting all of yesterday's misse
 all | Timmy's place: the ModuPro's and the Loupes' ranks each give an outfit and a yard piece now, from a stone molar and a brass articulator to a golden dental chair, a lighthouse and a Dark Matter observatory.
 all | Linked your devices? Change your name on one and the other now shows the new name too, the next time you open it.
 all | Every lecture now has a one-page sheet: its cram lines with its high-yield topics and hints together, to keep open or print on one page (Print or save as PDF). Find it in a lecture's notes toolbar, or under any lecture on More, Cram sheet.
+all | The night before an exam, 6 pm to midnight, the whole class fights the Midnight Plaque: every right answer from anyone hits it, and if it falls before midnight everyone who landed a hit gets up to 1,000 XP and crowns.

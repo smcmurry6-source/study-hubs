@@ -81,6 +81,10 @@ check-in hours: its entry in `hubs.js`.
 - **Its tint isn't on the page** ([BUG-198](../release/bug-log.md)): the hub draws in the engine's default grey-purple, not
   its violet; a one-line fix in `widget/hub.css` waits for Sam's look.
 
+- **The exam-eve boss** (2026-11-22, idea board #4, migration_v97: [game-server](../reference/game-server.md)): the Midnight
+  Plaque comes up 6 pm to midnight on Wed Dec 2 and Wed Dec 9, the eves of the two mocks, at 3,000 HP each (Sam can set
+  either with `eveBoss` on its exam in `hubs.js`). Read how the first went the morning after (inbox).
+
 ## Pending
 
 Open items for this hub are lines in [the inbox](../tasks/inbox.md) tagged Review of Systems, and
