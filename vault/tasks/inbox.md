@@ -10,6 +10,10 @@ this folder (deleting the line: the note carries it) or just does it, if it's sm
 (`- [x] ... (#123)`); ticked lines are cleared the next time someone goes through the inbox. Anything left to do from a chat
 lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the-vault.md)). See [README](README.md).
 
+- [ ] **The boards order people tied on a place by chance** (2026-11-22, #533's CI): `get_rank_board_v2`,
+  `get_leaderboard_v2` and the others end `order by rnk` alone, so tied people can trade places between loads (and at a
+  board's limit, who shows can change). Cosmetic and older than v96: add a stable second key (the name, then the id) when
+  someone next changes a board function.
 - [ ] **Does Link my devices time out for someone with thousands of answers?** (2026-11-22, applying `migration_v96`): on
   the live database `sh_xp_rebuild` took 25 s for 10 people the first time (cold cache), then about 1 s for 4 others.
   `redeem_link_code` runs a rebuild under anon's 3 s `statement_timeout`, so time one rebuild of a heavy visitor (read-only:
