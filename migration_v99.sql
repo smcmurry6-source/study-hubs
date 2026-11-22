@@ -1,6 +1,6 @@
 -- v99 (2026-11-22): the idea board's "Drip for Timmy" (Sam set it Planned: "You can already visit other timmys, but ill try
 -- to make a way where you can specifically select the people currently online. You already earn gold crowns for those
--- things, but we can add a mystery box"). Two new parts, no function replaced:
+-- things, but we can add a mystery box"). Three new parts, no function replaced:
 --
 --   1. The mystery box, in Timmy's shop: Shiny Gold Crowns for one random piece of the everyday shop that you don't own yet.
 --      The roll is made here, in one call that is idempotent on its request id, as buy_item is. Its rules are sh_box_rules():
@@ -22,8 +22,18 @@
 --      not), a count with nothing about who. No opt-out, as for visiting (Sam, 2026-11-11), with one difference: someone
 --      with the generated name never shows, so going back to a random name takes you off the list.
 --
+--   3. The Crowns board (Sam, 2026-11-22, on this PR: "Replace study streaks with crowns balance"): the dashboard
+--      leaderboard's Study streaks tab becomes the class's Shiny Gold Crowns on hand. A balance is sh_wallet's, about
+--      50-100 ms for a busy student, too slow to work out for the whole class (176 people) on every look. So it is worked
+--      out ahead into crowns_board, a few people at a time, by pg_cron's sh-crowns-board job (every 2 minutes, up to 8
+--      people, at most 2 s): first anyone whose XP or spending moved since theirs was worked out (the busiest first), then
+--      anyone whose balance is over an hour old (study time pays crowns too). get_crowns_board_v2 reads it, working out
+--      only the caller's own balance live, so your own row is always right. It is filled by the job, not here: the first
+--      pass takes about 45 minutes, highest XP first. The streaks board's function (get_leaderboard_v2) stays.
+--
 -- Written and tested on a throwaway copy of supabase/schema.sql (tools/release/xp.js section 18, rls.js). Nothing is
--- backfilled and no table changes: a few function definitions, safe at any hour.
+-- backfilled: function definitions, one new table (crowns_board, empty until the job fills it) and the job, safe at any
+-- hour.
 
 set local lock_timeout = '3s';
 
@@ -193,6 +203,90 @@ begin
 end;
 $$;
 
+-- ====================================================================== 3. the Crowns board
+-- each person's Shiny Gold Crowns on hand, as sh_wallet worked it out at `at`, with the XP and spending it was worked out
+-- from (so a refresh can tell whose has moved). Never read directly by a page: get_crowns_board_v2 below.
+create table if not exists public.crowns_board (
+  visitor_id text primary key,
+  balance integer not null,
+  xp integer not null,
+  spent integer not null,
+  at timestamptz not null default now()
+);
+alter table public.crowns_board enable row level security;
+revoke all on table public.crowns_board from public, anon, authenticated;
+create index if not exists crowns_board_balance_idx on public.crowns_board (balance desc);
+
+-- work out up to p_n balances, at most about 2 s of it: first the people whose XP or spending moved since theirs was
+-- worked out (or never worked out), highest XP first, then anyone over an hour old, oldest first. A device linked to
+-- another (its rows are under the id that remains) and anyone with no XP left are taken off. Returns how many it did.
+create or replace function public.sh_crowns_refresh(p_n integer default 8)
+returns integer language plpgsql security definer set search_path = public as $$
+declare c record; n integer := 0; w jsonb; t0 timestamptz := clock_timestamp();
+begin
+  delete from crowns_board b where not exists (select 1 from xp_visitors v where v.visitor_id = b.visitor_id)
+    or exists (select 1 from visitor_links l where l.alias_id = b.visitor_id);
+  for c in
+    with sp as (select p.visitor_id, sum(p.price)::integer as spent from pet_purchases p group by p.visitor_id),
+    cand as (
+      select v.visitor_id, v.xp, coalesce(sp.spent, 0) as spent, b.at,
+        (b.visitor_id is null or b.xp is distinct from v.xp or b.spent is distinct from coalesce(sp.spent, 0)) as moved
+      from xp_visitors v left join sp on sp.visitor_id = v.visitor_id left join crowns_board b on b.visitor_id = v.visitor_id
+      where not exists (select 1 from visitor_links l where l.alias_id = v.visitor_id)
+    )
+    select cand.visitor_id, cand.xp, cand.spent from cand where cand.moved or cand.at < now() - interval '1 hour'
+    order by cand.moved desc, case when cand.moved then cand.xp end desc nulls last, cand.at nulls first, cand.visitor_id
+    limit greatest(1, least(coalesce(p_n, 8), 200))
+  loop
+    exit when n > 0 and clock_timestamp() - t0 > interval '2 seconds';
+    w := sh_wallet(c.visitor_id);
+    insert into crowns_board (visitor_id, balance, xp, spent, at)
+      values (c.visitor_id, coalesce((w->>'balance')::integer, 0), c.xp, c.spent, now())
+      on conflict (visitor_id) do update set balance = excluded.balance, xp = excluded.xp, spent = excluded.spent, at = excluded.at;
+    n := n + 1;
+  end loop;
+  -- the job's own run log: kept 2 days (pg_cron keeps every run otherwise)
+  if extract(minute from now()) = 40 and to_regclass('cron.job_run_details') is not null then
+    begin
+      execute $q$delete from cron.job_run_details where end_time < now() - interval '2 days'
+                 and jobid in (select jobid from cron.job where jobname = 'sh-crowns-board')$q$;
+    exception when others then null;
+    end;
+  end if;
+  return n;
+end;
+$$;
+
+-- the board: the top p_limit (10, at most 50) by crowns on hand, ties sharing a place, and the caller's own row wherever
+-- it falls (is_me), each as the other _v2 boards give a row: the leaderboard name, the rank (from XP), the mastery
+-- flair and the visit key, never an id. The caller's balance is worked out now (one sh_wallet), the rest come from
+-- crowns_board; a balance of 0 isn't listed (but yours is). A linked device is its id that remains.
+create or replace function public.get_crowns_board_v2(p_visitor text default null, p_limit integer default 10)
+returns table(rnk bigint, display_name text, crowns integer, xp integer, journey integer, tier integer, level integer, step integer, is_me boolean, flair text, visit text)
+language plpgsql stable security definer set search_path = public as $$
+declare me text; my integer;
+begin
+  if p_visitor is not null and length(p_visitor) between 1 and 80 then
+    me := coalesce((select l.primary_id from visitor_links l where l.alias_id = p_visitor), p_visitor);
+    if exists (select 1 from xp_visitors v where v.visitor_id = me) then my := coalesce((sh_wallet(me)->>'balance')::integer, 0); end if;
+  end if;
+  return query
+  with b as (
+    select c.visitor_id as who, case when c.visitor_id = me and my is not null then my else c.balance end as crowns from crowns_board c
+    union all select me, my where my is not null and not exists (select 1 from crowns_board c where c.visitor_id = me)
+  ), r as (
+    select b.who, b.crowns, rank() over (order by b.crowns desc) as rk from b where b.crowns > 0 or b.who = me
+  ), top as (
+    select * from r where r.rk <= greatest(1, least(coalesce(p_limit, 10), 50)) or r.who = me
+  )
+  select t.rk, coalesce(vn.display_name, anon_name(t.who)), t.crowns, coalesce(x.xp, 0), k.journey, k.tier, k.level, k.step,
+    (me is not null and t.who = me), sh_mastery_flair(t.who), sh_visit_key(t.who)
+  from top t left join visitor_names vn on vn.visitor_id = t.who left join xp_visitors x on x.visitor_id = t.who
+    cross join lateral sh_rank(coalesce(x.xp, 0)) k
+  order by t.rk, lower(coalesce(vn.display_name, anon_name(t.who))), t.who;
+end;
+$$;
+
 -- ====================================================================== grants
 revoke all on function public.sh_box_rules() from public, anon, authenticated;
 revoke all on function public.sh_box_pool(text) from public, anon, authenticated;
@@ -205,3 +299,20 @@ revoke all on function public.open_mystery_box(text, text) from public;
 grant execute on function public.open_mystery_box(text, text) to anon, authenticated;
 revoke all on function public.get_studying_now(text) from public;
 grant execute on function public.get_studying_now(text) to anon, authenticated;
+revoke all on function public.sh_crowns_refresh(integer) from public, anon, authenticated;
+revoke all on function public.get_crowns_board_v2(text, integer) from public;
+grant execute on function public.get_crowns_board_v2(text, integer) to anon, authenticated;
+
+-- ====================================================================== the job (pg_cron, where the database has it)
+do $do$
+begin
+  if exists (select 1 from pg_available_extensions where name = 'pg_cron') then
+    begin
+      create extension if not exists pg_cron;
+      perform cron.unschedule(jobid) from cron.job where jobname = 'sh-crowns-board';
+      perform cron.schedule('sh-crowns-board', '*/2 * * * *', $c$set statement_timeout = '10s'; select public.sh_crowns_refresh(8)$c$);
+    exception when others then
+      raise notice 'pg_cron not set up (%): the Crowns board shows only what sh_crowns_refresh has worked out', sqlerrm;
+    end;
+  end if;
+end $do$;

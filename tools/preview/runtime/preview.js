@@ -1560,7 +1560,7 @@
        v54 adds to a row: the rank on the 63-step ladder (journey, tier, level, step: from the row's XP, or a made-up
        classmate's own XP on the boards that don't show it), the medals of the two that have them, and a visit key (made
        up here; the real one is a digest only the server can make, the same for a person on every board). */
-    if (/^get_(widget_bootstrap|rank_profile|rank_board|leaderboard|arcade_leaderboard)_v2$/.test(fn)) {
+    if (/^get_(widget_bootstrap|rank_profile|rank_board|crowns_board|leaderboard|arcade_leaderboard)_v2$/.test(fn)) {
       if (fn === "get_rank_profile_v2") return { data: profile2(v) };
       var d2 = fn === "get_widget_bootstrap_v2" ? widgetBootstrap(a, t) : rpc(fn.slice(0, -3), a).data;
       var vkey = visitKeyOf;
@@ -1704,6 +1704,14 @@
         /* the top ten, and your own row below them as the server keeps it (rnk <= limit or the caller's own row) */
         return { data: rows.map(function(r, i){ var tr2 = tierOf(r.xp); return { rnk: i + 1, display_name: r.display_name, xp: r.xp, tier: tr2, level: stepOf(r.xp) - tr2 * 3 + 1, is_me: r.is_me, flair: null }; })
           .filter(function(r){ return r.rnk <= (a.p_limit || 10) || (r.is_me && !!a.p_visitor); }) };
+      }
+      case "get_crowns_board": {
+        /* the Crowns board (migration_v99): crowns on hand, the top ten and your own row below them; yours is your wallet */
+        var cw = wallet2(a.p_visitor), crows = FAKE_NAMES.slice(0, 10).map(function(n){ var x = fakeXp(n); return { display_name: n, xp: x, crowns: Math.max(0, Math.floor(x / 2) - hash(n) % 9000), is_me: false }; });
+        if (cw) crows.push({ display_name: db.name || "You (preview)", xp: myXp(), crowns: Math.max(0, cw.balance), is_me: true });
+        crows.sort(function(x, y){ return y.crowns - x.crowns; });
+        return { data: crows.map(function(r, i){ var tr3 = tierOf(r.xp); return { rnk: i + 1, display_name: r.display_name, crowns: r.crowns, xp: r.xp, journey: 0, tier: tr3, level: stepOf(r.xp) - tr3 * 3 + 1, step: stepOf(r.xp), is_me: r.is_me, flair: null }; })
+          .filter(function(r){ return (r.rnk <= (a.p_limit || 10) && (r.crowns > 0 || r.is_me)) || r.is_me; }) };
       }
       case "get_leaderboard": return { data: FAKE_NAMES.slice(0, 8).map(function(n, i){ return { display_name: n, streak: 14 - i, total_answered: 900 - i * 70, tier: Math.max(0, 5 - i), level: 1 + i % 3, flair: null }; }) };
       case "get_arcade_leaderboard": {

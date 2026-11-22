@@ -676,7 +676,7 @@ function lint(hub, A){
         await sideways(`the ${t} tab`);
       }
       if (tabs.length && !(await page.$('#hubPanel .dx-stage .dx-ring'))) problems.push(`${name}: the open hub has no progress ring`);
-      for (const b of ['streaks', 'ranks']) { await page.click(`#boardSeg [data-board="${b}"]`); await page.waitForTimeout(200); if (!(await page.$('#board > *'))) problems.push(`${name}: the class board's ${b} list is empty`); await sideways(`the ${b} board`); }
+      for (const b of ['crowns', 'ranks']) { await page.click(`#boardSeg [data-board="${b}"]`); await page.waitForTimeout(200); if (!(await page.$('#board > *'))) problems.push(`${name}: the class board's ${b} list is empty`); await sideways(`the ${b} board`); }
       if (!(await page.$('#class #now #nowCount'))) problems.push(`${name}: the class panel has no "studying right now" count`);
       // the classroom in the studying-now tile, and the stage behind the top three (Sam, 2026-11-11). Eight made-up people at
       // once take their desks without the walk; an outfit that isn't one (here, markup) must come out as a plain Timmy.
@@ -1649,7 +1649,9 @@ function lint(hub, A){
       await page.addInitScript(() => { try { localStorage.setItem('sh_pet_born', '2026-10-01'); localStorage.setItem('sh_tour_done', '1'); localStorage.setItem('sh_rank_g', '4'); localStorage.setItem('sh_rank_tier', '1'); localStorage.setItem('sh_rank_step', '4'); } catch (e) {} });
       await page.route(/supabase\.co\/rest\/v1\/rpc\/get_widget_bootstrap_v2/, route => json(route, { rank, shop: { day: '2026-11-12', seasons: [], throwback: false, wallet: { balance: 0 }, items: [], inventory: [], locked: [], equipped: {}, costumes: [], snacks_today: [], boost: null } }));
       await page.route(/supabase\.co\/rest\/v1\/rpc\/get_rank_board_v2/, route => json(route, board));
-      await page.route(/supabase\.co\/rest\/v1\/rpc\/get_leaderboard_v2/, route => json(route, board.slice(0, 4).map(r => ({ display_name: r.display_name, streak: 10 - r.rnk, total_answered: 100, journey: 0, tier: 2, level: 1, step: 7, flair: null, visit: r.visit }))));
+      const casks = [];   /* the Crowns board (migration_v99, in the Study streaks tab's place): crowns on hand */
+      await page.route(/supabase\.co\/rest\/v1\/rpc\/get_crowns_board_v2/, route => { let a = {}; try { a = JSON.parse(route.request().postData() || '{}'); } catch (e) {} casks.push(a);
+        return json(route, board.slice(0, 4).map((r, i) => ({ rnk: r.rnk, display_name: r.display_name, crowns: 5000 - 1000 * i, xp: r.xp, journey: 0, tier: 2, level: 1, step: 7, is_me: false, flair: null, visit: r.visit }))); });
       await page.route(/supabase\.co\/rest\/v1\/rpc\/get_place/, route => { let a = {}; try { a = JSON.parse(route.request().postData() || '{}'); } catch (e) {} placeCalls[a.p_key] = (placeCalls[a.p_key] || 0) + 1; return json(route, places[a.p_key] || null); });
       await page.goto(BASE() + 'index.html'); await page.waitForTimeout(2000);
       if (asked.length) problems.push(`${name} (${label}): the place's files loaded with the dashboard (${asked.join(', ')}): a tap on a row is a first use`);
@@ -1794,9 +1796,20 @@ function lint(hub, A){
           if (t.n !== 1 || t.title !== 'Visit Alpha’s place' || !t.visit || !/^Place 1 of 4 on the board/.test(t.gnav) || gone) problems.push(`${name} (${label}): without the server's pick, a random visit should be the next of the board's rows with a place of their own, with the board's tour (${JSON.stringify(t)}, line ${JSON.stringify(gone)})`);
           await page.keyboard.press('Escape'); await page.waitForTimeout(500);
         }
-        await page.click('#boardSeg [data-board="streaks"]'); await page.waitForTimeout(800);
+        await page.click('#boardSeg [data-board="crowns"]'); await page.waitForTimeout(800);
         const sb = await page.$$eval('#board .dx-visit', bs => bs.map(b => b.getAttribute('aria-label')));
-        if (sb.length !== 4) problems.push(`${name} (${label}): the study streaks board's rows should be buttons too (${sb.join(' | ')})`);
+        const cv = await page.evaluate(() => ({ first: ((document.querySelector('#board .dx-podium .p1 .val') || {}).textContent || '').trim(), coin: !!document.querySelector('#board .dx-podium .p1 .survey-coin'),
+          note: (document.getElementById('boardNote') || {}).textContent || '', injected: !!window.__visit || !!document.querySelector('#board img') }));
+        const cid = await page.evaluate(() => localStorage.getItem('sh_visitor_id'));
+        if (sb.length !== 4) problems.push(`${name} (${label}): the Crowns board's rows should be buttons too (${sb.join(' | ')})`);
+        if (cv.first !== '5,000crowns' || !cv.coin || !/^Shiny Gold Crowns on hand/.test(cv.note) || cv.injected) problems.push(`${name} (${label}): the Crowns board should put the most crowns on hand first, with the coin, its note, and names as text (${JSON.stringify(cv)})`);
+        if (!casks.length || casks.some(a => Object.keys(a).sort().join() !== 'p_limit,p_visitor' || a.p_visitor !== cid || a.p_limit !== 10)) problems.push(`${name} (${label}): the Crowns board should send only the page's own id and the limit (${JSON.stringify(casks)})`);
+        /* before migration_v99 the function isn't there: the tab hides itself and the board goes back to Ranks */
+        await page.unroute(/supabase\.co\/rest\/v1\/rpc\/get_crowns_board_v2/);
+        await page.route(/supabase\.co\/rest\/v1\/rpc\/get_crowns_board_v2/, route => route.fulfill({ status: 404, contentType: 'application/json', body: JSON.stringify({ code: 'PGRST202', message: 'Could not find the function public.get_crowns_board_v2' }) }));
+        await page.click('#boardSeg [data-board="ranks"]'); await page.waitForTimeout(500); await page.click('#boardSeg [data-board="crowns"]'); await page.waitForTimeout(800);
+        const cg = await page.evaluate(() => ({ hidden: document.querySelector('#boardSeg [data-board="crowns"]').hidden, ranks: document.querySelector('#boardSeg [data-board="ranks"]').getAttribute('aria-pressed'), rows: document.querySelectorAll('#board .dx-visit').length }));
+        if (!cg.hidden || cg.ranks !== 'true' || !cg.rows) problems.push(`${name} (${label}): without the Crowns board's function the tab should hide and the board go back to Ranks (${JSON.stringify(cg)})`);
         /* Studying now (migration_v99): the people studying now under a name they chose, each row a visit, the place's
            arrows through the list ("Place 2 of 2 studying now"), the rest only counted; a name with markup in it is text, a
            row without a good key is left out, and the page sends only its own id */

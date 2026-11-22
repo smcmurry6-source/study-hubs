@@ -219,7 +219,7 @@ off.
   other device's key opens nothing.
 - The idea board and today's boards (the ones without `_v2`) carry no key.
 - **The client** (2026-11-13, [visiting](../tasks/done/2026-11-12-redesign-visiting.md)): on the new dashboard
-  (`widget/dash.js`) every row of the Ranks and Study streaks boards with a key (24 hex characters; anything else isn't
+  (`widget/dash.js`) every row of the Ranks and Crowns boards (Study streaks until 2026-11-22) with a key (24 hex characters; anything else isn't
   one) has its name as a button, `data-dash="visit"`, with the key on the row (`data-visit`), never on the button, so a
   click count never holds it. A tap asks `get_place` once a page for a person (the stage's outfits, `loadFits`, share the
   answer) and opens `shPlace.open({ place })`: the name as text in the title, no HP, no Customize, in the leaderboard's
@@ -510,10 +510,12 @@ server says what's finished and pays the bonus.
   crowns, a year-round collection 12,000-14,500 and the costumes 24,500, so the bonus gives back 4-8% of what it took.
   All 20 that pay make 20,000 XP and crowns at most.
 
-## The mystery box and Studying now (migration_v99)
+## The mystery box, Studying now and the Crowns board (migration_v99)
 
 From the idea board's "Drip for Timmy" (a classmate's idea, set Planned by Sam with the note: you can already visit other
-Timmys, a way to pick the people online, and a mystery box). Two parts, no table changes, no function replaced.
+Timmys, a way to pick the people online, and a mystery box). Three parts; one new table (`crowns_board`, a cache) and one
+pg_cron job; no function replaced. Sam approved the box's numbers, its tail as it is, and who shows under Studying now
+(2026-11-22: "The rest looks good to me"), and had the Study streaks board replaced by crowns on hand.
 
 - **The rules** are one function, `sh_box_rules()`: the price (750 crowns), how many a Central day (3) and each rarity's
   share of the roll (Common 40, Uncommon 30, Rare 18, Epic 9, Legendary 3). Sam's call; the numbers in study days are in
@@ -556,11 +558,25 @@ Timmys, a way to pick the people online, and a mystery box). Two parts, no table
   so a click count is `sh-now=row`, never the name in its label. A visit from either one goes through the list with the
   place's arrows ("Place 2 of 6 studying now": `nav.what` in `widget/place.js`). Without the function the tab hides itself
   and More draws nothing.
+- **The Crowns board** (Sam, 2026-11-22: "Replace study streaks with crowns balance"): the dashboard leaderboard's second tab,
+  in Study streaks' place, ranks the class by Shiny Gold Crowns on hand (`sh_wallet`'s balance: earned minus spent).
+  `sh_wallet` sums a person's whole history (about 100 ms for a busy one), too slow to run for the whole class on a
+  visitor's 3 s limit, so the balances are cached: **`crowns_board`** (`visitor_id`, `balance`, `xp`, `spent`, `at`; no
+  public access) is refreshed by the pg_cron job **`sh-crowns-board`** every 2 minutes, `sh_crowns_refresh(8)`: at most
+  8 people a run and never past 2 s, first whoever's XP or spending moved since their row (highest XP first), then anyone
+  whose row is over an hour old; it drops linked devices (an alias) and anyone no longer in `xp_visitors`, and clears its
+  own job log at minute 40. Right after the migration the cache is empty and fills in about 45 minutes (176 people).
+  **`get_crowns_board_v2(p_visitor, p_limit)`** reads the cache, works out only the caller's own balance live (a linked
+  device as its primary id), ranks by crowns (`rank()`, so ties share a place), and gives the top `p_limit` (at most 50)
+  with more than 0 crowns, plus the caller's own row: `rnk`, `display_name`, `crowns`, `xp`, `journey`, `tier`, `level`,
+  `step`, `is_me`, `flair`, `visit`, never an id. The dashboard (`widget/dash.js` `drawBoard`, `paintBoard`) draws it as
+  the other boards: the top three on the stage with a coin, the rest as rows, each a visit; without the function the tab
+  hides itself. `get_leaderboard_v2` (the streaks) stays in the database, unused by the dashboard.
 
 ## Tests
 
 `node tools/release/xp.js` builds a throwaway database from `supabase/schema.sql` with made-up history, applies the pending
-migrations as the release will, and checks all of the above (about 750 checks, the prizes of migration_v68 in section 14c, the mystery box and Studying now of migration_v99 in section 18, the collections of migration_v75 in 14d, the shop's client in section 13b and Learn and Flashcards' in 14b: a replayed call, a double tap and a linked device
+migrations as the release will, and checks all of the above (about 750 checks, the prizes of migration_v68 in section 14c, the mystery box, Studying now and the Crowns board of migration_v99 in section 18, the collections of migration_v75 in 14d, the shop's client in section 13b and Learn and Flashcards' in 14b: a replayed call, a double tap and a linked device
 among them, the rebuild against the live calls, the catalog against `tools/figures/site/sets.mjs`, three years of shelves
 day by day, a place opened from a board row, and a random visit going through the whole class, in 14a). `node tools/release/rls.js` applies the pending migrations too, seeds
 the new tables and calls every function a visitor can run with one visitor's id, failing if another visitor's id comes back;

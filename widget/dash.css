@@ -563,7 +563,6 @@ html.hx-still .dx-wn *, html.hx-still .dx-wn *::after { animation: none !importa
 .dx-podium .p3 { order: 3; }
 .dx-win-who { flex: none; display: grid; place-items: center; }
 .dx-win-who svg { width: 40px; height: 40px; }
-.dx .dx-win-who .flame { width: 30px; height: 36px; }
 .dx-win-txt { display: grid; gap: 1px; min-width: 0; }
 .dx-podium .nm { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 6px; min-width: 0; font-weight: var(--w-head); line-height: 1.2; }
 .dx-podium .p1 .nm { font-size: 18px; color: var(--ar-gold); }
@@ -587,6 +586,7 @@ html.hx-still .dx-wn *, html.hx-still .dx-wn *::after { animation: none !importa
 .dx-board .dx-vs i { display: block; height: 100%; border-radius: 3px; background: #f2c94c; transform-origin: 0 50%; animation: dx-fill 900ms var(--ease-expo) both; }
 .dx-board .val { min-width: 76px; text-align: right; font-weight: var(--w-head); white-space: nowrap; }
 .dx-board .val small { margin-left: 4px; font-size: var(--fs-meta); font-weight: var(--w-body); color: var(--ar-soft); }
+.dx .dx-board .val .survey-coin { display: inline-block; width: 18px; height: 18px; vertical-align: -3px; }
 /* visiting: on a row with a visit key the name is a button whose ::after covers the whole row, so a tap anywhere on it
    visits that person's place while the row's other parts still read as text; the medals stay their own button on top */
 .dx-visit { appearance: none; min-width: 24px; min-height: 24px; margin: 0; padding: 0; border: 0; background: none; color: inherit; font: inherit; line-height: inherit;

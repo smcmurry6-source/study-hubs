@@ -71,8 +71,8 @@ device: nobody can tell which Timmy is anyone else's.
 **Not a table either: Studying now** (`get_studying_now`, migration_v99, [game-server](game-server.md)). It reads the
 stored study pings (`activity_pings`, the last 3 minutes) and shows classmates, under the names they picked for the boards
 (never the generated one), as studying right now, with their rank and medals and a visit key: never which hub, how long,
-an id or a time. That is the one place a name meets activity on a page, and only "right now", as the Study streaks board
-already shows study days under a name; nothing new is stored, and anything written down still never joins a name to
+an id or a time. That is the one place a name meets activity on a page, and only "right now" (the Study streaks board,
+which showed study days under a name, gave its place to the Crowns board the same day); nothing new is stored, and anything written down still never joins a name to
 analytics ([learner-data-privacy](../rules/learner-data-privacy.md)).
 
 ### Questions
@@ -125,7 +125,7 @@ more people, never for anything about a person.
 | `podcast_episodes` | hub × episode: length in seconds | no | `admin_set_podcast_episode` | How many minutes an episode pays |
 | `report_outcomes` | report or suggestion × outcome (`fixed`, `no-change`) | no (the report has it) | `admin_resolve_report_v2` | "Fixed" pays the sender +100 |
 | `shop_items` | one item: kind, rarity, price, season, slot, HP or boost | no | the migration, `admin_upsert_shop_item` | The catalog |
-| `pet_purchases` | one purchase: visitor, item, price, request id, Central day, HP | yes | `buy_item` | Spending, snacks' HP, boosts bought |
+| `pet_purchases` | one purchase: visitor, item, price, request id, Central day, HP | yes | `buy_item`, `open_mystery_box` (migration_v99: kind `box`, the piece it gave as the item) | Spending, snacks' HP, boosts bought, boxes opened |
 | `pet_inventory` / `pet_equipped` | visitor × item; visitor × slot | yes | `buy_item`, `equip_item` | What Timmy has, wears and where his things stand |
 | `costume_log` | visitor × rare costume: first day seen | yes | `record_costume_sighting` | The "you" panel's costume log |
 | `ideas` | one idea: visitor (none for starters), leaderboard name, title, body, hub, category, source, status, hidden | yes | `post_idea`, `admin_post_starter_idea` | **Public to the class under the poster's name** (no id is ever sent back). `source`: `board`, `suggest`, `checkin`, `starter` (an idea Ask Timmy drafted is posted as `board`, with the student's tap; `ask:offer=idea-posted` counts them). An author's delete (`delete_my_idea`) removes the row with its votes, reports and notes |
@@ -134,6 +134,7 @@ more people, never for anything about a person.
 | `game_records` | one class record (`run`): the value, its holder, the run's id, the time | yes (the holder) | `record_answer_v2` (migration_v68) | Seeded from `correct_streaks`; the holder never leaves the database |
 | `notes_reads` | one lecture opened to read: visitor, hub, lecture, start, finish | yes | `notes_start_v2` / `notes_done_v2` (migration_v68) | Times "read to the end" for its 50; **kept 2 days** |
 | `prize_seen` | visitor × trophy kind held when migration_v68 ran | yes | the migration, once | Why trophies held before the prizes don't pay 200 |
+| `crowns_board` (migration_v99) | one person's crowns on hand, XP and spending when last worked out, and when | yes | `sh_crowns_refresh` (pg_cron `sh-crowns-board`) | A cache for the Crowns board (`get_crowns_board_v2`, [game-server](game-server.md)), rebuilt from `xp_awards` and `pet_purchases`; nothing new is collected |
 
 ### Learn and Flashcards (migration_v56, from the redesign's release; [game-server](game-server.md))
 
@@ -221,7 +222,7 @@ new one can't go undocumented.
 | `link` / `link-ask` | `link:code`, `link:linked`, `link:fail`, `link:share`, `link:open=<settings\|you\|name\|ideas\|podcast\|stats\|rank\|survey>` (11-18: the Link my devices card opened, from beside which name button; `survey` from 11-20: the survey pop-up's "Link this device"); `link-ask:shown`/`yes`/`no`/`later`/`code`/`fail`/`share`/`url-open` | Link my devices; the "is this your other device?" prompt | `widget/ranks.js`, `widget/linkask.js` | 10-21 |
 | `name` | `name:set`, `name:reset` | leaderboard name changed | `index.html` (dashboard) | 10-20 |
 | `news` | `news:more` (the arrows on the dashboard's What's new timeline, since 11-19); `news:open` (its one-line list opened, 11-17 to 11-19) | count; never which change was read | `widget/dash.js` | 11-17 |
-| `dash` | `dash:board=<ranks\|streaks\|now>` (a leaderboard tab picked on the dashboard; `now`, Studying now, from migration_v99) | which board was looked at; never a row or a name | `widget/dash.js` | with the redesign's release (`now`: 11-22) |
+| `dash` | `dash:board=<ranks\|crowns\|now>` (a leaderboard tab picked on the dashboard; `now`, Studying now, and `crowns`, crowns on hand, from migration_v99; `streaks` until 2026-11-22, when Crowns took its place) | which board was looked at; never a row or a name | `widget/dash.js` | with the redesign's release (`now`: 11-22) |
 | `ideas` | `ideas:post=board` / `=suggest` / `=checkin` (an idea posted, and from where; one Ask Timmy drafted counts as `board`), `ideas:vote`, `ideas:report`, `ideas:delete`, `ideas:tab=top` / `new` / `shipped`, `ideas:filter=hub:<hub id, all or every>`, `ideas:filter=cat:<category id or any>`, `ideas:checkin-private` (a check-in sent with the tick turned off) | the idea board's use; never an idea's words or a name | `widget/ideas.js`, the check-in in `widget/dash.js` | with the redesign's release (written 11-12) |
 | `place` | `place:open`, `place:equip:<slot>` (one of `equip_item`'s 13 slots: `outfit`, `home`, `scene`, `yard-left`, `yard-front`, `yard-corner`, `yard-side`, `yard-right`, `windows`, `porch`, `chimney`, `flag`, `paint`), `place:collections` (since 2026-11-19, migration_v75: the Collections view opened, from the place's button, the dashboard's or a hub's More) | Timmy's place opened; a change made in its customizer: the slot only, never which piece; the Collections view opened, never which collection. Its buttons are `data-tp="collections"` and `"coll-claim"` and the dashboard's `data-dash="collections"`, so a click never records a collection (a collection's bonus is its `xp_awards` row) | `widget/place.js` | with the redesign's release (written 11-12) |
 | `place:visit` | `place:visit` | someone's place opened from a row on the new dashboard's boards (visiting; from migration_v99 the Studying now tab too, and More's Studying now list on a hub, whose buttons count as `sh-now=row`), from "Visit someone random" (anyone in the class who has decorated their place, once the release's migration_v57 is applied) or by a visit's arrows (each place on a tour counts once); that a visit happened, never whose place or who visited it. The row's button is `data-dash="visit"` and the visit key stays on the row; the random button is `data-dash="visit-random"` and a visit's arrows and "Back to mine" are `data-tp="visit-prev"`, `"visit-next"`, `"visit-home"`, so a click records neither a name nor a key | `widget/place.js` (a visit's `open({ place })`), from `widget/dash.js` | with the redesign's release (written 11-13) |

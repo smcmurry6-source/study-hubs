@@ -1937,7 +1937,48 @@ try {
     eq(anonJson(`coalesce(get_studying_now(${q('x'.repeat(81))}), 'null'::jsonb)`), null, 'a malformed visitor id gets nothing');
     anon(`select clear_display_name('xp-SN-a')`);
     ok(!anonJson(`get_studying_now('xp-SN-me')`).people.some(p => p.name === 'Zelda Molar'), 'back to a random name: off the list');
-    notes.push(`the mystery box and studying now (migration_v99): ${i0.of} pieces in the box, the roll at every rarity's edge, ${won.length + 6} boxes opened; studying now names only the named, never an id`);
+
+    // the Crowns board (Sam, 2026-11-22: "Replace study streaks with crowns balance"): sh_wallet's balances worked out ahead
+    // into crowns_board a few at a time (the job), the caller's own worked out live
+    sql(`delete from crowns_board`);
+    const nAll = num(`select count(*) from xp_visitors v where not exists (select 1 from visitor_links l where l.alias_id = v.visitor_id)`);
+    let filled = 0, passes = 0;
+    while (filled < nAll && passes++ < 60) { sql(`select sh_crowns_refresh(200)`); filled = num(`select count(*) from crowns_board`); }
+    eq(filled, nAll, 'the refresh works out everyone with XP, a linked device only under the id that remains');
+    eq(num(`select count(*) from crowns_board b where b.balance <> (sh_wallet(b.visitor_id)->>'balance')::int`), 0, 'every balance on the board is the wallet\'s');
+    eq(num(`select sh_crowns_refresh(8)`), 0, 'with nothing moved and nothing an hour old, a refresh works out nobody');
+    award('xp-SN-a', 'cb-xp', 500); award('xp-SN-b', 'cb-xp', 900);
+    sql(`update crowns_board set spent = spent - 1 where visitor_id = 'xp-SN-old'`);
+    const atOf = v => one(`select at from crowns_board where visitor_id = ${q(v)}`);
+    const before = ['xp-SN-a', 'xp-SN-b', 'xp-SN-old'].map(atOf);
+    eq(num(`select sh_crowns_refresh(1)`), 1, 'a refresh takes the number it is given');
+    const hi = num(`select xp from xp_visitors where visitor_id = 'xp-SN-a'`) >= num(`select xp from xp_visitors where visitor_id = 'xp-SN-b'`) ? 'xp-SN-a' : 'xp-SN-b';
+    eq(['xp-SN-a', 'xp-SN-b', 'xp-SN-old'].map(atOf).map((t, i) => t !== before[i]), ['xp-SN-a', 'xp-SN-b', 'xp-SN-old'].map(v => v === hi), 'someone whose XP moved goes first, the higher XP first');
+    sql(`select sh_crowns_refresh(8)`);
+    eq(num(`select count(*) from crowns_board b where b.balance <> (sh_wallet(b.visitor_id)->>'balance')::int`), 0, 'after XP and spending moved, the next refresh catches up');
+    sql(`update crowns_board set at = now() - interval '2 hours' where visitor_id = 'xp-SN-prim'`);
+    eq(num(`select sh_crowns_refresh(8)`), 1, 'a balance over an hour old is worked out again (study time pays crowns too)');
+    sql(`insert into crowns_board (visitor_id, balance, xp, spent) values ('xp-SN-alias', 99999, 1, 0), ('xp-CB-gone', 99999, 1, 0) on conflict (visitor_id) do update set balance = 99999`);
+    sql(`select sh_crowns_refresh(1)`);
+    eq(num(`select count(*) from crowns_board where visitor_id in ('xp-SN-alias', 'xp-CB-gone')`), 0, 'a linked device and someone with no XP row are taken off');
+    // the board as a page reads it
+    const cbRows = v => anonJson(`(select coalesce(json_agg(b), '[]'::json) from get_crowns_board_v2(${v === null ? 'null' : q(v)}, 10) b)`);
+    const cb0 = cbRows(null), cbText = JSON.stringify(cb0);
+    const want = sql(`select balance from crowns_board where balance > 0 order by balance desc`).map(r => +r[0]);
+    const cut = want.length > 10 ? want[9] : -1;
+    eq(cb0.map(r => r.crowns), want.filter(c => c >= cut), 'the board: the top 10 by crowns on hand (ties share a place), from crowns_board');
+    ok(cb0.every((r, i) => r.rnk === 1 + cb0.filter(x => x.crowns > r.crowns).length), 'each row\'s place is one more than the people above it');
+    ok(cb0.every(r => /^[0-9a-f]{24}$/.test(r.visit) && Object.keys(r).sort().join(',') === 'crowns,display_name,flair,is_me,journey,level,rnk,step,tier,visit,xp'), 'each row: the name, the crowns, the rank, the flair and the visit key');
+    ok(!/xp-[A-Za-z]/.test(cbText.replace(/"visit":"[0-9a-f]{24}"/g, '')) && !cb0.some(r => r.is_me), `no id in the board, and no "you" without a visitor (${cbText.slice(0, 120)})`);
+    sql(`update crowns_board set balance = 1 where visitor_id = 'xp-SN-me'`);
+    const meLive = num(`select (sh_wallet('xp-SN-me')->>'balance')::int`), cbMe = cbRows('xp-SN-mine2'), mine = cbMe.filter(r => r.is_me);
+    eq([mine.length, mine[0] && mine[0].crowns, mine[0] && mine[0].display_name], [1, meLive, 'Me Myself'], 'your own row is worked out now (not the board\'s older figure), from a linked device too');
+    sql(`delete from crowns_board where visitor_id = 'xp-SN-me'`);
+    eq(cbRows('xp-SN-me').filter(r => r.is_me).map(r => r.crowns), [meLive], 'before the job reaches you, your row is there anyway');
+    eq(cbRows('x'.repeat(81)).filter(r => r.is_me).length, 0, 'a malformed visitor id is no one');
+    raises(() => anon(`select count(*) from public.crowns_board`), '42501', 'anon reads crowns_board directly');
+    raises(() => anon(`select sh_crowns_refresh(1)`), '42501', 'anon runs sh_crowns_refresh');
+    notes.push(`the mystery box and studying now (migration_v99): ${i0.of} pieces in the box, the roll at every rarity's edge, ${won.length + 6} boxes opened; studying now names only the named, never an id; the Crowns board matches every wallet`);
   }
 
   /* ---------- 15. the private parts stay private ---------- */
