@@ -1460,10 +1460,12 @@ function lint(hub, A){
                 await page.dblclick('dialog.tsh-sheet [data-shop="box-open"]'); await page.waitForTimeout(3200);
                 const bo = await page.evaluate(() => { const d = document.querySelector('dialog.tsh-sheet[open]'), h = d && d.querySelector('#tshI');
                   return { txt: d ? d.innerText.replace(/\s+/g, ' ') : '', h: h ? h.textContent : '', hEls: h ? h.children.length : -1, again: !!(d && d.querySelector('[data-shop="box-again"]')), place: !!(d && d.querySelector('[data-shop="place"]')),
-                    bal: (document.querySelector('.tsh-store [data-shop-bal]') || {}).textContent, left: (document.querySelector('.tsh-store .tsh-mbleft') || {}).textContent || '' }; });
+                    bal: (document.querySelector('.tsh-store [data-shop-bal]') || {}).textContent, left: (document.querySelector('.tsh-store .tsh-mbleft') || {}).textContent || '',
+                    day: (() => { const b = window.shShop && window.shShop.state().box; return b ? b.today + '/' + b.left_today : ''; })() }; });
                 if (boxAsks.length !== 1 || !/^[A-Za-z0-9_-]{8,64}$/.test(boxAsks[0] || '')) problems.push(`${name} (${label}): a double tap on Open should send one request with a request id (${boxAsks.join(', ')})`);
                 if (!/New out of the box/.test(bo.txt) || bo.h !== 'Mail<b>box</b>' || bo.hEls || !bo.place) problems.push(`${name} (${label}): the box should give its piece, its name as text, with "Place it" (${JSON.stringify(bo)})`);
-                if (bo.bal !== '5' || !/^2 of 3 left today/.test(bo.left.trim()) || bo.again) problems.push(`${name} (${label}): after a box the balance should read 5 and the box 2 of 3 left today, with no "Open another" while a box costs more than you have (${JSON.stringify(bo)})`);
+                /* 5 crowns left and a 25-crown box: the box's line says what's missing, and the day's count (1 opened, 2 left) is kept for when it's affordable */
+                if (bo.bal !== '5' || !/^20 more to go/.test(bo.left.trim()) || bo.day !== '1/2' || bo.again) problems.push(`${name} (${label}): after a box the balance should read 5, the box "20 more to go" with 2 left today, and no "Open another" while a box costs more than you have (${JSON.stringify(bo)})`);
                 await page.keyboard.press('Escape'); await page.waitForTimeout(300);
               }
             }

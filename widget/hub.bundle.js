@@ -874,8 +874,8 @@ return { name: p.name, key: p.visit, rank: { journey: +rk.journey || 0, tier: Ma
 var others = Math.max(0, Math.floor(+d.others || 0)), more = Math.max(0, others - NOW.length);
 var mini = function(p){ try { return R ? (R.miniOf && p.rank.journey > 0 ? R.miniOf(p.rank.journey, p.rank.tier, p.rank.level) : R.mini ? R.mini(p.rank.tier, p.rank.level) : "") : ""; } catch (e) { return ""; } };
 var row = function(p){ var f = R && R.flair ? R.flair(p.flair, { who: p.name }) : "";
-return '<li><button type="button" class="hx-nowbtn" data-sh-now="row" data-sh-visit data-key="' + p.key + '" aria-label="' + esc("Visit " + p.name + "’s place") + '"><i class="hx-nowdot" aria-hidden="true"></i>' + mini(p) +
-'<span class="hx-nownm">' + esc(p.name) + '</span><span class="hx-nowgo" aria-hidden="true">Visit</span></button>' + f + "</li>"; };
+return '<li><button type="button" class="hx-nowbtn" data-sh-now="row" data-sh-visit data-key="' + p.key + '"><i class="hx-nowdot" aria-hidden="true"></i><span class="hx-nowrk" aria-hidden="true">' + mini(p) + "</span>" +
+'<span class="hx-nownm">' + esc(p.name) + '</span><span class="hx-nowgo">Visit</span></button>' + f + "</li>"; };
 host.innerHTML = '<h2 id="hxNowH">Studying now</h2>' +
 (NOW.length ? '<p class="note">Classmates with a hub open right now, under the names they chose for the boards. Tap one to visit their Timmy.</p><ul class="hx-nowlist">' + NOW.map(row).join("") + "</ul>" +
 (more ? '<p class="note">And ' + (more === 1 ? "1 more person" : more + " more people") + " without a name on the boards.</p>" : "")

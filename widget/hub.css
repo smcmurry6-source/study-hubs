@@ -1050,9 +1050,9 @@ button.likely[aria-expanded="true"] .chev .ic { transform: rotate(90deg); }
   background: var(--row); color: var(--text); font: inherit; font-weight: var(--w-strong); text-align: left; text-decoration: none; cursor: pointer; }
 .hx .hx-nowbtn:hover { background: var(--active); }
 .hx-nownm { flex: 1; min-width: 0; overflow-wrap: anywhere; }
-.hx-nowbtn .sh-rank-mini { flex: none; }
+.hx-nowrk { flex: none; display: inline-flex; }
 .hx-nowgo { flex: none; font-size: var(--fs-meta); color: var(--muted); }
-.hx-nowgo::after { content: " \203A"; }
+.hx-nowgo::after { content: " \203A"; content: " \203A" / ""; }
 .hx-nowdot { flex: none; width: 10px; height: 10px; border-radius: 50%; background: #2fa86f; box-shadow: 0 0 0 3px rgba(47, 168, 111, .25); }
 .hx-nowbtn[aria-busy="true"] { cursor: progress; }
 .hint-group { margin-top: 20px; }
