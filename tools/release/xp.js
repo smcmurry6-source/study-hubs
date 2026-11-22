@@ -1784,9 +1784,12 @@ try {
           'pet', (select json_agg(d order by d.d) from get_pet_days_v2(i.v) d where d.d > (now() at time zone 'America/Chicago')::date - 61),
           'awards', (select json_agg(json_build_array(t.src, t.base, t.xp) order by t.src) from xp_award_totals t
                      where t.visitor_id = i.v and (t.base <> 0 or t.xp <> 0))) order by i.v) from ${ids} i),
-      'boards', json_build_array((select json_agg(r) from get_rank_board_v2(null, 500) r), (select json_agg(r) from get_leaderboard_v2(500) r),
-        (select json_agg(r) from get_correct_streak_stats_v2() r), (select json_agg(r) from get_trophy_stats_v2() r),
-        (select json_agg(r) from get_arcade_leaderboard_v2('xh', 'board', 'xp-Q', 50) r)))`;
+      -- each board's rows in a fixed order: the boards don't order people tied on a place, and the pack's deletes can
+      -- change the order the database hands ties back in (a CI run, 2026-11-22), which no page shows as a change
+      'boards', json_build_array((select json_agg(r order by r::text) from get_rank_board_v2(null, 500) r),
+        (select json_agg(r order by r::text) from get_leaderboard_v2(500) r),
+        (select json_agg(r order by r::text) from get_correct_streak_stats_v2() r), (select json_agg(r order by r::text) from get_trophy_stats_v2() r),
+        (select json_agg(r order by r::text) from get_arcade_leaderboard_v2('xh', 'board', 'xp-Q', 50) r)))`;
     const snap = () => json(snapSql);
     // and what rebuilding everyone gives before the pack (rolled back): a rebuild after it must give the same
     const rebuilt = () => JSON.parse(sql(`begin; select sh_xp_rebuild(array(select v from ${ids} x)); select (${snapSql})::text; rollback;`).map(x => x.join('')).join('').replace(/^[^{]*/, ''));
