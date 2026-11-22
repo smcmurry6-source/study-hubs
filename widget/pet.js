@@ -408,13 +408,13 @@
   }
 
   /* ================= the weekly pennant (idea board #6, migration_v98; vault/reference/game-server.md) =================
-     50 answers from Monday to Sunday (Central time), in any hub, and Timmy gets that week's pennant (its drawing is
+     100 answers from Monday to Sunday (Central time), in any hub, and Timmy gets that week's pennant (its drawing is
      window.SH_PENNANT, tools/figures/site/pennant.mjs). The count is his days' (the bootstrap's pet_days and this device's
-     log, as his HP reads them), so it costs no request. After the 50th answer's reply the page asks for the pennant
+     log, as his HP reads them), so it costs no request. After the 100th answer's reply the page asks for the pennant
      (claim_week_v2), and the server counts again. What only the server knows (how many in the class have theirs, the
      pennants earned) comes from get_my_week_v2, asked at most every 30 minutes by a page that shows it, and kept on the
      device (sh_week), as a claim's reply is. Each change goes out as sh:week. */
-  var WEEK_GOAL = 50, WEEK_FOR = 30 * 60e3, DAY_RE = /^\d{4}-\d{2}-\d{2}$/, weekAsking = false, weekAskedAt = 0, weekClaimed = "", weekShort = 0;
+  var WEEK_GOAL = 100, WEEK_FOR = 30 * 60e3, DAY_RE = /^\d{4}-\d{2}-\d{2}$/, weekAsking = false, weekAskedAt = 0, weekClaimed = "", weekShort = 0;
   function mondayOf(day){ var p = day.split("-"), k = (new Date(Date.UTC(+p[0], +p[1] - 1, +p[2])).getUTCDay() + 6) % 7; return addDays(day, -k); }
   function weekKept(){ try { var w = JSON.parse(ls("sh_week") || "null"); return w && typeof w === "object" ? w : {}; } catch (e) { return {}; } }
   function weekSaid(){ try { document.dispatchEvent(new CustomEvent("sh:week")); } catch (e) {} }
@@ -444,7 +444,7 @@
       weekKeep({ at: Date.now(), week: String(d.week), n: d.n | 0, cls: d["class"] == null ? null : d["class"] | 0, pennants: weekMine(d.pennants), pays: d.pays | 0 });
     }, function(){ weekAsking = false; });
   }
-  /* after an answer's reply (so it is counted), or once the page's days are in: 50 this week and no pennant yet */
+  /* after an answer's reply (so it is counted), or once the page's days are in: 100 this week and no pennant yet */
   function weekClaim(){
     var w = weekNow(), G = window.shGame;
     if (!M || !M.visitor || w.n < WEEK_GOAL || w.done || weekClaimed === w.week || w.n < weekShort || !G || !G.claim) return;
@@ -460,7 +460,7 @@
       }
       if (mine.indexOf(String(r.week)) < 0) mine.unshift(String(r.week));
       weekKeep({ at: Date.now(), week: String(r.week), n: r.n | 0, cls: r["class"] == null ? null : r["class"] | 0, pennants: weekMine(mine), pays: kept.pays | 0 || r.xp | 0 });
-      if (r.xp > 0 && visible()) setTimeout(function(){ talk("Fifty this week! A new pennant for my place. It's flying by the path.", "do-cheer", 5200); }, 2600);
+      if (r.xp > 0 && visible()) setTimeout(function(){ talk("A hundred this week! A new pennant for my place. It's flying by the path.", "do-cheer", 5200); }, 2600);
     });
   }
 

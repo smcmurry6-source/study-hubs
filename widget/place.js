@@ -770,7 +770,7 @@
       '<p class="tpv-note">These are the medals each hub gives, the same ones that pop up when one is earned. The board by the house hangs the best twenty.</p>');
   }
   /* ---------- the weekly pennants (idea board #6, migration_v98): this week's, as far as it's got, and every one earned,
-     newest first. 50 questions from Monday to Sunday (Central), in any hub, earn the week's; the newest flies from the
+     newest first. 100 questions from Monday to Sunday (Central), in any hub, earn the week's; the newest flies from the
      lamp post. Asked of the server when it opens (shPet.week(true): at most every 30 minutes), and drawn again when
      its answer comes (sh:week). ---------- */
   function pennantsHTML(){
@@ -778,14 +778,14 @@
     var d = K.design(w.week), got = w.done, left = Math.max(0, w.goal - w.n), pct = Math.round(Math.min(1, w.n / w.goal) * 100);
     var day = function(k, o){ var q = String(k).split("-"); return new Date(+q[0], +q[1] - 1, +q[2], 12).toLocaleDateString("en-US", o || { month: "short", day: "numeric", year: "numeric" }); };
     var now = '<div class="tpn-now' + (got ? " is-got" : "") + '">' + K.svg(w.week, 92, { dim: !got }) + '<div class="tpn-nowt"><p class="tpv-gk">This week, ' + esc(day(w.week, { month: "short", day: "numeric" })) + " to " + esc(day(w.ends, { month: "short", day: "numeric" })) + "</p>" +
-      "<b>" + (got ? "Yours! It’s flying by the path." : w.n >= w.goal ? "Fifty! Your pennant is on its way." : esc(Math.min(w.n, 999) + " of " + w.goal + " questions")) + "</b>" +
+      "<b>" + (got ? "Yours! It’s flying by the path." : w.n >= w.goal ? "A hundred! Your pennant is on its way." : esc(Math.min(w.n, 999) + " of " + w.goal + " questions")) + "</b>" +
       (got ? "" : '<div class="tpv-meter" aria-hidden="true"><i style="width:' + pct + '%"></i></div>') +
       "<span>" + (got ? esc((d ? d.name + "’s, with " + d.badge : "This week’s") + ".") : esc(left ? left + " more by Sunday night, in any hub" + (w.pays ? ", for this pennant and +" + w.pays.toLocaleString() + " XP and crowns." : ", for this pennant.") : "")) + "</span>" +
       (w.cls ? '<span class="tpn-class">' + w.cls.toLocaleString() + " in the class have theirs this week</span>" : "") + "</div></div>";
     var list = p.list.map(function(k, i){ var g = K.design(k); return '<li class="tpv-mcard tpn-card" style="--i:' + i + '">' + K.svg(k, 64) + "<b>" + esc(day(k, { month: "short", day: "numeric" })) + "</b><span>" + esc(g ? g.name + " #" + g.nth : "") + "</span></li>"; }).join("");
     return '<div class="tpv-mhead"><h3 id="tpvO">Your weekly pennants</h3><p>' + (p.list.length ? p.list.length + (p.list.length === 1 ? " pennant" : " pennants") + " earned" : "None yet: your first one flies by the path") + "</p></div>" + now +
       (list ? '<ul class="tpv-mgrid tpn-grid">' + list + "</ul>" : "") +
-      '<p class="tpv-note">Answer 50 questions from Monday to Sunday, in any hub, and Timmy gets that week’s pennant. Each one is new: the felt and its badge are the month’s, the stars count which week of the month it is, and the sleeve is the school year’s color.</p>';
+      '<p class="tpv-note">Answer 100 questions from Monday to Sunday, in any hub, and Timmy gets that week’s pennant. Each one is new: the felt and its badge are the month’s, the stars count which week of the month it is, and the sleeve is the school year’s color.</p>';
   }
   function openPennants(o){
     if (!V || V.m.visiting) return;
@@ -1091,7 +1091,7 @@
   function pennantCard(){
     var p = pennants(), w = p.w; if (!w) return "";
     return '<div class="tpv-gmedals tpn-side"><p class="tpv-gk">Weekly pennant</p><div class="tpn-row">' + p.K.svg(w.week, 52, { dim: !w.done }) +
-      "<p><b>" + (w.done ? "This week’s is yours" : esc(Math.min(w.n, 999) + " of " + w.goal + " this week")) + "</b>" + (p.list.length ? p.list.length + " earned in all" : "50 questions by Sunday earns it") + "</p></div>" +
+      "<p><b>" + (w.done ? "This week’s is yours" : esc(Math.min(w.n, 999) + " of " + w.goal + " this week")) + "</b>" + (p.list.length ? p.list.length + " earned in all" : "100 questions by Sunday earns it") + "</p></div>" +
       '<div class="tpv-row"><button type="button" class="tpv-btn" data-tp="pennants">' + ICON.medal + "<span>See the pennants</span></button></div></div>";
   }
   /* the customizer's cards sit in their rarity's frame, the shop's own card art (widget/hub-art/shop.js, SH_SHOP_ART.frame;

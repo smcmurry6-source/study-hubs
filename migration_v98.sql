@@ -1,15 +1,15 @@
--- migration_v98: the weekly class challenge (idea board #6): answer 50 questions between Monday and Sunday and your Timmy gets
--- that week's pennant.
+-- migration_v98: the weekly class challenge (idea board #6): answer 100 questions between Monday and Sunday and your Timmy
+-- gets that week's pennant (the idea said 50; Sam, 2026-11-22: "lets do 100").
 --
 -- * The week is Monday to Sunday, Central time (the days xp_days already keeps). What counts is every answer saved, in any hub
 --   and any part of it: practice, the drill, a mock, an arcade game, Learn (xp_days.n, which sh_xp_on_insert adds to on every
 --   answer; a flashcard isn't an answer). Linked devices count as one person (their answers move to the primary id).
 -- * Each person earns their own pennant; the "class" part is the same week for everyone, and a count of how many have theirs
 --   (shown only once it is at least 5, as everything the class sees about itself).
--- * A pennant is one row in week_pennants per person per week, made once: by the page when the 50th answer is in
+-- * A pennant is one row in week_pennants per person per week, made once: by the page when the 100th answer is in
 --   (claim_week_v2), or by the Monday sweep for anyone who got there without the page claiming it (sh_week_sweep). Its art is
 --   drawn from the week's date (tools/figures/site/pennant.mjs), so nothing about it is stored but the week.
--- * It pays `week` (sh_prizes: 500 XP and as many crowns, proposed for Sam in the PR), once, keyed 'week:<monday>'.
+-- * It pays `week` (sh_prizes: 500 XP and as many crowns; Sam, 2026-11-22: the rest "looks good"), once, keyed 'week:<monday>'.
 --
 -- Apply: small and quick (a new table, a few functions, a constraint added not valid, a cron line); any quiet hour. Nothing
 -- in the answer path changes: record_answer_v2, sh_answer and the bootstrap are untouched. Replaced: sh_prizes (adds `week`),
@@ -62,7 +62,7 @@ revoke all on public.week_pennants from anon, authenticated;
 -- PL/pgSQL throughout, like every function a page calls and what it calls (shared-infrastructure, migration_v76): a SQL
 -- function with its own search_path can't be inlined, so it would be planned again on every call
 create or replace function public.sh_week_goal()
-returns integer language plpgsql immutable set search_path = public as $$ begin return 50; end; $$;
+returns integer language plpgsql immutable set search_path = public as $$ begin return 100; end; $$;
 
 -- the Monday (Central) of the week a moment falls in
 create or replace function public.sh_week_of(p_at timestamptz)
@@ -141,7 +141,7 @@ begin
 end;
 $$;
 
--- the page asks for this week's pennant once its count reaches 50; the server counts again, so the page's count is only a hint
+-- the page asks for this week's pennant once its count reaches 100; the server counts again, so the page's count is only a hint
 create or replace function public.sh_claim_week(p_at timestamptz, p_visitor text)
 returns jsonb language plpgsql security definer set search_path = public as $$
 declare v_at timestamptz := coalesce(p_at, clock_timestamp()); wk date := sh_week_of(v_at); k int; paid int; had int; me text;
@@ -167,7 +167,7 @@ begin
 end;
 $$;
 
--- Monday's sweep: whoever reached 50 last week without the page claiming it (the tab closed on the 50th answer, an answer
+-- Monday's sweep: whoever reached 100 last week without the page claiming it (the tab closed on the 100th answer, an answer
 -- saved later from the device) gets the pennant, dated the week's last second. A linked device's answers count for its main
 -- id, as the claim counts them. Returns how many it made. One query over last week's xp_days rows (a few hundred), once a week.
 create or replace function public.sh_week_sweep(p_at timestamptz default null)

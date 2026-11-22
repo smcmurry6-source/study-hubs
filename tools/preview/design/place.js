@@ -2511,7 +2511,7 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
     statue: { n: "Your rank", does: "it gleams", say: "" },
     tree: { n: "The tree", does: "shakes", say: "Whoa, the tree is ticklish." },
     mastery: { n: "Your hub mastery", does: "it sparkles, and opens the big view of every medal", say: "One medal for every hub you've mastered. The ribbons are the hub's colors." },
-    pennant: { n: "Your weekly pennant", does: "it sparkles, and opens every pennant you've earned", say: "My newest pennant! Fifty questions, Monday to Sunday, and I get the next one." },
+    pennant: { n: "Your weekly pennant", does: "it sparkles, and opens every pennant you've earned", say: "My newest pennant! A hundred questions, Monday to Sunday, and I get the next one." },
     garden: { n: "The garden", does: "a carrot pops up", say: "Carrots: crunchy, and they scrub your teeth." },
     pool: { n: "The pool", does: "a splash", say: "Cannonball!" },
     hammock: { n: "The hammock", does: "swings", say: "Five minutes. Then back to studying." },

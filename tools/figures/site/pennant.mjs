@@ -1,4 +1,4 @@
-/* The weekly pennants (the weekly class challenge, idea board #6; migration_v98.sql): answer 50 questions from Monday to
+/* The weekly pennants (the weekly class challenge, idea board #6; migration_v98.sql): answer 100 questions from Monday to
    Sunday (Central time) and Timmy gets that week's pennant. A new one every week, so they collect, and the look of each
    comes from its week's Monday alone (the server keeps only the Monday):
      - the felt's color and the badge on it are the month's (MONTHS: January's snowflake to December's pine);
@@ -147,5 +147,5 @@ export function pennantKit(INK, C){
     for (; t <= end && out.length < 400; t += 7 * 864e5) out.push(new Date(t).toISOString().slice(0, 10));
     return out;
   }
-  return { design: design, flag: flag, svg: svg, mondays: mondays, MONTHS: MONTHS.map(function(m){ return { name: m.name, badge: m.badge, felt: m.felt }; }), GOAL: 50 };
+  return { design: design, flag: flag, svg: svg, mondays: mondays, MONTHS: MONTHS.map(function(m){ return { name: m.name, badge: m.badge, felt: m.felt }; }), GOAL: 100 };
 }

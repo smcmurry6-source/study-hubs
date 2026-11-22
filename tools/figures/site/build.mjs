@@ -313,7 +313,7 @@ let pennantCount = 0;
   }
   if (pennantCount < 200) bad.push("pennants: only " + pennantCount + " Mondays drawn");
   if (PENNANT.flag("not-a-date") || PENNANT.svg("2026-13-01") || PENNANT.design("")) bad.push("pennant: a bad date drew something");
-  if (PENNANT.GOAL !== 50) bad.push("pennant: the goal is 50 questions (migration_v98's sh_week_goal)");
+  if (PENNANT.GOAL !== 100) bad.push("pennant: the goal is 100 questions (migration_v98's sh_week_goal)");
 }
 for (const [w, s] of all) {
   if (/\sid=|url\(#|Gradient|<filter|<text|<style|<image|<script|on[a-z]+=/i.test(s)) bad.push(w + ": ids, gradients, filters, text, images or script");

@@ -119,7 +119,7 @@ while (new Date(t).getUTCDay() !== 1) t += 864e5;
 for (; t <= end && out.length < 400; t += 7 * 864e5) out.push(new Date(t).toISOString().slice(0, 10));
 return out;
 }
-return { design: design, flag: flag, svg: svg, mondays: mondays, MONTHS: MONTHS.map(function(m){ return { name: m.name, badge: m.badge, felt: m.felt }; }), GOAL: 50 };
+return { design: design, flag: flag, svg: svg, mondays: mondays, MONTHS: MONTHS.map(function(m){ return { name: m.name, badge: m.badge, felt: m.felt }; }), GOAL: 100 };
 })("#3B2E3A", {"enamel":"#FFFDF6","enamelShade":"#E9DFCC","gum":"#F78FA8","gumShade":"#E07090","gumLight":"#FFC0CD","pink":"#F7A3BA","metal":"#D5DBE1","metalShade":"#8E98A3","metalLight":"#EEF2F5","gold":"#F2C94C","goldShade":"#C9971C","goldLight":"#FFF0B3","bronze":"#D08A52","bronzeShade":"#9A5A2A","bronzeLight":"#F2C49A","silver":"#D9DFE5","silverShade":"#8E98A3","silverLight":"#F6F8FA","paper":"#FFFFFF","paperShade":"#ECE6EA","wood":"#C4915F","woodShade":"#8A5A3A","sky":"#CFEAF8","grass":"#A7DE93","grassShade":"#6CBB68","red":"#E5484D","blue":"#3FA7E0","yellow":"#FFE27A","green":"#3ECF7E","orange":"#F59A1E","plum":"#6B5A68","plumLight":"#ECE6EA"});
 ;
 /* ---- widget/toast.js ---- */
@@ -616,7 +616,7 @@ if (goalWait) { clearTimeout(goalWait); goalWait = 0; }
 prizeCard([{ t: "Today's goal met", xp: d.xp, c: d.xp, src: "ring" }], { sub: goalSub(), kind: "goal" });
 } else if (d.src === "week") {
 var wr = d.res || {}, wc = wr["class"] >= 5 ? " · " + fmt(wr["class"]) + " in the class have theirs" : "";
-prizeCard([{ t: "This week’s pennant", xp: d.xp, c: d.xp, src: "week", sub: fmt(wr.n || 50) + " questions since Monday. It’s flying at Timmy’s place" + wc }]);
+prizeCard([{ t: "This week’s pennant", xp: d.xp, c: d.xp, src: "week", sub: fmt(wr.n || 100) + " questions since Monday. It’s flying at Timmy’s place" + wc }]);
 HX.say("A new pennant for my place!", "do-hop");
 } else prizeCard([{ t: prizeName(d.src, d.res || {}), xp: d.xp, c: d.xp, src: d.src }]);
 if (d.src === "nuke" || d.src === "boss" || d.src === "top") HX.say(d.src === "nuke" ? "Ten thousand! Go spend it." : "Nice hit!", "do-hop");
@@ -856,7 +856,7 @@ return '<svg class="teeth' + (of && done >= of ? " is-met" : "") + '" viewBox="0
 '<circle class="t-track" cx="60" cy="60" r="' + r + '"/><circle class="t-arc" cx="60" cy="60" r="' + r + '" stroke-dasharray="' + c.toFixed(2) + '" stroke-dashoffset="' + (c * (1 - (of ? Math.min(1, done / of) : 0))).toFixed(2) + '"/>' +
 out + "</svg>";
 }
-function weekNow(){ var P = window.shPet; return P && P.week ? P.week() : { week: day(0), n: 0, goal: 50, done: false, cls: null, pennants: [], pays: 0, ends: day(0) }; }
+function weekNow(){ var P = window.shPet; return P && P.week ? P.week() : { week: day(0), n: 0, goal: 100, done: false, cls: null, pennants: [], pays: 0, ends: day(0) }; }
 document.addEventListener("sh:week", function(){ paintMeters(); });
 function weekRow(){
 var P = window.shPet, K = window.SH_PENNANT; if (!P || !P.week || !K) return "";

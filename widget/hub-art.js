@@ -129,5 +129,5 @@ window.SH_PENNANT = (function pennantKit(INK, C){
     for (; t <= end && out.length < 400; t += 7 * 864e5) out.push(new Date(t).toISOString().slice(0, 10));
     return out;
   }
-  return { design: design, flag: flag, svg: svg, mondays: mondays, MONTHS: MONTHS.map(function(m){ return { name: m.name, badge: m.badge, felt: m.felt }; }), GOAL: 50 };
+  return { design: design, flag: flag, svg: svg, mondays: mondays, MONTHS: MONTHS.map(function(m){ return { name: m.name, badge: m.badge, felt: m.felt }; }), GOAL: 100 };
 })("#3B2E3A", {"enamel":"#FFFDF6","enamelShade":"#E9DFCC","gum":"#F78FA8","gumShade":"#E07090","gumLight":"#FFC0CD","pink":"#F7A3BA","metal":"#D5DBE1","metalShade":"#8E98A3","metalLight":"#EEF2F5","gold":"#F2C94C","goldShade":"#C9971C","goldLight":"#FFF0B3","bronze":"#D08A52","bronzeShade":"#9A5A2A","bronzeLight":"#F2C49A","silver":"#D9DFE5","silverShade":"#8E98A3","silverLight":"#F6F8FA","paper":"#FFFFFF","paperShade":"#ECE6EA","wood":"#C4915F","woodShade":"#8A5A3A","sky":"#CFEAF8","grass":"#A7DE93","grassShade":"#6CBB68","red":"#E5484D","blue":"#3FA7E0","yellow":"#FFE27A","green":"#3ECF7E","orange":"#F59A1E","plum":"#6B5A68","plumLight":"#ECE6EA"});

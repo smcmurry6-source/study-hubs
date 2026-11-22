@@ -221,7 +221,7 @@
     } else if (d.src === "week") {
       /* the weekly pennant (migration_v98): what it was for, and how many in the class have theirs (from 5) */
       var wr = d.res || {}, wc = wr["class"] >= 5 ? " · " + fmt(wr["class"]) + " in the class have theirs" : "";
-      prizeCard([{ t: "This week’s pennant", xp: d.xp, c: d.xp, src: "week", sub: fmt(wr.n || 50) + " questions since Monday. It’s flying at Timmy’s place" + wc }]);
+      prizeCard([{ t: "This week’s pennant", xp: d.xp, c: d.xp, src: "week", sub: fmt(wr.n || 100) + " questions since Monday. It’s flying at Timmy’s place" + wc }]);
       HX.say("A new pennant for my place!", "do-hop");
     } else prizeCard([{ t: prizeName(d.src, d.res || {}), xp: d.xp, c: d.xp, src: d.src }]);
     if (d.src === "nuke" || d.src === "boss" || d.src === "top") HX.say(d.src === "nuke" ? "Ten thousand! Go spend it." : "Nice hit!", "do-hop");
@@ -527,11 +527,11 @@
       '<circle class="t-track" cx="60" cy="60" r="' + r + '"/><circle class="t-arc" cx="60" cy="60" r="' + r + '" stroke-dasharray="' + c.toFixed(2) + '" stroke-dashoffset="' + (c * (1 - (of ? Math.min(1, done / of) : 0))).toFixed(2) + '"/>' +
       out + "</svg>";
   }
-  /* ---------- the weekly pennant (idea board #6, migration_v98): 50 questions from Monday to Sunday, in any hub, and Timmy
+  /* ---------- the weekly pennant (idea board #6, migration_v98): 100 questions from Monday to Sunday, in any hub, and Timmy
      gets that week's pennant. The count and what the server last said are widget/pet.js's (shPet.week), its drawing
      window.SH_PENNANT (in this bundle's hub-art.js), so the row costs no request; shPet asks the server at most every
      30 minutes for the class count and the pennants earned. A tap opens Timmy's place, where the newest one flies. ---------- */
-  function weekNow(){ var P = window.shPet; return P && P.week ? P.week() : { week: day(0), n: 0, goal: 50, done: false, cls: null, pennants: [], pays: 0, ends: day(0) }; }
+  function weekNow(){ var P = window.shPet; return P && P.week ? P.week() : { week: day(0), n: 0, goal: 100, done: false, cls: null, pennants: [], pays: 0, ends: day(0) }; }
   document.addEventListener("sh:week", function(){ paintMeters(); });
   function weekRow(){
     var P = window.shPet, K = window.SH_PENNANT; if (!P || !P.week || !K) return "";

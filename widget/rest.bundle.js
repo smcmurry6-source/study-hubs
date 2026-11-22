@@ -2519,7 +2519,7 @@ var t = by[today] || [0, 0];
 return { hp: Math.round(hp), streak: streak, missedYesterday: !(by[addDays(today, -1)] || [0])[0] && born < today,
 treat: treat, everZero: everZero, revived: revived, dipped: dipped, today: { a: t[0], c: t[1] }, born: born, away: miss };
 }
-var WEEK_GOAL = 50, WEEK_FOR = 30 * 60e3, DAY_RE = /^\d{4}-\d{2}-\d{2}$/, weekAsking = false, weekAskedAt = 0, weekClaimed = "", weekShort = 0;
+var WEEK_GOAL = 100, WEEK_FOR = 30 * 60e3, DAY_RE = /^\d{4}-\d{2}-\d{2}$/, weekAsking = false, weekAskedAt = 0, weekClaimed = "", weekShort = 0;
 function mondayOf(day){ var p = day.split("-"), k = (new Date(Date.UTC(+p[0], +p[1] - 1, +p[2])).getUTCDay() + 6) % 7; return addDays(day, -k); }
 function weekKept(){ try { var w = JSON.parse(ls("sh_week") || "null"); return w && typeof w === "object" ? w : {}; } catch (e) { return {}; } }
 function weekSaid(){ try { document.dispatchEvent(new CustomEvent("sh:week")); } catch (e) {} }
@@ -2563,7 +2563,7 @@ kept.week = String(r.week); kept.n = r.n | 0; weekKeep(kept); return;
 }
 if (mine.indexOf(String(r.week)) < 0) mine.unshift(String(r.week));
 weekKeep({ at: Date.now(), week: String(r.week), n: r.n | 0, cls: r["class"] == null ? null : r["class"] | 0, pennants: weekMine(mine), pays: kept.pays | 0 || r.xp | 0 });
-if (r.xp > 0 && visible()) setTimeout(function(){ talk("Fifty this week! A new pennant for my place. It's flying by the path.", "do-cheer", 5200); }, 2600);
+if (r.xp > 0 && visible()) setTimeout(function(){ talk("A hundred this week! A new pennant for my place. It's flying by the path.", "do-cheer", 5200); }, 2600);
 });
 }
 var JOKES = [

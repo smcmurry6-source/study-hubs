@@ -1857,7 +1857,7 @@
     HUBS.concat(ARCHIVED_HUBS).forEach(function(h){ var p = readProgress(h); if (p) p.days.forEach(function(d){ by[d] = by[d] || { a: 0, c: 0 }; }); });
     return by;
   }
-  /* the weekly pennant (idea board #6, migration_v98): 50 questions from Monday to Sunday, in any hub, and Timmy gets that
+  /* the weekly pennant (idea board #6, migration_v98): 100 questions from Monday to Sunday, in any hub, and Timmy gets that
      week's pennant. Where it stands is widget/pet.js's (shPet.week: his days from the bootstrap and this device), drawn with
      window.SH_PENNANT (in this page's bundle, hub-art.js); the class count and the pennants earned come from the server,
      asked once the page is first scrolled or tapped (weekWake), at most every 30 minutes. A tap opens Timmy's place. */

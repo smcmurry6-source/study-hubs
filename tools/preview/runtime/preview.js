@@ -636,24 +636,24 @@
     return { ok: true, first: true };
   }
   /* Timmy's days with the HP his snacks gave each day (get_pet_days_v2; the bootstrap's pet_days the same) */
-  /* the weekly pennant, as migration_v98 answers it: a Monday-to-Sunday week (Central), 50 answers in it, a pennant once.
-     The made-up history earns the weeks it has 50 in; this account's claims are kept (db.pennants). The class count is
+  /* the weekly pennant, as migration_v98 answers it: a Monday-to-Sunday week (Central), 100 answers in it, a pennant once.
+     The made-up history earns the weeks it has 100 in; this account's claims are kept (db.pennants). The class count is
      made up (23, over the 5 the class sees from). */
   function monday2(dd){ var p = dd.split("-"), x = new RealDate(Date.UTC(+p[0], +p[1] - 1, +p[2])); x.setUTCDate(x.getUTCDate() - (x.getUTCDay() + 6) % 7); return x.toISOString().slice(0, 10); }
   function weekCounts2(t){ var by = {}; bootstrapPetDays(t).forEach(function(r){ var m = monday2(r.d); by[m] = (by[m] || 0) + r.attempts; }); return by; }
   function week2(v, t){
     var wk = monday2(centralDay(t)), by = v === db.visitor ? weekCounts2(t) : {}, mine = {};
-    if (v === db.visitor) { Object.keys(by).forEach(function(m){ if (m < wk && by[m] >= 50) mine[m] = 1; }); (db.pennants || []).forEach(function(m){ mine[m] = 1; }); }
+    if (v === db.visitor) { Object.keys(by).forEach(function(m){ if (m < wk && by[m] >= 100) mine[m] = 1; }); (db.pennants || []).forEach(function(m){ mine[m] = 1; }); }
     var list = Object.keys(mine).sort().reverse();
-    return { ok: true, week: wk, goal: 50, n: by[wk] || 0, done: !!mine[wk], "class": 23, pennants: list, pays: 500 };
+    return { ok: true, week: wk, goal: 100, n: by[wk] || 0, done: !!mine[wk], "class": 23, pennants: list, pays: 500 };
   }
   function claimWeek2(v, t){
     if (!v || String(v).length > 80) return { ok: false, error: "bad" };
     var w = week2(v, t), wl = wallet2(v);
-    if (w.n < 50) return { ok: true, src: "week", xp: 0, won: 0, repeat: true, crowns: wl ? wl.balance : 0, why: "short", n: w.n, goal: 50, week: w.week };
+    if (w.n < 100) return { ok: true, src: "week", xp: 0, won: 0, repeat: true, crowns: wl ? wl.balance : 0, why: "short", n: w.n, goal: 100, week: w.week };
     var paid = w.done || v !== db.visitor ? 0 : 500;
     if (paid) { db.pennants = (db.pennants || []).concat([w.week]); db.xp2 = (db.xp2 || 0) + paid; save(); wl = wallet2(v); }
-    return { ok: true, src: "week", xp: paid, won: paid, repeat: !paid, crowns: wl ? wl.balance : 0, week: w.week, n: w.n, goal: 50, pennant: true, "class": 23 + (paid ? 1 : 0), have: w.pennants.length + (paid ? 1 : 0) };
+    return { ok: true, src: "week", xp: paid, won: paid, repeat: !paid, crowns: wl ? wl.balance : 0, week: w.week, n: w.n, goal: 100, pennant: true, "class": 23 + (paid ? 1 : 0), have: w.pennants.length + (paid ? 1 : 0) };
   }
   function petDays2(t){
     var by = {};
@@ -1556,7 +1556,7 @@
     if (fn === "get_my_shop") return { data: shop2(v) };
     if (fn === "equip_item") return { write: v === db.visitor, data: equip2(v, a.p_slot, a.p_item) };
     if (fn === "get_pet_days_v2") return { data: v === db.visitor ? petDays2(t) : [] };
-    /* the weekly pennant (migration_v98): the week's answers from the made-up days, a pennant for each week of 50 or more */
+    /* the weekly pennant (migration_v98): the week's answers from the made-up days, a pennant for each week of 100 or more */
     if (fn === "get_my_week_v2") return { data: week2(v, t) };
     if (fn === "claim_week_v2") return { write: v === db.visitor, data: claimWeek2(v, t) };
     /* the shop (phase 4, part B): buying and the rare costumes' log */
