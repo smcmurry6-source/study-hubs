@@ -2151,6 +2151,49 @@ try {
     notes.push(`the mystery box and studying now (migration_v99): ${i0.of} pieces in the box, the roll at every rarity's edge, ${won.length + 6} boxes opened; studying now names only the named, never an id; the Crowns board matches every wallet`);
   }
 
+  /* ---------- 19. crowns Sam gives by hand (migration_v100): crowns only, once per key, to the id that remains ---------- */
+  if (one(`select to_regproc('public.sh_gift_crowns')`)) {
+    const gift = (v, key, c, note) => json(`sh_gift_crowns(${v == null ? 'null' : q(v)}, ${q(key)}, ${c == null ? 'null' : c}${note ? ', ' + q(note) : ''})`);
+    // someone with XP, a rank and a balance: a gift of 50,000 moves the balance and nothing else (50,000 XP would be Dark Matter)
+    for (let i = 0; i < 3; i++) award('xp-GF', 'rep:flag:gf' + i, 300);
+    const xp0 = xpOf('xp-GF'), p0 = json(`get_rank_profile_v2('xp-GF')`), w0 = json(`sh_wallet('xp-GF')`);
+    const g1 = gift('xp-GF', 'gift-test-1', 50000, 'a test');
+    const w1 = json(`sh_wallet('xp-GF')`), p1 = json(`get_rank_profile_v2('xp-GF')`);
+    eq([g1.ok, g1.given, g1.crowns, g1.balance, w1.balance - w0.balance, w1.earned - w0.earned, w1.gifts, w1.spent - w0.spent],
+       [true, true, 50000, w0.balance + 50000, 50000, 50000, 50000, 0], 'a gift of 50,000: the balance and what was earned go up 50,000, as `gifts`');
+    eq([xpOf('xp-GF'), p1.step, p1.journey, w1.dark, w1.prizes, w1.from_xp, w1.rankups], [xp0, p0.step, p0.journey, w0.dark, w0.prizes, w0.from_xp, w0.rankups],
+       'a gift moves no XP, no rank, no Dark Matter crowns and no prize');
+    const g2 = gift('xp-GF', 'gift-test-1', 50000, 'a test');
+    eq([g2.ok, g2.given, g2.balance, json(`sh_wallet('xp-GF')`).gifts], [true, false, w1.balance, 50000], 'the same key again gives nothing');
+    eq(['', null, 'x'.repeat(81)].map(v => gift(v, 'gift-bad', 10).error), ['visitor', 'visitor', 'visitor'], 'a bad visitor is refused');
+    eq([0, -5, 1000001, null].map(c => gift('xp-GF', 'gift-bad', c).error), ['crowns', 'crowns', 'crowns', 'crowns'], 'a bad amount is refused');
+    eq([gift('xp-GF', '', 10).error, num(`select count(*) from crown_gifts where key = 'gift-bad'`)], ['key', 0], 'a missing key is refused; nothing refused is written');
+    // spent like any crowns: someone with nothing buys an apple (100) with a gift of 200
+    const buyG = req => anonJson(`buy_item('xp-GZ', 'apple', ${q(req)})`);
+    const z0 = buyG('buy-gz-0000001');
+    gift('xp-GZ', 'gift-test-z', 200);
+    const z1 = buyG('buy-gz-0000002');
+    eq([z0.error, z1.ok, json(`sh_wallet('xp-GZ')`).balance], ['balance', true, 100], 'a gift is spent like any crowns');
+    // to the id that remains: a gift to a linked device lands on its main id, and Link my devices moves one given before
+    sql(`insert into visitor_links (alias_id, primary_id) values ('xp-GFa', 'xp-GFp')`);
+    gift('xp-GFa', 'gift-test-2', 700);
+    eq(rows(`select visitor_id, crowns from crown_gifts where key = 'gift-test-2'`), [{ visitor_id: 'xp-GFp', crowns: 700 }], 'a gift to a linked device goes to its main id');
+    gift('xp-GFb', 'gift-test-3', 300);
+    sql(`insert into visitor_links (alias_id, primary_id) values ('xp-GFb', 'xp-GFp')`);
+    eq([json(`sh_wallet('xp-GFp')`).gifts, num(`select count(*) from crown_gifts where visitor_id = 'xp-GFb'`)], [1000, 0], 'Link my devices moves the gifts to the main id');
+    // the Crowns board shows it at once, without moving what its refresh compares
+    sql(`select sh_crowns_refresh(200)`);
+    const cb0 = rows(`select balance, xp, spent from crowns_board where visitor_id = 'xp-GF'`)[0];
+    const g4 = gift('xp-GF', 'gift-test-4', 1234);
+    eq(rows(`select balance, xp, spent from crowns_board where visitor_id = 'xp-GF'`)[0], cb0 && { balance: cb0.balance + 1234, xp: cb0.xp, spent: cb0.spent },
+       'the gift shows on the Crowns board at once');
+    eq(g4.balance, json(`sh_wallet('xp-GF')`).balance, 'the reply carries the balance after the gift');
+    raises(() => anon(`select sh_gift_crowns('xp-GF', 'gift-anon', 10, '')`), '42501', 'anon gives itself crowns');
+    raises(() => anon(`select count(*) from public.crown_gifts`), '42501', 'anon reads crown_gifts directly');
+    raises(() => anon(`insert into public.crown_gifts (key, visitor_id, crowns) values ('gift-anon-2', 'xp-GF', 10)`), '42501', 'anon writes crown_gifts directly');
+    notes.push('crowns given by hand (migration_v100): crowns only (no XP, rank or prize moves), once per key, spent like any crowns, to the id that remains, on the Crowns board at once, closed to visitors');
+  }
+
   /* ---------- 15. the private parts stay private ---------- */
   for (const t of ['xp_awards', 'xp_award_totals', 'xp_boosts', 'xp_sessions', 'answer_xp', 'question_keys', 'game_baseline', 'pet_purchases', 'pet_inventory', 'pet_equipped', 'ideas', 'idea_votes', 'shop_items', 'visit_secret', 'card_reviews'])
     raises(() => anon(`select count(*) from public.${t}`), '42501', `anon reads ${t} directly`);

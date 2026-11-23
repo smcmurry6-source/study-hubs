@@ -71,7 +71,8 @@ select count(*) people,
   count(*) filter (where (w->>'balance')::int >= 700) a_rare, count(*) filter (where (w->>'balance')::int >= 1800) an_epic,
   count(*) filter (where (w->>'balance')::int >= 5000) a_legendary, count(*) filter (where (w->>'balance')::int >= 8000) anything,
   count(*) filter (where (w->>'spent')::int > 0) ever_bought,
-  round(100.0 * sum((w->>'spent')::int) / nullif(sum((w->>'earned')::int), 0)) pct_of_earned_spent
+  -- the crowns Sam gave by hand (crown_gifts, migration_v100) weren't earned by studying: left out of the share spent
+  round(100.0 * sum((w->>'spent')::int) / nullif(sum((w->>'earned')::int - coalesce((w->>'gifts')::int, 0)), 0)) pct_of_earned_spent
 from w;
 
 -- E4. The price ladder in study days: each band's price against E1's median and 75th-percentile day (paste E1's two

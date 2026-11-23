@@ -32,6 +32,16 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-23 (Crowns given by hand, migration_v100, Claude Code)** — Sam: "Give [one account, by its leaderboard name]
+  50,000 crowns". Every way to crowns until now pays XP too (a prize pays as many crowns as XP) or is worked out from XP and
+  rank, so a new kind: `crown_gifts`, one row a gift, which `sh_wallet` adds to what was earned (`gifts` in its answer) and
+  nothing else reads; `sh_gift_crowns(visitor, key, crowns, note)` gives one once per key, to the id that remains when
+  devices are linked, and updates the Crowns board row at once; a trigger moves a linked device's gifts. Closed to visitors:
+  only an agent (through the connector, when Sam asks) or Sam (the SQL editor) gives one. Applied live at about 7:03 pm
+  Central on 2026-11-22 (md5-checked before and after), then the 50,000 given: the balance went up 50,000, XP and rank
+  stayed. `tools/economy.sql` E3 leaves gifts out of the share spent. `tools/release/xp.js` section 19 tests it. How:
+  [game-server](vault/reference/game-server.md).
+
 - **2026-11-22 (Smoother scrolling, and nothing you can see pauses, Claude Code)** — Sam: "Is there a way that we can make the
   performance better for the dashboard when scrolling and in timmys shop and such?", then "I also hate that animations
   pause". The 2026-11-14 fix (BUG-147) made the drawings rest: 8 s of motion, frozen while scrolling or touching, the shop's
