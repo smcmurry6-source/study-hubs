@@ -159,38 +159,40 @@
     var x = piece(it), n = it.name || (x && x.n) || it.id;
     return { name: cardName(n), note: sentence(x && x.note || ""), say: x && x.say && x.say[0] || "", kind: KIND_N[it.kind] || "" };
   }
-  /* The card's frame from the shop's art, and the storefront's two layers. Each is a still, with the moving one over
-     it (.tsh-live) unless motion is off: an image that moves inside is drawn again whole on every frame, and a shelf
-     has dozens. So the shop moves for a few seconds when it opens, when a scroll ends and under a mouse, and rests
-     otherwise (shopLife; shop.css takes the moving ones away under .is-rest). 2026-11-14, Sam: "scrolling and things
-     are kind of sluggish and jittery". */
-  var FRAMES = {};
+  /* The card's frame from the shop's art, the storefront's two layers and the mystery box are drawn in the page, and
+     they move all the time, scrolling included (Sam, 2026-11-22: "I also hate that animations pause"). Until then each
+     was a still with a moving image over it that moved for 6 s at a time and hid while the shop scrolled (2026-11-14):
+     an image that moves inside is drawn again whole on every frame, while a drawing in the page draws again only what
+     moves (on a slowed phone the shelves' moving frames took about half the main thread as images and a quarter drawn
+     in the page, and almost nothing on the raster threads). Their rules are the shop art's own (SA.CSS, put in the page
+     once: every one of them is a ts- class). A drawing off the screen stops (watch(), .is-away in shop.css), which nobody
+     sees. With reduced motion they are stills, as before. */
+  var FRAMES = {}, ARTCSS = false;
+  function artCss(){
+    if (ARTCSS) return; ARTCSS = true;
+    var st = D.createElement("style"); st.setAttribute("data-shop-art", ""); st.textContent = SA.CSS; D.head.appendChild(st);
+  }
+  /* an image that moves inside: the item sheet's mystery box, the one piece on its screen */
   function moving(s, re){ return s.replace(/(<svg[^>]*>)/, "$1<style>" + SA.CSS.split("\n").filter(function(l){ return re.test(l); }).join("\n") + "</style>"); }
+  function live(s, cls){ artCss(); return '<span class="tsh-inl' + (cls ? " " + cls : "") + '" aria-hidden="true">' + s + "</span>"; }
   function frame(r){
-    if (!FRAMES[r]) {
-      var s = SA.frame(r);
-      FRAMES[r] = img(s, "", "tsh-rframe") + (reduced || !/ts-r-/.test(s) ? "" : img(moving(s, /ts-r-|@keyframes ts-spin|prefers-reduced/), "", "tsh-rframe tsh-live"));
-    }
+    if (!FRAMES[r]) { var s = SA.frame(r); FRAMES[r] = reduced || !/ts-r-/.test(s) ? img(s, "", "tsh-rframe") : live(s, "tsh-rframe"); }
     return FRAMES[r];
   }
   function store(layer){
     var key = "store-" + layer;
-    if (!FRAMES[key]) {
-      var s = SA.store(layer);
-      FRAMES[key] = img(s, "", "tsh-frontart") + (reduced || !/ts-s-/.test(s) ? "" : img(moving(s, /ts-s-|@keyframes ts-spin|@keyframes ts-r-tw|prefers-reduced/), "", "tsh-frontart tsh-live"));
-    }
+    if (!FRAMES[key]) { var s = SA.store(layer); FRAMES[key] = reduced || !/ts-s-/.test(s) ? img(s, "", "tsh-frontart") : live(s, "tsh-frontart"); }
     return FRAMES[key];
   }
-  function shopLife(dlg){
-    var t = 0, st = 0, scrolling = false;
-    function rest(){ clearTimeout(t); t = 0; dlg.classList.add("is-rest"); }
-    function wake(){ if (scrolling) return; clearTimeout(t); dlg.classList.remove("is-rest"); t = setTimeout(rest, 6000); }
-    dlg.addEventListener("scroll", function(){
-      if (!scrolling) { scrolling = true; rest(); }
-      clearTimeout(st); st = setTimeout(function(){ scrolling = false; wake(); }, 260);
-    }, { capture: true, passive: true });
-    dlg.addEventListener("mousemove", function(){ if (!t) wake(); }, { passive: true });
-    wake();
+  /* a drawing in the page moves while it is on the screen or close to it, and stops off it (each root has its own
+     watcher: the shop can be drawn in a hub's More and in its own window) */
+  function watch(root){
+    if (!W.IntersectionObserver) return;
+    if (root.__tshIO) root.__tshIO.disconnect();
+    var io = root.__tshIO = new IntersectionObserver(function(es){
+      es.forEach(function(e){ if (e.target.classList.contains("is-away") === e.isIntersecting) e.target.classList.toggle("is-away", !e.isIntersecting); });
+    }, { rootMargin: "160px 0px" });
+    $$(".tsh-inl", root).forEach(function(x){ io.observe(x); });
   }
   function coin(cls){ return img('<svg viewBox="0 0 24 24">' + SA.coinBody(false) + "</svg>", "", cls || "tsh-coin"); }
   function rarTag(r){ return '<i class="tsh-rar r-' + r + '">' + esc(r) + "</i>"; }
@@ -342,6 +344,7 @@
     html += '<p class="tsh-note tsh-storefoot">Rank sets are never on a shelf: you earn them. What you buy is yours on every device you link.</p></div>';
     root.innerHTML = html;
     wire(root);
+    watch(root);
   }
   function wire(root){
     $$('[data-shop="item"], [data-shop="showcase"]', root).forEach(function(b){ b.addEventListener("click", function(){ var it = find(b.getAttribute("data-item")); if (it) sheet(it); }); });
@@ -407,7 +410,6 @@
     $('[data-shop="close"]', dlg).addEventListener("click", close);
     try { dlg.showModal(); } catch (e) { dlg.setAttribute("open", ""); }
     D.documentElement.classList.add("tsh-open");
-    shopLife(dlg);
     mount($(".tsh-dlgbody", dlg), { level: 3, title: "tshT" });
     return api;
   }
@@ -587,7 +589,7 @@
   function boxSection(lvl){
     var B = S.box, st = boxState();
     var odds = (B.odds || []).map(function(o){ var r = cap(o.rarity); return '<li class="' + (o.chance ? "" : "is-none") + '">' + rarTag(r) + "<span>" + (o.chance ? pct(o.chance) : "none left") + "</span></li>"; }).join("");
-    return '<section class="tsh-mbox"><div class="tsh-mbart" aria-hidden="true">' + boxArt(false, "", true) + (reduced ? "" : boxArt(false, "tsh-live")) + "</div>" +
+    return '<section class="tsh-mbox"><div class="tsh-mbart" aria-hidden="true">' + (reduced ? boxArt(false, "", true) : live(SA.box(false), "")) + "</div>" +
       '<div class="tsh-mbinfo"><h' + lvl + ' class="tsh-tagsign">Mystery box</h' + lvl + ">" +
         '<p class="tsh-mbdesc">A piece from the everyday shop you don’t have yet, at random. Never a seasonal piece, a rare costume or a rank piece.</p>' +
         '<ul class="tsh-mbodds" aria-label="The odds for you">' + odds + "</ul>" +

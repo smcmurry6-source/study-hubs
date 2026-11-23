@@ -659,7 +659,7 @@ export function placeKit(INK, C, PACKS, SETS){
         for (var x = 0; x < 410; x += 34){ s += circ(x, 296 + R() * 6, 18 + R() * 8, c[0], 1.2); }
         /* a hot-air balloon drifting by (tap: up it goes) */
         var b = G("tp-eo", FO("M318 62 q-14 0 -14 -15 q0 -15 14 -15 q14 0 14 15 q0 15 -14 15 z", "#F7A3BA", 1.6) + F("M318 32 q6 1 8 15 q-1 14 -8 15 z", "#E07090") + L("M318 32 V62", 1, INK, .6) +
-          L("M312 62 l2 8 M324 62 l-2 8", 1) + FO("M313 70 h10 v6 h-10 z", K.wood, 1.2) + G("tp-float", ""));
+          L("M312 62 l2 8 M324 62 l-2 8", 1) + FO("M313 70 h10 v6 h-10 z", K.wood, 1.2));
         s += egg("balloon", G("tp-float", b) + circ(318, 54, 18, "#000", 0).replace("/>", ' opacity="0"/>'));
         return s;
       },

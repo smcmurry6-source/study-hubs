@@ -392,15 +392,17 @@ html.hx-still .dx-wn *, html.hx-still .dx-wn *::after { animation: none !importa
 .dx-rankbar i { position: relative; overflow: hidden; background: var(--ar-gold); }
 .dx-rankbar i::after { content: ""; position: absolute; top: 0; bottom: 0; left: -40%; width: 40%; background: rgba(255, 255, 255, .55); transform: skewX(-20deg); animation: dx-shine 2.8s ease-in-out infinite; }
 @keyframes dx-shine { 0%, 55% { transform: translateX(0) skewX(-20deg); } 100% { transform: translateX(400%) skewX(-20deg); } }
-/* A drawn picture moves when you arrive at it, then rests: dash.js marks each such part of the page (lifeWatch).
-   At rest its animations are taken away, not paused: a browser gives every moving shape in a drawing a layer of its
-   own (the page had 310 of them) and a paused one keeps its layer, which is what made scrolling jitter. */
-.is-rest svg *, svg.is-rest *, .is-away svg * { animation: none !important; }
+/* A part of the page that is off the screen stops (.is-away, dash.js lifeWatch); on the screen everything keeps moving,
+   scrolling included (Sam, 2026-11-22). Its shapes' animations are taken away, not paused, so the browser frees their
+   layers. The rule names only the shapes that move: a class on the part with a rule for every shape under it (svg *)
+   made the browser restyle every shape in the drawing each time a part came on or went off the screen (up to 3,700,
+   40 to 150 ms on a slowed phone), and that was the jitter. A new moving shape inside one of the dashboard's drawings
+   goes in this list (vault/reference/motion-cost.md). */
+.is-away :is(.st-cf, .st-tw, .dx-setlights, .st-crown, .st-conf, .st-twinkle, .st-lights, .rm-bob, .shb-rays, .shpet-bob, .shpet-wobble, .shpet-eye, .shpet-pupil, .shpet-sp,
+  .shpet-twinkle, .shpet-zz, .shpet-cloud, .shpet-leaf, .shpet-snow, .shpet-drop, .shpet-star, .shpet-flag, .shpet-fw, .shpet-sweat, .dx-wn-spark, .dx-wn-waves path) { animation: none !important; }
 /* the little Timmys in the classroom and on the stage don't blink or sparkle: at their size it can't be seen, and it
    was three sparkles and two eyes a Timmy, each a layer (63 of them in a full room) */
 .dx-room .shpet-sp, .dx-room .shpet-eye, .dx-set .shpet-sp, .dx-set .shpet-eye { animation: none !important; }
-/* and nothing else in a part of the page that is off screen moves either */
-.is-away *, .is-away *::before, .is-away *::after { animation-play-state: paused !important; }
 .dx-rankcard.is-still .dx-rankbar i::after { animation: none; display: none; }
 .dx-nextart { display: grid; place-items: center; width: 44px; height: 44px; }
 .dx-nextart svg { width: 44px; height: 44px; opacity: .92; }
@@ -677,15 +679,24 @@ html.hx-still .dx-wn *, html.hx-still .dx-wn *::after { animation: none !importa
 @keyframes st-bob { 50% { transform: translateY(-4px); } }
 @keyframes st-hop { 0%, 100% { transform: none; } 40% { transform: translateY(-10px); } }
 @keyframes dx-fill { from { transform: scaleX(0); } }
-.dx-arena .st-conf { animation: st-fall 7s linear infinite; }
-.dx-arena .st-twinkle { animation: st-twinkle 2.6s ease-in-out infinite; }
-.dx-arena .st-lights { animation: st-lights 4s ease-in-out infinite; }
+.dx-arena .st-conf, .dx-arena .st-cf { animation: st-fall 7s linear infinite; }
+.dx-arena .st-twinkle, .dx-arena .st-tw { animation: st-twinkle 2.6s ease-in-out infinite; }
+.dx-arena .st-lights, .dx-arena .dx-setlights { animation: st-lights 4s ease-in-out infinite; }
+/* the stage is two stills, its backdrop and the rest in front, with what moves drawn between them (the lights and the
+   twinkles) and over them (the crown and the confetti; dash.js, stageSvg and stageFx): boxes the compositor moves, so
+   the stage is never drawn again while they move */
+.dx-setbox { position: relative; }
+.dx-setlights, .dx-setfx { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.dx-setbox > .dx-setfront { position: absolute; left: 0; top: 0; width: 100%; height: 100%; }
+.dx-setfx { overflow: hidden; }
+.dx-setfx i { position: absolute; display: block; }
+.dx-setfx svg { display: block; overflow: visible; }
 .dx-arena .st-crown { animation: st-bob 2.4s ease-in-out infinite; }
 .dx-arena .st-win { animation: st-hop 700ms var(--ease-out) 600ms 1 both; }
 .dx-arena .st-win2 { animation-delay: 350ms; }
 .dx-arena .st-win3 { animation-delay: 100ms; }
-.dx-arena.is-still .st-conf, .dx-arena.is-still .st-twinkle, .dx-arena.is-still .st-lights, .dx-arena.is-still .st-crown, .dx-arena.is-still .st-win, .dx-arena.is-still .dx-vs i { animation: none; }
-@media (prefers-reduced-motion: reduce) { .dx-visit::after { transition: none; } .dx-nowlist .dx-pulse::after { animation: none; } .dx-arena .st-conf, .dx-arena .st-twinkle, .dx-arena .st-lights, .dx-arena .st-crown, .dx-arena .st-win, .dx-board .dx-vs i { animation: none; } }
+.dx-arena.is-still .st-conf, .dx-arena.is-still .st-twinkle, .dx-arena.is-still .st-lights, .dx-arena.is-still .st-cf, .dx-arena.is-still .st-tw, .dx-arena.is-still .dx-setlights, .dx-arena.is-still .st-crown, .dx-arena.is-still .st-win, .dx-arena.is-still .dx-vs i { animation: none; }
+@media (prefers-reduced-motion: reduce) { .dx-visit::after { transition: none; } .dx-nowlist .dx-pulse::after { animation: none; } .dx-arena .st-conf, .dx-arena .st-twinkle, .dx-arena .st-lights, .dx-arena .st-cf, .dx-arena .st-tw, .dx-arena .dx-setlights, .dx-arena .st-crown, .dx-arena .st-win, .dx-board .dx-vs i { animation: none; } }
 .dx-line { display: flex; align-items: flex-start; gap: 8px; font-size: var(--fs-label); color: var(--muted); }
 .dx-line[hidden] { display: none; }
 .dx-line .ic { flex: none; margin-top: 1px; }

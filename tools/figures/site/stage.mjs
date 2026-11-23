@@ -61,6 +61,19 @@ export function stageKit(INK, C){
     return P("M-3 0 H3 L2 " + f(-h + 12) + " H-2 Z", C.metalShade, 1.8) + P("M-12 0 H12 L9 -6 H-9 Z", C.metalShade, 1.8) +
       P("M-13 " + f(-h + 12) + " H13 L9 " + f(-h + 22) + " H-9 Z", C.gold, 2) + L("M-9 " + f(-h + 15) + " H4", 1.6, "#fff", .6);
   }
+  /* the three spotlights' beams, from the rig to the floor */
+  function beams(W, fl, cx){
+    return F("M" + f(W * .16) + " 0 L" + f(cx - 150) + " " + fl + " H" + f(cx - 40) + " L" + f(W * .16 + 16) + " 0 Z", "#FFE9A8", .09) +
+      F("M" + f(W * .84) + " 0 L" + f(cx + 150) + " " + fl + " H" + f(cx + 40) + " L" + f(W * .84 - 16) + " 0 Z", "#FFE9A8", .09) +
+      F("M" + f(cx - 10) + " 0 L" + f(cx - 86) + " " + fl + " H" + f(cx + 86) + " L" + f(cx + 10) + " 0 Z", "#FFE9A8", .12);
+  }
+  /* the stars and sparkles on the backdrop: where each is, its size, its color and when it twinkles (r: the set's own
+     random numbers, so stage() and fx() put them in the same places) */
+  function twinkles(W, fl, cx, cy, r){
+    var a = [], i;
+    for (i = 0; i < 16; i++){ var sx = 60 + r() * (W - 120), sy = 34 + r() * (fl - 150); if (Math.abs(sx - cx) < 60 && sy > cy - 70) continue; a.push({ x: sx, y: sy, d: f(r() * 3), r: 2.4 + r() * 4, c: i % 3 ? C.goldLight : "#fff" }); }
+    return a;
+  }
   /* the set: W x H, the floor line at o.floor (default H - 44). Sunburst behind the middle, curtains, lights, confetti. */
   function stage(o){
     var W = o.w, H = o.h, fl = o.floor || H - 44, cx = W / 2, s = "", r = rng(o.seed || 7), i;
@@ -72,12 +85,14 @@ export function stageKit(INK, C){
       s += F("M" + f(cx) + " " + f(cy) + " L" + f(cx + Math.cos(a0) * R) + " " + f(cy + Math.sin(a0) * R) + " L" + f(cx + Math.cos(a1) * R) + " " + f(cy + Math.sin(a1) * R) + " Z", NIGHT2);
     }
     s += '<circle class="st-halo" cx="' + f(cx) + '" cy="' + f(cy) + '" r="62" fill="#FFE9A8" opacity=".10"/><circle cx="' + f(cx) + '" cy="' + f(cy) + '" r="40" fill="#FFE9A8" opacity=".10"/>';
-    /* three spotlights from the rig */
-    s += '<g class="st-lights">' + F("M" + f(W * .16) + " 0 L" + f(cx - 150) + " " + fl + " H" + f(cx - 40) + " L" + f(W * .16 + 16) + " 0 Z", "#FFE9A8", .09) +
-      F("M" + f(W * .84) + " 0 L" + f(cx + 150) + " " + fl + " H" + f(cx + 40) + " L" + f(W * .84 - 16) + " 0 Z", "#FFE9A8", .09) +
-      F("M" + f(cx - 10) + " 0 L" + f(cx - 86) + " " + fl + " H" + f(cx + 86) + " L" + f(cx + 10) + " 0 Z", "#FFE9A8", .12) + "</g>";
-    /* stars and sparkles on the backdrop */
-    for (i = 0; i < 16; i++){ var sx = 60 + r() * (W - 120), sy = 34 + r() * (fl - 150); if (Math.abs(sx - cx) < 60 && sy > cy - 70) continue; s += '<g class="st-twinkle" style="animation-delay:' + f(r() * 3) + 's">' + spark(sx, sy, 2.4 + r() * 4, i % 3 ? C.goldLight : "#fff") + "</g>"; }
+    /* three spotlights from the rig, and stars and sparkles on the backdrop: what moves on the set. With o.fx false the
+       page draws them itself from fx(), between the backdrop (o.part "back", up to here) and the rest of the set in front
+       of them (o.part "front": the floor and the curtains, then the page's blocks and winners), so the set is two stills
+       with what moves between them, in the same order as when it is one drawing */
+    if (o.part === "back") return s;
+    var back = s; s = "";
+    if (o.fx !== false && !o.part) s += '<g class="st-lights">' + beams(W, fl, cx) + "</g>";
+    if (o.fx !== false && !o.part) twinkles(W, fl, cx, cy, r).forEach(function(t){ s += '<g class="st-twinkle" style="animation-delay:' + t.d + 's">' + spark(t.x, t.y, t.r, t.c) + "</g>"; });
     /* the floor: boards, a lit pool under the blocks */
     s += F("M0 " + fl + " H" + W + " V" + H + " H0 Z", "#5B4038") + F("M0 " + fl + " H" + W + " V" + f(fl + 6) + " H0 Z", "#7A5648");
     for (i = 1; i < 9; i++) s += L("M" + f(W * i / 9 + (i - 4.5) * 10) + " " + f(fl + 6) + " L" + f(W * i / 9 + (i - 4.5) * 34) + " " + H, 1.2, "#3F2B27", .6);
@@ -98,7 +113,7 @@ export function stageKit(INK, C){
     var fr = "M" + W + " 22"; for (i = n - 1; i >= 0; i--) fr += " Q" + f(sw * (i + .5)) + " 46 " + f(sw * i) + " 22";
     s += L(fr, 3, C.gold);
     for (i = 0; i <= n; i++) s += '<circle cx="' + f(sw * i) + '" cy="23" r="3.2" fill="' + C.gold + '" stroke="' + INK + '" stroke-width="1.4"/>';
-    return s;
+    return o.part === "front" ? s : back + s;
   }
   /* confetti and streamers over the stage (its own layer, so the page can let it fall) */
   function confetti(o){
@@ -110,5 +125,22 @@ export function stageKit(INK, C){
     }
     return s;
   }
-  return { stage: stage, pedestal: pedestal, crown: crown, torch: torch, confetti: confetti, spark: spark, laurel: laurel, G: G };
+  /* What moves on the set, for the page to draw over a still one (stage({ fx: false })), each part moved by the browser's
+     compositor without drawing the set again (Sam, 2026-11-22: "I also hate that animations pause"; a set whose
+     confetti, sparkles and lights move inside it is drawn again whole on every frame, and on a phone that is what made the
+     board jitter). lights: the beams, drawn in the set's own coordinates, to pulse as one picture. pieces: each twinkle
+     ("tw") and piece of confetti ("cf") on its own: x and y in the set's coordinates, its delay in seconds, its box (a
+     square of side b around the point) and its shape drawn round 0 0. */
+  function fx(o){
+    var W = o.w, H = o.h, fl = o.floor || H - 44, cx = W / 2, cy = fl - 96, out = [];
+    twinkles(W, fl, cx, cy, rng(o.seed || 7)).forEach(function(t){ out.push({ k: "tw", x: t.x, y: t.y, d: t.d, b: Math.ceil(t.r * 2 + 2), svg: spark(0, 0, t.r, t.c) }); });
+    var r = rng(o.seed || 3), cols = [C.gold, C.red, C.blue, C.green, C.pink, "#fff", C.orange], i;
+    for (i = 0; i < (o.n || 46); i++){
+      var x = 70 + r() * (W - 140), y = 46 + r() * (H - 150), c = cols[i % cols.length], a = Math.round(r() * 180), k = r(), d = f(-r() * 6);
+      out.push({ k: "cf", x: x, y: y, d: d, b: k < .8 ? 10 : 20, svg: k < .55 ? '<rect x="0" y="0" width="7" height="3.6" rx="1" fill="' + c + '" transform="rotate(' + a + ')"/>' :
+        k < .8 ? '<circle cx="0" cy="0" r="2.2" fill="' + c + '"/>' : L("M0 0 q4 -5 8 0 t8 0", 2, c) });
+    }
+    return { lights: beams(W, fl, cx), pieces: out };
+  }
+  return { stage: stage, fx: fx, pedestal: pedestal, crown: crown, torch: torch, confetti: confetti, spark: spark, laurel: laurel, G: G };
 }

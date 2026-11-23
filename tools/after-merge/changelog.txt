@@ -99,3 +99,4 @@ all | Timmy's shop has a mystery box: 750 crowns for a random piece you don't ha
 review-of-systems | Review of Systems is now in its own violet everywhere on its page: buttons, tabs, the countdown and the one-page sheets.
 all | The one-page sheets are for reading on screen now: the Print or save as PDF button is gone.
 review-of-systems | Cardio & Respiratory, Renal, MSK & GI, Fundamentals I and Fundamentals II checked against the professors' slides (and Renal against Dr. Herr's recordings): fixes, new notes, 226 new questions, and what the professors said to know or skip, in their words, as High-yield points. Ask Timmy now reads the course you're studying first.
+all | Smoother scrolling: the dashboard's pictures, the leaderboard's stage and Timmy's shop keep moving while you scroll instead of freezing, and cost your phone less to draw.

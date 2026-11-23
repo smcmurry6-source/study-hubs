@@ -117,7 +117,7 @@ leaderboards, the streak stats and the arcade board have `_v2` versions with the
   `dark` says how many; the Dark Matter scene shows it), **+20,000 for reaching the ModuPro and +30,000 for reaching the Loupes**
   (the same migration; Sam: "we can upp modupro to 20,000 and then loupes to 30,000"; at 125,000 and 250,000 XP, once each, crowns
   only, back pay included; `sh_prizes()`'s `modupro` and `loupes`, the wallet's `modupro` and `loupes` 1 once reached; the
-  hand-offs show them), **+ every prize's XP again as crowns** (migration_v68, next to last section), minus what was spent. Spending never lowers XP or rank. The XP from before the
+  hand-offs show them), **+ every prize's XP again as crowns** (migration_v68, next to last section), **+ the crowns given by hand** (`crown_gifts`, migration_v100, in its section below), minus what was spent. Spending never lowers XP or rank. The XP from before the
   switch counts, so the shop opens with what XP already earned; the one-time grants count from the switch on.
 - **The catalog** (`shop_items`): each item's kind, rarity, price (checked against its rarity's band), season, slot, HP or
   boost, `wide` for a yard item that takes two spots (the bowling lane), `gift` (everyone owns it) and `rank_tier` (owned
@@ -665,10 +665,36 @@ pg_cron job; no function replaced. Sam approved the box's numbers, its tail as i
   the other boards: the top three on the stage with a coin, the rest as rows, each a visit; without the function the tab
   hides itself. `get_leaderboard_v2` (the streaks) stays in the database, unused by the dashboard.
 
+## Crowns given by hand (migration_v100)
+
+Sam, 2026-11-23: "Give [one account, by its leaderboard name] 50,000 crowns". Every other way to crowns pays XP with them
+(a prize pays as many crowns as XP) or is worked out from XP, rank, trophies, medals or study time, so a grant through any
+of them would have moved XP and rank too (50,000 XP is the Handpiece's Dark Matter, with its own 5,000 crowns). A gift is
+crowns and nothing else.
+
+- **`crown_gifts`** (`key` unique, `visitor_id`, `crowns` 1 to 1,000,000, `note` up to 200 characters, `at`): one row a
+  gift, closed to visitors (RLS on, no grants). `sh_wallet` adds them to what was earned and returns them as `gifts`; no
+  XP, rank, prize or class number moves, and they are spent like any crowns.
+- **`sh_gift_crowns(visitor, key, crowns, note)`** gives one: to the id that remains when the devices are linked, once per
+  key (the same key again gives nothing: `given` false), and it brings the person's Crowns board row up to date at once
+  (the board's refresh only looks again at someone whose XP or spending moved, or after an hour). It answers `{ok, given,
+  crowns, balance}`, or `{ok: false, error}` (`visitor`, `key`, `crowns`). Anon can't run it: **an agent gives a gift only
+  when Sam asks**, through the Supabase connector (or Sam in the SQL editor), with a key such as `sam-<date>-<n>`, e.g.
+  `select sh_gift_crowns('<visitor id>', 'sam-2026-11-23-1', 50000, 'From Sam')`. Find the visitor id from the leaderboard
+  name in `visitor_names` (read-only), and say the name and the balance before and after in the chat only, never in the
+  repo ([learner-data-privacy](../rules/learner-data-privacy.md)).
+- **Link my devices** moves a linked device's gifts to the id that remains (the trigger `visitor_links_gifts`).
+- **Never take one back** by deleting its row once some of it is spent: the balance would go below zero
+  ([earn-rates-stay-enjoyable](../rules/earn-rates-stay-enjoyable.md)). The page shows no card for a gift: the balance
+  just goes up the next time it is read.
+- The economy audit (`tools/economy.sql` E3) leaves gifts out of the share of earned crowns that was spent, since they
+  weren't earned by studying.
+- The first, 2026-11-23: 50,000 crowns to one account, at Sam's request.
+
 ## Tests
 
 `node tools/release/xp.js` builds a throwaway database from `supabase/schema.sql` with made-up history, applies the pending
-migrations as the release will, and checks all of the above (about 750 checks, the prizes of migration_v68 in section 14c, the mystery box, Studying now and the Crowns board of migration_v99 in section 18, the collections of migration_v75 in 14d, the exam-eve boss of migration_v97 in 14f, the shop's client in section 13b and Learn and Flashcards' in 14b: a replayed call, a double tap and a linked device
+migrations as the release will, and checks all of the above (about 750 checks, the prizes of migration_v68 in section 14c, the mystery box, Studying now and the Crowns board of migration_v99 in section 18, the crowns given by hand of migration_v100 in section 19, the collections of migration_v75 in 14d, the exam-eve boss of migration_v97 in 14f, the shop's client in section 13b and Learn and Flashcards' in 14b: a replayed call, a double tap and a linked device
 among them, the rebuild against the live calls, the catalog against `tools/figures/site/sets.mjs`, three years of shelves
 day by day, a place opened from a board row, and a random visit going through the whole class, in 14a). `node tools/release/rls.js` applies the pending migrations too, seeds
 the new tables and calls every function a visitor can run with one visitor's id, failing if another visitor's id comes back;
