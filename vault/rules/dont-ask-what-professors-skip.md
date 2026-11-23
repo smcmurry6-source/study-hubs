@@ -11,7 +11,9 @@ Sam's standing rule for every hub, live and future. It started on 2026-11-08 for
 rule", from Heme & Endo Exam 2: "2 should come out along with any questions that professors say we dont need to know"),
 and on 2026-11-20 it took in the notes too: "dont include anything that was deemphasized or we were told not to worry
 about", then "make it a rule for every hub". **No question tests a point a professor said students don't need, and no note
-teaches it.** The professor's "skip this, know that" itself stays, as an Exam Hint.
+teaches it.** Since 2026-11-23 the professor's "skip this" isn't written down either (Sam, of Review of Systems' 50 such
+notes: "just do not include things they said not to memorize. dont include a note saying 'dont memorize'. thats just
+confusing and takes up space"): no `deemphasize` Exam Hint, no "You can skip" in High yield, no line in the podcast.
 
 - **What counts:** the course's professor says it in a recording, an in-class review, a focus list or a study guide, for
   example "you don't need to know this", "I'm not going to test you on", "skip this", "don't worry about", "trivia", "won't
@@ -19,13 +21,15 @@ teaches it.** The professor's "skip this, know that" itself stays, as an Exam Hi
   merely not discussed doesn't count by itself. A classmate's note, or an earlier class being told something wasn't on
   *their* exam, is a lead to ask Sam about, not a rule: in Review of Systems Sam kept CKD (a classmate's "NO EXAM Qs") and
   NYHA class, prazosin and artificial valves (the class above's "not on the test") ([decisions](../decisions.md), 2026-11-20).
-- **Look for it every time a lecture goes taught** (its recording arrives) and when a review or focus list comes in: search
-  the transcript for those phrases and record each one as a `deemphasize` Exam Hint, in the professor's words with what to
-  know instead ("Skip the AML subtypes M0 to M7; know AML versus ALL"). **Keep those hints** (Sam, 2026-11-20): they tell
-  students what to skip without teaching it. The podcast's "what was de-emphasized" is said the same way.
+- **Look for it every time a lecture goes taught** (its recording arrives) and when a review or focus list comes in, and in
+  the slides' speaker notes ("FOR REFERENCE ONLY! DO NOT MEMORIZE!"): search for those phrases and leave the point out.
+  Write no hint for it (the `deemphasize` kind, kept 2026-11-20 to 2026-11-23, is no longer written); list in the PR what
+  came out and the quote behind each, so Sam can see it. If the professor said what to know instead ("know AML versus ALL"),
+  make sure the notes teach that. A professor's "FYI" isn't a skip by itself (2026-11-23, one of the calls Sam left to the
+  agent, "use outside sources to decide the content calls": [decisions](../decisions.md)).
 - **The notes leave it out**: As taught, Plain English, High yield, the cram list, review tables, sort sets, mind maps and
   High likelihood topics don't describe a skipped point, not even marked as "not needed" or "background". Keep what the
-  professor said to know about it (the "know that" half of the hint). Editing a lecture's notes means recording its
+  professor said to know about it (the "know that" half). Editing a lecture's notes means recording its
   narration again in the same PR ([text-and-audio-never-drift](text-and-audio-never-drift.md)).
 - **A question whose key depends on a skipped point comes out**: delete it and mark its id `retired` in
   `tools/question-ids/<hub>.txt` ([question-ids-are-permanent](question-ids-are-permanent.md)). This rule is Sam's standing

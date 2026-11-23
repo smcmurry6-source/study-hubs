@@ -1739,6 +1739,7 @@ function context(){
 var c = { view: String(opt("section") || (isDash() ? "dashboard" : "")).slice(0, 60) };
 var pl = isDash() ? null : opt("place");
 if (pl && pl.lec) { c.lec = String(pl.lec); if (Number.isInteger(pl.k)) c.k = pl.k; }
+if (pl && pl.course) c.course = String(pl.course).slice(0, 40);
 return c;
 }
 function progressFrom(hub, core, state, examId){

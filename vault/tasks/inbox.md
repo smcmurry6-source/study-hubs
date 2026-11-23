@@ -79,10 +79,10 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   the tile). Sam's call whether it wants one; if so, its games, names and lobby art are its own
   ([arcade-skins](../rules/arcade-skins.md)), and the hub comes out of `TEXT_ONLY` in `sw.js`.~~ dropped: Sam, 2026-11-20, "No
   arcade" ([decisions](../decisions.md)).
-- [ ] **Review of Systems: Cardio & Respiratory and Renal from their slides** (2026-11-19, the hub's build): their Drive
+- [x] **Review of Systems: Cardio & Respiratory and Renal from their slides** (2026-11-19, the hub's build): their Drive
   folders had the thinnest sources (classmates' guides, no professor slides), so those sections rest most on standard
   references. If Sam can share their slides or transcripts, check those parts against them. Sam, 2026-11-20: "ill get you the other
-  slides soon": waiting on Sam.
+  slides soon". Done 2026-11-22 with the other courses Sam uploaded: [the task](done/2026-11-22-review-of-systems-from-the-slides.md).
 - [x] **Run the test-runs data fix once more on 2026-11-21** (2026-11-19, the evening lessons audit): the PR that adds
   `tools/ci/no-leaks.js` runs `tools/data-fixes/2026-11-19-test-runs.sql` after its merge, but a smoke test run locally from a
   branch older than the fix (another session's) still writes its game-layer check into the live hub until that branch takes

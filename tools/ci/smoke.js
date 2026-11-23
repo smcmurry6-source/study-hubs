@@ -926,6 +926,10 @@ function lint(hub, A){
           const before = sent.length; await page.click('.ska-send'); await page.waitForTimeout(3500);
           const last = sent[sent.length - 1];
           if (sent.length === before || !last.ask || last.ask.qid !== qid) problems.push(`${name} (${label}): Ask Timmy didn't send question ${qid} with the message (${JSON.stringify(last && last.ask)})`);
+          /* a hub of courses (core.json's groups): away from the notes the chat names the course the student is in, here the
+             course of the notes just opened (lec0), so Ask Timmy reads that course first (widget/hub-timmy.js askCourse) */
+          const g0 = (() => { try { const c = JSON.parse(fs.readFileSync(content(hub, 'core.json'), 'utf8')); return (c.groups || []).length ? (c.lectures.find(l => l.id === lec0) || {}).group || null : null; } catch (e) { return null; } })();
+          if (g0 && sent.length > before && !(last.context && last.context.course === g0)) problems.push(`${name} (${label}): Ask Timmy from the Question Bank didn't name the course (${JSON.stringify(last.context)}, expected course ${g0})`);
           if (await page.$('.ska.is-on')) await page.click('[data-ska="close"]');
         }
         await page.evaluate(() => { location.hash = 'questions/mock'; }); await page.waitForTimeout(800);
