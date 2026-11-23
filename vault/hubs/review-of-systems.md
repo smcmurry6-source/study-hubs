@@ -48,10 +48,16 @@ check-in hours: its entry in `hubs.js`.
   sources disagreed and how it was settled, per course: [the task](../tasks/done/2026-11-19-review-of-systems-hub.md). Not read: Anki decks (`.apkg`) and HEIC photos. Commercial review material
   (DAT Bootcamp, Dental Decks and the like) was never copied.
   **From 2026-11-22 the professors' slides** (and, for Renal, Dr. Herr's recordings' transcripts), which Sam uploaded then:
-  each part checked against them is listed with what is still unread in
-  [the slides task](../tasks/2026-11-22-review-of-systems-from-the-slides.md), and its `from` in `core.json` names the
-  decks. Where a slide disagrees with a standard reference the hub keeps the standard fact and the PR lists the slide's
-  version for Sam; a deck over 10 MB that the Drive connector returns empty needs a PDF or smaller copy.
+  each part checked against them is listed in [the slides task](../tasks/done/2026-11-22-review-of-systems-from-the-slides.md),
+  and its `from` in `core.json` names the decks. Where a slide disagrees with a standard reference the hub keeps the
+  standard fact and the PR lists the slide's version for Sam. A deck over 10 MB that the Drive connector returns empty
+  needs a PDF or smaller copy: Sam gave three as PDFs in the session (2026-11-23: the heart anatomy deck and Dr. Herr's
+  foregut and abdominal wall decks; not in Drive in that form, so ask Sam for them again). F1's Introduction to
+  Endocrinology and Histology 4 were checked against this site's Heme & Endo and MSK hubs instead (Sam: "check previous
+  hubs"), and the other unreadable decks are left to the study guides (Sam: "dont worry about the rest").
+  **Sam's calls on the conflicts** (2026-11-23, "use outside sources to decide the content calls"): one fact taught in
+  every course, from current references, listed in [decisions](../decisions.md): elective care after an MI, warfarin
+  extractions, antibiotics in liver disease, Pseudomonas and the rest.
 - **Graded work, "topic check only"** (Sam, 2026-11-19; [decisions](../decisions.md)): the earlier courses' quizzes,
   crosswords and exams were read only to check that every topic they test is covered by the hub's own questions. No question
   was copied or reworded from one, and nothing in the hub says a topic was on one. **This course's own 8 quizzes are never
@@ -64,10 +70,12 @@ check-in hours: its entry in `hubs.js`.
   about those courses' own exams, so they mark high-yield content and never predict the mocks. `core.json`'s `hintsFrom: "courses"` makes the engine
   say **High-yield points** for Exam hints (Home, More, search) and **High yield** for High likelihood (the bank's toggle, the card's tag and its why,
   High yield's intro), and Ask Timmy say the same (`supabase/functions/timmy/core.js`). Words that predict the mocks stay out of this hub's text.
-- **The quotes:** only Medical Emergencies has any (18, from its four lecture recordings, with each professor's name as the
-  transcript spells it). What those professors said they won't test (ECG patterns, airway adjunct sizing, the steroid chart
-  and the like) is left out of the notes as well as the questions ([dont-ask-what-professors-skip](../rules/dont-ask-what-professors-skip.md),
-  every hub's rule since 2026-11-20; Radiology's contrast and grayscale too). The other courses had no recordings in their folders.
+- **The quotes (High-yield points):** 169, every one what a professor said to know, in the professor's words: Medical
+  Emergencies' 18 from its recordings, and since the slides (2026-11-22) the rest from the decks, their speaker notes and
+  Dr. Herr's Renal recordings. What a professor said not to learn (ECG patterns, airway adjunct sizing, the steroid chart,
+  "FOR REFERENCE ONLY! DO NOT MEMORIZE!", the CKD lecture's reference ranges and the like) is left out of the notes and the
+  questions, and **nothing says it was left out**: no "don't memorize" point (Sam, 2026-11-23: "dont include a note saying
+  'dont memorize'"; [dont-ask-what-professors-skip](../rules/dont-ask-what-professors-skip.md)).
 - **Not High likelihood on purpose:** CKD (`rn-disease-01` to `-05`): a classmate's Renal Exam 1 objectives head it "NO EXAM
   Qs on this". The questions stay, since that was about the Renal course's own exam and CKD's dental care is board material;
   Sam kept it so (2026-11-20, [decisions](../decisions.md)). The merge script that built the content keeps it out.
@@ -76,13 +84,13 @@ check-in hours: its entry in `hubs.js`.
   suite's slowed phone (Heme & Endo Exam 3: 300-370 ms), nearly all of it the background work after Home has drawn (parsing the
   JSON, the search index of every part's notes). Its budget in `tools/release/budgets.json` is set from that (2026-11-20),
   and raised from 1,500 to 1,800 KB on 2026-11-22, when the professors' slides took it to about 1.6 MB (Sam: "I dont
-  want to sacrifice the quality of the material"; the page still draws by about 2.5 s, the rest loading behind it);
+  want to sacrifice the quality of the material", then "a budget raise is fine"; the page still draws by about 2.5 s, the rest loading behind it);
   chunking the search index is on the [inbox](../tasks/inbox.md). Ask Timmy's content
   for it was about 170-200k tokens by length, which is why Timmy moved to Haiku 5.5 ([decisions](../decisions.md),
   [ask-timmy](../reference/ask-timmy.md)). Checked against the professors' slides and recordings (2026-11-22) it passed
   200k, and Sam put the material first ("I dont want to sacrifice the quality of the material just so we can have ask
   timmy"): **Timmy reads the course the student is in** (Sam: "have Timmy only read the course the student is in"), one
-  course's notes, tables, cram sheet and High yield, about 36-89k tokens a question (every course's cram sheet when no
+  course's notes, tables, cram sheet and High yield, about 36-87k tokens a question (every course's cram sheet when no
   course is known), and the whole hub only when that isn't enough ([ask-timmy](../reference/ask-timmy.md), "Limits and money"). `tools/timmy/test.mjs` fails a course whose prompt
   reaches 95,000 tokens (Haiku 5.5 costs five times as much past a 100k prompt): a course that grows past it needs its
   notes looked at, or the check moved, with Sam.

@@ -154,7 +154,7 @@ list, no limit on gap answers. they are uncommon" ([decisions](../decisions.md))
   log's `turn` line says `content` `course` or `course+full` and `course` (the course's id, or `none`). Everything in the
   part is the course's own because Haiku 5.5's price goes up fivefold on a prompt over 100k tokens (input $0.50 and output
   $2.50 a million, against $0.10 and $0.50): with the rules and the site help (about 26k), one course's prompt is about
-  36-89k tokens (Fundamentals I the biggest; every course's cram sheet, about 30k, was in each until the same day, when
+  36-87k tokens (Fundamentals I the biggest; every course's cram sheet, about 30k, was in each until the same day, when
   Fundamentals I passed 95k with it), and `tools/timmy/test.mjs` fails a course's prompt, or the no-course one, that
   reaches 95,000 by the function's count, or whole content past 400,000 (200,000 for a hub without courses). On the
   dashboard the hub is read as before. The eval's
