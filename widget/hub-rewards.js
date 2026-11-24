@@ -86,9 +86,10 @@
   /* the arcade game being played: its session on the game layer (widget/games.js), which its answers carry */
   function arcSession(){ var G = window.shGames; return G && G.session ? G.session() : null; }
   /* more: { order: a sequence's steps as placed (authored indexes), session: the mock's session; an arcade answer takes
-     the running game's } */
+     the running game's; self: the student's own grade, as a recall card's (Learn's typed answer when the match didn't
+     find it: "I had it" / "I missed it", context "typed", migration_v102) } */
   function recordAnswer(qid, lecId, correct, ctx, choice, picks, more){
-    var qq = QBY[qid], kind = qq ? KIND[qq.type] || "" : "", game = v2();
+    var qq = QBY[qid], kind = more && more.self ? "self" : qq ? KIND[qq.type] || "" : "", game = v2();
     var xp = xpFor(qid, correct, kind === "self"), t = todayRec(), first = !t.n, mult = game && boost() ? 2 : 1;
     putAnswer(qid, lecId, correct);
     t.n++; if (correct) t.r++; t.xp += xp;

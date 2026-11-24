@@ -419,7 +419,20 @@ Good or Easy, on a schedule like Anki's that ends on exam eve. `migration_v56.sq
   answers only, as before.
 - **Learn's context**: v54's `record_answer_v2` didn't list `learn`, so Learn's answers were filed as `other` (Sam,
   2026-11-12: v54 isn't changed). `migration_v59.sql` (2026-11-16) adds `learn` to `sh_answer`'s list, so from then on
-  `answer_xp.ctx` says `learn`; the rows before it stay `other`. Nothing pays or checks by the context.
+  `answer_xp.ctx` says `learn`; the rows before it stay `other`. Nothing pays or checks by the context, except `typed` (next).
+- **Learn's typed answer** (`migration_v102.sql`, 2026-11-24, Sam's calls in [decisions](../decisions.md)): Learn's second step for a
+  question that stands without its choices and has a short answer (`typedOK` in `widget/study-modes.js`: 6 words, 48 letters) is
+  typed. The page grades it with a forgiving match (`SH_STUDY.match`, tested by `tools/ci/typed.js`) and sends context `typed`:
+  a match sends the right choice as the pick, graded from the key and paid as any answer (10 / 2); no match, and the student
+  says "I had it" or "I missed it": no choice and `p_self`, which `sh_answer` takes for a one-choice question only with
+  `typed` (elsewhere still `bad`) and records and pays as a self-graded card (kind `self`, a flat 2, a miss's first three a
+  day). Either way it goes to `personal_answers` and never to `record_answer` or `record_choice` (the class's % right and %
+  per choice), and question health writes no row for it. The typed words never leave the page. `tools/release/xp.js` section 20.
+- **Flashcards' Undo** (2026-11-24, no server change): a rating moves the card's schedule on the page at once but is held 5 s
+  (`UNDO_MS`) before `recordCard()` pays it and it goes into `STATE.cardq` for `record_card_v2`. Undo puts the card's schedule
+  back and sends nothing; the next rating, Close, hiding or leaving the page sends it at once. A rating still in `STATE.cardq`
+  when the page goes is sent by the hub's next page (`widget/hub-bank.js` fetches `study-modes.js` for it, only then) with its
+  first request id, so it is paid once.
 - **Before the migration** (the preview's `rpc()` answers all three from fixtures): the page keeps everything on the
   device, the ratings wait in `STATE.cardq` (up to 3,000), and the first call that finds the functions missing stops
   trying until the next page load. Test browsers (`navigator.webdriver`) send nothing.

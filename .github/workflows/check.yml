@@ -96,6 +96,9 @@ jobs:
       - name: Statement items in a new order on a later try (every order of every item agrees with its key; Ask Timmy's copy matches)
         if: ${{ !cancelled() }}
         run: node tools/ci/statements.js
+      - name: Learn's typed answer (the forgiving match marks a right answer right, never a wrong one, on every live hub's typed questions)
+        if: ${{ !cancelled() }}
+        run: node tools/ci/typed.js
       - name: Generated files are current (site art, each hub's question index and High yield from its content, Ask Timmy's site help from the About page, the bundles from the widget files)
         if: ${{ !cancelled() }}
         run: node tools/figures/site/build.mjs --check && node tools/hub-next/build.mjs --check && node tools/timmy/build.mjs --check && node tools/bundle/build.mjs --check

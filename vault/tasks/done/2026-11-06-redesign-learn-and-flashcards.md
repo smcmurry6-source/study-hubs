@@ -243,6 +243,21 @@ Proposed as the defaults above and confirmed by Sam, all six ("1, 2, 3, 4, 5, 6 
   by rating. The six calls above stand (rounds of 7, two rights, the schedule, what pays). Not built: a typed answer and
   an undo for a rating ([inbox](../inbox.md)).
 
+- 2026-11-24 (Claude Code, the backlog package "Learn: a typed answer; Flashcards: undo the last rating", PR #549): Sam, "Do typed
+  answers in learn and undo in flashcards too". Asked first how a typed answer is graded and paid, Sam picked both proposals
+  ([decisions](../../decisions.md)). **Learn's second step is typed** for a question that stands without its choices
+  (`hideable`) and whose right answer is short (`typedOK`: 6 words, 48 letters, not "all", "none", "both" or "above"): a box
+  and Check. The forgiving match (`SH_STUDY.match` at the top of `widget/study-modes.js`; case, accents, punctuation, "a",
+  "an", "the", a plural s, word order, number words, a parenthesis left out, and one typo in a word of 7 letters or more,
+  never in its first two letters) marks a clear match right by itself; otherwise the answer shows and the student taps "I
+  had it" or "I missed it" (a match to another choice says so). A match pays as an answer, a self-mark as a recall card,
+  and neither reaches the class's numbers (`migration_v102.sql`, context `typed`). This changes call 5 above for those
+  questions only (163 in Review of Systems); the rest keep "think of your answer, then show the choices". **Flashcards'
+  Undo**: a rating is held 5 s (an Undo bar under the next card, U or Ctrl/Cmd+Z) before it is paid and sent; Undo brings
+  the card back turned over. The next rating, Close, hiding or leaving the page sends it, and the hub's next page sends one
+  left in `STATE.cardq`. Tests: `tools/ci/typed.js` (new, in "Check hubs"), `tools/release/xp.js` section 20, the smoke
+  test's Learn and Flashcards walk (a typed match and a self-mark; Undo, nothing queued until it runs out, Close sends it).
+
 ## Outcome
 
 Built and merged ([#344](https://github.com/smcmurry6-source/study-hubs/pull/344), `7efb1ad`), not released: the Question Bank's **Study as: Questions · Learn · Flashcards** in the three new hubs, with the
@@ -252,6 +267,9 @@ the release; the release note says what goes in then.
 **Released 2026-11-14** with the redesign ([the release](2026-11-06-redesign-release.md)), in Occlusion and Perio, as
 rebuilt in the release's second round (full-screen sessions, Quizlet-style Learn, rated flashcards). `migration_v56` is
 applied. Left for Sam, in the [inbox](../inbox.md): one Learn round and a flashcard on the live site.
+
+**2026-11-24**: the two follow-ups the release left in the inbox are built: Learn's typed answer and Flashcards' Undo (the Log's
+last entry; `migration_v102.sql`; #549).
 
 Related: [the audit and plan](2026-11-05-redesign-audit-and-plan.md) · [the release](2026-11-06-redesign-release.md) ·
 [phase 2](2026-11-05-redesign-phase-2-live-hubs.md) · [question-bank-filter-panel](../../rules/question-bank-filter-panel.md) ·

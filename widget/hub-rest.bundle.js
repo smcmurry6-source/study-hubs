@@ -2621,6 +2621,7 @@ document.querySelectorAll(sel).forEach(function(c){ var s = st(c); if (!s.answer
 card = cands.indexOf(focus) >= 0 ? focus : cands.sort(function(a, b){ return st(b).pre - st(a).pre; })[0] || null;
 var s = card ? st(card) : null, q = qOf(qid);
 var ctx = String(d.ctx || (s && s.ctx) || "").toLowerCase();
+if (ctx === "typed") { if (card) { s.answered = true; addRating(card); } return; }
 var rec = ab({ q: qid, v: verOf(qid), k: "a", c: ctx, t: kindOf(q, (s && s.type) || ""), ok: d.correct ? 1 : 0 }, card);
 if (prior) { rec.n = prior.n + 1; if (prior.n) { rec.p = prior.last ? 1 : 0; rec.g = Math.round((t - prior.t) / 60000); } }
 if (typeof d.choice === "number") rec.ch = d.choice;
@@ -4710,9 +4711,11 @@ if (bg && !tickTimer) { follow(); startActivityPing(); }
 });
 window.addEventListener("pagehide", stopActivityPing);
 function answerToday(d, isCorrect){
+if (d.ctx !== "typed") {
 safeRpc("record_answer", { p_hub: HUB, p_qid: String(d.qid || ""), p_correct: isCorrect });
 if (typeof d.choice === "number") safeRpc("record_choice", { p_hub: HUB, p_qid: String(d.qid || ""), p_choice: d.choice });
 else if (Array.isArray(d.picks) && d.picks.length) safeRpc("record_choices", { p_hub: HUB, p_qid: String(d.qid || ""), p_choices: d.picks });
+}
 safeRpc("record_personal_answer", { p_visitor: VISITOR_ID, p_hub: HUB, p_qid: String(d.qid || ""), p_correct: isCorrect });
 safeRpc("record_correct_streak", { p_visitor: VISITOR_ID, p_correct: isCorrect });
 }

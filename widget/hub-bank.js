@@ -117,8 +117,16 @@
     /* o.num, o.of: the card's place in the set ("Question 12 of 84"), so you can see how many are left (a classmate's
        ask, from the idea board, 2026-11-15) */
     var head = '<header class="qc-head"><span class="qc-meta">' + (o.num ? qNum(o.num, o.of, id + "n") : "") + verTag(q) + '<span class="qc-lec" id="' + id + 'h">' + lecChip(q.lec) + "</span>" + likelyTag(q) + status + '</span><span class="qcard-top qc-tools"></span></header>';
-    var body = "", hide = !!o.hide && q.type === "mcq";
-    if (q.type === "mcq" || multi) {
+    var body = "", typed = !!o.typed && q.type === "mcq", hide = !!o.hide && q.type === "mcq";
+    if (typed) {
+      /* Learn's typed answer (widget/study-modes.js, Sam 2026-11-24): the stem alone and a box to type in. o.typed.match
+         (the forgiving match) says whether it's the right choice; if not, the answer shows and you say whether you had it.
+         What you type stays on this page: only right or wrong is sent (context "typed", migration_v102) */
+      body = '<form class="qc-typed" data-typed novalidate autocomplete="off"><label class="qc-typed-l" for="' + id + 't">Type the answer</label>' +
+        '<div class="qc-typed-row"><input class="qc-typed-in" id="' + id + 't" type="text" data-typein maxlength="160" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="done">' +
+        '<button class="btn btn-primary" type="submit" data-typecheck disabled>Check</button></div>' +
+        '<p class="note qc-typed-n">Small typos are fine.</p></form><div class="qc-typed-res" data-typedres hidden aria-live="polite"></div>';
+    } else if (q.type === "mcq" || multi) {
       var order = multi ? shuffled(q.choices.map(function(c, i){ return i; })) : choiceOrder(q);
       /* Learn's second step (widget/study-modes.js): the stem alone first, then the choices on request, still graded by the key */
       body = (hide ? '<div class="qc-go qc-think" data-thinkrow><button class="btn btn-primary" type="button" data-showch>' + icon("questions", 18) + 'Show the choices</button><span class="note">Think of your answer first, then show the choices.</span></div>' : "") +
@@ -149,6 +157,27 @@
   }
   function wireCard(el, q, o){
     var multi = q.type === "multi", picked = [], seqP = [], match = { sel: null, done: 0, err: 0, first: [] }, self = false;
+    /* Learn's typed answer: how it was graded ("match": the forgiving match found the right choice; "self": you said) */
+    var typedF = $("[data-typed]", el), typedHow = "";
+    if (typedF) {
+      var tin = $("[data-typein]", typedF), tchk = $("[data-typecheck]", typedF);
+      tin.addEventListener("input", function(){ tchk.disabled = !tin.value.trim(); });
+      typedF.addEventListener("submit", function(e){
+        e.preventDefault();
+        var v = tin.value.trim();
+        if (!v || tin.readOnly || el.classList.contains("is-answered") || el.classList.contains("is-skipped")) return;
+        tin.readOnly = true; tchk.hidden = true; $(".qc-typed-n", typedF).hidden = true;
+        var m = o.typed && o.typed.match ? o.typed.match(v, q) : { right: false };
+        if (m.right) { typedHow = "match"; answer(tchk); return; }
+        typedF.classList.add("is-asking");
+        var res = $("[data-typedres]", el);
+        res.innerHTML = '<p class="qc-ans"><b>Answer:</b> ' + esc(q.choices[q.answer]) + "</p>" +
+          '<p class="note">' + (m.other ? "That\u2019s one of the other choices." : "Not an exact match.") + " Did you have it?</p>" +
+          '<div class="qc-go" data-grade-row><button class="btn" type="button" data-tgrade="1">' + icon("check", 18) + 'I had it</button><button class="btn" type="button" data-tgrade="0">' + icon("cross", 18) + "I missed it</button></div>";
+        res.hidden = false;
+        var g = $("[data-tgrade]", res); if (g) g.focus();
+      });
+    }
     el.addEventListener("click", function(e){
       var b = e.target.closest("button"); if (!b || !el.contains(b) || el.classList.contains("is-answered")) return;
       if (b.hasAttribute("data-i")) {
@@ -164,6 +193,7 @@
       if (b.hasAttribute("data-showch")) { var row = $("[data-thinkrow]", el), ul = $(".qc-choices", el); if (ul) ul.hidden = false; if (row) row.remove(); var f0 = $(".ch", el); if (f0) f0.focus(); return; }
       if (b.hasAttribute("data-reveal")) { $(".qc-ans", el).hidden = false; $("[data-reveal-row]", el).hidden = true; $("[data-grade-row]", el).hidden = false; var g = $("[data-grade]", el); if (g) g.focus(); return; }
       if (b.hasAttribute("data-grade")) { self = b.getAttribute("data-grade") === "1"; $("[data-grade-row]", el).hidden = true; answer(b); return; }
+      if (b.hasAttribute("data-tgrade")) { self = b.getAttribute("data-tgrade") === "1"; typedHow = "self"; answer(b); return; }
       if (b.hasAttribute("data-step")) {
         var si = +b.getAttribute("data-step"); seqP.push(si); b.disabled = true; b.classList.add("is-on"); $(".ord", b).textContent = seqP.length;
         $("[data-seqtools]", el).hidden = false;
@@ -192,7 +222,16 @@
     function answer(from){
       el.classList.add("is-answered");
       var right = false, score = 0, partial = "", rec;
-      if (q.type === "mcq") {
+      if (typedHow) {
+        /* a match is graded by the server from the key (the right choice as the pick); "I had it" / "I missed it" is your
+           word, paid like a recall card. Neither goes to the class's numbers */
+        right = typedHow === "match" || self;
+        if (!right) partial = "You marked it missed";
+        var tr = $("[data-typedres]", el); if (tr) tr.remove();
+        typedF.classList.remove("is-asking"); typedF.classList.add(right ? "is-right" : "is-wrong");
+        el.__typed = typedHow;
+        rec = HX.recordAnswer(q.id, q.lec, right, "typed", typedHow === "match" ? q.answer : null, null, { self: typedHow === "self" });
+      } else if (q.type === "mcq") {
         right = picked[0] === q.answer;
         $$(".ch", el).forEach(function(b){ var i = +b.getAttribute("data-i"), st = i === q.answer ? "right" : i === picked[0] ? "wrong" : ""; paintChoice(b, st, i === picked[0], "ring"); });
         rec = HX.recordAnswer(q.id, q.lec, right, o.ctx, picked[0]);
@@ -221,7 +260,7 @@
       result(el, q, right, partial, rec.xp, picked, o);
       if (o.onAnswer) o.onAnswer(el, q, right);
       HX.reward(from, right, rec);
-      classPicks(el, q, picked);
+      if (!typedHow) classPicks(el, q, picked);
     }
   }
   function paintChoice(b, st, isPick, kind){
@@ -255,10 +294,12 @@
       : '<p class="verdict no">' + icon("cross", 26) + 'Not quite<span class="xp num">+' + xp + " XP</span></p>";
     var order = q.type === "sequence" ? '<ol class="qc-order">' + q.steps.map(function(s){ return "<li>" + esc(s) + "</li>"; }).join("") + "</ol>" : "";
     var pairs = q.type === "match" ? '<dl class="qc-pairs">' + q.pairs.map(function(p){ return "<div><dt>" + esc(p[0]) + "</dt><dd>" + esc(p[1]) + "</dd></div>"; }).join("") + "</dl>" : "";
-    res.innerHTML = verdict + figAfterHTML(q) + order + pairs + '<p class="qc-ex">' + esc(q.ex || "") + "</p>" +
+    /* Learn's typed answer: the right choice in words, and "Why each choice" with the right one marked, as on a flashcard */
+    var typed = el.__typed, said = typed ? '<p class="qc-ans qc-typed-ans"><b>Answer:</b> ' + esc(q.choices[q.answer]) + "</p>" : "";
+    res.innerHTML = verdict + said + figAfterHTML(q) + order + pairs + '<p class="qc-ex">' + esc(q.ex || "") + "</p>" +
       (q.cue && !right ? '<p class="qc-cue">' + icon("hints", 18) + "<span><b>Remember it:</b> " + esc(q.cue) + "</span></p>" : "") +
       (q.ref && window.shCases && window.shCases.refHTML ? window.shCases.refHTML(q) : "") +
-      whyHTML(q, q.type === "mcq" || q.type === "multi" ? picks : null) +
+      (typed ? whyHTML(q, null, null, true) : whyHTML(q, q.type === "mcq" || q.type === "multi" ? picks : null)) +
       '<p class="qc-class note" data-classnote hidden></p>' +
       /* Learn asks again by itself, so its cards have no "Try it again" */
       '<div class="qc-after">' + (o.noAgain ? "" : '<button class="btn" type="button" data-again>' + icon("retry", 18) + '<span class="l-long">Try it again</span><span class="l-short">Retry</span></button>') +
@@ -470,6 +511,17 @@
       $("[data-qview-back]", L.host).addEventListener("click", function(){ STATE.ui.qview = "questions"; saveState(); drawQuestions(L.el, L.preset); });
     });
   }
+  /* a flashcard rating or Learn step still waiting on the device (the page closed during a rating's Undo, or while
+     offline) goes out from the hub's next page even if Learn and Flashcards aren't opened: the module is fetched for it
+     then, and only then, and sends it with its first request id, so it is paid once. Not in a quiet spell (window.shDb) */
+  (function kick(n){
+    setTimeout(function(){
+      if (SM || smLoad || !Array.isArray(STATE.cardq) || !STATE.cardq.length) return;
+      try { if (navigator.webdriver) return; } catch (e) {}
+      if (window.shDb && window.shDb.busy && window.shDb.busy()) { if (n < 5) kick(n + 1); return; }
+      HX.loadScript(HX.WIDGET + "study-modes.js").then(function(){ if (!SM && window.SH_STUDY) SM = window.SH_STUDY(HX); }, function(){});
+    }, n ? 60000 : 8000);
+  })(0);
   /* the list the panel picked, shown the way the toggle says */
   function show(){
     if (qview() !== "questions") { study(); return; }
