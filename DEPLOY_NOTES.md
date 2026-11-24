@@ -32,6 +32,15 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-24 (Housekeeping: BUG-197's last rows, four retests, the inbox, Claude Code, #544)** — Nothing students see.
+  **BUG-197:** counted read-only, 2 `pq-` rows in question health (Review of Systems, ctx mock, 1 made-up visitor), from
+  12 minutes before #524 merged, none since: the guard proxy holds. `tools/data-fixes/2026-11-24-bug-197-last-rows.sql` (the
+  2026-11-20 fix's body) takes them after the merge. **Retested:** BUG-197; BUG-198 on the live site (Review of Systems'
+  `--hub` is `#6b46a8` on Home and Notes, light and dark, with every request off the site blocked); BUG-195 and BUG-194
+  (no recurrence in any of the 147 Check hubs and 111 Release tests runs since #506, logs searched). **Inbox:** its 16 ticked and struck lines cleared (each is in its PR, `decisions.md` or the bug log); the
+  boards PRs' line and the boards hub note rewritten to section 6 of `docs/boards/ENGINE_PLAN.md` (#81, #97, #100, #102
+  closed as replaced; #95, #101 through T-16 and T-17; ten finished as they are). **The sustainability task's** `due` moves
+  from 2026-12-02 (packages 1 and 2, done) to 2026-12-31, its next open box (the compaction after the December packs).
 - **2026-11-23 (Crowns given by hand, migration_v100, Claude Code)** — Sam: "Give [one account, by its leaderboard name]
   50,000 crowns". Every way to crowns until now pays XP too (a prize pays as many crowns as XP) or is worked out from XP and
   rank, so a new kind: `crown_gifts`, one row a gift, which `sh_wallet` adds to what was earned (`gifts` in its answer) and
