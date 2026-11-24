@@ -243,7 +243,7 @@ Proposed as the defaults above and confirmed by Sam, all six ("1, 2, 3, 4, 5, 6 
   by rating. The six calls above stand (rounds of 7, two rights, the schedule, what pays). Not built: a typed answer and
   an undo for a rating ([inbox](../inbox.md)).
 
-- 2026-11-24 (Claude Code, the backlog package "Learn: a typed answer; Flashcards: undo the last rating"): Sam, "Do typed
+- 2026-11-24 (Claude Code, the backlog package "Learn: a typed answer; Flashcards: undo the last rating", PR #549): Sam, "Do typed
   answers in learn and undo in flashcards too". Asked first how a typed answer is graded and paid, Sam picked both proposals
   ([decisions](../../decisions.md)). **Learn's second step is typed** for a question that stands without its choices
   (`hideable`) and whose right answer is short (`typedOK`: 6 words, 48 letters, not "all", "none", "both" or "above"): a box
@@ -269,7 +269,7 @@ rebuilt in the release's second round (full-screen sessions, Quizlet-style Learn
 applied. Left for Sam, in the [inbox](../inbox.md): one Learn round and a flashcard on the live site.
 
 **2026-11-24**: the two follow-ups the release left in the inbox are built: Learn's typed answer and Flashcards' Undo (the Log's
-last entry; `migration_v102.sql`).
+last entry; `migration_v102.sql`; #549).
 
 Related: [the audit and plan](2026-11-05-redesign-audit-and-plan.md) · [the release](2026-11-06-redesign-release.md) ·
 [phase 2](2026-11-05-redesign-phase-2-live-hubs.md) · [question-bank-filter-panel](../../rules/question-bank-filter-panel.md) ·
