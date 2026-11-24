@@ -483,7 +483,7 @@
   {"lec":"em-prevent","t":"The emergency kit: each drug's use, dose, route and catch (epinephrine, nitroglycerin, aspirin, naloxone, diphenhydramine, albuterol)","basis":"recording + study guide","ids":["em-prevent-10","em-prevent-11"]},
   {"lec":"em-prevent","t":"Prevention: the history, putting off elective care after an MI, never stopping blood thinners yourself, \"clearance\"","basis":"recording","ids":["em-prevent-01"]},
   {"lec":"em-prevent","t":"Head tilt-chin lift and the genioglossus","basis":"recording","ids":["em-prevent-07"]},
-  {"lec":"em-airway","t":"Foreign-body aspiration: mild versus severe, abdominal thrusts, no blind finger sweep, right main bronchus, ER for X-rays","basis":"recording","ids":["em-airway-01","em-airway-02"]},
+  {"lec":"em-airway","t":"Foreign-body aspiration: mild versus severe, back blows and abdominal thrusts, no blind finger sweep, right main bronchus, ER for X-rays","basis":"recording","ids":["em-airway-01","em-airway-02"]},
   {"lec":"em-airway","t":"Mallampati classes and the difficult airway","basis":"recording","ids":["em-airway-06"]},
   {"lec":"em-airway","t":"Laryngospasm in the lightly sedated patient","basis":"recording","ids":["em-airway-07","em-airway-08"]},
   {"lec":"em-airway","t":"Anaphylaxis: IM epinephrine in the thigh first","basis":"recording + study guide","ids":["em-airway-13"]},

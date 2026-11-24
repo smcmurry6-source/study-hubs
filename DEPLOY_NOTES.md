@@ -32,6 +32,26 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-24 (Review of Systems: every question vetted, Claude Code)** — Sam: "Vet all questions, the answer key, and
+  explanations in review of systems for accuracy, clarity, effectiveness, completeness. Make any necessary changes." All
+  1,369 questions were read in 19 slices (a course or part of one each): answered cold, then the key, the explanation and
+  every choice's why checked against the hub's notes, standard references and Sam's 2026-11-23/24 calls; each proposed
+  change was then read again before it went in. **No key was wrong** (the 52 of #552 hold). 71 questions changed: false
+  facts in a why or an explanation (HLA-A5, which doesn't exist; Merkel cell polyomavirus as IARC "Group 1", it is 2A;
+  marasmus as "over 60% weight loss", it is weight below 60% of normal; kallikrein activating factor XI; NMS "1-3 days
+  after starting"; the subclavian vessels skipping the superior thoracic aperture; mcg and q.a.d. on the do-not-use list),
+  one second right answer (`rd-physics-13`: a longer source distance also cuts photons), stems that argued against their
+  key or gave it away (`ns-anat-08` a stroke keyed as a nerve lesion, `hn-neck-02`, `cr-bp-04`, `he-heme-02`,
+  `rn-dental-06`), statements false only by wording or answered by their neighbor (`ns-sens-15`, `om-caries-15`,
+  `om-viral-05`, `rd-anatomy-10`, `f2-pkpd-22`), impossible distractors, and a dozen explanations that never said why
+  the key is right. **Choking follows the AHA's 2025 guideline everywhere** (5 back blows, then 5 abdominal thrusts; the
+  hub's EM-1 notes already said so, EM-2 and two questions said thrusts alone). `et-pro-15`'s choices changed so its
+  fourth statement is judged (key 3 → 2; the server starts a changed question's per-choice picks again by itself), and
+  `da-tmj-12` lost a wrong `which` label. The same errors came out of the notes (27 lines in `notes.json`, `study.json`
+  and one topic title in `core.json`; High yield rebuilt), with one "the lecture called ... low yield" sentence
+  ([dont-ask-what-professors-skip](vault/rules/dont-ask-what-professors-skip.md)). No id changed, none retired. Calls
+  left for Sam: [the inbox](vault/tasks/inbox.md). Reports #80-#84 (five Head & Neck keys #552 had already fixed, sent
+  from pages still showing the old copy) were resolved with their replies.
 - **2026-11-24 (After #552: the fixed keys' picks put back, BUG-200, Claude Code)** — After merge loaded Review of Systems' new keys, which set the 31 answered fixed questions' picks aside (`question_choices_past`: the choices' version includes the key), and then #552's recount found no picks and set them to 0% right. Within 3 minutes the picks went back under each question's current choice version and the recount ran again, by hand through the connector: 52 right of 105 tries. Recorded as `tools/data-fixes/2026-11-24-review-of-systems-picks.sql` (After merge runs it again on this merge: a no-op move and the same recount), tested on a throwaway copy in After merge's order; the gotcha is in [after-a-merge](vault/how-to/after-a-merge.md). Reports #69-#79 resolved with their replies (Sam: "Send the replies when fixed"); #68 waits for BUG-199. The class notice went out on Sam's word ("You can send the notice"): `site_notices` #8, "Fixed: 52 answer keys in Review of Systems", 20:13 UTC.
 
 - **2026-11-24 (the "Good question?" thumbs' words hidden again, Claude Code)** — #548 cut `.sh-cp-sr` from

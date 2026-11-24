@@ -10,6 +10,21 @@ this folder (deleting the line: the note carries it) or just does it, if it's sm
 (`- [x] ... (#123)`); ticked lines are cleared the next time someone goes through the inbox. Anything left to do from a chat
 lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the-vault.md)). See [README](README.md).
 
+- [ ] **Review of Systems: Sam's calls from the full read of the bank** (2026-11-24, every question vetted). **Changed from
+  current references, say if the course's own wording should come back:** choking is back blows and abdominal thrusts (AHA
+  2025; the lecture: abdominal thrusts); the do-not-use list is µg and q.o.d. (the notes had mcg and q.a.d.); `om-caries-15`
+  now tests that the caries and periodontal floras antagonize each other (it taught that the two diseases are inversely
+  related, which current reviews don't find); renal cell carcinoma's cystic risk is the acquired cystic disease of dialysis
+  (the notes had adult polycystic disease); the antibiotics the notes gave for acute bronchitis are for a bacterial flare of
+  chronic bronchitis. **Left as taught, right enough to stand:** teriparatide's 2-year limit (`mg-bone-03`; off the FDA label
+  since 2020); an umbilical polyp as a urachal remnant (`mg-gianat-30`; texts say urachal sinus); the alanine cycle's 6-8 ATP
+  (`f1-carbmet-22`; 5-7 by the 2.5/1.5 count the hub uses elsewhere); H2-blocker tolerance in 2-6 weeks (`mg-gipath-04`;
+  references say days); HPV in "more than 30%" of oropharyngeal cancers (`f2-virology-14`; about 70% in the United States);
+  "partial agonists" for butorphanol, nalbuphine and pentazocine (`f2-painrx-19`; boards say mixed agonist-antagonists);
+  HbA1c control on two scales (Heme & Endo: above 7% poor; Emergencies' lecture: 7 good, 8.5-10 fair, over 10 poor).
+  **Could be better, not wrong:** `em-cardiac-17`'s INR choices (2.4 against 4.6, 5.2, 6.0) never test the 3.5 line;
+  `ns-sens-14`'s distractors are easy; `da-tmj-16` nearly repeats `da-anomalies-11`; three Dental Anatomy explanations
+  mention a class guide that disagrees.
 - [ ] **The dashboard's progress ring reads only this device's copy of the hub** (2026-11-24, found fixing BUG-107):
   `readProgress()` in `widget/dash.js` reads the hub's saved state on the device, so on a new or linked device (and in the
   preview before a hub is opened) the open hub's card says "Your progress in this hub shows here" and 0 tried, though the
