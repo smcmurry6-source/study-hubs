@@ -32,6 +32,21 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-24 (A faster shop and a lighter Timmy's place, Claude Code)** — Two inbox lines, measured at 4x CPU as
+  [motion-cost](vault/reference/motion-cost.md) does. **The shop's opening:** of the three suspects none was most of it:
+  `mount()` in `widget/shop.js` drew every shelf twice on each first open (the cached shop, then the server's, which always
+  differed because the mystery box is never cached; about 600 ms). Now the server is asked while the files load and the
+  shelves wait for it up to 1.2 s; the sets' files are fetched beside the shop's art, not after it. The dashboard's
+  `drawWallet` (`widget/dash.js`) no longer focuses the Shop button behind the open shop (about 200 ms of layout) and draws
+  the row again only when it changes. The page keeps its scrollbar's room while the shop is open (`tsh-gut`,
+  `scrollbar-gutter: stable`; about 250 ms on a desktop with classic scrollbars). Long tasks 1.4 s → 0.9 s on a phone-size
+  screen, 1.8 s → 1.0 s on a laptop with scrollbars. **The place at night:** the stars were 2-3% of the busy main thread
+  (three twinkling groups cost more, so they stay as they were); the rest was the rank medal's shine in the place's panel,
+  a SMIL `<animate>` that drew the page every frame. It is a CSS transform now (`art()` in `widget/ranks.js`, its keyframes
+  inside the drawing), same path and timing: 95-97% busy → 11% (phone size), 87-90% → 33-38% (laptop size). It shines the
+  same in a hub's Stats, the trophy case and the cards. Rule 9 in motion-cost: no looping SMIL. Left on the to-do list:
+  the Diamond and Dark Matter medals' other SMIL, Timmy's place's and Focus mode's scrollbar, what's left of the shop's
+  opening, an iPhone look at the stars.
 - **2026-11-23 (Crowns given by hand, migration_v100, Claude Code)** — Sam: "Give [one account, by its leaderboard name]
   50,000 crowns". Every way to crowns until now pays XP too (a prize pays as many crowns as XP) or is worked out from XP and
   rank, so a new kind: `crown_gifts`, one row a gift, which `sh_wallet` adds to what was earned (`gifts` in its answer) and

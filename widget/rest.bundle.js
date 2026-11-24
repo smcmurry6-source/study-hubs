@@ -953,8 +953,10 @@ over += '<g clip-path="url(#' + p + 'clip)">' + stars + '</g>';
 }
 if (rich && t !== "antique" && t !== "stone" && (!S || S.rim)) over += '<path d="' + (S ? S.rim + '" fill="none' : "M50 -1.6 H122") + '" stroke="#fff" stroke-opacity="' + (t === "dark" ? ".35" : ".55") + '" stroke-width=".8" stroke-linecap="round"/>';
 if (anim && tier >= 2) {
-over += '<g clip-path="url(#' + p + 'clip)"><rect x="-40" y="' + (B ? B[1] - 10 : -30) + '" width="26" height="' + (B ? B[3] + 20 : 70) + '" fill="url(#' + p + 'sheen)" transform="skewX(-22)" opacity="' + (t === "dark" ? ".5" : ".9") + '">' +
-'<animate attributeName="x" values="' + (B ? (B[0] - 50) + ";" + (B[0] + B[2] + 60) + ";" + (B[0] + B[2] + 60) : "-60;190;190") + '" keyTimes="0;.35;1" dur="' + (t === "diamond" || t === "dark" ? "3.6" : "4.6") + 's" repeatCount="indefinite"/></rect></g>';
+var gx = B ? B[0] - 50 : -60, run = B ? B[2] + 110 : 250, gk = "sh-rank-gl" + String(run).replace(/\W/g, "_");
+over += '<style>@keyframes ' + gk + '{0%{transform:translateX(0)}35%,100%{transform:translateX(' + run + 'px)}}</style>' +
+'<g clip-path="url(#' + p + 'clip)"><g style="animation:' + gk + " " + (t === "diamond" || t === "dark" ? "3.6" : "4.6") + 's linear infinite">' +
+'<rect x="' + gx + '" y="' + (B ? B[1] - 10 : -30) + '" width="26" height="' + (B ? B[3] + 20 : 70) + '" fill="url(#' + p + 'sheen)" transform="skewX(-22)" opacity="' + (t === "dark" ? ".5" : ".9") + '"/></g></g>';
 }
 if (S && S.top) over += S.top(p, rich, old);
 var K = S && S.sparks ? S.sparks : null;
