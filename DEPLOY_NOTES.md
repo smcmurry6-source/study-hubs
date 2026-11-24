@@ -42,12 +42,13 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   picks, `.home-next` and fx.js's answer marks. 107 to 71 KB, 826 to 541 style rules (928 to 614 selectors), 46 to 31
   `@keyframes`; every one left is still used. Nothing new on `:root` (#525's lesson). Putting the sheet in on the slow
   phone (CPU 4x, median of 8 alternating loads): about 22 to about 15 ms. Computed styles of every element on Home,
-  Notes, Questions and More (and the panels and dialogs they open), laptop and phone, light, both darks and an accent
-  metal, 130 states and about 2.67 million styles: nothing drawn differs except what two copies of `main` also differ
-  by, and two races of the test itself; the rest is inside what the engine always hides. `widget/hub-rest.bundle.js`
-  rebuilt. Sam's call the same day ("Accent metal should stop being applied", [decisions](vault/decisions.md)): the
-  accent metal a student picked before Settings lost it (2026-11-05) is no longer applied, and a hub clears the saved
-  one (`sh_pref_accent`); `widget/ranks.js`'s metals and `applyAccent`, their textures (`assets/tex/`),
+  Notes, Questions and More (and the panels and dialogs they open), laptop and phone, light and both darks (78 states;
+  130 with a pair meant to add an accent metal, which never turned it on: the stubbed data has no rank, so the metal was
+  refused), about 2.67 million styles: nothing drawn differs except what two copies of `main` also differ by, and two
+  races of the test itself; the rest is inside what the engine always hides. `widget/hub-rest.bundle.js` rebuilt. Sam's
+  call the same day ("Accent metal should stop being applied", [decisions](vault/decisions.md)): the accent metal a
+  student picked before Settings lost it (2026-11-05) is no longer applied, and a hub clears the saved one
+  (`sh_pref_accent`); `widget/ranks.js`'s metals and `applyAccent`, their textures (`assets/tex/`),
   `tools/make-accent-tex.js`, the old Settings panel's swatches, v3.css's accent rules and the metal in the daily
   settings snapshot came out (`rest.bundle.js` 4.9 KB smaller). Left, in [the inbox](vault/tasks/inbox.md): the cleanup
   of the old parts `widget/v3.js` still builds and `widget/hub.css` hides (Sam: "The cleanup sounds good"), and Sam's
