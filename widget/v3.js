@@ -630,10 +630,6 @@
   var NUKE_VID_BASE = (function(){
     try { return new URL("vid/", thisScript.src).href; } catch (e) { return "vid/"; }
   })();
-  var FONT_STACKS = {
-    serif: "Georgia, 'Iowan Old Style', 'Times New Roman', serif",
-    sans: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
-  };
   var SIZE_ZOOM = { small: 0.9, "default": 1, large: 1.15, xlarge: 1.3, xxlarge: 1.45 };
 
   function prefGet(key, fallback){
@@ -689,10 +685,11 @@
   function extraOn(key){ return prefGet(key, "on") !== "off"; }
   function nukePref(){ return prefGet(SH_NUKE_PREF_KEY, "on"); }
 
+  /* Font was cut from Settings on 2026-11-05, and a font saved before then is no longer applied (Sam, 2026-11-24: "For font,
+     stop applying"): forget a saved one, as ranks-hub.js does the accent metal, and leave --font-body to the page */
   function applyFontPref(){
-    var stack = FONT_STACKS[prefGet(SH_FONT_KEY, "default")];
-    if (stack) document.documentElement.style.setProperty("--font-body", stack);
-    else document.documentElement.style.removeProperty("--font-body");
+    try { localStorage.removeItem(SH_FONT_KEY); } catch (e) {}
+    document.documentElement.style.removeProperty("--font-body");
   }
   function applySizePref(){
     var z = SIZE_ZOOM[prefGet(SH_SIZE_KEY, "default")] || 1;

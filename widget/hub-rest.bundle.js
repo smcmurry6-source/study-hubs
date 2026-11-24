@@ -3635,10 +3635,6 @@ try { return new URL("img/", thisScript.src).href; } catch (e) { return "img/"; 
 var NUKE_VID_BASE = (function(){
 try { return new URL("vid/", thisScript.src).href; } catch (e) { return "vid/"; }
 })();
-var FONT_STACKS = {
-serif: "Georgia, 'Iowan Old Style', 'Times New Roman', serif",
-sans: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
-};
 var SIZE_ZOOM = { small: 0.9, "default": 1, large: 1.15, xlarge: 1.3, xxlarge: 1.45 };
 function prefGet(key, fallback){
 try { var v = localStorage.getItem(key); return v === null ? fallback : v; } catch (e) { return fallback; }
@@ -3686,9 +3682,8 @@ return '<div class="shset-x"><div class="shset-xtxt"><b>' + x.label + '</b><smal
 function extraOn(key){ return prefGet(key, "on") !== "off"; }
 function nukePref(){ return prefGet(SH_NUKE_PREF_KEY, "on"); }
 function applyFontPref(){
-var stack = FONT_STACKS[prefGet(SH_FONT_KEY, "default")];
-if (stack) document.documentElement.style.setProperty("--font-body", stack);
-else document.documentElement.style.removeProperty("--font-body");
+try { localStorage.removeItem(SH_FONT_KEY); } catch (e) {}
+document.documentElement.style.removeProperty("--font-body");
 }
 function applySizePref(){
 var z = SIZE_ZOOM[prefGet(SH_SIZE_KEY, "default")] || 1;
