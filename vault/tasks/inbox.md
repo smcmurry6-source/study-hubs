@@ -137,10 +137,14 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   refuses one). Small: a `name_custom` flag in `get_widget_bootstrap_v2` (a migration copied from `main`'s newest copy), and
   `nameFromServer` in `widget/v3.js` and `widget/dash.js` clears the device's copy when it's false. (#523: `migration_v94`, applied
   2026-11-21 at 8:09 am Central; retested with BUG-196 after the merge.)
-- [ ] **Before the first collapse (about 2027-09-13), point the year-spanning readers at the totals** (2026-11-21, migration_v93):
+- [x] **Before the first collapse (about 2027-09-13), point the year-spanning readers at the totals** (2026-11-21, migration_v93):
   `sh_insights` (the admin page's Insights, every hub side by side), `get_hub_recap`, `tools/retro.sql` and `tools/lessons-daily.sql` read
   `activity_hourly` only, so a hub older than a year would show no time. Read `activity_daily` / `activity_visits_daily` (people per day,
   no ids) for days past the school year, or decide those hubs' numbers are only in their published recaps and `LESSONS.md`.
+  **Done** (2026-11-24, `migration_v101`, #PR): all four read `activity_daily` for the collapsed days' minutes; the per-person
+  numbers, which totals can't give, are kept per hub (`insight_cards_kept`) by the nightly job the night a hub's first day is
+  collapsed, and the Insights tab reads them from there ([insights-dashboard](../reference/insights-dashboard.md)). The migration
+  is applied after the merge, at 1-5 am Central (`supabase/pending-migrations.txt` until it is).
 - [ ] **A week after `migration_v85` is applied (2026-11-19), so on 2026-11-26, check what the part saved** (2026-11-19): the admin page's Ask Timmy tab (cost by
   day against 11-14 to 11-18's) and the edge logs' `turn` lines (`content`: `part`, `part+full`, `full`). In the eval, 16 of 50
   first questions were asked again with the whole content; if real students' share is much higher, the part costs more than it

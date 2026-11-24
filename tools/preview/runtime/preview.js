@@ -1125,7 +1125,8 @@
         { ran_at: iso(t - 9 * 86400000), database_mb: 199.6, counts: { activity_pings: 89000, ui_click_reach: 0, feature_events: 3, survey_declines: 80, survey_answer_ids: 0, exam_debriefs_ids: 0, question_flags_ids: 0, hub_suggestions_ids: 0, link_attempts: 14, activity_hourly_test: 0, ui_clicks_test: 0 } }] } };
     var hubs = H.map(function(h, i){ var p = h[1]; return { hub: h[0], exam: ex(h[2]), first_day: ex(Math.min(h[2], 0) - h[3]), last_day: ex(Math.min(0, h[2])), people: p, answerers: Math.round(p * (i ? 0.66 + i * 0.03 : 0.4)),
       answered_50: Math.round(p * 0.4), one_day: Math.round(p * 0.35), three_days: Math.round(p * (0.22 + i * 0.05)), under_5: Math.round(p * (i ? 0.18 + (i % 2) * 0.16 : 0.45)), median_mins: 25 + i * 15, p90_mins: 180 + i * 60, total_mins: p * (40 + i * 15),
-      median_answers: 18 + i * 12, questions_seen: 300, attempts: p * 60, correct: p * 48, last3_pct: h[2] <= 0 ? 60 + i * 5 : null, mocks: Math.round(p * 0.3), mock_people: Math.round(p * 0.2), mock_avg_pct: 70 + i }; });
+      median_answers: 18 + i * 12, questions_seen: 300, attempts: p * 60, correct: p * 48, last3_pct: h[2] <= 0 ? 60 + i * 5 : null, mocks: Math.round(p * 0.3), mock_people: Math.round(p * 0.2), mock_avg_pct: 70 + i,
+      collapsed_through: null, per_person_kept_on: null }; });   /* migration_v101: null until a hub's first day is past the school year */
     var SF = [["notes", 0.38, 0.9], ["bank", 0.3, 0.75], ["home", 0.08, 0.95], ["mock", 0.06, 0.3], ["hints", 0.05, 0.35], ["cram", 0.05, 0.3], ["drill", 0.03, 0.12], ["podcast", 0.02, 0.1], ["arcade", 0.03, 0.12]], surfaces = [];
     hubs.forEach(function(h){ SF.forEach(function(f){ surfaces.push({ hub: h.hub, surface: f[0], mins: Math.round(h.total_mins * f[1]), people: Math.round(h.people * f[2]) }); }); });
     return { generated_at: iso(t), hubs: hubs, surfaces: surfaces,
