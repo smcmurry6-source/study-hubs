@@ -1,5 +1,5 @@
 {
-  "about": "Patient Box v2's example cases (v2.1 added the bridge-and-post and the trauma cases, and the buccal-decay case; v2.2 the proximal root caries, root tips, resorption, sealants-and-temporaries and cracked-tooth cases): made-up patients assembled from modules, checked by node tools/ci/cases.js like a hub's (every module, view and check runs on them) and drawn for the screenshots in its PR. Not on any page. A new hub copies one into its content/core.json's pcases (vault/how-to/draw-a-patient-box-case.md).",
+  "about": "Patient Box v2's example cases (v2.1 added the bridge-and-post and the trauma cases, and the buccal-decay case; v2.2 the proximal root caries, root tips, resorption, sealants-and-temporaries and cracked-tooth cases; v2.3 the implant states, implant bridge and anterior implant cases): made-up patients assembled from modules, checked by node tools/ci/cases.js like a hub's (every module, view and check runs on them) and drawn for the screenshots in its PR. Not on any page. A new hub copies one into its content/core.json's pcases (vault/how-to/draw-a-patient-box-case.md).",
   "pcases": {
     "v2-full-mouth": {
       "title": "Full mouth, first visit",
@@ -190,6 +190,50 @@
       },
       "figs": [{ "kind": "film" }, { "kind": "view" }],
       "expect": { "kind": "health" }
+    },
+    "v23-implant-states": {
+      "title": "Lower right: two implants, two states",
+      "spec": {
+        "full": true, "teeth": ["28", "29", "30", "31"], "age": 64, "sex": "woman", "smoke": 0,
+        "cc": "The gum around my back implant bleeds when I brush, and it tastes bad.",
+        "mouth": { "teeth": 26, "involved": 0, "lost": 0 },
+        "modules": [
+          { "m": "missing", "teeth": ["1", "16", "17", "32"] },
+          { "m": "implant", "tooth": "29", "state": "health", "crown": "zirconia", "retention": "screw", "years": 3 },
+          { "m": "implant", "tooth": "30", "state": "peri-implantitis", "crown": "pfm", "retention": "cement", "cement": true, "len": 11.5, "loss": 3.5, "rec": 3, "pus": true, "years": 4 }
+        ]
+      },
+      "figs": [{ "kind": "film" }, { "kind": "chart" }, { "kind": "view" }],
+      "expect": { "kind": "health", "impl": { "29": { "dx": "peri-implant health" }, "30": { "dx": "peri-implantitis", "lossBeyondRemodeling": 3 } } }
+    },
+    "v23-implant-bridge": {
+      "title": "Full mouth: an implant bridge, and an implant healing",
+      "spec": {
+        "full": true, "teeth": ["18", "19", "20", "21", "22"], "age": 58, "sex": "man", "smoke": 0,
+        "cc": "I'm here for my checkup, and to see how the new implant is healing.",
+        "mouth": { "teeth": 24, "involved": 0, "lost": 0 },
+        "modules": [
+          { "m": "missing", "teeth": ["1", "16", "17", "32", "20"] },
+          { "m": "implant", "teeth": ["19", "21"], "state": "health", "retention": "screw", "years": 2 },
+          { "m": "bridge", "abutments": ["19", "21"], "material": "pfm" },
+          { "m": "implant", "tooth": "14", "state": "healing", "weeks": 6 }
+        ]
+      },
+      "figs": [{ "kind": "film" }, { "kind": "bitewing", "teeth": ["12", "13", "14", "15", "21", "20", "19", "18"] }, { "kind": "chart" }, { "kind": "view" }, { "kind": "odontogram" }, { "kind": "fmx" }],
+      "expect": { "kind": "health", "impl": { "14": { "dx": "healing implant" }, "19": { "dx": "peri-implant health" }, "21": { "dx": "peri-implant health" } } }
+    },
+    "v23-implant-anterior": {
+      "title": "Upper front: a bleeding implant and a loose one",
+      "spec": {
+        "teeth": ["7", "8", "9", "10"], "age": 41, "sex": "woman", "smoke": 0,
+        "cc": "My front implant bleeds when I floss, and the other one feels loose.",
+        "modules": [
+          { "m": "implant", "tooth": "8", "state": "mucositis", "crown": "lithium", "retention": "cement", "years": 2 },
+          { "m": "implant", "tooth": "10", "state": "failed", "crown": "pfm", "retention": "cement", "years": 1, "mob": 2 }
+        ]
+      },
+      "figs": [{ "kind": "film" }, { "kind": "chart" }, { "kind": "view" }],
+      "expect": { "kind": "health", "impl": { "8": { "dx": "peri-implant mucositis" }, "10": { "dx": "failed implant" } } }
     }
   },
   "questions": [
@@ -270,6 +314,54 @@
         "Apical periodontitis makes a tooth tender to percussion and shows a widened PDL or a lesion at the apex. #19's percussion is normal, and its apices look normal on the film.",
         "#19's MOD amalgam shows no radiolucency at its margins on the film, and decay doesn't cause a sharp pain on release.",
         "#18's bite test is negative."
+      ] },
+    { "id": "v23-ex-12", "pcase": "v23-implant-states", "rests": ["impl"],
+      "stem": "A 64-year-old: the gum around her back implant bleeds when she brushes. From the chart, the film and the box, what is #30's diagnosis?", "choices": ["Peri-implantitis", "Peri-implant mucositis", "Peri-implant health", "A failed implant"], "answer": 0,
+      "why": [
+        "Right: #30 bleeds at every site and suppurates at its mesial sites, its pockets reach 6 to 7 mm at the line angles, and its bone is 5 mm below the platform where the film at the crown's delivery had it at 1.5: 3.5 mm lost, past the initial remodeling (under 2 mm). Bleeding or suppuration with bone loss beyond remodeling is peri-implantitis (the 2017 World Workshop).",
+        "Mucositis bleeds without bone loss beyond the initial remodeling. #30 has lost 3.5 mm since its crown went on.",
+        "That is #29: no bleeding, 2 to 3 mm probings, and its bone where it was at delivery.",
+        "A failed implant is mobile, or has lost more than half its length of bone, or has a radiolucent line all round it. #30 is not mobile and keeps bone along most of its 11.5 mm."
+      ] },
+    { "id": "v23-ex-13", "pcase": "v23-implant-states", "rests": ["impl"], "pfig": [{ "kind": "film" }],
+      "stem": "On the film, what most likely started #30's disease?", "choices": ["Excess cement left under the crown's mesial margin", "The access channel through the crown", "An implant placed too close to #31", "Its crown's porcelain-fused-to-metal material"], "answer": 0,
+      "why": [
+        "Right: the bright fleck below #30's mesial margin, outside the abutment, is cement left behind when the crown was cemented. It was found in 81% of the implants with peri-implant disease in Wilson's study (2009), and the lecture puts cement-retained crowns at higher risk.",
+        "The access channel is #29's: its crown is screw-retained, so there is no cement, and the column through it is the composite and PTFE tape over the screw. #30's crown is cemented and has no channel.",
+        "#30 is more than 4 mm from #31's root, well past the 1.5 mm an implant is kept from a tooth.",
+        "The crown's material doesn't cause disease; what was left under it does. Metal-ceramic crowns are common on posterior implants."
+      ] },
+    { "id": "v23-ex-14", "pcase": "v23-implant-bridge", "rests": ["resto", "impl"],
+      "stem": "A 58-year-old at his checkup. From the films and the odontogram, what replaces #20?", "choices": ["A pontic on a three-unit bridge on implants at #19 and #21", "A pontic on a bridge joining #19's implant to #21's natural tooth", "An implant crown at #20", "Nothing: #20 is missing and not replaced"], "answer": 0,
+      "why": [
+        "Right: #19 and #21 are implants (threaded metal bodies with no roots or ligament), each carrying a metal-ceramic abutment crown, and #20's pontic hangs between them, joined at both contacts. Two implants carry a three-unit bridge (the lecture: a span flexes with its cube, so not usually four).",
+        "#21 is an implant too, with no root or PDL space. An implant is never joined to a tooth: the tooth moves 25 to 100 um in its ligament, the implant 3 to 5 um.",
+        "No implant is in #20's site: the bone under the pontic is a healed ridge.",
+        "The odontogram draws #20's crown with its root crossed out and a bar joining it to #19 and #21: a pontic."
+      ] },
+    { "id": "v23-ex-15", "pcase": "v23-implant-bridge", "rests": ["resto"], "pfig": [{ "kind": "bitewing", "teeth": ["12", "13", "14", "15", "21", "20", "19", "18"] }],
+      "stem": "On the bitewing, why does each of #19's and #21's crowns have a column through its middle, down to the screw?", "choices": ["They are screw-retained: it is the screw's access channel, sealed with composite over PTFE tape", "Recurrent caries down the middle of each crown", "Posts in root-filled teeth", "Cement holding the crowns to the abutments"], "answer": 0,
+      "why": [
+        "Right: a screw-retained crown is held by the abutment screw, reached through a channel from the occlusal; the channel is sealed with PTFE tape over the screw head and composite above it, both less radiopaque than the crown's metal around them.",
+        "Decay doesn't form in a straight column through a crown, and these are implant crowns: below them are threaded implants, not teeth.",
+        "There are no roots to hold a post: #19 and #21 are implants.",
+        "A cemented crown's cement is a thin line at its margin, and has no channel; these crowns are screwed on."
+      ] },
+    { "id": "v23-ex-16", "pcase": "v23-implant-anterior", "rests": ["impl"],
+      "stem": "A 41-year-old: her front implant bleeds when she flosses, and the other one feels loose. From the chart, the film and the box, which is right?", "choices": ["#8 has peri-implant mucositis; #10 has failed", "#8 has peri-implantitis; #10 has mucositis", "Both have peri-implantitis", "#8 is healthy; #10 has peri-implantitis"], "answer": 0,
+      "why": [
+        "Right: #8 bleeds at every site with 4 to 5 mm probings, but its bone is where it was when the crown went on (1.5 mm below the platform): inflammation without bone loss, mucositis, reversible. #10 is mobile (2) with a radiolucent line all round it: it has lost its osseointegration, a failed implant.",
+        "#8 has lost no bone since delivery, which peri-implantitis needs, and #10's mobility is more than inflammation: a mobile implant has failed.",
+        "Neither has bone loss past the initial remodeling; #10 has failed for another reason: it is held in fibrous tissue, not bone.",
+        "#8 bleeds at every site, which health never does, and #10's bone is at the crest; its problem is the line round it and its mobility."
+      ] },
+    { "id": "v23-ex-17", "pcase": "v23-implant-anterior", "rests": ["impl"],
+      "stem": "What should happen to #10's implant?", "choices": ["Remove it: a mobile implant has failed", "Clean and decontaminate its surface without surgery", "Splint its crown to #9", "Re-cement its crown"], "answer": 0,
+      "why": [
+        "Right: an implant that moves has lost its osseointegration and is held in fibrous tissue (the radiolucent line on the film); it can't be saved and is removed, and the site can be grafted for another later.",
+        "Nonsurgical therapy treats mucositis, as on #8, and is the start for peri-implantitis; it can't bring back bone contact once the implant moves.",
+        "Never join an implant to a tooth: the tooth moves 25 to 100 um in its ligament, the implant 3 to 5 um, so the joined tooth intrudes and the joint fails.",
+        "The crown isn't loose on its abutment; the whole implant moves in the bone."
       ] }
   ]
 }
