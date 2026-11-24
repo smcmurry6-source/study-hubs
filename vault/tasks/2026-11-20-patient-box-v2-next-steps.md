@@ -77,11 +77,35 @@ what v2.0 left, so it isn't lost. Its own track (Sam, 2026-11-06, [decisions](..
 - [ ] Pulp tests in `tests` (cold and the electric pulp test), with a pulp diagnosis to check them against: v2.2 left them out
 - [ ] On the drawn chart, a long upper root's apex runs under its tooth's mobility label ("M0"): the premolars of
       `v2-molar-furcation` and `v22-root-tips` show it (from before v2.2)
-- [ ] Implants on modules (step 4): an `implant` module for what is per-tooth numbers today
-- [ ] Prosthodontics and other hubs (step 5): fixed bridges are done on every view (v2.1); still to do: removable partial and
-      complete dentures, a cantilever or resin-bonded bridge, an implant-supported bridge, and Occlusion's `CASE_IMG`
+- [x] Implants on modules (step 4): an `implant` module for what is per-tooth numbers today (v2.3, 2026-11-24: `{ m:'implant' }`
+      with its state (health, mucositis, peri-implantitis, failed, healing under its cover screw), width and length by site,
+      crown material, cement or screw retention, excess cement, the delivery film's bone, recession, swelling, bleeding and
+      suppuration; the 2017 case definitions and the lecture's failure rule in `derive()`; the distances to a tooth and between
+      implants, the pocket base against the bone and the rest in `validate()`; every view draws it; examples
+      `v23-implant-states` and `v23-implant-anterior`)
+- [ ] Prosthodontics and other hubs (step 5): fixed bridges are done on every view (v2.1), and since v2.3 an implant-supported
+      bridge (two implants, one pontic, never joined to a tooth; example `v23-implant-bridge`); still to do: removable partial and
+      complete dentures, a cantilever or resin-bonded bridge, and Occlusion's `CASE_IMG`
       pictures onto the kit; with the dentures, an overdenture abutment (a root-filled retained root under a denture, which
       v2.2's `roottip` refuses for now) and a provisional bridge (v2.2 has the provisional crown only)
+- [ ] Sam looks at v2.3's drawings with their first case (the implant crown by material on the film, the screw access channel,
+      the excess cement, the failed implant's radiolucent line along its taper, the abutment and threads on the view, the chart's
+      submerged implant, the odontogram's cover screw, the implant bridge), the way the first box says
+- [ ] Sam's call (v2.3): for a patient with no earlier records, the 2017 consensus calls it peri-implantitis only with bleeding
+      or suppuration **and** probing of 6 mm or more **and** bone 3 mm or more below the implant's most coronal intraosseous part;
+      the PCD Implants lecture teaches the probing and the bone as either one. `derive()` follows the lecture
+      ([figures-teach-the-lecture](../rules/figures-teach-the-lecture.md)); a case that should read the same both ways has both
+- [ ] An implant placed too close (under 1.5 mm from a root or 3 mm from another implant) isn't drawn: `validate()` refuses it,
+      so a case about that mistake (the crestal bone it costs: Tarnow 2000, Esposito 1993) needs a flag that allows it and draws
+      the loss
+- [ ] Two implants carry a four-unit bridge under an opposing complete denture or a light bite (the lecture's exception):
+      `validate()` refuses more than one pontic on two implants because the record has no opposing arch; with the dentures
+- [ ] An implant's healing abutment (one-stage, or after uncovering), an immediate implant in a fresh socket, and a mucosa
+      inflamed at one implant only on the drawn view (the view's `gingiva.look` is the whole case's; one implant's mucositis
+      shows as its bleeding dots): v2.3 draws the cover screw and the loaded implant only
+- [ ] If PCD Implants Exam 1's page ever comes back, its four implant cases (in git before 6727d7f) move onto the `implant`
+      module with the same ids and keys: three of them fail v2.3's pocket-base rule as written (they gave facial numbers only, and
+      the lingual defaults sit 4 mm above their bone)
 - [x] More figures from the library as they're next touched: `widget/journeys.js`'s typodont (`TYPO`) still carries its own
       copy of the size table and outlines, and the arcade's other tooth tiles (Pocket Showdown, Cross-Section) are drawn by hand
       (2026-11-24: the typodont reads `widget/teeth.js`, which `handoff()` fetches, and draws the same 13,498 numbers as before;
@@ -124,6 +148,15 @@ what v2.0 left, so it isn't lost. Its own track (Sam, 2026-11-06, [decisions](..
   three boxes; added Sam's look, pulp tests, the chart's mobility label and the overdenture abutment. **Where it stopped:** the
   kit is done for this package; next are the implant module (step 4), then dentures and bridges (step 5), each from `main`
   once this merges.
+- 2026-11-24: Patient Box v2.3 (branch `claude/patient-box-v2-3`, from `main` at ef1ee24): the `implant` module and an
+  implant-supported bridge on every view, each call cited in `widget/cases.js`'s header (the 2017 World Workshop, the PCD Implants
+  lectures, Tarnow 2000, Wilson 2009 and the rest); three examples and six questions in `tools/cases/examples.json`; a record for
+  each rule and each of `derive()`'s readings in `tools/ci/cases.js`; the how-to. Also: a failed implant's radiolucent line
+  follows its taper (v1 drew a box), and a full-mouth view's tooth count leaves implants out, as `validate()` does. Ticked step
+  4 and the implant bridge in step 5; added Sam's look, the and/or call, an implant placed too close, the four-unit bridge, the
+  healing abutment and one-site mucositis, and PCD Implants' old cases. **Where it stopped:** next is step 5's dentures (with the
+  overdenture abutment and the four-unit implant bridge) and the cantilever and resin-bonded bridges, from `main` once this
+  merges.
 
 ## Outcome
 

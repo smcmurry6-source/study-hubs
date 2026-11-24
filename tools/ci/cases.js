@@ -56,7 +56,7 @@ for (const hub of fs.readdirSync(path.join(root, 'hubs')).sort()) {
 }
 /* the clinical calls v2.1's answers settled from outside sources (2026-11-21), and v2.2's (2026-11-24: proximal root caries, root
    tips, resorption, sealants, temporaries, the clinical tests; the sources are in widget/cases.js's header): each record must
-   pass or fail validate() as written */
+   pass or fail validate() as written; v2.3's (2026-11-24: implants on modules, an implant-supported bridge) too */
 {
   const { K } = load('var PCASES = {};');
   const base = { age: 50, sex: 'man', smoke: 0 };
@@ -146,6 +146,41 @@ for (const hub of fs.readdirSync(path.join(root, 'hubs')).sort()) {
     ['a test on a tooth not in the case', false, ['18', '19'], [], { tests: [{ test: 'percussion', tooth: '3', result: 'normal' }] }],
     ['the same test twice on one tooth', false, ['18', '19'], [], { tests: [{ test: 'percussion', tooth: '19', result: 'normal' }, { test: 'percussion', tooth: '19', result: 'normal' }] }],
     ['a test the kit doesn\'t have (pulp tests: not yet)', false, ['18', '19'], [], { tests: [{ test: 'cold', tooth: '19', result: 'normal' }] }],
+    // Patient Box v2.3 (2026-11-24): implants on modules, an implant-supported bridge
+    ['a healthy implant on a module', true, ['28', '29', '30'], [{ m: 'implant', tooth: '29', state: 'health', crown: 'zirconia', retention: 'screw', years: 3 }]],
+    ['mucositis, peri-implantitis and a failed implant on modules', true, ['7', '8', '9', '10'], [{ m: 'implant', tooth: '8', state: 'mucositis', crown: 'lithium' }, { m: 'implant', tooth: '10', state: 'failed', crown: 'pfm', mob: 2 }]],
+    ['peri-implantitis with excess cement and the facial mucosa receded', true, ['29', '30', '31'], [{ m: 'implant', tooth: '30', state: 'peri-implantitis', crown: 'pfm', retention: 'cement', cement: true, loss: 3.5, rec: 3, pus: true }]],
+    ['an implant state the kit doesn\'t know', false, ['28', '29', '30'], [{ m: 'implant', tooth: '29', state: 'ailing' }]],
+    ['bone loss past the baseline on a healthy implant', false, ['28', '29', '30'], [{ m: 'implant', tooth: '29', state: 'health', loss: 2 }]],
+    ['bone loss past the baseline with mucositis (that is peri-implantitis)', false, ['28', '29', '30'], [{ m: 'implant', tooth: '29', state: 'mucositis', loss: 2 }]],
+    ['an implant healing under its cover screw', true, ['13', '14', '15'], [{ m: 'implant', tooth: '14', state: 'healing', weeks: 6 }]],
+    ['a cover screw on a healthy, loaded implant', false, ['13', '14', '15'], [{ m: 'implant', tooth: '14', state: 'health', cover: true }]],
+    ['a crown on an implant still under its cover screw', false, ['13', '14', '15'], [{ m: 'implant', tooth: '14', state: 'healing', crown: 'pfm' }]],
+    ['years since delivery on an implant still under its cover screw', false, ['13', '14', '15'], [{ m: 'implant', tooth: '14', state: 'healing', years: 1 }]],
+    ['an implant under its cover screw probed', false, ['13', '14', '15'], [{ m: 'implant', tooth: '14', state: 'healing' }], { t: { 14: { pd: { f: [3, 2, 3], l: [3, 2, 3] } } } }],
+    ['an implant that failed under its cover screw', true, ['13', '14', '15'], [{ m: 'implant', tooth: '14', state: 'failed', cover: true }]],
+    ['a bridge on an implant still under its cover screw', false, ['12', '13', '14', '15'], [{ m: 'missing', teeth: ['13'] }, { m: 'implant', teeth: ['12', '14'], state: 'healing' }, { m: 'bridge', abutments: ['12', '14'], material: 'pfm' }]],
+    ['a retention the kit doesn\'t know', false, ['28', '29', '30'], [{ m: 'implant', tooth: '29', retention: 'glue' }]],
+    ['excess cement under a screw-retained crown', false, ['28', '29', '30'], [{ m: 'implant', tooth: '29', state: 'mucositis', retention: 'screw', cement: true }]],
+    ['a crown delivered 60 years ago', false, ['28', '29', '30'], [{ m: 'implant', tooth: '29', years: 60 }]],
+    ['a stainless steel crown on an implant', false, ['18', '19', '20'], [{ m: 'implant', tooth: '19', crown: 'ssc' }]],
+    ['an overhang on an implant crown (excess cement is implant.cement)', false, ['18', '19', '20'], [{ m: 'implant', tooth: '19', crown: 'pfm' }], { t: { 19: { margin: { overhang: 'm' } } } }],
+    ['a regular implant in a lower incisor\'s space (too close to its neighbors\' roots)', false, ['23', '24', '25'], [{ m: 'implant', tooth: '24', w: 4.1 }]],
+    ['a narrow implant in a lower incisor\'s space (1.6 mm to each root)', true, ['23', '24', '25'], [{ m: 'implant', tooth: '24' }]],
+    ['a narrow implant in an upper lateral\'s space', true, ['9', '10', '11'], [{ m: 'implant', tooth: '10' }]],
+    ['two implants side by side at #24 and #25 (under 3 mm apart)', false, ['23', '24', '25', '26'], [{ m: 'implant', teeth: ['24', '25'] }]],
+    ['two implants side by side at #8 and #9 (4.4 mm apart)', true, ['7', '8', '9', '10'], [{ m: 'implant', teeth: ['8', '9'] }]],
+    ['two implants side by side at #29 and #30', true, ['28', '29', '30', '31'], [{ m: 'implant', teeth: ['29', '30'] }]],
+    ['an implant\'s pocket base past the bone', false, ['28', '29', '30'], [{ m: 'implant', tooth: '29' }], { t: { 29: { pd: { f: [6, 5, 6], l: [3, 2, 3] } } } }],
+    ['an implant\'s pocket base 3 mm short of the bone', false, ['28', '29', '30'], [{ m: 'implant', tooth: '29', bone: 4 }], { t: { 29: { pd: { f: [3, 2, 3], l: [3, 2, 3] } } } }],
+    ['an implant\'s mucosal margin at the bone', false, ['28', '29', '30'], [{ m: 'implant', tooth: '29' }], { t: { 29: { rec: { f: [1, 1, 1], l: [-3, -2, -3] }, pd: { f: [1, 1, 1], l: [3, 2, 3] } } } }],
+    ['an implant-supported bridge', true, ['18', '19', '20', '21', '22'], [{ m: 'missing', teeth: ['20'] }, { m: 'implant', teeth: ['19', '21'], retention: 'screw' }, { m: 'bridge', abutments: ['19', '21'], material: 'pfm' }]],
+    ['a bridge joining an implant to a tooth', false, ['18', '19', '20', '21'], [{ m: 'missing', teeth: ['20'] }, { m: 'implant', tooth: '19' }, { m: 'bridge', abutments: ['19', '21'], material: 'pfm' }]],
+    ['two pontics on two implants', false, ['18', '19', '20', '21', '22'], [{ m: 'missing', teeth: ['19', '20'] }, { m: 'implant', teeth: ['18', '21'] }, { m: 'bridge', abutments: ['18', '21'], material: 'zirconia' }]],
+    ['a lithium disilicate bridge on implants at #3 and #5', false, ['3', '4', '5'], [{ m: 'missing', teeth: ['4'] }, { m: 'implant', teeth: ['3', '5'] }, { m: 'bridge', abutments: ['3', '5'], material: 'lithium' }]],
+    ['a lithium disilicate bridge on implants at #7 and #9', true, ['7', '8', '9'], [{ m: 'missing', teeth: ['8'] }, { m: 'implant', teeth: ['7', '9'] }, { m: 'bridge', abutments: ['7', '9'], material: 'lithium' }]],
+    ['a full mouth counting an implant as a tooth', false, ['29', '30', '31'], [{ m: 'missing', teeth: ['1', '16', '17', '32'] }, { m: 'implant', tooth: '30' }], { full: true, mouth: { teeth: 28, involved: 0, lost: 0 } }],
+    ['a full mouth counting its implant apart', true, ['29', '30', '31'], [{ m: 'missing', teeth: ['1', '16', '17', '32'] }, { m: 'implant', tooth: '30' }], { full: true, mouth: { teeth: 27, involved: 0, lost: 0 } }],
   ];
   // a record: [what, passes, teeth, modules, more of the record (per-tooth t, tests)]
   for (const [what, ok, teeth, modules, extra] of calls) {
@@ -166,6 +201,7 @@ for (const hub of fs.readdirSync(path.join(root, 'hubs')).sort()) {
   const TIP = [{ m: 'roottip', tooth: '14', kind: 'fragment', len: 4, root: 'mesiobuccal' }];
   const RET = [{ m: 'roottip', tooth: '12', kind: 'retained' }];
   const CRACK = [{ m: 'restoration', tooth: '19', surfaces: 'MOD', material: 'amalgam' }, { m: 'fracture', tooth: '19', type: 'crack' }];
+  const PI = [{ m: 'implant', tooth: '30', state: 'peri-implantitis', crown: 'pfm', retention: 'cement', cement: true, loss: 3.5, years: 4 }];
   const recs = [
     ['a cervical lesion on the view', true, ['18', '19', '20'], [{ m: 'caries', tooth: '19', surface: 'B', depth: 'dentin' }], [{ kind: 'view' }]],
     ['root caries on the view', true, ['21', '22'], [{ m: 'recession', teeth: ['22'], mm: 3 }, { m: 'caries', tooth: '22', surface: 'F', depth: 'dentin', root: true }], [{ kind: 'view' }]],
@@ -199,6 +235,17 @@ for (const hub of fs.readdirSync(path.join(root, 'hubs')).sort()) {
     ['a cracked tooth with its bite test in the record\'s rows', true, ['18', '19'], CRACK, [{ kind: 'film' }], ['fracture'], [], { tests: [{ test: 'bite', tooth: '19', result: 'positive', cusp: 'DL', release: true }] }],
     ['a cracked tooth with no test and no odontogram', false, ['18', '19'], CRACK, [{ kind: 'film' }], ['fracture']],
     ['a temporary filling on a bitewing', true, ['19', '20'], [{ m: 'restoration', tooth: '20', surfaces: 'DO', material: 'temporary', temp: 'cavit' }], [{ kind: 'bitewing', teeth: ['14', '13', '19', '20'] }], ['resto']],
+    // Patient Box v2.3 (2026-11-24): implants on modules (the box's row gives the delivery film's bone, or says there is none)
+    ['peri-implantitis on the film and the chart, with the delivery film in the box', true, ['29', '30', '31'], PI, [{ kind: 'film' }, { kind: 'chart' }], ['impl']],
+    ['peri-implantitis on the film alone (bleeding is a chart\'s finding)', false, ['29', '30', '31'], PI, [{ kind: 'film' }], ['impl']],
+    ['peri-implantitis on the film, the bleeding in a row', true, ['29', '30', '31'], PI, [{ kind: 'film' }], ['impl'], [['Exam', '#30 bleeds and suppurates on probing']]],
+    ['peri-implantitis on the chart alone (the bone is a film\'s)', false, ['29', '30', '31'], PI, [{ kind: 'chart' }], ['impl']],
+    ['an implant with no earlier records on the film and the chart', true, ['29', '30', '31'], [{ m: 'implant', tooth: '30', state: 'peri-implantitis', baseline: false, bone: 5 }], [{ kind: 'film' }, { kind: 'chart' }], ['impl']],
+    ['an implant under its cover screw on a film', true, ['13', '14', '15'], [{ m: 'implant', tooth: '14', state: 'healing', weeks: 6 }], [{ kind: 'film' }], ['impl']],
+    ['an implant under its cover screw on the view alone (it is under the mucosa)', false, ['13', '14', '15'], [{ m: 'implant', tooth: '14', state: 'healing', weeks: 6 }], [{ kind: 'view' }], ['impl']],
+    ['a failed implant on its film', true, ['9', '10', '11'], [{ m: 'implant', tooth: '10', state: 'failed', crown: 'pfm' }], [{ kind: 'film' }], ['impl']],
+    ['an implant question on a case with no implant', false, ['28', '29', '30'], [], [{ kind: 'film' }, { kind: 'chart' }], ['impl']],
+    ['an implant-supported bridge on a bitewing', true, ['18', '19', '20', '21'], [{ m: 'missing', teeth: ['20'] }, { m: 'implant', teeth: ['19', '21'], retention: 'screw' }, { m: 'bridge', abutments: ['19', '21'], material: 'pfm' }], [{ kind: 'bitewing', teeth: ['14', '13', '12', '21', '20', '19', '18'] }], ['resto']],
   ];
   // a record: [what, answerable, teeth, modules, figs, rests (caries by default), the question's own rows, more of the record]
   for (const [what, ok, teeth, modules, figs, rests, rows, extra] of recs) {
@@ -206,6 +253,29 @@ for (const hub of fs.readdirSync(path.join(root, 'hubs')).sort()) {
     if (v.length) { bad++; console.error(`✗ the kit's rules: ${what}: the record itself fails validate(): ${v.join('; ')}`); continue; }
     const p = K.answerable(spec, figs, K.rows(spec).concat(rows || []), rests || ['caries']);
     if (ok !== !p.length) { bad++; console.error(`✗ the kit's rules: ${what} should ${ok ? 'be' : 'not be'} answerable` + (p.length ? ': ' + p.join('; ') : '')); }
+  }
+}
+/* Patient Box v2.3 (2026-11-24): what derive() makes of an implant's numbers (the 2017 World Workshop's definitions, the lecture's
+   failure rule; the sources are in widget/cases.js's header): each record must pass validate() and give its diagnosis */
+{
+  const { K } = load('var PCASES = {};');
+  const base = { age: 55, sex: 'woman', smoke: 0, teeth: ['29', '30', '31'] };
+  const dxs = [
+    ['a healthy implant', [{ m: 'implant', tooth: '30', state: 'health' }], 'peri-implant health'],
+    ['inflamed with the bone where it was at delivery', [{ m: 'implant', tooth: '30', state: 'mucositis' }], 'peri-implant mucositis'],
+    ['inflamed with 3 mm lost since delivery', [{ m: 'implant', tooth: '30', state: 'peri-implantitis' }], 'peri-implantitis'],
+    ['bone 1.8 mm below the platform at delivery and now: remodeling, not loss', [{ m: 'implant', tooth: '30', state: 'health', baseline: 1.8 }], 'peri-implant health'],
+    ['more than half its length of bone lost, not mobile', [{ m: 'implant', tooth: '30', state: 'peri-implantitis', loss: 4.5 }], 'failed implant'],
+    ['mobile with a radiolucent line round it', [{ m: 'implant', tooth: '30', state: 'failed' }], 'failed implant'],
+    ['under its cover screw', [{ m: 'implant', tooth: '30', state: 'healing', weeks: 8 }], 'healing implant'],
+    ['no earlier records, inflamed, bone 3.5 mm below the platform', [{ m: 'implant', tooth: '30', state: 'peri-implantitis', baseline: false, bone: 3.5 }], 'peri-implantitis'],
+    ['no earlier records, inflamed, bone 2 mm below the platform and probing 5 mm', [{ m: 'implant', tooth: '30', state: 'mucositis', baseline: false, bone: 2 }], 'peri-implant mucositis'],
+  ];
+  for (const [what, modules, want] of dxs) {
+    const spec = Object.assign({ modules }, base), v = K.validate(spec);
+    if (v.length) { bad++; console.error(`✗ the kit's implant rules: ${what}: the record fails validate(): ${v.join('; ')}`); continue; }
+    const got = K.derive(spec).impl['30'];
+    if (!got || got.dx !== want) { bad++; console.error(`✗ the kit's implant rules: ${what} should be ${want}, derive() gives ${got ? got.dx : 'nothing'}`); }
   }
 }
 /* the example cases (not on any page), checked like a hub's */

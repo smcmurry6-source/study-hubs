@@ -85,7 +85,40 @@
      radiopaque zinc oxide-eugenol cement;
    - clinical tests (Cameron, JADA 1964;68:405; AAE, Cracking the Cracked Tooth Code, 2008; Cohen's): a cracked tooth hurts on biting
      one cusp, most on release; transillumination's light stops at a crack, and a full crown blocks it; no one test proves a crack; a
-     tooth with apical periodontitis is tender to percussion and to biting; an ankylosed one rings (spec.tests, the case's rows). */
+     tooth with apical periodontitis is tender to percussion and to biting; an ankylosed one rings (spec.tests, the case's rows).
+   Patient Box v2.3 (2026-11-24): implants on modules ({ m:'implant' }) and an implant-supported bridge, each call settled from outside
+   sources and the PCD Implants lectures:
+   - peri-implant states: the 2017 World Workshop's case definitions (Berglundh et al., J Clin Periodontol 2018;45(S20):S286; Renvert,
+     Persson, Pirih and Camargo, J Clin Periodontol 2018;45(S20):S278): health no bleeding or suppuration and no bone loss beyond the
+     initial remodeling; mucositis bleeding and/or suppuration, no bone loss beyond it; peri-implantitis bleeding and/or suppuration,
+     deeper probing and bone loss beyond it. With no earlier records, the consensus asks for all three of bleeding or suppuration, a
+     probing depth of 6 mm or more and bone 3 mm or more apical to the implant's most coronal intraosseous part; the lecture (PCD
+     Implants, peri-implant disease) teaches the depth and the bone as either one, and derive() keeps the lecture's (the hubs teach it;
+     a case that wants both readings to agree has both). The initial remodeling is under 2 mm (the lecture); more than half the
+     implant's length of bone lost, or any mobility, is a failed implant (the lecture; ICOI Pisa, Misch et al., Implant Dent 2008;17:5);
+   - the numbers an implant module writes: healthy peri-implant mucosa 3 to 4 mm tall over the crest (barrier epithelium about 2 mm,
+     connective tissue 1 to 1.5 mm: Berglundh and Lindhe, J Clin Periodontol 1996;23:971; the lecture), taller between teeth than on
+     the facial (Kan et al., J Periodontol 2003;74:557); a probe stops at the connective tissue's level in health, about 1.5 mm short
+     of the bone, and goes past it, close to the bone, when the tissue is inflamed (Lang, Wetzel, Stich and Caffesse, Clin Oral
+     Implants Res 1994;5:191; Abrahamsson and Soldini, J Clin Periodontol 2006;33:290). So validate() wants an implant's pocket base
+     within 2.5 mm above the bone and no more than half a millimeter below it, and the margin at least a millimeter above it; its
+     recession and attachment are measured from the platform;
+   - where implants go: 1.5 mm from a tooth's root and 3 mm from another implant (the lecture; Tarnow, Cho and Wallace, J Periodontol
+     2000;71:546: 3 mm or less between implants loses more crestal bone; Esposito, Ekestubbe and Grondahl, Clin Oral Implants Res
+     1993;4:151; Grunder, Gracis and Capelli, Int J Periodontics Restorative Dent 2005;25:113), with the diameters of the common
+     bone-level systems (narrow 3.3 mm for a lower incisor or an upper lateral, regular 4.1, wide 4.8 for a molar) and 10 mm long
+     unless a case says; one too close isn't drawn;
+   - retention: cement-retained or screw-retained; excess cement left under the margin was found in 81% of peri-implant disease cases
+     (Wilson, J Periodontol 2009;80:1388) and the lecture puts cement-retained crowns at higher risk; most cements show on a film, some
+     barely (Wadhwani, Hess, Faber, Pineyro and Chen, J Prosthet Dent 2010;103:295). A screw-retained crown's access channel is sealed
+     with PTFE tape over the screw head and composite above it (Moraguez and Belser, J Prosthet Dent 2010;103:189). On the film a
+     metal, metal-ceramic or zirconia crown is as radiopaque as metal and hides the abutment, lithium disilicate is about dentin's and
+     shows it (Pekkan, Pekkan, Hatipoglu and Tuna, J Prosthet Dent 2011;106:109);
+   - an implant-supported bridge: two implants carry a three-unit bridge, not usually four (the lecture: a span flexes with its cube),
+     and implant fixed partial dentures do well (Pjetursson et al., Clin Oral Implants Res 2012;23(S6):22); never an implant joined to
+     a tooth (the lecture: the tooth moves 25 to 100 um in its ligament, the implant 3 to 5 um; Lang, Pjetursson, Tan, Bragger, Egger
+     and Zwahlen, Clin Oral Implants Res 2004;15:643: lower survival and intrusion of the tooth). Lithium disilicate stays a bridge
+     material up to the second premolar, as on teeth. */
 (function(){
   'use strict';
   var I = {};
@@ -165,6 +198,19 @@
      and spec.tests: [{ test:'bite', tooth, result:'positive' | 'negative', release:true, cusp:'DL' }, { test:'transillumination',
        tooth, result }, { test:'percussion', tooth, result:'normal' | 'tender' | 'metallic' }]: the case's clinical tests, which the
        box's rows give and validate() holds to the record (a positive bite test or transillumination needs what causes it)
+     Patient Box v2.3 (2026-11-24; the sources are in this file's header): implants on modules, in place of v1's per-tooth numbers
+       { m:'implant', tooth (or teeth), state:'health' | 'mucositis' | 'peri-implantitis' | 'failed' | 'healing', w, len, crown,
+           retention:'cement' | 'screw', cement:true, baseline:1.5 | { m, d } | false, loss, bone, rec, swell, bop, pus, mob, cover,
+           years, weeks }   writes implant, bone (mm below the platform), pd, rec, bop, pus, halo and mob (implantModule()): w and len
+           in mm (by default 3.3 for a lower incisor or an upper lateral, 4.8 for a molar, 4.1 elsewhere; 10 long); crown the implant
+           crown's material (gold, pfm, zirconia, lithium, provisional); baseline the bone on the film at the crown's delivery (1.5 mm
+           by default; false: no earlier films or probings, so the 2017 rule for a patient without records decides); loss mm lost
+           since (peri-implantitis: 3 by default); rec mm the facial mucosa has receded from where it healed, swell mm it is swollen
+           (mucositis: 1); bop a share of the sites (every site of an inflamed implant by default); pus at the deepest site of each
+           surface; failed: mobile (mob 1) with a radiolucent line round it, cover:true when it failed before it was uncovered;
+           healing: under its cover screw, no crown and no probing; years since the crown was delivered, weeks since placement
+       { m:'bridge', abutments:[a, b], material } on two implants (each in an implant module): an implant-supported bridge, drawn on
+           every view; never an implant joined to a tooth, and one pontic between two implants
      The record keeps everything else (age, smoke, hba1c, cc, mouth, gingiva), and the box rows, every view and the key
      are drawn from it. */
   var MAT = ['amalgam', 'composite', 'gold', 'crown'], DEPTH = ['enamel', 'dentin', 'pulp'];
@@ -176,6 +222,18 @@
   var TESTS = ['bite', 'transillumination', 'percussion'], RESULTS = { bite:['positive', 'negative'], transillumination:['positive', 'negative'], percussion:['normal', 'tender', 'metallic'] };
   var FILLS = ['adequate', 'short', 'long', 'voids'], POSTS = ['cast', 'metal', 'fiber'], CORES = ['amalgam', 'composite', 'cast'];
   var FX = ['crown', 'cusp', 'crack', 'vrf', 'hrf'], HRF_AT = ['cervical', 'middle', 'apical'];
+  /* v2.3: implants on modules. The states the module writes numbers for; the implant record's own fields; the crowns an implant
+     carries (no stainless steel crown: that is a molar tooth's); how far an implant's platform must stay from a tooth's root and
+     from another implant (the lecture's 1.5 mm and 3 mm: Grunder 2005, Tarnow 2000); the mucosa's height above the bone in health
+     (3-4 mm: Berglundh and Lindhe 1996), and how far above the bone the probe stops in each state (Lang 1994; Abrahamsson and
+     Soldini 2006) */
+  var ISTATES = ['health', 'mucositis', 'peri-implantitis', 'failed', 'healing'], IKEYS = ['w', 'len', 'baseline', 'cement', 'cover', 'retention', 'years', 'weeks'];
+  var ICROWNS = ['gold', 'pfm', 'zirconia', 'lithium', 'provisional'], RETAIN = ['cement', 'screw'], TO_TOOTH = 1.5, TO_IMPLANT = 3;
+  var PLAT = 1.1, MUCOSA = 3.5, PROBE_GAP = { health:1.5, mucositis:1, 'peri-implantitis':.5, failed:.5 };
+  /* the width an implant gets by default where the author gives none: narrow (3.3) for a lower incisor or an upper lateral, wide
+     (4.8) for a molar, regular (4.1) elsewhere (the narrow, regular and wide sizes of the common bone-level systems) */
+  function implantW(n){ var c = CAT(n); if(!c) return 4.1; return c.pos >= 6 ? 4.8 : (c.pos === 2 || (c.pos === 1 && c.arch !== 'upper')) ? 3.3 : 4.1; }
+  function sides2(v, def){ return v && typeof v === 'object' ? { m:+(v.m != null ? v.m : def), d:+(v.d != null ? v.d : def) } : { m:v == null ? def : +v, d:v == null ? def : +v }; }
   /* the roots a film shows one by one (the canals it can judge): a molar's mesial and distal (buccal) roots, else the one in front */
   /* a class name built from the record's data only when the value is one the kit knows (the rest is markup) */
   function oneOf(v, list, pre){ return list.indexOf(v) >= 0 ? pre + v : ''; }
@@ -216,6 +274,50 @@
       }
       if(md.mob != null) r.mob = md.mob; else r.mob = pct >= 70 ? 2 : pct >= 55 ? 1 : 0;
     });
+  }
+  /* v2.3: an implant from its state. The record's numbers follow, as the bone module's do: the bone today in mm below the platform
+     (the baseline, plus loss), the mucosal margin 3.5 mm above the bone the mucosa healed on (the lecture's 3-4 mm), 1 mm higher
+     between the teeth (the papilla), and the probe's stop above the bone by state: 1.5 mm in health (the connective tissue zone),
+     1 mm in mucositis and 0.5 mm in peri-implantitis or at a failed implant, where it passes the inflamed tissue to near the bone
+     (Lang 1994). Swelling moves the margin up (mucositis: 1 mm by default), recession down. Every site bleeds once it is inflamed
+     (bop: a share of them instead), and pus wells from the deepest site of each surface. A failed implant is mobile with a
+     radiolucent line around it; a healing one sits under its cover screw, unprobed. */
+  function implantModule(t, n, md, w, probs){
+    var c = CAT(n); if(!c){ probs.push(w + 'tooth ' + n + ' is not a universal number'); return; }
+    var st = md.state || 'health', r = ensure(t, n), im = { w:md.w != null ? md.w : implantW(n), len:md.len != null ? md.len : 10 };
+    if(ISTATES.indexOf(st) < 0){ probs.push(w + 'state must be ' + ISTATES.join(', ')); return; }
+    ['retention', 'years', 'weeks'].forEach(function(k){ if(md[k] != null) im[k] = md[k]; });
+    if(md.cement) im.cement = true;
+    if(md.loss != null && st !== 'peri-implantitis' && st !== 'failed') probs.push(w + 'bone loss past the baseline is peri-implantitis (or a failed implant): ' + st + ' has none');
+    if(md.cover && st !== 'healing' && st !== 'failed') probs.push(w + 'a cover screw is a healing implant\'s (state healing), or one that failed before it was uncovered (state failed)');
+    if(st === 'healing' || md.cover){
+      ['crown', 'baseline', 'rec', 'swell', 'pus', 'bop', 'years'].forEach(function(k){ if(md[k] != null && md[k] !== false) probs.push(w + 'an implant under its cover screw has no ' + (k === 'years' ? 'crown delivered (give weeks since placement)' : k === 'crown' || k === 'baseline' ? k + ' yet' : 'probing (' + k + ')')); });
+      im.cover = true; r.implant = im; var b0 = sides2(md.bone, 0), l0 = st === 'failed' ? sides2(md.loss, 0) : { m:0, d:0 }; r.bone = { m:b0.m + l0.m, d:b0.d + l0.d };
+      if(st === 'failed'){ r.halo = true; r.mob = md.mob != null ? md.mob : 1; }
+      return;
+    }
+    var base = md.baseline === false ? null : sides2(md.baseline, 1.5);
+    if(base) im.baseline = { m:base.m, d:base.d };
+    var loss = sides2(md.loss, st === 'peri-implantitis' ? 3 : 0), from = base || sides2(null, 1.5);
+    var bone = md.bone != null ? sides2(md.bone, 0) : { m:from.m + loss.m, d:from.d + loss.d };
+    r.implant = im; r.bone = bone;
+    if(md.crown) r.crown = md.crown;
+    if(st === 'failed'){ r.halo = true; r.mob = md.mob != null ? md.mob : 1; }
+    var healed = (from.m + from.d) / 2, swell = md.swell != null ? md.swell : st === 'mucositis' ? 1 : 0, gap = PROBE_GAP[st];
+    /* the margin heals about MUCOSA mm over the crest; rec (facial, as the recession module's) moves it apically, a millimeter less at
+       the line angles and on the lingual */
+    var recF = Math.round(healed - MUCOSA) - swell, R = md.rec || 0, at = [bone.m, (bone.m + bone.d) / 2, bone.d];
+    var inflamed = st !== 'health';
+    r.pd = {}; r.rec = {}; r.bop = {}; r.pus = {};
+    ['f', 'l'].forEach(function(s){
+      var Rs = s === 'f' ? R : Math.max(0, R - 1), Ra = Math.max(0, Rs - 1), recs = [recF - 1 + Ra, recF + Rs, recF - 1 + Ra];
+      r.rec[s] = recs; r.pd[s] = at.map(function(b, i){ return Math.max(1, Math.round(b - gap - recs[i])); });
+      r.bop[s] = [0, 0, 0]; r.pus[s] = [0, 0, 0];
+      if(inflamed && md.bop == null) r.bop[s] = [1, 1, 1];
+      if(md.pus && inflamed){ var dp = Math.max.apply(null, r.pd[s]), ip = r.pd[s].indexOf(dp); if(dp >= 4){ r.pus[s][ip] = 1; r.bop[s][ip] = 1; } }
+    });
+    if(inflamed && md.bop != null){ var sites = []; ['f', 'l'].forEach(function(s){ [0, 1, 2].forEach(function(i){ sites.push([s, i, r.pd[s][i]]); }); });
+      sites.sort(function(a, b){ return b[2] - a[2]; }); sites.slice(0, Math.round(md.bop * 6)).forEach(function(x){ r.bop[x[0]][x[1]] = 1; }); }
   }
   /* bleeding, suppuration or plaque at a share of the sites (of md.teeth, or of every tooth in the case), the deepest first */
   function siteModule(t, md, spec, field){
@@ -275,6 +377,7 @@
         ['at', 'side', 'size', 'mm', 'root', 'heithersay'].forEach(function(k){ if(md[k] != null) rx[k] = md[k]; });
         (rz.rsp = rz.rsp || []).push(rx); }
       else if(md.m === 'sealant') (md.teeth ? list(md.teeth) : list(md.tooth)).forEach(function(n){ ensure(t, n).seal = normSurf(n, md.surfaces || 'O'); });
+      else if(md.m === 'implant') (md.teeth ? list(md.teeth) : list(md.tooth)).forEach(function(n){ implantModule(t, n, md, w, probs); });
       else if(md.m === 'bone') boneModule(t, md, probs);
       else if(md.m === 'bop' || md.m === 'pus' || md.m === 'plaque') siteModule(t, md, spec, md.m);
       else if(md.m === 'recession') list(md.teeth).forEach(function(n){ var r = ensure(t, n), mm = md.mm || 0; r.rec = r.rec || {}; r.pd = r.pd || {};
@@ -339,8 +442,13 @@
         var beyond, progressing, dx;
         if(base){ beyond = Math.max((now.m || 0) - Math.max(base.m || 0, 2), (now.d || 0) - Math.max(base.d || 0, 2)); progressing = Math.max((now.m || 0) - (base.m || 0), (now.d || 0) - (base.d || 0)) > 0; }
         else { beyond = Math.max(now.m || 0, now.d || 0) - 3 + .01; progressing = beyond > 0; if(maxPD >= 6 && infl) beyond = Math.max(beyond, .01); }
-        dx = t.mob || t.halo ? 'failed implant' : beyond > 0 && infl ? 'peri-implantitis' : infl ? 'peri-implant mucositis' : beyond > 0 ? 'bone loss without inflammation' : 'peri-implant health';
-        out.impl[t.n] = { dx:dx, meffert: t.mob || t.halo ? 'failed' : progressing && infl ? 'failing' : beyond > 0 ? 'ailing' : 'healthy', lossBeyondRemodeling:+Math.max(0, beyond).toFixed(1), baseline:!!base };
+        /* v2.3: bone lost past half the implant's length is a failure too, mobile or not (the lecture: "losing more than half the
+           implant's length of bone, or any mobility, means failure"; the ICOI Pisa scale, Misch 2008) */
+        var lost = t.mob || t.halo || Math.max(now.m || 0, now.d || 0) > im.len / 2;
+        /* an implant still under its cover screw isn't loaded or probed: it is healing, unless it has failed */
+        if(im.cover && !lost){ out.impl[t.n] = { dx:'healing implant', meffert:'healing', lossBeyondRemodeling:0, baseline:false }; return; }
+        dx = lost ? 'failed implant' : beyond > 0 && infl ? 'peri-implantitis' : infl ? 'peri-implant mucositis' : beyond > 0 ? 'bone loss without inflammation' : 'peri-implant health';
+        out.impl[t.n] = { dx:dx, meffert: lost ? 'failed' : progressing && infl ? 'failing' : beyond > 0 ? 'ailing' : 'healthy', lossBeyondRemodeling:+Math.max(0, beyond).toFixed(1), baseline:!!base };
         return;
       }
       var vrf = t.fx.filter(function(f){ return f.type === 'vrf'; });
@@ -547,11 +655,59 @@
         if(x.result === 'tender' && !(t.lesion || t.apdl || crack || cusp || fx('vrf') || fx('hrf') || fx('crown'))) bad(w + 'tender to percussion needs a cause in the record: apical periodontitis, a crack or fracture, or a recent injury'); }
     });
   }
+  /* v2.3: one implant's own rules (its sources are in this file's header). Its record holds only what the kit draws; a cemented
+     crown is the one that leaves excess cement; an implant under its cover screw has no crown, bridge, baseline film or probing;
+     its crown is a material an implant carries; its platform keeps 1.5 mm from a neighbor's root and 3 mm from a neighboring
+     implant (the lecture; Grunder 2005, Tarnow 2000), measured where the kit draws them (the teeth at their contacts, a tooth's root
+     at its cervical width); and the probe stops where the mucosa allows: no deeper than the bone, no more than 2.5 mm above it,
+     with the margin at least 1 mm above the bone (Lang 1994; Berglundh and Lindhe 1996) */
+  function implantCheck(spec, t, w, bad, num){
+    var im = t.implant;
+    Object.keys(im).forEach(function(k){ if(IKEYS.indexOf(k) < 0) bad(w + 'implant.' + k + ' is not something the kit draws'); });
+    if(im.retention != null && RETAIN.indexOf(im.retention) < 0) bad(w + 'implant retention must be ' + RETAIN.join(' or '));
+    if(im.cement && im.retention === 'screw') bad(w + 'excess cement is left under a cemented crown: a screw-retained one has none');
+    if(im.years != null) num(im.years, 0, 40, w + 'years since the crown was delivered');
+    if(im.weeks != null) num(im.weeks, 0, 52, w + 'weeks since the implant was placed');
+    if(im.cover){
+      if(t.crown) bad(w + 'an implant under its cover screw has no crown yet');
+      if(t.abut) bad(w + 'an implant under its cover screw carries no bridge yet');
+      if(im.cement || im.retention || im.years != null || im.baseline) bad(w + 'an implant under its cover screw has no crown yet, so no retention, cement, years since delivery or baseline film');
+      ['pd', 'rec', 'bop', 'pus', 'plaque'].forEach(function(k){ if(t.raw[k]) bad(w + 'an implant under its cover screw is under the mucosa and can\'t be probed (' + k + ')'); });
+    }
+    if(t.crownMat && ICROWNS.indexOf(t.crownMat) < 0) bad(w + 'an implant crown is ' + ICROWNS.join(', ') + (t.crownMat === 'ssc' ? ' (a stainless steel crown is a molar tooth\'s)' : ''));
+    if(t.margin.open || t.margin.overhang) bad(w + 'an implant crown\'s margin: excess cement is implant.cement, and an open margin or overhang isn\'t drawn on one');
+    var named = spec.full ? null : allNums(spec);
+    [+t.n - 1, +t.n + 1].forEach(function(b){
+      if(b < 1 || b > 32 || !adjacent(t.n, b)) return; var nb = String(b); if(named && named.indexOf(nb) < 0) return;
+      var u = tooth(spec, nb); if(u.missing) return;
+      var ctr = (t.d.cw + u.d.cw) / 2;
+      if(u.implant){ if(b < +t.n) return; var gi = ctr - im.w / 2 - u.implant.w / 2;
+        if(gi < TO_IMPLANT - 1e-9) bad(w + 'and #' + nb + '\'s implants are ' + f1(gi) + ' mm apart: implants are kept 3 mm apart, or the bone between them resorbs and the papilla goes (Tarnow 2000): narrower implants, or a pontic between'); }
+      else { var gt = ctr - u.d.cv / 2 - im.w / 2;
+        var fit = Math.floor((im.w - 2 * (TO_TOOTH - gt)) * 10) / 10;
+        if(gt < TO_TOOTH - 1e-9) bad(w + 'the implant is ' + f1(gt) + ' mm from #' + nb + '\'s root: an implant is kept 1.5 mm from a tooth (' + (fit >= 3 ? 'one up to ' + fit + ' mm wide fits here' : 'no implant 3 mm or wider fits here') + ')'); }
+    });
+    if(im.cover) return;
+    var bm = t.bone.m || 0, bd = t.bone.d || 0;
+    ['f', 'l'].forEach(function(s){ [0, 1, 2].forEach(function(i){
+      var b = i === 0 ? bm : i === 2 ? bd : (bm + bd) / 2, base = t.pd[s][i] + t.rec[s][i], site = w + (s === 'f' ? 'facial' : 'lingual') + ' ' + SITE_NAME[i] + ' ';
+      if(base > b + .5) bad(site + 'the pocket base (' + base + ' mm below the platform) is past the bone (' + f1(b) + ' mm): the probe stops at the bone');
+      else if(base < b - 2.5) bad(site + 'the pocket base sits ' + f1(b - base) + ' mm above the bone (the bone ' + f1(b) + ' mm below the platform): the probe stops about 1-1.5 mm above it in health and nearer in disease');
+      if(t.rec[s][i] > b - 1) bad(site + 'the mucosal margin (recession ' + t.rec[s][i] + ') sits within 1 mm of the bone (' + f1(b) + ' mm below the platform)'); }); });
+  }
   /* bridges across the record: every run of pontics has an abutment at each end, every abutment is next to a pontic */
   function bridgeCheck(spec, bad){
     var T = {}; for(var n = 1; n <= 32; n++) T[n] = tooth(spec, String(n));
     for(var a = 1; a <= 32; a++){ var t = T[a];
-      if(t.pontic){ [a - 1, a + 1].forEach(function(b){ if(b < 1 || b > 32 || !adjacent(a, b)) { bad('#' + a + ': a pontic at the end of the arch has no abutment past it'); return; } var u = T[b]; if(!u.pontic && !u.abut) bad('#' + a + ': a pontic next to #' + b + ', which is neither a pontic nor an abutment'); if(u.abut && u.missing) bad('#' + b + ': an abutment that is missing'); if(u.abut && u.implant) bad('#' + b + ': an implant abutment (a tooth-and-implant bridge is not drawn)'); if(u.pontic && u.pontic !== t.pontic) bad('#' + a + ': one bridge, two materials'); }); }
+      if(t.pontic){ [a - 1, a + 1].forEach(function(b){ if(b < 1 || b > 32 || !adjacent(a, b)) { bad('#' + a + ': a pontic at the end of the arch has no abutment past it'); return; } var u = T[b]; if(!u.pontic && !u.abut) bad('#' + a + ': a pontic next to #' + b + ', which is neither a pontic nor an abutment'); if(u.abut && u.missing) bad('#' + b + ': an abutment that is missing'); if(u.pontic && u.pontic !== t.pontic) bad('#' + a + ': one bridge, two materials'); });
+        /* v2.3: the run of pontics this one starts, and the abutments at its two ends: both teeth or both implants (never an implant
+           joined to a tooth: the tooth moves 25-100 um in its ligament, the implant 3-5 um, so the implant takes the load; Lang 2004),
+           and two implants carry one pontic (a three-unit bridge), not usually two (the lecture: a span flexes with its cube) */
+        if(!(a > 1 && adjacent(a, a - 1) && T[a - 1].pontic)){ var e = a; while(e < 32 && adjacent(e, e + 1) && T[e + 1].pontic) e++;
+          var A0 = T[a - 1], A1 = T[e + 1];
+          if(A0 && A1 && adjacent(a - 1, a) && adjacent(e, e + 1) && A0.abut && A1.abut){
+            if(!!A0.implant !== !!A1.implant) bad('#' + (a - 1) + ' to #' + (e + 1) + ': a bridge joining an implant to a tooth (never: the tooth moves 25-100 um in its ligament, the implant 3-5 um, so the implant takes the load)');
+            else if(A0.implant && e > a) bad('#' + (a - 1) + ' to #' + (e + 1) + ': ' + (e - a + 1) + ' pontics on two implants: two implants carry a three-unit bridge, not usually a longer one (a span flexes with its cube): add an implant under a pontic'); } } }
       if(t.abut && !t.missing && ![a - 1, a + 1].some(function(b){ return b >= 1 && b <= 32 && adjacent(a, b) && T[b].pontic; })) bad('#' + a + ': an abutment with no pontic beside it');
       if(t.abut && t.crownMat && [a - 1, a + 1].some(function(b){ return b >= 1 && b <= 32 && adjacent(a, b) && T[b].pontic && T[b].pontic !== t.crownMat; })) bad('#' + a + ': the abutment crown and its pontic are different materials');
     }
@@ -575,13 +731,14 @@
       if(m.lost != null){ num(m.lost, 0, 32, 'teeth lost'); if(m.teeth != null && m.lost + m.teeth > 32) bad('teeth lost + teeth present exceed 32'); } }
     if(spec.full){
       /* a full-mouth case: the box's counts must be the record's */
-      var gone = 0, inv = 0;
-      for(var j = 1; j <= 32; j++){ var tj = tooth(spec, String(j)); if(tj.missing){ gone++; continue; } if(tj.implant) continue;
+      /* v2.3: an implant stands where a tooth was lost, so it counts as a tooth gone, not one present (the staging counts teeth) */
+      var gone = 0, inv = 0, imps = 0;
+      for(var j = 1; j <= 32; j++){ var tj = tooth(spec, String(j)); if(tj.missing){ gone++; continue; } if(tj.implant){ imps++; continue; }
         if(Math.max(tj.cal.f[0], tj.cal.f[2], tj.cal.l[0], tj.cal.l[2]) >= 1 || (tj.bone.m || 0) > 0 || (tj.bone.d || 0) > 0) inv++; }
       if(!m || m.teeth == null) bad('a full-mouth case gives mouth.teeth');
-      else if(m.teeth !== 32 - gone) bad('mouth.teeth = ' + m.teeth + ', but the record has ' + (32 - gone) + ' teeth present');
+      else if(m.teeth !== 32 - gone - imps) bad('mouth.teeth = ' + m.teeth + ', but the record has ' + (32 - gone - imps) + ' teeth present' + (imps ? ' (its ' + imps + ' implant' + (imps > 1 ? 's are' : ' is') + ' not a tooth)' : ''));
       if(m && m.involved != null && m.involved !== inv) bad('mouth.involved = ' + m.involved + ', but ' + inv + ' teeth in the record have attachment or bone loss');
-      if(m && m.lost != null && m.lost > gone) bad('mouth.lost = ' + m.lost + ', but only ' + gone + ' teeth are missing');
+      if(m && m.lost != null && m.lost > gone + imps) bad('mouth.lost = ' + m.lost + ', but only ' + (gone + imps) + ' teeth are missing or replaced by implants');
     }
     var g = spec.gingiva || {};
     if(g.kt != null) num(g.kt, 0, 9, 'keratinized tissue width');
@@ -641,8 +798,9 @@
         ['m', 'd'].forEach(function(sd){ var b = t.bone[sd] || 0; num(b, 0, im.len - 1, w + 'implant bone loss ' + sd);
           if(im.baseline){ num(im.baseline[sd] || 0, 0, im.len - 1, w + 'baseline bone ' + sd); if(b < (im.baseline[sd] || 0)) bad(w + 'bone at ' + sd + ' is higher than at the baseline'); } });
         if(t.furc.f || t.furc.l || t.furcX) bad(w + 'an implant has no furcation');
-        if(t.endo || t.amalgam || t.calc || t.resto.length || t.caries.length || t.lesion || t.fx.length || t.apdl || t.abut || t.retained || t.rtip || t.rsp.length || t.seal) bad(w + 'an implant and a root in one site: an implant has no root filling, restoration, caries, periapical lesion, resorption, sealant or root calculus');
+        if(t.endo || t.amalgam || t.calc || t.resto.length || t.caries.length || t.lesion || t.fx.length || t.apdl || t.retained || t.rtip || t.rsp.length || t.seal) bad(w + 'an implant and a root in one site: an implant has no root filling, restoration, caries, periapical lesion, resorption, sealant or root calculus');
         if(t.mob && !t.halo) bad(w + 'a mobile implant has lost osseointegration: set halo:true so the film shows it');
+        implantCheck(spec, t, w, bad, num);
         return;
       }
       if(t.halo) bad(w + 'halo is for implants');
@@ -734,6 +892,7 @@
       if(t.missing && t.pontic){ var dp = t.d, sgp = mr ? -1 : 1; inner += path('dc-crown dc-restored' + (t.pontic === 'gold' ? ' dc-goldcrown' : ''), TL.ponticMM(typeOf(t.n), { per:4 }).map(function(p){ return [cx + sgp * p[0] * k, y0 - p[1] * k]; })); return; }
       if(t.missing){ inner += '<path class="dc-x" d="M' + f1(cx - 10) + ' ' + f1(y0 - 24) + 'l20 20m0 -20l-20 20"/>'; return; }
       inner += chartTooth(t, cx, y0, k, mr);
+      if(t.implant && t.implant.cover) return;   /* submerged under the mucosa: nothing to probe yet */
       if(hasFurc(t.n) && !hide.furc && (t.furc[sf] || 0) > 0) inner += furcMark(t.furc[sf], cx, y0 + CAT(t.n).trunk * k + 2, 5);
       /* the gingival margin and the pocket base through the three sites (tooth terms m, c, d in viewer order); the
          middle site's CEJ sits where the cervical line dips */
@@ -754,7 +913,8 @@
   }
   function chartTable(spec, ts, sf, o){
     var hide = o.hide || {};
-    function cells(fn){ return ts.map(function(t){ if(t.missing) return '<td class="pc-miss">' + (t.pontic ? 'pontic' : 'X') + '</td>'; return '<td>' + fn(t) + '</td>'; }).join(''); }
+    function cells(fn, mob){ return ts.map(function(t){ if(t.missing) return '<td class="pc-miss">' + (t.pontic ? 'pontic' : 'X') + '</td>';
+      if(t.implant && t.implant.cover && !mob) return '<td class="pc-miss">submerged</td>'; return '<td>' + fn(t) + '</td>'; }).join(''); }
     function sites(t, arr, mark){ return '<span class="pc-sites">' + siteOrder(t.n).map(function(si){ return '<span class="' + (mark && mark[si] ? 'bop' : '') + '">' + esc(arr[si]) + '</span>'; }).join('') + '</span>'; }
     var h = '<table class="pchart dc-table"><caption class="dc-cap">' + (sf === 'f' ? 'Facial' : 'Lingual') + ' surfaces: three sites per tooth, left to right as you look at the patient</caption><thead><tr><th scope="row">Tooth</th>' +
       ts.map(function(t){ return '<th scope="col">#' + esc(t.n) + (t.implant ? '<br><small>implant</small>' : '') + '</th>'; }).join('') + '</tr></thead><tbody>';
@@ -764,8 +924,8 @@
     if(ts.some(function(t){ return t.pus[sf].some(Boolean); })) h += '<tr><th scope="row">Suppuration</th>' + cells(function(t){ return siteOrder(t.n).map(function(si){ return t.pus[sf][si] ? '<span class="pc-flag">+</span>' : '<span>–</span>'; }).join(''); }) + '</tr>';
     if(ts.some(function(t){ return t.plaque[sf].some(Boolean); })) h += '<tr><th scope="row">Plaque</th>' + cells(function(t){ return siteOrder(t.n).map(function(si){ return t.plaque[sf][si] ? '<span class="pc-flag">+</span>' : '<span>–</span>'; }).join(''); }) + '</tr>';
     if(sf === 'f'){
-      if(!hide.mob) h += '<tr><th scope="row">Mobility</th>' + cells(function(t){ return t.mob ? '<span class="pc-flag">' + esc(t.mob) + '</span>' : '0'; }) + '</tr>';
-      if(!hide.furc && ts.some(function(t){ return !t.missing && (isMolar(t.n) || (hasFurc(t.n) && (t.furc.f || t.furc.l))); })) h += '<tr><th scope="row">Furcation (Glickman)</th>' + cells(function(t){ if(!hasFurc(t.n)) return '–'; var f = t.furc.f || 0, l = t.furc.l || 0; return (f ? '<span class="pc-flag">' + ['', 'I', 'II', 'III', 'IV'][f] + '</span> facial' : '') + (f && l ? ', ' : '') + (l ? '<span class="pc-flag">' + ['', 'I', 'II', 'III', 'IV'][l] + '</span> lingual' : '') || 'none'; }) + '</tr>';
+      if(!hide.mob) h += '<tr><th scope="row">Mobility</th>' + cells(function(t){ return t.mob ? '<span class="pc-flag">' + esc(t.mob) + '</span>' : '0'; }, true) + '</tr>';
+      if(!hide.furc && ts.some(function(t){ return !t.missing && !t.implant && (isMolar(t.n) || (hasFurc(t.n) && (t.furc.f || t.furc.l))); })) h += '<tr><th scope="row">Furcation (Glickman)</th>' + cells(function(t){ if(!hasFurc(t.n) || t.implant) return '–'; var f = t.furc.f || 0, l = t.furc.l || 0; return (f ? '<span class="pc-flag">' + ['', 'I', 'II', 'III', 'IV'][f] + '</span> facial' : '') + (f && l ? ', ' : '') + (l ? '<span class="pc-flag">' + ['', 'I', 'II', 'III', 'IV'][l] + '</span> lingual' : '') || 'none'; }) + '</tr>';
     }
     return '<div class="pchart-wrap">' + h + '</tbody></table></div>';
   }
@@ -781,7 +941,8 @@
     if(two) s += '<p class="dc-sides">One chart from one visit: the facial side of these teeth, then the lingual side of the same teeth.</p>';
     surfaces.forEach(function(sf){ s += (two ? '<div class="dc-surf">' + sideHead(sf, up) : '') + chartStrip(spec, ts, sf, o) + chartTable(spec, ts, sf, o) + (two ? '</div>' : ''); });
     s += '<div class="pchart-key">Blue line: the gingival margin. Red line: the base of the pocket (probing depth below the margin). <span class="bop">Red dot</span>: bleeding on probing; yellow dot: suppuration. Recession is the CEJ to the margin, in mm; a negative number means the margin sits coronal to the CEJ.' +
-      (hide.cal ? '' : ' CAL = probing depth + recession.') + ' M = mobility (0-3).' + (hide.furc ? '' : ' Furcation triangles: open = Class I, half filled = II, filled = III.') + '</div>';
+      (hide.cal ? '' : ' CAL = probing depth + recession.') + (ts.some(function(t){ return t.implant && !t.implant.cover; }) ? ' An implant\'s numbers are measured from its platform (drawn on the CEJ line), where a tooth\'s are from its CEJ.' : '') +
+      (ts.some(function(t){ return t.implant && t.implant.cover; }) ? ' An implant under its cover screw is submerged under the mucosa, not yet probed.' : '') + ' M = mobility (0-3).' + (hide.furc ? '' : ' Furcation triangles: open = Class I, half filled = II, filled = III.') + '</div>';
     return s;
   };
 
@@ -1286,19 +1447,41 @@
       R.push([x + hw * taper, yy + pitch * .3], [x + hw * taper + .38 * k, yy + pitch * .65], [x + hw * taper, yy + pitch]); }
     var yb = y0 + len, tip = hw * .72;
     L.push([x - tip, yb - .6 * k], [x - tip * .6, yb]); R.push([x + tip, yb - .6 * k], [x + tip * .6, yb]);
-    /* excess cement left under the crown margin: a bright fleck on the mesial side, below the margin */
+    /* excess cement left under the crown margin: a bright fleck on the mesial side, below the margin (most cements show on a film,
+       some barely: Wadhwani 2010; a case that has it draws it) */
     if(im.cement && !o.cover) s += path('xr-metal', [[x - hw * .95 * g.sg - .1 * k * g.sg, y0 - .4 * k], [x - hw * 1.35 * g.sg, y0 - .1 * k], [x - hw * 1.25 * g.sg, y0 + .9 * k], [x - hw * .95 * g.sg, y0 + .7 * k]]);
-    /* a failed implant: a radiolucent line all round it (fibrous tissue where bone should touch the threads) */
-    if(o.halo) s += path('xr-pdl', [[x - hw - .9 * k, y0 - .2 * k], [x + hw + .9 * k, y0 - .2 * k], [x + tip + .9 * k, yb + .3 * k], [x - tip - .9 * k, yb + .3 * k]], false, 'opacity:.95');
+    /* a failed implant: a radiolucent line all round it (fibrous tissue where bone should touch the threads), following the implant's
+       taper half a millimeter or so past its threads and round its apex (v2.3; v1 drew a box) */
+    if(o.halo){ var hl = [], hr = [], m2 = .6 * k;
+      for(var j = 0; j <= 8; j++){ var u = j / 8, yh = y0 + u * (len - .6 * k), tw = hw * (1 - .18 * u * u) + .38 * k + m2; hl.push([x - tw, yh]); hr.push([x + tw, yh]); }
+      hl.push([x - tip - m2 * .5, yb + m2 * .8]); hr.push([x + tip + m2 * .5, yb + m2 * .8]);
+      s += path('xr-pdl', TL.filletClosed(hl.concat(hr.reverse()), .6 * k), false, 'opacity:.95'); }
     s += path('xr-metal', L.concat(R.reverse()));
     if(!o.cover){
-      s += path('xr-metal', [[x - hw * .84, y0 + .1 * k], [x - hw * .74, y0 - 2.6 * k], [x + hw * .74, y0 - 2.6 * k], [x + hw * .84, y0 + .1 * k]]);
-      var y1 = g.top + g.d.ch * .5 * k, ha = hw * .74, drop = (y0 - 1.1 * k) - g.cej;
+      var abP = [[x - hw * .84, y0 + .1 * k], [x - hw * .74, y0 - 2.6 * k], [x + hw * .74, y0 - 2.6 * k], [x + hw * .84, y0 + .1 * k]];
+      s += path('xr-metal', abP);
+      var y1 = g.top + g.d.ch * .5 * k, ha = hw * .74, drop = (y0 - 1.1 * k) - g.cej, m = o.crownMat, scr = o.implant.retention === 'screw';
       var cw = g.crown.map(function(p){ var f = Math.max(0, Math.min(1, (p[1] - y1) / (g.cej - y1))), e = f * f * (3 - 2 * f), dx = p[0] - x;
         return [x + dx * (1 - e) + (dx < 0 ? -ha : ha) * e, p[1] + e * drop]; });
-      s += path('xr-crown', cw);
-      s += path('xr-bore', [[x - .58 * k, y0 + 3 * k], [x - .58 * k, y0 - 1.9 * k], [x - .8 * k, y0 - 1.9 * k], [x - .8 * k, y0 - 2.6 * k], [x + .8 * k, y0 - 2.6 * k], [x + .8 * k, y0 - 1.9 * k], [x + .58 * k, y0 - 1.9 * k], [x + .58 * k, y0 + 3 * k]]);
-      s += path('xr-metal', [[x - .42 * k, y0 + 2.8 * k], [x - .42 * k, y0 - 1.9 * k], [x - .66 * k, y0 - 1.9 * k], [x - .66 * k, y0 - 2.5 * k], [x + .66 * k, y0 - 2.5 * k], [x + .66 * k, y0 - 1.9 * k], [x + .42 * k, y0 - 1.9 * k], [x + .42 * k, y0 + 2.8 * k]]);
+      /* v2.3: the crown by its material, as a tooth's is drawn (crownCls): a metal-ceramic crown's porcelain over a metal coping that
+         hugs the abutment; a crown the kit isn't told the material of drawn as v1 drew it */
+      if(m === 'pfm'){ var cwH = g.d.cw / 2 * k, ym = g.cej - g.d.ch * .45 * k;
+        s += path('xr-porc', cw) + path('xr-metal', TL.filletClosed([[x - ha - .35 * k, y0 - 1.15 * k], [x - cwH + 1.15 * k, ym], [x - cwH + 1.35 * k, g.top + 1.7 * k], [x + cwH - 1.35 * k, g.top + 1.7 * k], [x + cwH - 1.15 * k, ym], [x + ha + .35 * k, y0 - 1.15 * k]], .7 * k)); }
+      else s += path(m ? crownCls(m) : 'xr-crown', cw);
+      /* the abutment seen through a crown less radiopaque than metal (lithium disilicate, a provisional); a metal, metal-ceramic or
+         zirconia crown hides it and the screw above the crown's margin (Pekkan 2011), unless the screw's own channel runs through it */
+      var hides = m === 'gold' || m === 'pfm' || m === 'zirconia';
+      if(m === 'lithium' || m === 'provisional') s += path('xr-metal', abP, false, 'opacity:.55');
+      var top = hides && !scr ? y0 - 1.15 * k : y0 - 2.6 * k;
+      function clipTop(pts){ return pts.map(function(p){ return [p[0], Math.max(p[1], top)]; }); }
+      /* a screw-retained crown (v2.3): the screw's access channel up through the crown to the occlusal, sealed with PTFE tape over the
+         screw head and composite above it (Moraguez and Belser 2010): both radiopaque, the tape less than the composite, and the
+         channel a column less radiopaque than a metal or zirconia crown around it, brighter than porcelain or lithium disilicate */
+      if(scr){ var yo = g.top + .25 * k, cwd = 1.25 * k;
+        s += path('xr-chan', TL.filletClosed([[x - cwd, y0 - 2.4 * k], [x - cwd * 1.06, yo], [x + cwd * 1.06, yo], [x + cwd, y0 - 2.4 * k]], .2 * k));
+        s += path('xr-ptfe', TL.filletClosed([[x - cwd * .96, y0 - 2.5 * k], [x - cwd * .97, y0 - 4.3 * k], [x + cwd * .97, y0 - 4.6 * k], [x + cwd * .96, y0 - 2.5 * k]], .25 * k)); }
+      s += path('xr-bore', clipTop([[x - .58 * k, y0 + 3 * k], [x - .58 * k, y0 - 1.9 * k], [x - .8 * k, y0 - 1.9 * k], [x - .8 * k, y0 - 2.6 * k], [x + .8 * k, y0 - 2.6 * k], [x + .8 * k, y0 - 1.9 * k], [x + .58 * k, y0 - 1.9 * k], [x + .58 * k, y0 + 3 * k]]));
+      s += path('xr-metal', clipTop([[x - .42 * k, y0 + 2.8 * k], [x - .42 * k, y0 - 1.9 * k], [x - .66 * k, y0 - 1.9 * k], [x - .66 * k, y0 - 2.5 * k], [x + .66 * k, y0 - 2.5 * k], [x + .66 * k, y0 - 1.9 * k], [x + .42 * k, y0 - 1.9 * k], [x + .42 * k, y0 + 2.8 * k]]));
     } else {
       /* a cover screw: the implant sits submerged under the mucosa, its top flush with the crest */
       s += path('xr-metal', [[x - hw * .7, y0 + .1 * k], [x - hw * .5, y0 - .5 * k], [x + hw * .5, y0 - .5 * k], [x + hw * .7, y0 + .1 * k]]);
@@ -1601,8 +1784,11 @@
       ['O', 'F', 'L', 'M', 'D'].forEach(function(x){ out += path('dc-osurf dc-o-gone', P[x]); });
       out += boxX() + tipMark(1.5);
     }
-    var crowned = t.crown || t.implant;
-    if(!t.retained) ['O', 'F', 'L', 'M', 'D'].forEach(function(x){
+    /* an implant under its cover screw (v2.3): no crown yet, so its surfaces are drawn as a missing tooth's, with the implant's
+       mark under a flat cap (the cover screw) */
+    var sub = t.implant && t.implant.cover, crowned = t.crown || (t.implant && !sub);
+    if(sub) ['O', 'F', 'L', 'M', 'D'].forEach(function(x){ out += path('dc-osurf dc-o-gone', P[x]); });
+    if(!t.retained && !sub) ['O', 'F', 'L', 'M', 'D'].forEach(function(x){
       out += path('dc-osurf' + (crowned ? ' dc-o-crowned' : '') + (t.crownMat === 'gold' ? ' dc-o-gold' : '') + (fill[x] ? ' ' + fill[x] : seal[x] ? ' dc-o-sealant' : '') + (car[x] ? ' dc-o-caries' : ''), P[x]);
       if(car[x]) out += hatch(P[x], 2.8);
       if(rec[x]) out += hatch(P[x], 2.8).replace('dc-o-hatch', 'dc-o-hatch dc-o-hatch-r');
@@ -1618,7 +1804,8 @@
     if(crowned) out += '<rect class="dc-o-crown" x="' + f1(cx - r - 2) + '" y="' + f1(cy - r - 2) + '" width="' + (2 * r + 4) + '" height="' + (2 * r + 4) + '" rx="3.5"/>';
     if(t.implant){ var sy = edge + dir * 3;
       out += '<path class="dc-o-impl" d="M' + f1(cx) + ' ' + f1(sy) + 'v' + f1(dir * 11) + '"/><path class="dc-o-impl dc-o-thread" d="' +
-        [0, 3.5, 7, 10.5].map(function(dy, i){ var hw = 4.2 - i * .7; return 'M' + f1(cx - hw) + ' ' + f1(sy + dir * dy) + 'h' + f1(2 * hw); }).join('') + '"/>'; }
+        [0, 3.5, 7, 10.5].map(function(dy, i){ var hw = 4.2 - i * .7; return 'M' + f1(cx - hw) + ' ' + f1(sy + dir * dy) + 'h' + f1(2 * hw); }).join('') + '"/>';
+      if(sub) out += '<path class="dc-o-cover" d="M' + f1(cx - 4.6) + ' ' + f1(edge + dir * 1.2) + 'h9.2"/>'; }
     if(t.endo) out += '<path class="dc-o-endo" d="M' + f1(cx) + ' ' + f1(edge + dir * 2) + 'v' + f1(dir * 11) + '"/>';
     if(t.eo && t.eo.post) out += '<path class="dc-o-post" d="M' + f1(cx) + ' ' + f1(edge + dir * 1.5) + 'v' + f1(dir * 5.5) + '"/>';
     if(t.eo && t.eo.sep) out += '<path class="dc-o-sep" d="M' + f1(cx - 3) + ' ' + f1(edge + dir * 10.5) + 'h6"/>';
@@ -1669,7 +1856,7 @@
       t.resto.forEach(function(r){ if(r.mat === 'ceramic') h.ceramic = 1; if(r.type === 'inlay' || r.type === 'onlay') h.ind = 1; if(r.type === 'veneer') h.ven = 1; });
       t.caries.forEach(function(c){ if(c.recurrent) h.rec = 1; });
       t.fx.forEach(function(f){ h[f.type === 'crack' ? 'crack' : 'fx'] = 1; });
-      if(t.retained) h.retained = 1; if(t.rtip) h.rtip = 1; if(t.rsp.length) h.rsp = 1; if(t.seal) h.seal = 1;
+      if(t.retained) h.retained = 1; if(t.rtip) h.rtip = 1; if(t.rsp.length) h.rsp = 1; if(t.seal) h.seal = 1; if(t.implant && t.implant.cover) h.cover = 1;
       t.resto.forEach(function(r){ if(r.mat === 'temporary') h.temp = 1; }); }
     return h;
   }
@@ -1691,6 +1878,7 @@
       (has.rec ? k(path('dc-osurf dc-o-amalgam', sq) + hatch(sq, 3.2).replace('dc-o-hatch', 'dc-o-hatch dc-o-hatch-r'), 'recurrent caries') : '') +
       (has.seal ? k(path('dc-osurf dc-o-sealant', sq), 'sealant') : '') +
       (has.temp ? k(path('dc-osurf dc-o-temporary', sq) + dot('dc-o-dots', 6, 7, .9) + dot('dc-o-dots', 10, 9, .9), 'temporary filling') : '') +
+      (has.cover ? k('<path class="dc-o-cover" d="M3 2H13"/><path class="dc-o-impl" d="M8 3.5V14.5"/><path class="dc-o-impl dc-o-thread" d="M4.3 5h7.4M5 8.5h6M5.8 12h4.4"/>', 'implant under its cover screw (not yet uncovered, no crown)') : '') +
       (has.retained ? k('<path class="dc-ox" d="M2 1.5L9 7.5M9 1.5L2 7.5"/><path class="dc-o-rbar" d="M11 3.5h4.5"/><path class="dc-o-rroot" d="M13.2 3.5V15"/>', 'retained root (crown gone, root kept)') : '') +
       (has.rtip ? k('<path class="dc-o-root" d="M8 1V9"/><path class="dc-o-rbar" d="M4.4 9.5h7.2"/><path class="dc-o-rroot" d="M8 9.5V15"/>', 'root tip left in the bone') : '') +
       (has.rsp ? k('<path class="dc-o-root" d="M8 1V15"/><path class="dc-o-rsp" d="M8 5.5l2.5 2.5l-2.5 2.5l-2.5 -2.5Z"/>', 'resorption') : '') +
@@ -1716,7 +1904,7 @@
         else if(tipW) notes.push('#' + n + ': ' + tipW);
         continue; }
       if(t.retained) bits.push('retained root (the crown lost to decay)');
-      if(t.implant) bits.push('implant');
+      if(t.implant) bits.push('implant' + (t.implant.cover ? ' under its cover screw (no crown yet)' : t.implant.retention ? ' (' + t.implant.retention + '-retained)' : ''));
       if(t.crown) bits.push((t.abut ? 'bridge abutment, ' : '') + (t.crownMat ? CROWN_NAME[t.crownMat] || t.crownMat + ' crown' : 'crown'));
       if(t.margin.open) bits.push('open crown margin ' + String(t.margin.open).toUpperCase());
       if(t.margin.overhang) bits.push('overhanging crown margin ' + String(t.margin.overhang).toUpperCase());
@@ -1889,6 +2077,14 @@
       function V(pts){ return pts.map(function(p){ return [X(p[0]), cej - dir * p[1] * k]; }); }
       if(c.t.missing && c.t.pontic){ s += path('io-tooth pfm' + oneOf(c.t.pontic, CROWNS, ' cr-') + (up ? '' : ' low'), V(TL.ponticMM(typeOf(c.t.n), { per:4 }))); return; }
       if(c.t.missing || (c.t.implant && c.t.implant.cover)) return;
+      /* an implant (v2.3): the abutment and the implant's threaded body behind the mucosa, seen where the margin has receded past the
+         crown's margin (the platform 1.1 mm apical to it, as on the film; its recession is measured from the platform) */
+      if(c.t.implant){ var im = c.t.implant, hw = im.w / 2 * k, pf = cej + dir * PLAT * k, ab = Math.min(hw * .84, d.cv / 2 * k * .9), body = [], j;
+        s += path('io-impl io-abut', [[c.cx - ab * .9, cej - dir * .4 * k], [c.cx + ab * .9, cej - dir * .4 * k], [c.cx + ab, pf], [c.cx - ab, pf]]);
+        for(j = 0; j <= 10; j++){ var u = j / 10, yy = pf + dir * u * im.len * k, tw = hw * (1 - .2 * u * u); body.push([c.cx + tw, yy]); body.unshift([c.cx - tw, yy]); }
+        s += path('io-impl', body);
+        for(j = .7; j < im.len - .5; j += .8){ var ty = pf + dir * j * k, tw2 = hw * (1 - .2 * Math.pow(j / im.len, 2));
+          s += path('io-thread', [[c.cx - tw2, ty], [c.cx + tw2, ty + dir * .3 * k]], true); } }
       if(!c.t.implant){
         var roots = mkRoots(d, X, k, cej).map(function(r){ return { a0:r.a0, a1:r.a1, w0:r.w0, wa:r.wa, y0:cej, len:dir * r.len }; });
         roots.forEach(function(r){ var pts = rootOutline({ a0:r.a0, a1:r.a1, w0:r.w0, wa:r.wa, y0:0, len:Math.abs(r.len) }, 0, 0, 0).map(function(p){ return [p[0], cej + dir * p[1]]; }); s += path('io-root', pts); });
@@ -1924,7 +2120,7 @@
       if(c.t.missing && c.t.pontic){ edge.push([left, cej - dir * .3 * k], [c.cx, cej - dir * .45 * k], [right, cej - dir * .3 * k]); return; }
       if(c.t.missing || (c.t.implant && c.t.implant.cover)){ edge.push([left, cej + dir * 1.2 * k], [c.cx, cej + dir * 1.8 * k], [right, cej + dir * 1.2 * k]); return; }
       if(i === 0) edge.push([-6, cej - dir * pap * .35], [left - 6, cej - dir * pap * .5], [left, cej - dir * pap]);
-      so.forEach(function(si, j){ var rec = c.t.rec.f[si], my = cej + dir * rec * k + (j === 1 ? dir * (c.d.cej || 0) * k : 0);
+      so.forEach(function(si, j){ var rec = c.t.rec.f[si], my = cej + dir * rec * k + (c.t.implant ? dir * PLAT * k : j === 1 ? dir * (c.d.cej || 0) * k : 0);
         var deepest = j === 1 && rec > 0 && rec > Math.max(c.t.rec.f[so[0]], c.t.rec.f[so[2]]);
         if(deepest) edge.push([sx[1] - d.cw * .2 * k, my - dir * .55 * k]);
         edge.push([sx[j], my]);
@@ -1962,7 +2158,9 @@
     cols.forEach(function(c){ s += txt(c.cx, up ? H - 10 : 18, '#' + c.t.n, 'io-lab', 'middle'); });
     var seen = []; ts.forEach(function(t){ if(t.missing || t.implant) return; t.caries.forEach(function(cr){ var L = buccalLesion(t, cr); if(L && L.visible) seen.push('#' + t.n + ', ' + lesionWords(t, cr)); });
       if(t.retained && stumpShows(t)) seen.push('#' + t.n + ', a retained root at the gingiva'); if(/B/.test(t.seal)) seen.push('#' + t.n + ', a buccal pit sealant'); });
-    var label = o.aria || ('Drawn ' + (up ? 'upper' : 'lower') + ' buccal view of ' + ts.map(function(t){ return '#' + t.n; }).join(', ') + ': the gingiva ' + (look === 'inflamed' ? 'red and swollen' : look === 'fibrotic' ? 'pale and fibrotic' : 'pink and stippled') + ', drawn from the chart' + (seen.length ? '; decay: ' + seen.join('; ') : ''));
+    ts.forEach(function(t){ if(!t.implant || t.implant.cover) return; var r = Math.max(t.rec.f[0], t.rec.f[1], t.rec.f[2]);
+      if(r > .6) seen.push('#' + t.n + ', the implant\'s threads showing above the mucosa'); else if(r > -PLAT) seen.push('#' + t.n + ', the abutment showing above the mucosa'); });
+    var label = o.aria || ('Drawn ' + (up ? 'upper' : 'lower') + ' buccal view of ' + ts.map(function(t){ return '#' + t.n; }).join(', ') + ': the gingiva ' + (look === 'inflamed' ? 'red and swollen' : look === 'fibrotic' ? 'pale and fibrotic' : 'pink and stippled') + ', drawn from the chart' + (seen.length ? '; seen: ' + seen.join('; ') : ''));
     return '<svg class="io dc-view" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + esc(label) + '">' + s + '</svg>';
   };
 
@@ -2001,6 +2199,16 @@
     if(m.teeth != null) r.push(['Teeth', m.teeth + ' present' + (m.lost ? '; ' + m.lost + ' lost to periodontitis' : m.lost === 0 ? '; none lost to periodontitis' : '')]);
     if(m.involved != null && m.teeth != null) r.push(['Teeth involved', m.involved + ' of ' + m.teeth + ' have attachment loss']);
     if(m.stage4 && m.stage4.length) r.push(['Also', m.stage4.join('; ')]);
+    /* v2.3: each implant's history, which its diagnosis is read against: the crown and how it is held, when it was delivered, and
+       the baseline film (the bone then, in mm below the platform), or that there are no earlier records; a healing one's cover
+       screw. Never what the film or the chart shows today */
+    allOf(spec).forEach(function(t){ if(!t.implant || t.missing) return; var im = t.implant, b = im.baseline, bits = [];
+      if(im.cover) bits.push((im.weeks != null ? 'placed ' + im.weeks + ' week' + (im.weeks === 1 ? '' : 's') + ' ago' : 'placed') + ', under its cover screw (not yet uncovered)');
+      else {
+        bits.push((im.retention ? im.retention + '-retained ' : '') + (t.crownMat ? String(CROWN_NAME[t.crownMat] || t.crownMat + ' crown').replace(/ \(temporary\)/, '') : 'crown') + (t.abut ? ' (a bridge abutment)' : '') + (im.years != null ? ', delivered ' + (im.years ? im.years + ' year' + (im.years === 1 ? '' : 's') + ' ago' : 'this year') : ''));
+        bits.push(b ? 'on the film taken when the crown was delivered (the baseline), the bone was ' + (b.m === b.d ? f1(b.m) + ' mm' : f1(b.m) + ' mm mesially and ' + f1(b.d) + ' mm distally') + ' below the platform' : 'no earlier films or probings to compare with');
+      }
+      r.push(['Implant #' + t.n, bits.join('; ')]); });
     /* v2.2: the case's clinical tests, one row a test, each tooth's result in words */
     TESTS.forEach(function(ty){ var xs = (spec.tests || []).filter(function(x){ return x && x.test === ty; }); if(!xs.length) return;
       r.push([{ bite:'Bite test', transillumination:'Transillumination', percussion:'Percussion' }[ty], xs.map(function(x){ return '#' + x.tooth + ': ' + testWords(x); }).join('; ')]); });
@@ -2041,10 +2249,11 @@
         var sides = ts.map(function(n){ return CAT(n) && CAT(n).side; }); if(sides.some(function(x){ return x !== sides[0]; })) P.push(w + 'a bitewing shows one side');
       }
       if(f.kind === 'fmx' || f.kind === 'odontogram'){
-        var gone = 0; for(var j = 1; j <= 32; j++) if(tooth(spec, String(j)).missing) gone++;
+        /* an implant replaces a tooth: it isn't one of the teeth present, and a tooth lost to periodontitis may be under one (v2.3) */
+        var gone = 0, imps = 0; for(var j = 1; j <= 32; j++){ var tj = tooth(spec, String(j)); if(tj.missing) gone++; else if(tj.implant) imps++; }
         if(!spec.full) P.push(w + 'a full-mouth view needs full:true and every tooth in the record (missing ones by the missing module)');
-        if(m.teeth != null && m.teeth !== 32 - gone) P.push(w + 'the box says ' + m.teeth + ' teeth present; the record has ' + (32 - gone));
-        if(m.lost != null && m.lost > gone) P.push(w + m.lost + ' teeth lost to periodontitis, but only ' + gone + ' are missing');
+        if(m.teeth != null && m.teeth !== 32 - gone - imps) P.push(w + 'the box says ' + m.teeth + ' teeth present; the record has ' + (32 - gone - imps) + (imps ? ' (and ' + imps + ' implant' + (imps > 1 ? 's' : '') + ')' : ''));
+        if(m.lost != null && m.lost > gone + imps) P.push(w + m.lost + ' teeth lost to periodontitis, but only ' + (gone + imps) + ' are missing or replaced by implants');
       }
     });
     return P;
@@ -2092,7 +2301,17 @@
       if(k === 'extent' && !row(/involv|extent|of \d+ teeth/i)) P.push('extent: localized or generalized rests on how many teeth are involved, and no row gives it');
       if(k === 'rt') Object.keys(D.rt).forEach(function(n){ if(!chart(n)) P.push('rt: the recession type of #' + n + ' needs its chart (facial recession and interdental CAL)'); });
       if(k === 'furc' && D.furc && !(chart(D.furcTooth, function(f){ return !(f.hide && f.hide.furc); }) || (film(D.furcTooth) && tooth(spec, D.furcTooth).furcX))) P.push('furc: the furcation of #' + D.furcTooth + ' is not shown');
-      if(k === 'impl') Object.keys(D.impl).forEach(function(n){ if(!film(n)) P.push('impl: the implant at #' + n + ' needs its film'); });
+      /* v2.3: an implant's diagnosis rests on its film (the bone today), on what it is compared with (the baseline film, or the word
+         that there are no earlier records, in a row or a picture's note) and, unless it failed, on bleeding or suppuration (its chart
+         or a row); one under its cover screw on its film alone */
+      if(k === 'impl'){ var notes = figs.map(function(f){ return f.note || ''; }).join(' | ');
+        if(!Object.keys(D.impl).length) P.push('impl: the record has no implant');
+        Object.keys(D.impl).forEach(function(n){ var ti = tooth(spec, n), im = ti.implant, dd = D.impl[n], hist = rowText + ' | ' + notes;
+          if(!film(n)) P.push('impl: the implant at #' + n + ' needs its film');
+          if(im.cover) return;
+          if(im.baseline ? !/baseline|earlier film|previous film|prior film|when the crown was delivered|at delivery|1-year|one-year|year after/i.test(hist) : !/no (earlier|previous|prior|baseline)|no records/i.test(hist))
+            P.push('impl: #' + n + '\'s diagnosis is read against ' + (im.baseline ? 'its baseline film, and no row or note gives the bone then' : 'the rule for a patient without records, and no row or note says there are none'));
+          if(dd.dx !== 'failed implant' && !(chart(n) || row(/bleed|bop|suppur|\bpus\b|exudat/i))) P.push('impl: #' + n + '\'s bleeding or suppuration on probing (or that there is none) needs its chart or a row'); }); }
       /* v2.1: endodontic findings need a periapical (film or full-mouth series: a bitewing stops short of the apices); fractures
          each by what shows them (a crack on no film at all: a row with the bite test or transillumination, or the odontogram; a
          vertical root fracture on a periapical or as its narrow pocket on the chart; a horizontal one on a periapical; a crown

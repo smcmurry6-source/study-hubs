@@ -34,6 +34,25 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 - **2026-11-24 (Lessons refresh: 52 answer keys in Review of Systems, Claude Code)** — Ten "keyed wrong" reports in a day led to a read of all 1,369 keys against their explanations and why lines (seven agents, a course or two each): 51 of Head & Neck's 68 single-answer items and `f1-biomol-03` pointed one choice past the right answer, wrong since the build (#480), every one by exactly one place; fixed in `hubs/review-of-systems/content/questions.json`. `tools/data-fixes/2026-11-24-review-of-systems-keys.sql` recounts their `question_stats` from `question_choices` after the merge (tested twice on a throwaway copy); After merge loads the new keys. Also: when troponin reaches the blood (`f2-genpath-20`, its notes and cram line), the panoramic chin-down error (`rd-anatomy-07` and its notes), and small slips in seven why lines and explanations. Listen with the device voice: BUG-199. `LESSONS.md` refreshed (Live signals, the game economy, a standing lesson on reading keys before a drafted bank ships). Then Sam's four calls ("Send the replies when fixed, adding the answer key step is good, prices are good for now, fix 5", [decisions](vault/decisions.md)): the key read is a step of [build-a-hub](vault/how-to/build-a-hub.md)'s Check; the shop's prices stay; Gold's agar is 20% sucrose (`om-viral-01` and its notes) and B cells finish maturing in the spleen (`f1-innate-12`), from standard references; reports #69-#79 are resolved with their replies once the fix is live, and #68's waits for BUG-199.
 
+- **2026-11-24 (Patient Box v2.3, Claude Code)** — the case kit (`widget/cases.js`, `widget/cases.css`) gets the
+  **`implant` module** and an **implant-supported bridge**, on every view ([the task](vault/tasks/2026-11-20-patient-box-v2-next-steps.md),
+  steps 4 and 5), each clinical call settled from outside sources and the PCD Implants lectures and cited in `cases.js`'s header
+  (Sam, 2026-11-21: "Use outside sources to determine answers"). `{ m:'implant', tooth, state }` writes an implant's numbers from its
+  state (health, mucositis, peri-implantitis, failed, healing under its cover screw): the mucosa about 3.5 mm over the crest, the
+  probe short of the bone in health and near it in disease (Lang 1994), the delivery film's bone (1.5 mm by default, or `false`:
+  no records), `loss`, facial `rec`, `swell`, bleeding and suppuration; widths by site (3.3, 4.1, 4.8) and lengths; the crown's
+  material and `retention` cement or screw, and `cement: true`, excess cement (Wilson 2009). `derive()` adds the lecture's failure
+  rule (more than half the implant's length of bone, or any mobility) and the healing state; `validate()` keeps an implant 1.5 mm
+  from a root and 3 mm from another implant (Tarnow 2000), its pocket base against its bone, a cover screw with nothing of a
+  crown's, and refuses a bridge joining an implant to a tooth or more than one pontic on two implants. Drawn: the film's crown by
+  material (a metal-ceramic coping, lithium disilicate showing the abutment), a screw-retained crown's access channel (composite
+  over PTFE tape), a failed implant's radiolucent line along its taper (v1 drew a box); the view's abutment and threads where the
+  mucosa has receded; the chart's submerged implant and its key line; the odontogram's cover screw and key entry. The box gets an
+  implant row (crown, retention, years, the delivery film's bone). A full-mouth view's tooth count leaves implants out, as
+  `validate()` does. `rests: ["impl"]` wants the film, and the chart or a bleeding row. Three examples and six questions in
+  `tools/cases/examples.json`; `tools/ci/cases.js` adds 34 records for `validate()`, 10 for `answerable()` and 9 for `derive()`;
+  the how-to has the module. No live hub has dental cases, so students see nothing yet; `sw.js` to `sh-v76` for the changed kit.
+
 - **2026-11-24 (`widget/v3.css` cut to what a hub on the engine draws, #548, Claude Code)** — The package "Trim
   widget/v3.css to what the engine draws" (the inbox line). v3.css loses the rules for what only the old single-file hub
   pages drew (down since 2026-11-19) or what a hub on the engine always hides (`widget/hub.css`'s `display:none
