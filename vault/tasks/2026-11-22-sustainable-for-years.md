@@ -4,7 +4,7 @@ status: in-progress
 hub: site
 created: 2026-11-22
 requested-by: Sam
-due: 2026-12-02
+due: 2026-12-31
 waiting-on:
 agent:
 pr:
@@ -174,6 +174,11 @@ they can.
 - 2026-11-22: package 5's CI check and change-log trim (Claude Code). The trim kept a week, not a month (above), and is
   rerun by every lessons audit. The podcast skill and `tools/podcast/README.md` said to commit the episode's mp3; they now
   say never to. The third box (the audio repo) stays open.
+- 2026-11-24 (Claude Code, the housekeeping package, #PR): the `due: 2026-12-02` was for packages 1 and 2, before the free
+  database ran out of room and before Review of Systems' mocks; both are done (their Log lines above, 2026-11-22). `due` is now
+  2026-12-31, for the next open box: package 2's compaction once the nightly job has packed the hubs that come due about
+  2026-12-19 (about 224,000 answers at 20,000 a night, so until about the end of December). Packages 3 (boards, with the
+  boards build's T-13), 4 (parked) and 5's audio repo (when narration comes back) have no date.
 
 ## Outcome
 
