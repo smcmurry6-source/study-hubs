@@ -3441,7 +3441,7 @@ for (;;) {
 if (s >= words.length) { endVoice(sess); return; }
 e = pieceEnd(words, s); text = ""; offs = [];
 for (var k = s; k < e; k++) { if (text) text += " "; offs.push(text.length); text += words[k].text; }
-if (/[0-9A-Za-zÀ-ɏͰ-Ͽ]/.test(text)) break;
+if (/[0-9A-Za-z\u00C0-\u024F\u0370-\u03FF]/.test(text)) break;
 s = e;
 }
 sess.at = s; sess.end = e; sess.rate = rateNow();
