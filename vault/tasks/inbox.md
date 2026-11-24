@@ -95,11 +95,21 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   `tools/ci/smoke.js`'s `wiringCheck` (Million-Dollar Smile's sessions and answers, Timmy Time's minutes) needs a live engine hub
   with Smile in its `content/arcade.js`, and Review of Systems has no arcade, so it is skipped until one is built. When the next
   hub with an arcade ships, check its smoke run prints "the game layer's wiring" for it (nothing to change: it picks the hub itself).
-- [ ] **Learn: a typed answer** (2026-11-13, idea from making Learn "more like quizlet"): Quizlet's Learn ends on written
+- [x] **Learn: a typed answer** (2026-11-13, idea from making Learn "more like quizlet"): Quizlet's Learn ends on written
   questions. Ours ends on recall before the choices show (Sam's call 5, 2026-11-06), because a typed answer can't be
-  graded against a bank question's choice. Only if Sam asks for it.
-- [ ] **Flashcards: undo the last rating** (2026-11-13, same): not built, because a rating is paid and sent to the server
-  at once; it needs the rating held back a few seconds first. Only if Sam asks for it.
+  graded against a bank question's choice. Only if Sam asks for it. (#549, Sam: "Do typed answers in learn and undo in
+  flashcards too": a short answer's second, mastering step is typed; a forgiving match marks a clear one right, otherwise
+  the student says; a match pays as an answer, a self-mark like a recall card, neither in the class's numbers;
+  migration_v102, applied live.)
+- [x] **Flashcards: undo the last rating** (2026-11-13, same): not built, because a rating is paid and sent to the server
+  at once; it needs the rating held back a few seconds first. Only if Sam asks for it. (#549: a rating is held 5 seconds
+  under the next card with an Undo, or U, or Ctrl+Z; saved at the next rating, Close, or when the page is hidden or
+  closed, and one still queued is sent by the next page, paid once.)
+- [ ] **Learn's typed answer: read how it goes after a week or two** (2026-11-24, from building it): how often a typed
+  answer is matched by itself and how often the student has to say ("I had it" / "I missed it"): `answer_xp` rows with
+  `ctx = 'typed'`, `kind` `one` (matched or a wrong choice typed) against `self` (marked by hand). If most are marked by
+  hand, the match may need to forgive more (`SH_STUDY.match` in `widget/study-modes.js`, checked by `tools/ci/typed.js`),
+  or the six-word limit on which answers are typed may need to move. Totals only ([learner-data-privacy](../rules/learner-data-privacy.md)).
 - [ ] **Cut `widget/v3.css` to the rules a hub on the engine draws** (2026-11-21, left from #525's restyle fix): about 20 ms of putting the sheet in is still matching its 789 rules against the page, and much of it styled the old single-file pages. A static check finds almost nothing dead yet, because `widget/v3.js` still draws those old parts; once the game layer's last fallbacks are out of `widget/v3.js` (another session, 2026-11-21), find the rules nothing left can draw, drop them, and diff every element's computed style before and after as #525 did. Small gain: do it with the next v3.js cleanup, not on its own.
 - [x] **Before the first collapse (about 2027-09-13), point the year-spanning readers at the totals** (2026-11-21, migration_v93):
   `sh_insights` (the admin page's Insights, every hub side by side), `get_hub_recap`, `tools/retro.sql` and `tools/lessons-daily.sql` read

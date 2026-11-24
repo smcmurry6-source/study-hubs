@@ -18,9 +18,84 @@
    - Both run as a session over the whole screen (Sam, 2026-11-13: "more like it does on quizlet"): the bank keeps a
      launcher (what's picked, how far along, Start), and Start opens a layer with its own top row (Close, how far along,
      today's goal and XP), one card at a time in the middle. Escape or Close goes back to the bank.
+   - Since 2026-11-24 (Sam: "Do typed answers in learn and undo in flashcards too"): Learn's second step is typed when the
+     answer is short (the forgiving match, just below; context "typed", migration_v102), and a flashcard's rating is held
+     UNDO_MS for its Undo before it is paid and sent.
    Every button here carries a fixed data-sm name, so click counts never record a question's words. ============ */
 (function(){
   "use strict";
+  /* ======================= Learn's typed answer: the forgiving match (Sam, 2026-11-24) =======================
+     Learn's last step for a question whose short answer stands without its choices is typed, as on Quizlet. A typed
+     answer is right by itself when, tidied the same way, its words are the right choice's words: case, accents,
+     punctuation, "a", "an" and "the", a plural s, word order, number words ("two", "first") and one small typo in a long
+     word (7 letters or more, never in its first two letters, so "abduction" is never "adduction") don't matter, and a
+     parenthesis in the choice may be left out. It is never right when it matches a wrong choice too. Anything else shows
+     the answer, and the student says whether they had it. Pure, no page needed: tools/ci/typed.js tests it. */
+  var NUMW = { zero: "0", one: "1", two: "2", three: "3", four: "4", five: "5", six: "6", seven: "7", eight: "8", nine: "9", ten: "10", eleven: "11", twelve: "12",
+    first: "1st", second: "2nd", third: "3rd", fourth: "4th", fifth: "5th", sixth: "6th", seventh: "7th", eighth: "8th", ninth: "9th", tenth: "10th" };
+  var DROP = { a: 1, an: 1, the: 1 };
+  function words(str){
+    var s = String(str == null ? "" : str), out = [];
+    try { s = s.normalize("NFD"); } catch (e) {}
+    s = s.replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/&/g, " and ").replace(/['\u2018\u2019`]/g, "").replace(/[^a-z0-9]+/g, " ");
+    s.split(" ").forEach(function(t){
+      if (!t) return;
+      (/^\d+(st|nd|rd|th)$/.test(t) ? [t] : t.split(/(\d+)/)).forEach(function(w){
+        if (!w || DROP[w]) return;
+        w = NUMW[w] || w;
+        if (!/\d/.test(w) && w.length > 3 && /s$/.test(w) && !/(ss|us|is)$/.test(w)) w = w.slice(0, -1);
+        out.push(w);
+      });
+    });
+    return out;
+  }
+  /* one letter added, dropped, changed, or two side by side swapped */
+  function oneEdit(a, b){
+    if (a === b) return true;
+    var la = a.length, lb = b.length, i = 0; if (Math.abs(la - lb) > 1) return false;
+    while (i < la && i < lb && a.charAt(i) === b.charAt(i)) i++;
+    if (la === lb) return a.slice(i + 1) === b.slice(i + 1) || (a.charAt(i) === b.charAt(i + 1) && a.charAt(i + 1) === b.charAt(i) && a.slice(i + 2) === b.slice(i + 2));
+    return la > lb ? a.slice(i + 1) === b.slice(i) : a.slice(i) === b.slice(i + 1);
+  }
+  /* t typed for k: the same, or one small typo in a long word (numbers are exact) */
+  function close(t, k){ return t === k || (k.length >= 7 && !/\d/.test(t + k) && t.slice(0, 2) === k.slice(0, 2) && oneEdit(t, k)); }
+  function sameWords(A, B){
+    if (!A.length || A.length !== B.length) return false;
+    var left = A.slice(), rest = [];
+    B.forEach(function(w){ var i = left.indexOf(w); if (i > -1) left.splice(i, 1); else rest.push(w); });
+    return rest.every(function(k){ for (var i = 0; i < left.length; i++) if (close(left[i], k)) { left.splice(i, 1); return true; } return false; });
+  }
+  /* the same words, or the same letters run together ("mesio-buccal" for "Mesiobuccal"; exact, so a typo can't cross
+     from one word into the next: "Factor VII" is never "Factor VIII") */
+  function matches(text, choice){
+    var A = words(text); if (!A.length) return false;
+    var c = String(choice == null ? "" : choice), forms = [c], bare = c.replace(/\([^)]*\)/g, " ");
+    if (bare !== c) forms.push(bare);
+    return forms.some(function(f){ var B = words(f); return B.length > 0 && (sameWords(A, B) || A.join("") === B.join("")); });
+  }
+  /* { right, other }: right when it matches the right choice (in either wording) and no wrong one; other when it matches
+     a wrong one and not the right one */
+  function typedMatch(text, q){
+    var base = q && q._base || q, sets = base && base !== q ? [q, base] : [q], R = [], W = [];
+    sets.forEach(function(x){ if (x && Array.isArray(x.choices)) x.choices.forEach(function(c, i){ (i === x.answer ? R : W).push(c); }); });
+    var right = R.some(function(c){ return matches(text, c); }), other = W.some(function(c){ return matches(text, c); });
+    return { right: right && !other, other: other && !right };
+  }
+  /* questions that can be recalled without their choices: one-answer questions whose stem doesn't lean on them (no
+     "which of the following", EXCEPT, NOT, true/false, statements...). The rest show their choices (Flashcards) and
+     need two rights in different rounds (Learn). */
+  var LEANS = /\b(which|the following|following|except|not|least|true|false|statements?|above|below|these|those|all of|none of|best describes?|correct|incorrect|both|neither)\b/i;
+  function HIDEABLE(q){ return q.type === "mcq" && ["tf", "2stmt", "numbered", "which", "whichf", "except"].indexOf(q.fmt) < 0 && !LEANS.test(String(q.stem || "")); }
+  /* which questions are typed: a one-answer question whose stem stands alone (HIDEABLE, above) and whose right answer is
+     short (6 words, 48 letters, a parenthesis aside), not "all", "none", "both" or "above", and told apart from every other
+     choice by its words. The rest keep "think of your answer, then show the choices" */
+  function typedOK(q){
+    if (!q || q.type !== "mcq" || !Array.isArray(q.choices) || typeof q.answer !== "number") return false;
+    var a = String(q.choices[q.answer] || "").replace(/\([^)]*\)/g, " ").replace(/\s+/g, " ").trim(), w = words(a);
+    if (!w.length || w.length > 6 || a.length > 48 || /\b(all|none|both|neither|above|below)\b/i.test(a)) return false;
+    var me = w.slice().sort().join(" ");
+    return q.choices.every(function(c, i){ return i === q.answer || words(c).slice().sort().join(" ") !== me; });
+  }
   window.SH_STUDY = function(HX){
     var $ = HX.$, $$ = HX.$$, esc = HX.esc, h = HX.h, pl = HX.pl, fmt = HX.fmt, icon = HX.icon, track = HX.track, ls = HX.ls,
       STATE = HX.STATE, saveState = HX.saveState, saveNow = HX.saveNow, QBY = HX.QBY, lc = HX.lc, lecChip = HX.lecChip,
@@ -164,11 +239,10 @@
     }
 
     /* ======================= the parts both use ======================= */
-    /* questions that can be recalled without their choices: one-answer questions whose stem doesn't lean on them (no
-       "which of the following", EXCEPT, NOT, true/false, statements...). The rest show their choices (Flashcards) and
-       need two rights in different rounds (Learn). */
-    var LEANS = /\b(which|the following|following|except|not|least|true|false|statements?|above|below|these|those|all of|none of|best describes?|correct|incorrect|both|neither)\b/i;
-    function hideable(q){ return q.type === "mcq" && ["tf", "2stmt", "numbered", "which", "whichf", "except"].indexOf(q.fmt) < 0 && !LEANS.test(String(q.stem || "")); }
+    /* questions that can be recalled without their choices (HIDEABLE, at the top) */
+    var hideable = HIDEABLE;
+    /* Learn's typed step: a question that stands alone with a short answer (typedOK, at the top) */
+    function typedQ(q){ return hideable(q) && typedOK(q); }
     function inBankOrder(items){
       var pos = {}, seen = {}; HX.LECS.forEach(function(l, i){ pos[l.id] = i; });
       return items.filter(function(q){ if (!q || seen[q.id]) return false; seen[q.id] = 1; return true; })
@@ -283,7 +357,7 @@
         sumline(L, setName(L) ? "Learning the <b class=\"num\">" + fmt(items.length) + "</b> in " + esc(setName(L)) : "Learning <b class=\"num\">" + fmt(items.length) + "</b> of " + fmt(L.all || items.length) + " questions");
         launch(L, "learn", "Learn",
           '<div class="sm-launch-head"><span class="sm-launch-ic" aria-hidden="true">' + icon("learn", 26) + '</span><div><h2>Learn</h2><p class="note">' +
-            (all ? "Every one of these is mastered." : "Rounds of 7, one question at a time. A question is mastered once you've had it right twice.") + "</p></div></div>" +
+            (all ? "Every one of these is mastered." : "Rounds of 7, one question at a time. A question is mastered once you've had it right twice, the second time typed when its answer is short.") + "</p></div></div>" +
           '<div class="sm-prog"><div class="sm-prog-top"><p class="sm-pct"><b class="num">' + pctOf(c) + '%</b> of the way</p><p class="sm-of note"><span class="num">' + fmt(c.done) + " of " + fmt(items.length) + " mastered</span></p></div>" +
           '<div class="sm-bar" role="img" aria-label="' + c.done + " mastered, " + c.learning + " learning, " + c.fresh + ' not started"><i class="b-done" style="width:' + w(c.done) + '"></i><i class="b-learn" style="width:' + w(c.learning) + '"></i></div>' +
           '<ul class="sm-legend"><li><i class="k-new" aria-hidden="true"></i><b class="num">' + fmt(c.fresh) + '</b> Not started</li><li><i class="k-learn" aria-hidden="true"></i><b class="num">' + fmt(c.learning) + '</b> Learning</li><li><i class="k-done" aria-hidden="true"></i><b class="num">' + fmt(c.done) + "</b> Mastered</li></ul></div>" +
@@ -365,17 +439,20 @@
         if (!R.queue.length) { roundDone(); return; }
         var i = R.queue.shift(), sl = R.slots[i], q = sl.q;
         sl.st = "now"; R.cur = i; paintRound();
-        var s = stepOf(q.id), second = s === 1, hide = second && hideable(q);
+        /* the second time: typed when the answer is short (Sam, 2026-11-24), else recalled before the choices show */
+        var s = stepOf(q.id), second = s === 1, typed = second && typedQ(q), hide = second && !typed && hideable(q);
         stage.innerHTML = "";
-        var el = HX.card(q, { ctx: "learn", noAgain: true, hide: hide, note: sl.again ? "Second try" : second ? (hide ? "Once more to master it: recall it first" : "Once more to master it") : (s === 0 ? "Still learning this one" : ""), onAnswer: answered });
+        var el = HX.card(q, { ctx: "learn", noAgain: true, hide: hide, typed: typed ? { match: typedMatch } : null,
+          note: sl.again ? "Second try" : second ? (typed ? "Once more to master it: type the answer" : hide ? "Once more to master it: recall it first" : "Once more to master it") : (s === 0 ? "Still learning this one" : ""), onAnswer: answered });
         stage.appendChild(el);
+        if (typed) track("learn:typed");
         /* "Don't know?": the answer, with no guess recorded; the question comes back like a miss */
         if (q.type === "mcq") {
-          var dk = h('<p class="sm-dk" data-dk><button class="btn btn-text" type="button" data-sm="dontknow">Don\u2019t know?</button><span class="note sm-keys">Keys 1 to ' + Math.min(9, q.choices.length) + " pick a choice</span></p>");
-          var res0 = $(".qc-result", el); if (res0) el.insertBefore(dk, res0); else el.appendChild(dk);
+          var dk = h('<p class="sm-dk" data-dk><button class="btn btn-text" type="button" data-sm="dontknow">Don\u2019t know?</button>' + (typed ? "" : '<span class="note sm-keys">Keys 1 to ' + Math.min(9, q.choices.length) + " pick a choice</span>") + "</p>");
+          var res0 = $("[data-typedres]", el) || $(".qc-result", el); if (res0) el.insertBefore(dk, res0); else el.appendChild(dk);
           $("[data-sm=dontknow]", dk).addEventListener("click", function(){ skip(el, q); });
         }
-        var f = $("[data-showch]", el) || $(".ch", el) || $("[data-reveal]", el);
+        var f = $("[data-typein]", el) || $("[data-showch]", el) || $(".ch", el) || $("[data-reveal]", el);
         if (f) f.focus({ preventScroll: true });
         F.body.scrollTop = 0;
       }
@@ -384,6 +461,9 @@
         var sl = R.slots[R.cur]; if (!sl || el.classList.contains("is-answered") || el.classList.contains("is-skipped")) return;
         el.classList.add("is-skipped");
         var think = $("[data-thinkrow]", el), ul = $(".qc-choices", el); if (think) think.remove(); if (ul) ul.hidden = false;
+        /* a typed card: the box goes, and the answer is said in words (it has no choices to mark) */
+        var tf = $("[data-typed]", el), tr = $("[data-typedres]", el); if (tr) tr.remove();
+        if (tf) tf.outerHTML = '<p class="qc-ans qc-typed-ans"><b>Answer:</b> ' + esc(q.choices[q.answer]) + "</p>";
         $$(".ch", el).forEach(function(b){ b.disabled = true; if (+b.getAttribute("data-i") === q.answer) { b.classList.add("is-key"); $(".txt", b).insertAdjacentHTML("beforeend", '<span class="sr">, the answer</span>'); } });
         R.streak = 0;
         if (!R.slots.some(function(x){ return x.again && x.q.id === q.id; })) { R.slots.push({ q: q, st: "todo", again: true }); R.queue.push(R.slots.length - 1); }
@@ -414,7 +494,7 @@
         var dk = $("[data-dk]", el); if (dk) dk.remove();
         var res = $(".qc-result", el), word = PRAISE[(R.right + q.id.length) % PRAISE.length];
         var tag = ns === 2 ? '<span class="sm-tag is-done is-pop">' + burstHTML(10) + icon("check", 16) + "Mastered</span>"
-          : right ? '<span class="sm-tag is-right is-pop">' + esc(word) + '</span><span class="note sm-sub">' + (hideable(q) ? "Once more, without the choices, and it's mastered" : "Once more in a later round and it's mastered") + "</span>"
+          : right ? '<span class="sm-tag is-right is-pop">' + esc(word) + '</span><span class="note sm-sub">' + (ns === 2 ? "" : typedQ(q) ? "Once more, typed this time, and it's mastered" : hideable(q) ? "Once more, without the choices, and it's mastered" : "Once more in a later round and it's mastered") + "</span>"
           : '<span class="sm-tag">Comes back ' + (R.queue.length ? "at the end of this round" : "next round") + "</span>";
         var row = h('<div class="qc-go sm-next"><button class="btn btn-primary" type="button" data-sm="next">' + (R.queue.length ? "Next" : "Finish the round") + icon("chevron", 16) + "</button>" + tag + "</div>");
         /* right under "Right" / "Not quite", so Next and the praise are in view; the explanation follows for whoever wants it */
@@ -464,7 +544,7 @@
         if (HX.say) HX.say(n > 1 ? "All " + n + " mastered! Look at you." : "Mastered! Look at you.", "do-hop");
         roundEl.hidden = true;
         stage.innerHTML = '<section class="recap sm-done enter" aria-label="All mastered">' + (reduced ? "" : burstHTML(22, true)) + "<h2>" + (n === 1 ? "Mastered" : "You mastered all " + fmt(n)) + "</h2>" +
-          "<p>Each one right twice, the second time " + (items.some(hideable) ? "without the choices when it could be." : "in a later round.") + " Flashcards bring them back before you forget them.</p>" +
+          "<p>Each one right twice, the second time " + (items.some(typedQ) ? "typed or without the choices when it could be." : items.some(hideable) ? "without the choices when it could be." : "in a later round.") + " Flashcards bring them back before you forget them.</p>" +
           '<div class="qc-go"><button class="btn btn-primary" type="button" data-sm="tocards">' + icon("cards", 18) + 'Flashcards for these</button><button class="btn" type="button" data-sm="reset">' + icon("retry", 18) + "Start over</button></div></section>";
         replay($("[data-bar]", prog), "is-shine");
         $("[data-sm=tocards]", stage).addEventListener("click", function(){ F.close(true); STATE.ui.qview = "cards"; saveState(); track("bank:view=cards"); HX.drawQuestions(L.el, L.preset); });
@@ -479,6 +559,11 @@
     /* ======================= Flashcards ======================= */
     var KEYS = ["again", "hard", "good", "easy"], NAMES = { again: "Again", hard: "Hard", good: "Good", easy: "Easy" };
     var current = null;   // the flashcard on screen, for the keys
+    /* Undo (Sam, 2026-11-24: "undo in flashcards too"): a rating is held back this long before it is paid and sent, with
+       an Undo under the next card. The next rating, Close, leaving the page or hiding it sends it at once; one still waiting
+       when the page goes is in STATE.cardq with its request id, and the hub's next page sends it (widget/hub-bank.js), so
+       it is paid once */
+    var UNDO_MS = 5000, undoKey = null;
     function deckOf(items, now){
       var C = cards(), due = [], learning = [], fresh = [], later = [];
       items.forEach(function(q){ var c = C[q.id]; if (!c) fresh.push(q); else if (c.d <= now) due.push(q); else if (c.s !== "R") learning.push(q); else later.push(q); });
@@ -504,11 +589,50 @@
       pull(function(changed){ if (changed && L.host.isConnected && !FOCUS) drawLaunch(); });
 
       function run(F){
-      var newLeft = 20, ahead = null, timer = 0, sess = { n: 0, again: 0, hard: 0, good: 0, easy: 0 };
+      var newLeft = 20, ahead = null, timer = 0, sess = { n: 0, again: 0, hard: 0, good: 0, easy: 0 }, held = null;
       F.top.innerHTML = '<ul class="sm-counts" data-smcounts aria-label="This deck"></ul>';
       F.col.innerHTML = '<div class="sm-stage" data-smstage aria-live="polite"></div>';
       var countsEl = $("[data-smcounts]", F.root), stage = $("[data-smstage]", F.root);
-      F.onClose = function(){ clearTimeout(timer); current = null; };
+      /* the Undo bar: over the bottom of the session, above a turned-over card's ratings */
+      var bar = h('<div class="fc-undo" data-undobar hidden><p class="fc-undo-t" role="status" aria-live="polite" data-undot></p>' +
+        '<button class="btn fc-undo-b" type="button" data-sm="undo">' + icon("retry", 18) + 'Undo<kbd class="fc-key" aria-hidden="true">U</kbd></button><i class="fc-undo-run" aria-hidden="true"></i></div>');
+      F.root.appendChild(bar);
+      $("[data-sm=undo]", bar).addEventListener("click", undo);
+      function away(){ if (document.visibilityState === "hidden") commit(); }
+      document.addEventListener("visibilitychange", away); window.addEventListener("pagehide", commit);
+      F.onClose = function(){ clearTimeout(timer); commit(); current = null; undoKey = null; document.removeEventListener("visibilitychange", away); window.removeEventListener("pagehide", commit); };
+      /* the held rating, paid and sent now: the XP flies from the bar while it's on screen */
+      function commit(){
+        var H = held; if (!H) return;
+        held = null; undoKey = null; clearTimeout(H.t);
+        var rec = HX.recordCard(H.q.id, H.r, H.pays, H.req);
+        enqueue([H.q.id, H.r, H.at, H.ahead ? 1 : 0, H.req]);
+        HX.reward(!F.closed && !bar.hidden && document.visibilityState !== "hidden" ? $("[data-undot]", bar) : null, null, rec);
+        hideBar();
+      }
+      function hideBar(){
+        if (bar.hidden) return;
+        if (reduced) { bar.hidden = true; return; }
+        bar.classList.add("is-going"); setTimeout(function(){ if (!held) { bar.hidden = true; bar.classList.remove("is-going"); } }, 180);
+      }
+      function showBar(H){
+        var w = inWords(cards()[H.q.id].d, H.at);
+        $("[data-undot]", bar).innerHTML = "<b>" + NAMES[H.r] + "</b> · back " + (w === "Tomorrow" ? "tomorrow" : /^In /.test(w) ? "in " + w.slice(3) : "in " + w);
+        bar.classList.remove("is-going"); bar.hidden = false; bar.style.setProperty("--undo-ms", UNDO_MS + "ms");
+        replay($(".fc-undo-run", bar), "is-on");
+      }
+      /* the last rating taken back: the card's schedule as it was, and the card again, turned over, to rate it again */
+      function undo(){
+        var H = held; if (!H) return;
+        held = null; undoKey = null; clearTimeout(H.t); clearTimeout(timer);
+        var C = cards(); if (H.c0) C[H.q.id] = H.c0; else delete C[H.q.id];
+        if (H.isNew) newLeft++;
+        sess.n--; sess[H.r]--;
+        saveState(); track("cards:undo");
+        bar.hidden = true;
+        paintCounts();
+        draw(H.q, H.ahead, true);
+      }
       function paintCounts(D){
         D = D || deckOf(items, Date.now());
         countsEl.innerHTML = countsHTML(D);
@@ -554,8 +678,9 @@
         /* a card back within the half hour (a learning step): it comes up by itself while the deck is open */
         if (nextAt && nextAt - Date.now() < 30 * MIN) timer = setTimeout(function(){ if (stage.isConnected && !current) next(); }, Math.max(1000, nextAt - Date.now() + 500));
       }
-      function draw(q, isAhead){
-        var C = cards(), c = C[q.id], now = Date.now(), state = !c ? "New" : isAhead ? "Ahead of schedule" : c.s === "R" ? "Due for review" : "Learning";
+      /* back: drawn turned over (an Undo brings the card back to be rated again) */
+      function draw(q, isAhead, back){
+        var base = q, C = cards(), c = C[q.id], now = Date.now(), state = !c ? "New" : isAhead ? "Ahead of schedule" : c.s === "R" ? "Due for review" : "Learning";
         /* a card seen before comes back reworded (widget/hub.js worded(): the next wording each review) */
         if (HX.worded) q = HX.worded(q, c ? c.n || 0 : 0);
         /* and a statement item in a new order (widget/statements.js, through hub-bank.js's later()) */
@@ -572,7 +697,7 @@
         if (P.likelyWire) P.likelyWire(el, q);
         stage.innerHTML = ""; stage.appendChild(el);
         if (HX.FIG && HX.FIG.ANIMA) { try { HX.FIG.ANIMA.mount(el); } catch (e) {} }
-        current = { el: el, q: q, ahead: isAhead, flipped: false, at: now };
+        current = { el: el, q: q, base: base, ahead: isAhead, flipped: false, at: now };
         el.addEventListener("click", function(e){
           var b = e.target.closest("button");
           if (b && el.contains(b)) {
@@ -589,6 +714,7 @@
         var fb = $("[data-sm=flip]", el); if (fb) fb.focus({ preventScroll: true });
         F.body.scrollTop = 0;
         swipe(el);
+        if (back) flip(true);
       }
       /* a turned-over card follows a finger: past a third of the way left it's Again, right it's Good (as on Quizlet) */
       function swipe(el){
@@ -658,7 +784,7 @@
           host.appendChild(rb);
         }
       }
-      function flip(){
+      function flip(now){
         var cur = current; if (!cur || cur.flipped) return;
         cur.flipped = true;
         var el = cur.el, q = cur.q, turn = $(".fc-turn", el);
@@ -685,23 +811,25 @@
           /* the answer in view; the ratings stay at the bottom of the screen while the card is longer than it (study-modes.css) */
           var an = $(".fc-ans", el); if (an) an.scrollIntoView({ block: "nearest", behavior: reduced ? "auto" : "smooth" });
         };
-        if (reduced || !turn.animate) { show(); el.classList.add("is-flipped"); if (!reduced || !turn.animate) return; turn.animate([{ opacity: 0.2 }, { opacity: 1 }], { duration: 160 }); return; }
+        if (now === true || reduced || !turn.animate) { show(); el.classList.add("is-flipped"); if (now === true || !reduced || !turn.animate) return; turn.animate([{ opacity: 0.2 }, { opacity: 1 }], { duration: 160 }); return; }
         /* the card turns over: a quarter turn, the answer, then back to face you */
         var a = turn.animate([{ transform: "perspective(1400px) rotateX(0deg)" }, { transform: "perspective(1400px) rotateX(88deg)" }], { duration: 170, easing: "cubic-bezier(0.5, 0, 0.75, 0)" });
         a.onfinish = function(){ show(); el.classList.add("is-flipped"); turn.animate([{ transform: "perspective(1400px) rotateX(-88deg)" }, { transform: "perspective(1400px) rotateX(0deg)" }], { duration: 230, easing: "cubic-bezier(0.22, 1, 0.36, 1)" }); };
       }
+      /* a rating moves the card's schedule at once, and is held back UNDO_MS (the Undo bar) before it is paid and sent */
       function rate(r, from){
         var cur = current; if (!cur || !cur.flipped) return;
+        commit();   // the one before can't be undone any more
         current = null;
         var q = cur.q, C = cards(), now = Date.now(), c0 = C[q.id], pays = !cur.ahead && (!c0 || c0.d <= now), req = reqId();
         if (!c0) newLeft--;
         sess.n++; sess[r]++;
-        C[q.id] = sched(c0, r, now);
-        var rec = HX.recordCard(q.id, r, pays, req);
-        enqueue([q.id, r, now, cur.ahead ? 1 : 0, req]);
-        HX.reward(from, null, rec);
+        C[q.id] = sched(c0, r, now); saveState();
+        held = { q: cur.base || q, r: r, at: now, c0: c0, pays: pays, req: req, ahead: cur.ahead, isNew: !c0 };
+        held.t = setTimeout(commit, UNDO_MS); undoKey = undo;
+        showBar(held);
         $$(".fc-r", cur.el).forEach(function(b){ b.disabled = true; b.classList.toggle("is-picked", b === from); });
-        setTimeout(function(){ if (stage.isConnected) next(); }, reduced ? 0 : 280);
+        setTimeout(function(){ if (stage.isConnected && !current) next(); }, reduced ? 0 : 280);
       }
       next();
       }
@@ -709,10 +837,11 @@
 
     /* the keys on a laptop: Space turns it over, 1 to 4 rate it, and the arrows are Again (left) and Good (right) */
     document.addEventListener("keydown", function(e){
-      var cur = current;
-      if (!cur || !cur.el.isConnected || e.altKey || e.ctrlKey || e.metaKey) return;
-      var t = e.target, tag = t && t.tagName;
+      var cur = current, t = e.target, tag = t && t.tagName;
       if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || (t && t.isContentEditable) || document.querySelector("dialog[open]")) return;
+      /* U (or Ctrl/Cmd+Z) takes back the last rating while its Undo is up */
+      if (undoKey && !e.altKey && !e.shiftKey && ((!e.ctrlKey && !e.metaKey && (e.key === "u" || e.key === "U")) || ((e.ctrlKey || e.metaKey) && (e.key === "z" || e.key === "Z")))) { e.preventDefault(); undoKey(); return; }
+      if (!cur || !cur.el.isConnected || e.altKey || e.ctrlKey || e.metaKey) return;
       if (!cur.flipped && (e.key === " " || e.key === "Spacebar")) {
         if (t && t.closest && t.closest("button, a, summary") && !t.closest("[data-sm=flip]")) return;
         e.preventDefault(); var fb = $("[data-sm=flip]", cur.el); if (fb) fb.click();
@@ -724,6 +853,7 @@
     /* rows waiting from an earlier visit go out now */
     setTimeout(flush, 0);
 
-    return { learn: learn, cards: flashcards, sched: sched, inWords: inWords, hideable: hideable, rebuild: rebuild, dayStart: dayStart };
+    return { learn: learn, cards: flashcards, sched: sched, inWords: inWords, hideable: hideable, typed: function(q){ return hideable(q) && typedOK(q); }, rebuild: rebuild, dayStart: dayStart };
   };
+  window.SH_STUDY.match = typedMatch; window.SH_STUDY.typed = function(q){ return HIDEABLE(q) && typedOK(q); }; window.SH_STUDY.typedOK = typedOK; window.SH_STUDY.words = words;
 })();
