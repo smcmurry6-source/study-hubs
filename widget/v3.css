@@ -785,6 +785,9 @@ mark.sh-hl.sh-hl-c-o{background:rgba(255,140,30,.38);} [data-theme="dark"] mark.
 .sh-qrate{display:flex; flex-wrap:wrap; align-items:center; gap:4px 6px; margin-top:10px; padding-top:8px;
   border-top:1px dashed color-mix(in srgb, var(--ink, #3a4050) 16%, transparent); font-size:.76rem; line-height:1.3; color:var(--ink-faint, #7a8090);}
 .sh-qrate-q{font-weight:600; margin-right:2px;}
+/* each thumb's words, for a screen reader only (qhealth.js draws them in .sh-cp-sr; #548 cut this rule with the old
+   class picks, and the words showed beside the thumbs on every answered question until 2026-11-24) */
+.sh-cp-sr{position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;}
 .sh-qrate-b{appearance:none; background:none; border:1px solid transparent; border-radius:8px; width:30px; height:28px; padding:0;
   display:inline-flex; align-items:center; justify-content:center; color:var(--ink-faint, #7a8090); cursor:pointer;}
 .sh-qrate-b svg{width:16px; height:16px;}

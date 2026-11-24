@@ -105,3 +105,4 @@ all | Learn now has you type short answers the second time (small typos are fine
 review-of-systems | The accent metals from the old Settings are retired: if you had picked one, the hub shows its own colors again.
 review-of-systems | Fixed 52 answer keys that pointed one choice past the right answer (51 in Head & Neck, one in Fundamentals I): if a Head & Neck question marked you wrong when your pick matched its explanation, you were right. Thanks for the reports. Also fixed: when troponin reaches the blood after an infarct (hours later), the panoramic chin-down error (an exaggerated smile), and Gold's agar (20% sucrose).
 review-of-systems | The font choice from the old Settings is retired too: if you had picked one, the hub shows its own font again.
+all | Fixed: the "Good question?" thumbs under an answer showed their words beside them. They're two small buttons again.

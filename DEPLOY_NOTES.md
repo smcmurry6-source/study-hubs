@@ -32,6 +32,13 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-24 (the "Good question?" thumbs' words hidden again, Claude Code)** — #548 cut `.sh-cp-sr` from
+  `widget/v3.css` with the old class picks, but `widget/qhealth.js` labels the "Good question?" thumbs with it, so on
+  every answered question the words "Yes, a good question" and "No, something is off" showed in full beside the thumbs,
+  overlapping at phone width (BUG-201). #548's check compared every page's styles without answering a question, which is
+  when the thumbs appear. The rule is back, by the thumbs' block; `widget/hub-rest.bundle.js` rebuilt, `sw.js` sh-v80.
+  Found while drawing a sample Patient Box case for Sam, which also found that a hub without `content/figures.js` never
+  draws a case question ([the task](vault/tasks/2026-11-20-patient-box-v2-next-steps.md) has the box).
 - **2026-11-24 (Peri-implantitis by the 2017 consensus; a saved font no longer applies, Claude Code)** — Two of Sam's calls. (1) "Go with outside sources for 553": with no earlier records, the Patient Box kit's `derive()` calls an implant peri-implantitis only with all three of the 2017 consensus's findings together (bleeding or suppuration, probing 6 mm or more, bone 3 mm or more below the platform), not the lecture's either-one, and `validate()` (`implantCheck()`) refuses a record without records that has bleeding and only one of the other two, since the two readings would differ. Every example and the tests' records read the same as before; `tools/ci/cases.js` gains the two refusals. No live hub has cases. (2) "For font, stop applying": `applyFontPref()` in `widget/v3.js` clears a font saved in the old Settings (`sh_pref_font`, cut 2026-11-05) and leaves `--font-body` to the page, as #548 did the accent metal; the font is out of the daily settings snapshot (`widget/clicks.js`); bundles rebuilt, `sw.js` sh-v79.
 - **2026-11-24 (Patient Box v2.4: a front space's labial flange, Claude Code)** — #554's two open calls, at Sam's word ("No to
   canine cingulum rest, use outside sources to answer #2"): a mandibular canine keeps taking no cingulum rest, and a partial
