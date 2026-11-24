@@ -32,6 +32,18 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-24 (The typodont and the arcade's tooth tiles drawn from the tooth library, Claude Code)** — the package "The
+  typodont and the arcade's tooth tiles drawn from the tooth library" ([the task](vault/tasks/2026-11-20-patient-box-v2-next-steps.md)).
+  `widget/journeys.js`'s typodont (the ModuPro hand-off) dropped its own copy of Wheeler's table, the crown outline, the
+  grooves and the curve smoothing and reads `widget/teeth.js`, which `handoff()` now fetches beside the journey art (`typo()`
+  is null until it arrives); every one of the 13,498 numbers it draws is the same as before. The library gained
+  `buccalGroovesMM()` (the typodont's molar grooves) and an incisor's proximal view (`LL`, Wheeler's labiolingual sizes and
+  curvatures; `proxCrownMM`, `mkProxRoot`, `proxOutlineMM`; schematic between his landmarks). In
+  `tools/figures/site/arcade.mjs`: Pocket Showdown's molars (`boardTooth()`, a lower second molar), Occlusion's Cross-Section
+  (`sectionMolar()`, a lower first molar in its bone, ligament and gum) and Perio's Cross-Section (`sectionIncisor()`, a lower
+  central incisor from the side with its probe) are drawn from the library; built into `tools/preview/design/art.js` only,
+  since neither hub's page is up. Nothing students see changes.
+
 - **2026-11-23 (Crowns given by hand, migration_v100, Claude Code)** — Sam: "Give [one account, by its leaderboard name]
   50,000 crowns". Every way to crowns until now pays XP too (a prize pays as many crowns as XP) or is worked out from XP and
   rank, so a new kind: `crown_gifts`, one row a gift, which `sh_wallet` adds to what was earned (`gifts` in its answer) and
