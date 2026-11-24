@@ -1,6 +1,6 @@
 ---
 type: reference
-tags: [widget, performance, animation, dashboard, place, shop, redesign]
+tags: [widget, performance, animation, dashboard, place, shop, ranks, redesign]
 ---
 
 # What moving pictures cost
@@ -54,6 +54,27 @@ Under the same 4x slower processor, scrolling the dashboard while everything kee
 on `main` with everything frozen during the scroll (a second scroll: 20 ms a frame on a phone-size screen, 24 on a
 laptop-size one; `main` 19 and 20), with fewer long tasks on the phone.
 
+## The shop's opening and the place at night (2026-11-24)
+
+- **The shop drew itself twice on every first open.** `mount()` in `widget/shop.js` drew the cached shop, then asked the
+  server and drew again if the answer differed, and it always did: the mystery box is never cached. Now the server is asked
+  while the files load and the shelves wait for it (up to 1.2 s), so they are drawn once. The sets' files are fetched as
+  soon as the place's kit is there, beside the shop's own art.
+- **Never `focus()` something behind an open modal.** The dashboard's wallet row (`drawWallet` in `widget/dash.js`) did on
+  every `sh:shop`: an inert button can't take focus, but asking made the browser restyle and lay out the whole dashboard
+  (about 200 ms on a slowed phone). The row is drawn again only when its balance or dot changes.
+- **A window that hides the page's scrollbar keeps its room** (`tsh-gut`, `scrollbar-gutter: stable`, in `widget/shop.js`
+  and `widget/shop.css`): with a classic scrollbar (a Windows desktop) its going changed the page's width, and the whole
+  dashboard was laid out again (about 250 ms on a slowed laptop). Headless Chromium hides scrollbars: launch it with
+  `ignoreDefaultArgs: ['--hide-scrollbars']` to see this.
+- On a slowed phone the shop's long tasks went from 1.4 s to 0.9 s. What is left is the shop itself: the modal's opening
+  restyles the page behind (it becomes inert), the first draw of about 25 pieces, and its paint.
+- **The place at night wasn't the stars.** With its view open, a slowed phone's main thread was 95-97% busy; the 30 stars
+  of a night sky were 2-3% of it, and twinkling them in three groups cost more (each group's opacity covers the whole
+  sky, so every frame repaints all of it, not 30 dots). The rest was one SMIL `<animate>`: the rank medal's shine in the
+  place's panel (`art()` in `widget/ranks.js`), which made the browser draw the page on every frame. As a CSS transform,
+  with the same path and timing, the view is 11% busy (laptop size 87-90% → 33-38%), 12 frames drawn in 3 s instead of 150.
+
 ## The rules
 
 1. **Free motion can run all the time.** Free means a `transform` or `opacity` animation on an HTML box (or a whole
@@ -81,6 +102,13 @@ laptop-size one; `main` 19 and 20), with fewer long tasks on the phone.
 7. **Never animate `filter`, `left`, `top`, `width`, `height` or a `box-shadow`** on something that loops. Move an
    overlay's `opacity` or `transform` instead (the crown's glint in `widget/ranks.js` is the pattern).
 8. **No empty group with a moving class**, and no animation on something that draws nothing.
+9. **No SMIL that loops** (`<animate>`, `<animateTransform>`): no stylesheet stops it (not `animation: none`, not
+   `.is-away`, not reduced motion), and the browser draws the page on every frame on its main thread while it is there.
+   Use a CSS animation of `transform` or `opacity`, its `@keyframes` in a `<style>` inside the drawing so it moves wherever
+   the drawing goes (the medal's shine in `widget/ranks.js` is the pattern). The Diamond and Dark Matter medals still have
+   some ([the inbox](../tasks/inbox.md)).
+10. **Twinkling in a group isn't cheaper than one by one** when the group is spread out: what repaints is the group's whole
+   box.
 
 ## How to measure
 
@@ -96,7 +124,11 @@ fast. Measure in a scripted browser on the preview (`node tools/preview/serve.js
 - **Layers:** `LayerTree.enable` and count `layerTreeDidChange`'s layers, by the element that owns each
   (`DOM.describeNode`). Dozens named after one class is that class's animation.
 - **What moves:** `document.getAnimations()` (and each shadow root's) lists CSS animations and what they animate, but
-  not what moves inside an image: look for `<img>` whose SVG source has `animation:` in it.
+  not what moves inside an image: look for `<img>` whose SVG source has `animation:` in it. Nor SMIL:
+  `querySelectorAll('animate, animateTransform, animateMotion')`, in the page and in each shadow root.
+- **Frames drawn:** count the trace's `Commit` events on the main thread. With nothing moving on the main thread there are a
+  few a second; 60 a second with nothing changing in the page means something redraws every frame (SMIL, a script's
+  `requestAnimationFrame`, an animation the browser can't run by itself).
 
 - **In a Claude Code cloud session the browser draws without a graphics card** (`chrome://gpu`: "Software only"), so the
   compositor can't run animations and even free motion shows up as main-thread work. Compare two versions with the

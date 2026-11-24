@@ -1749,13 +1749,15 @@ var el = $("youShop"); if (!el) return;
 var sh = SHOP.shop, bal = sh && sh.wallet ? sh.wallet.balance : null;
 if (bal == null) { el.hidden = true; return; }
 var dot = ls("sh_shop_dot") === ctDay(), had = el.contains(document.activeElement);
+var key = bal + "|" + dot; if (!el.hidden && SHOP.drawn === key && SHOP.drawnIn === el) return;
+SHOP.drawn = key; SHOP.drawnIn = el;
 el.innerHTML = '<p class="dx-coinnum"><svg viewBox="0 0 24 24" width="22" height="22" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true" focusable="false">' + SHOP_COIN + '</svg><span class="dx-cointx"><b class="num">' + num(bal) + "</b><span>Shiny Gold Crowns</span></span></p>" +
 '<span class="dx-walletbtns"><button type="button" class="btn dx-collbtn" data-dash="collections">Collections</button>' +
 '<button type="button" class="btn dx-shopbtn" data-dash="shop">Timmy’s shop' + (dot ? '<i class="dx-dot dx-shopdot" aria-hidden="true"></i><span class="sr"> (a rare costume came in)</span>' : "") + "</button></span>";
 el.hidden = false;
 var btn = q(".dx-shopbtn", el); btn.addEventListener("click", openShop);
 q(".dx-collbtn", el).addEventListener("click", openCollections);
-if (had || SHOP.open) btn.focus({ preventScroll: true });
+if (had && !SHOP.open) btn.focus({ preventScroll: true });
 }
 function openCollections(){
 var back = function(){ var b = q(".dx-collbtn"); if (b) b.focus({ preventScroll: true }); };

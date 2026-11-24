@@ -375,22 +375,31 @@
     }, 30000);
   }
 
-  /* draw the shop into a page (a hub's More): the cached shop at once, then the server's */
+  /* draw the shop into a page (a hub's More), once: what the server has now (another device may have bought something,
+     and the mystery box's odds) is asked for at once, while the files load, and the shelves wait for it a little. Drawing
+     the cached shop first and then the server's drew every shelf twice on every first open (the box was never cached),
+     about 600 ms of a slowed phone's 1.5 s (2026-11-24, vault/reference/motion-cost.md). A server slower than that gets
+     the cached shop, drawn again only if the answer differs. */
+  function wait(ms){ return new Promise(function(res){ setTimeout(res, ms); }); }
+  function itemIds(){ return (S.shop && S.shop.items || []).map(function(it){ return it.id; }); }
   function mount(el, o){
     o = o || {};
     if (!el) return Promise.resolve(false);
     if (!el.innerHTML) el.innerHTML = '<p class="tsh-note" role="status">Opening the shop…</p>';
     ls("sh_shop_dot", null); track("shop:open");
-    return ready().then(function(){ return S.shop ? null : read(); }).then(function(){
+    css();
+    var got = false, fresh = Promise.all([read(), boxRead()]).then(function(){ got = true; });
+    /* the sets' files as soon as the place's kit is here, beside the shop's own art (not after it) */
+    return Promise.all([art(), kit().then(function(){ return S.shop ? packs(itemIds()) : null; })]).then(function(){
+      return got || !S.shop ? fresh : Promise.race([fresh, wait(1200)]);
+    }).then(function(){
       if (!S.shop) throw new Error("no shop");
-      return packs((S.shop.items || []).map(function(it){ return it.id; }));
+      return packs(itemIds());
     }).then(function(){
       if (!el.isConnected) return false;
       var ent = { el: el, o: o }; S.roots = S.roots.filter(function(x){ return x.el !== el && x.el.isConnected; }); S.roots.push(ent);
       page(el, o); clock();
-      /* then what the server has now (drawn again only if it differs) */
-      var was = JSON.stringify([S.shop, S.box]);
-      Promise.all([read(), boxRead()]).then(function(){ return packs((S.shop.items || []).map(function(it){ return it.id; })); }).then(function(){ if (el.isConnected && JSON.stringify([S.shop, S.box]) !== was) page(el, o); });
+      if (!got) { var was = JSON.stringify([S.shop, S.box]); fresh.then(function(){ return packs(itemIds()); }).then(function(){ if (el.isConnected && JSON.stringify([S.shop, S.box]) !== was) page(el, o); }); }
       try { D.dispatchEvent(new CustomEvent("sh:shop", { detail: { shop: S.shop, opened: true } })); } catch (e) {}
       return true;
     }, function(){ if (el.isConnected) el.innerHTML = '<p class="tsh-note">The shop couldn’t be opened just now. Try again in a moment.</p>'; return false; });
@@ -400,15 +409,19 @@
   function open(o){
     o = o || {};
     if (DLG) return api;
+    /* the page's scrollbar goes while the shop is open; where it takes room (a desktop's), its room is kept, or the whole
+       page behind is laid out again at the new width (about 250 ms on a slowed laptop). Read before anything changes. */
+    var gut = W.innerWidth > D.documentElement.clientWidth;
     css();
     var dlg = D.createElement("dialog"); dlg.className = "tsh-dlg"; dlg.setAttribute("aria-labelledby", "tshT");
     dlg.innerHTML = '<div class="tsh-dlgin"><button type="button" class="tsh-x" data-shop="close" aria-label="Close the shop">' + IC.x + '</button><div class="tsh-dlgbody"><h2 class="sr" id="tshT">Timmy’s Shop</h2><p class="tsh-note" role="status">Opening the shop…</p></div></div>';
     D.body.appendChild(dlg); DLG = { dlg: dlg, back: D.activeElement, onClose: o.onClose || null };
-    var shut = function(){ if (!DLG) return; var d = DLG; DLG = null; if (d.dlg.parentNode) d.dlg.parentNode.removeChild(d.dlg); D.documentElement.classList.remove("tsh-open"); try { if (d.back && d.back.isConnected) d.back.focus(); } catch (e) {} if (d.onClose) try { d.onClose(); } catch (e) {} };
+    var shut = function(){ if (!DLG) return; var d = DLG; DLG = null; if (d.dlg.parentNode) d.dlg.parentNode.removeChild(d.dlg); D.documentElement.classList.remove("tsh-open", "tsh-gut"); try { if (d.back && d.back.isConnected) d.back.focus(); } catch (e) {} if (d.onClose) try { d.onClose(); } catch (e) {} };
     dlg.addEventListener("close", shut);
     dlg.addEventListener("click", function(e){ if (e.target === dlg) close(); });
     $('[data-shop="close"]', dlg).addEventListener("click", close);
     try { dlg.showModal(); } catch (e) { dlg.setAttribute("open", ""); }
+    if (gut) D.documentElement.classList.add("tsh-gut");
     D.documentElement.classList.add("tsh-open");
     mount($(".tsh-dlgbody", dlg), { level: 3, title: "tshT" });
     return api;
