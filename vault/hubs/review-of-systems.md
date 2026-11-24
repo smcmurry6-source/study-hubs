@@ -102,6 +102,8 @@ check-in hours: its entry in `hubs.js`.
   grey-purple; one line in `widget/hub.css` (`:root[data-hx-hub="review-of-systems"]`) gives it its violet, the four values
   from `tools/figures/site/style.mjs`. A new hub on the engine needs the same line, or it draws in the default too.
 
+- **Its keys were read in full on 2026-11-24** (the lessons audit, after ten "keyed wrong" reports in a day): 51 of Head & Neck's 68 single-answer items and `f1-biomol-03` pointed one choice past the right answer, from the build; fixed, with `tools/data-fixes/2026-11-24-review-of-systems-keys.sql` recounting their class numbers. Every other course and every fixed-order format was right. A new batch of drafted questions gets the same read before it ships ([build-a-hub](../how-to/build-a-hub.md)'s Check, Sam, 2026-11-24). The same audit settled two facts from standard references (Sam: "fix 5"): Gold's agar is 20% sucrose (`om-viral-01`, the Oral Micro notes' media table), and B cells finish maturing in the spleen (`f1-innate-12`, as `f1-hyper-10` and the notes say). The single-answer choices are shuffled on the card, so where a key sits in `choices` gives nothing away.
+
 - **The exam-eve boss** (2026-11-22, idea board #4, migration_v97: [game-server](../reference/game-server.md)): the Midnight
   Plaque comes up 3 pm to midnight on Wed Dec 2 and Wed Dec 9, the eves of the two mocks, at 3,000 HP each (Sam can set
   either with `eveBoss` on its exam in `hubs.js`), on Home, in the band and, on a wide screen, under Today in the Question Bank. Read how the first went the morning after (inbox).

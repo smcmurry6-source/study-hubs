@@ -4,7 +4,7 @@ Sam's standing rule (2026-09-29): **every time a hub is archived, use all the da
 next hubs.** This file is where that lands. It is shared by every session (Claude Code, Cowork, each hub's Claude
 Project): read it before building or restructuring a hub, and add to it whenever one is archived.
 
-**Last refreshed: 2026-11-20** (3 pm Central, a quiet afternoon after Heme & Endo Exam 3; the 8:30 am audit wrote its retrospective and recap; the game economy is read too, Sam's rule since 11-18). Sam
+**Last refreshed: 2026-11-24** (7 to 9 am Central, Review of Systems' second week, nine days before its Mock 1; it found 52 answer keys one choice off and fixed them; the game economy is read too, Sam's rule since 11-18). Sam
 runs the lessons refresh by hand (`tools/lessons-refresh.md`): it updates this file from all tracked data, reports and suggestions
 and ships small fixes to the live hubs. **Before building a new hub, if this date isn't today, run steps 1-3 of
 `tools/lessons-refresh.md` first.**
@@ -97,47 +97,77 @@ What each signal tells an author, and what to do with it in the next hub (and in
 
 ## Live signals (rewritten by each refresh)
 
-**2026-11-20, afternoon (data read 3 to 3:30 pm Central).** "Since" = this morning's audit (8:30 am). Live hub: **Review of Systems**
-alone (two mock boards, Dec 3 and Dec 10). Heme & Endo Exam 3 archived at 9 am (`archiveOn`) and its page came down at 10 (#503); a few
-people still had it open after 8 am (about 30 minutes in all, most of it in its cram sheet during the exam hour), a few past 10. **The database is 358
-MB** of the Free plan's 500 MB, the same as this morning (`personal_answers` 84 MB, `activity_pings` 46, `question_events` 38, `xp_seen`
-33, `answer_xp` 27). **Data quality** (the admin page's kept copy, still 1:41 am: nobody opened the admin page since): no test rows in
-clicks, events, time or answers. **This morning's data fix ran** (After merge, #503, green): no `pq-` rows are left in question events,
-stats or answers (BUG-192's retest; the 11-21 re-run in the inbox still stands).
+**2026-11-24, morning (data read 7 to 9 am Central).** "Since" = the last audit (11-20, 3 pm). Live hub: **Review of Systems** alone
+(two mock boards, Thu Dec 3 and Thu Dec 10). **The database is 287 MB** of the Free plan's 500 MB (358 at the last audit: the shorter
+analytics windows, `migration_v95`, and the archived hubs' answers packed, `v96`, took about 70 MB off; `personal_answers` 69 MB,
+`activity_pings` 34, `xp_seen` 32, `answer_xp` 27, `xp_awards` 20); **the repo 2.39 GB** as GitHub counts it (2.4 GB on 11-21: no
+growth); **the site 42 MB** of 1 GB. **Data quality** (the admin page's kept copy, 1 am today): no test rows in clicks, events, time or
+answers.
 
-**Since 8:30 am the class rested** (the morning after back-to-back exams): Review of Systems had a handful of people for a few minutes each
-(13 minutes over its first two days, 21 answers from a couple of people), no reports, suggestions, searches or mocks, and nothing for
-question health to read. No survey answers. **Check-ins:** a few for Heme & Endo Exam 3 by 3 pm (fewer than 5; the button opened at 10 am),
-all "About right" and "Better than I expected" (in its retrospective); none more for the Perio final (29). Searches: only this morning's
-three in Exam 3 (the platelet disorder no lecture taught).
+**Review of Systems has started, slowly** (the week after back-to-back exams, Thanksgiving week): 21 people ever, 16 hours, 7 under 5
+minutes, 10 on one day only, a median 11 minutes each; **Monday 11-23 was its first real day** (14 people, 651 minutes). 613 answers
+from 14 people, 68% right; no mocks yet. Time: notes 452 minutes (15 people), the bank 385 (11), Learn 57 (a couple), Home 40 (20).
+Reading levels: High yield 6 people, As taught 6, Plain English 4; one-page sheets 5; Ask Timmy a few. The bank opens on Head & Neck,
+the first course, so that is where the answers went: **12 of the 14 answerers, 328 answers**.
 
-**Did the last refresh work?** Nothing to measure: this morning's audit changed no question (its hub came down the same morning). The
-evening audit's four explanation fixes in Exam 3 were read this morning: first tries 36% of 47 before, 56% of 45 after, against 39% to
-59% for the 25 unfixed items as low, so **can't tell**, as the standing lesson says.
+**52 answer keys were one choice off, and the class found them** (fixed in this audit). On 11-23 and this morning students reported 10
+Head & Neck questions and one Fundamentals I question as keyed wrong (two of the reports drafted by Ask Timmy from the notes). Each key
+pointed one choice past the right answer, the one its own explanation and why lines describe. Seven agents then read all 1,369 keys
+against their explanations and why lines, one or two courses each: **51 of Head & Neck's 68 single-answer items** (plain, EXCEPT,
+which-is-true and which-is-false) were shifted, every one by exactly one place, plus `f1-biomol-03`; Head & Neck's true/false,
+two-statement and numbered items and every other course were right. The keys were wrong from the build (11-19, #480), not from #541.
+The data says the class knew better: on **first tries** (before any explanation) 39 of 63 answers to these questions picked the true
+answer and were marked wrong, 11 picked the old key; on **retries** 25 of 35 switched to the hub's wrong key. The 52 keys are fixed,
+`tools/data-fixes/2026-11-24-review-of-systems-keys.sql` recounts their class numbers after the merge, and the After merge workflow
+loads the new keys. A question someone answered right and was told was wrong stays among their misses until they answer it again (an
+answer's pick isn't kept per person). The lesson is a standing one now ("A bank built by many drafting sessions"). The same read found
+a few slips, fixed: when troponin reaches the blood (`f2-genpath-20`, its notes and cram line said at 20-30 minutes, about when the
+cells die; it is a few hours later), the panoramic chin-down error (`rd-anatomy-07` and its notes said a "frown"; it is an exaggerated
+smile), two why lines swapped (`em-prevent-08`), a case about a woman that said "him" and "the extraction" at a scaling visit
+(`em-cardiac-02`), a why line that started "Also" though the choices are shuffled (`em-cardiac-15`), a cusp named wrong in a why line
+(`da-posterior-08`), a number that didn't match its stem (`f1-cells-18`), a typo, and an explanation that named a classmates' guide
+(`f1-molbio-02`). Two facts the read flagged were settled from standard references on Sam's word ("fix 5"): Gold's agar is
+mitis-salivarius with **20%** sucrose and bacitracin (`om-viral-01` and its notes said 15%, from a study guide), and B cells develop
+in the bone marrow and finish maturing in the spleen (`f1-innate-12` said they complete their development in the marrow, against
+`f1-hyper-10` and the notes).
+
+**Listen** (report #68): on F1-1 the device voice "won't play or give options to speed up or slow down". The hub has no recordings, so
+Listen is the device's voice, which has a voice picker but no speed control, and reads a whole part as one utterance (up to about
+27,000 characters at As taught); started 6 times by a couple of people since 11-20. Not reproduced here (a headless browser has no
+voices): [BUG-199](vault/release/bug-log.md). Every new hub reads this way now ([no-narration-in-the-repo](vault/rules/no-narration-in-the-repo.md)).
+
+**Check-ins:** Heme & Endo Exam 3 has **16** (13 since the retrospective's first few): About right 13, Hub was harder 3, none "easier" or
+"different"; Better than expected 13, About what I expected 3, none worse; readiness median 3 of 5; their median 215 minutes in the hub
+against 68 for everyone (the standing lesson on heavy users holds). A few more for the Perio final and the Occlusion final, nothing
+written that names a topic. No survey answers. Searches: two in Review of Systems, nothing to add.
+
+**Did the last refresh work?** Nothing to measure: the last audit changed no question. **Read next time:** Head & Neck's first tries
+on the 52 fixed keys against the rest of the bank's (they should go from 17% "right" to about the bank's average), and whether the
+reports stop.
 
 **The game economy** (Sam's standing rule since 2026-11-18, [earn-rates-stay-enjoyable](vault/rules/earn-rates-stay-enjoyable.md);
-`tools/economy.sql` over 11-19 and 11-20, since `migration_v78` took out the "A miss fixed" bonus; the prices unchanged since 11-18).
-Read again at 3 pm: the class barely studied after this morning's reading, so it moved by a few crowns. **Skews:** both are exam
-days (the Perio final and the Exam 3 eve, then exam morning), and `migration_v89` (11-20, 7 am) pays 5,000 crowns for Dark Matter and
-20,000 and 30,000 for the ModuPro and the Loupes, back pay included (fewer than 5 people so far).
-- **Earning:** the median study day earned **about 950 crowns** (25th percentile 460, 75th 2,200, 90th 3,450; 100 study days from 79
-  people; a median 89 minutes in the hubs against 149 in the last reading): 345 from study XP, 150 from hub time, prizes 870 at the
-  75th percentile. **Per hour of study: 650 crowns and 1,195 XP** (this morning 650 and 1,185; the reading before, 700 and 1,125).
-  The class's rhythm (E2, 28 days, 117 people): the median student has 7 study days in four weeks (the middle half 2 to 14).
-- **The ladder in median study days** (at 950; a heavy day of 2,200 in brackets): Common 0.1-0.2 (0.0-0.1), Uncommon 0.3-0.5 (0.1-0.2),
-  Rare 0.7-1.3 (0.3-0.5), Epic 1.6-3.0 (0.7-1.3), Legendary 4.2-8.5 (1.8-3.6). Every band is still under the yardstick (Rare 2-4, Epic
-  5-10, Legendary 10-20); the shorter days of exam week bring it closer than any reading yet.
-- **Wallets** (74 who answered on 11-19 or 11-20): median **11,140 crowns** (10th percentile 1,370, 25th 4,970, 75th 16,640, 90th
-  26,050); 44 could buy the priciest piece (8,000), 55 a Legendary, 66 an Epic, 68 a Rare; 2 hold under a Common. 21 have ever bought
-  something, and **12% of all crowns earned has been spent** (11% the evening before). Since 11-19: 15 purchases, about 20,240 crowns,
-  mostly yards (78 purchases from 23 people and about 122,900 crowns all time); 19 opened their place, 12 the shop; 23 have customized it.
-  **Signs seen: too fast** (the median wallet still buys anything; an Epic in 2-3 median days) and **hoarding at the line** (12%); not
-  "too slow", not "nothing to want".
-- **The leaderboards** (E7a, totals): 50 names. The rank board's top ten hold 33,970-54,370 XP (median 39,620) against everyone's
-  middle half 15,610-32,420 (median 21,680). 47 of the 50 keep a study streak of 3+ days, 12 of 7+ (median 5.5). Arcade boards with 5+
-  players: the same eight.
-- **Sam's call stands** ("prices are good for now", twice on 2026-11-18): no proposal on an exam day. The first reading in a normal week
-  (Review of Systems' weeks, before its Dec 3 mock) proposes again only if the too-fast sign still holds then.
+`tools/economy.sql` over 11-21 to this morning, the first quiet days with today's rules: v92's seven prizes from 11-20, v97 to v99's
+eve boss, weekly pennant and mystery box from 11-22; prices unchanged since 11-18). **Skews:** a small sample of the heaviest users (13
+people, 18 study days), short days in a quiet week, and v92's and v89's back pay (11-20) still in the wallets.
+- **Earning:** the median study day earned **about 300 crowns** (25th percentile 90, 75th 600, 90th 875) in a median 24 minutes; per
+  hour **625 crowns and 920 XP** (exam week, 11-19 and 11-20: 650 and 1,195). The class's rhythm (E2, 28 days, 116 people): the median
+  student has 8 study days in four weeks (the middle half 2 to 14).
+- **The ladder in median study days** (at 300; a heavy day of 600 in brackets): Common 0.3-0.6 (0.2-0.3), Uncommon 0.8-1.5 (0.4-0.7),
+  Rare 2.3-4.0 (1.2-2.0), Epic 5.0-9.2 (2.5-4.6), Legendary 13-26 (6.6-13). **In a normal week every band sits on the yardstick** (Rare
+  2-4, Epic 5-10, Legendary 10-20); exam week's 950-crown days put every band under it. The prices fit the quiet weeks and run fast in
+  exam weeks.
+- **Wallets** (the 13 who answered since 11-21): median **16,840 crowns** (10th percentile 7,360, 90th 32,480); 11 of 13 could buy the
+  priciest piece (8,000), all 13 a Rare. **31% of what they earned has been spent** (12% across 74 people in exam week: a different,
+  heavier group). Since 11-21: 48 purchases, about 54,600 crowns, from a few people each day; 16 mystery boxes (12,000 crowns) since it
+  opened on 11-22; 7 people opened the shop and 7 their place. All time: 126 purchases from 24 people, about 177,500 crowns.
+  **Signs seen: too fast by the wallet test only** (the median wallet of these heavy users holds more than the priciest piece and
+  most could buy anything; an Epic takes 5-9 median days, not under 3); **not hoarding** (31%), not "too slow".
+- **The leaderboards** (E7a, totals): 50 names. The rank board's top ten hold 35,470-56,770 XP (median 42,320) against everyone's
+  middle half 17,260-34,550 (median 22,580). **Study streaks broke over the quiet weekend**: a couple of the 50 keep 3+ days (47 a week
+  ago). Arcade boards with 5+ players: the same eight, all archived hubs'.
+- **Sam's call** (2026-11-24, on #552's choice between keeping the prices and a shelf above Legendary): **"prices are good for
+  now"**. Read it again after Review of Systems' Mock 1; propose again only if a normal week shows a too-fast sign on the ladder,
+  not only in the wallets ([decisions](vault/decisions.md)).
 
 **Older feature readings (kept for reference; the standing lessons carry what they mean):**
 - Heme & Endo (10-27 to 10-30): "Try it again" reached 63 of its 67 answerers (4,258 retries shown, 79% right); High likelihood order
@@ -350,6 +380,17 @@ Reports come in through each question's Report button (`question_flags`, with th
 suggestion box (`hub_suggestions`) and dashboard surveys (`survey_responses`). Read all of them in every retro;
 each one is usually a pattern, not a one-off, so fix the pattern across the bank and write it down here.
 
+- **A bank built by many drafting sessions needs its keys read before it ships.** Review of Systems was drafted by 13 sessions and
+  merged by a script that checked answer ranges, a why for every choice, the fixed statement choices and ids; all of it passed, and
+  51 of Head & Neck's 68 single-answer items (and `f1-biomol-03`) were still keyed one choice past the answer their own explanation
+  and why lines name, from the build (11-19) to the 11-24 audit. Its fixed-order formats (true/false, two-statement, numbered) were
+  all right: a label like "Both statements are true" carries its meaning, an index into shuffled choices doesn't. The class caught it
+  (first tries picked the true answer 39 of 63 times and were marked wrong, retries then took the hub's wrong key 25 of 35 times, 10
+  reports in a day), but only after a week of learning wrong anatomy. Reading every key against its explanation and why lines, one
+  agent per course of about 200 questions, took 2 to 4 minutes a course and found every reported item. Do that before a new bank or
+  a batch of drafted questions ships (a step of [build-a-hub](vault/how-to/build-a-hub.md)'s Check since 2026-11-24: Sam,
+  "adding the answer key step is good"), and when the first reports of one bank say "keyed wrong", check the whole course, not the one
+  item: a fault that comes from how a draft was merged repeats.
 - **Every question type needs obvious right/wrong feedback.** Two of the first four real reports were about this:
   self-graded recall cards looked unchanged after tapping "I got it" (perio, fixed 2026-09-28), and ordering
   questions didn't say clearly whether the order was right (perio `q4-49`, fixed 2026-09-29 in #19: finished
@@ -483,7 +524,7 @@ went in on the eve. Data: **88 people, 169 h**, half of Exam 2's 360; 38 came on
 tries 67% of 6,728**, the lowest of any hub: Perio's final 78%). Recap on the dashboard since 11-20 (featured: `ll-num-bsx`, the B
 symptoms). Its narration and Timmy Time came off the site with this audit (283 MB, the site 327 -> 44 MB). Check-ins: **a few by 3 pm on exam
 day** (fewer than 5; the button opened at 10 am, the morning after back-to-back exams), every one "About right" and "Better than I
-expected"; later ones go into the next audit.
+expected"; later ones go into the next audit (**16 by 11-24**: About right 13, Hub was harder 3; Better than expected 13, About what I expected 3; their median 215 minutes).
 
 **The hub got one evening.** The Perio final was the morning before, and 75 of this hub's 88 people had studied for it in its last
 three days. Until then the hub was nearly empty: 11-17 97 min (20 people), 11-18 455 (14). Then **11-19, from the Perio final's
