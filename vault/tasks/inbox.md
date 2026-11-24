@@ -10,20 +10,45 @@ this folder (deleting the line: the note carries it) or just does it, if it's sm
 (`- [x] ... (#123)`); ticked lines are cleared the next time someone goes through the inbox. Anything left to do from a chat
 lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the-vault.md)). See [README](README.md).
 
+- [ ] **The dashboard's progress ring reads only this device's copy of the hub** (2026-11-24, found fixing BUG-107):
+  `readProgress()` in `widget/dash.js` reads the hub's saved state on the device, so on a new or linked device (and in the
+  preview before a hub is opened) the open hub's card says "Your progress in this hub shows here" and 0 tried, though the
+  bootstrap already brings the account's answers. Draw the ring from those answers when the device has none? Live, minor.
 - [ ] **Scroll the dashboard and the shop on a real phone** (2026-11-22, the no-pausing change): an iPhone in Safari and an
   Android phone in Chrome, a long scroll of the dashboard top to bottom and of the shop's shelves, then Timmy's place at
   night. The cloud browser draws without a graphics card, so the compositor's part (the stage's sparkles and confetti, the
   place card's layer) couldn't be measured there ([motion-cost](../reference/motion-cost.md)). Jitter that is left goes in
-  the bug log with what was on screen.
-- [ ] **Timmy's place at night: about 60 stars twinkle one by one inside the stage's drawing** (2026-11-22): the open
+  the bug log with what was on screen. At night, look at the place's stars on the iPhone too: they still twinkle one by
+  one (2026-11-24: in Chromium they cost 2-3% of a slowed phone, and twinkling them in three groups cost more, but WebKit
+  draws every shape that moves inside a drawing on its main thread, so an iPhone may differ).
+- [x] **Timmy's place at night: about 60 stars twinkle one by one inside the stage's drawing** (2026-11-22): the open
   place view keeps a slowed phone's main thread about half busy (`main` about nine-tenths, so not new). Draw the night sky's
   stars as a layer over the scene, the way the leaderboard's stage does its sparkles (`tools/figures/site/place.mjs`,
   `widget/place.js`), or twinkle them in a few groups, and measure again ([motion-cost](../reference/motion-cost.md)).
+  Done 2026-11-24 (#550): measured, the stars were 2-3% of it (three groups cost more); the rest was the rank medal's shine
+  in the place's panel, SMIL that drew the page every frame. Now a CSS transform, same look: 95-97% busy → 11% (phone size,
+  4x), 87-90% → 33-38% (laptop size). The stars stay as they were.
 - [ ] **What else moves inside a dashboard drawing** (2026-11-22): the classroom's Timmys bob (`rm-bob`, up to 10), the
   hub card's megaphone waves (`dx-wn-wave`, `dx-wn-spark`), the idea board's and the recap's Timmys blink. Each is small;
   lift one out of its drawing like the stage if a real phone shows it.
-- [ ] **The shop takes about 4 s to open on a slowed phone** (2026-11-22, measured at 4x): the dashboard draws itself again
+- [x] **The shop takes about 4 s to open on a slowed phone** (2026-11-22, measured at 4x): the dashboard draws itself again
   on `sh:shop`, a set's art file loads, and the room's size is worked out again. Find which of the three is most of it.
+  Done 2026-11-24 (#550): most of it was none of the three: the shop drew every shelf twice on each first open (about
+  600 ms); then the dashboard's `focus()` behind the shop on `sh:shop` (about 200 ms), the page's width changing when its
+  scrollbar went (about 250 ms, desktops with classic scrollbars), and the set's file fetched after the shop's art (one
+  round trip). All four cut: long tasks 1.4 s → 0.9 s (phone size, 4x), settled 1.85 s → 1.45 s.
+- [ ] **Timmy's place and Focus mode hide the page's scrollbar the way the shop did** (2026-11-24, the shop's opening):
+  `html.tpv-open` (`widget/place.css`) and `html.hx-fz-open` (`widget/hub.css`) set `overflow: hidden`, so on a desktop
+  with classic scrollbars the page behind is laid out again at a new width. Do as the shop now does (`tsh-gut` in
+  `widget/shop.js` and `widget/shop.css`: `scrollbar-gutter: stable` when the page had a scrollbar) and measure.
+- [ ] **The Diamond and Dark Matter medals still move with SMIL** (2026-11-24, the place at night): `widget/ranks.js`
+  `art()` with `animate` gives them SMIL sparkles, stars, a glow and (Dark Matter) a moving texture filter, which no
+  stylesheet stops and which draw the page on every frame wherever an animated medal is (the place's panel, a hub's Stats,
+  the trophy case, the cards). Make the sparkles, stars and glow CSS like the shine (`sh-rank-gl…`), hold the texture still,
+  and measure with a Diamond and a Dark Matter test account ([motion-cost](../reference/motion-cost.md)).
+- [ ] **What is left of the shop's opening** (2026-11-24, a lead): on a slowed phone the dialog's opening restyles the page
+  behind (about 160 ms, the modal makes it inert) and the first draw of about 25 pieces takes about 770 ms, then its paint
+  about 300 ms. If a real phone still feels slow, draw the shelves below the first screen as they come near it.
 - [ ] **Read how the first Midnight Plaque went, the morning of Dec 3** (2026-11-22, idea board #4): `select * from
   eve_bosses where day = '2026-12-02'` (fell or not, when, how many people, what it paid), and the pg_cron runs of
   `sh-eve-boss` that night (any over a second, any failed). If it fell before 6 pm (from 3 pm, the past eves' middle one would have fallen about 8 pm) or got away with over a quarter left,
@@ -84,10 +109,14 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   hand, the match may need to forgive more (`SH_STUDY.match` in `widget/study-modes.js`, checked by `tools/ci/typed.js`),
   or the six-word limit on which answers are typed may need to move. Totals only ([learner-data-privacy](../rules/learner-data-privacy.md)).
 - [ ] **Cut `widget/v3.css` to the rules a hub on the engine draws** (2026-11-21, left from #525's restyle fix): about 20 ms of putting the sheet in is still matching its 789 rules against the page, and much of it styled the old single-file pages. A static check finds almost nothing dead yet, because `widget/v3.js` still draws those old parts; once the game layer's last fallbacks are out of `widget/v3.js` (another session, 2026-11-21), find the rules nothing left can draw, drop them, and diff every element's computed style before and after as #525 did. Small gain: do it with the next v3.js cleanup, not on its own.
-- [ ] **Before the first collapse (about 2027-09-13), point the year-spanning readers at the totals** (2026-11-21, migration_v93):
+- [x] **Before the first collapse (about 2027-09-13), point the year-spanning readers at the totals** (2026-11-21, migration_v93):
   `sh_insights` (the admin page's Insights, every hub side by side), `get_hub_recap`, `tools/retro.sql` and `tools/lessons-daily.sql` read
   `activity_hourly` only, so a hub older than a year would show no time. Read `activity_daily` / `activity_visits_daily` (people per day,
   no ids) for days past the school year, or decide those hubs' numbers are only in their published recaps and `LESSONS.md`.
+  **Done** (2026-11-24, `migration_v101`, #545): all four read `activity_daily` for the collapsed days' minutes; the per-person
+  numbers, which totals can't give, are kept per hub (`insight_cards_kept`) by the nightly job the night a hub's first day is
+  collapsed, and the Insights tab reads them from there ([insights-dashboard](../reference/insights-dashboard.md)). The migration
+  is applied after the merge, at 1-5 am Central (`supabase/pending-migrations.txt` until it is).
 - [ ] **A week after `migration_v85` is applied (2026-11-19), so on 2026-11-26, check what the part saved** (2026-11-19): the admin page's Ask Timmy tab (cost by
   day against 11-14 to 11-18's) and the edge logs' `turn` lines (`content`: `part`, `part+full`, `full`). In the eval, 16 of 50
   first questions were asked again with the whole content; if real students' share is much higher, the part costs more than it

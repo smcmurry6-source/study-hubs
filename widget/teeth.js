@@ -140,6 +140,60 @@
     if(d.bif) return [.6, 1.5, 1.9, d.rl - .5];
     return null;
   }
+  /* the buccal grooves a facial view shows on a molar (Wheeler): each starts at the notch between two buccal cusps (a point
+     crownMM lists twice, so the groove and the outline can't disagree) and runs toward the cervix, ending in the buccal pit
+     about the middle of the crown; the mandibular first molar has two, its distobuccal groove the shorter. In crownMM's mm,
+     [[notch], [end]] from mesial to distal; none on an anterior or a premolar. The typodont (widget/journeys.js) and the
+     arcade's molars (tools/figures/site/arcade.mjs) draw them. */
+  var GROOVE_END = { maxM:function(){ return [[.05, .45]]; }, manM1:function(w){ return [[-w * .2, .5], [w * .36, .58]]; }, manM2:function(){ return [[.08, .48]]; } };
+  function buccalGroovesMM(d){
+    var f = GROOVE_END[d.s], p = crownMM(d), h = d.ch, out = [], i;
+    if(!f) return out;
+    var ends = f(d.cw / 2);
+    for(i = 1; i < p.length; i++) if(p[i][0] === p[i - 1][0] && p[i][1] === p[i - 1][1] && p[i][1] > h * .7 && out.length < ends.length) out.push([p[i].slice(), [ends[out.length][0], ends[out.length][1] * h]]);
+    return out;
+  }
+  /* ---------- the proximal view (from the mesial): a section through the tooth from facial to lingual ----------
+     LL: Wheeler's labiolingual (buccolingual) diameters, mm: [the crown at its crests of curvature, the cervix] and the
+     cervical line's curvature on the mesial and distal (it rises toward the incisal on the proximal surfaces, so a
+     section through the middle of the tooth has its CEJ level on the facial and the lingual). */
+  var LL = {
+    maxI1:[7, 6, 3.5, 2.5], maxI2:[6, 5, 3, 2], maxC:[8, 7, 2.5, 1.5], maxP1:[9, 8, 1, 0], maxP2:[9, 8, 1, 0],
+    maxM1:[11, 10, 1, 0], maxM2:[11, 10, 1, 0], maxM3:[10, 9.5, 1, 0],
+    manI1:[6, 5.3, 3, 2], manI2:[6.5, 5.8, 3, 2], manC:[7.5, 7, 2.5, 1], manP1:[7.5, 6.5, 1, 0], manP2:[8, 7, 1, 0],
+    manM1:[10.5, 9, 1, 0], manM2:[10, 9, 1, 0], manM3:[9.5, 9, 1, 0]
+  };
+  /* the incisors' outline in that section (Wheeler's mesial aspect), facial at -x, lingual at +x, the cervix at y = 0, the
+     edge at y = ch. The crown is a wedge: its facial and lingual crests of curvature in the cervical third, about 0.5 mm
+     past the root; the facial outline nearly straight from there to the incisal ridge; the lingual convex over the
+     cingulum, concave over the lingual fossa, convex again at the incisal ridge. A maxillary incisor's ridge is on the line
+     that bisects the root; a mandibular incisor's is lingual to it, and its crown thinner at the edge. Shares of the crown's
+     half width (the cervix at the cervix's) and length; drawn anew from those descriptions, schematic in between. The
+     canines, premolars and molars aren't drawn in this view yet (null). */
+  var PROX = {
+    maxI:[[-.971, .114], [-1, .21], [-.9, .4], [-.7, .6], [-.457, .79], [-.243, .933], [-.157, .99], [-.043, 1], [.129, .981], [.271, .905],
+      [.386, .781], [.457, .648], [.6, .495], [.829, .343], [.986, .2], [.957, .095]],
+    manI:[[-.983, .111], [-1, .2], [-.917, .4], [-.683, .622], [-.333, .844], [-.117, .956], [.067, 1], [.25, .972], [.35, .889], [.45, .711],
+      [.583, .544], [.8, .367], [.983, .2], [.95, .1]]
+  };
+  function proxShape(d){ var s = d.s; return s === 'maxI1' || s === 'maxI2' ? 'maxI' : s === 'manI1' || s === 'manI2' ? 'manI' : null; }
+  function proxCrownMM(d){
+    var sh = proxShape(d), ll = LL[d.s]; if(!sh) return null;
+    var w = ll[0] / 2, v = ll[1] / 2, h = d.ch;
+    return [[-v, 0]].concat(PROX[sh].map(function(p){ return [p[0] * w, p[1] * h]; }), [[v, 0], [v * .5, 0], [0, 0], [-v * .5, 0]]);
+  }
+  /* the root in that section, as rootsMM gives one: [x at the cervix, x at the apex, half width at the cervix, length]; conical,
+     its apex on the line through the middle of the cervix */
+  function proxRootMM(d){ var ll = LL[d.s]; return proxShape(d) ? [0, 0, ll[1] / 2, d.rl] : null; }
+  function mkProxRoot(d, X, k, cej){ var r = proxRootMM(d); return r ? { a0:X(r[0]), a1:X(r[1]), w0:r[2] * k, wa:.75 * k, y0:cej, len:r[3] * k } : null; }
+  /* one incisor in that section, in mm as outlineMM gives a tooth (the crown toward +y, the root toward -y), with iv, the
+     index of the crown's lingual cervical corner (crown[0..iv] is its outer surface); null for the other teeth */
+  function proxOutlineMM(n, o){
+    o = o || {}; var d = typeof n === 'string' && XT[n] ? XT[n] : XT[typeOf(n)], raw = proxCrownMM(d), per = o.per || 6;
+    if(!raw) return null;
+    var crown = dense(raw, true, per), r = mkProxRoot(d, function(x){ return x; }, 1, 0);
+    return { dims:d, ll:LL[d.s], crown:crown, iv:(raw.length - 4) * per, root:rootOutline(r, 0, 0, 0).map(function(p){ return [p[0], -p[1]]; }) };
+  }
 
 
   /* ---------- root geometry shared by the chart, the film and the view (px) ----------
@@ -561,6 +615,7 @@
   T.enamelMM = enamelMM; T.dejPts = dejPts; T.hornsMM = hornsMM; T.pulpPts = pulpPts; T.CONTACT = CONTACT;
   T.sideAt = sideAt; T.topAt = topAt; T.restoMM = restoMM; T.restoParts = restoParts; T.recurMM = recurMM; T.prepMM = prepMM; T.ponticMM = ponticMM; T.PREP = PREP;
   T.crownLoop = crownLoop; T.onSide = onSide; T.sideArc = sideArc; T.overArc = overArc; T.fillet = fillet; T.filletClosed = filletClosed; T.shrink = shrink; T.cariesMM = cariesMM; T.archMM = archMM;
+  T.buccalGroovesMM = buccalGroovesMM; T.LL = LL; T.proxCrownMM = proxCrownMM; T.proxRootMM = proxRootMM; T.mkProxRoot = mkProxRoot; T.proxOutlineMM = proxOutlineMM;
   T.all = function(){ var a = []; for(var i = 1; i <= 32; i++) a.push(catalogue(i)); return a; };
   if(typeof module === 'object' && module.exports) module.exports = T;
   if(typeof window !== 'undefined') window.SH_TEETH = T;

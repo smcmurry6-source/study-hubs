@@ -48,6 +48,54 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   sent by the hub's next page, paid once (its request id). `tools/ci/smoke.js` walks both.
   [The task](vault/tasks/done/2026-11-06-redesign-learn-and-flashcards.md).
 
+- **2026-11-24 (A faster shop and a lighter Timmy's place, Claude Code)** — Two inbox lines, measured at 4x CPU as
+  [motion-cost](vault/reference/motion-cost.md) does. **The shop's opening:** of the three suspects none was most of it:
+  `mount()` in `widget/shop.js` drew every shelf twice on each first open (the cached shop, then the server's, which always
+  differed because the mystery box is never cached; about 600 ms). Now the server is asked while the files load and the
+  shelves wait for it up to 1.2 s; the sets' files are fetched beside the shop's art, not after it. The dashboard's
+  `drawWallet` (`widget/dash.js`) no longer focuses the Shop button behind the open shop (about 200 ms of layout) and draws
+  the row again only when it changes. The page keeps its scrollbar's room while the shop is open (`tsh-gut`,
+  `scrollbar-gutter: stable`; about 250 ms on a desktop with classic scrollbars). Long tasks 1.4 s → 0.9 s on a phone-size
+  screen, 1.8 s → 1.0 s on a laptop with scrollbars. **The place at night:** the stars were 2-3% of the busy main thread
+  (three twinkling groups cost more, so they stay as they were); the rest was the rank medal's shine in the place's panel,
+  a SMIL `<animate>` that drew the page every frame. It is a CSS transform now (`art()` in `widget/ranks.js`, its keyframes
+  inside the drawing), same path and timing: 95-97% busy → 11% (phone size), 87-90% → 33-38% (laptop size). It shines the
+  same in a hub's Stats, the trophy case and the cards. Rule 9 in motion-cost: no looping SMIL. Left on the to-do list:
+  the Diamond and Dark Matter medals' other SMIL, Timmy's place's and Focus mode's scrollbar, what's left of the shop's
+  opening, an iPhone look at the stars.
+- **2026-11-24 (The typodont and the arcade's tooth tiles drawn from the tooth library, Claude Code)** — the package "The
+  typodont and the arcade's tooth tiles drawn from the tooth library" ([the task](vault/tasks/2026-11-20-patient-box-v2-next-steps.md)).
+  `widget/journeys.js`'s typodont (the ModuPro hand-off) dropped its own copy of Wheeler's table, the crown outline, the
+  grooves and the curve smoothing and reads `widget/teeth.js`, which `handoff()` now fetches beside the journey art (`typo()`
+  is null until it arrives); every one of the 13,498 numbers it draws is the same as before. The library gained
+  `buccalGroovesMM()` (the typodont's molar grooves) and an incisor's proximal view (`LL`, Wheeler's labiolingual sizes and
+  curvatures; `proxCrownMM`, `mkProxRoot`, `proxOutlineMM`; schematic between his landmarks). In
+  `tools/figures/site/arcade.mjs`: Pocket Showdown's molars (`boardTooth()`, a lower second molar), Occlusion's Cross-Section
+  (`sectionMolar()`, a lower first molar in its bone, ligament and gum) and Perio's Cross-Section (`sectionIncisor()`, a lower
+  central incisor from the side with its probe) are drawn from the library; built into `tools/preview/design/art.js` only,
+  since neither hub's page is up. Nothing students see changes.
+
+- **2026-11-24 (The year-spanning readers read the totals, migration_v101, Claude Code)** — The to-do "Before the first
+  collapse (about 2027-09-13), point the year-spanning readers at the totals". From the night a day turns a year old, the
+  nightly job collapses its per-person hours into `activity_daily` (migration_v93), and the Insights tab (`sh_insights`), the
+  recap (`get_hub_recap`), `tools/retro.sql` and `tools/lessons-daily.sql` read `activity_hourly` only: a hub's oldest days
+  would have dropped out, and a hub older than a year out of Insights altogether (its people falling under 5). Now all four
+  add the collapsed days' minutes from `activity_daily`, worked out from pings so a day gives the same numbers before and
+  after. What totals can't give (a hub's people, one day / 3+ days, median and p90 minutes, median answers, a surface's
+  people, the check-ins' median) the job keeps per hub in `insight_cards_kept` the night its first day is collapsed, and
+  Insights reads it from then on ("per person as of <day>" on the hub's row); the recap's hours of the day, regulars and
+  awards count the kept days, and its image says so. Nothing has been collapsed yet, so nothing needed filling in.
+  `tools/release/retention.js` checks a partly collapsed hub's Insights line, surfaces, check-ins and recap are the same
+  before and after. **Applied after the merge**, 1-5 am Central (in `supabase/pending-migrations.txt` until then). How:
+  [insights-dashboard](vault/reference/insights-dashboard.md), [analytics-retention](vault/reference/analytics-retention.md).
+
+- **2026-11-24 (The preview's two small bugs, BUG-107 and BUG-039, Claude Code)** — Preview only, nothing on the live
+  site changes. (1) The preview's dashboard drew Timmy at 0 HP for the returning, missed and high-XP test accounts until a
+  hub had been opened, because the made-up answer history was built from the hub page's own question list: the preview's
+  build now puts every engine hub's question ids and exam dates into the runtime (`hubFixtures()` in
+  `tools/preview/transform.js`), so any page makes the same history (the dashboard first: 100 HP). (2) On a small phone the
+  Preview button covered the exam check-in's buttons: while one of the page's dialogs is open it now moves to the corner or
+  edge that covers least of it (`dodge()` in `tools/preview/runtime/preview.js`), and stays put otherwise.
 - **2026-11-24 (Housekeeping: BUG-197's last rows, four retests, the inbox, Claude Code, #544)** — Nothing students see.
   **BUG-197:** counted read-only, 2 `pq-` rows in question health (Review of Systems, ctx mock, 1 made-up visitor), from
   12 minutes before #524 merged, none since: the guard proxy holds. `tools/data-fixes/2026-11-24-bug-197-last-rows.sql` (the
