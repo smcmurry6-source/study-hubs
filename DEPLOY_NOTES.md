@@ -32,6 +32,22 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-24 (Learn's typed answer and Flashcards' Undo, migration_v102, Claude Code)** — Sam: "Do typed answers in
+  learn and undo in flashcards too" (the two inbox lines). **Learn:** a question's second, mastering step is typed when its
+  right answer is short (six words or fewer, not "all of the above" or the like, distinct from every other choice: 163 of
+  Review of Systems' questions); a longer one is still asked without its choices, or with them. A forgiving match
+  (`SH_STUDY.match` in `widget/study-modes.js`: case, spaces, punctuation, accents, articles, a plural s, number words,
+  word order, and one typo in a word of 7 letters or more, never in its first two) marks a clear match right by itself;
+  otherwise the right answer shows and the student taps "I had it" or "I missed it" (Sam's call). A match pays as an
+  answer (10, then 2), a self-mark like a recall card (a flat 2), and a typed answer counts in your own answers but not
+  in the class's numbers: `sh_answer` takes the new context `typed` (migration_v102, applied live at about 6:55 pm Central
+  on 2026-11-23, md5-checked before and after; `tools/release/xp.js` section 20). The typed words never leave the page.
+  `tools/ci/typed.js` (in "Check hubs") checks the match on every live hub's typed questions. **Flashcards:** a rating is
+  held for 5 seconds under the next card with an Undo (or U, or Ctrl+Z), which puts the card back, flipped, with its
+  schedule as it was; it is saved at the next rating, Close, or when the page is hidden or closed, and one still queued is
+  sent by the hub's next page, paid once (its request id). `tools/ci/smoke.js` walks both.
+  [The task](vault/tasks/done/2026-11-06-redesign-learn-and-flashcards.md).
+
 - **2026-11-23 (Crowns given by hand, migration_v100, Claude Code)** — Sam: "Give [one account, by its leaderboard name]
   50,000 crowns". Every way to crowns until now pays XP too (a prize pays as many crowns as XP) or is worked out from XP and
   rank, so a new kind: `crown_gifts`, one row a gift, which `sh_wallet` adds to what was earned (`gifts` in its answer) and

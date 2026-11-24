@@ -100,3 +100,4 @@ review-of-systems | Review of Systems is now in its own violet everywhere on its
 all | The one-page sheets are for reading on screen now: the Print or save as PDF button is gone.
 review-of-systems | Cardio & Respiratory, Renal, MSK & GI, Fundamentals I and Fundamentals II checked against the professors' slides (and Renal against Dr. Herr's recordings): fixes, new notes, 243 new questions, and what the professors said to know, in their words, as High-yield points. Ask Timmy now reads the course you're studying first.
 all | Smoother scrolling: the dashboard's pictures, the leaderboard's stage and Timmy's shop keep moving while you scroll instead of freezing, and cost your phone less to draw.
+all | Learn now has you type short answers the second time (small typos are fine), and Flashcards has an Undo for 5 seconds after each rating.

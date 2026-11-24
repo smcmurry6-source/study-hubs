@@ -116,6 +116,11 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   graded against a bank question's choice. Only if Sam asks for it.
 - [ ] **Flashcards: undo the last rating** (2026-11-13, same): not built, because a rating is paid and sent to the server
   at once; it needs the rating held back a few seconds first. Only if Sam asks for it.
+- [ ] **Learn's typed answer: read how it goes after a week or two** (2026-11-24, from building it): how often a typed
+  answer is matched by itself and how often the student has to say ("I had it" / "I missed it"): `answer_xp` rows with
+  `ctx = 'typed'`, `kind` `one` (matched or a wrong choice typed) against `self` (marked by hand). If most are marked by
+  hand, the match may need to forgive more (`SH_STUDY.match` in `widget/study-modes.js`, checked by `tools/ci/typed.js`),
+  or the six-word limit on which answers are typed may need to move. Totals only ([learner-data-privacy](../rules/learner-data-privacy.md)).
 - [ ] ~~**Sound for the hand-off and the Dark Matter unlock**, only if the redesign ever gets a sound setting (it has none; the
   scenes are silent on purpose: [the journeys](done/2026-11-06-redesign-progression-journeys.md)).~~ dropped: Sam, 2026-11-21,
   "No beeps" (no sound setting is coming).
