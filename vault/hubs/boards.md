@@ -50,9 +50,10 @@ PR https://github.com/smcmurry6-source/study-hubs/pull/70. Nothing of it is on t
   `LIKELY_TOPICS = []`, and nothing on the page shows High Likelihood. When the first unit is published, `tools/ci/smoke.js`'s check
   for a lecture with questions but no topics skips boards (as `LIKELY_SKIP` does for a lecture whose exam is over) rather than
   getting ranked topics (the inbox line).
-- **16 open PRs into this branch** (#81, #87, #91, #94, #95, #97-#104, #106, #110, #111, from 2026-10-13/14), left open
-  on 2026-11-20 (Sam). None was on the branch then. Their state is in `docs/boards/reviews/session-7.md` and
-  `session-7b.md`; each needs this branch merged in and a rebuild before it can merge. #97's migration needs the next free
-  number on `main` (main is past v89), not v34/v35.
+- **The open PRs into this branch** (16 from 2026-10-13/14, left open on 2026-11-20 by Sam; their reviews are
+  `docs/boards/reviews/session-7.md` and `session-7b.md`) go the way section 6 of `docs/boards/ENGINE_PLAN.md` (on
+  `claude/boards-hub`) says: #81, #97, #100 and #102 were closed as replaced by the engine (2026-11-22); #95 and #101 (Chairside) land
+  through T-16 and T-17; the other ten are finished as they are and, once T-07 has landed, merge without a page rebuild.
+  None merges `main` in on its own (the inbox line).
 
 Related: [home](../home.md) · [decisions](../decisions.md)

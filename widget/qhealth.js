@@ -184,6 +184,9 @@
       card = cands.indexOf(focus) >= 0 ? focus : cands.sort(function(a, b){ return st(b).pre - st(a).pre; })[0] || null;
       var s = card ? st(card) : null, q = qOf(qid);
       var ctx = String(d.ctx || (s && s.ctx) || "").toLowerCase();
+      /* Learn's typed answer: no row (nobody saw the choices, the time is typing time, and a self-mark is the student's
+         word), but "Good question?" under it as on any card */
+      if (ctx === "typed") { if (card) { s.answered = true; addRating(card); } return; }
       var rec = ab({ q: qid, v: verOf(qid), k: "a", c: ctx, t: kindOf(q, (s && s.type) || ""), ok: d.correct ? 1 : 0 }, card);
       if (prior) { rec.n = prior.n + 1; if (prior.n) { rec.p = prior.last ? 1 : 0; rec.g = Math.round((t - prior.t) / 60000); } }
       if (typeof d.choice === "number") rec.ch = d.choice;

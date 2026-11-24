@@ -53,6 +53,95 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   settings snapshot came out (`rest.bundle.js` 4.9 KB smaller). Left, in [the inbox](vault/tasks/inbox.md): the cleanup
   of the old parts `widget/v3.js` still builds and `widget/hub.css` hides (Sam: "The cleanup sounds good"), and Sam's
   call on a saved font choice, which still applies the same way.
+- **2026-11-24 (Patient Box v2.2, Claude Code)** — the case kit (`widget/cases.js`, `widget/cases.css`, `widget/teeth.js`)
+  draws and checks what v2.1 left ([the task](vault/tasks/2026-11-20-patient-box-v2-next-steps.md)), each clinical call settled
+  from outside sources and cited in `cases.js`'s header (Sam, 2026-11-21: "Use outside sources to determine answers"):
+  **proximal root caries** (`root: true` on M or D: a saucer-shaped notch on a film between the CEJ and the crest, only on a
+  root bared by interdental attachment and bone loss; not on the view; an arrested one needs the exam in a row); the
+  **`roottip`** module (a retained root broken off about a millimeter above the CEJ, or a root tip in a healed socket under a
+  ridge that dips over it); **`resorption`** (internal, external cervical by Heithersay's class with its pink spot on the view,
+  external apical, replacement with the ankylosed tooth immobile and metallic on percussion); **`sealant`** (O, a mandibular
+  molar's buccal pit, a maxillary molar's or incisor's lingual; on the view and the odontogram, never a film); **temporary
+  fillings** (`material: "temporary"`, `temp` IRM or Cavit, bright with voids over a cotton pellet) and the **provisional
+  crown**; and the record's **`tests`** (bite test, transillumination, percussion), each a Patient Box row, so a crack's finding
+  is in the case, not a question's `pbox`. `rests` gains `roottip`, `resorption` and `sealant`; `tools/ci/cases.js` holds a
+  record for every rule (53 for `validate()`, 21 for `answerable()`); five examples and six questions in
+  `tools/cases/examples.json`; the how-to has the modules. Also fixed: a crowned tooth on the drawn chart looked natural in
+  the dark theme. No live hub has dental cases, so students see nothing yet; `sw.js` to `sh-v75` for the changed kit.
+
+- **2026-11-24 (Learn's typed answer and Flashcards' Undo, migration_v102, Claude Code)** — Sam: "Do typed answers in
+  learn and undo in flashcards too" (the two inbox lines). **Learn:** a question's second, mastering step is typed when its
+  right answer is short (six words or fewer, not "all of the above" or the like, distinct from every other choice: 163 of
+  Review of Systems' questions); a longer one is still asked without its choices, or with them. A forgiving match
+  (`SH_STUDY.match` in `widget/study-modes.js`: case, spaces, punctuation, accents, articles, a plural s, number words,
+  word order, and one typo in a word of 7 letters or more, never in its first two) marks a clear match right by itself;
+  otherwise the right answer shows and the student taps "I had it" or "I missed it" (Sam's call). A match pays as an
+  answer (10, then 2), a self-mark like a recall card (a flat 2), and a typed answer counts in your own answers but not
+  in the class's numbers: `sh_answer` takes the new context `typed` (migration_v102, applied live at about 6:55 pm Central
+  on 2026-11-23, md5-checked before and after; `tools/release/xp.js` section 20). The typed words never leave the page.
+  `tools/ci/typed.js` (in "Check hubs") checks the match on every live hub's typed questions. **Flashcards:** a rating is
+  held for 5 seconds under the next card with an Undo (or U, or Ctrl+Z), which puts the card back, flipped, with its
+  schedule as it was; it is saved at the next rating, Close, or when the page is hidden or closed, and one still queued is
+  sent by the hub's next page, paid once (its request id). `tools/ci/smoke.js` walks both.
+  [The task](vault/tasks/done/2026-11-06-redesign-learn-and-flashcards.md).
+
+- **2026-11-24 (A faster shop and a lighter Timmy's place, Claude Code)** — Two inbox lines, measured at 4x CPU as
+  [motion-cost](vault/reference/motion-cost.md) does. **The shop's opening:** of the three suspects none was most of it:
+  `mount()` in `widget/shop.js` drew every shelf twice on each first open (the cached shop, then the server's, which always
+  differed because the mystery box is never cached; about 600 ms). Now the server is asked while the files load and the
+  shelves wait for it up to 1.2 s; the sets' files are fetched beside the shop's art, not after it. The dashboard's
+  `drawWallet` (`widget/dash.js`) no longer focuses the Shop button behind the open shop (about 200 ms of layout) and draws
+  the row again only when it changes. The page keeps its scrollbar's room while the shop is open (`tsh-gut`,
+  `scrollbar-gutter: stable`; about 250 ms on a desktop with classic scrollbars). Long tasks 1.4 s → 0.9 s on a phone-size
+  screen, 1.8 s → 1.0 s on a laptop with scrollbars. **The place at night:** the stars were 2-3% of the busy main thread
+  (three twinkling groups cost more, so they stay as they were); the rest was the rank medal's shine in the place's panel,
+  a SMIL `<animate>` that drew the page every frame. It is a CSS transform now (`art()` in `widget/ranks.js`, its keyframes
+  inside the drawing), same path and timing: 95-97% busy → 11% (phone size), 87-90% → 33-38% (laptop size). It shines the
+  same in a hub's Stats, the trophy case and the cards. Rule 9 in motion-cost: no looping SMIL. Left on the to-do list:
+  the Diamond and Dark Matter medals' other SMIL, Timmy's place's and Focus mode's scrollbar, what's left of the shop's
+  opening, an iPhone look at the stars.
+- **2026-11-24 (The typodont and the arcade's tooth tiles drawn from the tooth library, Claude Code)** — the package "The
+  typodont and the arcade's tooth tiles drawn from the tooth library" ([the task](vault/tasks/2026-11-20-patient-box-v2-next-steps.md)).
+  `widget/journeys.js`'s typodont (the ModuPro hand-off) dropped its own copy of Wheeler's table, the crown outline, the
+  grooves and the curve smoothing and reads `widget/teeth.js`, which `handoff()` now fetches beside the journey art (`typo()`
+  is null until it arrives); every one of the 13,498 numbers it draws is the same as before. The library gained
+  `buccalGroovesMM()` (the typodont's molar grooves) and an incisor's proximal view (`LL`, Wheeler's labiolingual sizes and
+  curvatures; `proxCrownMM`, `mkProxRoot`, `proxOutlineMM`; schematic between his landmarks). In
+  `tools/figures/site/arcade.mjs`: Pocket Showdown's molars (`boardTooth()`, a lower second molar), Occlusion's Cross-Section
+  (`sectionMolar()`, a lower first molar in its bone, ligament and gum) and Perio's Cross-Section (`sectionIncisor()`, a lower
+  central incisor from the side with its probe) are drawn from the library; built into `tools/preview/design/art.js` only,
+  since neither hub's page is up. Nothing students see changes.
+
+- **2026-11-24 (The year-spanning readers read the totals, migration_v101, Claude Code)** — The to-do "Before the first
+  collapse (about 2027-09-13), point the year-spanning readers at the totals". From the night a day turns a year old, the
+  nightly job collapses its per-person hours into `activity_daily` (migration_v93), and the Insights tab (`sh_insights`), the
+  recap (`get_hub_recap`), `tools/retro.sql` and `tools/lessons-daily.sql` read `activity_hourly` only: a hub's oldest days
+  would have dropped out, and a hub older than a year out of Insights altogether (its people falling under 5). Now all four
+  add the collapsed days' minutes from `activity_daily`, worked out from pings so a day gives the same numbers before and
+  after. What totals can't give (a hub's people, one day / 3+ days, median and p90 minutes, median answers, a surface's
+  people, the check-ins' median) the job keeps per hub in `insight_cards_kept` the night its first day is collapsed, and
+  Insights reads it from then on ("per person as of <day>" on the hub's row); the recap's hours of the day, regulars and
+  awards count the kept days, and its image says so. Nothing has been collapsed yet, so nothing needed filling in.
+  `tools/release/retention.js` checks a partly collapsed hub's Insights line, surfaces, check-ins and recap are the same
+  before and after. **Applied after the merge**, 1-5 am Central (in `supabase/pending-migrations.txt` until then). How:
+  [insights-dashboard](vault/reference/insights-dashboard.md), [analytics-retention](vault/reference/analytics-retention.md).
+
+- **2026-11-24 (The preview's two small bugs, BUG-107 and BUG-039, Claude Code)** — Preview only, nothing on the live
+  site changes. (1) The preview's dashboard drew Timmy at 0 HP for the returning, missed and high-XP test accounts until a
+  hub had been opened, because the made-up answer history was built from the hub page's own question list: the preview's
+  build now puts every engine hub's question ids and exam dates into the runtime (`hubFixtures()` in
+  `tools/preview/transform.js`), so any page makes the same history (the dashboard first: 100 HP). (2) On a small phone the
+  Preview button covered the exam check-in's buttons: while one of the page's dialogs is open it now moves to the corner or
+  edge that covers least of it (`dodge()` in `tools/preview/runtime/preview.js`), and stays put otherwise.
+- **2026-11-24 (Housekeeping: BUG-197's last rows, four retests, the inbox, Claude Code, #544)** — Nothing students see.
+  **BUG-197:** counted read-only, 2 `pq-` rows in question health (Review of Systems, ctx mock, 1 made-up visitor), from
+  12 minutes before #524 merged, none since: the guard proxy holds. `tools/data-fixes/2026-11-24-bug-197-last-rows.sql` (the
+  2026-11-20 fix's body) takes them after the merge. **Retested:** BUG-197; BUG-198 on the live site (Review of Systems'
+  `--hub` is `#6b46a8` on Home and Notes, light and dark, with every request off the site blocked); BUG-195 and BUG-194
+  (no recurrence in any of the 147 Check hubs and 111 Release tests runs since #506, logs searched). **Inbox:** its 16 ticked and struck lines cleared (each is in its PR, `decisions.md` or the bug log); the
+  boards PRs' line and the boards hub note rewritten to section 6 of `docs/boards/ENGINE_PLAN.md` (#81, #97, #100, #102
+  closed as replaced; #95, #101 through T-16 and T-17; ten finished as they are). **The sustainability task's** `due` moves
+  from 2026-12-02 (packages 1 and 2, done) to 2026-12-31, its next open box (the compaction after the December packs).
 - **2026-11-23 (Crowns given by hand, migration_v100, Claude Code)** — Sam: "Give [one account, by its leaderboard name]
   50,000 crowns". Every way to crowns until now pays XP too (a prize pays as many crowns as XP) or is worked out from XP and
   rank, so a new kind: `crown_gifts`, one row a gift, which `sh_wallet` adds to what was earned (`gifts` in its answer) and

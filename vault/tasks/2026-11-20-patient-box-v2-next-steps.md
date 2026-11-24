@@ -56,19 +56,41 @@ what v2.0 left, so it isn't lost. Its own track (Sam, 2026-11-06, [decisions](..
       at the outline, nothing of a lingual surface); `rests: ["caries"]` and the validate rules (root caries needs recession);
       example `v21-buccal-decay` with `v21-ex-5` (branch `claude/patient-box-buccal-decay`)
 - [ ] Sam looks at decay seen from the buccal with its first case, the way the first box says
-- [ ] Proximal root caries (a lesion under the contact on a root exposed by interdental attachment loss, a film finding): the
-      kit draws root caries on the facial and lingual only
+- [x] Proximal root caries (a lesion under the contact on a root exposed by interdental attachment loss, a film finding): the
+      kit draws root caries on the facial and lingual only (v2.2, 2026-11-24: `root: true` on M or D, a saucer-shaped notch on
+      a film between the CEJ and the crest; it needs interdental recession and bone loss at that side, the view doesn't show it,
+      and an arrested one needs the exam in a row; example `v22-root-caries`)
 - [ ] Sam still looks at v2.1's drawings with their first case (crown materials, posts, fractures, bridges, the redrawn
       fillings and calculus, and the answers above), the way the first box says
-- [ ] Root tips, resorption, sealants and temporary restorations (left out of v2.1; optional in Sam's ask)
-- [ ] A crack's own row: the kit has no bite-test or transillumination field, so a crack question gives its finding in the
-      question's `pbox`; a `tests` field in the record would put it in the case's own rows
+- [x] Root tips, resorption, sealants and temporary restorations (left out of v2.1; optional in Sam's ask) (v2.2: the
+      `roottip` module, retained or a fragment in a healed socket; `resorption`, internal, external cervical by Heithersay's
+      class, external apical and replacement; `sealant` on O, a mandibular molar's B, a maxillary molar's or incisor's L;
+      `material: "temporary"` with `temp` IRM or Cavit, and the `provisional` crown; on every view and in the checks, with
+      `rests` `roottip`, `resorption` and `sealant`; examples `v22-root-tips`, `v22-resorption`, `v22-sealants-temps`)
+- [x] A crack's own row: the kit has no bite-test or transillumination field, so a crack question gives its finding in the
+      question's `pbox`; a `tests` field in the record would put it in the case's own rows (v2.2: `tests`, the bite test,
+      transillumination and percussion, each a Patient Box row, each result checked against the record; example
+      `v22-cracked-tooth`)
+- [ ] Sam looks at v2.2's drawings with their first case (proximal root caries, the retained root and the root tip, the four
+      resorptions and the pink spot, sealants, temporary fillings and the pellet, the provisional crown, and their odontogram
+      marks), the way the first box says
+- [ ] Pulp tests in `tests` (cold and the electric pulp test), with a pulp diagnosis to check them against: v2.2 left them out
+- [ ] On the drawn chart, a long upper root's apex runs under its tooth's mobility label ("M0"): the premolars of
+      `v2-molar-furcation` and `v22-root-tips` show it (from before v2.2)
 - [ ] Implants on modules (step 4): an `implant` module for what is per-tooth numbers today
 - [ ] Prosthodontics and other hubs (step 5): fixed bridges are done on every view (v2.1); still to do: removable partial and
       complete dentures, a cantilever or resin-bonded bridge, an implant-supported bridge, and Occlusion's `CASE_IMG`
-      pictures onto the kit
-- [ ] More figures from the library as they're next touched: `widget/journeys.js`'s typodont (`TYPO`) still carries its own
+      pictures onto the kit; with the dentures, an overdenture abutment (a root-filled retained root under a denture, which
+      v2.2's `roottip` refuses for now) and a provisional bridge (v2.2 has the provisional crown only)
+- [x] More figures from the library as they're next touched: `widget/journeys.js`'s typodont (`TYPO`) still carries its own
       copy of the size table and outlines, and the arcade's other tooth tiles (Pocket Showdown, Cross-Section) are drawn by hand
+      (2026-11-24: the typodont reads `widget/teeth.js`, which `handoff()` fetches, and draws the same 13,498 numbers as before;
+      Pocket Showdown's molars, Occlusion's Cross-Section molar and Perio's Cross-Section incisor are drawn from the library,
+      the incisor from its new proximal view)
+- [ ] The rest of the arcade's hand-drawn teeth onto the library when they're next touched: Mind the Pocket's tooth,
+      Million-Dollar Smile's teeth and the cards' crowns in `tools/figures/site/arcade.mjs` (the `TEETH` comment there)
+- [ ] The library's proximal view for canines, premolars and molars: `proxOutlineMM()` draws incisors only (Wheeler's
+      mesial aspect; the outline between his landmarks is schematic) and returns null for the rest
 - [ ] If Perio's page ever comes back, its eleven cases (in git before 6b32460) move onto modules with the same ids and keys
 
 ## Log
@@ -90,6 +112,18 @@ what v2.0 left, so it isn't lost. Its own track (Sam, 2026-11-06, [decisions](..
 - 2026-11-21: decay seen from the buccal (branch `claude/patient-box-buccal-decay`, on top of #526): the view's lesions, its
   restorations rechecked, the `caries` rests and validate rules, example 5. Ticked its box; added Sam's look and proximal root
   caries.
+- 2026-11-24: the typodont and the arcade's tooth tiles from the library (branch `claude/typodont-and-tiles-from-library`):
+  `buccalGroovesMM()` and the incisors' proximal view (`LL`, `proxOutlineMM()`) added to `widget/teeth.js`; the typodont's own
+  tables taken out of `widget/journeys.js`; Pocket Showdown and both Cross-Section tiles redrawn. Ticked its box; added the
+  arcade's other teeth and the proximal view for the other teeth.
+
+- 2026-11-24: Patient Box v2.2 ([#551](https://github.com/smcmurry6-source/study-hubs/pull/551), branch `claude/patient-box-v2-2`, from `main` at 6038dee): proximal root caries, root tips
+  and retained roots, resorption, sealants, temporary fillings and provisional crowns, the clinical tests (`tests`), each call
+  cited in `widget/cases.js`'s header; five examples and six questions in `tools/cases/examples.json`; a record for each rule in
+  `tools/ci/cases.js`; the how-to. Also fixed: a crowned tooth on the drawn chart looked natural in the dark theme. Ticked the
+  three boxes; added Sam's look, pulp tests, the chart's mobility label and the overdenture abutment. **Where it stopped:** the
+  kit is done for this package; next are the implant module (step 4), then dentures and bridges (step 5), each from `main`
+  once this merges.
 
 ## Outcome
 

@@ -205,6 +205,7 @@
 
 /* ---------- the shop as a dialog (the dashboard, the place) ---------- */
 html.tsh-open { overflow: hidden; }
+html.tsh-open.tsh-gut { scrollbar-gutter: stable; }
 /* sized in % of the screen, not vw and dvh, which the text-size zoom enlarges (BUG-190): a modal dialog's box is the screen.
    Its height comes from its content, so the dialog is a flex column with a cap and the inside shrinks to it and scrolls */
 dialog.tsh-dlg { width: min(1060px, calc(100% - 24px)); max-width: none; max-height: calc(100% - 24px); margin: auto; padding: 0; border: 0; border-radius: 24px; background: transparent; color: var(--text); overflow: visible;

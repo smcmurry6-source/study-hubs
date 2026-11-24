@@ -2194,6 +2194,33 @@ try {
     notes.push('crowns given by hand (migration_v100): crowns only (no XP, rank or prize moves), once per key, spent like any crowns, to the id that remains, on the Crowns board at once, closed to visitors');
   }
 
+  /* ---------- 20. Learn's typed answer (migration_v102): a match pays as an answer, a self-mark as a recall card, and
+     neither reaches the class's numbers ---------- */
+  if (one(`select position('''typed''' in prosrc) > 0 from pg_proc where proname = 'sh_answer'`) === 't') {
+    eq(anonJson(`admin_load_question_keys(${S}, 'xt', ${q(JSON.stringify([1, 2, 3, 4, 5].map(i => ({ id: 't' + i, kind: 'one', answer: [1] }))))}::jsonb)`).loaded, 5, 'five keys for the typed hub');
+    const A = 40 * DAY, ty = (qid, at, o) => ans('xp-TY', qid, Object.assign({ hub: 'xt', ctx: 'typed', at: A + at }, o));
+    const pick = (r) => [r.ok, r.correct, r.kind, r.xp];
+    eq(pick(ty('t1', 0, { choice: 1, claim: true, req: 'typed-req-0001' })), [true, true, 'one', 10], 'a typed answer the match found right: graded from the key, 10 the first time');
+    eq(pick(ty('t1', 10, { choice: 1, claim: true })), [true, true, 'one', 2], 'and 2 after');
+    eq(pick(ty('t2', 20, { choice: 0, claim: false })), [true, false, 'one', 1], 'a typed choice the key says is wrong is a miss (1 XP)');
+    eq(pick(ty('t3', 30, { self: true, claim: true })), [true, true, 'self', 2], '"I had it": no choice, their word, paid like a recall card (a flat 2)');
+    eq(pick(ty('t4', 40, { self: false, claim: false })), [true, false, 'self', 2], '"I missed it": a self-graded miss, 2');
+    for (let i = 1; i <= 3; i++) ty('t4', 40 + 10 * i, { self: false, claim: false });
+    eq(rows(`select (x.resp->>'xp')::int xp from answer_xp x join personal_answers a on a.id = x.answer_id where a.visitor_id = 'xp-TY' and a.qid = 't4' order by a.answered_at`).map(r => r.xp), [2, 2, 2, 0],
+      'a self-marked miss pays its first three a day, as a recall card');
+    eq(ty('t1', 90, { choice: 1, claim: true, req: 'typed-req-0001' }).repeat, true, 'a replayed typed answer gets its first reply and pays nothing new');
+    eq([num(`select count(*) from question_stats where hub = 'xt'`), num(`select count(*) from question_choices where hub = 'xt'`)], [0, 0],
+      'no typed answer reaches the class\'s stats or the % beside each choice');
+    eq(rows(`select a.qid, a.correct, x.ctx, x.kind from personal_answers a join answer_xp x on x.answer_id = a.id where a.visitor_id = 'xp-TY' and a.qid in ('t1', 't3') order by a.answered_at`),
+      [{ qid: 't1', correct: true, ctx: 'typed', kind: 'one' }, { qid: 't1', correct: true, ctx: 'typed', kind: 'one' }, { qid: 't3', correct: true, ctx: 'typed', kind: 'self' }],
+      'every typed answer is in your own answers, filed as context typed');
+    eq(ans('xp-TY', 't5', { hub: 'xt', ctx: 'learn', claim: true, self: true, at: A + 200 }).error, 'bad', 'outside a typed answer, a one-choice question with no choice is still refused');
+    eq(pick(ans('xp-TY', 't5', { hub: 'xt', ctx: 'learn', choice: 1, at: A + 210 })), [true, true, 'one', 10], 'Learn\'s own picks are as before');
+    eq([num(`select count(*) from question_stats where hub = 'xt' and qid = 't5'`), num(`select coalesce(sum(picks), 0) from question_choices where hub = 'xt' and qid = 't5'`)], [1, 1],
+      'and still count for the class');
+    notes.push('Learn\'s typed answer (migration_v102): a match is graded from the key and paid as an answer, "I had it" / "I missed it" as a recall card, none of it in the class\'s numbers');
+  } else problems.push('migration_v102 (Learn\'s typed answer) is not in the schema or the pending list');
+
   /* ---------- 15. the private parts stay private ---------- */
   for (const t of ['xp_awards', 'xp_award_totals', 'xp_boosts', 'xp_sessions', 'answer_xp', 'question_keys', 'game_baseline', 'pet_purchases', 'pet_inventory', 'pet_equipped', 'ideas', 'idea_votes', 'shop_items', 'visit_secret', 'card_reviews'])
     raises(() => anon(`select count(*) from public.${t}`), '42501', `anon reads ${t} directly`);

@@ -163,3 +163,38 @@
 .dc-view .io-rc-deep{fill:#7a4d22}.dc-view .io-rc-deep.io-arr{fill:#24130a}
 .dc-view .io-rec{fill:#5e4a3a;stroke:#3d2f24;stroke-width:.5;opacity:.9;stroke-linejoin:round}
 .dc-view .io-prox{fill:#6f6252;opacity:.32}.dc-view .io-prox.io-prox-deep{opacity:.52}
+/* Patient Box v2.2 (the sources are in cases.js's header). On a film: a temporary filling (IRM, Cavit) brighter than enamel, below
+   metal, with the dark voids of a hand-packed material, over the radiolucent cotton pellet in the chamber; a provisional crown
+   below dentin, so its preparation shows through, set with a bright zinc oxide-eugenol line; internal resorption as dark as the
+   pulp; external cervical resorption dark and mottled with bone, the canal's walls still seen through a facial or lingual one;
+   proximal root caries a dark core in a softer edge */
+.dc-film .xr-temp{fill:#f5f5f5}.dc-film .xr-tvoid{fill:#9a9a9a;opacity:.8}.dc-film .xr-pellet{fill:#565656}
+.dc-film .xr-prov{fill:#9e9e9e}.dc-film .xr-zoe{fill:none;stroke:#f1f1f1;stroke-width:1.2;stroke-linejoin:round;stroke-linecap:round}
+.dc-film .xr-irr{fill:#4a4a4a}
+.dc-film .xr-ecr{fill:#333;opacity:.82}.dc-film .xr-ecr.xr-ecr-f{opacity:.5}.dc-film .xr-mottle{fill:#8c8c8c;opacity:.55}
+.dc-film .xr-prrs{fill:none;stroke:#bdbdbd;stroke-width:.8;stroke-linecap:round;stroke-linejoin:round}
+.dc-film .xr-car.xr-car-soft{opacity:.32}
+/* on the chart: a retained root's stump in the root's own color; a temporary filling cream with a dashed edge. A crowned
+   tooth stays gray in the dark theme too (the theme's crown color had been winning over it, so a crown looked natural) */
+.dc-crown.dc-stump{fill:#e2d6b6;stroke:#8a6a3c}
+:root[data-theme="dark"] .dc-crown.dc-stump{fill:#b8ac8d;stroke:#6b5530}:root[data-theme="dark"] .dc-crown.dc-restored{fill:#c4c7cf;stroke:#6f7480}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .dc-crown.dc-stump{fill:#b8ac8d;stroke:#6b5530}:root:not([data-theme="light"]) .dc-crown.dc-restored{fill:#c4c7cf;stroke:#6f7480}}
+:root .dc-crown.dc-restored.dc-goldcrown{fill:#e2b84a;stroke:#9a7420}
+.dc-amalgam.dc-temp{fill:#e8dcbc;stroke:#8f7d4f;stroke-width:.8;stroke-dasharray:2 1.4}
+/* on the drawn view: the retained root's stump; a sealant opaque white in the pit; IRM ivory, Cavit pinkish white; a provisional
+   crown's acrylic a little duller than a tooth; the pink spot of external cervical resorption under the enamel */
+.dc-view .io-tooth.io-stump{fill:#d9c48f;stroke:#9a7d4a}
+.dc-view .io-seal{fill:#fbfaf4;stroke:#d6d2c4;stroke-width:.6}
+.dc-view .io-r-temporary,.dc-view .io-r-temporary.io-t-irm{fill:#ece3c6;stroke:#bfae82}.dc-view .io-r-temporary.io-t-cavit{fill:#e9d3cf;stroke:#bf9f99}
+.dc-view .io-tooth.cr-provisional{fill:#f5efe2;stroke:#a8956c}
+.dc-view .io-pink{fill:#cf5d7b;opacity:.42}.dc-view .io-pink.io-pink-edge{opacity:.2}
+/* on the odontogram: a sealant green, a temporary filling sand with two dots, a root tip's or retained root's remaining root solid
+   with a bar where it ends, resorption a diamond on the root */
+.dc-ow{--o-seal:#2f9e6a;--o-temp:#e3d2a2}
+:root[data-theme="dark"] .dc-ow{--o-seal:#4cc28a;--o-temp:#8f7d52}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .dc-ow{--o-seal:#4cc28a;--o-temp:#8f7d52}}
+.dc-ow .dc-osurf.dc-o-sealant{fill:var(--o-seal)}.dc-ow .dc-osurf.dc-o-temporary{fill:var(--o-temp)}
+.dc-ow .dc-o-dots{fill:var(--ink)}
+.dc-ow .dc-o-rbar{fill:none;stroke:var(--ink);stroke-width:2.2;stroke-linecap:round}
+.dc-ow .dc-o-rroot{fill:none;stroke:var(--ink);stroke-width:2.2;stroke-linecap:round}
+.dc-ow .dc-o-rsp{fill:var(--surface);stroke:var(--o-lesion);stroke-width:1.5;stroke-linejoin:round}

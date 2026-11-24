@@ -1,5 +1,5 @@
 {
-  "about": "Synthetic test accounts for previews (RELEASE_TEST_PLAN.md, 'Test accounts'). petDaysAgo: Timmy Tooth was adopted that many days ago (sh_pet_born), so he shows on the hubs as he does for a student who adopted him; the new learner has not adopted him. Every id, name and number here is made up: none is copied or derived from a real student, visitor id, answer, report or comment. Never paste production rows into this file (the repo is public). Answers are generated in the browser from each hub's own question ids, with a fixed seed, so every tester sees the same history.",
+  "about": "Synthetic test accounts for previews (RELEASE_TEST_PLAN.md, 'Test accounts'). petDaysAgo: Timmy Tooth was adopted that many days ago (sh_pet_born), so he shows on the hubs as he does for a student who adopted him; the new learner has not adopted him. Every id, name and number here is made up: none is copied or derived from a real student, visitor id, answer, report or comment. Never paste production rows into this file (the repo is public). Answers are generated in the browser from each hub's own question ids (tools/preview/transform.js builds them into the runtime, so the dashboard has the history before a hub is opened), with a fixed seed, so every tester sees the same history.",
   "adminSecret": "preview-admin",
   "personas": [
     {
