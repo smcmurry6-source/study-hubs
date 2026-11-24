@@ -1522,9 +1522,29 @@ function lint(hub, A){
           const back = await page.evaluate(() => { const c = document.querySelector('.sm-cards .fcard'); return { ans: !!c.querySelector('.fc-ans'), rates: c.querySelectorAll('.fc-r').length, shown: !c.querySelector('[data-raterow]').hidden, w: document.documentElement.scrollWidth - innerWidth }; });
           if (!back.ans || back.rates !== 4 || !back.shown) problems.push(`${name} (${label}): a flashcard turned over should show its answer and four ratings (${JSON.stringify(back)})`);
           if (back.w > 1) problems.push(`${name} (${label}): a turned-over flashcard scrolls sideways by ${back.w}px`);
+          /* a rating is held back 5 s with an Undo (Sam, 2026-11-24): nothing queued for the server until then; Undo brings the
+             card back turned over and queues nothing; Close sends the one still held (its row in the saved queue, STATE.cardq) */
+          const queued = () => page.evaluate(() => { try { const s = JSON.parse(localStorage.getItem(window.SH_HUB.stateKey) || '{}'); return (s.cardq || []).length; } catch (e) { return -1; } });
+          const q0 = await queued();
           await page.click('.sm-cards [data-sm="good"]'); await page.waitForTimeout(900);
           const after = await page.evaluate(() => { const c = document.querySelector('.sm-cards .fcard'); return { id: c && c.getAttribute('data-fqid'), caught: !!document.querySelector('.sm-caught') }; });
           if (!after.caught && (!after.id || after.id === first)) problems.push(`${name} (${label}): rating a flashcard Good didn't bring the next card`);
+          const ub = await page.evaluate(() => { const b = document.querySelector('.sm-focus [data-undobar]'); return { shown: !!b && !b.hidden, text: b ? b.textContent.trim() : '', w: document.documentElement.scrollWidth - innerWidth }; });
+          if (!ub.shown || !/Good/.test(ub.text)) problems.push(`${name} (${label}): after a rating, its Undo should show with the rating (${JSON.stringify(ub)})`);
+          if (ub.w > 1) problems.push(`${name} (${label}): the Undo bar scrolls the page sideways by ${ub.w}px`);
+          if (await queued() !== q0) problems.push(`${name} (${label}): a rating went into the server's queue before its Undo ran out`);
+          if (ub.shown) {
+            await page.click('.sm-focus [data-sm="undo"]'); await page.waitForTimeout(600);
+            const un = await page.evaluate(() => { const c = document.querySelector('.sm-cards .fcard'), b = document.querySelector('.sm-focus [data-undobar]');
+              return { id: c && c.getAttribute('data-fqid'), flipped: !!c && c.classList.contains('is-flipped'), rates: c ? c.querySelectorAll('.fc-r:not(:disabled)').length : 0, bar: !!b && !b.hidden }; });
+            if (un.id !== first || !un.flipped || un.rates !== 4 || un.bar) problems.push(`${name} (${label}): Undo should bring the rated card back, turned over with its four ratings, and hide the bar (${JSON.stringify(un)})`);
+            if (await queued() !== q0) problems.push(`${name} (${label}): an undone rating still went into the server's queue`);
+            await page.click('.sm-cards [data-sm="good"]'); await page.waitForTimeout(600);
+          }
+          if (await page.$('.sm-focus [data-sm="exit"]')) { await page.click('.sm-focus [data-sm="exit"]'); await page.waitForTimeout(500); }
+          if (await queued() !== q0 + 1) problems.push(`${name} (${label}): Close should send the rating still held for its Undo (the queue went from ${q0} to ${await queued()})`);
+          const re = await page.waitForSelector('.sm-launch [data-sm="start"]', { timeout: 5000 }).catch(() => null);
+          if (re) { await re.click(); await page.waitForSelector('.sm-cards .fcard, .sm-caught', { timeout: 10000 }).catch(() => null); }
         }
         const unnamedIn = await page.$$eval('.sm button', bs => bs.filter(b => !b.closest('.qcard') && ![...b.attributes].some(a => /^data-/.test(a.name))).map(b => (b.textContent || '').trim().slice(0, 30)));
         if (unnamedIn.length) problems.push(`${name} (${label}): button(s) in a Flashcards session without a fixed data-* name (click counts): ${unnamedIn.join(', ')}`);
@@ -1540,8 +1560,59 @@ function lint(hub, A){
         if (!(await page.$('#qlist .qcard'))) problems.push(`${name} (${label}): back on Questions, the bank drew no question cards`);
       }
       errs.forEach(e => problems.push(`${name} (${label}): JavaScript error: ${e}`));
-      notes.push(`${name} (${label}): the "Study as" toggle, a Learn question and a flashcard turned over and rated`);
+      notes.push(`${name} (${label}): the "Study as" toggle, a Learn question and a flashcard turned over, rated, undone and rated again`);
       await page.close();
+    }
+    /* Learn's typed answer (Sam, 2026-11-24): two questions Learn types, put at their second step in the saved state before
+       the page loads, come first in a round as a box to type in. The right answer typed in capitals is right by itself
+       (Mastered, no class picks); words that don't match show the answer and "I had it" / "I missed it". */
+    for (const hub of engineHubs.slice(0, 1)) {
+      const qf = path.join(root, 'hubs', hub, 'content/questions.json'); if (!fs.existsSync(qf)) continue;
+      const vm = require('vm'), sb = { window: {} }; vm.createContext(sb);
+      vm.runInContext(fs.readFileSync(path.join(root, 'widget/study-modes.js'), 'utf8'), sb);
+      let qs = JSON.parse(fs.readFileSync(qf, 'utf8')); qs = Array.isArray(qs) ? qs : (qs.questions || Object.values(qs));
+      const typedQs = qs.filter(q => sb.window.SH_STUDY.typed(q)).slice(0, 2), ans = {}; typedQs.forEach(q => { ans[q.id] = q.choices[q.answer]; });
+      const name = `${hub}, Learn's typed answer`;
+      if (typedQs.length < 2) { notes.push(`${name} (${label}): fewer than two questions Learn types, not walked`); continue; }
+      /* the saved state is set from a page of the same site that runs no script (a stylesheet), so no hub page writes over it */
+      const key = (fs.readFileSync(path.join(root, 'hubs', hub, 'index.html'), 'utf8').match(/stateKey:\s*"([^"]+)"/) || [])[1];
+      if (!key) { problems.push(`${name} (${label}): no stateKey in the hub's page`); continue; }
+      const errs = [], p2 = await context.newPage(); p2.on('pageerror', e => errs.push(e.message));
+      await p2.goto(BASE() + 'widget/study-modes.css');
+      await p2.evaluate(([k, ids]) => { const s = JSON.parse(localStorage.getItem(k) || '{}'); s.learn = { r: 0, q: {} }; ids.forEach(id => { s.learn.q[id] = 1; }); s.ui = Object.assign(s.ui || {}, { qview: 'learn' }); localStorage.setItem(k, JSON.stringify(s)); }, [key, typedQs.map(q => q.id)]);
+      await p2.goto(BASE() + `hubs/${hub}/index.html#questions`); await p2.waitForTimeout(1200);
+      const st = await p2.waitForSelector('.sm-launch [data-sm="start"]', { timeout: 15000 }).catch(() => null);
+      if (!st) problems.push(`${name} (${label}): Learn drew no launcher`);
+      else {
+        await st.click();
+        for (const how of ['match', 'self']) {
+          const box = await p2.waitForSelector('.sm-focus [data-smstage] .qcard [data-typein]', { timeout: 10000 }).catch(() => null);
+          if (!box) { problems.push(`${name} (${label}): a question at its second step that Learn types drew no box to type in (${how})`); break; }
+          const id = await p2.evaluate(() => document.querySelector('[data-smstage] .qcard').getAttribute('data-qid'));
+          if (!ans[id]) { problems.push(`${name} (${label}): Learn typed ${id}, not one of the two put at their second step`); break; }
+          const visCh = await p2.evaluate(() => !!document.querySelector('[data-smstage] .qcard .ch'));
+          if (visCh) problems.push(`${name} (${label}): a typed question also shows its choices`);
+          await box.fill(how === 'match' ? ans[id].toUpperCase() + '.' : 'zzqx not it');
+          await p2.keyboard.press('Enter'); await p2.waitForTimeout(400);
+          if (how === 'self') {
+            const ask = await p2.evaluate(() => { const c = document.querySelector('[data-smstage] .qcard'); return { answered: c.classList.contains('is-answered'), grade: c.querySelectorAll('[data-tgrade]').length, ans: !!c.querySelector('.qc-typed-res .qc-ans') }; });
+            if (ask.answered || ask.grade !== 2 || !ask.ans) problems.push(`${name} (${label}): words that don't match should show the answer with "I had it" and "I missed it" (${JSON.stringify(ask)})`);
+            const g = await p2.$('[data-smstage] [data-tgrade="1"]'); if (g) { await g.click(); await p2.waitForTimeout(400); }
+          }
+          const done = await p2.evaluate(() => { const c = document.querySelector('[data-smstage] .qcard');
+            return { answered: c.classList.contains('is-answered'), ok: !!c.querySelector('.verdict.ok'), mastered: !!document.querySelector('[data-smstage] .sm-tag.is-done'), picks: c.classList.contains('has-picks'), next: !!document.querySelector('[data-smstage] [data-sm="next"]'), ans: !!c.querySelector('.qc-typed-ans') }; });
+          if (!done.answered || !done.ok || !done.mastered || done.picks || !done.next || !done.ans) problems.push(`${name} (${label}): a typed answer ${how === 'match' ? 'that matches' : 'marked "I had it"'} should be right, mastered, with the answer and Next and no class picks (${JSON.stringify(done)})`);
+          const nx = await p2.$('[data-smstage] [data-sm="next"]'); if (nx) { await nx.click(); await p2.waitForTimeout(500); }
+        }
+      }
+      const unnamed = await p2.$$eval('.sm button', bs => bs.filter(b => !b.closest('.qcard') && ![...b.attributes].some(a => /^data-/.test(a.name))).map(b => (b.textContent || '').trim().slice(0, 30)));
+      if (unnamed.length) problems.push(`${name} (${label}): button(s) without a fixed data-* name: ${unnamed.join(', ')}`);
+      /* back to Questions, as the walk above leaves it: closed with Escape, then the toggle (the page saves it as it goes) */
+      await p2.keyboard.press('Escape'); await p2.waitForTimeout(400);
+      const qb = await p2.$('[data-qview="questions"]'); if (qb) { await qb.click(); await p2.waitForTimeout(400); }
+      errs.forEach(e => problems.push(`${name} (${label}): JavaScript error: ${e}`));
+      notes.push(`${name} (${label}): two questions typed, one matched and one marked "I had it"`);
+      await p2.close();
     }
     /* the dashboard's "you" card: the place is drawn over a blank frame (the old house picture's spot). The page is at its
        request budget, so nothing of the place loads with it; the place draws on first use and keeps a still, and the

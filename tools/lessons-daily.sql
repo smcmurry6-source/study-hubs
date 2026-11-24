@@ -24,11 +24,17 @@ select hub, term, sum(searches) searches from search_terms
 where day >= :since::date and hits = 0 group by 1, 2 order by 3 desc limit 60;
 
 -- 3. Use per hub since the last refresh: people, minutes, top sections
---    (activity_hourly: n pings of 25 s per hour, hub, section and person; raw pings are kept 3 days only, migration_v74)
-select hub, count(distinct visitor_id) people, sum(n) * 25 / 60 mins from activity_hourly
-where h >= :since::date group by 1 order by 3 desc;
-select hub, coalesce(nullif(section, ''), '(none)') section, sum(n) * 25 / 60 mins, count(distinct visitor_id) people
-from activity_hourly where h >= :since::date group by 1, 2 order by 1, 3 desc;
+--    (activity_hourly: n pings of 25 s per hour, hub, section and person; raw pings are kept 3 days only, migration_v74).
+--    A :since more than a year back reaches days collapsed into activity_daily (no ids, migration_v93): their minutes count,
+--    and their people are the most on one day in one section (a floor).
+select hub, greatest(count(distinct visitor_id), max(people)) people, sum(n)::bigint * 25 / 60 mins from (
+  select hub, visitor_id, n, null::int people from activity_hourly where h >= :since::date
+  union all select hub, null, n, people from activity_daily where day >= :since::date) t
+group by 1 order by 3 desc;
+select hub, coalesce(nullif(section, ''), '(none)') section, sum(n)::bigint * 25 / 60 mins, greatest(count(distinct visitor_id), max(people)) people from (
+  select hub, section, visitor_id, n, null::int people from activity_hourly where h >= :since::date
+  union all select hub, section, null, n, people from activity_daily where day >= :since::date) t
+group by 1, 2 order by 1, 3 desc;
 -- features found by fewer than 3 people in the last 7 days
 select hub, target, count(distinct visitor_id) people from ui_click_reach
 where day >= current_date - 7 group by 1, 2 having count(distinct visitor_id) < 3 order by 1, 2 limit 80;
@@ -48,8 +54,10 @@ where s.attempts >= 20 and c.picks::float / s.attempts >= 0.4 order by c.hub, pc
 -- 5. Mock exams and drill since the last refresh
 select hub, count(*) mocks, count(distinct visitor_id) people, round(avg(100.0 * correct / total)) avg_pct
 from mock_scores where created_at >= :since::date group by 1;
-select hub, sum(n) * 25 / 60 drill_mins, count(distinct visitor_id) people from activity_hourly
-where h >= :since::date and section like 'drill/%' group by 1;
+select hub, sum(n)::bigint * 25 / 60 drill_mins, greatest(count(distinct visitor_id), max(people)) people from (
+  select hub, visitor_id, n, null::int people from activity_hourly where h >= :since::date and section like 'drill/%'
+  union all select hub, null, n, people from activity_daily where day >= :since::date and section like 'drill/%') t
+group by 1;
 
 -- 6. Did the last refresh's fixes work? Compare them with items that were as low and weren't fixed (2026-11-12: low items
 --    rise on their own, so a before/after alone says little). Replace :hub, :fixed_at (when the fixes went live, e.g.

@@ -245,10 +245,16 @@
     }
     // rim light: a thin bright line along the top of the body
     if (rich && t !== "antique" && t !== "stone" && (!S || S.rim)) over += '<path d="' + (S ? S.rim + '" fill="none' : "M50 -1.6 H122") + '" stroke="#fff" stroke-opacity="' + (t === "dark" ? ".35" : ".55") + '" stroke-width=".8" stroke-linecap="round"/>';
-    // moving glint (metals, diamond, dark matter)
+    // moving glint (metals, diamond, dark matter): a band of light crossing the metal, moved by a CSS transform, which the
+    // browser can do by itself. It was SMIL on the band's x, which no stylesheet stops and which made the browser draw the
+    // page again on every frame for as long as a shining medal was on it: Timmy's place's panel kept a slowed phone about
+    // two-thirds busy (2026-11-24, vault/reference/motion-cost.md). The same path and timing: 35% of the time crossing, then
+    // out of sight. Its keyframes ride in the drawing, so it shines wherever it is put (a page, a shadow root, an image).
     if (anim && tier >= 2) {
-      over += '<g clip-path="url(#' + p + 'clip)"><rect x="-40" y="' + (B ? B[1] - 10 : -30) + '" width="26" height="' + (B ? B[3] + 20 : 70) + '" fill="url(#' + p + 'sheen)" transform="skewX(-22)" opacity="' + (t === "dark" ? ".5" : ".9") + '">' +
-        '<animate attributeName="x" values="' + (B ? (B[0] - 50) + ";" + (B[0] + B[2] + 60) + ";" + (B[0] + B[2] + 60) : "-60;190;190") + '" keyTimes="0;.35;1" dur="' + (t === "diamond" || t === "dark" ? "3.6" : "4.6") + 's" repeatCount="indefinite"/></rect></g>';
+      var gx = B ? B[0] - 50 : -60, run = B ? B[2] + 110 : 250, gk = "sh-rank-gl" + String(run).replace(/\W/g, "_");
+      over += '<style>@keyframes ' + gk + '{0%{transform:translateX(0)}35%,100%{transform:translateX(' + run + 'px)}}</style>' +
+        '<g clip-path="url(#' + p + 'clip)"><g style="animation:' + gk + " " + (t === "diamond" || t === "dark" ? "3.6" : "4.6") + 's linear infinite">' +
+        '<rect x="' + gx + '" y="' + (B ? B[1] - 10 : -30) + '" width="26" height="' + (B ? B[3] + 20 : 70) + '" fill="url(#' + p + 'sheen)" transform="skewX(-22)" opacity="' + (t === "dark" ? ".5" : ".9") + '"/></g></g>';
     }
     if (S && S.top) over += S.top(p, rich, old);
     var K = S && S.sparks ? S.sparks : null;

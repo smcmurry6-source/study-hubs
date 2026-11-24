@@ -82,8 +82,15 @@ what v2.0 left, so it isn't lost. Its own track (Sam, 2026-11-06, [decisions](..
       complete dentures, a cantilever or resin-bonded bridge, an implant-supported bridge, and Occlusion's `CASE_IMG`
       pictures onto the kit; with the dentures, an overdenture abutment (a root-filled retained root under a denture, which
       v2.2's `roottip` refuses for now) and a provisional bridge (v2.2 has the provisional crown only)
-- [ ] More figures from the library as they're next touched: `widget/journeys.js`'s typodont (`TYPO`) still carries its own
+- [x] More figures from the library as they're next touched: `widget/journeys.js`'s typodont (`TYPO`) still carries its own
       copy of the size table and outlines, and the arcade's other tooth tiles (Pocket Showdown, Cross-Section) are drawn by hand
+      (2026-11-24: the typodont reads `widget/teeth.js`, which `handoff()` fetches, and draws the same 13,498 numbers as before;
+      Pocket Showdown's molars, Occlusion's Cross-Section molar and Perio's Cross-Section incisor are drawn from the library,
+      the incisor from its new proximal view)
+- [ ] The rest of the arcade's hand-drawn teeth onto the library when they're next touched: Mind the Pocket's tooth,
+      Million-Dollar Smile's teeth and the cards' crowns in `tools/figures/site/arcade.mjs` (the `TEETH` comment there)
+- [ ] The library's proximal view for canines, premolars and molars: `proxOutlineMM()` draws incisors only (Wheeler's
+      mesial aspect; the outline between his landmarks is schematic) and returns null for the rest
 - [ ] If Perio's page ever comes back, its eleven cases (in git before 6b32460) move onto modules with the same ids and keys
 
 ## Log
@@ -105,6 +112,10 @@ what v2.0 left, so it isn't lost. Its own track (Sam, 2026-11-06, [decisions](..
 - 2026-11-21: decay seen from the buccal (branch `claude/patient-box-buccal-decay`, on top of #526): the view's lesions, its
   restorations rechecked, the `caries` rests and validate rules, example 5. Ticked its box; added Sam's look and proximal root
   caries.
+- 2026-11-24: the typodont and the arcade's tooth tiles from the library (branch `claude/typodont-and-tiles-from-library`):
+  `buccalGroovesMM()` and the incisors' proximal view (`LL`, `proxOutlineMM()`) added to `widget/teeth.js`; the typodont's own
+  tables taken out of `widget/journeys.js`; Pocket Showdown and both Cross-Section tiles redrawn. Ticked its box; added the
+  arcade's other teeth and the proximal view for the other teeth.
 
 - 2026-11-24: Patient Box v2.2 ([#551](https://github.com/smcmurry6-source/study-hubs/pull/551), branch `claude/patient-box-v2-2`, from `main` at 6038dee): proximal root caries, root tips
   and retained roots, resorption, sealants, temporary fillings and provisional crowns, the clinical tests (`tests`), each call

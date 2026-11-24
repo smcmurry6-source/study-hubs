@@ -11,7 +11,8 @@
              and its keypad.
    - cloze:  Mind the Gap. A page of the notes with one term missing, the caret waiting, a pencil.
    - smile:  Million-Dollar Smile. Twelve rungs up to a gold-crowned smile, three lifelines.
-   - cross:  Cross-Section. A mini crossword beside a molar cut in section: enamel, dentin, pulp, the gum and the bone.
+   - cross:  Cross-Section. A mini crossword beside a molar cut in section: enamel, dentin, pulp, the ligament, the gum and
+             the bone (a mandibular first molar from the tooth library, 2026-11-24: sectionMolar).
 
    Heme & Endo Exam 2 (redesign phase 2; from its games and HEE2_SKIN, the pathology lab at night):
    - sort:   Lab Sort. Cards (a capsule, a drop of blood, a follicle) rain into two bins, one marked up, one marked down
@@ -28,21 +29,45 @@
    Perio (redesign phase 2; from its games and PERIO_SKIN, the perio clinic):
    - board:  Pocket Showdown. The game's board as a perio chart: a column per session under its colored head, molars in
              their gums for tiles, a probe in a pocket that bleeds, one tile answered right, a Deep Pocket star. Redrawn
-             2026-11-11 (Sam: the first one's teeth "look terrible"; the redraw approved the same day).
+             2026-11-11 (Sam: the first one's teeth "look terrible"; the redraw approved the same day); its molars from the
+             tooth library since 2026-11-24 (boardTooth: a mandibular second molar's facial face).
    - escape: Perio Clinic Escape. The clinic after hours: the panoramic viewer off, the locked charting computer, the
              chart, the typodont, the taped cassette, the door's keypad.
    - cloze:  Mind the Pocket. A page of notes with one term missing, beside a probe in a tooth's pocket.
    - smile:  Million-Dollar Smile. Twelve rungs up to a smile with healthy gums and one gold tooth.
-   - cross:  Cross-Section. A mini crossword beside an incisor cut in section in its bone and gum, a probe in the sulcus.
+   - cross:  Cross-Section. A mini crossword beside an incisor cut in section in its bone and gum, a probe in the sulcus
+             (a mandibular central incisor in the tooth library's proximal view, 2026-11-24: sectionIncisor).
    - crusher: Calculus Crusher. A wall of calculus bricks, one breaking, a ball and a curette for a paddle.
    - stage:  Stage & Grade (2026-11-17). A molar's film on the viewer, its bone crest lowered, a vertical defect and the
              furcation open, the root's thirds ruled beside it; the staging chart on a clipboard, one stage ticked and
              the grade's three tokens, the worst one circled. */
 import { INK, C, HI } from "./style.mjs";
 import { createRequire } from "node:module";
-/* the tooth library the Patient Box cases draw from (widget/teeth.js): Stage & Grade's film draws its molar from it, so the
-   arcade's tooth and a case's are the same tooth (Patient Box v2, Sam 2026-11-06: "Figures pull from the tooth catalogue too") */
+/* the tooth library the Patient Box cases draw from (widget/teeth.js): Stage & Grade's film, both Cross-Sections and Pocket
+   Showdown's tiles draw their teeth from it, so the arcade's tooth and a case's are the same tooth (Patient Box v2, Sam
+   2026-11-06: "Figures pull from the tooth catalogue too"). Mind the Pocket's tooth, Million-Dollar Smile's teeth and the
+   cards' crowns are still drawn by hand (a to-do in vault/tasks/2026-11-20-patient-box-v2-next-steps.md). */
 const TEETH = createRequire(import.meta.url)("../../../widget/teeth.js");
+/* the library's point lists as path data, closed or open */
+const ptsD = (a) => a.map((p) => p[0].toFixed(1) + " " + p[1].toFixed(1)).join(" L");
+const shut = (a) => "M" + ptsD(a) + " Z";
+const opened = (a) => "M" + ptsD(a);
+/* several outlines drawn as one, in ink: each one's stroke under all their fills, so only the outline of the whole shows
+   (a crown and its roots, a pulp chamber and its canals) */
+const merged = (parts, fill, w) => parts.map((p) => `<path d="${shut(p)}" fill="${INK}" stroke="${INK}" stroke-width="${w * 2}" stroke-linejoin="round"/>`).join("") +
+  parts.map((p) => `<path d="${shut(p)}" fill="${fill}"/>`).join("");
+/* a run of an outline moved toward a point by d px, for the highlight and shading along a crown's surface */
+const toward = (a, cx, cy, d) => a.map((p) => { const dx = cx - p[0], dy = cy - p[1], L = Math.hypot(dx, dy) || 1; return [p[0] + dx / L * d, p[1] + dy / L * d]; });
+/* a tooth from the library, crown up, the CEJ's corners at y = cej, cx its middle, k px a mm (mesial at the left): its crown
+   (C[0..iv] the outer surface), roots, the trunk between them, the dentin under the enamel and the pulp, in px */
+function libTooth(type, cx, cej, k){
+  const d = TEETH.XT[type], X = (x) => cx + x * k, L = TEETH.crownLoop(d, 6);
+  const crown = L.C.map((p) => [X(p[0]), cej - p[1] * k]), roots = TEETH.mkRoots(d, X, k, cej);
+  return { d, X, k, cej, cx, crown, iv: L.iv, roots, rootPts: roots.map((r) => TEETH.rootOutline(r, 0, cej, cej)),
+    trunk: d.tr ? TEETH.trunkPts(roots, 1, 0, cej - 1, cej + d.tr * k, k) : null,
+    dentin: TEETH.dejPts(crown, d, cx, cej - d.ch * k, cej, k), pulp: TEETH.pulpPts(d, X, k, cej, roots),
+    grooves: TEETH.buccalGroovesMM(d).map((g) => g.map((p) => [X(p[0]), cej - p[1] * k])) };
+}
 
 const ink = (w = 2.5) => `stroke="${INK}" stroke-width="${w}" stroke-linejoin="round" stroke-linecap="round"`;
 const line = (d, w = 2.5, col = INK) => `<path d="${d}" fill="none" stroke="${col}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round"/>`;
@@ -196,16 +221,34 @@ function cross(T){
     `<rect x="16" y="16" width="156" height="132" rx="8" fill="${C.paper}" ${ink(3)}/>` +
     cells.join("") + marks +
     `<rect x="22" y="22" width="144" height="120" fill="none" ${ink(3)}/>` +
-    /* the molar in section: bone, gum, two roots with their canals, dentin, enamel, the pulp chamber */
-    `<path d="M186 120 C196 112 278 112 300 120 L300 162 L186 162 Z" fill="${C.wood}" ${ink(2.5)}/>` +
-    [[200, 140], [226, 150], [264, 148], [288, 136]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="3" fill="${C.woodShade}"/>`).join("") +
-    `<path d="M202 70 C200 50 214 36 230 44 C236 36 250 36 256 44 C272 36 286 50 284 70 C282 92 276 102 272 112 C270 128 268 146 262 156 C256 158 252 150 250 136 C248 124 246 118 243 118 C240 118 238 124 236 136 C234 150 230 158 224 156 C218 146 216 128 214 112 C210 102 204 92 202 70 Z" fill="${C.goldLight}" ${ink(3)}/>` +
-    `<path d="M202 70 C200 50 214 36 230 44 C236 36 250 36 256 44 C272 36 286 50 284 70 C278 62 270 60 262 62 C256 56 250 56 243 60 C236 56 230 56 224 62 C216 60 208 62 202 70 Z" fill="${C.enamel}" ${ink(2.5)}/>` +
-    `<path d="M226 78 C226 70 236 68 243 72 C250 68 260 70 260 78 C260 88 256 96 254 100 C254 112 252 126 250 140 C248 126 246 110 243 104 C240 110 238 126 236 140 C234 126 232 112 232 100 C230 96 226 88 226 78 Z" fill="${C.pink}" ${ink(2)}/>` +
-    `<path d="M196 104 C206 96 214 100 216 108 M290 104 C280 96 272 100 270 108" fill="none" stroke="${C.gumShade}" stroke-width="3" stroke-linecap="round"/>` +
-    `<path d="M188 112 C196 100 208 100 215 108 L216 124 C206 118 196 118 188 124 Z" fill="${C.gum}" ${ink(2.2)}/>` +
-    `<path d="M298 112 C290 100 278 100 271 108 L270 124 C280 118 290 118 298 124 Z" fill="${C.gum}" ${ink(2.2)}/>` +
-    hi("M210 56 C212 50 216 46 222 46");
+    sectionMolar(243, 70, 6.2);
+}
+/* Cross-Section's molar, from the tooth library: a mandibular first molar cut through its crown and both roots at its true
+   proportions (Wheeler's, 6.2 px a millimeter, the CEJ at y 70): the enamel thinning to nothing at the CEJ over the
+   dentin (TEETH.dejPts), the pulp chamber with a horn under each cusp and a canal down each root (TEETH.pulpPts), the
+   ligament round the roots, the bone's crest 1.5 mm below the CEJ (the library's crest in health) and up between the roots
+   to the furcation, the gum's margin a little above the CEJ (about 1 mm in health: Newman and Carranza). */
+function sectionMolar(cx, cej, k){
+  const t = libTooth("manM1", cx, cej, k), crest = cej + TEETH.tooth(30).landmarks.crest * k, yM = cej - 1.1 * k;
+  const side = (y, sg) => TEETH.sideAt(y < cej ? t.crown : t.rootPts[sg < 0 ? 0 : 1], y, sg);
+  const x0 = 184, x1 = 302, bl = side(crest, -1), br = side(crest, 1);
+  const bone = `M${x0} 172 L${x0} ${crest + 14} C${x0 + 6} ${crest + 6} ${bl - 10} ${crest} ${bl - 1} ${crest} L${br + 1} ${crest} C${br + 10} ${crest} ${x1 - 6} ${crest + 6} ${x1} ${crest + 14} L${x1} 172 Z`;
+  /* the pores: two in each side of the bone and one between the roots, where there is room */
+  const gapY = 138, gl = TEETH.sideAt(t.rootPts[0], gapY, 1), gr = TEETH.sideAt(t.rootPts[1], gapY, -1);
+  const pores = [[x0 + 9, 128], [x0 + 12, 154], [x1 - 9, 130], [x1 - 13, 156]].concat(gr - gl > 9 ? [[(gl + gr) / 2, gapY + 4]] : []);
+  const pdl = t.rootPts.concat(t.trunk ? [t.trunk] : []).map((r) => `<path d="${opened(r.filter((p) => p[1] >= crest))}" fill="none" stroke="${C.pink}" stroke-width="11" stroke-linejoin="round"/>`).join("");
+  /* the gum each side: its margin on the enamel, down the tooth to the crest, over the bone and round its outer face */
+  const gum = (sg) => {
+    const m = [side(yM, sg), yM], c = [side(cej, sg), cej], a = [side(crest, sg), crest], o = sg < 0 ? x0 : x1, f = (x) => (o + sg * x).toFixed(1), F = (v) => v.toFixed(1);
+    return `<path d="M${F(m[0])} ${F(yM)} L${F(c[0])} ${cej} L${F(a[0])} ${F(crest)} C${F(a[0] + sg * 9)} ${F(crest)} ${f(-6)} ${F(crest + 6)} ${f(-1.5)} ${F(crest + 14)} ` +
+      `C${f(1)} ${F(crest - 7)} ${F(m[0] + sg * 15)} ${F(yM - 3)} ${F(m[0] + sg * 1.2)} ${F(yM - .4)} Z" fill="${C.gum}" ${ink(2.2)}/>`;
+  };
+  return `<path d="${bone}" fill="${C.wood}" ${ink(2.5)}/>` + pores.map(([x, y]) => `<circle cx="${x.toFixed(1)}" cy="${y}" r="3" fill="${C.woodShade}"/>`).join("") +
+    pdl + merged([t.crown].concat(t.rootPts, t.trunk ? [t.trunk] : []), C.goldLight, 3) +
+    `<path d="${shut(t.crown)}" fill="${C.enamel}"/><path d="${shut(t.dentin)}" fill="${C.goldLight}"/>` +
+    line(opened(t.dentin.slice(0, t.iv + 1)), 2) +
+    merged(t.pulp, C.pink, 1.8) +
+    gum(-1) + gum(1);
 }
 
 const build = (T) => ({
@@ -434,20 +477,33 @@ const BONE = C.enamelShade, PORE = C.woodShade;
 const OPT = ["#FFD84D", "#FF6FA3", "#43E0AC", "#B69CFF"];   // the games' four answer colors (the escape room's keypad slots)
 const star = (x, y, s = 1, fill = C.yellow) => `<path d="M${x} ${y - 7 * s} l${2.4 * s} ${5.2 * s} ${5.2 * s} ${2.4 * s} ${-5.2 * s} ${2.4 * s} ${-2.4 * s} ${5.2 * s} ${-2.4 * s} ${-5.2 * s} ${-5.2 * s} ${-2.4 * s} ${5.2 * s} ${-2.4 * s} Z" fill="${fill}" ${ink(1.6)}/>`;
 
-/* Pocket Showdown's tile: a molar crown standing in its gum (Perio's emblem tooth), its CEJ at 0,0, about 28 wide */
-const BOARD_TOOTH = "M-11 3 C-13.6 -3 -14.6 -10 -12.8 -15.4 C-11.2 -20.4 -6.8 -22.2 -3.8 -19.8 C-2.3 -18.6 -1.1 -18.2 0 -18.2 C1.1 -18.2 2.3 -18.6 3.8 -19.8 C6.8 -22.2 11.2 -20.4 12.8 -15.4 C14.6 -10 13.6 -3 11 3 L11 9 L-11 9 Z";
-const BOARD_SHADE = "M6.6 -20.2 C10.4 -20.6 13.4 -17.6 13.6 -12 C13.8 -6.6 12.6 -1.6 10.4 2.6 L7.6 2.6 C9.8 -2.8 10.6 -9.6 9.4 -14.6 C8.8 -17.2 7.8 -19 6.6 -20.2 Z";
-/* its gum: a rounded cuff hugging the neck, the margin lowest at the tooth's middle (the zenith) and rising to a papilla at
-   each side, its lower edge shaded */
-const boardGum = (x, y, fill = C.gum) =>
-  `<path d="M${x - 14.5} ${y - 6} C${x - 10} ${y - 4} ${x - 7} ${y + 1.5} ${x} ${y + 1.5} C${x + 7} ${y + 1.5} ${x + 10} ${y - 4} ${x + 14.5} ${y - 6} ` +
-  `C${x + 16} ${y - 3} ${x + 17} ${y + 3} ${x + 16.5} ${y + 8} Q${x + 16} ${y + 12} ${x + 12} ${y + 12} L${x - 12} ${y + 12} Q${x - 16} ${y + 12} ${x - 16.5} ${y + 8} ` +
-  `C${x - 17} ${y + 3} ${x - 16} ${y - 3} ${x - 14.5} ${y - 6} Z" fill="${fill}"/>` +
-  `<path d="M${x - 15.8} ${y + 7.4} C${x - 6} ${y + 9.6} ${x + 6} ${y + 9.6} ${x + 15.8} ${y + 7.4} Q${x + 15} ${y + 11.2} ${x + 12} ${y + 11.2} L${x - 12} ${y + 11.2} Q${x - 15} ${y + 11.2} ${x - 15.8} ${y + 7.4} Z" fill="${C.gumShade}"/>` +
-  `<path d="M${x - 14.5} ${y - 6} C${x - 10} ${y - 4} ${x - 7} ${y + 1.5} ${x} ${y + 1.5} C${x + 7} ${y + 1.5} ${x + 10} ${y - 4} ${x + 14.5} ${y - 6} ` +
-  `C${x + 16} ${y - 3} ${x + 17} ${y + 3} ${x + 16.5} ${y + 8} Q${x + 16} ${y + 12} ${x + 12} ${y + 12} L${x - 12} ${y + 12} Q${x - 16} ${y + 12} ${x - 16.5} ${y + 8} ` +
-  `C${x - 17} ${y + 3} ${x - 16} ${y - 3} ${x - 14.5} ${y - 6} Z" fill="none" ${ink(2)}/>` +
-  hi(`M${x - 13.6} ${y - 2} C${x - 14.4} ${y} ${x - 14.6} ${y + 2.4} ${x - 14.2} ${y + 4.6}`);
+/* Pocket Showdown's tile: a mandibular second molar from the tooth library, its facial face as a perio chart draws it (Wheeler's
+   crown, 3 px a millimeter, 31.5 wide: its mesiobuccal and distobuccal cusps and the buccal groove between them,
+   TEETH.buccalGroovesMM), its CEJ's corners at x, y and its neck going down into the gum; shaded along its distal side */
+function boardTooth(x, y, fill, shade){
+  const k = 3, t = libTooth("manM2", x, y, k), w = t.d.cv / 2 * k, F = (v) => v.toFixed(1);
+  const outer = t.crown.slice(0, t.iv + 1), body = outer.concat([[x + w, y + 9], [x - w, y + 9]]);
+  /* the shade: a crescent inside the distal outline, from the cervix over the distal cusp, widest at its middle */
+  const run = outer.filter((p) => p[0] > x + 5.5), n = run.length - 1;
+  const inner = run.map((p, i) => { const u = Math.sin(Math.PI * i / n); return [p[0] - (p[0] - x) * .42 * u, p[1] + (y - 9 - p[1]) * .14 * u]; });
+  /* the highlight down the mesial side */
+  const mes = outer.filter((p) => p[0] < x - 7 && p[1] < y - 6 && p[1] > y - 17).map((p) => [p[0] + 3.2, p[1]]);
+  return `<path d="${shut(body)}" fill="${fill}" ${ink(2.2)}/>` + `<path d="${shut(run.concat(inner.reverse()))}" fill="${shade}"/>` +
+    t.grooves.map((g) => line(`M${F(g[0][0])} ${F(g[0][1])} L${F(g[1][0])} ${F(g[1][1])}`, 1.6)).join("") +
+    `<path d="${shut(body)}" fill="none" ${ink(2.2)}/>` + (mes.length > 1 ? hi(opened(mes)) : "");
+}
+/* its gum: a rounded cuff hugging the neck, the margin lowest at the tooth's middle (the zenith, a little above the CEJ) and
+   rising to a papilla at each side, its lower edge shaded; s widens it to the tooth */
+const boardGum = (x, y, fill = C.gum, s = 1.1) => {
+  const X = (d) => (x + d * s).toFixed(1);
+  const cuff = `M${X(-14.5)} ${y - 6} C${X(-10)} ${y - 4.4} ${X(-7)} ${y - .8} ${x} ${y - .8} C${X(7)} ${y - .8} ${X(10)} ${y - 4.4} ${X(14.5)} ${y - 6} ` +
+    `C${X(16)} ${y - 3} ${X(17)} ${y + 3} ${X(16.5)} ${y + 8} Q${X(16)} ${y + 12} ${X(12)} ${y + 12} L${X(-12)} ${y + 12} Q${X(-16)} ${y + 12} ${X(-16.5)} ${y + 8} ` +
+    `C${X(-17)} ${y + 3} ${X(-16)} ${y - 3} ${X(-14.5)} ${y - 6} Z`;
+  return `<path d="${cuff}" fill="${fill}"/>` +
+    `<path d="M${X(-15.8)} ${y + 7.4} C${X(-6)} ${y + 9.6} ${X(6)} ${y + 9.6} ${X(15.8)} ${y + 7.4} Q${X(15)} ${y + 11.2} ${X(12)} ${y + 11.2} L${X(-12)} ${y + 11.2} Q${X(-15)} ${y + 11.2} ${X(-15.8)} ${y + 7.4} Z" fill="${C.gumShade}"/>` +
+    `<path d="${cuff}" fill="none" ${ink(2)}/>` +
+    hi(`M${X(-13.6)} ${y - 2.6} C${X(-14.4)} ${y - .4} ${X(-14.6)} ${y + 2.2} ${X(-14.2)} ${y + 4.6}`);
+};
 function pBoard(T){
   /* the game's own board (PERIO_SKIN): a perio chart, one column per session under its colored head, teeth for tiles */
   const cols = [48, 104, 160, 216, 272], rows = [64, 102, 140];
@@ -458,8 +514,7 @@ function pBoard(T){
   });
   rows.forEach((y, r) => cols.forEach((x, c) => {
     const right = r === 0 && c === 1, bled = r === 1 && c === 3;
-    parts.push(`<g transform="translate(${x} ${y})"><path d="${BOARD_TOOTH}" fill="${right ? "#E6FFF4" : C.enamel}" ${ink(2.2)}/>` +
-      `<path d="${BOARD_SHADE}" fill="${right ? "#BFEBD6" : C.enamelShade}"/>` + hi("M-9.6 -14 C-10.4 -10.6 -10 -7 -8.8 -4.4") + "</g>");
+    parts.push(boardTooth(x, y, right ? "#E6FFF4" : C.enamel, right ? "#BFEBD6" : C.enamelShade));
     parts.push(boardGum(x, y, bled ? "#F27596" : C.gum));
   }));
   /* the tile just answered right (a check over its crown), the one that bled on probing, and a Deep Pocket */
@@ -601,36 +656,46 @@ function pCross(T){
     cells.push(`<rect x="${x}" y="${y}" width="24" height="24" fill="${v === "1" ? INK : v === "2" && c === 3 ? T.light : C.paper}" stroke="${INK}" stroke-width="2"/>`);
   }));
   const marks = [0, 1, 2, 3, 4].map((r) => `<path d="M${100} ${40 + r * 24} L${106} ${30 + r * 24} L${112} ${40 + r * 24}" fill="none" stroke="${T.ink}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>`).join("");
-  const cx = 248, cej = 74, crest = 86, m = 66;
-  /* labial face to the left, lingual (with its cingulum) to the right */
-  const ROOT = `M${cx - 19} ${cej} C${cx - 18} 100 ${cx - 12} 128 ${cx - 2} 150 C${cx} 152 ${cx + 1} 152 ${cx + 3} 150 C${cx + 11} 128 ${cx + 16} 100 ${cx + 18} ${cej}`;
-  const TOOTH = `M${cx - 3} 14 C${cx - 12} 30 ${cx - 19} 48 ${cx - 20} 62 L${cx - 19} ${cej} ` + ROOT.slice(ROOT.indexOf("C")) +
-    ` C${cx + 20} 64 ${cx + 22} 56 ${cx + 14} 46 C${cx + 8} 38 ${cx + 4} 26 ${cx + 3} 14 Z`;
-  const ENAMEL = `M${cx - 3} 14 C${cx - 12} 30 ${cx - 19} 48 ${cx - 20} 62 L${cx - 19} ${cej} C${cx - 15} 56 ${cx - 9} 40 ${cx - 1} 22 C${cx + 2} 32 ${cx + 8} 44 ${cx + 14} 54 C${cx + 17} 60 ${cx + 18} 68 ${cx + 18} ${cej} C${cx + 20} 64 ${cx + 22} 56 ${cx + 14} 46 C${cx + 8} 38 ${cx + 4} 26 ${cx + 3} 14 Z`;
-  const PULP = `M${cx} 38 C${cx - 6} 52 ${cx - 7} 66 ${cx - 6} 84 C${cx - 5} 108 ${cx - 2} 132 ${cx} 146 C${cx + 2} 132 ${cx + 5} 108 ${cx + 6} 84 C${cx + 7} 66 ${cx + 5} 52 ${cx} 38 Z`;
-  /* the PDL: a pink band along the root, from crest to crest round the apex */
-  const PDL = `M${cx - 20} ${crest} C${cx - 18} 104 ${cx - 13} 130 ${cx - 2} 153 C${cx} 155 ${cx + 1} 155 ${cx + 3} 153 C${cx + 12} 130 ${cx + 17} 104 ${cx + 19} ${crest}`;
-  /* the alveolar bone, both plates joined below the apex */
-  const BONEP = `M${cx - 40} 170 C${cx - 38} 140 ${cx - 36} 110 ${cx - 22} ${crest} C${cx - 21} 104 ${cx - 15} 132 ${cx - 2} 156 L${cx + 3} 156 C${cx + 15} 132 ${cx + 20} 104 ${cx + 21} ${crest} C${cx + 34} 110 ${cx + 38} 140 ${cx + 40} 170 Z`;
-  /* the gum: its margin on the enamel a little above the CEJ, the sulcus, then attached to the tooth down to the crest
-     and over the bone */
-  const GUM_L = `M${cx - 21.5} ${m} C${cx - 21.5} ${m + 4} ${cx - 20.5} ${cej - 2} ${cx - 19.6} ${cej} L${cx - 20} ${crest} C${cx - 35} 110 ${cx - 38} 140 ${cx - 40} 170 L${cx - 52} 170 C${cx - 50} 140 ${cx - 46} 104 ${cx - 36} ${cej + 6} C${cx - 31} ${m + 2} ${cx - 26} ${m - 2} ${cx - 21.5} ${m} Z`;
-  const GUM_R = `M${cx + 20.5} ${m} C${cx + 20.5} ${m + 4} ${cx + 19} ${cej - 2} ${cx + 18.2} ${cej} L${cx + 19} ${crest} C${cx + 34} 110 ${cx + 38} 140 ${cx + 40} 170 L${cx + 52} 170 C${cx + 50} 140 ${cx + 46} 104 ${cx + 36} ${cej + 6} C${cx + 31} ${m + 2} ${cx + 26} ${m - 2} ${cx + 20.5} ${m} Z`;
-  const pores = [[cx - 30, 130], [cx - 33, 154], [cx - 26, 110], [cx + 28, 124], [cx + 31, 150], [cx + 12, 160], [cx - 10, 162]];
   return ground(C.sky) +
     `<rect x="16" y="16" width="156" height="132" rx="8" fill="${C.paper}" ${ink(3)}/>` +
     cells.join("") + marks +
     `<rect x="22" y="22" width="144" height="120" fill="none" ${ink(3)}/>` +
-    `<path d="${BONEP}" fill="${BONE}" ${ink(2.4)}/>` + pores.map(([x, y]) => `<circle cx="${x}" cy="${y}" r="2.4" fill="${PORE}"/>`).join("") +
-    `<path d="${PDL}" fill="none" stroke="${C.pink}" stroke-width="6" stroke-linecap="round"/>` +
-    `<path d="${TOOTH}" fill="${C.goldLight}" ${ink(2.6)}/>` +
-    `<path d="${ENAMEL}" fill="${C.enamel}" ${ink(2)}/>` +
-    `<path d="${PULP}" fill="${C.gum}" ${ink(1.8)}/>` +
-    hi(`M${cx - 9} 30 C${cx - 13} 38 ${cx - 16} 46 ${cx - 17} 54`) +
-    /* the probe, walked down the labial face into the sulcus */
-    probe(cx - 30, 0, cx - 21.2, cej - 3, 8, 0, T.mid) +
-    `<path d="${GUM_L}" fill="${C.gum}" ${ink(2.2)}/><path d="${GUM_R}" fill="${C.gum}" ${ink(2.2)}/>` +
-    hi(`M${cx - 30} ${cej - 2} C${cx - 36} ${cej + 4} ${cx - 40} ${cej + 14} ${cx - 42} ${cej + 26}`);
+    sectionIncisor(248, 68, 6.2, T);
+}
+/* Cross-Section's tooth, from the tooth library: a mandibular central incisor cut from labial (left) to lingual, as the library's
+   proximal view draws it (TEETH.proxOutlineMM: Wheeler's mesial aspect, 6.2 px a millimeter, the CEJ at y 68): its crown a
+   wedge with the incisal ridge lingual to the root's axis, the cingulum and the lingual fossa, the enamel thinning to the CEJ
+   over the dentin, the pulp narrowing to its horn and down the canal, the ligament round the root, the bone's crest 1.5 mm
+   below the CEJ, the gum's margin about 1 mm above it and attached down to the crest, and a probe walked down the labial
+   face past its crest of curvature into the sulcus, its marks at the tooth's own scale (a UNC 15's bands). */
+function sectionIncisor(cx, cej, k, T){
+  const d = TEETH.XT.manI1, o = TEETH.proxOutlineMM("manI1"), X = (x) => cx + x * k, F = (v) => v.toFixed(1);
+  const crown = o.crown.map((p) => [X(p[0]), cej - p[1] * k]), root = TEETH.mkProxRoot(d, X, k, cej), rootPts = TEETH.rootOutline(root, 0, cej, cej);
+  const dentin = TEETH.dejPts(crown, d, cx, cej - d.ch * k, cej, k), pulp = TEETH.pulpPts(d, X, k, cej, [root]);
+  const crest = cej + TEETH.tooth(25).landmarks.crest * k, yM = cej - 1.1 * k;
+  const side = (y, sg) => TEETH.sideAt(y < cej ? crown : rootPts, y, sg), bl = side(crest, -1), br = side(crest, 1);
+  /* the alveolar bone, its labial and lingual plates joined below the apex, and its pores */
+  const bone = `M${cx - 44} 172 C${cx - 43} 140 ${cx - 38} ${F(crest + 24)} ${F(bl - 1.5)} ${F(crest)} L${F(br + 1.5)} ${F(crest)} C${cx + 38} ${F(crest + 24)} ${cx + 43} 140 ${cx + 44} 172 Z`;
+  const pores = [[cx - 30, 132], [cx - 34, 156], [cx - 27, 110], [cx + 29, 126], [cx + 32, 152], [cx + 12, 162], [cx - 11, 164]];
+  const pdl = `<path d="${opened(rootPts.filter((p) => p[1] >= crest))}" fill="none" stroke="${C.pink}" stroke-width="10" stroke-linejoin="round"/>`;
+  /* the gum each side: its margin on the enamel, down the tooth to the crest, over the bone and round its outer face */
+  const gum = (sg) => {
+    const m = side(yM, sg), c = side(cej, sg), a = side(crest, sg), f = (x) => F(cx + sg * x);
+    return `<path d="M${F(m)} ${F(yM)} L${F(c)} ${cej} L${F(a)} ${F(crest)} L${F(a + sg * 1.5)} ${F(crest)} C${f(38)} ${F(crest + 24)} ${f(43)} 140 ${f(44)} 172 L${f(56)} 172 ` +
+      `C${f(55)} 140 ${f(50)} ${F(crest + 12)} ${f(39)} ${F(cej - 1)} C${f(33)} ${F(yM - 1)} ${F(m + sg * 7)} ${F(yM - 3.2)} ${F(m + sg * 1.4)} ${F(yM - 1.4)} ` +
+      `Q${F(m + sg * .4)} ${F(yM - .9)} ${F(m)} ${F(yM)} Z" fill="${C.gum}" ${ink(2.2)}/>`;
+  };
+  /* the probe: its tip in the sulcus just above the CEJ, its shaft clear of the labial crest of curvature */
+  const tipY = cej - .4 * k, tip = [side(tipY, -1) - 1.5, tipY];
+  const cy = cej - TEETH.LL.manI1[0] * 0 - .2 * d.ch * k, bulge = [side(cy, -1) - 4, cy];
+  const x0 = tip[0] + (bulge[0] - tip[0]) * tip[1] / (tip[1] - bulge[1]), len = Math.hypot(tip[0] - x0, tip[1]);
+  return `<path d="${bone}" fill="${BONE}" ${ink(2.4)}/>` + pores.map(([x, y]) => `<circle cx="${x}" cy="${y}" r="2.4" fill="${PORE}"/>`).join("") +
+    pdl + merged([crown, rootPts], C.goldLight, 2.6) +
+    `<path d="${shut(crown)}" fill="${C.enamel}"/><path d="${shut(dentin)}" fill="${C.goldLight}"/>` + line(opened(dentin.slice(0, o.iv + 1)), 2) +
+    merged(pulp, C.gum, 1.8) +
+    probe(+F(x0), 0, +F(tip[0]), +F(tip[1]), Math.round(len / k), 0, T.mid) +
+    gum(-1) + gum(1) +
+    hi(`M${F(cx - 46)} ${F(crest + 30)} C${F(cx - 48)} ${F(crest + 42)} ${F(cx - 50)} ${F(crest + 54)} ${F(cx - 51)} ${F(crest + 66)}`);
 }
 
 /* a lump of calculus: a rough rounded brick, speckled */
