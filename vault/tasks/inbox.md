@@ -141,7 +141,7 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   `sh_insights` (the admin page's Insights, every hub side by side), `get_hub_recap`, `tools/retro.sql` and `tools/lessons-daily.sql` read
   `activity_hourly` only, so a hub older than a year would show no time. Read `activity_daily` / `activity_visits_daily` (people per day,
   no ids) for days past the school year, or decide those hubs' numbers are only in their published recaps and `LESSONS.md`.
-  **Done** (2026-11-24, `migration_v101`, #PR): all four read `activity_daily` for the collapsed days' minutes; the per-person
+  **Done** (2026-11-24, `migration_v101`, #545): all four read `activity_daily` for the collapsed days' minutes; the per-person
   numbers, which totals can't give, are kept per hub (`insight_cards_kept`) by the nightly job the night a hub's first day is
   collapsed, and the Insights tab reads them from there ([insights-dashboard](../reference/insights-dashboard.md)). The migration
   is applied after the merge, at 1-5 am Central (`supabase/pending-migrations.txt` until it is).
