@@ -318,7 +318,7 @@
     { "id": "v23-ex-12", "pcase": "v23-implant-states", "rests": ["impl"],
       "stem": "A 64-year-old: the gum around her back implant bleeds when she brushes. From the chart, the film and the box, what is #30's diagnosis?", "choices": ["Peri-implantitis", "Peri-implant mucositis", "Peri-implant health", "A failed implant"], "answer": 0,
       "why": [
-        "Right: #30 bleeds at every site and suppurates at its mesial sites, its pockets are 6 to 7 mm, and its bone is 5 mm below the platform where the film at the crown's delivery had it at 1.5: 3.5 mm lost, past the initial remodeling (under 2 mm). Bleeding or suppuration with bone loss beyond remodeling is peri-implantitis (the 2017 World Workshop).",
+        "Right: #30 bleeds at every site and suppurates at its mesial sites, its pockets reach 6 to 7 mm at the line angles, and its bone is 5 mm below the platform where the film at the crown's delivery had it at 1.5: 3.5 mm lost, past the initial remodeling (under 2 mm). Bleeding or suppuration with bone loss beyond remodeling is peri-implantitis (the 2017 World Workshop).",
         "Mucositis bleeds without bone loss beyond the initial remodeling. #30 has lost 3.5 mm since its crown went on.",
         "That is #29: no bleeding, 2 to 3 mm probings, and its bone where it was at delivery.",
         "A failed implant is mobile, or has lost more than half its length of bone, or has a radiolucent line all round it. #30 is not mobile and keeps bone along most of its 11.5 mm."
