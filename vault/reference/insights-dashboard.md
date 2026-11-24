@@ -29,6 +29,15 @@ Part of [analytics governance](analytics-governance.md).
   flagged only past 20 retries (`minRetries`).
 - All time, per hub. Time reads `activity_hourly` (one ping = 25 s), answers read `personal_answers`; caveats in
   [analytics-data-quality](analytics-data-quality.md).
+- **A hub older than a year** (from about 2027-09-13; `migration_v101.sql`): the nightly job collapses each day the night it
+  turns a year old into `activity_daily`, with no person in it ([analytics-retention](analytics-retention.md)). The hub's
+  time (total minutes, first and last day, the last 3 days, Where time goes) still counts every day, from both tables. Its
+  per-person numbers (People, Answered, Under 5 min, 3+ days, Median time and answers, a surface's people, the check-ins'
+  median) can't be worked out from totals, so the job keeps them in `insight_cards_kept` the night the hub's first day is
+  collapsed, and the tab reads them from there: the hub's row says "per person as of <that day>" (`per_person_kept_on`;
+  `collapsed_through` is the last day kept only as totals). Someone who first studies a hub after that night isn't in its
+  per-person numbers; no hub has been used that long yet. The recap (`get_hub_recap`) does the same for its minutes,
+  sections and modes; its hours of the day, regulars and awards count only the days still kept, and its image says so.
 
 ## The cards
 

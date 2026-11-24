@@ -1841,6 +1841,8 @@ table.data.tm-table td.lbl{white-space:nowrap;}
       var q = pick && byId[pick.qid], question = q && q.text ? { text: q.text, answer: q.answer } : null;
       recapCanvas = document.createElement("canvas");
       var footnote = String(R.first_day) < "2026-09-25" ? "Time before Sep 25 counts at most 3 hours per sitting, so tabs left open don't inflate it." : "";
+      /* migration_v101: days past the school year are daily totals with no person in them */
+      if (R.collapsed_through) footnote = "Days through " + String(R.collapsed_through) + " are kept as totals: the hours of the day and the awards count only later days.";
       recapBuilt = { hub: hub, R: R, title: $("#rcTitle").value, color: HUB_COLOR[hub], names: $("#rcNames").checked, question: question, footnote: footnote };
       window.shRecap.draw(recapCanvas, R, { title: recapBuilt.title, color: recapBuilt.color, names: recapBuilt.names, question: question, footnote: footnote });
       recapCanvas.setAttribute("role", "img"); recapCanvas.setAttribute("aria-label", "Recap image for " + $("#rcTitle").value);
@@ -1946,7 +1948,9 @@ table.data.tm-table td.lbl{white-space:nowrap;}
       if (fa) F.activation.push(name + " " + act + "%"); if (fb) F.bounce.push(name + " " + bounce + "%"); if (fr) F.returning.push(name + " " + ret + "%");
       if (fc) F.cram.push(name + " " + h.last3_pct + "%"); if (fd) F.depth.push(name + " " + h.median_answers);
       var ex = h.exam ? "exam " + esc(h.exam) : "";
-      return '<tr><td class="lbl">' + hubName(h.hub) + '<span class="sub2">' + ex + (h.first_day ? " · " + esc(h.first_day) + " to " + esc(h.last_day) : "") + '</span></td>' +
+      /* migration_v101: a hub whose oldest days are past the school year reads its per-person numbers from the card the nightly job kept */
+      var kept = h.per_person_kept_on ? " · per person as of " + esc(h.per_person_kept_on) : "";
+      return '<tr><td class="lbl">' + hubName(h.hub) + '<span class="sub2">' + ex + (h.first_day ? " · " + esc(h.first_day) + " to " + esc(h.last_day) : "") + kept + '</span></td>' +
         nCell(fmtNum(p)) + nCell(act == null ? null : act + "%", fa, fmtNum(h.answerers)) + nCell(bounce == null ? null : bounce + "%", fb) +
         nCell(ret == null ? null : ret + "%", fr) + nCell(fmtMin(h.median_mins), false, "p90 " + fmtMin(h.p90_mins)) +
         nCell(h.median_answers == null ? null : fmtNum(h.median_answers), fd) + nCell(h.last3_pct == null ? null : h.last3_pct + "%", fc) +

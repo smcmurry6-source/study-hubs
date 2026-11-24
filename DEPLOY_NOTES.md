@@ -32,6 +32,20 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-24 (The year-spanning readers read the totals, migration_v101, Claude Code)** — The to-do "Before the first
+  collapse (about 2027-09-13), point the year-spanning readers at the totals". From the night a day turns a year old, the
+  nightly job collapses its per-person hours into `activity_daily` (migration_v93), and the Insights tab (`sh_insights`), the
+  recap (`get_hub_recap`), `tools/retro.sql` and `tools/lessons-daily.sql` read `activity_hourly` only: a hub's oldest days
+  would have dropped out, and a hub older than a year out of Insights altogether (its people falling under 5). Now all four
+  add the collapsed days' minutes from `activity_daily`, worked out from pings so a day gives the same numbers before and
+  after. What totals can't give (a hub's people, one day / 3+ days, median and p90 minutes, median answers, a surface's
+  people, the check-ins' median) the job keeps per hub in `insight_cards_kept` the night its first day is collapsed, and
+  Insights reads it from then on ("per person as of <day>" on the hub's row); the recap's hours of the day, regulars and
+  awards count the kept days, and its image says so. Nothing has been collapsed yet, so nothing needed filling in.
+  `tools/release/retention.js` checks a partly collapsed hub's Insights line, surfaces, check-ins and recap are the same
+  before and after. **Applied after the merge**, 1-5 am Central (in `supabase/pending-migrations.txt` until then). How:
+  [insights-dashboard](vault/reference/insights-dashboard.md), [analytics-retention](vault/reference/analytics-retention.md).
+
 - **2026-11-24 (The preview's two small bugs, BUG-107 and BUG-039, Claude Code)** — Preview only, nothing on the live
   site changes. (1) The preview's dashboard drew Timmy at 0 HP for the returning, missed and high-XP test accounts until a
   hub had been opened, because the made-up answer history was built from the hub page's own question list: the preview's
