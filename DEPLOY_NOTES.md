@@ -32,6 +32,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-24 (Lessons refresh: 52 answer keys in Review of Systems, Claude Code)** — Ten "keyed wrong" reports in a day led to a read of all 1,369 keys against their explanations and why lines (seven agents, a course or two each): 51 of Head & Neck's 68 single-answer items and `f1-biomol-03` pointed one choice past the right answer, wrong since the build (#480), every one by exactly one place; fixed in `hubs/review-of-systems/content/questions.json`. `tools/data-fixes/2026-11-24-review-of-systems-keys.sql` recounts their `question_stats` from `question_choices` after the merge (tested twice on a throwaway copy); After merge loads the new keys. Also: when troponin reaches the blood (`f2-genpath-20`, its notes and cram line), the panoramic chin-down error (`rd-anatomy-07` and its notes), and small slips in seven why lines and explanations. Listen with the device voice: BUG-199. `LESSONS.md` refreshed (Live signals, the game economy, a standing lesson on reading keys before a drafted bank ships).
 - **2026-11-24 (A faster shop and a lighter Timmy's place, Claude Code)** — Two inbox lines, measured at 4x CPU as
   [motion-cost](vault/reference/motion-cost.md) does. **The shop's opening:** of the three suspects none was most of it:
   `mount()` in `widget/shop.js` drew every shelf twice on each first open (the cached shop, then the server's, which always
@@ -58,7 +59,6 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   (`sectionMolar()`, a lower first molar in its bone, ligament and gum) and Perio's Cross-Section (`sectionIncisor()`, a lower
   central incisor from the side with its probe) are drawn from the library; built into `tools/preview/design/art.js` only,
   since neither hub's page is up. Nothing students see changes.
-
 - **2026-11-24 (The year-spanning readers read the totals, migration_v101, Claude Code)** — The to-do "Before the first
   collapse (about 2027-09-13), point the year-spanning readers at the totals". From the night a day turns a year old, the
   nightly job collapses its per-person hours into `activity_daily` (migration_v93), and the Insights tab (`sh_insights`), the
@@ -72,7 +72,6 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   `tools/release/retention.js` checks a partly collapsed hub's Insights line, surfaces, check-ins and recap are the same
   before and after. **Applied after the merge**, 1-5 am Central (in `supabase/pending-migrations.txt` until then). How:
   [insights-dashboard](vault/reference/insights-dashboard.md), [analytics-retention](vault/reference/analytics-retention.md).
-
 - **2026-11-24 (The preview's two small bugs, BUG-107 and BUG-039, Claude Code)** — Preview only, nothing on the live
   site changes. (1) The preview's dashboard drew Timmy at 0 HP for the returning, missed and high-XP test accounts until a
   hub had been opened, because the made-up answer history was built from the hub page's own question list: the preview's
@@ -98,7 +97,6 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   Central on 2026-11-22 (md5-checked before and after), then the 50,000 given: the balance went up 50,000, XP and rank
   stayed. `tools/economy.sql` E3 leaves gifts out of the share spent. `tools/release/xp.js` section 19 tests it. How:
   [game-server](vault/reference/game-server.md).
-
 - **2026-11-22 (Smoother scrolling, and nothing you can see pauses, Claude Code)** — Sam: "Is there a way that we can make the
   performance better for the dashboard when scrolling and in timmys shop and such?", then "I also hate that animations
   pause". The 2026-11-14 fix (BUG-147) made the drawings rest: 8 s of motion, frozen while scrolling or touching, the shop's
@@ -116,7 +114,6 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   dashboard with everything moving takes about what `main` took with everything frozen (20/24 ms a frame on phone/laptop,
   `main` 19/20). This cloud browser has no graphics card, so the compositor's share couldn't be measured: check on a real
   phone. [motion-cost](vault/reference/motion-cost.md), [decisions](vault/decisions.md).
-
 - **2026-11-22 (Review of Systems against the professors' slides and recordings; Ask Timmy reads one course, Claude Code)** —
   Sam uploaded the courses' slides and some recordings' transcripts. One reviewer per part checked it and wrote a proposal
   (exact edits, new questions, hints, retirements, calls for Sam), merged in order, slides before recordings:
@@ -144,7 +141,6 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   Deploys itself after the merge (After merge: Ask Timmy's function changed). The page's download budget
   (`tools/release/budgets.json`) went from 1,500 to 1,800 KB (Sam: "a budget raise is fine"): about 1,605 KB with the slides, drawn by about 2.7 s. The
   real-model eval wasn't run (Sam: "dont worry about the eval, its a waste").
-
 - **2026-11-22 (The exam-eve boss, the Midnight Plaque, idea board #4, Claude Code)** — Sam set the idea Planned ("This could
   be fun. Maybe have an xp + gold crowns reward"), then, on the PR's numbers: "open it from 3pm to midntight, hp is good, pay
   is good, he can also have a card below the today card on the question bank". The night before every exam in `hubs.js`, 3 pm to midnight Central, one
@@ -240,7 +236,6 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   Central on 2026-11-21, Sam's call), md5-checked, with trials on the live data first; Genetics (1,907 answers) and
   Hepatobiliary (9,974) packed, then compacted: the database 293 MB, `personal_answers` 84 → 69 MB, `xp_awards` 27 → 19 MB
   (the task's Log). Most hubs come due about 2026-12-19; their compaction is a box in the task.
-
 - **2026-11-22 (Shorter windows for the analytics, `migration_v95.sql`, Claude Code)** — Package 1 of
   [the plan for years](vault/tasks/2026-11-22-sustainable-for-years.md) (Sam: "Okay all that is good to me"). `hubs_down`
   (hub, the Central day its page came down) is written by the After merge workflow's `down` step (`tools/after-merge/run.js`;
@@ -1213,175 +1208,6 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   archived dialog whenever it comes (it never closed it on the engine's pages, so every run failed from 10 pm on 11-16, `main`
   included), expects no Ask icon on an archived hub (Timmy isn't there, `hub-timmy.js`), and checks Timmy Time's minute on a hub
   whose audio is still up.
-- **2026-11-16 (Occlusion Question Bank, Codex)** — Restored **What cusp hits where?** at the top of the base Question Bank (`/hubs/occlusion/#questions`): students can choose **Contacts** or **Movements**, and the existing best-score behavior remains. The game had survived the redesign in the generated figures code, but its mount point had been removed. It is intentionally absent from Learn, Flashcards, Daily drill, Yesterday's misses, Weak spots and the mock; the Occlusion-only `SH_HUB.bank.cuspGame` configuration makes that explicit. `tools/ci/smoke.js` now holds that placement and launcher behavior.
-- **2026-11-16 (Occlusion, Claude Code)** — Sam: "fix the open reports in occlusion, send the replies, and merge." The
-  drawn figures' base styles (letter pins, lines, labels: `.fg-pin`, `.fg-line`, `.fg-t`...) had been left behind on the old
-  page at the redesign's release, so the A-D pins were black dots (unreadable in dark mode); restored in
-  `tools/figures/occlusion/od.css` and rebuilt. `mo-orth-occ` rewritten (two choices were the same words swapped) and
-  `nc-tf-4` reworded to Dr. Lawson's "night guard". Reports 45-48 resolved with replies.
-- **2026-11-16 (Heme & Endo Exam 3 hub, Claude Code, #379)** — Sam: "create the hub for endo exam 3. you can reuse the art
-  that was made for endo exam 2. also, the lecture from dr taylor was moved from exam 2 to exam 3. you can reuse what was
-  made for his lecture for this exam". New hub `hubs/heme-endo-exam3/` on the engine (Exam 3, Fri 11/20, 8:00-9:30 am, 35
-  questions, new material only), **285 questions** over five lectures: **A** Dental endocrinology (Dr. Taylor) brought over
-  whole from Exam 2 (58 questions, same `dc-` ids, hints, topics, tables; `vault/tasks/done/2026-11-10-heme-endo-exam3-carry-lecture-a.md`),
-  **L17** Pregnancy and lactation and **L18** Estrogens and androgens from their slides and recordings (58 and 59 questions,
-  16 quoted hints each), **L19** Introduction to hematology and **L20** Lymphomas and leukemias from their slides (55 each;
-  taught Tue 11/17). Every format the rules ask for, every choice with its why, 53 High Likelihood topics, review tables,
-  Side by side, processes and Lab Sort sets, a 25-question mock (5 per lecture, at the exam's pace). Narration: As taught and
-  Plain English for all five, High yield for A. **Art and arcade are Exam 2's, reused** (Sam's exception to
-  every-hub-gets-its-own-art): `tools/figures/site/` gives the hub Exam 2's tint, emblem, masthead and medal
-  (`widget/hub-art/heme-endo-exam3.js`), `widget/ranks.js` its medal, and Exam 2's Cycle Arcade is `content/arcade.js` with
-  this hub's scores (the Path Lab Escape moved to the week of Exam 3). Wired into `hubs.js` (first card), `sw.js` (`HUBS`,
-  `sh-v61`), the admin page's and recap's labels, `budgets.json`, the About page's arcade entries, and CI's figure check.
-  **Not done, merged early because Sam was running out of usage** ("merge before i run out of usage, we can finish the rest
-  when it resets"): the 22 figures Sam approved (drafts in `tools/figures/heme-endo-exam3/drafts/`) and High yield
-  narration for L17-L20 (`vault/tasks/2026-11-16-heme-endo-exam3-figures.md`); L19 and L20 to taught and L21 and L22, whose
-  slides weren't posted (`vault/tasks/done/2026-11-16-heme-endo-exam3-l19-l22.md`). Not used (graded-coursework): the Exam 3 Anki
-  deck in Drive, "Resources from D3s", Quiz 4 (open until 11/19). Hub note: `vault/hubs/heme-endo-exam3.md`.
-- **2026-11-16 (Time in Learn and in Flashcards, told apart from the Question Bank, Claude Code, [#381](https://github.com/smcmurry6-source/study-hubs/pull/381))** — Sam asked
-  "do we have tracking for how people do questions between the bank, learn, and flashcards", then "i want to see where people
-  spend the most time between the three", then "yes do it. merge when ready". Nothing students see changes. The engine logged
-  all three as `compendium/bank`, so the admin page's time by section couldn't split them (a first day's estimate from answer
-  and rating timing: about 94% of the time in the bank, 5% in Learn, under 1% in Flashcards). Now `section()` in
-  `widget/hub.js` sends `compendium/learn` or `compendium/cards` while the bank is studied as Learn or Flashcards (on any set
-  but the mock, the launcher and the full-screen session alike), and `migration_v59.sql` (applied through the connector)
-  replaces `sh_surface()` with the surfaces `learn` and `cards`, and places the redesign's other sections the lessons audit
-  found unplaced (`compendium/drill` and `compendium/misses` as `drill`, `more/timmy` as `podcast`, the rest of More as a
-  new `more`; days already recorded are placed too). It also keeps Learn's answers as context `learn` in `answer_xp`
-  (they were `other`; nothing pays by it). The admin page's Insights → "Where time goes" has Learn, Flashcards and More
-  columns. Tests: `tools/release/admin-ops.js` checks 26 section names, `tools/release/xp.js` Learn's context and pay.
-  Bundles rebuilt; the event taxonomy, game-server, Insights notes, decisions and the inbox (two lines ticked) updated.
-- **2026-11-15 (Perio: `q7-07` retired, Claude Code, the lessons audit's follow-up)** — Report #44 ("too many details for a
-  non-MC question"): `q7-07` was a self-graded recall card listing the immune changes smoking causes, which `q7-03` and
-  statement 2 of `q7-N03` already ask; the final has no recall items, and the bank audit's own rule retires a recall card that
-  repeats a scored item's fact. Sam: "retire it". Out of `questions.json` and the smoking topic's `ids` (core.json and the seven
-  questions that carry a copy); `q7-07 retired` in `tools/question-ids/perio.txt`; 670 → 669 questions. S7's High yield
-  ("8 questions in the bank" → 7) recorded again (`audio/implants-perio-hy.mp3` and its words file). The class's numbers on
-  the other questions are untouched (nothing moved).
-- **2026-11-16 (PCD Implants Exam 1, MSK Exam 3 and GI Exam 2 check-ins closed, Claude Code)** — Sam: "close the check
-  ins for implants, musculoskeletal 3, and gi 2". `checkinClosed:true` on each exam in `hubs.js` (`pcd-implants-exam1`,
-  `msk-exam3`, `hepatobiliary`); `pastExams()` in `widget/dash.js` skips them, so they leave the Exam check-ins panel in
-  Past hubs and the pop-up no longer goes out. Answers already sent stay on `review/` → Check-ins. The hub pages, their
-  recaps and the other open check-ins (Heme & Endo Exam 2, the Occlusion midterm and final) are unchanged.
-- **2026-11-15 (Question Bank: 50, 100, 200 or all at a time, every card numbered, Claude Code, #373)** — Sam: "Lets implement the numbering of
-  the questions in the question bank idea" (a classmate: "adding question numbers so we know how many more are left ... if
-  it's like 80+ questions I'm not just scrolling forever and I could maybe take a break when I hit #40"; also on the idea
-  board), then "I want the questions to be shown in intervals of 100 unless there are less questions than that in the
-  filter. Showing all 844 feels unmanageable", then "an option by the filters with how many questions to show at a time.
-  50/100/200/all questions". **At a time**, beside Order in the panel: 50, 100 (to start), 200 or All (`STATE.ui.qsize`). A
-  longer list is shown a set of that size at a time: above it, "Questions [101–200] of 845" with Previous, Next and a
-  picker for any set (`.qsets`); at the end of a set, "That's questions 1–100 of 845" and **Next 100 questions**, which goes
-  to the top of the next set. Every card starts with **"Question 12 of 100"**, its place in the set (fewer than the size,
-  one set: "of 84"; All: "of 845"). Inside a set the cards still come fifty at a time and
-  load by themselves (Sam's 11-14 call). The bank keeps its place while the filters stay the same (`STATE.ui.qpage`, the
-  set's first question, so a new size keeps it: 101–200 becomes 101–150), except
-  Not answered yet and Missed last time, which start at their first set. The Daily drill counts the ones done today (with 5
-  done, its first card left is "Question 6 of 20"); Yesterday's misses and Weak spots count from 1; the mock's existing
-  "Question n" gains "of N". "Try it again" keeps the number; the missed question that comes back a few cards later has
-  none; Learn and Flashcards keep their own progress. New events `bank:size=` and `bank:page=next|prev|pick|end`. `widget/hub-bank.js`
-  (`qNum()`, `setsBar()`, `toSet()`, `page()`), `widget/hub.css` (`.qc-n`, `.qsets`, `.qset-end`), bundles rebuilt.
-  Found in testing and fixed: BUG-154 (the number crowded the lecture chip on a narrow phone) and BUG-155 (Next 100 left a
-  phone at the bottom of the new set: scroll anchoring). The single-file engines weren't touched: every hub still on one is
-  archived. About page ("Questions"), the bank's rule note, decisions, the event taxonomy and the inbox updated. **After the
-  merge** (the After merge workflow, #375): Ask Timmy deployed again for the About page's new words
-  (`supabase/functions/timmy/site.json`), the post-check, and the changelog lines for Occlusion and Perio
-  (`tools/after-merge/changelog.txt`).
-- **After merge: the after-merge steps run by themselves (2026-11-15, Claude Code)** — Sam: "for the after the merge, lets
-  make all of that automatic." A new workflow, **After merge** (`.github/workflows/after-merge.yml`), runs
-  `tools/after-merge/run.js` on every push to `main`. The script works out from git what the push changed and does only
-  what that needs:
-  - **answer keys:** a changed hub bank's keys load;
-  - **Ask Timmy:** the function deploys when `supabase/functions/timmy/` changed, then gets one real question (it fails on
-    a nap);
-  - **Timmy Time:** a new episode (or a new length) is registered;
-  - **pages:** it waits up to 15 minutes for GitHub Pages to serve the push;
-  - **data fixes:** a fix the push added to `tools/data-fixes/` runs once, after the pages are live;
-  - **changelog:** each line the push added to `tools/after-merge/changelog.txt` (`<hub> | <message>`, the new home of
-    the changelog line) is logged;
-  - **post-release check:** `postcheck.js` runs.
-
-  Each run's summary is a table of the steps. A missing secret shows as "blocked", and either a blocked or a failed step
-  turns `main` red. The secrets go in the repository's `after-merge` environment, limited to `main`, so no pull request's
-  workflow can read them; **Sam adds them once** (the inbox). The logs are public, so it prints no secret and no row of
-  data. `tools/after-merge/test.js` checks the plan on made-up pushes in "Check hubs". It was dry-run on #361, #366, #369
-  and #371, and every plan matched what those merges needed.
-  **First real run, by hand, for #370:** 845 Occlusion keys loaded, Ask Timmy version 6 (its question answered), Pages
-  live in 61 s, both data fixes run (#370's and the 11-14 `in-bennett` one, which had never run), the post-release check
-  passed, and the changelog line logged. Docs: [after-a-merge](vault/how-to/after-a-merge.md), ship-a-change steps 3, 7
-  and 8, build-a-hub's answer keys, ask-timmy, secrets, the release plan, the PR template, and the podcast and
-  lessons-audit skills. **Not automated:** migrations.
-- **2026-11-15 (the Plaque Boss gets its own band on the redesign's hubs, Claude Code)** — Sam: "Refine the question bank
-  monsters ui appearance. It looks like its messing up other buttons." Since the release, the boss docked itself inside the
-  engine's top bar (`widget/eggs.js` `bossDock()` found the page's sticky `<header>`, the bar's one row of buttons): on a
-  phone it squeezed the bottom tabs to 4-11 px with their labels piled up, on a laptop it ran off the screen
-  ([BUG-153](vault/release/bug-log.md)). Now, on Occlusion and Perio, it is a band of its own right after the top bar (laptop,
-  tablet) or the top strip (phone), sticky under it and moved when a phone turns (`placeBoss()`), tinted with the boss's
-  own color in the engine's type and tokens (`widget/hub.css` `.sh-egg-boss.is-band`: face, name, HP bar, HP, its line on
-  a laptop, a 32 px ×). While it's up, eggs.js sets `--boss-h` on the page, and what sticks under the bar moves down by it
-  (the lecture list, the bank's side panel, the mock's clock, a pinned figure, Ask Timmy's panel in `widget/ask.css`). The old
-  single-file hubs' docked strip is unchanged. Bundles rebuilt; About page's Plaque Boss line reworded. No schema change.
-- **Occlusion: the final's question bank audited, and a mock that leans on High likelihood (2026-11-15, Claude Code, [#370](https://github.com/smcmurry6-source/study-hubs/pull/370))** — Sam:
-  "audit occlusions question bank to see if we can make it higher yield ... accurate, with good answer options and sufficient
-  explanations", then "make sure the exam hints are utilized as best as possible". Every L6-L10 question checked against the
-  notes and the Exam Hints. **156 questions fixed** in place (ids kept): 4 that the notes contradict ([BUG-152](vault/release/bug-log.md):
-  `cs-in-crown-lab`'s case, `nc-sel-acid`, `mo-histo`, `ot-sel-clin`), keys that were the longest choice trimmed, giveaway and
-  arguable distractors rewritten, whys and explanations completed, professors' words quoted where a hint backs the point. **Every
-  emphasized hint is now tested**: 4 new questions (`in-worth`, `mo-joint-load`, `mo-splint-cause`, `dn-wf-skel`), weak ones
-  re-aimed, 3 new High likelihood topics for L7's orphan hints (the splint as an environment of healing, painless wear, a
-  traumatic force), and topics renamed, added to and trimmed across L6-L10 (63 in all). **Retired** on Sam's call: `mo-better-q`,
-  `mo-swim`, `in-2s-4` (kept: `mo-bell`, `mo-occupational`, `ot-tf-4`, `ot-tf-5`, `dn-tf-6`). 845 questions. **The mock**: 7 of each
-  lecture's 9 from its High likelihood questions (Sam: "mostly high likelihood. Like 75%"): `core.mock.likelyShare` (0-1),
-  read by `buildMock()` in `widget/hub-bank.js` for any hub that sets it, each side unseen and missed first, topped up from the
-  other side when short (L10 is all High likelihood: 9 of 9). The mock's blurb and the About page's High Likelihood entry say
-  so; Ask Timmy's site help rebuilt. High yield rebuilt and **recorded again for all five final lectures**. Class data:
-  `tools/data-fixes/2026-11-15-occlusion-audit.sql` (73 rewritten choices' picks, 8 re-aimed questions' "% right", recounted
-  from the new versions' answers) runs once after the merge. Sam's calls on its two open questions: the splint follows Dr. Givan's slides, and L10 keeps "Miller" as
-  Dr. Abou-Arraj's slide has it ([decisions](vault/decisions.md)); after-merge steps: [the inbox](vault/tasks/inbox.md);
-  what the next audit needs to know: "The final's bank audit" in [the hub note](vault/hubs/occlusion.md).
-- **2026-11-15 (Perio: the question bank audited for the final, Claude Code)** — Sam: "audit perios question bank to see
-  if we can make it higher yield ... accurate, with good answer options and sufficient explanations. Make sure the exam
-  hints are utilized as best as possible." Every question was read against its session's notes, hints, review tables
-  and cram lines (one reviewer per session, every proposal checked against the notes before it went in). **750 → 670
-  questions**: 263 edited in place (30 accuracy fixes to explanations, why lines or choices, e.g. `q8-03`'s second right
-  answer, `q9-07`'s Type 1B treatment, `q6-L07`'s "well contained"; 113 answer-choice fixes for giveaways and
-  throwaways; 85 thin explanations; 22 clarity; 13 format, such as 2- and 3-pair matching items brought to 4), 103
-  retired under Sam's "not more than twice" bar (76 repeats, counting statements and across sessions; 27 trivia with no
-  exam signal), 23 new (`q<n>-F01`..., 8 select-all and 5 matching, the final's formats) where an emphasize hint had no
-  question on its own point. Two new High likelihood topics (S4), none removed; 460 questions tagged (was 424). The
-  key is the longest choice in 15% of MCQs (was 24%). Notes, hints and review tables unchanged, so As taught, Plain
-  English and Timmy Time stand; **High yield changed in all nine sessions and was narrated again**
-  (`audio/<lecture>-hy.mp3` and words files). Every retired id is listed with its reason in
-  [the audit's note](vault/tasks/done/2026-11-15-perio-bank-audit.md), with eight notes issues for Sam (none changes a key).
-  Merged as #371 (Sam: "Merge when ready"; and on the notes: "Leave the 8 spots", the 27 retirements stand). **Done at
-  the merge:** `node tools/xp/keys.js perio --load` (670 keys loaded, 103 retired), `log_changelog` for Perio, and
-  `node tools/release/postcheck.js` passed (21 of 21 files live, the dashboard and Perio with no errors).
-- **Occlusion: Timmy Time for the final, in the midterm episode's place (2026-11-15, Claude Code)** — Sam: "Podcast for occlusion final. Replace the midterm with it." A 48-minute episode (`final-review`, 11 chapters) on L6-L10: articulators and the facebow, the records, functional disturbances and TMD, splints, mobility, wear and bruxism, keeping a denture in, balanced, non-balanced and lingualized, Dr. Lawson's NCCLs and Dr. Abou-Arraj's occlusion and the periodontium, then a 27-question lightning round. Written from the hub's own notes, Exam Hints (quoted word for word), cram sheet, High Likelihood topics and LESSONS.md's live signals (the Bennett angle and the fossae, the facebow's level, "less bone, but a bigger arch", both Miller scales). Script `tools/podcast/occlusion/script.md`; the midterm's moved to `midterm.md`; mp3 `hubs/occlusion/audio/timmy-time.mp3` (replaced, 34 MB, -16.4 LUFS); `podcast` in `content/core.json` with one lore comment (the toothbrush by the door); the dashboard's `sub` and the About page's episode list. Lexicon: A-D-A, R-D-A, N-C-C-L(s), Abou-Arraj's, kinematic, periodontitis, periodontics, Realeff, orofacial, and the verbs "ever use" and "don't use". Lore (LORE.md): thirty-one's one-tooth night guard, his self-checked mobility, the toothbrush vindicated by L9. Merged as #366 (Sam: "Merge"), after a rebase onto #367: both PRs' About lines, lore, lexicon entries and decision rows kept. **Done at the merge:** `admin_set_podcast_episode(..., 'occlusion', 'final-review', 2863)` (listening earns XP), `log_changelog` for Occlusion, and `node tools/release/postcheck.js` passed (4 of 4 files live, the dashboard and Occlusion with no errors). Then, on Sam's OK ("Merge and ok"), the `timmy` function was deployed again for the new site help (`node tools/timmy/deploy.mjs`, version 5), which the session's permission check had first stopped.
-- **2026-11-15 (Timmy Time: the Perio final episode, Claude Code)** — Sam: "Podcast for perio final. Replace the midterm
-  with it." Perio never had an episode, so this is its first, for the final (Thu Nov 19); Occlusion's midterm episode
-  stays (Sam's answer, [decisions](vault/decisions.md)). A 49-minute (49.1) review: `hubs/perio/audio/timmy-time.mp3`
-  (35 MB, -16.4 LUFS, 96 kbps), script `tools/podcast/perio/script.md`, from the hub's notes (As taught), Exam Hints (every
-  professor quote word for word; Dr. Kaur's final focus as a paraphrase, as the hub has it), the cram sheet, the High
-  Likelihood topics and LESSONS.md's live signals (the select-all on what SRP aims for, the closest furcation entrance
-  mixed up with the narrowest). 13 chapters: S1-S3, S4 (with the instruments, in for the final), furcations, resective
-  surgery, regeneration, implants (health, mucositis and peri-implantitis read case by case), antibiotics, host
-  modulation, recession and grafts, gingival excess with crown lengthening and the esthetic norms, a 32-question
-  lightning round and the sign-off. S1-S4 take 16% of it, as the final's split does. Left out on the Nov 12 review's word:
-  suture techniques and pictures, Miller & McEntire, entrance widths and the doses (it says Dr. Litz's "know the chart" was
-  superseded). Lore (Sam took all four): Timmy's own furcation (a lower first molar's two entrances, about 2.5 mm down, and
-  its mesial root concavity), thirty-one stages himself with a toothpick ("You're not staged. You're anxious."), may have
-  an enamel projection and wasn't Dr. Kaur's thirty-one, the toothbrush's big episode, and the pie after the release.
-  Two lore comments (rolled): thirty-one and the toothbrush by the door. `lexicon.json` gains 43 entries (gingiva,
-  gingival, gingivitis, gingivectomy and mucogingival, which espeak read with a hard g; Kaur, Geurs, Caton, McGuire,
-  Salud, debride, digoxin, the cyclines, PerioChip, Periostat, Arestin, and `C-A-L`, `P-G-A`, `E-D-T-A`, `F-D-A`,
-  `D-F-D-B-A`, whose final A read "uh"; narration made from now on gets them too). Hub: `content/core.json`'s `podcast`
-  (id `final-review`), so Home's Timmy Time quick link and More's tile appear; dashboard card gets `podcast` and "Timmy
-  Time" in modes; About page's episode list, `supabase/functions/timmy/site.json`, `LORE.md` and the hub note updated.
-  The title is "Perio final: ..." ("Periodontology" broke mid-word on Home's phone tile). Shared fix with it
-  ([BUG-151](vault/release/bug-log.md)): the small line on a hub's Timmy Time tiles (Home and More, `widget/hub.css`) is full
-  white, since 86-88% white on Perio's pink failed the 4.5:1 contrast check.
-  Merged as #367 (Sam: "Merge"). **Done at the merge:** `admin_set_podcast_episode(..., 'perio', 'final-review', 2948)`
-  (listening earns XP), the `timmy` function deployed again for the new site help (version 4), `log_changelog` for Perio,
-  and `node tools/release/postcheck.js` passed (6 of 6 files live, the dashboard, Occlusion and Perio with no errors).
 
 This list is intentionally short — it's an orientation aid, not a full
 changelog (that's the Supabase `changelog` table / dashboard "What's New"
