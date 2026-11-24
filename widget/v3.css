@@ -528,12 +528,6 @@ html.sh-8bit button, html.sh-8bit .card, html.sh-8bit [class*="card"]{box-shadow
 .sh-link-enter input{flex:1; min-width:0; font-family:var(--shw-mono); font-size:18px; letter-spacing:.14em; text-transform:uppercase; padding:6px 10px; border-radius:10px; border:1px solid var(--shw-line2); background:var(--shw-bg); color:var(--shw-ink);}
 .sh-link-msg{margin-top:6px; min-height:1.2em;}
 
-/* an unlocked accent is a metal, not just a colour (widget/ranks.js applyAccent sets data-sh-accent and --sh-tex):
-   filled accent things in every hub get the rank's own texture. Text and borders keep the flat --accent. */
-html[data-sh-accent] .sh-archived-go{
-  background-image:var(--sh-tex); background-size:100% 100%; color:var(--sh-tex-ink); text-shadow:var(--sh-tex-shadow); border-color:var(--accent-ink);}
-html[data-sh-accent] :is(.bar i:not([class*="tag-"] i), .sh-mastery-bar i, .shstat-hbar){
-  background-image:var(--sh-tex); background-size:100% 100%;}
 
 @media (prefers-reduced-motion: reduce){ .sh-rank-name, .sh-trophy-medal::after{animation:none !important;} }
 /* trophies are buttons: tap one to read it (secret ones give a clue) */
