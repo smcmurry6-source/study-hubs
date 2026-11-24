@@ -92,9 +92,11 @@
      Persson, Pirih and Camargo, J Clin Periodontol 2018;45(S20):S278): health no bleeding or suppuration and no bone loss beyond the
      initial remodeling; mucositis bleeding and/or suppuration, no bone loss beyond it; peri-implantitis bleeding and/or suppuration,
      deeper probing and bone loss beyond it. With no earlier records, the consensus asks for all three of bleeding or suppuration, a
-     probing depth of 6 mm or more and bone 3 mm or more apical to the implant's most coronal intraosseous part; the lecture (PCD
-     Implants, peri-implant disease) teaches the depth and the bone as either one, and derive() keeps the lecture's (the hubs teach it;
-     a case that wants both readings to agree has both). The initial remodeling is under 2 mm (the lecture); more than half the
+     probing depth of 6 mm or more and bone 3 mm or more apical to the implant's most coronal intraosseous part, and derive() follows
+     it (Sam, 2026-11-24: "Go with outside sources"; the lecture, PCD Implants, peri-implant disease, teaches the depth and the bone as
+     either one). A record with no earlier records that has bleeding and only one of the two is refused (validate()): it is
+     peri-implantitis by the lecture and not by the consensus, so it would teach neither; give it a baseline film, or all three or
+     neither. The initial remodeling is under 2 mm (the lecture); more than half the
      implant's length of bone lost, or any mobility, is a failed implant (the lecture; ICOI Pisa, Misch et al., Implant Dent 2008;17:5);
    - the numbers an implant module writes: healthy peri-implant mucosa 3 to 4 mm tall over the crest (barrier epithelium about 2 mm,
      connective tissue 1 to 1.5 mm: Berglundh and Lindhe, J Clin Periodontol 1996;23:971; the lecture), taller between teeth than on
@@ -586,19 +588,19 @@
       if(t.implant){
         /* an implant is read against its baseline film (bone in mm below the platform; ~2 mm of crestal remodeling is
            expected), not staged: health, mucositis (inflamed, no loss beyond remodeling) or peri-implantitis (loss
-           beyond it). With no baseline (2018 case definitions): bone 3 mm or more below the most coronal part of the
-           implant and/or PD 6 mm or more with profuse bleeding = peri-implantitis. Meffert: ailing (static loss, no
+           beyond it). With no baseline (2018 case definitions, all three together): bleeding or suppuration, PD 6 mm or more
+           and bone 3 mm or more below the most coronal part of the implant = peri-implantitis. Meffert: ailing (static loss, no
            inflammation), failing (progressing, inflamed), failed (mobile, or a radiolucent line around it). */
         var im = t.implant, base = im.baseline, now = t.bone, infl = t.bop.f.concat(t.bop.l, t.pus.f, t.pus.l).some(Boolean), maxPD = Math.max.apply(null, t.pd.f.concat(t.pd.l));
         var beyond, progressing, dx;
         if(base){ beyond = Math.max((now.m || 0) - Math.max(base.m || 0, 2), (now.d || 0) - Math.max(base.d || 0, 2)); progressing = Math.max((now.m || 0) - (base.m || 0), (now.d || 0) - (base.d || 0)) > 0; }
-        else { beyond = Math.max(now.m || 0, now.d || 0) - 3 + .01; progressing = beyond > 0; if(maxPD >= 6 && infl) beyond = Math.max(beyond, .01); }
+        else { beyond = Math.max(now.m || 0, now.d || 0) - 3 + .01; progressing = beyond > 0; }
         /* v2.3: bone lost past half the implant's length is a failure too, mobile or not (the lecture: "losing more than half the
            implant's length of bone, or any mobility, means failure"; the ICOI Pisa scale, Misch 2008) */
         var lost = t.mob || t.halo || Math.max(now.m || 0, now.d || 0) > im.len / 2;
         /* an implant still under its cover screw isn't loaded or probed: it is healing, unless it has failed */
         if(im.cover && !lost){ out.impl[t.n] = { dx:'healing implant', meffert:'healing', lossBeyondRemodeling:0, baseline:false }; return; }
-        dx = lost ? 'failed implant' : beyond > 0 && infl ? 'peri-implantitis' : infl ? 'peri-implant mucositis' : beyond > 0 ? 'bone loss without inflammation' : 'peri-implant health';
+        dx = lost ? 'failed implant' : beyond > 0 && infl && (base || maxPD >= 6) ? 'peri-implantitis' : infl ? 'peri-implant mucositis' : beyond > 0 ? 'bone loss without inflammation' : 'peri-implant health';
         out.impl[t.n] = { dx:dx, meffert: lost ? 'failed' : progressing && infl ? 'failing' : beyond > 0 ? 'ailing' : 'healthy', lossBeyondRemodeling:+Math.max(0, beyond).toFixed(1), baseline:!!base };
         return;
       }
@@ -828,6 +830,15 @@
     if(im.cement && im.retention === 'screw') bad(w + 'excess cement is left under a cemented crown: a screw-retained one has none');
     if(im.years != null) num(im.years, 0, 40, w + 'years since the crown was delivered');
     if(im.weeks != null) num(im.weeks, 0, 52, w + 'weeks since the implant was placed');
+    /* with no earlier records the 2017 consensus wants bleeding or suppuration, PD 6 mm or more and bone 3 mm or more below the
+       platform together (Sam, 2026-11-24: "Go with outside sources"); bleeding with only one of the other two is peri-implantitis by
+       the lecture's either-one and not by the consensus, so the record is refused rather than teach one of them */
+    if(!im.cover && !im.baseline && !t.mob && !t.halo){
+      var pds = (t.pd.f || []).concat(t.pd.l || []), deep = Math.max.apply(null, pds.length ? pds : [0]), down = Math.max(t.bone.m || 0, t.bone.d || 0);
+      var lostHalf = down > im.len / 2, inflamed = (t.bop.f || []).concat(t.bop.l || [], t.pus.f || [], t.pus.l || []).some(Boolean);
+      if(!lostHalf && inflamed && (down >= 3) !== (deep >= 6))
+        bad(w + 'with no earlier records, peri-implantitis needs bleeding or suppuration, probing of 6 mm or more and bone 3 mm or more below the platform together (the 2017 consensus): this implant has ' + (down >= 3 ? 'bone ' + f1(down) + ' mm down but probes ' + deep + ' mm at most' : 'probing to ' + deep + ' mm but bone only ' + f1(down) + ' mm down') + '; give it a baseline film, or all three, or neither');
+    }
     if(im.cover){
       if(t.crown) bad(w + 'an implant under its cover screw has no crown yet');
       if(t.abut) bad(w + 'an implant under its cover screw carries no bridge yet');

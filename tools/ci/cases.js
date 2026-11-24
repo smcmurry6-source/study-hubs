@@ -153,6 +153,9 @@ for (const hub of fs.readdirSync(path.join(root, 'hubs')).sort()) {
     ['an implant state the kit doesn\'t know', false, ['28', '29', '30'], [{ m: 'implant', tooth: '29', state: 'ailing' }]],
     ['bone loss past the baseline on a healthy implant', false, ['28', '29', '30'], [{ m: 'implant', tooth: '29', state: 'health', loss: 2 }]],
     ['bone loss past the baseline with mucositis (that is peri-implantitis)', false, ['28', '29', '30'], [{ m: 'implant', tooth: '29', state: 'mucositis', loss: 2 }]],
+    // no earlier records: the 2017 consensus wants bleeding, probing 6 mm or more and bone 3 mm or more together (Sam, 2026-11-24)
+    ['no earlier records, bleeding and bone 3.5 mm down but probing 5 mm at most (only two of the consensus\'s three)', false, ['29', '30', '31'], [{ m: 'implant', tooth: '30', state: 'peri-implantitis', baseline: false, bone: 3.5, rec: 3 }]],
+    ['no earlier records, bleeding and probing 6 mm but bone 2.5 mm down (only two of the consensus\'s three)', false, ['29', '30', '31'], [{ m: 'implant', tooth: '30', state: 'mucositis', baseline: false, bone: 2.5 }]],
     ['an implant healing under its cover screw', true, ['13', '14', '15'], [{ m: 'implant', tooth: '14', state: 'healing', weeks: 6 }]],
     ['a cover screw on a healthy, loaded implant', false, ['13', '14', '15'], [{ m: 'implant', tooth: '14', state: 'health', cover: true }]],
     ['a crown on an implant still under its cover screw', false, ['13', '14', '15'], [{ m: 'implant', tooth: '14', state: 'healing', crown: 'pfm' }]],
@@ -349,7 +352,7 @@ for (const hub of fs.readdirSync(path.join(root, 'hubs')).sort()) {
     ['more than half its length of bone lost, not mobile', [{ m: 'implant', tooth: '30', state: 'peri-implantitis', loss: 4.5 }], 'failed implant'],
     ['mobile with a radiolucent line round it', [{ m: 'implant', tooth: '30', state: 'failed' }], 'failed implant'],
     ['under its cover screw', [{ m: 'implant', tooth: '30', state: 'healing', weeks: 8 }], 'healing implant'],
-    ['no earlier records, inflamed, bone 3.5 mm below the platform', [{ m: 'implant', tooth: '30', state: 'peri-implantitis', baseline: false, bone: 3.5 }], 'peri-implantitis'],
+    ['no earlier records, inflamed, bone 3.5 mm below the platform and probing 6 mm (all three of the 2017 consensus)', [{ m: 'implant', tooth: '30', state: 'peri-implantitis', baseline: false, bone: 3.5 }], 'peri-implantitis'],
     ['no earlier records, inflamed, bone 2 mm below the platform and probing 5 mm', [{ m: 'implant', tooth: '30', state: 'mucositis', baseline: false, bone: 2 }], 'peri-implant mucositis'],
   ];
   for (const [what, modules, want] of dxs) {

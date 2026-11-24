@@ -30,6 +30,10 @@ what v2.0 left, so it isn't lost. Its own track (Sam, 2026-11-06, [decisions](..
 
 - [ ] The next hub with dental cases: its first cases use modules, and Sam approves each new module and view with its first
       case (restoration, caries, endo, the odontogram, the bitewing, the full-mouth series)
+- [ ] The next hub with dental cases ships a `content/figures.js` (an empty `window.SH_FIGURES = function(){ return {}; };`
+      is enough) and `figures.css`, or `needFigures()` in `widget/hub.js` stops waiting on them: it loads the hub's figure
+      file before it draws any case question, and Review of Systems has none, so a case question there never draws (found
+      2026-11-24, drawing a sample case for Sam)
 - [ ] The About page gets the new kinds of picture (odontogram, bitewing, full-mouth series) when a live hub first shows one
       ([about-page](../rules/about-page.md))
 - [x] Restorations and caries (Order step 2, Sturdevant's): preparation outlines that follow the crown's own surface (smooth
@@ -108,10 +112,12 @@ what v2.0 left, so it isn't lost. Its own track (Sam, 2026-11-06, [decisions](..
 - [ ] Sam looks at v2.3's drawings with their first case (the implant crown by material on the film, the screw access channel,
       the excess cement, the failed implant's radiolucent line along its taper, the abutment and threads on the view, the chart's
       submerged implant, the odontogram's cover screw, the implant bridge), the way the first box says
-- [ ] Sam's call (v2.3): for a patient with no earlier records, the 2017 consensus calls it peri-implantitis only with bleeding
+- [x] Sam's call (v2.3): for a patient with no earlier records, the 2017 consensus calls it peri-implantitis only with bleeding
       or suppuration **and** probing of 6 mm or more **and** bone 3 mm or more below the implant's most coronal intraosseous part;
       the PCD Implants lecture teaches the probing and the bone as either one. `derive()` follows the lecture
       ([figures-teach-the-lecture](../rules/figures-teach-the-lecture.md)); a case that should read the same both ways has both
+      (Sam, 2026-11-24: "Go with outside sources": `derive()` now follows the consensus, and `validate()` refuses a record without
+      records that has bleeding and only one of the other two; [decisions](../decisions.md))
 - [ ] An implant placed too close (under 1.5 mm from a root or 3 mm from another implant) isn't drawn: `validate()` refuses it,
       so a case about that mistake (the crestal bone it costs: Tarnow 2000, Esposito 1993) needs a flag that allows it and draws
       the loss
@@ -195,6 +201,10 @@ what v2.0 left, so it isn't lost. Its own track (Sam, 2026-11-06, [decisions](..
   9 records in `tools/ci/cases.js`. Also on every view: the ridge over a gap is measured from the neighbors' mid-facial margins
   (it was from their CEJs, so a gap sat about 2 mm too deep), and a front denture base fills the cervical embrasure beside
   each abutment.
+- 2026-11-24: Sam asked for a sample case. `v24-front-flanges` (with `v24-ex-28`) and `v24-partial-class-i` (with `v24-ex-19`)
+  were put into a local copy of Review of Systems only, drawn by the engine on the preview's made-up data at phone width, and
+  the screenshots sent to Sam in chat; nothing was committed. The first try found that a hub without `content/figures.js`
+  never draws a case question (the box above). The "Sam looks at v2.4's drawings" box stays open until Sam says.
 
 ## Outcome
 
