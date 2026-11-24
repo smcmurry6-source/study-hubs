@@ -2420,8 +2420,9 @@
   /* the ridge's edge below the CEJ (mm) where a tooth is missing: resorbed under a denture */
   function gapMM(spec, t){ return t.missing && (spec.dentures || {})[archOf(t.n)] ? ridgeOf(spec, t.n) + .3 : 1.2; }
   function viewDenture(spec, den, cols, occ, dir, k, kt, W, up, siteMy, contact, gumAt){
-    var s = '', full = den.type === 'complete';
+    var s = '', full = den.type === 'complete', fr, under, over;
     function geo(c){ var sg = c.mr ? -1 : 1, cej = occ + dir * c.d.ch * k; return { cej:cej, V:function(pts){ return pts.map(function(p){ return [c.cx + sg * p[0] * k, cej - dir * p[1] * k]; }); }, X:function(px){ return c.cx + sg * px * k; } }; }
+    fr = full ? { under:'', over:'' } : viewFrame(spec, cols, dir, k, geo); under = fr.under; over = fr.over;
     var runs = [], cur = null;
     /* the denture's teeth: those it replaces, and one over each overdenture abutment (the base covers the abutment) */
     function dt(t){ return t.dent || t.od; }
@@ -2467,26 +2468,68 @@
       if(Lc){ arc(xl + rc, yb - dir * rc, Math.PI / 2, Math.PI); bot.push([xl, yb - dir * rc]); }
       s += path('io-base', e.concat(bot));
       s += path('io-base-hi', border.slice(1, -1).map(function(p){ return [p[0], p[1] - dir * .9 * k]; }), true); });
-    if(full) return s;
-    /* the framework */
-    function band(pts, w0, w1){ var L = [], R = [], n = pts.length;
-      for(var i = 0; i < n; i++){ var a = pts[Math.max(0, i - 1)], b = pts[Math.min(n - 1, i + 1)], dx = b[0] - a[0], dy = b[1] - a[1], l = Math.hypot(dx, dy) || 1, w = (w0 + (w1 - w0) * i / (n - 1)) / 2;
-        L.push([pts[i][0] - dy / l * w, pts[i][1] + dx / l * w]); R.unshift([pts[i][0] + dy / l * w, pts[i][1] - dx / l * w]); }
-      return L.concat(R); }
+    return under + s + over;
+  }
+  /* v2.4: a partial denture's cobalt-chromium framework on the drawn view, as two layers: what lies against the teeth's proximal
+     surfaces (a clasp's minor connector, the RPI's proximal plate) and the I-bar's approach, drawn before the denture teeth and
+     the base so they cover it where they lie over it; then what lies on the buccal and occlusal surfaces (the clasp arms, the
+     rests). Each part is a tapered, round-ended bar with a highlight along it, following the crown's own outline: an occlusal
+     rest in the marginal ridge shows from the buccal only where it crosses the occlusal embrasure, over the crown's corner; an
+     incisal rest caps the incisal angle; a circumferential arm leaves its shoulder above the height of contour by the rest and
+     ends in the gingival third at the far line angle, 1.6 mm wide tapering to 0.8; an I-bar's approach runs 3.5 mm below the
+     gingival margin (Krol 1973; McCracken's: 3-4 mm) and turns up at the middle of the buccal, crossing the margin at a right
+     angle, to its tip in the gingival third */
+  function viewFrame(spec, cols, dir, k, geo){
+    var under = '', over = '';
+    function metal(pts, w0, w1, G, caps){ var c = G.V(pts), n = c.length, L = [], R = [], H = [], i;
+      if(n < 2) return '';
+      for(i = 0; i < n; i++){ var a = c[Math.max(0, i - 1)], b = c[Math.min(n - 1, i + 1)], dx = b[0] - a[0], dy = b[1] - a[1], l = Math.hypot(dx, dy) || 1, w = (w0 + (w1 - w0) * i / (n - 1)) * k / 2, nx = -dy / l, ny = dx / l;
+        L.push([c[i][0] + nx * w, c[i][1] + ny * w]); R.push([c[i][0] - nx * w, c[i][1] - ny * w]);
+        var up = ny < 0 ? 1 : -1; H.push([c[i][0] + up * nx * w * .38, c[i][1] + up * ny * w * .38, w]); }
+      function cap(p, q, sgn){ var o = [], cx = (p[0] + q[0]) / 2, cy = (p[1] + q[1]) / 2, r = Math.hypot(p[0] - q[0], p[1] - q[1]) / 2, a0 = Math.atan2(p[1] - cy, p[0] - cx);
+        for(var j = 1; j < 8; j++){ var a = a0 + sgn * Math.PI * j / 8; o.push([cx + r * Math.cos(a), cy + r * Math.sin(a)]); } return o; }
+      var e = c[n - 1], f = c[n - 2], turn = ((e[0] - f[0]) * (L[n - 1][1] - e[1]) - (e[1] - f[1]) * (L[n - 1][0] - e[0])) > 0 ? 1 : -1;
+      var shape = L.concat(cap(L[n - 1], R[n - 1], -turn), R.reverse());
+      if(caps === 2) shape = shape.concat(cap(R[R.length - 1], L[0], -turn));
+      var hi = []; H.forEach(function(h, j){ if(j > 0 && j < n - 1) hi.push(h); });
+      var hp = hi.map(function(h){ return [h[0], h[1]]; }), hw = hi.map(function(h){ return h[2] * .3; }), hL = [], hR = [];
+      for(i = 0; i < hp.length; i++){ var a2 = hp[Math.max(0, i - 1)], b2 = hp[Math.min(hp.length - 1, i + 1)], ex = b2[0] - a2[0], ey = b2[1] - a2[1], l2 = Math.hypot(ex, ey) || 1, ww = hw[i] * Math.sin(Math.PI * (i + .5) / hp.length);
+        hL.push([hp[i][0] - ey / l2 * ww, hp[i][1] + ex / l2 * ww]); hR.unshift([hp[i][0] + ey / l2 * ww, hp[i][1] - ex / l2 * ww]); }
+      return path('io-clasp', shape) + (hp.length > 1 ? path('io-clasp-hi', hL.concat(hR)) : ''); }
     function curve(P, n){ var o = []; for(var i = 0; i <= n; i++){ var u = i / n, a = 1 - u; o.push([a * a * a * P[0][0] + 3 * a * a * u * P[1][0] + 3 * a * u * u * P[2][0] + u * u * u * P[3][0], a * a * a * P[0][1] + 3 * a * a * u * P[1][1] + 3 * a * u * u * P[2][1] + u * u * u * P[3][1]]); } return o; }
+    /* the crown's outline (mm, x + distal, y above the CEJ): where it is at a height on one side, and its points near a corner,
+       pushed out a little from the crown's middle so the metal lies over the enamel's edge */
+    function rim(d){ return dense(crownMM(d), true, 6); }
+    function sideX(d, sd, y){ var o = rim(d), best = sd * d.cv / 2; for(var i = 0; i < o.length; i++){ var a = o[i], b = o[(i + 1) % o.length];
+      if(a[1] === b[1] || (a[1] - y) * (b[1] - y) > 0) continue; var x = a[0] + (b[0] - a[0]) * (y - a[1]) / (b[1] - a[1]); if(sd * x > sd * best) best = x; } return best; }
+    function corner(d, sd, x0, x1, y0, out){ var cy = d.ch * .45, o = rim(d).filter(function(p){ return sd * p[0] >= x0 * d.cw / 2 && sd * p[0] <= x1 * d.cw / 2 && p[1] >= y0 * d.ch; });
+      o.sort(function(a, b){ return sd * a[0] - sd * b[0]; });
+      return o.map(function(p){ var dx = p[0], dy = p[1] - cy, l = Math.hypot(dx, dy) || 1; return [p[0] + dx / l * out, p[1] + dy / l * out]; }); }
+    function down(d, sd, y0, y1, out){ var o = []; for(var j = 0; j <= 8; j++){ var y = y0 + (y1 - y0) * j / 8; o.push([(y >= 0 ? sideX(d, sd, y) : sd * d.cv / 2) + sd * out, y]); } return o; }
     cols.forEach(function(c){ var t = c.t; if(t.missing || (!t.clasp && !t.rest)) return; var G = geo(c), d = c.d, hw = d.cw / 2, ch = d.ch, post = posOf(t.n) >= 4;
       var dM = nbr(t.n, true), dD = nbr(t.n, false), bM = dM && tooth(spec, dM).dent, bD = dD && tooth(spec, dD).dent;
-      var rs = String(t.rest || ''), restAt = function(sd){ return G.V(TL.filletClosed([[sd * hw * .2, ch + .05], [sd * hw * .62, ch * .9], [sd * hw * .74, ch * .78], [sd * hw * .3, ch * .86]], .25)); };
-      if(post) [['m', -1], ['d', 1]].forEach(function(e){ if(rs.indexOf(e[0]) >= 0) s += path('io-clasp', restAt(e[1])); });
-      if(rs === 'incisal') s += path('io-clasp', G.V(TL.filletClosed([[-.9, ch + .1], [.9, ch + .1], [.6, ch - .9], [-.6, ch - .9]], .3)));
-      if(t.clasp === 'rpi'){ var sd = bD ? 1 : -1;
-        s += path('io-clasp', G.V(band([[sd * hw * 1.02, ch * .62], [sd * hw * 1.04, -.4]], 1.1, 1.3)));
-        var ap = curve([[sd * (hw + 2.2), -2.6], [sd * hw * .2, -2.6], [-.1 * hw, -2], [-.1 * hw, -1]], 10).concat(curve([[-.1 * hw, -1], [-.1 * hw, 0], [-.1 * hw, ch * .2], [-.1 * hw, ch * .34]], 5).slice(1));
-        s += path('io-clasp', G.V(band(ap, 1.5, .9))); }
+      var rs = String(t.rest || ''), gm = gumMM(t)(0), gum = gumMM(t);
+      /* a connector down a proximal surface ends hidden in the base, 1.2 mm past that side's margin */
+      function inBase(sd){ return gum(sd * d.cw * .34) - 1.2; }
+      /* occlusal rests over the corner of the crown by the marginal ridge */
+      if(post) [['m', -1], ['d', 1]].forEach(function(e){ if(rs.indexOf(e[0]) >= 0) over += metal(corner(d, e[1], .42, .95, .74, .3), .95, .85, G, 2); });
+      /* an incisal rest caps the incisal angle (a mandibular canine's distoincisal) */
+      if(rs === 'incisal') over += metal(corner(d, 1, .1, .7, .8, .3), .95, .85, G, 2);
+      if(t.clasp === 'rpi'){ var sd = bD ? 1 : -1, xi = -sd * .12 * hw, ya = gm - 3.5, rb = 1.8;
+        /* the proximal plate on the guide plane next to the base, into the base below */
+        under += metal(down(d, sd, ch * .86, inBase(sd), .42), 1.15, 1.3, G, 0);
+        /* the I-bar: from under the base, its approach 3.5 mm below the margin, a smooth bend, up to its tip */
+        var ib = curve([[sd * (hw + 4), ya - .5], [sd * (hw + 1.6), ya - .1], [xi + sd * (rb + .8), ya], [xi + sd * rb, ya]], 8)
+          .concat(curve([[xi + sd * rb, ya], [xi + sd * rb * .45, ya], [xi, ya + rb * .55], [xi, ya + rb]], 6).slice(1))
+          .concat(curve([[xi, ya + rb], [xi, ya + rb + 1.5], [xi, ch * .24], [xi, ch * .33]], 6).slice(1));
+        under += metal(ib, 2, 1.25, G, 1); }
       else if(t.clasp){ var so = bD && !bM ? 1 : bM && !bD ? -1 : rs === 'd' ? 1 : -1;
-        s += path('io-clasp', G.V(band([[so * hw * 1.02, ch * .8], [so * hw * 1.04, -.3]], 1.1, 1.2)));
-        s += path('io-clasp', G.V(band(curve([[so * hw * .96, ch * .8], [so * hw * .2, ch * .72], [-so * hw * .35, ch * .42], [-so * hw * .86, ch * .3]], 14), 1.25, .55))); } });
-    return s;
+        /* next to the base, the minor connector down the proximal into it (elsewhere it crosses the occlusal embrasure to the
+           lingual, behind the tooth); the arm from its shoulder, level at first, dipping into the undercut in its last third */
+        if(so > 0 ? bD : bM) under += metal(down(d, so, ch * .8, inBase(so), .38), 1.1, 1.25, G, 0);
+        var x0 = sideX(d, so, ch * .74), x3 = sideX(d, -so, ch * .34);
+        over += metal(curve([[x0 - so * .25, ch * .74], [so * hw * .05, ch * .73], [-so * hw * .6, ch * .62], [x3 + so * .55, ch * .34]], 16), 1.6, .8, G, 1); } });
+    return { under:under, over:over };
   }
   I.view = function(spec, o){
     spec = prep(spec); o = o || {}; var ts = teethOf(spec, o.teeth), up = isUpper(ts[0].n), k = o.k || 8.2, g = spec.gingiva || {};
@@ -2531,36 +2574,63 @@
       r.pts = []; var steps = Math.max(6, Math.round(span / (.7 * k)));
       for(i = 0; i <= steps; i++){ var x = r.xa + span * i / steps; r.pts.push([x, r.y(x)]); } });
     /* the free gingiva: its margin follows recession at the three facial sites (negative recession: margin on the crown,
-       swollen); papillae between teeth fill the embrasure, blunted when edematous; calculus and plaque along the margin */
+       swollen); calculus and plaque along the margin. Between two teeth the papilla: the margin scallops up from each
+       tooth's line angles to a tip in the gingival embrasure, its sides steepening as they hug the crowns (the scallop is
+       deepest in front, its bone 2.1-4.1 mm higher between the teeth than at mid-facial: Becker, Ochsenbein, Tibbetts and
+       Becker, J Clin Periodontol 1997;24:727; the papilla fills the embrasure short of the contact: Tarnow, Magner and
+       Fletcher, J Periodontol 1992;63:995): its tip 3.4 mm above the line angles' margin between incisors and
+       canines, 2.4 between premolars and 1.8 between molars, at least half a millimeter short of the contact; lower when
+       swollen (blunted), beside an implant (Tarnow et al., J Periodontol 2003;74:1785: lower still between two), and beside a root with no crown; a
+       receded line angle takes the papilla down with it. At either end of the view the next tooth's half papilla */
     var edge = [], marks = '';
+    function crowned(c){ return !gapCol(c) && !c.t.od && !c.t.retained; }
+    function contact(c, side){ var sg = c.mr ? -1 : 1, cej = occ + dir * c.d.ch * k, best = null;
+      (c.t.missing ? TL.ponticMM(typeOf(c.t.n), { per:4 }) : crownMM(c.d)).forEach(function(p){ if(!best || side * sg * p[0] > side * sg * best[0]) best = p; });
+      return [c.cx + sg * best[0] * k, cej - dir * best[1] * k]; }
+    function rise(n){ var p = posOf(n); return p <= 3 ? 3.4 : p <= 5 ? 2.4 : 1.8; }
+    function margins(c){ var cej = occ + dir * c.d.ch * k;
+      if(c.t.missing) return [cej - dir * .3 * k, cej - dir * .45 * k, cej - dir * .3 * k];
+      return [0, 1, 2].map(function(j){ return siteMy(c, j); }); }
+    function sx(c, j){ return c.cx + (j - 1) * c.d.cw * .34 * k; }
+    function tipOf(a, b, half){ var T = Math.min(rise(a.t.n), rise((b || a).t.n)) * (edema ? .62 : 1);
+      [a, b].forEach(function(c){ if(!c) return; if(c.t.implant) T *= b && a.t.implant && b.t.implant ? .78 : .86; if(c.t.retained || c.t.od) T *= .5; if(c.t.missing) T *= .8; });
+      var xt = b ? (a.cx + a.d.cw / 2 * k + b.cx - b.d.cw / 2 * k) / 2 : half > 0 ? a.cx + a.d.cw / 2 * k : a.cx - a.d.cw / 2 * k;
+      var base = b ? (margins(a)[2] + margins(b)[0]) / 2 : margins(a)[half > 0 ? 2 : 0], yt = base - dir * T * k;
+      if(b && crowned(a) && crowned(b)){ var ca = contact(a, 1), cb = contact(b, -1), cy = (ca[1] + cb[1]) / 2 + dir * .5 * k; if(dir * (yt - cy) < 0) yt = cy; }
+      /* how round its tip is: a back tooth's broader, a swollen one's broadest */
+      var rd = Math.min(.85, (posOf(a.t.n) > 3 || (b && posOf(b.t.n) > 3) ? .55 : .3) + (edema ? .3 : 0));
+      return [xt, yt, rd]; }
+    /* each tooth's margin is one U from tip to tip through its mid-facial margin, steepest at the tips; the papilla is two such
+       halves meeting at its tip */
+    var P = edema ? 1.8 : 2.2, US = [1, .95, .88, .78, .62, .42, .2, 0];
+    function scal(u, rd){ var g = Math.pow(u, P); return g + (rd || 0) * (1 - g) * smooth((u - .7) / .3); }
+    function half(c, Z, t, out){ var sd = t[0] > c.cx ? 1 : -1, w = Math.abs(t[0] - c.cx);
+      US.forEach(function(u){ out.push([c.cx + sd * u * w, Z + (t[1] - Z) * scal(u, t[2])]); }); return out; }
+    function yOn(c, Z, t, x){ var u = Math.min(1, Math.abs(x - c.cx) / Math.abs(t[0] - c.cx)); return Z + (t[1] - Z) * scal(u, t[2]); }
     cols.forEach(function(c, i){
-      var d = c.d, cej = occ + dir * d.ch * k, so = siteOrder(c.t.n), sx = [c.cx - d.cw * .34 * k, c.cx, c.cx + d.cw * .34 * k];
-      var left = c.cx - d.cw / 2 * k, right = c.cx + d.cw / 2 * k, pap = (edema ? 1.6 : 2.6) * k;
-      if(c.t.missing && c.t.pontic){ edge.push([left, cej - dir * .3 * k], [c.cx, cej - dir * .45 * k], [right, cej - dir * .3 * k]); return; }
+      var d = c.d, so = siteOrder(c.t.n), pv = cols[i - 1], nx = cols[i + 1], m = margins(c), Z = m[1];
       if(gapCol(c)){ gaps.forEach(function(r){ if(r.a === i) edge.push.apply(edge, r.pts.slice(r.L ? 1 : 0, r.R ? -1 : r.pts.length)); }); return; }
-      if(i === 0) edge.push([-6, cej - dir * pap * .35], [left - 6, cej - dir * pap * .5], [left, cej - dir * pap]);
-      so.forEach(function(si, j){ var rec = c.t.rec.f[si], my = cej + dir * rec * k + (c.t.implant ? dir * PLAT * k : j === 1 ? dir * (c.d.cej || 0) * k : 0);
-        var deepest = j === 1 && rec > 0 && rec > Math.max(c.t.rec.f[so[0]], c.t.rec.f[so[2]]);
-        if(deepest) edge.push([sx[1] - d.cw * .2 * k, my - dir * .55 * k]);
-        edge.push([sx[j], my]);
-        if(deepest) edge.push([sx[1] + d.cw * .2 * k, my - dir * .55 * k]);
-        if(c.t.bop.f[si]) marks += dot('dc-blood', sx[j], my + dir * 2.2, 2.4);
-        if(c.t.pus.f[si]) marks += dot('dc-pusdrop', sx[j] + 4, my + dir * 5, 2.8);
-        if(c.t.plaque.f[si]) marks += path('dc-plaque', [[sx[j] - 4, my - dir * .2 * k], [sx[j] + 4, my - dir * .2 * k], [sx[j] + 3, my - dir * 1.1 * k], [sx[j] - 3, my - dir * 1.0 * k]]); });
-      var nx = cols[i + 1];
-      if(nx && gapCol(nx)) return;
-      edge.push([right, cej - dir * pap]);
-      if(nx && !nx.t.missing) edge.push([(right + nx.cx - nx.d.cw / 2 * k) / 2, cej - dir * pap * 1.1]);
-      if(!nx) edge.push([right + 6, cej - dir * pap * .5], [W + 6, cej - dir * pap * .35]);
+      var tl = pv && !gapCol(pv) ? tipOf(pv, c) : !pv ? tipOf(c, null, -1) : null, tr = nx && !gapCol(nx) ? tipOf(c, nx) : !nx ? tipOf(c, null, 1) : null;
+      /* beside a gap the U stops at the line angle's margin, where the ridge's slope begins */
+      var hl = tl || [sx(c, 0) - (sx(c, 0) - c.cx) * .47, m[0] + (m[0] - Z) * 1.16], hr = tr || [sx(c, 2) + (sx(c, 2) - c.cx) * .47, m[2] + (m[2] - Z) * 1.16];
+      /* at the view's start, the half papilla of the tooth before it, mirrored from this tooth's own */
+      if(!pv){ edge.push([-6, Z]); half(c, Z, tl, []).reverse().forEach(function(p){ var q = 2 * tl[0] - p[0]; if(q > -6) edge.push([q, p[1]]); }); }
+      var Lh = half(c, Z, hl, []), Rh = half(c, Z, hr, []).reverse().slice(1);
+      if(tl) Lh = Lh.slice(1);
+      else { Lh = Lh.filter(function(p){ return p[0] > sx(c, 0) + .5; }); Lh.unshift([sx(c, 0), m[0]]); }
+      if(!tr){ Rh = Rh.filter(function(p){ return p[0] < sx(c, 2) - .5; }); Rh.push([sx(c, 2), m[2]]); }
+      edge.push.apply(edge, Lh.concat(Rh));
+      if(!c.t.missing) so.forEach(function(si, j){ var x = sx(c, j), my = j === 1 ? Z : yOn(c, Z, j ? hr : hl, x);
+        if(c.t.bop.f[si]) marks += dot('dc-blood', x, my + dir * 2.2, 2.4);
+        if(c.t.pus.f[si]) marks += dot('dc-pusdrop', x + 4, my + dir * 5, 2.8);
+        if(c.t.plaque.f[si]) marks += path('dc-plaque', [[x - 4, my - dir * .2 * k], [x + 4, my - dir * .2 * k], [x + 3, my - dir * 1.1 * k], [x - 3, my - dir * 1.0 * k]]); });
+      if(!nx){ half(c, Z, tr, []).forEach(function(p){ var q = 2 * tr[0] - p[0]; if(q < W + 6 && q > tr[0]) edge.push([q, p[1]]); }); edge.push([W + 6, Z]); }
     });
     /* a missing tooth at either end of the view: the gingiva still runs to the view's edge */
     if(edge.length){ if(edge[0][0] > -6) edge.unshift([-6, edge[0][1]]); var lp = edge[edge.length - 1]; if(lp[0] < W + 6) edge.push([W + 6, lp[1]]); }
     /* v2.4: past the gum, toward the occlusal plane, is the mouth (dark): one shape whose edge is the gum's own (drawn over it,
        so no seam), seen above each contact between two crowns (the incisal and occlusal embrasures), past the last tooth at
        either end of the view, and over a gap down to its ridge. The crowns are drawn over it */
-    function contact(c, side){ var sg = c.mr ? -1 : 1, cej = occ + dir * c.d.ch * k, best = null;
-      (c.t.missing ? TL.ponticMM(typeOf(c.t.n), { per:4 }) : crownMM(c.d)).forEach(function(p){ if(!best || side * sg * p[0] > side * sg * best[0]) best = p; });
-      return [c.cx + sg * best[0] * k, cej - dir * best[1] * k]; }
     var e = dense(edge, false, 5), oc = occ - dir * 14;
     function gumAt(x){ for(var j = 1; j < e.length; j++){ var a = e[j - 1], b = e[j]; if(a[0] !== b[0] && (a[0] - x) * (b[0] - x) <= 0) return a[1] + (b[1] - a[1]) * (x - a[0]) / (b[0] - a[0]); } return null; }
     s += path('io-bg', [[-6, oc]].concat(e, [[W + 6, oc]]));

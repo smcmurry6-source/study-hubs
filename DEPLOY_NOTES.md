@@ -56,7 +56,12 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   2012), instead of a stepped pink block; past the gum, the embrasures between crowns and the space past the last tooth are the
   dark of the mouth (they were pink down to the incisal edges); the pink strip under the upper incisal edges is gone; an
   overdenture abutment stands on a broad mound; a denture base over a bounded space is a rounded collar just past the ridge, and
-  its papillae are no taller than a natural one; the stipple stays off the gaps. No live hub has dental cases, so students see nothing yet; `sw.js` to `sh-v77` for the changed kit.
+  its papillae are no taller than a natural one; the stipple stays off the gaps. Then (Sam: "The interdental papillae look
+  terrible and unnatural"; "the metal portions of the dentures dont look good"): each tooth's margin is one smooth U from papilla
+  to papilla through its mid-facial margin, the papilla tall in front and lower behind (Becker 1997, Tarnow 1992), short of the
+  contact, rounder on back teeth and when swollen; and the framework is tapered, round-ended metal with a highlight, following
+  each crown's outline: rests over the marginal ridge's corner, arms level from the shoulder and dipping into the undercut,
+  connectors and the proximal plate hidden in the base, the I-bar out from under the base 3.5 mm below the margin. No live hub has dental cases, so students see nothing yet; `sw.js` to `sh-v77` for the changed kit.
 
 - **2026-11-24 (Patient Box v2.3, Claude Code)** — the case kit (`widget/cases.js`, `widget/cases.css`) gets the
   **`implant` module** and an **implant-supported bridge**, on every view ([the task](vault/tasks/2026-11-20-patient-box-v2-next-steps.md),

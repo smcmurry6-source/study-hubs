@@ -177,7 +177,10 @@ what v2.0 left, so it isn't lost. Its own track (Sam, 2026-11-06, [decisions](..
   provisional bridges, on every view, each call cited in `widget/cases.js`'s header (McCracken's, the Glossary, Kratochvil 1963,
   Krol 1973, Zarb's, Crum and Rooney 1978, Shillingburg's, Kern 2005 and 2011 and the rest); five examples and ten questions in
   `tools/cases/examples.json`; a record for each rule, each question's pictures and each Kennedy class in `tools/ci/cases.js`;
-  the how-to. Also: the view's stipple no longer falls on a gap's dark patch. Ticked step 5 (Occlusion's `CASE_IMG` struck: its
+  the how-to. Also, at Sam's word ("The way the gingiva is handled needs to be better. It looks bad"), the view's gum redone on
+  every case: one smooth ridge over a gap (Tan 2012), the dark of the mouth past the gum, a mound under an overdenture abutment,
+  a rounded collar for a bounded denture base (the PR has before and after); then, at Sam's word again, the papillae (one U per
+  tooth from tip to tip, Becker 1997, Tarnow 1992) and the framework's metal (tapered bars on the crowns' outlines). Ticked step 5 (Occlusion's `CASE_IMG` struck: its
   page came down 2026-11-19); added Sam's look, the implant overdenture, a partial overdenture and caries on an abutment, and the
   implant and molar cantilevers. The four-unit implant bridge stays its own box. **Where it stopped:** the kit is done for this
   package; what's left is above.
