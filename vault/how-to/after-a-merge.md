@@ -67,6 +67,14 @@ so one that canceled a waiting push run leaves it to the next push's run.
   at the merge, whatever the hour, so it stays small.
 - It doesn't decide whether a data fix is right: that's the PR's review, like any change. A fix that writes to the
   class's data is reviewed in its PR and runs once, after the merge.
+- **A changed answer key restarts that question's picks before any data fix runs** (2026-11-24, [BUG-200](../release/bug-log.md)).
+  The keys step comes first, and the key loader (`admin_load_question_keys`) moves a question's picks to
+  `question_choices_past` when its choices' version changes, a fingerprint of its choices *and its key*
+  (`choiceVersion()` in `tools/xp/keys.js`). So a fix that recounts a key change from `question_choices` finds nothing
+  there: Review of Systems' 52 fixed keys read 0% right for a few minutes, until
+  `tools/data-fixes/2026-11-24-review-of-systems-picks.sql` moved the picks back. When only the key moved (the same choices
+  in the same places), the fix moves that load's picks back first, as that file does. Test a data fix on a throwaway copy
+  in the order After merge runs it: load the old keys, add picks, load the new keys, then the fix.
 
 Related: [ship-a-change](ship-a-change.md) · [build-a-hub](build-a-hub.md) · [ask-timmy](../reference/ask-timmy.md) ·
 [secrets](../rules/secrets.md) · [roll-back-a-release](roll-back-a-release.md)

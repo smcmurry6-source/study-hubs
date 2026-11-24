@@ -1,3 +1,5 @@
+-- (It ran after the new keys had moved these questions' picks aside, so it set them to 0 right: put right the same day by
+-- 2026-11-24-review-of-systems-picks.sql. After merge runs a fix only when it's added, so this note changes nothing.)
 -- Review of Systems' class numbers after the lessons audit of 2026-11-24 fixed 52 answer keys (51 in Head & Neck, one in
 -- Fundamentals I, f1-biomol-03). Each key pointed one choice past the right answer, the one its explanation and why lines
 -- describe (students reported ten of them on 11-23 and 11-24). The audit moved each key back one place; nothing else about
