@@ -30,6 +30,10 @@ what v2.0 left, so it isn't lost. Its own track (Sam, 2026-11-06, [decisions](..
 
 - [ ] The next hub with dental cases: its first cases use modules, and Sam approves each new module and view with its first
       case (restoration, caries, endo, the odontogram, the bitewing, the full-mouth series)
+- [ ] The next hub with dental cases ships a `content/figures.js` (an empty `window.SH_FIGURES = function(){ return {}; };`
+      is enough) and `figures.css`, or `needFigures()` in `widget/hub.js` stops waiting on them: it loads the hub's figure
+      file before it draws any case question, and Review of Systems has none, so a case question there never draws (found
+      2026-11-24, drawing a sample case for Sam)
 - [ ] The About page gets the new kinds of picture (odontogram, bitewing, full-mouth series) when a live hub first shows one
       ([about-page](../rules/about-page.md))
 - [x] Restorations and caries (Order step 2, Sturdevant's): preparation outlines that follow the crown's own surface (smooth
@@ -197,6 +201,10 @@ what v2.0 left, so it isn't lost. Its own track (Sam, 2026-11-06, [decisions](..
   9 records in `tools/ci/cases.js`. Also on every view: the ridge over a gap is measured from the neighbors' mid-facial margins
   (it was from their CEJs, so a gap sat about 2 mm too deep), and a front denture base fills the cervical embrasure beside
   each abutment.
+- 2026-11-24: Sam asked for a sample case. `v24-front-flanges` (with `v24-ex-28`) and `v24-partial-class-i` (with `v24-ex-19`)
+  were put into a local copy of Review of Systems only, drawn by the engine on the preview's made-up data at phone width, and
+  the screenshots sent to Sam in chat; nothing was committed. The first try found that a hub without `content/figures.js`
+  never draws a case question (the box above). The "Sam looks at v2.4's drawings" box stays open until Sam says.
 
 ## Outcome
 
