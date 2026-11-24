@@ -46,6 +46,22 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   before and after. **Applied after the merge**, 1-5 am Central (in `supabase/pending-migrations.txt` until then). How:
   [insights-dashboard](vault/reference/insights-dashboard.md), [analytics-retention](vault/reference/analytics-retention.md).
 
+- **2026-11-24 (The preview's two small bugs, BUG-107 and BUG-039, Claude Code)** — Preview only, nothing on the live
+  site changes. (1) The preview's dashboard drew Timmy at 0 HP for the returning, missed and high-XP test accounts until a
+  hub had been opened, because the made-up answer history was built from the hub page's own question list: the preview's
+  build now puts every engine hub's question ids and exam dates into the runtime (`hubFixtures()` in
+  `tools/preview/transform.js`), so any page makes the same history (the dashboard first: 100 HP). (2) On a small phone the
+  Preview button covered the exam check-in's buttons: while one of the page's dialogs is open it now moves to the corner or
+  edge that covers least of it (`dodge()` in `tools/preview/runtime/preview.js`), and stays put otherwise.
+- **2026-11-24 (Housekeeping: BUG-197's last rows, four retests, the inbox, Claude Code, #544)** — Nothing students see.
+  **BUG-197:** counted read-only, 2 `pq-` rows in question health (Review of Systems, ctx mock, 1 made-up visitor), from
+  12 minutes before #524 merged, none since: the guard proxy holds. `tools/data-fixes/2026-11-24-bug-197-last-rows.sql` (the
+  2026-11-20 fix's body) takes them after the merge. **Retested:** BUG-197; BUG-198 on the live site (Review of Systems'
+  `--hub` is `#6b46a8` on Home and Notes, light and dark, with every request off the site blocked); BUG-195 and BUG-194
+  (no recurrence in any of the 147 Check hubs and 111 Release tests runs since #506, logs searched). **Inbox:** its 16 ticked and struck lines cleared (each is in its PR, `decisions.md` or the bug log); the
+  boards PRs' line and the boards hub note rewritten to section 6 of `docs/boards/ENGINE_PLAN.md` (#81, #97, #100, #102
+  closed as replaced; #95, #101 through T-16 and T-17; ten finished as they are). **The sustainability task's** `due` moves
+  from 2026-12-02 (packages 1 and 2, done) to 2026-12-31, its next open box (the compaction after the December packs).
 - **2026-11-23 (Crowns given by hand, migration_v100, Claude Code)** — Sam: "Give [one account, by its leaderboard name]
   50,000 crowns". Every way to crowns until now pays XP too (a prize pays as many crowns as XP) or is worked out from XP and
   rank, so a new kind: `crown_gifts`, one row a gift, which `sh_wallet` adds to what was earned (`gifts` in its answer) and
