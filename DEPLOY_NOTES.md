@@ -32,6 +32,22 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-24 (Patient Box v2.2, Claude Code)** — the case kit (`widget/cases.js`, `widget/cases.css`, `widget/teeth.js`)
+  draws and checks what v2.1 left ([the task](vault/tasks/2026-11-20-patient-box-v2-next-steps.md)), each clinical call settled
+  from outside sources and cited in `cases.js`'s header (Sam, 2026-11-21: "Use outside sources to determine answers"):
+  **proximal root caries** (`root: true` on M or D: a saucer-shaped notch on a film between the CEJ and the crest, only on a
+  root bared by interdental attachment and bone loss; not on the view; an arrested one needs the exam in a row); the
+  **`roottip`** module (a retained root broken off about a millimeter above the CEJ, or a root tip in a healed socket under a
+  ridge that dips over it); **`resorption`** (internal, external cervical by Heithersay's class with its pink spot on the view,
+  external apical, replacement with the ankylosed tooth immobile and metallic on percussion); **`sealant`** (O, a mandibular
+  molar's buccal pit, a maxillary molar's or incisor's lingual; on the view and the odontogram, never a film); **temporary
+  fillings** (`material: "temporary"`, `temp` IRM or Cavit, bright with voids over a cotton pellet) and the **provisional
+  crown**; and the record's **`tests`** (bite test, transillumination, percussion), each a Patient Box row, so a crack's finding
+  is in the case, not a question's `pbox`. `rests` gains `roottip`, `resorption` and `sealant`; `tools/ci/cases.js` holds a
+  record for every rule (53 for `validate()`, 21 for `answerable()`); five examples and six questions in
+  `tools/cases/examples.json`; the how-to has the modules. Also fixed: a crowned tooth on the drawn chart looked natural in
+  the dark theme. No live hub has dental cases, so students see nothing yet; `sw.js` to `sh-v75` for the changed kit.
+
 - **2026-11-23 (Crowns given by hand, migration_v100, Claude Code)** — Sam: "Give [one account, by its leaderboard name]
   50,000 crowns". Every way to crowns until now pays XP too (a prize pays as many crowns as XP) or is worked out from XP and
   rank, so a new kind: `crown_gifts`, one row a gift, which `sh_wallet` adds to what was earned (`gifts` in its answer) and

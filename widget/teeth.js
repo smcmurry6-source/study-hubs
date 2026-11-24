@@ -424,8 +424,9 @@
   /* a full crown's preparation (Rosenstiel's reductions): the outline moved in by the axial reduction at the sides and the
      occlusal (incisal) one at the top, a shoulder or chamfer of `margin` mm at the cervical line, smoothed the way a
      preparation's cusps are flattened. Returns { arc, poly }: arc from the mesial margin over the top to the distal margin,
-     poly closed along the cervical line. */
-  var PREP = { gold:{ m:.5, ax:1.0, occ:1.5 }, pfm:{ m:1.0, ax:1.4, occ:2.0 }, zirconia:{ m:.6, ax:1.0, occ:1.0 }, lithium:{ m:1.0, ax:1.1, occ:1.6 }, ssc:{ m:.1, ax:.5, occ:1.2 } };
+     poly closed along the cervical line. A provisional crown (Patient Box v2.2) sits on the preparation made for its definitive
+     crown, drawn as a metal-ceramic one's (the commonest). */
+  var PREP = { gold:{ m:.5, ax:1.0, occ:1.5 }, pfm:{ m:1.0, ax:1.4, occ:2.0 }, zirconia:{ m:.6, ax:1.0, occ:1.0 }, lithium:{ m:1.0, ax:1.1, occ:1.6 }, ssc:{ m:.1, ax:.5, occ:1.2 }, provisional:{ m:1.0, ax:1.4, occ:2.0 } };
   function prepMM(type, kind, o){
     o = o || {}; var d = XT[type], L = crownLoop(d, o.per), C = L.C, h = d.ch, P = PREP[kind] || PREP.gold, v = d.cv / 2, c = d.cej || 0;
     var ext = o.extra || 0, col = o.collar;
