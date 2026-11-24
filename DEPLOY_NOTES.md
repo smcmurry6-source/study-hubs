@@ -32,6 +32,18 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-24 (Patient Box v2.4: a front space's labial flange, Claude Code)** — #554's two open calls, at Sam's word ("No to
+  canine cingulum rest, use outside sources to answer #2"): a mandibular canine keeps taking no cingulum rest, and a partial
+  denture's front bounded space (incisors and canines with teeth on both sides) gets its `flange`, from Faigenblum 2023 (Prim
+  Dent J) and Dental Update: `none`, the teeth gum-fitted on a ridge that has barely resorbed (up to 1.5 mm) and drawn standing in
+  the gum as a bridge's pontics are, with their own margins and papillae; `partial`, a collar 1 mm past the ridge's crest (up to
+  3 mm); `full`, a labial flange into the sulcus with its root eminences carved. It is chosen from `ridge` by default and refused
+  past those (the millimeters are the kit's reading); a front base also fills the cervical embrasure beside each abutment. On
+  every view, the ridge over a gap is now measured from the neighbors' mid-facial margins (it was from their CEJs, so gaps sat
+  about 2 mm too deep: the root tips, complete overdenture and both partial examples moved a little). Example
+  `v24-front-flanges`, question `v24-ex-28`, 9 `validate()` records in `tools/ci/cases.js`; the how-to has `flange`. `sw.js`
+  `sh-v78`.
+
 - **2026-11-24 (Lessons refresh: 52 answer keys in Review of Systems, Claude Code)** — Ten "keyed wrong" reports in a day led to a read of all 1,369 keys against their explanations and why lines (seven agents, a course or two each): 51 of Head & Neck's 68 single-answer items and `f1-biomol-03` pointed one choice past the right answer, wrong since the build (#480), every one by exactly one place; fixed in `hubs/review-of-systems/content/questions.json`. `tools/data-fixes/2026-11-24-review-of-systems-keys.sql` recounts their `question_stats` from `question_choices` after the merge (tested twice on a throwaway copy); After merge loads the new keys. Also: when troponin reaches the blood (`f2-genpath-20`, its notes and cram line), the panoramic chin-down error (`rd-anatomy-07` and its notes), and small slips in seven why lines and explanations. Listen with the device voice: BUG-199. `LESSONS.md` refreshed (Live signals, the game economy, a standing lesson on reading keys before a drafted bank ships). Then Sam's four calls ("Send the replies when fixed, adding the answer key step is good, prices are good for now, fix 5", [decisions](vault/decisions.md)): the key read is a step of [build-a-hub](vault/how-to/build-a-hub.md)'s Check; the shop's prices stay; Gold's agar is 20% sucrose (`om-viral-01` and its notes) and B cells finish maturing in the spleen (`f1-innate-12`), from standard references; reports #69-#79 are resolved with their replies once the fix is live, and #68's waits for BUG-199.
 
 - **2026-11-24 (Patient Box v2.4, Claude Code)** — the case kit (`widget/cases.js`, `widget/cases.css`) gets **removable partial

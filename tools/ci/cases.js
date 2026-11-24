@@ -229,6 +229,20 @@ for (const hub of fs.readdirSync(path.join(root, 'hubs')).sort()) {
     ['an upper Class II partial denture on a complete palate', true, ['2', '3', '4'], [{ m: 'missing', teeth: ['1', '2', '3', '16', '17', '32'] }, { m: 'denture', type: 'partial', arch: 'upper', connector: 'palate', clasps: { 4: 'rpi', 14: 'circumferential', 15: 'circumferential' }, rests: { 6: 'cingulum' } }], F(26)],
     ['a provisional bridge', true, ['29', '30', '31'], [{ m: 'missing', teeth: ['30'] }, { m: 'bridge', abutments: ['29', '31'], material: 'provisional' }]],
   );
+  // a front bounded space's labial flange (2026-11-24, Faigenblum 2023): none (gum-fitted) to 1.5 mm of resorption, partial to 3, full past it
+  const FRONT = { m: 'missing', teeth: ['9', '10'] };
+  const UP = (more) => Object.assign({ m: 'denture', type: 'partial', arch: 'upper', connector: 'ap-strap', clasps: { 3: 'circumferential', 14: 'circumferential' }, rests: { 3: 'm', 14: 'm', 8: 'cingulum', 11: 'cingulum' } }, more || {});
+  calls.push(
+    ['front teeth gum-fitted on a ridge resorbed 1 mm', true, ['8', '9', '10', '11'], [FRONT, UP({ ridge: 1 })], F(30)],
+    ['front teeth gum-fitted on a ridge resorbed 2 mm (it needs a flange)', false, ['8', '9', '10', '11'], [FRONT, UP({ ridge: 2, flange: 'none' })], F(30)],
+    ['a partial labial flange on a ridge resorbed 2 mm', true, ['8', '9', '10', '11'], [FRONT, UP({ ridge: 2, flange: 'partial' })], F(30)],
+    ['a partial labial flange on a ridge resorbed 4 mm (it needs a full one)', false, ['8', '9', '10', '11'], [FRONT, UP({ ridge: 4, flange: 'partial' })], F(30)],
+    ['a full labial flange on a ridge resorbed 4 mm', true, ['8', '9', '10', '11'], [FRONT, UP({ ridge: 4, flange: 'full' })], F(30)],
+    ['a full labial flange on a ridge resorbed 1 mm (a choice the kit allows)', true, ['8', '9', '10', '11'], [FRONT, UP({ ridge: 1, flange: 'full' })], F(30)],
+    ['a flange that is not none, partial or full', false, ['8', '9', '10', '11'], [FRONT, UP({ ridge: 1, flange: 'open' })], F(30)],
+    ['a flange on a denture with no front bounded space', false, ['20', '21'], [{ m: 'missing', teeth: LOW }, RPD({ flange: 'full' })], F(25)],
+    ['a flange on a complete denture', false, ['5', '6', '7'], [{ m: 'missing', teeth: ['17', '32'] }, { m: 'denture', type: 'complete', arch: 'upper', abutments: ['6', '11'], flange: 'full' }], F(16)],
+  );
   // a record: [what, passes, teeth, modules, more of the record (per-tooth t, tests)]
   for (const [what, ok, teeth, modules, extra] of calls) {
     const p = K.validate(Object.assign({ teeth, modules }, base, extra || {}));

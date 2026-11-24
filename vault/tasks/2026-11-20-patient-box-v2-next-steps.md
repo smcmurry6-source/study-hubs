@@ -91,9 +91,11 @@ what v2.0 left, so it isn't lost. Its own track (Sam, 2026-11-06, [decisions](..
       crown only) (v2.4, 2026-11-24: `{ m:'denture' }`, partial with its connector, clasps, RPIs and rests and the Kennedy class
       `derive()` works out, or complete over its overdenture abutments; the bridge module's `cantilever`, `type: "resin-bonded"`
       and `material: "provisional"`; every view draws them; examples `v24-partial-class-i`, `v24-partial-class-ii`,
-      `v24-complete-overdenture`, `v24-cantilevers` and `v24-resin-bonded`)
+      `v24-complete-overdenture`, `v24-cantilevers` and `v24-resin-bonded`; a front space's labial flange, 2026-11-24:
+      `v24-front-flanges`)
 - [ ] Sam looks at v2.4's drawings with their first case (on the view, the denture's pink base and teeth, the clasp arms, the
-      RPI's plate and I-bar and the rests, and with the denture out the resorbed ridge and an overdenture abutment's dome; on the
+      RPI's plate and I-bar and the rests, a front space's gum-fitted teeth and full labial flange, and with the denture out the
+      resorbed ridge and an overdenture abutment's dome; on the
       film the ridge, the dome and its seal, the resin-bonded wing, the cantilever's joins and the provisional bridge; the
       odontogram's denture marks and key), the way the first box says
 - [ ] An implant-retained overdenture (attachments on implants under a complete denture): `validate()` refuses an implant under
@@ -184,6 +186,15 @@ what v2.0 left, so it isn't lost. Its own track (Sam, 2026-11-06, [decisions](..
   page came down 2026-11-19); added Sam's look, the implant overdenture, a partial overdenture and caries on an abutment, and the
   implant and molar cantilevers. The four-unit implant bridge stays its own box. **Where it stopped:** the kit is done for this
   package; what's left is above.
+- 2026-11-24: the two calls #554 left (Sam: "No to canine cingulum rest, use outside sources to answer #2"). (1) No cingulum
+  rest on a mandibular canine: the kit already refused it; recorded in [decisions](../decisions.md). (2) A front bounded space's
+  labial flange, from Faigenblum 2023 (Prim Dent J) and Dental Update: the denture's `flange` is `none` (the teeth gum-fitted
+  on the ridge, drawn as a bridge's pontics are, with their own margins and papillae), `partial` (a collar 1 mm past the
+  ridge's crest) or `full` (a labial flange into the sulcus), chosen from `ridge` (to 1.5 mm, to 3, past it: the kit's
+  reading, since the papers give no millimeters) and refused past those; example `v24-front-flanges` and question `v24-ex-28`;
+  9 records in `tools/ci/cases.js`. Also on every view: the ridge over a gap is measured from the neighbors' mid-facial margins
+  (it was from their CEJs, so a gap sat about 2 mm too deep), and a front denture base fills the cervical embrasure beside
+  each abutment.
 
 ## Outcome
 
