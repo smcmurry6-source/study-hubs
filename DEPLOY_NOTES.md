@@ -50,7 +50,8 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   `da-tmj-12` lost a wrong `which` label. The same errors came out of the notes (27 lines in `notes.json`, `study.json`
   and one topic title in `core.json`; High yield rebuilt), with one "the lecture called ... low yield" sentence
   ([dont-ask-what-professors-skip](vault/rules/dont-ask-what-professors-skip.md)). No id changed, none retired. Calls
-  left for Sam: [the inbox](vault/tasks/inbox.md).
+  left for Sam: [the inbox](vault/tasks/inbox.md). Reports #80-#84 (five Head & Neck keys #552 had already fixed, sent
+  from pages still showing the old copy) were resolved with their replies.
 - **2026-11-24 (After #552: the fixed keys' picks put back, BUG-200, Claude Code)** — After merge loaded Review of Systems' new keys, which set the 31 answered fixed questions' picks aside (`question_choices_past`: the choices' version includes the key), and then #552's recount found no picks and set them to 0% right. Within 3 minutes the picks went back under each question's current choice version and the recount ran again, by hand through the connector: 52 right of 105 tries. Recorded as `tools/data-fixes/2026-11-24-review-of-systems-picks.sql` (After merge runs it again on this merge: a no-op move and the same recount), tested on a throwaway copy in After merge's order; the gotcha is in [after-a-merge](vault/how-to/after-a-merge.md). Reports #69-#79 resolved with their replies (Sam: "Send the replies when fixed"); #68 waits for BUG-199. The class notice went out on Sam's word ("You can send the notice"): `site_notices` #8, "Fixed: 52 answer keys in Review of Systems", 20:13 UTC.
 
 - **2026-11-24 (the "Good question?" thumbs' words hidden again, Claude Code)** — #548 cut `.sh-cp-sr` from
