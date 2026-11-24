@@ -13,7 +13,7 @@
    single-file hubs' pages and the separate widget files they load by name are cached as they are used.
    Not here on purpose: widget/hub-art/outfits.js and the set files in widget/hub-art/place/ (fetched
    only when that outfit or set is drawn). */
-var VERSION = 'sh-v76';
+var VERSION = 'sh-v77';
 var HUBS = ['review-of-systems'];
 /* the hubs above with no drawn figures and no arcade (Review of Systems, Sam, 2026-11-19): no figures.js/css or arcade.js/css to keep */
 var TEXT_ONLY = ['review-of-systems'];

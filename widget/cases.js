@@ -118,7 +118,64 @@
      and implant fixed partial dentures do well (Pjetursson et al., Clin Oral Implants Res 2012;23(S6):22); never an implant joined to
      a tooth (the lecture: the tooth moves 25 to 100 um in its ligament, the implant 3 to 5 um; Lang, Pjetursson, Tan, Bragger, Egger
      and Zwahlen, Clin Oral Implants Res 2004;15:643: lower survival and intrusion of the tooth). Lithium disilicate stays a bridge
-     material up to the second premolar, as on teeth. */
+     material up to the second premolar, as on teeth.
+   Patient Box v2.4 (2026-11-24): removable partial and complete dentures, overdenture abutments, cantilever, resin-bonded and
+   provisional bridges ({ m:'denture' }; the bridge module's cantilever and type), each call settled from outside sources. The
+   textbooks (McCracken's Removable Partial Prosthodontics, Carr and Brown; Zarb's Prosthodontic Treatment for Edentulous Patients;
+   Shillingburg's Fundamentals of Fixed Prosthodontics; Rosenstiel's Contemporary Fixed Prosthodontics) are as their teaching
+   summaries give them; the papers were checked against their PubMed records:
+   - Kennedy's classes (the Glossary of Prosthodontic Terms, 10th ed., J Prosthet Dent 2023;130(4 Suppl 1):e1) and Applegate's rules
+     (McCracken's): classify after the planned extractions; a missing third molar, or second molar, the denture doesn't replace isn't
+     counted; the most posterior space sets the class (I both sides free-ended, II one side, III bounded, IV one bounded space across
+     the midline in front of the teeth left); every other space is a modification, counted, whatever its size; Class IV has none.
+     derive() works it out (kennedy) and the box never states it; a tooth missing inside the arch that nothing replaces is refused;
+   - rests (McCracken's): an occlusal rest on a premolar or molar in its marginal ridge, the side next to the denture base, and on
+     a distal-extension abutment the mesial (a distal rest next to the free-end base tips the abutment toward it as the base
+     rotates); a cingulum rest on a maxillary canine (or several maxillary incisors); a mandibular canine's cingulum has too little
+     enamel, so it takes an incisal rest at its distoincisal angle, the least preferred rest and a last resort on an incisor;
+   - clasps (McCracken's; Davenport et al., Br Dent J 2001;190:71; Owen and Naidoo, Int Dent J 2022;72:58): every clasp has its rest;
+     the retentive arm's tip in the gingival third, in a 0.25 mm undercut for cast cobalt-chromium, usually on the buccal with the
+     rigid reciprocal arm on the lingual; the RPI (Kratochvil, J Prosthet Dent 1963;13:114; Krol, J Prosthet Dent 1973;29:408) on a
+     distal-extension abutment: a mesio-occlusal rest, a distal proximal plate on a guide plane and an I-bar in the gingival third
+     near the middle of the buccal, its approach arm 3-4 mm from the gingival margin, so the plate and bar move away from the tooth
+     as the base rotates; clasps on both sides of the arch; no clasp on a tooth with mobility 2 or more (an abutment's support; the
+     abutments do well with yearly recall: Bergman, Hugoson and Olsson, J Prosthet Dent 1982;48:506 and J Oral Rehabil 1995;22:595);
+   - major connectors and indirect retainers (McCracken's; the Glossary): a lingual bar needs 8 mm from the lingual gingival margins
+     to the raised floor of the mouth (its upper border 4 mm below them, the bar about 4 mm tall), else a lingual plate (also for
+     tori, a high frenum or anterior teeth that need support); the upper connectors a palatal strap, an anterior-posterior strap, a
+     horseshoe or a complete palate (chosen by the class, not refused by it). A Class I or II denture has an indirect retainer, a
+     rest on the far side of the fulcrum line from its free-end base: a canine's or first premolar's;
+   - films are taken with removable prostheses out (Iannucci and Howerton, Dental Radiography: patient preparation): its framework
+     would shadow the teeth, so every film here is drawn without the denture and says so. A denture's acrylic is radiolucent (Tsuge,
+     J Oral Sci 2009;51:223: under 0.5 mm Al per 2 mm, dentin 2.3; Bloodworth and Render, J Prosthet Dent 1992;67:121);
+   - the edentulous ridge resorbs most in the first year and slowly after it, the anterior mandible about four times as fast as the
+     maxilla (Tallgren, J Prosthet Dent 1972;27:120; Atwood and Coy, J Prosthet Dent 1971;26:280; Cawood and Howell, Int J Oral
+     Maxillofac Surg 1988;17:232): the denture's ridge (mm below the neighbors' crests; 1.5 by default, 0-15) on the film and the view;
+   - overdenture abutments (Zarb's; Leong et al., Cureus 2024;16:e53184; Crum and Rooney, J Prosthet Dent 1978;40:610: less bone lost
+     under them): a canine first, then a premolar, with at least half its bone support; root-filled, cut to a dome about 2-3 mm
+     above the gingival margin and its canal's orifice sealed with amalgam, composite or glass ionomer, which do alike (Keltjens et
+     al., J Dent 1999;27:551); a fifth were lost over up to 22 years, to periodontal disease, periapical lesions and caries, more
+     often without daily fluoride and recall (Ettinger and Qian, JADA 2004;135:739). A vital abutment, a coping and an
+     implant-retained overdenture aren't drawn yet;
+   - cantilevers (Shillingburg's, via Hill, Compend Contin Educ Dent 2009;30:580; Rosenstiel's; Pjetursson, Tan, Lang, Bragger,
+     Egger and Zwahlen, Clin Oral Implants Res 2004;15:667: 81.8% at 10 years, abutments losing vitality the commonest problem):
+     one small pontic; a single abutment only for a maxillary lateral incisor from the canine; a first premolar from the second
+     premolar and first molar splinted, cantilevered mesially (the pontic past the last abutment, distally, rests on expert opinion
+     and finite-element studies: refused); a molar only as a premolar-sized pontic on two splinted premolars (not drawn); never a
+     canine (it guides the excursions); not on implants here;
+   - resin-bonded bridges (Livaditis and Thompson, J Prosthet Dent 1982;47:52; Kern, Quintessence Int 2005;36:141 and Kern and
+     Sasse, J Adhes Dent 2011;13:407: single-retainer 94.4% at 10 years, two-retainer 73.9%; Kern, Passia, Sasse and Yazigi, J Dent
+     2017;65:51; Kern and Glaser, J Esthet Restor Dent 2023;35:64; Pjetursson et al., Clin Oral Implants Res 2008;19:131; Thoma et
+     al., Clin Oral Implants Res 2017;28:1421): a metal or zirconia wing (zirconia at least 0.7 mm) bonded to the lingual enamel of
+     an uncrowned abutment, wrapping the proximal next to the pontic, its margin above the gingiva, with no restoration where it
+     bonds; one pontic, an incisor's,
+     canine's or premolar's; the single-retainer cantilever for an incisor (Kern prefers the central incisor for a lateral), the
+     two-retainer design debonding one wing unnoticed; not on a mobile abutment. On a film the wing lies over the crown as a
+     radiopaque band;
+   - a provisional bridge: PMMA or bis-acryl on temporary cement, less radiopaque than dentin (Pekkan 2011; Tsuge 2009), drawn as
+     v2.2's provisional crown is.
+   The odontogram's marks follow no single standard (charting conventions vary by school and software): a denture's teeth crossed
+   out and joined by its base, as the common teaching charts draw them, with every mark in its key. */
 (function(){
   'use strict';
   var I = {};
@@ -211,10 +268,24 @@
            healing: under its cover screw, no crown and no probing; years since the crown was delivered, weeks since placement
        { m:'bridge', abutments:[a, b], material } on two implants (each in an implant module): an implant-supported bridge, drawn on
            every view; never an implant joined to a tooth, and one pontic between two implants
+     Patient Box v2.4 (2026-11-24; the sources are in this file's header):
+       { m:'denture', type:'partial', arch, connector, floor, ridge, years, replaces:[...], clasps:{ n:'circumferential' | 'rpi' },
+           rests:{ n:'m' | 'd' | 'md' | 'cingulum' | 'incisal' } }   a removable partial denture: it replaces every missing tooth of
+           its arch but the third molars and a bridge's pontics (or replaces); a clasp's rest, where rests gives none, is worked out;
+           connector strap | ap-strap | horseshoe | palate (upper), bar | plate (lower); floor the lingual gingival margins to the
+           floor of the mouth, mm (a lingual bar needs 8); ridge the edentulous ridge's resorption, mm; years worn
+       { m:'denture', type:'complete', arch, ridge, years, abutments:[...], seal:'amalgam' | 'composite' | 'gi' }   a complete
+           denture: every tooth of the arch missing but its overdenture abutments, each root-filled (the endo module may give its
+           fill), cut to a dome and sealed
+       { m:'bridge', abutments:[a] (or two side by side, splinted), cantilever:'n', material }   a cantilever bridge: its one
+           pontic n held from one side
+       { m:'bridge', type:'resin-bonded', abutments:[a, b] (or [a] with cantilever), material:'metal' | 'zirconia' }   a
+           resin-bonded bridge: wings on the abutments' lingual enamel, the pontic porcelain on the metal framework or zirconia
+       bridge material:'provisional' (a provisional bridge)
      The record keeps everything else (age, smoke, hba1c, cc, mouth, gingiva), and the box rows, every view and the key
      are drawn from it. */
   var MAT = ['amalgam', 'composite', 'gold', 'crown'], DEPTH = ['enamel', 'dentin', 'pulp'];
-  var RMAT = ['amalgam', 'composite', 'gold', 'ceramic', 'temporary'], RTYPE = ['direct', 'inlay', 'onlay', 'veneer'], CROWNS = ['gold', 'pfm', 'zirconia', 'lithium', 'ssc', 'provisional'], BRIDGES = CROWNS.slice(0, 4);
+  var RMAT = ['amalgam', 'composite', 'gold', 'ceramic', 'temporary'], RTYPE = ['direct', 'inlay', 'onlay', 'veneer'], CROWNS = ['gold', 'pfm', 'zirconia', 'lithium', 'ssc', 'provisional'], BRIDGES = CROWNS.slice(0, 4).concat('provisional');
   var CROWN_NAME = { gold:'full gold crown', pfm:'porcelain-fused-to-metal crown', zirconia:'zirconia crown', lithium:'lithium disilicate crown', ssc:'stainless steel crown', provisional:'provisional (temporary) crown' };
   /* v2.2: temporary fillings, resorption, root tips, sealants, clinical tests */
   var TEMPS = ['irm', 'cavit'], TEMP_NAME = { irm:'IRM', cavit:'Cavit' }, RSP = ['internal', 'cervical', 'apical', 'replacement'], AT_T = { cervical:.22, middle:.5, apical:.75 };
@@ -232,6 +303,22 @@
   var PLAT = 1.1, MUCOSA = 3.5, PROBE_GAP = { health:1.5, mucositis:1, 'peri-implantitis':.5, failed:.5 };
   /* the width an implant gets by default where the author gives none: narrow (3.3) for a lower incisor or an upper lateral, wide
      (4.8) for a molar, regular (4.1) elsewhere (the narrow, regular and wide sizes of the common bone-level systems) */
+  /* v2.4: dentures, overdenture abutments, cantilever, resin-bonded and provisional bridges (the sources are in this file's header).
+     A partial denture's clasps and rests, its major connector by arch, an overdenture abutment's seal over its canal, a resin-bonded
+     bridge's retainer wings */
+  var DENT = ['partial', 'complete'], CLASPS = ['circumferential', 'rpi'], REST_AT = ['m', 'd', 'md', 'cingulum', 'incisal'], SEALS = ['amalgam', 'composite', 'gi'], WINGS = ['metal', 'zirconia'];
+  var CONNECTORS = { upper:['strap', 'ap-strap', 'horseshoe', 'palate'], lower:['bar', 'plate'] };
+  var CONNECTOR_NAME = { strap:'a palatal strap', 'ap-strap':'an anterior-posterior palatal strap', horseshoe:'a horseshoe (U-shaped) connector', palate:'a complete palatal plate', bar:'a lingual bar', plate:'a lingual plate' };
+  var REST_NAME = { m:'mesial occlusal', d:'distal occlusal', md:'mesial and distal occlusal', cingulum:'cingulum', incisal:'incisal' };
+    var CLASP_NAME = { circumferential:'circumferential clasp', rpi:'RPI clasp (a mesial rest, a distal proximal plate and an I-bar)' }, SEAL_NAME = { amalgam:'amalgam', composite:'composite', gi:'glass ionomer' };
+  var DKEYS = ['type', 'connector', 'years', 'floor', 'ridge', 'replaces'], LINGUAL_BAR = 8, RIDGE = 1.5;
+  function archNums(arch){ var o = []; for(var i = arch === 'upper' ? 1 : 17, e = i + 16; i < e; i++) o.push(String(i)); return o; }
+  function archOf(n){ return isUpper(n) ? 'upper' : 'lower'; }
+  /* a tooth's neighbor toward the midline (mesial) or away from it (distal) in its arch; the two centrals are each other's mesial */
+  function nbr(n, mesial){ var p = posOf(n), out = null; [+n - 1, +n + 1].forEach(function(b){ if(b < 1 || b > 32 || !adjacent(n, b)) return; var q = posOf(b); if(mesial ? (q < p || (q === 1 && p === 1)) : q > p) out = String(b); }); return out; }
+  /* a distal-extension (free-end) abutment: the tooth distal to it is one the denture replaces, and everything past it to the end of
+     the arch is gone. get(n) gives { dent, gone } from whichever record is at hand (expand's raw one, or tooth()) */
+  function freeEnd(n, get){ var b = nbr(n, false); if(!b || !get(b).dent) return false; while(b){ if(!get(b).gone) return false; b = nbr(b, false); } return true; }
   function implantW(n){ var c = CAT(n); if(!c) return 4.1; return c.pos >= 6 ? 4.8 : (c.pos === 2 || (c.pos === 1 && c.arch !== 'upper')) ? 3.3 : 4.1; }
   function sides2(v, def){ return v && typeof v === 'object' ? { m:+(v.m != null ? v.m : def), d:+(v.d != null ? v.d : def) } : { m:v == null ? def : +v, d:v == null ? def : +v }; }
   /* the roots a film shows one by one (the canals it can judge): a molar's mesial and distal (buccal) roots, else the one in front */
@@ -337,7 +424,7 @@
   }
   function expand(spec){
     if(!spec || !spec.modules) return spec;
-    var t = {}, probs = [];
+    var t = {}, probs = [], dens = {};
     spec.modules.forEach(function(md, i){
       var w = 'module ' + (i + 1) + ' (' + md.m + '): ';
       if(md.m === 'missing') list(md.teeth).forEach(function(n){ ensure(t, n).missing = true; });
@@ -355,6 +442,7 @@
         ['post', 'core', 'sep', 'missed'].forEach(function(k){ if(md[k]) eo[k] = md[k]; });
         if(typeof md.fill === 'string') eo.fill = md.fill;
         if(md.fill !== false) re.endo = Object.keys(eo).length ? eo : true;
+        else { re.nofill = true; if(re.od) probs.push(w + '#' + md.tooth + ' is an overdenture abutment: it is root-filled (a vital one isn\'t drawn yet)'); }
         if(md.widened) re.apdl = true;
         if(md.lesion) re.lesion = md.lesion; }
       else if(md.m === 'fracture'){ var rf = ensure(t, md.tooth), fx = { type:md.type };
@@ -363,12 +451,42 @@
           rf.pd = rf.pd || {}; rf.pd[sf] = (rf.pd[sf] || [2, 2, 2]).slice(); rf.pd[sf][1] = dep;
           rf.bop = rf.bop || {}; rf.bop[sf] = (rf.bop[sf] || [0, 0, 0]).slice(); rf.bop[sf][1] = 1; }
         (rf.fx = rf.fx || []).push(fx); }
-      else if(md.m === 'bridge'){ var ab = list(md.abutments), bm = md.material || 'pfm';
-        if(BRIDGES.indexOf(bm) < 0) probs.push(w + 'a bridge is ' + BRIDGES.join(', ') + ' (a stainless steel crown is a single crown)');
-        if(ab.length !== 2) probs.push(w + 'a bridge names its two abutments');
+      else if(md.m === 'bridge'){ var ab = list(md.abutments), rb = md.type === 'resin-bonded', bm = md.material || (rb ? 'metal' : 'pfm'), cv = md.cantilever != null ? String(md.cantilever) : null;
+        /* v2.4: a resin-bonded bridge's abutments carry wings bonded to their lingual enamel, not crowns, and its pontic is porcelain on
+           the metal framework (a metal one) or zirconia; a cantilever's pontic hangs off one end, held by one abutment or two splinted */
+        var pm = rb ? (bm === 'zirconia' ? 'zirconia' : 'pfm') : bm;
+        if(md.type != null && md.type !== 'conventional' && !rb) probs.push(w + 'type is conventional (the default) or resin-bonded');
+        if(rb ? WINGS.indexOf(bm) < 0 : BRIDGES.indexOf(bm) < 0) probs.push(w + (rb ? 'a resin-bonded bridge is metal (cobalt-chromium or nickel-chromium) or zirconia' : 'a bridge is ' + BRIDGES.join(', ') + ' (a stainless steel crown is a single crown)'));
+        var abutAs = function(n, splint){ var ra = ensure(t, n); if(rb) ra.wing = bm; else ra.crown = bm; ra.abut = splint ? 'splint' : true; };
+        if(cv){
+          if(ab.length < 1 || ab.length > 2) probs.push(w + 'a cantilever names one abutment, or two side by side');
+          else if(ab.length === 2 && !adjacent(ab[0], ab[1])) probs.push(w + 'a cantilever\'s two abutments are side by side, splinted together');
+          else if(ab.indexOf(cv) >= 0 || ab.filter(function(n){ return adjacent(n, cv); }).length !== 1) probs.push(w + 'the cantilevered pontic sits next to one abutment, past the end of the bridge');
+          else { ab.forEach(function(n){ abutAs(n, ab.length > 1); }); var rp = ensure(t, cv); rp.pontic = pm; rp.cant = true; } }
+        else if(ab.length !== 2) probs.push(w + 'a bridge names its two abutments (or one, with cantilever: the pontic it holds)');
         else { var span = bridgeSpan(ab[0], ab[1]);
           if(!span || !span.length) probs.push(w + 'the abutments must be in one arch with at least one tooth between them');
-          else { ab.forEach(function(n){ var ra = ensure(t, n); ra.crown = bm; ra.abut = true; }); span.forEach(function(n){ ensure(t, n).pontic = bm; }); } } }
+          else { ab.forEach(function(n){ abutAs(n, false); }); span.forEach(function(n){ ensure(t, n).pontic = pm; }); } } }
+      else if(md.m === 'denture'){ var dt = md.type || 'partial', ar = md.arch, ods = list(md.abutments);
+        if(DENT.indexOf(dt) < 0) probs.push(w + 'type must be partial or complete');
+        else if(ar !== 'upper' && ar !== 'lower') probs.push(w + 'arch must be upper or lower');
+        else if(dens[ar]) probs.push(w + 'a second denture in the ' + ar + ' arch');
+        else {
+          var dd = { type:dt }; ['connector', 'years', 'floor', 'ridge'].forEach(function(k){ if(md[k] != null) dd[k] = md[k]; });
+          Object.keys(md).forEach(function(k){ if(['m', 'type', 'arch', 'connector', 'years', 'floor', 'ridge', 'abutments', 'seal', 'replaces', 'clasps', 'rests'].indexOf(k) < 0) probs.push(w + k + ' is not part of a denture'); });
+          /* an overdenture abutment: a root-filled root under the denture, domed and its canal sealed (the endo module may give the fill) */
+          if(dt === 'partial' && (md.abutments || md.seal)) probs.push(w + 'overdenture abutments go under a complete denture here (one under a partial denture isn\'t drawn yet)');
+          else ods.forEach(function(n){ var ro = ensure(t, n); if(ro.nofill){ probs.push(w + '#' + n + ' is an overdenture abutment: it is root-filled (a vital one isn\'t drawn yet)'); return; }
+            ro.od = md.seal || 'amalgam'; if(!ro.endo) ro.endo = { fill:'adequate' }; });
+          if(dt === 'complete'){
+            ['replaces', 'clasps', 'rests', 'connector', 'floor'].forEach(function(k){ if(md[k] != null) probs.push(w + 'a complete denture has no ' + k + ' (that is a partial denture\'s)'); });
+            /* every tooth of the arch is gone but its overdenture abutments; the denture's fourteen teeth replace all but the third molars */
+            archNums(ar).forEach(function(n){ if(ods.indexOf(n) >= 0) return; var rc = ensure(t, n);
+              if(rc.implant){ probs.push(w + '#' + n + ' is an implant: an implant-retained overdenture (attachments on implants under the denture) isn\'t drawn yet'); return; }
+              rc.missing = true; if(posOf(n) < 8) rc.dent = 'complete'; });
+          } else { dd.replaces = md.replaces ? list(md.replaces) : null; dd.clasps = md.clasps || {}; dd.rests = md.rests || {};
+            dd.replaces && dd.replaces.forEach(function(n){ ensure(t, n).missing = true; }); }
+          dens[ar] = dd; } }
       else if(md.m === 'roottip'){ var rt = ensure(t, md.tooth);
         if(md.kind === 'fragment'){ rt.missing = true; rt.rtip = { len:md.len == null ? 4 : md.len }; if(md.root) rt.rtip.root = md.root; }
         else if(md.kind == null || md.kind === 'retained') rt.retained = true;
@@ -384,6 +502,20 @@
         r.rec.f = (r.rec.f || [-2, -2, -2]).slice(); r.pd.f = (r.pd.f || [2, 2, 2]).slice(); var cal = r.pd.f[1] + r.rec.f[1]; r.rec.f[1] = Math.max(mm, 0); r.pd.f[1] = Math.max(1, cal - mm); });
       else probs.push(w + 'unknown module');
     });
+    /* v2.4: a partial denture, once every module has run: the teeth it replaces (by default every missing tooth of its arch but the
+       third molars and a bridge's pontics), its clasps, and each clasp's rest where the author gives none: a cingulum rest on a maxillary
+       canine or incisor, an incisal rest on a mandibular one; on a premolar or molar the mesial for an RPI and for a distal-extension abutment (a rest next to the free-end base
+       tips the abutment toward it), otherwise the side next to the denture base */
+    Object.keys(dens).forEach(function(ar){ var dd = dens[ar]; if(dd.type !== 'partial') return;
+      var rep = dd.replaces || archNums(ar).filter(function(n){ var r = t[n]; return r && r.missing && !r.pontic && posOf(n) < 8; });
+      rep.forEach(function(n){ ensure(t, n).dent = 'partial'; });
+      dd.replaces = rep;
+      var get = function(n){ var r = t[n] || {}; return { dent:!!r.dent || !!r.od, gone:(!!r.missing && !r.pontic) || !!r.od }; };
+      Object.keys(dd.rests).forEach(function(n){ ensure(t, n).rest = dd.rests[n]; });
+      Object.keys(dd.clasps).forEach(function(n){ var r = ensure(t, n); r.clasp = dd.clasps[n]; if(r.rest) return;
+        var mz = nbr(n, true), di = nbr(n, false), md2 = mz && get(mz).dent, dd2 = di && get(di).dent;
+        r.rest = posOf(n) <= 3 ? (isUpper(n) ? 'cingulum' : 'incisal') : r.clasp === 'rpi' || freeEnd(n, get) ? 'm' : md2 && dd2 ? 'md' : dd2 ? 'd' : 'm'; });
+      delete dd.clasps; delete dd.rests; });
     /* the author's own numbers win, field by field */
     Object.keys(spec.t || {}).forEach(function(n){
       var own = spec.t[n]; if(!own) return; var r = ensure(t, n);
@@ -391,6 +523,7 @@
     });
     var out = {}; Object.keys(spec).forEach(function(k){ out[k] = spec[k]; });
     out.t = t; out._moduleProblems = probs; delete out.modules;
+    if(Object.keys(dens).length){ var dz = {}; Object.keys(spec.dentures || {}).forEach(function(a){ dz[a] = spec.dentures[a]; }); Object.keys(dens).forEach(function(a){ dz[a] = dens[a]; }); out.dentures = dz; }
     return out;
   }
   var CACHE = typeof WeakMap === 'function' ? new WeakMap() : null;
@@ -414,7 +547,8 @@
       resto:t.resto || [], caries:t.caries || [], lesion:t.lesion || 0, raw:t,
       crownMat:typeof t.crown === 'string' ? t.crown : null, margin:t.margin || {}, eo:t.endo && typeof t.endo === 'object' ? t.endo : null,
       apdl:!!t.apdl, fx:t.fx || [], pontic:t.pontic || null, abut:!!t.abut,
-      retained:!!t.retained, rtip:t.rtip || null, rsp:t.rsp || [], seal:t.seal ? String(t.seal) : '' };
+      retained:!!t.retained, rtip:t.rtip || null, rsp:t.rsp || [], seal:t.seal ? String(t.seal) : '',
+      dent:t.dent || null, clasp:t.clasp || null, rest:t.rest ? String(t.rest) : '', od:t.od || null, wing:t.wing || null, cant:!!t.cant, splint:t.abut === 'splint' };
     r.cal = { f:r.pd.f.map(function(p, i){ return p + r.rec.f[i]; }), l:r.pd.l.map(function(p, i){ return p + r.rec.l[i]; }) };
     return r;
   }
@@ -497,6 +631,9 @@
     out.rt = {};
     ts.forEach(function(t){ if(t.missing || t.implant) return; var fr = t.rec.f[1], ip = Math.max(t.cal.f[0], t.cal.f[2], t.cal.l[0], t.cal.l[2]), fc = t.cal.f[1];
       if(fr > 0) out.rt[t.n] = ip <= 0 ? 'RT1' : ip <= fc ? 'RT2' : 'RT3'; });
+    /* v2.4: each partial denture's arch, its Kennedy class (Applegate's rules) */
+    out.kennedy = {};
+    Object.keys(spec.dentures || {}).forEach(function(ar){ var d = spec.dentures[ar]; if(!d || d.type !== 'partial') return; var K = kennedyOf(spec, ar); if(K) out.kennedy[ar] = K; });
     return out;
   };
 
@@ -512,7 +649,7 @@
      fractures and bridges. Every one is an error (validate() has no warnings). A vertical root fracture on a tooth with no root
      canal treatment or restoration is allowed only on a molar the case marks vital:true: most follow root canal treatment, a post
      or a large restoration (Cohen's), and the untreated ones are nearly all attrited first molars (Liao et al. 2017, 2021). */
-  function v21(t, w, cat, bad){
+  function v21(t, w, cat, bad, spec){
     var post = cat.pos >= 4, molar = cat.pos >= 6, fr = filmRoots(t.n), sides = function(v){ return /^(m|d|md|dm)$/.test(String(v)); };
     if(t.crownMat && CROWNS.indexOf(t.crownMat) < 0) bad(w + 'crown must be true or one of ' + CROWNS.join(', '));
     if(t.crownMat === 'ssc' && !molar) bad(w + 'a stainless steel crown on a permanent tooth is for a molar (AAPD: primary teeth and permanent molars)');
@@ -561,7 +698,13 @@
         if(f.pd != null){ num(f.pd, 5, 12, w + 'vrf pocket'); } }
       if(ty === 'hrf'){ if(cat.roots.length > 1) bad(w + 'a horizontal root fracture is drawn on a single-rooted tooth'); if(HRF_AT.indexOf(f.at) < 0) bad(w + 'hrf at must be ' + HRF_AT.join(', ')); }
     });
-    if(t.abut){ if(!t.crown) bad(w + 'a bridge abutment carries a crown'); }
+    if(t.abut && !t.crown && !t.wing) bad(w + 'a bridge abutment carries a crown (or, on a resin-bonded bridge, a wing)');
+    if(t.wing){ if(WINGS.indexOf(t.wing) < 0) bad(w + 'a resin-bonded wing is metal or zirconia'); if(t.crown) bad(w + 'a resin-bonded wing on a crowned tooth: a crowned abutment carries a conventional bridge'); if(!t.abut) bad(w + 'a resin-bonded wing with no bridge (the bridge module writes it)');
+      if(t.mob >= 2) bad(w + 'a resin-bonded wing on a tooth with mobility ' + t.mob + ': a mobile abutment debonds it (Kern)');
+      /* the wing bonds to the enamel of the lingual and of the proximal next to the pontic: no restoration there */
+      var pm = nbr(t.n, true), side = pm && tooth(spec, pm).pontic ? 'M' : 'D';
+      t.resto.forEach(function(r){ var hit = String(r.s || '').split('').filter(function(c){ return c === 'L' || c === side; });
+        if(hit.length) bad(w + 'a resin-bonded wing bonds to enamel: a restoration on ' + hit.join('') + ', under the wing (a restored abutment takes a conventional bridge)'); }); }
     function num(v, lo, hi, what){ if(typeof v !== 'number' || v < lo || v > hi) bad(what + ' = ' + v + ' is outside ' + lo + '-' + hi); }
   }
   /* decay seen from the buccal: what a lesion's look and place allow (Fejerskov's Dental Caries; ICDAS; Nyvad and Fejerskov's root
@@ -594,7 +737,7 @@
     function num(v, lo, hi, what){ if(typeof v !== 'number' || isNaN(v) || v < lo || v > hi) bad(w + what + ' = ' + v + ' is outside ' + f1(lo) + '-' + f1(hi)); }
     if(t.rtip) bad(w + 'a root tip in a healed socket is on a missing tooth (kind fragment marks it missing); a root whose crown is gone is kind retained');
     if(t.retained) [['crown', t.crown], ['restoration', t.resto.length || t.amalgam], ['caries', t.caries.length], ['fracture', t.fx.length], ['root canal filling', t.endo], ['sealant', t.seal], ['resorption', t.rsp.length], ['bridge abutment', t.abut], ['crown margin', t.margin.open || t.margin.overhang]].forEach(function(e){
-      if(e[1]) bad(w + 'a retained root (its crown gone) has no ' + e[0] + (e[0] === 'caries' ? ': the decay that took the crown is drawn with it' : e[0] === 'root canal filling' ? ' here: a root-filled root kept under a denture is an overdenture abutment, not drawn yet' : '')); });
+      if(e[1]) bad(w + 'a retained root (its crown gone) has no ' + e[0] + (e[0] === 'caries' ? ': the decay that took the crown is drawn with it' : e[0] === 'root canal filling' ? ' here: a root-filled root kept under a denture is an overdenture abutment (the denture module\'s abutments)' : '')); });
     var seen = {};
     t.rsp.forEach(function(x){
       if(!x || RSP.indexOf(x.type) < 0){ bad(w + 'resorption type must be ' + RSP.join(', ')); return; }
@@ -695,11 +838,14 @@
       else if(base < b - 2.5) bad(site + 'the pocket base sits ' + f1(b - base) + ' mm above the bone (the bone ' + f1(b) + ' mm below the platform): the probe stops about 1-1.5 mm above it in health and nearer in disease');
       if(t.rec[s][i] > b - 1) bad(site + 'the mucosal margin (recession ' + t.rec[s][i] + ') sits within 1 mm of the bone (' + f1(b) + ' mm below the platform)'); }); });
   }
-  /* bridges across the record: every run of pontics has an abutment at each end, every abutment is next to a pontic */
+  /* bridges across the record: every run of pontics has an abutment at each end (a cantilever's one pontic an abutment on one side),
+     every abutment is next to a pontic (or splinted to the abutment that is) */
   function bridgeCheck(spec, bad){
     var T = {}; for(var n = 1; n <= 32; n++) T[n] = tooth(spec, String(n));
+    function nb(a, b){ return b >= 1 && b <= 32 && adjacent(a, b); }
     for(var a = 1; a <= 32; a++){ var t = T[a];
-      if(t.pontic){ [a - 1, a + 1].forEach(function(b){ if(b < 1 || b > 32 || !adjacent(a, b)) { bad('#' + a + ': a pontic at the end of the arch has no abutment past it'); return; } var u = T[b]; if(!u.pontic && !u.abut) bad('#' + a + ': a pontic next to #' + b + ', which is neither a pontic nor an abutment'); if(u.abut && u.missing) bad('#' + b + ': an abutment that is missing'); if(u.pontic && u.pontic !== t.pontic) bad('#' + a + ': one bridge, two materials'); });
+      if(t.pontic && t.cant) cantCheck(T, a, bad);
+      else if(t.pontic){ [a - 1, a + 1].forEach(function(b){ if(!nb(a, b)) { bad('#' + a + ': a pontic at the end of the arch has no abutment past it'); return; } var u = T[b]; if(!u.pontic && !u.abut) bad('#' + a + ': a pontic next to #' + b + ', which is neither a pontic nor an abutment'); if(u.abut && u.missing) bad('#' + b + ': an abutment that is missing'); if(u.pontic && u.pontic !== t.pontic) bad('#' + a + ': one bridge, two materials'); if(u.pontic && u.cant) bad('#' + a + ': a pontic next to a cantilevered one: a cantilever carries one pontic'); });
         /* v2.3: the run of pontics this one starts, and the abutments at its two ends: both teeth or both implants (never an implant
            joined to a tooth: the tooth moves 25-100 um in its ligament, the implant 3-5 um, so the implant takes the load; Lang 2004),
            and two implants carry one pontic (a three-unit bridge), not usually two (the lecture: a span flexes with its cube) */
@@ -707,10 +853,122 @@
           var A0 = T[a - 1], A1 = T[e + 1];
           if(A0 && A1 && adjacent(a - 1, a) && adjacent(e, e + 1) && A0.abut && A1.abut){
             if(!!A0.implant !== !!A1.implant) bad('#' + (a - 1) + ' to #' + (e + 1) + ': a bridge joining an implant to a tooth (never: the tooth moves 25-100 um in its ligament, the implant 3-5 um, so the implant takes the load)');
-            else if(A0.implant && e > a) bad('#' + (a - 1) + ' to #' + (e + 1) + ': ' + (e - a + 1) + ' pontics on two implants: two implants carry a three-unit bridge, not usually a longer one (a span flexes with its cube): add an implant under a pontic'); } } }
-      if(t.abut && !t.missing && ![a - 1, a + 1].some(function(b){ return b >= 1 && b <= 32 && adjacent(a, b) && T[b].pontic; })) bad('#' + a + ': an abutment with no pontic beside it');
-      if(t.abut && t.crownMat && [a - 1, a + 1].some(function(b){ return b >= 1 && b <= 32 && adjacent(a, b) && T[b].pontic && T[b].pontic !== t.crownMat; })) bad('#' + a + ': the abutment crown and its pontic are different materials');
+            else if(A0.implant && e > a) bad('#' + (a - 1) + ' to #' + (e + 1) + ': ' + (e - a + 1) + ' pontics on two implants: two implants carry a three-unit bridge, not usually a longer one (a span flexes with its cube): add an implant under a pontic');
+            /* v2.4: a resin-bonded bridge replaces one tooth: both wings bonded, one pontic between (Kern; Pjetursson 2008) */
+            if(!!A0.wing !== !!A1.wing) bad('#' + (a - 1) + ' to #' + (e + 1) + ': a bridge with a resin-bonded wing at one end and a crown at the other');
+            else if(A0.wing && e > a) bad('#' + (a - 1) + ' to #' + (e + 1) + ': ' + (e - a + 1) + ' pontics on a resin-bonded bridge: it replaces one tooth');
+            if(A0.wing && A0.wing !== A1.wing) bad('#' + (a - 1) + ' to #' + (e + 1) + ': one resin-bonded bridge, two framework materials');
+            if(A0.wing && posOf(a) >= 6) bad('#' + a + ': a resin-bonded bridge replacing a molar: it is for an incisor, a canine or a premolar'); } } }
+      if(t.abut && !t.missing && ![a - 1, a + 1].some(function(b){ return nb(a, b) && T[b].pontic; }) && !(t.splint && [a - 1, a + 1].some(function(b){ return nb(a, b) && T[b].splint; }))) bad('#' + a + ': an abutment with no pontic beside it');
+      if(t.abut && t.crownMat && [a - 1, a + 1].some(function(b){ return nb(a, b) && T[b].pontic && T[b].pontic !== t.crownMat; })) bad('#' + a + ': the abutment crown and its pontic are different materials');
+      if(t.splint && !t.missing && [a - 1, a + 1].some(function(b){ return nb(a, b) && T[b].splint && T[b].crownMat !== t.crownMat; })) bad('#' + a + ': two splinted abutments, two materials');
     }
+  }
+  /* v2.4: a cantilever (the sources are in this file's header): one pontic held from one side only, by one abutment or two splinted
+     side by side. Never a molar; a premolar on two splinted abutments, mesial to them (a distal cantilever tips the last abutment
+     under load); a single abutment holds an incisor only (a maxillary lateral from the canine, on a conventional bridge; on a
+     resin-bonded one, an incisor from one incisor or canine); not on implants (not drawn yet) */
+  function cantCheck(T, a, bad){
+    var t = T[a], w = '#' + a + ': ', nbs = [a - 1, a + 1].filter(function(b){ return b >= 1 && b <= 32 && adjacent(a, b); });
+    var ab = nbs.filter(function(b){ return T[b].abut && !T[b].missing; }), pn = nbs.filter(function(b){ return T[b].pontic; });
+    if(pn.length) bad(w + 'a cantilever carries one pontic: #' + pn.join(', #') + ' beside it is a pontic too');
+    if(ab.length !== 1){ bad(w + (ab.length ? 'a pontic held on both sides is a fixed-fixed bridge, not a cantilever' : 'a cantilevered pontic is held by an abutment on one side')); return; }
+    var A = T[ab[0]], rest = A.splint ? [ab[0] - 1, ab[0] + 1].filter(function(b){ return b !== a && b >= 1 && b <= 32 && adjacent(ab[0], b) && T[b].splint; }) : [], units = [A].concat(rest.map(function(b){ return T[b]; }));
+    var p = posOf(a), pa = posOf(A.n), rb = !!A.wing;
+    if(units.some(function(u){ return u.implant; })) { bad(w + 'a cantilever on implants isn\'t drawn yet'); return; }
+    if(units.some(function(u){ return !!u.wing !== rb; })) bad(w + 'a cantilever\'s abutments are both crowned or both resin-bonded');
+    if(p >= 6) bad(w + 'a cantilevered molar: only a premolar-sized pontic on two splinted premolars is accepted, and that isn\'t drawn yet (a full molar is too long a lever)');
+    else if(p >= 4){ if(rb) bad(w + 'a resin-bonded cantilever replaces an incisor (single-retainer: Kern)'); else if(units.length < 2) bad(w + 'a cantilevered premolar needs two splinted abutments (the second premolar and first molar for a first premolar)'); if(p > pa && !rb) bad(w + 'a distal cantilever: the pontic sits mesial to its abutments (a pontic past the last abutment tips it distally under load)'); }
+    else if(p === 3) bad(w + 'a cantilevered canine: the canine takes the bite in a lateral excursion, too much for a cantilever');
+    else if(units.length === 1 && !rb && !(p === 2 && pa === 3 && isUpper(a))) bad(w + 'a single-abutment cantilever (a conventional bridge) replaces a maxillary lateral incisor from the canine: a pontic on one crowned incisor levers it');
+    if(rb && units.length > 1) bad(w + 'a resin-bonded cantilever has one retainer wing (the single-retainer design: Kern)');
+  }
+  /* v2.4: dentures (the sources are in this file's header). A complete denture: the arch is gone but its overdenture abutments. A
+     partial denture: teeth left in its arch, the teeth it replaces missing, no tooth missing inside the arch that nothing replaces;
+     clasps on natural teeth, on both sides of the arch (cross-arch: a one-sided denture can be swallowed), each with its rest; an
+     RPI on a distal-extension abutment, whose rest is mesial; a rest a tooth can take (an occlusal rest on a premolar or molar, a
+     cingulum rest on a maxillary canine or incisor, an incisal rest on a mandibular one, whose cingulum is too shallow); a Class I or
+     II denture with an indirect retainer, a rest farther forward than its free-end abutments; a lingual bar only with room for it
+     (8 mm from the lingual gingival margin to the floor of the mouth, else a lingual plate); no clasp on a tooth with mobility 2 or
+     more. An overdenture abutment: under a denture, root-filled, with at least half its bone support, nothing of a crown's on it */
+  function dentureCheck(spec, bad, num){
+    var D = spec.dentures || {};
+    Object.keys(D).forEach(function(ar){ var d = D[ar], w = 'the ' + ar + ' denture: ';
+      if(ar !== 'upper' && ar !== 'lower'){ bad('dentures.' + ar + ': the arch is upper or lower'); return; }
+      if(!d || DENT.indexOf(d.type) < 0){ bad(w + 'type must be partial or complete'); return; }
+      Object.keys(d).forEach(function(k){ if(DKEYS.indexOf(k) < 0) bad(w + k + ' is not part of a denture'); });
+      if(d.years != null) num(d.years, 0, 60, w + 'years worn');
+      if(d.ridge != null) num(d.ridge, 0, 15, w + 'ridge resorption (mm)');
+      var ts = archNums(ar).map(function(n){ return tooth(spec, n); });
+      if(d.type === 'complete'){
+        ts.forEach(function(t){ if(t.missing || t.od) return; bad(w + '#' + t.n + ' is still there under a complete denture: only an overdenture abutment stays (abutments)'); });
+        if(d.connector || d.floor != null) bad(w + 'a complete denture has no major connector (it is all base)');
+        return; }
+      if(d.connector != null && CONNECTORS[ar].indexOf(d.connector) < 0) bad(w + 'an ' + ar + ' major connector is ' + CONNECTORS[ar].join(', '));
+      if(d.floor != null){ if(ar !== 'lower') bad(w + 'floor (the floor of the mouth\'s depth) is a lower denture\'s'); else num(d.floor, 2, 20, w + 'the lingual gingival margin to the floor of the mouth (mm)');
+        if(ar === 'lower' && d.connector === 'bar' && typeof d.floor === 'number' && d.floor < LINGUAL_BAR) bad(w + 'a lingual bar needs ' + LINGUAL_BAR + ' mm from the lingual gingival margin to the floor of the mouth (here ' + d.floor + '): a 4 mm bar kept 3-4 mm off the margin; use a lingual plate'); }
+      var left = ts.filter(function(t){ return !t.missing && !t.od; });
+      if(!left.length){ bad(w + 'a partial denture with no teeth left in its arch is a complete denture'); return; }
+      var rep = ts.filter(function(t){ return t.dent; });
+      if(!rep.length) bad(w + 'a partial denture replaces at least one tooth');
+      (d.replaces || []).forEach(function(n){ if(archOf(n) !== ar) bad(w + '#' + n + ' is not in the ' + ar + ' arch'); });
+      ts.forEach(function(t){ if(t.dent && t.dent !== 'partial') bad(w + '#' + t.n + ' is a complete denture\'s tooth'); });
+      var K = kennedyOf(spec, ar);
+      if(K) K.gaps.forEach(function(n){ bad(w + '#' + n + ' is missing inside the arch and nothing replaces it: add it to the denture\'s replaces (or a bridge)'); });
+      var get = function(n){ var u = tooth(spec, n); return { dent:!!u.dent || !!u.od, gone:(u.missing && !u.pontic) || !!u.od }; };
+      var clasped = ts.filter(function(t){ return t.clasp; });
+      clasped.forEach(function(t){ var tw = '#' + t.n + ' ';
+        if(CLASPS.indexOf(t.clasp) < 0) bad(tw + 'clasp must be ' + CLASPS.join(' or '));
+        if(t.implant || t.od || t.retained) bad(tw + 'a clasp grips a crown: not on ' + (t.implant ? 'an implant' : t.od ? 'an overdenture abutment' : 'a retained root'));
+        if(t.mob >= 2) bad(tw + 'a clasp on a tooth with mobility ' + t.mob + ': an abutment needs its bone support (McCracken)');
+        if(!t.rest) bad(tw + 'a clasp with no rest: every clasp has its rest, which carries the denture\'s load');
+        if(t.clasp === 'rpi'){ if(!freeEnd(t.n, get)) bad(tw + 'an RPI is a distal-extension abutment\'s clasp: the tooth distal to it, and everything past it, must be gone and the denture\'s base there');
+          if(posOf(t.n) < 3) bad(tw + 'an RPI is for a canine, premolar or molar abutment'); } });
+      ts.forEach(function(t){ if(!t.rest) return; var tw = '#' + t.n + ' ', p = posOf(t.n), rs = t.rest;
+        if(REST_AT.indexOf(rs) < 0){ bad(tw + 'rest must be ' + REST_AT.join(', ')); return; }
+        if(t.missing || t.implant || t.od || t.retained) return;
+        if(p >= 4 && (rs === 'cingulum' || rs === 'incisal')) bad(tw + 'a premolar or molar takes an occlusal rest: m, d or md');
+        if(p <= 3 && /^(m|d|md)$/.test(rs)) bad(tw + 'a canine or incisor takes a cingulum or incisal rest, not an occlusal one');
+        if(rs === 'cingulum' && !isUpper(t.n)) bad(tw + 'a mandibular ' + (p === 3 ? 'canine' : 'incisor') + '\'s cingulum has too little enamel for a rest seat: an incisal rest (McCracken)');
+        if(freeEnd(t.n, get) && /d/.test(rs) && p >= 4) bad(tw + 'a distal-extension abutment\'s rest goes on its mesial: one next to the free-end base tips the abutment toward it (McCracken)'); });
+      if(clasped.length && !(clasped.some(function(t){ return CAT(t.n).side === 'right'; }) && clasped.some(function(t){ return CAT(t.n).side === 'left'; })))
+        bad(w + 'clasps on one side of the arch only: a partial denture is held on both sides (cross-arch), or it can be dislodged and swallowed');
+      if(!clasped.length) bad(w + 'a partial denture with no clasps');
+      if(K && (K.cls === 'I' || K.cls === 'II')){ var fm = Math.min.apply(null, K.free.map(posOf));
+        if(!ts.some(function(t){ return t.rest && !t.missing && posOf(t.n) < fm; })) bad(w + 'a Class ' + K.cls + ' denture needs an indirect retainer: a rest farther forward than its free-end abutment' + (K.free.length > 1 ? 's' : '') + ' (#' + K.free.join(', #') + '), such as a cingulum rest on a canine'); }
+    });
+    for(var n = 1; n <= 32; n++){ var t = tooth(spec, String(n)), tw = '#' + n + ' ';
+      if((t.clasp || t.rest) && !(D[archOf(n)] && D[archOf(n)].type === 'partial')) bad(tw + 'a clasp or rest belongs to a partial denture in its arch');
+      if(t.dent && !D[archOf(n)]) bad(tw + 'a denture tooth with no denture in its arch');
+      if(!t.od) continue;
+      if(SEALS.indexOf(t.od) < 0) bad(tw + 'an overdenture abutment\'s canal is sealed with ' + SEALS.join(', '));
+      if(!D[archOf(n)]) bad(tw + 'an overdenture abutment sits under a denture: none in its arch');
+      if(!t.endo) bad(tw + 'an overdenture abutment here is root-filled (a vital one, barely reduced, isn\'t drawn yet)');
+      if(Math.max(t.bone.m || 0, t.bone.d || 0) > 50) bad(tw + 'an overdenture abutment keeps at least half its bone support (here ' + Math.max(t.bone.m || 0, t.bone.d || 0) + '% lost)');
+      [['crown', t.crown], ['restoration', t.resto.length || t.amalgam], ['caries', t.caries.length], ['fracture', t.fx.length], ['sealant', t.seal], ['post or core', t.eo && (t.eo.post || t.eo.core)], ['bridge', t.abut || t.wing], ['clasp', t.clasp], ['retained root', t.retained]].forEach(function(e){
+        if(e[1]) bad(tw + 'an overdenture abutment (cut down to a dome, its canal sealed) has no ' + e[0] + (e[0] === 'caries' ? ' drawn yet' : '')); });
+    }
+  }
+  /* v2.4: Kennedy's class of a partial denture's arch, by Applegate's rules: a missing third molar (or second molar) the denture
+     doesn't replace isn't counted; the most posterior space sets the class (I both sides free-ended, II one side, III bounded, IV one
+     bounded space across the midline, in front of the teeth left); every other space is a modification, counted, whatever its size;
+     Class IV has none. gaps: teeth missing inside the arch that nothing replaces (validate() refuses them; here they count as
+     teeth). free: the free-end abutments */
+  function kennedyOf(spec, ar){
+    var nums = archNums(ar), sl = nums.map(function(n){ var t = tooth(spec, n); return t.dent || t.od ? 'E' : !t.missing || t.pontic ? 'T' : 'X'; });
+    var a = 0, b = sl.length - 1, runs = [], gaps = [], cur = null, i;
+    while(a <= b && sl[a] === 'X') a++; while(b >= a && sl[b] === 'X') b--;
+    for(i = a; i <= b; i++){ if(sl[i] === 'E'){ if(cur) cur.to = i; else { cur = { from:i, to:i }; runs.push(cur); } } else { cur = null; if(sl[i] === 'X') gaps.push(nums[i]); } }
+    if(!runs.length || !sl.slice(a, b + 1).some(function(x){ return x !== 'E'; })) return null;
+    var fl = sl[a] === 'E', fr = sl[b] === 'E', free = [], cls, mods;
+    if(fl){ for(i = runs[0].to + 1; i <= b && sl[i] !== 'T'; i++); free.push(nums[i]); }
+    if(fr){ for(i = runs[runs.length - 1].from - 1; i >= a && sl[i] !== 'T'; i--); free.push(nums[i]); }
+    if(fl && fr){ cls = 'I'; mods = runs.length - 2; }
+    else if(fl || fr){ cls = 'II'; mods = runs.length - 1; }
+    else if(runs.length === 1 && runs[0].from <= 7 && runs[0].to >= 8){ cls = 'IV'; mods = 0; }
+    else { cls = 'III'; mods = runs.length - 1; }
+    return { cls:cls, mods:mods, text:'Kennedy Class ' + cls + (mods ? ', modification ' + mods : ''), free:free, gaps:gaps,
+      spaces:runs.map(function(r){ return nums.slice(r.from, r.to + 1); }) };
   }
   I.validate = function(spec){
     spec = prep(spec);
@@ -746,12 +1004,17 @@
     if(g.look && ['healthy', 'inflamed', 'fibrotic'].indexOf(g.look) < 0) bad('gingiva.look must be healthy, inflamed or fibrotic');
     ts.forEach(function(t){
       var w = '#' + t.n + ' ', raw = t.raw;
-      Object.keys(raw).forEach(function(k){ if(['pd', 'rec', 'bop', 'pus', 'plaque', 'mob', 'furc', 'bone', 'vdef', 'furcX', 'calc', 'crown', 'endo', 'amalgam', 'implant', 'missing', 'halo', 'lift', 'resto', 'caries', 'lesion', 'margin', 'apdl', 'fx', 'pontic', 'abut', 'retained', 'rtip', 'rsp', 'seal'].indexOf(k) < 0) bad(w + 'unknown field ' + k); });
+      Object.keys(raw).forEach(function(k){ if(['pd', 'rec', 'bop', 'pus', 'plaque', 'mob', 'furc', 'bone', 'vdef', 'furcX', 'calc', 'crown', 'endo', 'amalgam', 'implant', 'missing', 'halo', 'lift', 'resto', 'caries', 'lesion', 'margin', 'apdl', 'fx', 'pontic', 'abut', 'retained', 'rtip', 'rsp', 'seal', 'dent', 'clasp', 'rest', 'od', 'wing', 'cant', 'nofill'].indexOf(k) < 0) bad(w + 'unknown field ' + k); });
       /* impossible combinations: nothing on a missing tooth; nothing of a tooth's own on an implant */
       if(t.pontic && !t.missing) bad(w + 'a pontic replaces a missing tooth: add #' + t.n + ' to the missing module');
       if(t.pontic && BRIDGES.indexOf(t.pontic) < 0) bad(w + 'a pontic is ' + BRIDGES.join(', '));
+      /* v2.4: a denture tooth stands where a tooth was lost; a pontic and a denture tooth in one place can't both be */
+      if(t.dent && DENT.indexOf(t.dent) < 0) bad(w + 'dent is partial or complete');
+      if(t.dent && !t.missing) bad(w + 'a denture tooth replaces a missing tooth: #' + t.n + ' is still there');
+      if(t.dent && t.pontic) bad(w + 'a bridge\'s pontic and a denture tooth in one place');
+      if(t.cant && !t.pontic) bad(w + 'cant marks a cantilevered pontic');
       if(t.missing){
-        [['margin', t.margin.open || t.margin.overhang], ['fracture', t.fx.length], ['widened PDL', t.apdl], ['abutment', t.abut], ['resto', t.resto.length], ['crown', t.crown], ['amalgam', t.amalgam], ['caries', t.caries.length], ['endo', t.endo], ['periapical lesion', t.lesion], ['furcation', t.furc.f || t.furc.l || t.furcX], ['implant', t.implant], ['calculus', t.calc], ['retained root', t.retained], ['resorption', t.rsp.length], ['sealant', t.seal]].forEach(function(e){ if(e[1]) bad(w + 'a missing tooth has ' + (e[0] === 'resto' ? 'a restoration' : e[0] === 'caries' ? 'caries' : 'a ' + e[0]) + (e[0] === 'retained root' ? ' (a root left after an extraction is a root tip: kind fragment)' : '')); });
+        [['margin', t.margin.open || t.margin.overhang], ['fracture', t.fx.length], ['widened PDL', t.apdl], ['abutment', t.abut], ['resto', t.resto.length], ['crown', t.crown], ['amalgam', t.amalgam], ['caries', t.caries.length], ['endo', t.endo], ['periapical lesion', t.lesion], ['furcation', t.furc.f || t.furc.l || t.furcX], ['implant', t.implant], ['calculus', t.calc], ['retained root', t.retained], ['resorption', t.rsp.length], ['sealant', t.seal], ['clasp', t.clasp], ['rest', t.rest], ['overdenture abutment', t.od], ['resin-bonded wing', t.wing]].forEach(function(e){ if(e[1]) bad(w + 'a missing tooth has ' + (e[0] === 'resto' ? 'a restoration' : e[0] === 'caries' ? 'caries' : 'a ' + e[0]) + (e[0] === 'retained root' ? ' (a root left after an extraction is a root tip: kind fragment)' : '')); });
         /* a root tip left in the healed socket (v2.2) */
         if(t.rtip){ var tmax = Math.min(6, t.d.rl - 3);
           Object.keys(t.rtip).forEach(function(k){ if(k !== 'len' && k !== 'root') bad(w + 'rtip.' + k + ' is not something the kit draws'); });
@@ -760,7 +1023,7 @@
         return;
       }
       var cat = CAT(t.n);
-      v21(t, w, cat, bad);
+      v21(t, w, cat, bad, spec);
       v22(t, w, cat, bad);
       t.resto.forEach(function(r){ if(!r || RMAT.indexOf(r.mat) < 0) bad(w + 'a restoration\'s material must be ' + RMAT.join(', ') + ' (a crown is crown:true, or the crown\'s material)');
         String(r && r.s || '').split('').forEach(function(x){ if(cat.surfaces.indexOf(x) < 0) bad(w + 'restoration surface ' + x + ' is not one of this tooth\'s (' + cat.surfaces.join('') + ')'); });
@@ -798,8 +1061,10 @@
         ['m', 'd'].forEach(function(sd){ var b = t.bone[sd] || 0; num(b, 0, im.len - 1, w + 'implant bone loss ' + sd);
           if(im.baseline){ num(im.baseline[sd] || 0, 0, im.len - 1, w + 'baseline bone ' + sd); if(b < (im.baseline[sd] || 0)) bad(w + 'bone at ' + sd + ' is higher than at the baseline'); } });
         if(t.furc.f || t.furc.l || t.furcX) bad(w + 'an implant has no furcation');
-        if(t.endo || t.amalgam || t.calc || t.resto.length || t.caries.length || t.lesion || t.fx.length || t.apdl || t.retained || t.rtip || t.rsp.length || t.seal) bad(w + 'an implant and a root in one site: an implant has no root filling, restoration, caries, periapical lesion, resorption, sealant or root calculus');
+        if(t.endo || t.amalgam || t.calc || t.resto.length || t.caries.length || t.lesion || t.fx.length || t.apdl || t.retained || t.rtip || t.rsp.length || t.seal || t.od) bad(w + 'an implant and a root in one site: an implant has no root filling, restoration, caries, periapical lesion, resorption, sealant or root calculus');
         if(t.mob && !t.halo) bad(w + 'a mobile implant has lost osseointegration: set halo:true so the film shows it');
+        if(t.clasp || t.rest) bad(w + 'a clasp or rest on an implant: an implant under a partial denture carries an attachment, which isn\'t drawn yet');
+        if(t.wing) bad(w + 'a resin-bonded wing is bonded to a tooth\'s enamel, not to an implant');
         implantCheck(spec, t, w, bad, num);
         return;
       }
@@ -831,10 +1096,11 @@
         if(t.furcX > fmax) bad(w + 'the film shows more furcation loss (furcX ' + t.furcX + ') than the probe found (' + fmax + ')');
         if((fcs[0] === 3) !== (fcs[1] === 3) && !t.d.pal) bad(w + 'a Class III furcation is through and through: both surfaces');
       }
-      if(t.endo && !t.implant && !(t.crown || t.amalgam || t.resto.some(function(r){ return r.type !== 'veneer' && (cat.pos <= 3 ? /L/.test(r.s) : (/O/.test(r.s) || r.type === 'onlay' || (/M/.test(r.s) && /D/.test(r.s)))); })))
+      if(t.endo && !t.implant && !t.od && !(t.crown || t.amalgam || t.resto.some(function(r){ return r.type !== 'veneer' && (cat.pos <= 3 ? /L/.test(r.s) : (/O/.test(r.s) || r.type === 'onlay' || (/M/.test(r.s) && /D/.test(r.s)))); })))
         bad(w + 'a root-filled tooth needs its access restored: a crown, or a restoration over the access (' + (cat.pos <= 3 ? 'L on an incisor or canine: a veneer alone leaves the lingual access open' : 'one with O') + '; Ray and Trope 1995)');
     });
     if(ts.some(function(t){ return t.pontic || t.abut; }) || toothKeys(spec.t).some(function(n){ return spec.t[n].pontic || spec.t[n].abut; })) bridgeCheck(spec, bad);
+    if(spec.dentures || toothKeys(spec.t).some(function(n){ var r = spec.t[n]; return r.dent || r.clasp || r.rest || r.od; })) dentureCheck(spec, bad, num);
     if(spec.tests != null){ if(!Array.isArray(spec.tests)) bad('tests is a list'); else testsCheck(spec, bad); }
     return P;
   };
@@ -860,6 +1126,9 @@
     if(back) s += path('dc-root dc-back', rootOutline(back, 0, y0, y0));
     roots.forEach(function(r){ s += path('dc-root', rootOutline(r, 0, y0, y0)); });
     if(d.tr){ var tp = trunkPts(roots, sg, 0, y0 - 1, y0 + d.tr * k, k); if(tp) s += path('dc-root dc-trunk', tp); }
+    /* v2.4: an overdenture abutment: the crown cut down to a dome, the canal's orifice sealed */
+    if(t.od){ var dm = [], pl = [], i2; for(i2 = 0; i2 <= 16; i2++){ var a2 = Math.PI * i2 / 16; dm.push([X(-d.cv / 2 * Math.cos(a2)), y0 - domeMM(a2) * k]); pl.push([X(1.1 * Math.cos(a2)), y0 - (DOME - .3 - 1.1 * Math.sin(a2)) * k]); }
+      return s + path('dc-crown dc-stump', dm.concat([[X(d.cv / 2), y0 + 2], [X(-d.cv / 2), y0 + 2]])) + path('dc-amalgam' + (t.od === 'composite' ? ' dc-comp' : t.od === 'gi' ? ' dc-gi' : ''), pl); }
     /* a retained root (v2.2): the crown broken off about a millimeter above the CEJ */
     if(t.retained){ var yc = y0 - .9 * k; return s + path('dc-crown dc-stump', clipHalf(dense(crownMM(d), true, 4).map(function(p){ return [X(p[0]), y0 - p[1] * k]; }), [0, yc], [1, yc], [cx, y0 + 5], .2 * k)); }
     s += path('dc-crown' + (t.crown ? ' dc-restored' : '') + (t.crownMat === 'gold' ? ' dc-goldcrown' : ''), dense(crownMM(d), true, 4).map(function(p){ return [X(p[0]), y0 - p[1] * k]; }));
@@ -956,6 +1225,7 @@
     var g = { o:o, d:d, k:k, x:o.x, cej:cej, top:top, sg:sg, X:X, crown:cr, roots:[] };
     var crestY = cej + 1.5 * k, bm = (o.bone && o.bone[0]) || 0, bd = (o.bone && o.bone[1]) || 0;
     g.crestM = crestY + bm * k; g.crestD = crestY + bd * k;
+    if(o.ridge != null){ g.crestM = g.crestD = crestY + o.ridge * k; return g; }
     if(o.implant || (o.pontic && !o.rtip)) return g;
     g.roots = mkRoots(d, X, k, cej);
     g.back = mkBack(d, X, k, cej);
@@ -976,7 +1246,7 @@
     return clipHalf(pts, [L[0][0], L[0][1] - off], [L[1][0], L[1][1] - off], [rAx(fr, 1), fr.y0 + fr.len], .14 * g.k); }
   function crestLR(g){ return g.sg > 0 ? [g.crestM, g.crestD] : [g.crestD, g.crestM]; }
   function socketSVG(g, dd, cls){
-    if(g.o.implant || (g.o.pontic && !g.frag)) return '';
+    if(g.o.implant || g.o.ridge != null || (g.o.pontic && !g.frag)) return '';
     var c = crestLR(g), s = '', fun = (g.o.funnel || 0) * g.k;
     g.roots.forEach(function(r){ var pts = rootOutline(r, dd * g.k, c[0], c[1], fun); s += path(cls, g.frag ? fragCut(g, pts, dd * g.k) : pts); });
     if(g.d.tr && !g.frag){ var y0 = Math.min(c[0], c[1]), tf = trunkPts(g.roots, g.sg, dd * g.k, y0, g.cej + g.d.tr * g.k, g.k); if(tf) s += path(cls, tf); }
@@ -984,10 +1254,12 @@
   }
   function toothSVG(g){
     var s = '', o = g.o, k = g.k, d = g.d;
+    if(o.ridge != null) return '';
     if(o.implant) return implantSVG(g);
     if(o.pontic) return ponticSVG(g) + (o.rtip ? fragSVG(g) : '');
     if(o.rtip) return fragSVG(g);
     if(o.retained) return stumpSVG(g);
+    if(o.od) return odSVG(g);
     var cut = fxCut(g);
     function C(pts){ return cut ? cut(pts) : pts; }
     if(g.back) s += path('xr-dentin', rootOutline(g.back, 0, g.cej, g.cej), false, 'opacity:.5');
@@ -1014,6 +1286,7 @@
     else if(o.crown) s += crownSVG(g);
     if(o.crown && o.margin) s += marginSVG(g);
     if(o.crown && o.caries) s += recurRootSVG(g);
+    if(o.wing) s += wingSVG(g);
     (o.fx || []).forEach(function(f){ if(f.type === 'hrf') s += hrfSVG(g, f); if(f.type === 'cusp' && /L/.test(f.cusp)) s += cuspFadeSVG(g, f); });
     if(o.calc) s += calcSVG(g);
     s += rspSVG(g, 'end');
@@ -1040,6 +1313,37 @@
     s += path('xr-dentin', stub) + pulpSVG(g, C) + path('xr-car', clipHalf(stub, [0, yc], [1, yc], [g.x, g.top], .18 * k));
     if(o.calc) s += calcSVG(g);
     return s;
+  }
+  /* the dome's height above the CEJ (mm) at angle a along it (0 and pi: its cervical edges) */
+  var DOME = 4.3; function domeMM(a){ return .4 + (DOME - .4) * Math.pow(Math.sin(a), .8); }
+  /* v2.4: an overdenture abutment (the sources are in this file's header): root-filled, its crown cut down to a smooth dome about
+     4.3 mm above the CEJ (2-3 mm above the gingival margin), the canal's orifice sealed with a plug a few mm deep: amalgam as bright
+     as metal, composite and glass ionomer a little less */
+  function odSVG(g){
+    var o = g.o, k = g.k, d = g.d, v = d.cv / 2, s = '', dome = [], N = 16, i;
+    if(g.back) s += path('xr-dentin', rootOutline(g.back, 0, g.cej, g.cej), false, 'opacity:.5');
+    g.roots.forEach(function(r){ s += path('xr-dentin', rootOutline(r, 0, g.cej, g.cej)); });
+    if(d.tr){ var tp = trunkPts(g.roots, g.sg, 0, g.cej - 1, g.cej + d.tr * k, k); if(tp) s += path('xr-dentin', tp); }
+    dome.push([g.X(-v), g.cej + 2]);
+    for(i = 0; i <= N; i++){ var a = Math.PI * i / N; dome.push([g.X(-v * Math.cos(a)), g.cej - domeMM(a) * k]); }
+    dome.push([g.X(v), g.cej + 2]);
+    s += path('xr-dentin', dome);
+    if(o.endo) s += endoSVG(g);
+    var pw = Math.min(1.3, v * .45), plug = [];
+    for(i = 0; i <= N; i++){ var b = Math.PI * i / N; plug.push([g.X(pw * Math.cos(b)), g.cej - (DOME - .35 - 3 * Math.sin(b)) * k]); }
+    s += path(o.od === 'amalgam' ? 'xr-metal' : o.od === 'composite' ? 'xr-comp' : 'xr-gi', plug);
+    return s;
+  }
+  /* v2.4: a resin-bonded bridge's wing (the sources are in this file's header): a metal (or zirconia) plate under a millimeter thick
+     bonded to the lingual enamel and wrapping the proximal next to the pontic. The beam passes through it, so it lies over the crown
+     as a radiopaque band from about 1.5 mm short of the incisal edge or cusp tips to about 1 mm above the CEJ (the margin kept on
+     enamel, above the gingiva) */
+  function wingSVG(g){
+    var k = g.k, y0 = g.top + 1.5 * k, y1 = g.cej - 1 * k, far = g.o.wingSide === 'm' ? 1 : -1, xc = g.X(far * (g.d.cw / 2 - 1.2));
+    var band = clipHalf(clipHalf(g.crown, [0, y0], [1, y0], [g.x, g.cej], 0), [0, y1], [1, y1], [g.x, g.top], 0);
+    /* it wraps the proximal next to the pontic and stops about a millimeter short of the other */
+    band = clipHalf(band, [xc, 0], [xc, 1], [g.X(-far * g.d.cw), g.cej], 0);
+    return path(g.o.wing === 'zirconia' ? 'xr-zr' : 'xr-metal', band, false, 'opacity:.82');
   }
   /* a point inside a closed outline (even-odd) */
   function inPoly(p, poly){ var c = false; for(var i = 0, j = poly.length - 1; i < poly.length; j = i++){ var a = poly[i], b = poly[j];
@@ -1429,8 +1733,9 @@
   function connectorsSVG(gs){
     var s = '';
     for(var i = 0; i + 1 < gs.length; i++){ var A = gs[i], B = gs[i + 1];
-      if(!((A.o.pontic && (B.o.pontic || B.o.abut)) || (B.o.pontic && A.o.abut))) continue;
-      var m = A.o.pontic || B.o.pontic, k = A.k, xa = A.x + A.d.cw * k / 2, xb = B.x - B.d.cw * k / 2, x = (xa + xb) / 2;
+      if(!((A.o.pontic && (B.o.pontic || B.o.abut)) || (B.o.pontic && A.o.abut) || (A.o.splint && B.o.splint))) continue;
+      if(A.o.pontic && B.o.pontic && (A.o.cant || B.o.cant)) continue;
+      var m = A.o.pontic || B.o.pontic || A.o.crownMat || 'pfm', k = A.k, xa = A.x + A.d.cw * k / 2, xb = B.x - B.d.cw * k / 2, x = (xa + xb) / 2;
       var hc = (TL.CONTACT[A.o.t][1] * A.d.ch + TL.CONTACT[B.o.t][0] * B.d.ch) / 2, y = (A.cej + B.cej) / 2 - (hc - .6) * k;
       var bx = function(hw, hh){ return TL.filletClosed([[x - hw * k, y - hh * k], [x + hw * k, y - hh * k], [x + hw * k, y + hh * k], [x - hw * k, y + hh * k]], Math.min(hw, hh) * .8 * k); };
       /* a metal-ceramic connector is metal inside its porcelain */
@@ -1496,6 +1801,7 @@
     var top = [], k = gs[0].k, extra = '';
     function side(g, right, y){
       if(g.o.implant) return g.x + (right ? 1 : -1) * (g.o.implant.w / 2 + .1) * k;
+      if(g.o.ridge != null) return g.x + (right ? 1 : -1) * g.d.cw / 2 * k * .92;
       /* a root tip's site: the healed ridge spans the whole tooth's place (its roots as they were), not only the fragment */
       var dd = ((g.o.pdl || .2) + (g.o.lam || .22)) * k, xs = (g.site || g.roots).map(function(r){ var t = Math.max(0, (y - r.y0) / r.len); return rAx(r, t) + (right ? 1 : -1) * rHw(r, t); });
       return (right ? Math.max.apply(null, xs) + dd : Math.min.apply(null, xs) - dd);
@@ -1507,7 +1813,9 @@
       if(i === 0) top.push([Math.min(-5, xl - 2.5 * k), c[0] - .3 * k]);
       if(vL) top.push([xl - 1.6 * k, c[0] - .2 * k], [xl - .3 * k, c[0] + vL * k * .85]);
       var ym = Math.max(c[0] + vL * k, c[1] + vR * k) * .35 + Math.max(c[0], c[1]) * .65 + (g.frag ? 1.3 : .4) * k;
-      if(g.frag) top.push([xl, c[0]], [xl + (g.x - xl) * .45, c[0] + (ym - c[0]) * .8], [g.x, ym], [xr - (xr - g.x) * .45, c[1] + (ym - c[1]) * .8], [xr, c[1]]);
+      /* v2.4: a healed edentulous ridge: rounded, a little higher at its middle than at its ends, its cortex unbroken */
+      if(g.o.ridge != null) top.push([xl, c[0] + .2 * k], [xl + (g.x - xl) * .5, c[0] - .1 * k], [g.x, c[0] - .2 * k], [xr - (xr - g.x) * .5, c[1] - .1 * k], [xr, c[1] + .2 * k]);
+      else if(g.frag) top.push([xl, c[0]], [xl + (g.x - xl) * .45, c[0] + (ym - c[0]) * .8], [g.x, ym], [xr - (xr - g.x) * .45, c[1] + (ym - c[1]) * .8], [xr, c[1]]);
       else top.push([xl, c[0] + vL * k], [g.x, ym], [xr, c[1] + vR * k]);
       if(vR) top.push([xr + .3 * k, c[1] + vR * k * .85], [xr + 1.6 * k, c[1] - .2 * k]);
       var nx = gs[i + 1];
@@ -1595,7 +1903,10 @@
       /* a pontic stands in its missing tooth's place: drawn like a tooth with no root */
       /* v2.2: a root tip under the healed ridge (meeting the neighbors' crests, a little concave over the socket), alone or under
          a pontic */
-      if(t.missing && (t.pontic || t.rtip)){ if(t.pontic) x.pontic = t.pontic; x.bone = [0, 0]; if(t.rtip) x.rtip = t.rtip; list.push(x); return; }
+      if(t.missing && (t.pontic || t.rtip)){ if(t.pontic) x.pontic = t.pontic; if(t.cant) x.cant = true; x.bone = [0, 0]; if(t.rtip) x.rtip = t.rtip; list.push(x); return; }
+      /* v2.4: a denture's tooth: films are taken with the denture out, so its place is the healed edentulous ridge, its crest
+         resorbed below the neighbors' (the denture's ridge, mm; 1.5 by default: the first months' loss after an extraction) */
+      if(t.missing && t.dent){ x.ridge = ridgeOf(spec, t.n); list.push(x); return; }
       if(t.missing){ if(o.at) return; if(list.length) list[list.length - 1].gapAfter = (list[list.length - 1].gapAfter || 0) + d.cw; else gapFirst += d.cw; return; }
       /* bone loss % of root length -> mm below the normal crest (1.5 mm below the CEJ); an implant's bone is in mm
          below its platform, which sits at that crest line */
@@ -1605,6 +1916,8 @@
       if(t.resto.length) x.resto = t.resto; if(t.caries.length) x.caries = t.caries; if(t.lesion) x.lesion = t.lesion;
       if(t.crownMat) x.crownMat = t.crownMat; if(t.margin.open || t.margin.overhang) x.margin = t.margin; if(t.eo) x.eo = t.eo;
       if(t.apdl) x.apdl = true; if(t.fx.length) x.fx = t.fx; if(t.abut) x.abut = true;
+      if(t.od) x.od = t.od; if(t.splint) x.splint = true;
+      if(t.wing){ x.wing = t.wing; var wm = nbr(t.n, true); x.wingSide = wm && tooth(spec, wm).pontic ? 'm' : 'd'; }
       if(t.retained) x.retained = true; if(t.rsp.length) x.rsp = t.rsp;
       if(t.mob >= 2) x.pdl = .34;
       if(t.implant){ x.implant = t.implant; x.cover = !!t.implant.cover; }
@@ -1623,6 +1936,7 @@
     return '<svg class="xr dc-film' + (cls ? ' ' + cls : '') + '" viewBox="0 0 ' + w + ' ' + h + '" role="img" aria-label="' + esc(label) + '"><rect class="xr-film" x="0" y="0" width="' + w + '" height="' + h + '" rx="14"/>' + inner + '<circle class="xr-dot" cx="' + dotP[0] + '" cy="' + dotP[1] + '" r="3"/></svg>';
   }
   function names(ts){ return ts.map(function(t){ return '#' + t.n; }).join(', '); }
+  function ridgeOf(spec, n){ var d = (spec.dentures || {})[archOf(n)]; return d && d.ridge != null ? d.ridge : RIDGE; }
   /* a periapical film of the case's teeth (or the figure's): bone levels, defects, furcations, restorations, caries,
      periapical lesions and implants from the model */
   I.film = function(spec, o){
@@ -1766,8 +2080,12 @@
     function tipMark(y1){ var yb = edge + dir * y1; return '<path class="dc-o-rbar" d="M' + f1(cx - 3.6) + ' ' + f1(yb) + 'h7.2"/><path class="dc-o-rroot" d="M' + f1(cx) + ' ' + f1(yb) + 'V' + f1(edge + dir * 13.5) + '"/>'; }
     function boxX(){ return '<path class="dc-ox" d="M' + f1(cx - r - 1) + ' ' + f1(cy - r - 1) + 'l' + (2 * r + 2) + ' ' + (2 * r + 2) + 'm0 ' + (-2 * r - 2) + 'l' + (-2 * r - 2) + ' ' + (2 * r + 2) + '"/>'; }
     if(t.abut || t.pontic){ var rn = up ? +n + 1 : +n - 1, ln = up ? +n - 1 : +n + 1, by = up ? cy + r + 3.5 : cy - r - 3.5;
-      [[rn, 1], [ln, -1]].forEach(function(e){ var m = e[0]; if(m < 1 || m > 32 || !adjacent(n, m)) return; var u = tooth(spec, String(m)); if(!((u.pontic || u.abut) && (u.pontic || t.pontic))) return;
+      [[rn, 1], [ln, -1]].forEach(function(e){ var m = e[0]; if(m < 1 || m > 32 || !adjacent(n, m)) return; var u = tooth(spec, String(m)); if(!(((u.pontic || u.abut) && (u.pontic || t.pontic) && !(u.pontic && t.pontic && (u.cant || t.cant))) || (u.splint && t.splint))) return;
         out += '<path class="dc-o-bar" d="M' + f1(cx) + ' ' + f1(by) + 'h' + f1(e[1] * OD.cw / 2) + '"/>'; }); }
+    /* v2.4: a denture's tooth (one it replaces, or one over an overdenture abutment): a dashed outline round the box, and the
+       denture's base as a pink band on the root side, joining its teeth */
+    var dMark = (t.dent || t.od) ? '<path class="dc-o-base" d="M' + f1(cx - OD.cw / 2) + ' ' + f1(edge + dir * 2.4) + 'h' + OD.cw + '"/><rect class="dc-o-dent" x="' + f1(cx - r - 2.5) + '" y="' + f1(cy - r - 2.5) + '" width="' + (2 * r + 5) + '" height="' + (2 * r + 5) + '" rx="4"/>' : '';
+    if(t.missing && t.dent) return out + dMark + ['O', 'F', 'L', 'M', 'D'].map(function(x){ return path('dc-osurf dc-o-gone', P[x]); }).join('') + boxX() + (t.rtip ? '<path class="dc-o-root" d="M' + f1(cx) + ' ' + f1(edge + dir * 4) + 'V' + f1(edge + dir * tipBar) + '"/>' + tipMark(tipBar) : '');
     if(t.missing && t.pontic){
       ['O', 'F', 'L', 'M', 'D'].forEach(function(x){ out += path('dc-osurf dc-o-crowned' + (cm === 'gold' ? ' dc-o-gold' : ''), P[x]); });
       out += '<rect class="dc-o-crown" x="' + f1(cx - r - 2) + '" y="' + f1(cy - r - 2) + '" width="' + (2 * r + 4) + '" height="' + (2 * r + 4) + '" rx="3.5"/>' + txt(cx, cy + 2.6, LET[cm] || '', 'dc-olet', 'middle');
@@ -1788,7 +2106,11 @@
        mark under a flat cap (the cover screw) */
     var sub = t.implant && t.implant.cover, crowned = t.crown || (t.implant && !sub);
     if(sub) ['O', 'F', 'L', 'M', 'D'].forEach(function(x){ out += path('dc-osurf dc-o-gone', P[x]); });
-    if(!t.retained && !sub) ['O', 'F', 'L', 'M', 'D'].forEach(function(x){
+    /* v2.4: an overdenture abutment: the crown gone (its surfaces drawn as gone, no X: the root stays), a dome at the cervix in its
+       seal's color, under the denture's dashed tooth */
+    if(t.od){ out += dMark; ['O', 'F', 'L', 'M', 'D'].forEach(function(x){ out += path('dc-osurf dc-o-gone', P[x]); });
+      out += '<path class="dc-o-od dc-o-' + (t.od === 'gi' ? 'gi' : t.od === 'composite' ? 'composite' : 'amalgam') + '" d="M' + f1(cx - 4.4) + ' ' + f1(edge + dir * .2) + 'Q' + f1(cx) + ' ' + f1(edge - dir * 5.6) + ' ' + f1(cx + 4.4) + ' ' + f1(edge + dir * .2) + 'Z"/>'; }
+    if(!t.retained && !sub && !t.od) ['O', 'F', 'L', 'M', 'D'].forEach(function(x){
       out += path('dc-osurf' + (crowned ? ' dc-o-crowned' : '') + (t.crownMat === 'gold' ? ' dc-o-gold' : '') + (fill[x] ? ' ' + fill[x] : seal[x] ? ' dc-o-sealant' : '') + (car[x] ? ' dc-o-caries' : ''), P[x]);
       if(car[x]) out += hatch(P[x], 2.8);
       if(rec[x]) out += hatch(P[x], 2.8).replace('dc-o-hatch', 'dc-o-hatch dc-o-hatch-r');
@@ -1802,6 +2124,19 @@
       if(f.type === 'vrf') out += '<path class="dc-o-fx" d="M' + f1(cx + 2.5) + ' ' + f1(edge + dir * 1.5) + 'l-2.4 ' + f1(dir * 2.6) + 'l2.4 ' + f1(dir * 2.6) + 'l-2.4 ' + f1(dir * 2.6) + 'l2.4 ' + f1(dir * 2.6) + '"/>';
       if(f.type === 'hrf') out += '<path class="dc-o-fx" d="M' + f1(cx - 4.5) + ' ' + f1(edge + dir * 8) + 'l3 -1.6l3 3.2l3 -3.2"/>'; });
     if(crowned) out += '<rect class="dc-o-crown" x="' + f1(cx - r - 2) + '" y="' + f1(cy - r - 2) + '" width="' + (2 * r + 4) + '" height="' + (2 * r + 4) + '" rx="3.5"/>';
+    /* v2.4: a resin-bonded wing: its lingual surface and the proximal next to its pontic in the framework's color; a partial
+       denture's clasp outside the facial surface (a circumferential clasp an arc from the side it starts on, an RPI's I-bar a bar
+       rising to the facial's middle) and its rests (an occlusal rest a triangle in the marginal ridge, a cingulum rest a half disc
+       on the lingual, an incisal rest a notch in the incisal edge) */
+    if(t.wing){ var pm = nbr(n, true), pSide = pm && tooth(spec, pm).pontic ? 'M' : 'D';
+      [P.L, P[pSide]].forEach(function(pp){ out += path('dc-osurf dc-o-wing' + (t.wing === 'zirconia' ? ' dc-o-wing-z' : ''), pp); }); }
+    if(t.clasp){ var bM2 = nbr(n, true), bD2 = nbr(n, false), dM2 = bM2 && tooth(spec, bM2).dent, dD2 = bD2 && tooth(spec, bD2).dent, sx = (dD2 && !dM2 ? -mx : dM2 && !dD2 ? mx : t.rest === 'd' ? -mx : mx), yf = cy + fy * r;
+      if(t.clasp === 'rpi') out += '<path class="dc-o-clasp" d="M' + f1(cx - .5 * mx) + ' ' + f1(yf + fy * 8.5) + 'V' + f1(yf + fy * 1.6) + '"/>';
+      else out += '<path class="dc-o-clasp" d="M' + f1(cx + sx * (r + 1.6)) + ' ' + f1(cy) + 'Q' + f1(cx + sx * (r + 1.6)) + ' ' + f1(yf + fy * 2.6) + ' ' + f1(cx) + ' ' + f1(yf + fy * 2.6) + 'T' + f1(cx - sx * r * .75) + ' ' + f1(yf + fy * 1.4) + '"/>'; }
+    if(t.rest){ String(t.rest).replace('md', 'md').split('').forEach(function(sd){ if(sd !== 'm' && sd !== 'd') return; var ex = cx + (sd === 'm' ? mx : -mx) * q, ix = ex - (sd === 'm' ? mx : -mx) * 3.6;
+        if(t.rest === 'm' || t.rest === 'd' || t.rest === 'md') out += '<path class="dc-o-rest" d="M' + f1(ex) + ' ' + f1(cy - 2.6) + 'L' + f1(ix) + ' ' + f1(cy) + 'L' + f1(ex) + ' ' + f1(cy + 2.6) + 'Z"/>'; });
+      if(t.rest === 'cingulum'){ var ly = cy - fy * q; out += '<path class="dc-o-rest" d="M' + f1(cx - 3) + ' ' + f1(ly) + 'A3 3 0 0 ' + (fy > 0 ? 1 : 0) + ' ' + f1(cx + 3) + ' ' + f1(ly) + 'Z"/>'; }
+      if(t.rest === 'incisal') out += '<path class="dc-o-rest" d="M' + f1(cx - 2.4) + ' ' + f1(cy - fy * q) + 'L' + f1(cx) + ' ' + f1(cy) + 'L' + f1(cx + 2.4) + ' ' + f1(cy - fy * q) + 'Z"/>'; }
     if(t.implant){ var sy = edge + dir * 3;
       out += '<path class="dc-o-impl" d="M' + f1(cx) + ' ' + f1(sy) + 'v' + f1(dir * 11) + '"/><path class="dc-o-impl dc-o-thread" d="' +
         [0, 3.5, 7, 10.5].map(function(dy, i){ var hw = 4.2 - i * .7; return 'M' + f1(cx - hw) + ' ' + f1(sy + dir * dy) + 'h' + f1(2 * hw); }).join('') + '"/>';
@@ -1857,6 +2192,7 @@
       t.caries.forEach(function(c){ if(c.recurrent) h.rec = 1; });
       t.fx.forEach(function(f){ h[f.type === 'crack' ? 'crack' : 'fx'] = 1; });
       if(t.retained) h.retained = 1; if(t.rtip) h.rtip = 1; if(t.rsp.length) h.rsp = 1; if(t.seal) h.seal = 1; if(t.implant && t.implant.cover) h.cover = 1;
+      if(t.dent) h.dent = 1; if(t.clasp) h[t.clasp === 'rpi' ? 'ibar' : 'clasp'] = 1; if(t.rest) h.rest = 1; if(t.od) h.od = 1; if(t.wing) h.wing = 1; if(t.cant) h.cant = 1;
       t.resto.forEach(function(r){ if(r.mat === 'temporary') h.temp = 1; }); }
     return h;
   }
@@ -1884,6 +2220,12 @@
       (has.rsp ? k('<path class="dc-o-root" d="M8 1V15"/><path class="dc-o-rsp" d="M8 5.5l2.5 2.5l-2.5 2.5l-2.5 -2.5Z"/>', 'resorption') : '') +
       (has.letters ? '<span class="dc-ok dc-ok-t">crown letters: G gold, P porcelain-fused-to-metal, Z zirconia, L lithium disilicate, S stainless steel, T provisional (temporary)</span>' : '') +
       (has.bridge ? k('<path class="dc-o-bar" d="M1 8H15"/>', 'bridge (a bar joins its units)') + k(path('dc-osurf dc-o-crowned', [[4, 1.5], [12, 1.5], [12, 7.5], [4, 7.5]]) + '<path class="dc-ox dc-o-nroot" d="M5.5 9L10.5 15M10.5 9L5.5 15"/>', 'pontic (crown drawn, root crossed out: the tooth is missing)') : '') +
+      (has.dent ? k('<path class="dc-o-base" d="M0 14H16"/><rect class="dc-o-dent" x="1.5" y="1.5" width="13" height="10" rx="2.5"/><path class="dc-ox" d="M4 4L12 9.5M12 4L4 9.5"/>', 'denture tooth (pink band: its base)') : '') +
+      (has.clasp ? k('<rect class="dc-o-crown" x="5" y="1.5" width="9" height="9" rx="2"/><path class="dc-o-clasp" d="M3 6Q3 13.5 9 13.5T14 12.5"/>', 'clasp') : '') +
+      (has.ibar ? k('<rect class="dc-o-crown" x="3.5" y="1.5" width="9" height="9" rx="2"/><path class="dc-o-clasp" d="M8 15.5V11.8"/>', 'I-bar (an RPI clasp\'s arm)') : '') +
+      (has.rest ? k('<rect class="dc-o-crown" x="1.5" y="1.5" width="13" height="13" rx="2.5"/><path class="dc-o-rest" d="M12 5.2L8.4 8L12 10.8Z"/>', 'rest') : '') +
+      (has.od ? k('<path class="dc-osurf dc-o-gone" d="M3 1.5H13V8H3Z"/><path class="dc-o-od dc-o-amalgam" d="M3.6 10Q8 4.6 12.4 10Z"/><path class="dc-o-endo" d="M8 10V15.5"/>', 'overdenture abutment (root-filled, cut to a dome, sealed)') : '') +
+      (has.wing ? k(path('dc-osurf', sq) + path('dc-osurf dc-o-wing', [[2, 9], [14, 9], [14, 14], [2, 14]]), 'resin-bonded wing (bonded to the lingual)') : '') +
       (has.post ? k('<path class="dc-o-endo" d="M8 1.5V14.5"/><path class="dc-o-post" d="M8 1.5V7"/>', 'post') : '') +
       (has.sep ? k('<path class="dc-o-endo" d="M8 1.5V14.5"/><path class="dc-o-sep" d="M5 11H11"/>', 'separated instrument') : '') +
       (has.fx ? k('<path class="dc-o-fx" d="M1.5 9l3 -3l3 4l3 -4l3.5 3.5"/>', 'fracture') : '') +
@@ -1900,12 +2242,14 @@
     for(var n = 1; n <= 32; n++){ var t = tooth(spec, String(n)), c = CAT(n), bits = [];
       if(t.missing){ miss.push('#' + n);
         var tipW = t.rtip ? 'a root tip (about ' + (t.rtip.len || 4) + ' mm of the ' + (t.rtip.root || filmRoots(n)[0]) + ' root) left in the bone' : '';
-        if(t.pontic) notes.push('#' + n + ': pontic (' + String(CROWN_NAME[t.pontic] || t.pontic).replace(' crown', '') + ')' + (tipW ? ', ' + tipW + ' under it' : ''));
+        if(t.pontic) notes.push('#' + n + ': ' + (t.cant ? 'cantilevered ' : '') + 'pontic (' + String(CROWN_NAME[t.pontic] || t.pontic).replace(' crown', '') + ')' + (t.cant ? ', held from one side' : '') + (tipW ? ', ' + tipW + ' under it' : ''));
         else if(tipW) notes.push('#' + n + ': ' + tipW);
         continue; }
       if(t.retained) bits.push('retained root (the crown lost to decay)');
+      if(t.od) bits.push('overdenture abutment (root-filled, cut to a dome, sealed with ' + SEAL_NAME[t.od] + ')');
+      if(t.wing) bits.push('resin-bonded bridge retainer (a ' + (t.wing === 'zirconia' ? 'zirconia' : 'metal') + ' wing bonded to its lingual)');
       if(t.implant) bits.push('implant' + (t.implant.cover ? ' under its cover screw (no crown yet)' : t.implant.retention ? ' (' + t.implant.retention + '-retained)' : ''));
-      if(t.crown) bits.push((t.abut ? 'bridge abutment, ' : '') + (t.crownMat ? CROWN_NAME[t.crownMat] || t.crownMat + ' crown' : 'crown'));
+      if(t.crown) bits.push((t.abut ? 'bridge abutment' + (t.splint ? ' (splinted to the abutment beside it)' : '') + ', ' : '') + (t.crownMat ? CROWN_NAME[t.crownMat] || t.crownMat + ' crown' : 'crown'));
       if(t.margin.open) bits.push('open crown margin ' + String(t.margin.open).toUpperCase());
       if(t.margin.overhang) bits.push('overhanging crown margin ' + String(t.margin.overhang).toUpperCase());
       if(t.seal) bits.push(t.seal + ' sealant');
@@ -1921,7 +2265,13 @@
       t.fx.forEach(function(f){ bits.push(f.type === 'crown' ? 'crown fracture (' + f.depth + ')' : f.type === 'cusp' ? 'fractured ' + f.cusp + ' cusp' : f.type === 'crack' ? 'cracked tooth' : f.type === 'vrf' ? 'vertical root fracture' : 'horizontal root fracture (' + f.at + ' third)'); });
       if(bits.length) notes.push('#' + n + ': ' + bits.join(', '));
     }
-    return '<details class="dc-otext"><summary>The chart as text</summary><p>' + (miss.length ? 'Missing: ' + miss.join(', ') + '. ' : 'No teeth missing. ') + esc(notes.join('; ')) + (notes.length ? '.' : '') + '</p></details>';
+    /* v2.4: each denture in words: what it replaces, its clasps, rests and major connector (never its Kennedy class) */
+    var dz = Object.keys(spec.dentures || {}).map(function(ar){ var d = spec.dentures[ar], A = ar.charAt(0).toUpperCase() + ar.slice(1), nums = archNums(ar), ods = nums.filter(function(m){ return tooth(spec, m).od; });
+      if(d.type === 'complete') return A + ' complete denture' + (ods.length ? ' (an overdenture, over #' + ods.join(' and #') + ')' : '');
+      var cl = nums.filter(function(m){ return tooth(spec, m).clasp; }).map(function(m){ return '#' + m + ' (' + (tooth(spec, m).clasp === 'rpi' ? 'RPI' : 'circumferential') + ')'; });
+      var rs = nums.filter(function(m){ return tooth(spec, m).rest; }).map(function(m){ return '#' + m + ' (' + REST_NAME[tooth(spec, m).rest] + ')'; });
+      return A + ' removable partial denture replacing #' + (d.replaces || []).join(', #') + (cl.length ? '; clasps on ' + cl.join(', ') : '') + (rs.length ? '; rests on ' + rs.join(', ') : '') + (d.connector ? '; ' + CONNECTOR_NAME[d.connector] : ''); });
+    return '<details class="dc-otext"><summary>The chart as text</summary><p>' + (miss.length ? 'Missing: ' + miss.join(', ') + '. ' : 'No teeth missing. ') + (dz.length ? esc(dz.join('. ')) + '. ' : '') + esc(notes.join('; ')) + (notes.length ? '.' : '') + '</p></details>';
   }
 
   /* a fractured crown or buccal cusp on the drawn view: the piece gone, the fracture face's dentin showing (deeper than the
@@ -2055,6 +2405,59 @@
   function stumpShows(t){ return Math.max(t.rec.f[0], t.rec.f[1], t.rec.f[2]) > -.9; }
   I.buccalLesion = function(spec, n, c){ spec = prep(spec); return buccalLesion(tooth(spec, String(n)), c); };
   /* ---------- the drawn buccal view ---------- */
+  /* v2.4: a denture on the drawn view (the sources are in this file's header): its pink acrylic base over the ridge, festooned
+     around its denture teeth and running toward the vestibule (across the whole view for a complete denture, over each run of
+     replaced teeth for a partial), its teeth, and a partial denture's cobalt-chromium framework: each clasp's buccal arm (a
+     circumferential clasp from the rest's side, over the occlusal third, down to its tip in the cervical third at the far line
+     angle, below the height of contour; an RPI's I-bar rising from the vestibule to the cervical third at mid-buccal, its distal
+     proximal plate and mesial rest), and an occlusal rest where it crosses the marginal ridge. x in mm from the tooth's middle,
+     + distal; y in mm above its CEJ */
+  /* the ridge's edge below the CEJ (mm) where a tooth is missing: resorbed under a denture */
+  function gapMM(spec, t){ return t.missing && (spec.dentures || {})[archOf(t.n)] ? ridgeOf(spec, t.n) + .3 : 1.2; }
+  function viewDenture(spec, den, cols, occ, dir, k, kt, W, up){
+    var s = '', full = den.type === 'complete', fl = kt + 2.6 * k;
+    function geo(c){ var sg = c.mr ? -1 : 1, cej = occ + dir * c.d.ch * k; return { cej:cej, V:function(pts){ return pts.map(function(p){ return [c.cx + sg * p[0] * k, cej - dir * p[1] * k]; }); }, X:function(px){ return c.cx + sg * px * k; } }; }
+    var runs = [], cur = null;
+    /* the denture's teeth: those it replaces, and one over each overdenture abutment (the base covers the abutment) */
+    function dt(t){ return t.dent || t.od; }
+    cols.forEach(function(c, i){ var on = dt(c.t) || (full && c.t.missing); if(on){ if(!cur){ cur = { a:i, b:i }; runs.push(cur); } else cur.b = i; } else cur = null; });
+    runs.forEach(function(r){ var A = cols[r.a], B = cols[r.b], top = [], x0 = r.a === 0 ? -6 : A.cx - A.d.cw / 2 * k - .4 * k, x1 = r.b === cols.length - 1 ? W + 6 : B.cx + B.d.cw / 2 * k + .4 * k;
+      var cA = occ + dir * A.d.ch * k, cB = occ + dir * B.d.ch * k;
+      top.push([x0, cA - dir * .4 * k]);
+      for(var i = r.a; i <= r.b; i++){ var c = cols[i], cj = occ + dir * c.d.ch * k, L = c.cx - c.d.cw / 2 * k, R = c.cx + c.d.cw / 2 * k;
+        if(!dt(c.t)){ top.push([L, cj + dir * .2 * k], [R, cj + dir * .2 * k]); continue; }
+        top.push([L, cj - dir * 1.4 * k], [c.cx - c.d.cw * .3 * k, cj + dir * .1 * k], [c.cx, cj + dir * .45 * k], [c.cx + c.d.cw * .3 * k, cj + dir * .1 * k], [R, cj - dir * 1.4 * k]); }
+      top.push([x1, cB - dir * .4 * k]);
+      var e = dense(top, false, 4), yb = (dir > 0 ? Math.max(cA, cB) : Math.min(cA, cB)) + dir * fl, bot = [];
+      /* the flange's border, rounded into the vestibule; where the run ends at an abutment, the base stops at its proximal */
+      if(r.b !== cols.length - 1) bot.push([x1, cB + dir * fl * .5]);
+      for(var j = 0; j <= 12; j++){ var u = j / 12; bot.push([x1 + (x0 - x1) * u, yb + dir * .7 * k * Math.sin(Math.PI * u)]); }
+      if(r.a !== 0) bot.push([x0, cA + dir * fl * .5]);
+      s += path('io-base', e.concat(bot));
+      s += path('io-base-hi', e.slice(2, -2).map(function(p){ return [p[0], p[1] + dir * 1.1 * k]; }), true); });
+    cols.forEach(function(c){ if(!dt(c.t)) return; var G = geo(c);
+      s += path('io-tooth io-dt' + (up ? '' : ' low'), dense(crownMM(c.d), true, 4).map(function(p){ return G.V([p])[0]; })); });
+    if(full) return s;
+    /* the framework */
+    function band(pts, w0, w1){ var L = [], R = [], n = pts.length;
+      for(var i = 0; i < n; i++){ var a = pts[Math.max(0, i - 1)], b = pts[Math.min(n - 1, i + 1)], dx = b[0] - a[0], dy = b[1] - a[1], l = Math.hypot(dx, dy) || 1, w = (w0 + (w1 - w0) * i / (n - 1)) / 2;
+        L.push([pts[i][0] - dy / l * w, pts[i][1] + dx / l * w]); R.unshift([pts[i][0] + dy / l * w, pts[i][1] - dx / l * w]); }
+      return L.concat(R); }
+    function curve(P, n){ var o = []; for(var i = 0; i <= n; i++){ var u = i / n, a = 1 - u; o.push([a * a * a * P[0][0] + 3 * a * a * u * P[1][0] + 3 * a * u * u * P[2][0] + u * u * u * P[3][0], a * a * a * P[0][1] + 3 * a * a * u * P[1][1] + 3 * a * u * u * P[2][1] + u * u * u * P[3][1]]); } return o; }
+    cols.forEach(function(c){ var t = c.t; if(t.missing || (!t.clasp && !t.rest)) return; var G = geo(c), d = c.d, hw = d.cw / 2, ch = d.ch, post = posOf(t.n) >= 4;
+      var dM = nbr(t.n, true), dD = nbr(t.n, false), bM = dM && tooth(spec, dM).dent, bD = dD && tooth(spec, dD).dent;
+      var rs = String(t.rest || ''), restAt = function(sd){ return G.V(TL.filletClosed([[sd * hw * .2, ch + .05], [sd * hw * .62, ch * .9], [sd * hw * .74, ch * .78], [sd * hw * .3, ch * .86]], .25)); };
+      if(post) [['m', -1], ['d', 1]].forEach(function(e){ if(rs.indexOf(e[0]) >= 0) s += path('io-clasp', restAt(e[1])); });
+      if(rs === 'incisal') s += path('io-clasp', G.V(TL.filletClosed([[-.9, ch + .1], [.9, ch + .1], [.6, ch - .9], [-.6, ch - .9]], .3)));
+      if(t.clasp === 'rpi'){ var sd = bD ? 1 : -1;
+        s += path('io-clasp', G.V(band([[sd * hw * 1.02, ch * .62], [sd * hw * 1.04, -.4]], 1.1, 1.3)));
+        var ap = curve([[sd * (hw + 2.2), -2.6], [sd * hw * .2, -2.6], [-.1 * hw, -2], [-.1 * hw, -1]], 10).concat(curve([[-.1 * hw, -1], [-.1 * hw, 0], [-.1 * hw, ch * .2], [-.1 * hw, ch * .34]], 5).slice(1));
+        s += path('io-clasp', G.V(band(ap, 1.5, .9))); }
+      else if(t.clasp){ var so = bD && !bM ? 1 : bM && !bD ? -1 : rs === 'd' ? 1 : -1;
+        s += path('io-clasp', G.V(band([[so * hw * 1.02, ch * .8], [so * hw * 1.04, -.3]], 1.1, 1.2)));
+        s += path('io-clasp', G.V(band(curve([[so * hw * .96, ch * .8], [so * hw * .2, ch * .72], [-so * hw * .35, ch * .42], [-so * hw * .86, ch * .3]], 14), 1.25, .55))); } });
+    return s;
+  }
   I.view = function(spec, o){
     spec = prep(spec); o = o || {}; var ts = teethOf(spec, o.teeth), up = isUpper(ts[0].n), k = o.k || 8.2, g = spec.gingiva || {};
     var look = g.look || 'healthy', edema = g.edema != null ? g.edema : (look === 'inflamed' ? 1 : 0);
@@ -2070,6 +2473,11 @@
     mgj.push([W + 5, mgj[mgj.length - 1][1]]); mgj.unshift([-5, mgj[0][1]]);
     var mg = dense(mgj, false, 5);
     s += path('io-gum dc-attached' + (look === 'inflamed' ? ' dc-inflamed' : look === 'fibrotic' ? ' dc-fibrotic' : ''), mg.concat([[W + 5, occ], [-5, occ]]));
+    /* v2.4: where a tooth is missing (or cut down to an overdenture abutment's dome), past the ridge is the mouth (dark), not the
+       attached gingiva: the ridge's edge (the free gingiva, below) then reads as a ridge */
+    cols.forEach(function(c, i){ if(!((c.t.missing && !c.t.pontic) || (c.t.implant && c.t.implant.cover) || c.t.od)) return;
+      var cej = occ + dir * c.d.ch * k, L = i ? c.cx - c.d.cw / 2 * k : -6, R = i < cols.length - 1 ? c.cx + c.d.cw / 2 * k : W + 6, deep = cej + dir * ((c.t.od ? 0 : gapMM(spec, c.t)) + 2) * k;
+      s += path('io-bg', [[L, deep], [R, deep], [R, occ - dir * 14], [L, occ - dir * 14]]); });
     /* teeth: the labial crown outline, roots behind the gum (seen where there is recession) */
     cols.forEach(function(c){
       var d = c.d, sg = c.mr ? -1 : 1, cej = occ + dir * d.ch * k;
@@ -2093,6 +2501,11 @@
       var cr = dense(crownMM(d), true, 4).map(function(p){ return [X(p[0]), cej - dir * p[1] * k]; });
       /* a retained root (v2.2): the stump about a millimeter above the CEJ, its broken top soft and brown with decay (often under the
          gingiva: the chart's recession says) */
+      /* v2.4: an overdenture abutment: its dome above the gingiva, the seal's edge at its top (under a denture that is in, the base
+         covers it) */
+      if(c.t.od){ var dm = [], i3; for(i3 = 0; i3 <= 16; i3++){ var a3 = Math.PI * i3 / 16; dm.push([-d.cv / 2 * Math.cos(a3), domeMM(a3)]); }
+        s += path('io-tooth io-od' + (up ? '' : ' low'), V(dm.concat([[d.cv / 2, -3], [-d.cv / 2, -3]])));
+        s += path('io-r io-r-' + (c.t.od === 'gi' ? 'gi' : c.t.od), V(TL.filletClosed([[-1.1, DOME - .55], [1.1, DOME - .55], [.9, DOME - .08], [-.9, DOME - .08]], .3))); return; }
       if(c.t.retained){ var stub = clipHalf(cr, V([[-9, .9]])[0], V([[9, .9]])[0], V([[0, -2]])[0], .22 * k);
         s += path('io-tooth io-stump' + (up ? '' : ' low'), stub) + path('io-cav', clipHalf(stub, V([[-9, .4]])[0], V([[9, .4]])[0], V([[0, 3]])[0], .15 * k)); return; }
       var ven = c.t.resto.some(function(r){ return r.type === 'veneer'; }), fx = c.t.fx.filter(function(f){ return f.type === 'crown' || (f.type === 'cusp' && /B/.test(f.cusp)); })[0];
@@ -2118,6 +2531,7 @@
       var d = c.d, cej = occ + dir * d.ch * k, so = siteOrder(c.t.n), sx = [c.cx - d.cw * .34 * k, c.cx, c.cx + d.cw * .34 * k];
       var left = c.cx - d.cw / 2 * k, right = c.cx + d.cw / 2 * k, pap = (edema ? 1.6 : 2.6) * k;
       if(c.t.missing && c.t.pontic){ edge.push([left, cej - dir * .3 * k], [c.cx, cej - dir * .45 * k], [right, cej - dir * .3 * k]); return; }
+      if(c.t.missing && (spec.dentures || {})[archOf(c.t.n)]){ var rg = gapMM(spec, c.t) * k; edge.push([left, cej + dir * rg], [c.cx, cej + dir * (rg - .3 * k)], [right, cej + dir * rg]); return; }
       if(c.t.missing || (c.t.implant && c.t.implant.cover)){ edge.push([left, cej + dir * 1.2 * k], [c.cx, cej + dir * 1.8 * k], [right, cej + dir * 1.2 * k]); return; }
       if(i === 0) edge.push([-6, cej - dir * pap * .35], [left - 6, cej - dir * pap * .5], [left, cej - dir * pap]);
       so.forEach(function(si, j){ var rec = c.t.rec.f[si], my = cej + dir * rec * k + (c.t.implant ? dir * PLAT * k : j === 1 ? dir * (c.d.cej || 0) * k : 0);
@@ -2133,10 +2547,17 @@
       if(nx && !nx.t.missing) edge.push([(right + nx.cx - nx.d.cw / 2 * k) / 2, cej - dir * pap * 1.1]);
       if(!nx) edge.push([right + 6, cej - dir * pap * .5], [W + 6, cej - dir * pap * .35]);
     });
+    /* a missing tooth at either end of the view: the gingiva still runs to the view's edge */
+    if(edge.length){ if(edge[0][0] > -6) edge.unshift([-6, edge[0][1]]); var lp = edge[edge.length - 1]; if(lp[0] < W + 6) edge.push([W + 6, lp[1]]); }
     var e = dense(edge, false, 5), base = up ? -5 : H + 5;
     s += path('io-gum dc-free' + (look === 'inflamed' ? ' dc-inflamed' : look === 'fibrotic' ? ' dc-fibrotic' : ''), e.concat([[e[e.length - 1][0], base], [e[0][0], base]]));
     if(look !== 'inflamed' && g.stippling !== false){ var r = rnd(7 + n), cejM = 0; cols.forEach(function(c){ cejM += (occ + dir * c.d.ch * k) / n; });
-      for(var i = 0; i < 70; i++){ var px = 20 + r() * (W - 40), py = cejM + dir * (.6 * k + r() * (kt - .8 * k)); s += dot('dc-stipple', px, py, .9); } }
+      /* v2.4: no stipple where a gap's ridge (resorbed under a denture, or a socket's) sits below the dot */
+      for(var i = 0; i < 70; i++){ var px = 20 + r() * (W - 40), py = cejM + dir * (.6 * k + r() * (kt - .8 * k)), gc = null;
+        cols.forEach(function(c){ if(!gc || Math.abs(px - c.cx) < Math.abs(px - gc.cx)) gc = c; });
+        if(gc.t.od && o.out && Math.abs(px - gc.cx) > gc.d.cw * .3 * k) continue;
+        if((gc.t.missing || (gc.t.od && o.out)) && dir * (py - (occ + dir * gc.d.ch * k + dir * (gc.t.od ? 0 : gapMM(spec, gc.t)) * k)) < .5 * k) continue;
+        s += dot('dc-stipple', px, py, .9); } }
     s += marks;
     /* supragingival calculus (Newman and Carranza): a yellow-tan deposit on the cervical third, hugging the margin, thickest
        toward the interproximal line angles, its crown-side edge irregular. It follows the margin across the facial and tapers
@@ -2155,9 +2576,13 @@
         return [p[0], p[1] - dir * th]; });
       s += path('dc-calc', low.map(function(p){ return [p[0], p[1] + dir * .4]; }).concat(dense(hi, false, 2).reverse())); });
     function mean(pts){ return pts.reduce(function(a, p){ return a + p[0]; }, 0) / pts.length; }
+    var den = (spec.dentures || {})[up ? 'upper' : 'lower'], dIn = den && !o.out;
+    if(dIn) s += viewDenture(spec, den, cols, occ, dir, k, kt, W, up);
     cols.forEach(function(c){ s += txt(c.cx, up ? H - 10 : 18, '#' + c.t.n, 'io-lab', 'middle'); });
     var seen = []; ts.forEach(function(t){ if(t.missing || t.implant) return; t.caries.forEach(function(cr){ var L = buccalLesion(t, cr); if(L && L.visible) seen.push('#' + t.n + ', ' + lesionWords(t, cr)); });
-      if(t.retained && stumpShows(t)) seen.push('#' + t.n + ', a retained root at the gingiva'); if(/B/.test(t.seal)) seen.push('#' + t.n + ', a buccal pit sealant'); });
+      if(t.retained && stumpShows(t)) seen.push('#' + t.n + ', a retained root at the gingiva'); if(/B/.test(t.seal)) seen.push('#' + t.n + ', a buccal pit sealant');
+      if(t.od && !dIn) seen.push('#' + t.n + ', a root cut down to a dome, its canal sealed'); if(t.clasp && dIn) seen.push('#' + t.n + ', the denture\'s ' + (t.clasp === 'rpi' ? 'I-bar' : 'clasp')); });
+    if(den) seen.unshift(dIn ? 'the ' + (den.type === 'complete' ? 'complete' : 'partial') + ' denture in' : 'the denture out');
     ts.forEach(function(t){ if(!t.implant || t.implant.cover) return; var r = Math.max(t.rec.f[0], t.rec.f[1], t.rec.f[2]);
       if(r > .6) seen.push('#' + t.n + ', the implant\'s threads showing above the mucosa'); else if(r > -PLAT) seen.push('#' + t.n + ', the abutment showing above the mucosa'); });
     var label = o.aria || ('Drawn ' + (up ? 'upper' : 'lower') + ' buccal view of ' + ts.map(function(t){ return '#' + t.n; }).join(', ') + ': the gingiva ' + (look === 'inflamed' ? 'red and swollen' : look === 'fibrotic' ? 'pale and fibrotic' : 'pink and stippled') + ', drawn from the chart' + (seen.length ? '; seen: ' + seen.join('; ') : ''));
@@ -2179,7 +2604,12 @@
       if(!body) return;
       /* the series stays at a size its films can be read at, and scrolls sideways on a phone */
       if(f.kind === 'fmx') body = '<div class="dc-scroll">' + body + '</div><p class="dc-scroll-hint">Scroll sideways for the whole series.</p>';
-      out += '<figure class="pimg dc-fig' + (WIDE[f.kind] ? ' wide' : '') + '"><figcaption><b>' + esc(KINDS[f.kind]) + '</b>' + (f.title ? ' · ' + esc(f.title) : '') + '</figcaption>' + body + (f.note ? '<div class="pimg-cap">' + esc(f.note) + '</div>' : '') + '</figure>';
+      /* v2.4: films are taken with a denture out (it would hide the ridge, and its framework would shadow the teeth); a view says
+         whether its arch's denture is in */
+      var dens = spec.dentures || {}, ft = figTeeth(spec, f), dn = ft.some(function(n){ return dens[archOf(n)]; }), dw = '';
+      if(dn && (f.kind === 'film' || f.kind === 'bitewing' || f.kind === 'fmx')) dw = 'Taken with the denture out.';
+      if(dn && f.kind === 'view') dw = f.out ? 'The denture taken out.' : 'The denture in.';
+      out += '<figure class="pimg dc-fig' + (WIDE[f.kind] ? ' wide' : '') + '"><figcaption><b>' + esc(KINDS[f.kind]) + '</b>' + (f.title ? ' · ' + esc(f.title) : '') + '</figcaption>' + body + (f.note || dw ? '<div class="pimg-cap">' + esc([dw, f.note].filter(Boolean).join(' ')) + '</div>' : '') + '</figure>';
     });
     if(!out) return '';
     return '<div class="pimg-grid dc-figs">' + out + '</div><div class="pimg-note dc-note">Drawn for this hub from the case\'s numbers to show the findings; not a patient image or a real radiograph. Tooth sizes and shapes are averages (Wheeler).</div>';
@@ -2209,6 +2639,14 @@
         bits.push(b ? 'on the film taken when the crown was delivered (the baseline), the bone was ' + (b.m === b.d ? f1(b.m) + ' mm' : f1(b.m) + ' mm mesially and ' + f1(b.d) + ' mm distally') + ' below the platform' : 'no earlier films or probings to compare with');
       }
       r.push(['Implant #' + t.n, bits.join('; ')]); });
+    /* v2.4: each denture: what it is, how long it has been worn, and a partial denture's teeth (never its Kennedy class, its clasps or
+       its major connector, which the pictures show and a question may ask); the floor of the mouth's depth, which the lower
+       connector is chosen by */
+    Object.keys(spec.dentures || {}).forEach(function(ar){ var d = spec.dentures[ar]; if(!d) return; var A = ar.charAt(0).toUpperCase() + ar.slice(1);
+      var yrs = d.years != null ? ', worn ' + (d.years ? d.years + ' year' + (d.years === 1 ? '' : 's') : 'since this year') : '';
+      if(d.type === 'complete') r.push([A + ' denture', 'complete denture' + yrs]);
+      else r.push([A + ' denture', 'removable partial denture (a cast cobalt-chromium framework, acrylic base and denture teeth)' + yrs + (d.replaces && d.replaces.length ? '; replaces #' + d.replaces.join(', #') : '')]);
+      if(d.floor != null) r.push(['Floor of the mouth', d.floor + ' mm below the lingual gingival margins of the lower front teeth']); });
     /* v2.2: the case's clinical tests, one row a test, each tooth's result in words */
     TESTS.forEach(function(ty){ var xs = (spec.tests || []).filter(function(x){ return x && x.test === ty; }); if(!xs.length) return;
       r.push([{ bite:'Bite test', transillumination:'Transillumination', percussion:'Percussion' }[ty], xs.map(function(x){ return '#' + x.tooth + ': ' + testWords(x); }).join('; ')]); });
@@ -2241,8 +2679,11 @@
       ts.forEach(function(n){ if(!CAT(n)) P.push(w + 'tooth ' + n + ' is not a universal number'); });
       if(f.kind === 'chart' || f.kind === 'film' || f.kind === 'view'){
         var a = ts.map(isUpper); if(a.some(Boolean) && !a.every(Boolean)) P.push(w + 'the teeth are not all in one arch');
-        if(!present(spec, ts).length) P.push(w + 'every tooth in it is missing');
+        /* v2.4: a film or the view of a complete denture's arch shows the ridge (or the denture); a chart has nothing to probe */
+        if(!present(spec, ts).length && (f.kind === 'chart' || !ts.some(function(n){ return tooth(spec, n).dent; }))) P.push(w + 'every tooth in it is missing');
       }
+      if(f.out != null){ if(f.kind !== 'view') P.push(w + 'out (the denture taken out) is the view\'s: a film is taken with it out anyway');
+        else if(!(spec.dentures || {})[ts.length && isUpper(ts[0]) ? 'upper' : 'lower']) P.push(w + 'out: there is no denture in this arch to take out'); }
       if(f.kind === 'bitewing'){
         ts.forEach(function(n){ var c = CAT(n); if(c && c.films.indexOf('bitewing') < 0) P.push(w + 'a bitewing of #' + n + ' (the ' + c.name + '): bitewings show premolars and molars'); });
         if(!ts.some(isUpper) || ts.every(isUpper)) P.push(w + 'a bitewing shows both arches: list upper and lower teeth');
@@ -2261,7 +2702,7 @@
   /* answerable from what's shown: each question says what its key rests on (q.rests: stage, grade, extent, rt, furc, impl,
      kind), and this fails when the figures and rows it shows don't include it. The twin of hide, which stops a picture
      from giving the answer away. */
-  var RESTS = ['stage', 'grade', 'extent', 'rt', 'furc', 'impl', 'kind', 'endo', 'fracture', 'resto', 'caries', 'roottip', 'resorption', 'sealant'];
+  var RESTS = ['stage', 'grade', 'extent', 'rt', 'furc', 'impl', 'kind', 'endo', 'fracture', 'resto', 'caries', 'roottip', 'resorption', 'sealant', 'denture', 'kennedy'];
   I.RESTS = RESTS;
   I.answerable = function(spec, figs, rows, rests){
     spec = prep(spec); figs = figs || []; rows = rows || []; var P = [], D = I.derive(spec), m = spec.mouth || {};
@@ -2334,6 +2775,8 @@
           if(f.type === 'crown' && !(xr(n) || vw(n) || odo(n))) P.push('fracture: #' + n + '\'s crown fracture needs a film, the view or the odontogram');
           if(f.type === 'cusp' && !(xr(n) || odo(n) || (/B/.test(f.cusp) && vw(n)))) P.push('fracture: #' + n + '\'s fractured cusp needs a film or the odontogram' + (/B/.test(f.cusp) ? ', or the view' : '')); }); }); }
       if(k === 'resto'){ var rs = all.filter(function(t){ return t.crown || t.resto.length || t.pontic || t.amalgam; });
+        /* v2.4: a resin-bonded bridge's wing is on the lingual: a film (the metal's or zirconia's shadow) or the odontogram */
+        all.forEach(function(t){ if(t.wing && !(xr(t.n) || odo(t.n))) P.push('resto: #' + t.n + '\'s resin-bonded wing is on the lingual: it needs a film or the odontogram'); });
         if(!rs.length) P.push('resto: the record has no restoration');
         rs.forEach(function(t){ var n = t.n, margin = t.margin.open || t.margin.overhang || t.resto.some(function(r){ return r.overhang || r.open; }) || t.caries.some(function(c){ return c.recurrent && (c.s === 'M' || c.s === 'D'); });
           var bm = t.caries.filter(function(c){ return c.recurrent && c.s !== 'M' && c.s !== 'D'; });
@@ -2371,6 +2814,25 @@
       if(k === 'sealant'){ var sl = allOf(spec).filter(function(t){ return !t.missing && t.seal; });
         if(!sl.length) P.push('sealant: the record has no sealant');
         sl.forEach(function(t){ if(!(odo(t.n) || row(/sealant|sealed/i) || (/B/.test(t.seal) && vw(t.n)))) P.push('sealant: #' + t.n + '\'s sealant shows on no film: give the odontogram or a row' + (/B/.test(t.seal) ? ', or the view (its buccal pit)' : '')); }); }
+      /* v2.4: a denture shows in its row, on the odontogram or on the view with it in; its clasps and rests on the view with it in
+         (the buccal side: a clasp's arm, an occlusal or incisal rest; a cingulum rest is on the lingual, so only the odontogram) or the odontogram; an overdenture abutment on a periapical, the odontogram or
+         the view with the denture out; the Kennedy class on what shows the whole arch (the odontogram, the full-mouth series, or a
+         view of every tooth of it) */
+      var dens = spec.dentures || {}, D2 = Object.keys(dens);
+      function vwIn(n){ return inFig(['view'], n, function(f){ return !f.out; }); }
+      function vwOut(n){ return inFig(['view'], n, function(f){ return !!f.out; }); }
+      if(k === 'denture'){ if(!D2.length) P.push('denture: the record has no denture');
+        D2.forEach(function(ar){ var nums = archNums(ar);
+          if(!(row(new RegExp(ar + ' denture', 'i')) || nums.some(function(n){ return odo(n) || vwIn(n); }))) P.push('denture: the ' + ar + ' denture shows in no row or picture');
+          nums.forEach(function(n){ var t = tooth(spec, n);
+            if(t.clasp && !(vwIn(n) || odo(n))) P.push('denture: #' + n + '\'s clasp needs the view with the denture in, or the odontogram');
+            else if(t.rest && !t.clasp && !((vwIn(n) && t.rest !== 'cingulum') || odo(n))) P.push('denture: #' + n + '\'s ' + (t.rest === 'cingulum' ? 'cingulum rest is on the lingual: give the odontogram' : 'rest needs the view with the denture in, or the odontogram'));
+            if(t.od && !(pa(n) || odo(n) || vwOut(n))) P.push('denture: #' + n + '\'s overdenture abutment needs a periapical, the odontogram or the view with the denture out'); }); }); }
+      if(k === 'kennedy'){ var kd = D2.filter(function(ar){ return dens[ar].type === 'partial'; });
+        if(!kd.length) P.push('kennedy: the record has no partial denture');
+        kd.forEach(function(ar){ var nums = archNums(ar);
+          if(!(figs.some(function(f){ return f.kind === 'odontogram' || f.kind === 'fmx' || (f.kind === 'view' && nums.every(function(n){ return figTeeth(spec, f).indexOf(n) >= 0; })); })))
+            P.push('kennedy: the ' + ar + ' arch\'s class rests on every tooth of it: give the odontogram, the full-mouth series or a view of the whole arch'); }); }
     });
     return P;
   };
@@ -2378,7 +2840,8 @@
      must appear in the question's text, so the explanation can't drift from the picture */
   I.got = function(spec){
     var d = I.derive(spec);
-    return { kind:d.kind, stage:d.stage, grade:d.grade, extent:d.extent, dx:d.dx, rt:d.rt, impl:d.impl, triggers:d.triggers, ratio:d.ratio,
+    var kn = {}; Object.keys(d.kennedy).forEach(function(a){ kn[a] = d.kennedy[a].text; });
+    return { kind:d.kind, stage:d.stage, grade:d.grade, extent:d.extent, dx:d.dx, rt:d.rt, impl:d.impl, kennedy:kn, triggers:d.triggers, ratio:d.ratio,
       maxInterdental:d.maxInterdental.v, maxRBL:d.maxRBL.pct, maxPD:d.maxPD.v, bopPct:d.bopPct, extentPct:d.extentPct };
   };
   I.checkSays = function(spec, q){
