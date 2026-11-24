@@ -32,6 +32,8 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-24 (After #552: the fixed keys' picks put back, BUG-200, Claude Code)** — After merge loaded Review of Systems' new keys, which set the 31 answered fixed questions' picks aside (`question_choices_past`: the choices' version includes the key), and then #552's recount found no picks and set them to 0% right. Within 3 minutes the picks went back under each question's current choice version and the recount ran again, by hand through the connector: 52 right of 105 tries. Recorded as `tools/data-fixes/2026-11-24-review-of-systems-picks.sql` (After merge runs it again on this merge: a no-op move and the same recount), tested on a throwaway copy in After merge's order; the gotcha is in [after-a-merge](vault/how-to/after-a-merge.md). Reports #69-#79 resolved with their replies (Sam: "Send the replies when fixed"); #68 waits for BUG-199. The class notice went out on Sam's word ("You can send the notice"): `site_notices` #8, "Fixed: 52 answer keys in Review of Systems", 20:13 UTC.
+
 - **2026-11-24 (the "Good question?" thumbs' words hidden again, Claude Code)** — #548 cut `.sh-cp-sr` from
   `widget/v3.css` with the old class picks, but `widget/qhealth.js` labels the "Good question?" thumbs with it, so on
   every answered question the words "Yes, a good question" and "No, something is off" showed in full beside the thumbs,
