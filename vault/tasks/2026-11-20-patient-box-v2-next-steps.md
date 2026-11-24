@@ -97,11 +97,11 @@ what v2.0 left, so it isn't lost. Its own track (Sam, 2026-11-06, [decisions](..
       and `material: "provisional"`; every view draws them; examples `v24-partial-class-i`, `v24-partial-class-ii`,
       `v24-complete-overdenture`, `v24-cantilevers` and `v24-resin-bonded`; a front space's labial flange, 2026-11-24:
       `v24-front-flanges`)
-- [ ] Sam looks at v2.4's drawings with their first case (on the view, the denture's pink base and teeth, the clasp arms, the
+- [x] Sam looks at v2.4's drawings with their first case (on the view, the denture's pink base and teeth, the clasp arms, the
       RPI's plate and I-bar and the rests, a front space's gum-fitted teeth and full labial flange, and with the denture out the
       resorbed ridge and an overdenture abutment's dome; on the
       film the ridge, the dome and its seal, the resin-bonded wing, the cantilever's joins and the provisional bridge; the
-      odontogram's denture marks and key), the way the first box says
+      odontogram's denture marks and key), the way the first box says. Done 2026-11-24 on a sample case ("Looks good"; the log)
 - [ ] An implant-retained overdenture (attachments on implants under a complete denture): `validate()` refuses an implant under
       a complete denture for now; with it, a root's attachment or coping, and a vital overdenture abutment (v2.4 draws the
       root-filled, domed and sealed one only)
@@ -204,7 +204,9 @@ what v2.0 left, so it isn't lost. Its own track (Sam, 2026-11-06, [decisions](..
 - 2026-11-24: Sam asked for a sample case. `v24-front-flanges` (with `v24-ex-28`) and `v24-partial-class-i` (with `v24-ex-19`)
   were put into a local copy of Review of Systems only, drawn by the engine on the preview's made-up data at phone width, and
   the screenshots sent to Sam in chat; nothing was committed. The first try found that a hub without `content/figures.js`
-  never draws a case question (the box above). The "Sam looks at v2.4's drawings" box stays open until Sam says.
+  never draws a case question (the box above). Sam's answer: "Looks good", so the "Sam looks at v2.4's drawings" box is
+  ticked, with no change asked for (the session had offered to round the lower ridge's V in `v24-front-flanges` with the denture out;
+  it stays as drawn).
 
 ## Outcome
 
