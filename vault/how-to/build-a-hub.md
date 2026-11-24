@@ -123,8 +123,20 @@ student still has open from before the edit is graded against the key it showed.
 `node tools/ci/syntax.js`, `node tools/ci/vault.js` and `node tools/ci/smoke.js`: the smoke test clicks through the
 hubs you changed (all of them when a shared file changed) on desktop and phone and fails on missing formats, whys, predicted topics or narration files; `node tools/hub-next/build.mjs --check` fails on content that wasn't rebuilt. Its first local run
 writes the hub's question-id registry, `tools/question-ids/<hub-id>.txt`: commit it
-([question-ids-are-permanent](../rules/question-ids-are-permanent.md)). Then a draft PR
-([ship-a-change](ship-a-change.md)).
+([question-ids-are-permanent](../rules/question-ids-are-permanent.md)).
+
+**Read every answer key before the PR** (Sam, 2026-11-24: "adding the answer key step is good"). The lint checks that a key
+is in range and that every choice has a why, but not that the key points at the right choice: Review of Systems shipped
+with 51 of Head & Neck's 68 single-answer keys one choice past the answer their own explanations gave, and the class found
+them in its first two days ([LESSONS.md](../../LESSONS.md)). For every new or redrafted question, read the stem, the keyed
+choice, the explanation and every why together, and check that the keyed choice is the one they call right (for EXCEPT
+and which-is-false items, the false one). Give it to agents, one per course or about 200 questions, each asked only to
+read keys against explanations and whys and list the ids that disagree with the right choice (2-4 minutes a course); read
+each listed question yourself before changing a key. Single-answer formats need it most: a true/false, two-statement or
+numbered choice says what it means in its own words, an index doesn't. A key fixed after students answered also needs the
+class's numbers recounted after the merge, as `tools/data-fixes/2026-11-24-review-of-systems-keys.sql` did.
+
+Then a draft PR ([ship-a-change](ship-a-change.md)).
 
 ## Adding a lecture
 
@@ -134,7 +146,7 @@ Adding a lecture to a live hub, or taking one from slides-only to taught, needs 
 - notes at both written levels and all three mp3s (High yield is built from the notes, then recorded:
   [text-and-audio-never-drift](../rules/text-and-audio-never-drift.md));
 - exam hints quoted from the recording, and its `likelyTopics` entries ranked with the rest;
-- questions in all three extra formats, each choice with its why;
+- questions in all three extra formats, each choice with its why, and every key read against its explanation and whys (Check, above);
 - Side by side tables, cram lines, arcade words or sort sets (`study.json`);
 - the mock blueprint, `examInfo` and `courseDates` if the exam's scope or dates change (and the exam's date in `hubs.js`);
 - a diagram review for the new lecture, put to Sam;

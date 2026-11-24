@@ -126,7 +126,10 @@ cells die; it is a few hours later), the panoramic chin-down error (`rd-anatomy-
 smile), two why lines swapped (`em-prevent-08`), a case about a woman that said "him" and "the extraction" at a scaling visit
 (`em-cardiac-02`), a why line that started "Also" though the choices are shuffled (`em-cardiac-15`), a cusp named wrong in a why line
 (`da-posterior-08`), a number that didn't match its stem (`f1-cells-18`), a typo, and an explanation that named a classmates' guide
-(`f1-molbio-02`).
+(`f1-molbio-02`). Two facts the read flagged were settled from standard references on Sam's word ("fix 5"): Gold's agar is
+mitis-salivarius with **20%** sucrose and bacitracin (`om-viral-01` and its notes said 15%, from a study guide), and B cells develop
+in the bone marrow and finish maturing in the spleen (`f1-innate-12` said they complete their development in the marrow, against
+`f1-hyper-10` and the notes).
 
 **Listen** (report #68): on F1-1 the device voice "won't play or give options to speed up or slow down". The hub has no recordings, so
 Listen is the device's voice, which has a voice picker but no speed control, and reads a whole part as one utterance (up to about
@@ -162,8 +165,9 @@ people, 18 study days), short days in a quiet week, and v92's and v89's back pay
 - **The leaderboards** (E7a, totals): 50 names. The rank board's top ten hold 35,470-56,770 XP (median 42,320) against everyone's
   middle half 17,260-34,550 (median 22,580). **Study streaks broke over the quiet weekend**: a couple of the 50 keep 3+ days (47 a week
   ago). Arcade boards with 5+ players: the same eight, all archived hubs'.
-- **For Sam** (the last audit said a normal week proposes again only if the too-fast sign holds; it holds for wallets, not for the
-  ladder): in the PR, keep the prices, or add a shelf above Legendary for the full wallets, with numbers.
+- **Sam's call** (2026-11-24, on #552's choice between keeping the prices and a shelf above Legendary): **"prices are good for
+  now"**. Read it again after Review of Systems' Mock 1; propose again only if a normal week shows a too-fast sign on the ladder,
+  not only in the wallets ([decisions](vault/decisions.md)).
 
 **Older feature readings (kept for reference; the standing lessons carry what they mean):**
 - Heme & Endo (10-27 to 10-30): "Try it again" reached 63 of its 67 answerers (4,258 retries shown, 79% right); High likelihood order
@@ -384,7 +388,8 @@ each one is usually a pattern, not a one-off, so fix the pattern across the bank
   (first tries picked the true answer 39 of 63 times and were marked wrong, retries then took the hub's wrong key 25 of 35 times, 10
   reports in a day), but only after a week of learning wrong anatomy. Reading every key against its explanation and why lines, one
   agent per course of about 200 questions, took 2 to 4 minutes a course and found every reported item. Do that before a new bank or
-  a batch of drafted questions ships, and when the first reports of one bank say "keyed wrong", check the whole course, not the one
+  a batch of drafted questions ships (a step of [build-a-hub](vault/how-to/build-a-hub.md)'s Check since 2026-11-24: Sam,
+  "adding the answer key step is good"), and when the first reports of one bank say "keyed wrong", check the whole course, not the one
   item: a fault that comes from how a draft was merged repeats.
 - **Every question type needs obvious right/wrong feedback.** Two of the first four real reports were about this:
   self-graded recall cards looked unchanged after tapping "I got it" (perio, fixed 2026-09-28), and ordering
