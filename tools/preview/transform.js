@@ -168,6 +168,24 @@ function shopCatalog(){
   return rows.map(r => SHOP_COLS.map(k => k === 'wide' ? !!wide[r.id] : k === 'shelf' || k === 'gift' ? !!r[k] : k === 'rotates' ? (r.rotates == null ? true : r.rotates) : r[k] == null ? null : r[k]));
 }
 
+/* every hub on the engine's question ids, in its bank's order, and its exam dates: what the runtime makes a test
+   account's answer history from (BUG-107). The hub's page exports the same (SH_EXPORT.questions, .exams), but only on
+   that page, so until a hub had been opened the dashboard had no history to read and drew Timmy at 0 HP. */
+function hubFixtures(){
+  const out = {}, dir = path.join(ROOT, 'hubs');
+  let ids = [];
+  try { ids = fs.readdirSync(dir).filter(h => fs.existsSync(path.join(dir, h, 'content', 'questions.json'))).sort(); } catch (e) { return out; }
+  ids.forEach(h => {
+    try {
+      const qs = JSON.parse(fs.readFileSync(path.join(dir, h, 'content', 'questions.json'), 'utf8'));
+      let exams = [];
+      try { exams = (JSON.parse(fs.readFileSync(path.join(dir, h, 'content', 'core.json'), 'utf8')).exams || []).map(x => ({ date: x.date })); } catch (e) {}
+      out[h] = { q: qs.filter(q => q && q.id).map(q => q.id), exams };
+    } catch (e) {}
+  });
+  return out;
+}
+
 function runtime(o){
   const src = fs.readFileSync(path.join(__dirname, 'runtime', 'preview.js'), 'utf8');
   const personas = JSON.parse(fs.readFileSync(path.join(__dirname, 'fixtures', 'personas.json'), 'utf8'));
@@ -175,7 +193,7 @@ function runtime(o){
     label: o.label, ref: o.ref, sha: o.sha, builtAt: o.builtAt, data: o.data,
     fixtureHost: FIXTURE_HOST, stagingHost: o.data === 'staging' ? new URL(o.stagingUrl).host : null,
     liveSite: LIVE_SITE, audio: o.audio || { mode: 'local', included: [] }, personas: personas.personas, adminSecret: personas.adminSecret,
-    shop: { cols: SHOP_COLS, rows: shopCatalog() }
+    shop: { cols: SHOP_COLS, rows: shopCatalog() }, hubs: hubFixtures()
   };
   return `window.SH_PREVIEW_CONFIG = ${JSON.stringify(cfg)};\n` + src;
 }
