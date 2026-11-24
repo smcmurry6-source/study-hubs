@@ -21,7 +21,7 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   place view keeps a slowed phone's main thread about half busy (`main` about nine-tenths, so not new). Draw the night sky's
   stars as a layer over the scene, the way the leaderboard's stage does its sparkles (`tools/figures/site/place.mjs`,
   `widget/place.js`), or twinkle them in a few groups, and measure again ([motion-cost](../reference/motion-cost.md)).
-  Done 2026-11-24 (#PR): measured, the stars were 2-3% of it (three groups cost more); the rest was the rank medal's shine
+  Done 2026-11-24 (#550): measured, the stars were 2-3% of it (three groups cost more); the rest was the rank medal's shine
   in the place's panel, SMIL that drew the page every frame. Now a CSS transform, same look: 95-97% busy → 11% (phone size,
   4x), 87-90% → 33-38% (laptop size). The stars stay as they were.
 - [ ] **What else moves inside a dashboard drawing** (2026-11-22): the classroom's Timmys bob (`rm-bob`, up to 10), the
@@ -29,7 +29,7 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   lift one out of its drawing like the stage if a real phone shows it.
 - [x] **The shop takes about 4 s to open on a slowed phone** (2026-11-22, measured at 4x): the dashboard draws itself again
   on `sh:shop`, a set's art file loads, and the room's size is worked out again. Find which of the three is most of it.
-  Done 2026-11-24 (#PR): most of it was none of the three: the shop drew every shelf twice on each first open (about
+  Done 2026-11-24 (#550): most of it was none of the three: the shop drew every shelf twice on each first open (about
   600 ms); then the dashboard's `focus()` behind the shop on `sh:shop` (about 200 ms), the page's width changing when its
   scrollbar went (about 250 ms, desktops with classic scrollbars), and the set's file fetched after the shop's art (one
   round trip). All four cut: long tasks 1.4 s → 0.9 s (phone size, 4x), settled 1.85 s → 1.45 s.
