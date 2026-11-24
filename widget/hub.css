@@ -570,8 +570,9 @@ html.hx-still .ql-pod *, html.hx-still .pod-x *, html.hx-still .teeth .tooth { a
 .toolbar .tool-tip { display: inline-flex; align-items: center; gap: 6px; margin-left: 4px; }
 .reading:has(> .tipline) .tool-tip { display: none; }   /* the first-visit tip says it already */
 .hx .sh-tts-btn .sh-tts-label-pause { display: none; }
-.hx .sh-tts-btn.is-playing .sh-tts-label-play, .hx .sh-tts-btn.playing .sh-tts-label-play { display: none; }
-.hx .sh-tts-btn.is-playing .sh-tts-label-pause, .hx .sh-tts-btn.playing .sh-tts-label-pause { display: inline; }
+/* widget/v3.js marks the button data-state="playing" (BUG-199: with only the class selectors, it lost both words while it read) */
+.hx .sh-tts-btn[data-state="playing"] .sh-tts-label-play { display: none; }
+.hx .sh-tts-btn[data-state="playing"] .sh-tts-label-pause { display: inline; }
 .mmap { margin: 12px 0; padding: 12px; border-radius: var(--r-panel); background: var(--panel); overflow-x: auto; }
 .reading-prose { margin-top: 16px; font-size: 17px; line-height: 1.65; }
 .reading-prose > * + * { margin-top: 14px; }
