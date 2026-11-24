@@ -32,6 +32,37 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-24 (Patient Box v2.4, Claude Code)** — the case kit (`widget/cases.js`, `widget/cases.css`) gets **removable partial
+  and complete dentures**, **overdenture abutments**, and **cantilever, resin-bonded and provisional bridges**, on every view
+  ([the task](vault/tasks/2026-11-20-patient-box-v2-next-steps.md), step 5), each clinical call settled from outside sources and
+  cited in `cases.js`'s header (Sam, 2026-11-21: "Use outside sources to determine answers"). `{ m:'denture', type:'partial' }`
+  takes its `connector` (a lingual bar only with 8 mm to the floor of the mouth, else a plate), `clasps` (circumferential or RPI)
+  and `rests` (occlusal, cingulum, incisal; a clasp's own rest worked out), `ridge` and `years`; `validate()` keeps an RPI to a
+  free-end abutment with its rest mesial, clasps on both sides, none on mobility 2, no cingulum rest on a mandibular canine, an
+  indirect retainer on a Class I or II, and every missing tooth replaced (McCracken's; Kratochvil 1963; Krol 1973). `derive()`
+  works out the arch's Kennedy class by Applegate's rules (`kennedy`); the box never states it. `type:'complete'` takes the
+  whole arch with its `abutments`: root-filled roots cut to a dome and sealed (amalgam, composite or glass ionomer), at least half
+  their bone (Zarb's; Crum and Rooney 1978; Ettinger and Qian 2004). The bridge module gets `cantilever` (a maxillary lateral
+  from the canine, a premolar from two splinted abutments, hung mesially; never a canine), `type: "resin-bonded"` (metal or
+  zirconia wings on unrestored lingual enamel, one pontic, the single-retainer design for an incisor: Kern) and
+  `material: "provisional"`. Drawn: films taken with the denture out (and said so), the resorbed ridge, a dome and its seal, a
+  wing over its abutment's crown, a cantilever's joins; the view with the denture in (its base, teeth, clasp arms, the RPI's plate
+  and I-bar, rests) or `out: true` (the ridge, the domes); the chart's dome; the odontogram's denture teeth on their base, clasps,
+  I-bars, rests, domes and wings, each in the key. The box gets a row for each denture and the floor of the mouth.
+  `rests: ["denture"]` and `["kennedy"]` say what a question can rest on (a cingulum rest only on the odontogram, a wing only on a
+  film or the odontogram). Five examples and ten questions in `tools/cases/examples.json`; `tools/ci/cases.js` adds 41 records for
+  `validate()`, 14 for `answerable()` and 6 for the Kennedy class; the how-to has the module. Also, on every drawn view (Sam: "The way the gingiva is handled needs to
+  be better"): the gum over a missing tooth is one smooth ridge from the neighbors' margins, about 1.2 mm below their CEJs (Tan
+  2012), instead of a stepped pink block; past the gum, the embrasures between crowns and the space past the last tooth are the
+  dark of the mouth (they were pink down to the incisal edges); the pink strip under the upper incisal edges is gone; an
+  overdenture abutment stands on a broad mound; a denture base over a bounded space is a rounded collar just past the ridge, and
+  its papillae are no taller than a natural one; the stipple stays off the gaps. Then (Sam: "The interdental papillae look
+  terrible and unnatural"; "the metal portions of the dentures dont look good"): each tooth's margin is one smooth U from papilla
+  to papilla through its mid-facial margin, the papilla tall in front and lower behind (Becker 1997, Tarnow 1992), short of the
+  contact, rounder on back teeth and when swollen; and the framework is tapered, round-ended metal with a highlight, following
+  each crown's outline: rests over the marginal ridge's corner, arms level from the shoulder and dipping into the undercut,
+  connectors and the proximal plate hidden in the base, the I-bar out from under the base 3.5 mm below the margin. No live hub has dental cases, so students see nothing yet; `sw.js` to `sh-v77` for the changed kit.
+
 - **2026-11-24 (Patient Box v2.3, Claude Code)** — the case kit (`widget/cases.js`, `widget/cases.css`) gets the
   **`implant` module** and an **implant-supported bridge**, on every view ([the task](vault/tasks/2026-11-20-patient-box-v2-next-steps.md),
   steps 4 and 5), each clinical call settled from outside sources and the PCD Implants lectures and cited in `cases.js`'s header
