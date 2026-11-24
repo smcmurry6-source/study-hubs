@@ -198,3 +198,11 @@
 .dc-ow .dc-o-rbar{fill:none;stroke:var(--ink);stroke-width:2.2;stroke-linecap:round}
 .dc-ow .dc-o-rroot{fill:none;stroke:var(--ink);stroke-width:2.2;stroke-linecap:round}
 .dc-ow .dc-o-rsp{fill:var(--surface);stroke:var(--o-lesion);stroke-width:1.5;stroke-linejoin:round}
+/* Patient Box v2.3 on the drawn view: an implant's titanium abutment and threaded body, seen where the mucosa has receded (the view
+   keeps its own colors in both themes, as a photograph would) */
+.dc-view .io-impl{fill:#a9b0b9;stroke:#5f6771;stroke-width:1;stroke-linejoin:round}.dc-view .io-impl.io-abut{fill:#c3c8cf}
+.dc-view .io-thread{fill:none;stroke:#5f6771;stroke-width:1.1;stroke-linecap:round}
+/* on the odontogram: an implant's cover screw, a flat cap over its mark */
+.dc-ow .dc-o-cover{fill:none;stroke:var(--ink);stroke-width:2.6;stroke-linecap:round}
+/* on the film (v2.3): a screw-retained implant crown's access channel, composite over PTFE tape, both radiopaque, the tape less so */
+.dc-film .xr-chan{fill:#e0e0e0}.dc-film .xr-ptfe{fill:#c8c8c8}

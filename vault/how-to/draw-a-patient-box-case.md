@@ -33,12 +33,14 @@ engine loads `teeth.js` then `cases.js` and `cases.css` only on a hub that has c
 Box, and puts the case's rows above the question's own `pbox` rows. Nothing else to wire. (The old single-file hubs, all
 down since 2026-11-19, loaded the two scripts by hand: `teeth.js` first.)
 
-**Start from an example**: `tools/cases/examples.json` has ten made-up patients built from modules, with a question or two
+**Start from an example**: `tools/cases/examples.json` has thirteen made-up patients built from modules, with a question or two
 each using `rests` and `says`: a full mouth, a molar furcation, since v2.1 (2026-11-21) a bridge with a post and core
 (`v21-bridge-post`), a trauma case (`v21-trauma`) and decay seen from the buccal (`v21-buccal-decay`), and since v2.2
 (2026-11-24) proximal root caries (`v22-root-caries`), a retained root and a root tip (`v22-root-tips`), the four kinds of
 resorption (`v22-resorption`), sealants and temporaries (`v22-sealants-temps`) and a cracked tooth found by its tests
-(`v22-cracked-tooth`). Copy one, change it, run `node tools/ci/cases.js`.
+(`v22-cracked-tooth`), and since v2.3 (2026-11-24) implants: a healthy one beside one with peri-implantitis and excess cement
+(`v23-implant-states`), a bridge on two implants with another implant under its cover screw (`v23-implant-bridge`) and mucositis
+beside a failed implant (`v23-implant-anterior`). Copy one, change it, run `node tools/ci/cases.js`.
 
 ## Writing a case: modules
 
@@ -81,7 +83,8 @@ over the result field by field, for the one number you want by hand.
 | `roottip` `{ tooth, kind, len, root }` | v2.2. `kind: "retained"`: the crown lost to decay about a millimeter above the CEJ, the root in its socket (a ragged top with a band of soft decay and the chamber open on a film; a tan stump with a brown top on the view, where it shows above the gingiva; the crown crossed out and the root drawn solid with a bar on the odontogram); nothing of a crown's (no restoration, caries, fracture, sealant, resorption, root canal filling: an overdenture abutment isn't drawn yet), a periapical lesion allowed (`endo` with `fill: false`). `kind: "fragment"`: a root tip left in a healed socket after an extraction, the tooth otherwise missing: the apical `len` mm (1.5 to 6, default 4) of one `root` (one the film shows; the first by default), its coronal end broken obliquely, with its canal, PDL space and lamina dura, under a healed ridge a little concave over the socket; on the odontogram the tooth crossed out, its root dashed, and a bar with the solid tip past it. Alone, or under a pontic |
 | `resorption` `{ tooth, type, ... }` | v2.2, one of each type a tooth. `internal` (`at` cervical, middle or apical, `size` 1-4 mm, no wider than the root allows, `root`; not in a root-filled canal): a smooth oval widening of the canal, centered on it, the canal's outline lost in it. `cervical` (external cervical, `side` m, d, f or l, `heithersay` 1-4, `root`): below the CEJ (under the enamel from class 2), as long and as deep as its class; on M or D a ragged notch from the root's surface toward the canal that stops short of it, on F or L an irregular radiolucency over the canal with the canal's walls still drawn through it, mottled with bone from class 2, and on the facial from class 2 a pink spot through the cervical crown on the view. `apical` (`mm` 1 to the lesser of 5 and a third of the root, `root`): the root shorter and its end blunted. `replacement` (ankylosis: `side` m, d or md, `at`, `mm` 2 to the lesser of 10 and 60% of the root): along that much of the root the PDL space and lamina dura gone and the bone running into the root; the tooth must have mobility 0, and a percussion test on it must say `metallic`. A diamond on the root on the odontogram |
 | `sealant` `{ teeth, surfaces }` | v2.2. `O` on a premolar or molar (the default), `B` a mandibular molar's buccal pit, `L` a maxillary molar's palatal groove or a maxillary incisor's lingual pit; not on a crowned tooth, a restored surface, or over caries into the dentin or a cavity (it may go over a non-cavitated enamel lesion: ADA and AAPD 2016). No film draws one (it is thin and no brighter than enamel); the view draws a buccal pit's, opaque white; the odontogram fills the surface green |
-| `bridge` `{ abutments: [a, b], material }` | a fixed bridge: crowns of `material` (`pfm`, `gold`, `zirconia` or `lithium`; never `ssc`, and lithium disilicate only in front of the molars) on the two abutments, a pontic at every tooth between them, joined by connectors on the film, the chart, the view and the odontogram (the charting convention: a bar across the units, the pontic's crown drawn and its root crossed out with an X). The teeth between must be in the `missing` module |
+| `bridge` `{ abutments: [a, b], material }` | a fixed bridge: crowns of `material` (`pfm`, `gold`, `zirconia` or `lithium`; never `ssc`, and lithium disilicate only in front of the molars) on the two abutments, a pontic at every tooth between them, joined by connectors on the film, the chart, the view and the odontogram (the charting convention: a bar across the units, the pontic's crown drawn and its root crossed out with an X). The teeth between must be in the `missing` module. **On implants** (v2.3): both abutments in `implant` modules (their crowns take the bridge's material), one pontic between them (two implants carry a three-unit bridge, not usually four: a span flexes with its cube), never an implant joined to a tooth (the tooth moves 25-100 um in its ligament, the implant 3-5 um) |
+| `implant` `{ tooth or teeth, state, w, len, crown, retention, cement, baseline, loss, bone, rec, swell, bop, pus, mob, cover, years, weeks }` | v2.3. An implant in the tooth's place, its numbers measured from the platform. `state`: `health` (the default), `mucositis`, `peri-implantitis`, `failed` or `healing`. `w` and `len` mm (by default 3.3 for a lower incisor or an upper lateral, 4.8 for a molar, 4.1 elsewhere; 10 long), at least 1.5 mm from a neighbor's root and 3 mm from a neighbor's implant (one closer isn't drawn). `crown`: `gold`, `pfm`, `zirconia`, `lithium` or `provisional` (no SSC), drawn on a film by its material: a metal, metal-ceramic or zirconia crown hides the abutment, lithium disilicate and a provisional show it through; `retention`: `cement` or `screw` (a screw-retained crown's access channel through the crown on the film, composite over PTFE tape over the screw head); `cement: true` (cement-retained only) is excess cement left under the margin, a bright fleck on the film's mesial. `baseline`: the bone below the platform on the film taken when the crown was delivered (1.5 mm by default, a number or `{ m, d }`; `false`: no earlier films or probings, so the 2017 rule for a patient without records decides); `loss` mm lost since (peri-implantitis only: 3 by default), or `bone` to give it outright. The mucosa heals about 3.5 mm over the crest, so a healthy implant probes 3/2/3 with its margin 2-3 mm above the platform; `rec` mm the facial mucosa has receded (the lingual 1 less, the line angles 1 less), which shows the abutment and then the threads on the view; `swell` mm of swelling (mucositis: 1); an inflamed implant bleeds at every site unless `bop` gives a share, `pus` at each surface's deepest site. `failed`: mobile (`mob` 1 by default) with a radiolucent line round it on the film. `healing`: under its cover screw, `weeks` since placement: no crown, retention, baseline or probing (the chart says it is submerged; nothing shows on the view; the odontogram draws it with a flat cap and no crown); `cover: true` with `failed` for one that failed before it was uncovered. `years` since the crown was delivered. The box gets a row for each implant (its crown and when it was delivered, and the delivery film's bone or that there are no earlier records) |
 | `bone` `{ teeth, percent, pattern, defect, side, rec, swell, furc, mob }` | bone loss (% of the root; a number or `{ tooth: % }`), horizontal or `vertical` with `defect` mm on `side` `m` or `d`; then CAL at all six sites so the pocket base sits about 1 mm coronal to the crest, recession (`rec` facial mm, the lingual 1 less), probing depth (at least 2 mm; `swell` adds a pseudopocket), furcations that follow the bone past the trunk (Class I within 1.5 mm, II from 1.5 mm past, III from 4 mm) and mobility that follows the bone (1 from 55%, 2 from 70%) |
 | `bop`, `pus`, `plaque` `{ rate, teeth }` | that share of the sites, the deepest first |
 | `recession` `{ teeth, mm }` | facial recession at the middle site |
@@ -102,7 +105,7 @@ and `validate()` checks `mouth.teeth`, `involved` and `lost` against the record.
 
 The v1 per-tooth fields still work, alone or under modules: `pd`, `rec`, `bop`, `pus`, `plaque` (three sites a surface, in
 tooth terms `[mesial, middle, distal]`), `mob`, `furc { f, l }`, `furcX`, `bone { m, d }`, `vdef`, `calc`, `amalgam`,
-`crown`, `endo`, `implant { w, len, baseline, cement, cover }`, `halo`, `missing`, and v2's `resto`, `caries`, `lesion`, and
+`crown`, `endo`, `implant { w, len, baseline, cement, cover }` (since v2.3 also `retention`, `years`, `weeks`), `halo`, `missing`, and v2's `resto`, `caries`, `lesion`, and
 v2.1's `margin`, `apdl`, `fx`, `pontic` and `abut` (written by the modules above). `calc` draws calculus on a film as a small, irregular
 radiopaque spur on each proximal root surface just apical to the CEJ (about half a millimeter thick, 1 to 2.5 mm long, never
 past the crest: White and Pharoah, Newman and Carranza), and on the view as a yellow-tan band on the cervical third with an
@@ -125,6 +128,12 @@ The view also draws what of a restoration shows from the buccal (2026-11-21): a 
 onlay's cap over the buccal cusps, a Class III or IV (faint when placed from the lingual; a lingual surface not at all), a
 crown or veneer by material, and of a Class II's proximal box only a sliver at the crown's outline (its buccal wall just clears
 the contact); an overhang, an open margin and a box's gingival floor lie under the papilla and don't show.
+An implant (v2.3) is drawn on every picture from the same numbers: on a film its threaded body, the abutment, the crown by its
+material, a screw-retained crown's access channel or a cemented one's excess cement, the bone against the platform and a failed
+one's radiolucent line; on the chart its body under the CEJ line (its numbers measured from the platform, as the key says),
+"submerged" under its cover screw; on the view its crown, and the abutment and threads where the mucosa has receded past them;
+on the odontogram the implant's mark past a ringed crown, or a flat cap and no crown under its cover screw. An implant-supported
+bridge is drawn as a bridge on teeth is, with implants under its abutment crowns.
 `hide: { cal, furc, mob }` takes a row off a chart that would give the answer away.
 
 ## The checks (`node tools/ci/cases.js`)
@@ -157,6 +166,18 @@ the contact); an overhang, an open margin and a box's gingival floor lie under t
   a crown or a restored surface, or over dentin caries or a cavity; a temporary that isn't direct, a `temp` the kit doesn't know
   or on another material, an overhang or open margin on one; a test the kit doesn't have, on a tooth that isn't there, twice on
   one tooth, or with a result the record can't explain (above). `tools/ci/cases.js` holds a record for each call.
+- **v2.3's findings**: an implant state, retention or implant field the kit doesn't know; bone loss past the baseline on a
+  healthy implant or with mucositis (that is peri-implantitis); a cover screw on a loaded implant, or a crown, retention, cement,
+  years, baseline, probing or a bridge on one still under it; excess cement under a screw-retained crown; years outside 0-40 or
+  weeks outside 0-52; an SSC, an open margin or an overhang on an implant crown; an implant under 1.5 mm from a neighbor's root or
+  under 3 mm from a neighbor's implant (the message says what width fits); an implant's pocket base past its bone or more than 2.5
+  mm short of it, or its margin within 1 mm of the bone; a bridge joining an implant to a tooth, or more than one pontic on two
+  implants; a full mouth that counts an implant as a tooth (`mouth.teeth` counts teeth only; `lost` may include the teeth implants
+  replaced). `derive()` reads an implant against its delivery film: bleeding or suppuration with no loss past the 2 mm of initial
+  remodeling is mucositis, with loss past it peri-implantitis; without records, bone 3 mm or more below the platform or probing 6 mm
+  or more with bleeding (the lecture's "and/or"; the 2017 consensus wants all three, so a case that should read the same both ways
+  has both); mobility, a radiolucent line, or more than half its length of bone lost is a failed implant. `tools/ci/cases.js` holds
+  a record for each rule and for each of `derive()`'s readings.
 - **Impossible combinations**: a restoration, caries, an endo filling, a lesion or a furcation on a missing tooth; a
   furcation on a tooth or an entrance that has none (the library knows a maxillary first premolar's mesial and distal
   entrances, and that a film rarely shows them); an implant with a root's things (a filling, caries, a lesion); a
@@ -179,7 +200,9 @@ the contact); an overhang, an open margin and a box's gingival floor lie under t
   roottip: a root tip from a periapical or the odontogram, a retained root from any film, the odontogram, or the view where its
   stump is above the gingiva (it needs recession); resorption: a periapical, external cervical from any film; sealant: the
   odontogram, a row that says so, or the view for a buccal pit's; a crack's bite test or transillumination counts from the
-  record's own `tests` rows).
+  record's own `tests` rows; impl (v2.3): the film of each implant, and, unless it has failed or is still under its cover screw,
+  its chart or a row with its bleeding; the box's implant row gives the delivery film's bone or says there are no earlier
+  records, which the record writes by itself).
   It is the twin of `hide`, which stops a picture from giving the answer away.
 - **The numbers an explanation quotes**: `says: { "stage": 3, "maxInterdental": 6 }` on a question; each must be what the
   record gives and must appear in the question's text.
@@ -234,7 +257,20 @@ classes, Quintessence Int 1999; Andreasen and Hjorting-Hansen, Acta Odontol Scan
 ankylosed tooth's metallic sound); sealants (the ADA and AAPD guideline, Wright, JADA 2016; their radiopacity, Celikel 2024);
 temporary materials' radiopacity (Tanomaru-Filho, J Appl Oral Sci 2008, for IRM; DuBois, Mil Med 2000, for Cavit), the depth of
 Cavit that seals (Webber, Oral Surg 1978) and provisional crown materials' (Pekkan 2011); and the cracked tooth's tests (Cameron,
-JADA 1964; the AAE's Cracking the Cracked Tooth Code, 2008; Cohen's). Their text and images are never copied; what is labeled and keyed follows the lecture
+JADA 1964; the AAE's Cracking the Cracked Tooth Code, 2008; Cohen's).
+
+**Patient Box v2.3's clinical calls** (2026-11-24, the same way, with the PCD Implants lectures; the citations are in
+`widget/cases.js`'s header): the peri-implant states by the 2017 World Workshop's case definitions (Berglundh and Renvert, J Clin
+Periodontol 2018), with the lecture's rule for a patient without records kept where it differs (and/or, where the consensus wants
+both), the initial remodeling under 2 mm and failure past half the implant's length or with any mobility (the lecture; ICOI Pisa,
+Misch, Implant Dent 2008); the mucosa's height and how far a probe goes (Berglundh and Lindhe, J Clin Periodontol 1996; Kan, J
+Periodontol 2003; Lang, Clin Oral Implants Res 1994; Abrahamsson and Soldini, J Clin Periodontol 2006); the distances to a tooth
+and between implants (the lecture; Tarnow, J Periodontol 2000; Esposito, Clin Oral Implants Res 1993; Grunder, Int J Periodontics
+Restorative Dent 2005) and the common bone-level diameters; excess cement (Wilson, J Periodontol 2009: in 81% of peri-implant
+disease) and cement on a film (Wadhwani, J Prosthet Dent 2010); a screw access channel's seal (Moraguez and Belser, J Prosthet Dent
+2010: PTFE tape, radiopaque, under composite); crown materials on a film (Pekkan, J Prosthet Dent 2011); and implant bridges (the
+lecture: two implants carry three units, never an implant joined to a tooth; Pjetursson, Clin Oral Implants Res 2012; Lang, Clin
+Oral Implants Res 2004, for tooth-implant bridges' lower survival and intrusion). Their text and images are never copied; what is labeled and keyed follows the lecture
 ([outside-sources-for-figures](../rules/outside-sources-for-figures.md)). Every patient is made up; everything is original SVG.
 
 Related: [build-a-hub](build-a-hub.md) · [diagram-review](../rules/diagram-review.md) ·
