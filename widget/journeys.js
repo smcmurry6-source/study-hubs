@@ -583,133 +583,93 @@
       '<button type="button" class="shj-go shj-gold" data-shj="go" data-at style="--at:' + s(R0 + 2.4) + '">' + COIN + "Collect " + fmt(pays) + " crowns</button></div>";
   }
 
-  /* ---------- the typodont, from the front, in mm: x across, y down, the occlusal plane at y = 0. Drawn anew from what
-     these sources say. The crowns' sizes and facial outlines are Wheeler's (Dental Anatomy, Physiology and Occlusion;
-     widget/cases.js has the same table and outlines for the Patient Box cases): the central incisor's sharp mesioincisal
-     and rounded distoincisal angles, the canine's cusp tip and short mesial ridge, the premolars' buccal cusps, the
-     molars' two (the mandibular first, three) rounded buccal cusps with a buccal groove between them. The arches are
-     average adult ones (the maxillary wider and longer, the mandibular behind it by about 2.5 mm of overjet), each tooth
-     set between its contact points on them, so the back teeth turn away and narrow as in a frontal photograph, and a
-     tooth turned away shows its cusps edge-on. The occlusion is Class I (the maxillary canine over the embrasure between
-     the mandibular canine and first premolar), with about 2.5 mm of overbite in front and the curve of Spee. The gum
-     follows every cervical line, with a papilla in each embrasure and the roots' bulges over the front teeth, the canine's
-     the strongest, on the typodont's two soft-gum bases and their plates (Acadental's ModuPRO One, the brochure
-     tools/figures/site/journeys.mjs names: 32 teeth). Illustrative beyond that. ---------- */
-  var TYPO = (function(){
-    /* Catmull-Rom smoothing (widget/cases.js's dense): a point listed twice keeps a sharp corner */
-    function dense(pts, per){
-      var n = pts.length, out = [];
-      for (var i = 0; i < n; i++) {
-        var p0 = pts[(i - 1 + n) % n], p1 = pts[i], p2 = pts[(i + 1) % n], p3 = pts[(i + 2) % n];
-        var c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6], c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
-        for (var j = 0; j < per; j++) { var t = j / per, u = 1 - t;
-          out.push([u * u * u * p1[0] + 3 * u * u * t * c1[0] + 3 * u * t * t * c2[0] + t * t * t * p2[0], u * u * u * p1[1] + 3 * u * u * t * c1[1] + 3 * u * t * t * c2[1] + t * t * t * p2[1]]); }
-      }
-      return out;
-    }
-    /* Wheeler's averages, mm: cw the width at the contacts, cv at the cervix, ch the crown's length, cej how far the
-       cervical line dips at the middle of the facial surface */
-    var XT = {
-      maxI1: { cw: 8.5, cv: 7, ch: 10.5, s: "maxI1", cej: .7 }, maxI2: { cw: 6.5, cv: 5, ch: 9, s: "maxI2", cej: .6 }, maxC: { cw: 7.5, cv: 5.5, ch: 10, s: "maxC", cej: .6 },
-      maxP1: { cw: 7, cv: 5, ch: 8.5, s: "maxP1", cej: .4 }, maxP2: { cw: 6.5, cv: 5, ch: 8.5, s: "maxP2", cej: .4 }, maxM1: { cw: 10, cv: 8, ch: 7.5, s: "maxM", cej: .3 },
-      maxM2: { cw: 9, cv: 7, ch: 7, s: "maxM", cej: .3 }, maxM3: { cw: 8.5, cv: 6.5, ch: 6.5, s: "maxM", cej: .3 },
-      manI1: { cw: 5, cv: 3.5, ch: 9, s: "manI1", cej: .5 }, manI2: { cw: 5.5, cv: 4, ch: 9.5, s: "manI2", cej: .5 }, manC: { cw: 7, cv: 5.5, ch: 11, s: "manC", cej: .6 },
-      manP1: { cw: 7, cv: 5, ch: 8.5, s: "manP1", cej: .4 }, manP2: { cw: 7, cv: 5, ch: 8, s: "manP2", cej: .4 }, manM1: { cw: 11, cv: 9, ch: 7.5, s: "manM1", cej: .3 },
-      manM2: { cw: 10.5, cv: 8, ch: 7, s: "manM2", cej: .3 }, manM3: { cw: 10, cv: 7.5, ch: 7, s: "manM2", cej: .3 }
-    };
-    /* a crown's facial outline (widget/cases.js's crownMM): mesial at -x, the cervix at y = 0, the edge at y = ch */
-    function crown(d){
-      var w = d.cw / 2, v = d.cv / 2, h = d.ch, s = d.s, p;
-      if (s === "maxI1") p = [[-v, 0], [-v - .15, h * .12], [-w + .35, h * .45], [-w, h * .78], [-w + .1, h * .96], [-w + .1, h * .96], [-w + .6, h], [w - 1.4, h * .985], [w - .35, h * .9], [w, h * .68], [w - .3, h * .42], [v + .1, h * .1], [v, 0]];
-      else if (s === "maxI2") p = [[-v, 0], [-v - .1, h * .12], [-w + .3, h * .5], [-w, h * .78], [-w + .25, h * .95], [-w + .9, h], [w - 1.7, h * .97], [w - .5, h * .86], [w, h * .62], [w - .3, h * .4], [v + .1, h * .1], [v, 0]];
-      else if (s === "maxC") p = [[-v, 0], [-v - .2, h * .15], [-w + .3, h * .45], [-w, h * .67], [-w + .3, h * .84], [-.35, h], [w - .45, h * .74], [w, h * .55], [w - .3, h * .35], [v + .1, h * .1], [v, 0]];
-      else if (s === "maxP1") p = [[-v, 0], [-v - .25, h * .2], [-w + .2, h * .45], [-w, h * .62], [-w + .4, h * .82], [.3, h], [w - .4, h * .8], [w, h * .62], [w - .2, h * .45], [v + .25, h * .2], [v, 0]];
-      else if (s === "maxP2") p = [[-v, 0], [-v - .25, h * .2], [-w + .2, h * .45], [-w, h * .62], [-w + .5, h * .86], [0, h * .97], [w - .5, h * .86], [w, h * .62], [w - .2, h * .45], [v + .25, h * .2], [v, 0]];
-      else if (s === "maxM") p = [[-v, 0], [-v - .4, h * .2], [-w + .2, h * .45], [-w, h * .62], [-w + .3, h * .84], [-w * .5, h], [-.05, h * .87], [-.05, h * .87], [w * .45, h * .96], [w - .3, h * .82], [w, h * .6], [w - .2, h * .42], [v + .4, h * .2], [v, 0]];
-      else if (s === "manM1") p = [[-v, 0], [-v - .4, h * .2], [-w + .2, h * .45], [-w, h * .62], [-w + .3, h * .84], [-w * .58, h], [-w * .27, h * .87], [-w * .27, h * .87], [w * .05, h * .97], [w * .33, h * .85], [w * .33, h * .85], [w * .6, h * .9], [w - .25, h * .78], [w, h * .58], [w - .2, h * .42], [v + .4, h * .2], [v, 0]];
-      else if (s === "manM2") p = [[-v, 0], [-v - .4, h * .2], [-w + .2, h * .45], [-w, h * .62], [-w + .3, h * .84], [-w * .48, h], [0, h * .87], [0, h * .87], [w * .46, h * .98], [w - .3, h * .82], [w, h * .6], [w - .2, h * .42], [v + .4, h * .2], [v, 0]];
-      else if (s === "manI1") p = [[-v, 0], [-v - .1, h * .15], [-w + .2, h * .55], [-w, h * .88], [-w + .1, h], [-w + .1, h], [w - .1, h], [w - .1, h], [w, h * .88], [w - .2, h * .55], [v + .1, h * .15], [v, 0]];
-      else if (s === "manI2") p = [[-v, 0], [-v - .1, h * .15], [-w + .2, h * .55], [-w, h * .88], [-w + .1, h], [-w + .1, h], [w - .25, h * .97], [w, h * .84], [w - .2, h * .55], [v + .1, h * .15], [v, 0]];
-      else if (s === "manC") p = [[-v, 0], [-v - .15, h * .3], [-w + .1, h * .62], [-w, h * .75], [-w + .3, h * .9], [-.3, h], [w - .5, h * .8], [w, h * .55], [w - .3, h * .3], [v + .1, h * .1], [v, 0]];
-      else if (s === "manP1") p = [[-v, 0], [-v - .3, h * .2], [-w + .2, h * .45], [-w, h * .6], [-w + .4, h * .8], [-.2, h], [w - .4, h * .8], [w, h * .6], [w - .2, h * .45], [v + .3, h * .2], [v, 0]];
-      else p = [[-v, 0], [-v - .3, h * .2], [-w + .2, h * .45], [-w, h * .6], [-w + .6, h * .86], [0, h * .95], [w - .6, h * .86], [w, h * .6], [w - .2, h * .45], [v + .3, h * .2], [v, 0]];
-      var c = d.cej || 0;
-      return p.concat([[v * .55, -c * .8], [0, -c], [-v * .55, -c * .8]]);
-    }
-    /* the molars' buccal grooves, from the notch between two cusps toward the cervix */
-    function grooves(d){
-      var w = d.cw / 2, h = d.ch;
-      if (d.s === "maxM") return [[[-.05, h * .87], [.05, h * .45]]];
-      if (d.s === "manM1") return [[[-w * .27, h * .87], [-w * .2, h * .5]], [[w * .33, h * .85], [w * .36, h * .58]]];
-      if (d.s === "manM2") return [[[0, h * .87], [.08, h * .48]]];
-      return [];
-    }
-    var POS = ["I1", "I2", "C", "P1", "P2", "M1", "M2", "M3"];
-    /* half of each arch's facial outline, as its contact points from the midline back (x across, z back, mm) */
-    var AF = {
-      u: [[0, 0], [8, 1.8], [13.8, 5.4], [18.6, 11.2], [21, 18], [23.6, 24.2], [26.8, 34], [28.6, 43], [29.6, 51]],
-      l: [[0, 2.5], [4.8, 3.6], [10, 5.8], [14.6, 10.8], [17.8, 17.3], [20.4, 23.8], [23.4, 34.4], [25.6, 44.6], [27.2, 54.5]]
-    };
-    var OFF = [0, .75, 0, .2, .2, 0, .2, .5];           // a maxillary edge's height above the occlusal plane
-    var OB = [2.5, 2.5, 2.2, 1.6, 1.5, 1.4, 1.4, 1.4];  // the vertical overlap: a mandibular edge behind the maxillary
-    var PH = [.42, .42, .4, .32, .3, .26, .25, .24];    // a papilla's tip, as a part of the crown's length
-    function fz(z){ return 260 / (260 + z); }           // the camera 26 cm in front
-    function spee(z){ return -.0009 * z * z; }          // the curve of Spee: the back teeth sit higher
-    function mid(a, b){ return [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2]; }
-    function build(){
-      var teeth = [], gum = {};
-      ["u", "l"].forEach(function(a){
-        var up = a === "u", A = AF[a], row = [];
-        [-1, 1].forEach(function(sd){
-          for (var k = 0; k < 8; k++) (function(k){
-            var d = XT[(up ? "max" : "man") + POS[k]], p0 = A[k], p1 = A[k + 1], w = d.cw / 2, h = d.ch, hc = h * .8;
-            var dx = p1[0] - p0[0], dz = p1[1] - p0[1], face = Math.abs(dx) / Math.sqrt(dx * dx + dz * dz);
-            function P(x, y){
-              if (k > 2 && y > hc) y = hc + (y - hc) * (.15 + .85 * face * face);
-              var t = (x + w) / (2 * w), z = p0[1] + dz * t, f = fz(z), X = (p0[0] + dx * t) * f * sd;
-              return [X, up ? (spee(z) - OFF[k] - (h - y)) * f : (spee(z) - OB[k] + (h - y)) * f];
-            }
-            var c = P(0, h * .5);
-            function rel(p){ var r = P(p[0], p[1]); return [r[0] - c[0], r[1] - c[1]]; }
-            var q = { arch: a, sd: sd, k: k, z: (p0[1] + p1[1]) / 2, face: face, cx: c[0], cy: c[1],
-              pts: dense(crown(d), 6).map(rel), gr: face > .45 ? grooves(d).map(function(l){ return l.map(rel); }) : [],
-              zen: P(0, -d.cej), cm: P(-d.cv / 2, 0), cd: P(d.cv / 2, 0), tipD: P(w, PH[k] * h), tipM: P(-w, PH[k] * h), top: P(0, -9.5),
-              edge: P(0, h)[1] - c[1], w2: Math.abs(P(w, h * .6)[0] - P(-w, h * .6)[0]) };
-            teeth.push(q); row.push(q);
-          })(k);
+  /* ---------- the typodont, from the front, in mm: x across, y down, the occlusal plane at y = 0. Its teeth are the tooth
+     library's (widget/teeth.js, window.SH_TEETH, the one the Patient Box cases and the arcade's molars draw from): Wheeler's
+     crown sizes and facial outlines (Dental Anatomy, Physiology and Occlusion: the central incisor's sharp mesioincisal and
+     rounded distoincisal angles, the canine's cusp tip and short mesial ridge, the premolars' buccal cusps, the molars' two
+     (the mandibular first, three) rounded buccal cusps) and the molars' buccal grooves (buccalGroovesMM), so a tooth here and
+     a case's can't disagree. What is the typodont's own, drawn anew from what these sources say: the arches are average
+     adult ones (the maxillary wider and longer, the mandibular behind it by about 2.5 mm of overjet), each tooth set between
+     its contact points on them, so the back teeth turn away and narrow as in a frontal photograph, and a tooth turned away
+     shows its cusps edge-on. The occlusion is Class I (the maxillary canine over the embrasure between the mandibular canine
+     and first premolar), with about 2.5 mm of overbite in front and the curve of Spee. The gum follows every cervical line,
+     with a papilla in each embrasure and the roots' bulges over the front teeth, the canine's the strongest, on the
+     typodont's two soft-gum bases and their plates (Acadental's ModuPRO One, the brochure tools/figures/site/journeys.mjs
+     names: 32 teeth). Illustrative beyond that. typo() is null until the library is loaded (handoff() fetches it); an older
+     copy of the library kept offline, without the grooves, draws the molars without them. ---------- */
+  var TYPO = null;
+  function typo(){
+    var TL = window.SH_TEETH;
+    if (TYPO || !TL) return TYPO;
+    TYPO = (function(){
+      var POS = TL.POS;
+      /* half of each arch's facial outline, as its contact points from the midline back (x across, z back, mm) */
+      var AF = {
+        u: [[0, 0], [8, 1.8], [13.8, 5.4], [18.6, 11.2], [21, 18], [23.6, 24.2], [26.8, 34], [28.6, 43], [29.6, 51]],
+        l: [[0, 2.5], [4.8, 3.6], [10, 5.8], [14.6, 10.8], [17.8, 17.3], [20.4, 23.8], [23.4, 34.4], [25.6, 44.6], [27.2, 54.5]]
+      };
+      var OFF = [0, .75, 0, .2, .2, 0, .2, .5];           // a maxillary edge's height above the occlusal plane
+      var OB = [2.5, 2.5, 2.2, 1.6, 1.5, 1.4, 1.4, 1.4];  // the vertical overlap: a mandibular edge behind the maxillary
+      var PH = [.42, .42, .4, .32, .3, .26, .25, .24];    // a papilla's tip, as a part of the crown's length
+      function fz(z){ return 260 / (260 + z); }           // the camera 26 cm in front
+      function spee(z){ return -.0009 * z * z; }          // the curve of Spee: the back teeth sit higher
+      function mid(a, b){ return [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2]; }
+      function build(){
+        var teeth = [], gum = {};
+        ["u", "l"].forEach(function(a){
+          var up = a === "u", A = AF[a], row = [];
+          [-1, 1].forEach(function(sd){
+            for (var k = 0; k < 8; k++) (function(k){
+              var d = TL.XT[(up ? "max" : "man") + POS[k]], p0 = A[k], p1 = A[k + 1], w = d.cw / 2, h = d.ch, hc = h * .8;
+              var dx = p1[0] - p0[0], dz = p1[1] - p0[1], face = Math.abs(dx) / Math.sqrt(dx * dx + dz * dz);
+              function P(x, y){
+                if (k > 2 && y > hc) y = hc + (y - hc) * (.15 + .85 * face * face);
+                var t = (x + w) / (2 * w), z = p0[1] + dz * t, f = fz(z), X = (p0[0] + dx * t) * f * sd;
+                return [X, up ? (spee(z) - OFF[k] - (h - y)) * f : (spee(z) - OB[k] + (h - y)) * f];
+              }
+              var c = P(0, h * .5);
+              function rel(p){ var r = P(p[0], p[1]); return [r[0] - c[0], r[1] - c[1]]; }
+              var q = { arch: a, sd: sd, k: k, z: (p0[1] + p1[1]) / 2, face: face, cx: c[0], cy: c[1],
+                pts: TL.dense(TL.crownMM(d), true, 6).map(rel), gr: face > .45 && TL.buccalGroovesMM ? TL.buccalGroovesMM(d).map(function(l){ return l.map(rel); }) : [],
+                zen: P(0, -d.cej), cm: P(-d.cv / 2, 0), cd: P(d.cv / 2, 0), tipD: P(w, PH[k] * h), tipM: P(-w, PH[k] * h), top: P(0, -9.5),
+                edge: P(0, h)[1] - c[1], w2: Math.abs(P(w, h * .6)[0] - P(-w, h * .6)[0]) };
+              teeth.push(q); row.push(q);
+            })(k);
+          });
+          /* the gum's edge, tooth by tooth across the screen: down into each papilla, up to each tooth's zenith */
+          row.sort(function(m, n){ return m.cx - n.cx; });
+          var e = [];
+          for (var i = 0; i < row.length; i++) {
+            var q = row[i], near = q.sd < 0 ? q.cd : q.cm, far = q.sd < 0 ? q.cm : q.cd, mine = q.sd < 0 ? q.tipD : q.tipM;
+            e.push({ tip: i ? mid(mine, row[i - 1].sd < 0 ? row[i - 1].tipM : row[i - 1].tipD) : mine, c: near, z: q.zen, c2: far });
+          }
+          var lastQ = row[row.length - 1];
+          e.push({ tip: lastQ.sd < 0 ? lastQ.tipM : lastQ.tipD });
+          gum[a] = { row: row, edge: e };
         });
-        /* the gum's edge, tooth by tooth across the screen: down into each papilla, up to each tooth's zenith */
-        row.sort(function(m, n){ return m.cx - n.cx; });
-        var e = [];
-        for (var i = 0; i < row.length; i++) {
-          var q = row[i], near = q.sd < 0 ? q.cd : q.cm, far = q.sd < 0 ? q.cm : q.cd, mine = q.sd < 0 ? q.tipD : q.tipM;
-          e.push({ tip: i ? mid(mine, row[i - 1].sd < 0 ? row[i - 1].tipM : row[i - 1].tipD) : mine, c: near, z: q.zen, c2: far });
-        }
-        var lastQ = row[row.length - 1];
-        e.push({ tip: lastQ.sd < 0 ? lastQ.tipM : lastQ.tipD });
-        gum[a] = { row: row, edge: e };
-      });
-      teeth.sort(function(m, n){ return n.z - m.z; });   // the back teeth first: the front ones overlap them at the contacts
-      return { teeth: teeth, gum: gum };
-    }
-    /* the gum's outline: the edge above, then out and around its ends and back across the top */
-    function gumPath(G, up){
-      var e = G.edge, p = new Path2D(), sg = up ? -1 : 1, lo = Infinity, i;
-      G.row.forEach(function(q){ lo = Math.min(lo, sg * q.top[1]); });
-      var top = sg * lo + sg * 1.5, L = e[0].tip[0] - .6, Rr = e[e.length - 1].tip[0] + .6, o = 1.4;
-      p.moveTo(L + o * .6, top); p.quadraticCurveTo(L - o, (top + e[0].tip[1]) / 2, L, e[0].tip[1]);
-      for (i = 0; i < e.length - 1; i++) {
-        if (i) p.quadraticCurveTo(e[i - 1].c2[0], e[i - 1].c2[1], e[i].tip[0], e[i].tip[1]);
-        p.quadraticCurveTo(e[i].c[0], e[i].c[1], e[i].z[0], e[i].z[1]);
+        teeth.sort(function(m, n){ return n.z - m.z; });   // the back teeth first: the front ones overlap them at the contacts
+        return { teeth: teeth, gum: gum };
       }
-      var last = e[e.length - 1].tip;
-      p.quadraticCurveTo(e[i - 1].c2[0], e[i - 1].c2[1], last[0], last[1]);
-      p.lineTo(Rr, last[1]); p.quadraticCurveTo(Rr + o, (top + last[1]) / 2, Rr - o * .6, top);
-      p.quadraticCurveTo(0, top + sg * 1.2, L + o * .6, top); p.closePath();
-      return { p: p, top: top, L: L, R: Rr };
-    }
-    return { build: build, gum: gumPath };
-  })();
+      /* the gum's outline: the edge above, then out and around its ends and back across the top */
+      function gumPath(G, up){
+        var e = G.edge, p = new Path2D(), sg = up ? -1 : 1, lo = Infinity, i;
+        G.row.forEach(function(q){ lo = Math.min(lo, sg * q.top[1]); });
+        var top = sg * lo + sg * 1.5, L = e[0].tip[0] - .6, Rr = e[e.length - 1].tip[0] + .6, o = 1.4;
+        p.moveTo(L + o * .6, top); p.quadraticCurveTo(L - o, (top + e[0].tip[1]) / 2, L, e[0].tip[1]);
+        for (i = 0; i < e.length - 1; i++) {
+          if (i) p.quadraticCurveTo(e[i - 1].c2[0], e[i - 1].c2[1], e[i].tip[0], e[i].tip[1]);
+          p.quadraticCurveTo(e[i].c[0], e[i].c[1], e[i].z[0], e[i].z[1]);
+        }
+        var last = e[e.length - 1].tip;
+        p.quadraticCurveTo(e[i - 1].c2[0], e[i - 1].c2[1], last[0], last[1]);
+        p.lineTo(Rr, last[1]); p.quadraticCurveTo(Rr + o, (top + last[1]) / 2, Rr - o * .6, top);
+        p.quadraticCurveTo(0, top + sg * 1.2, L + o * .6, top); p.closePath();
+        return { p: p, top: top, L: L, R: Rr };
+      }
+      return { build: build, gum: gumPath };
+    })();
+    return TYPO;
+  }
 
   /* the moving light of the ModuPro's hand-off: the typodont (its open jaws, the mouth and the Handpiece in it, the bite,
      the chews, the fold into the medallion), the dust it pulls in, the Handpiece's shards and the coins; the Loupes' hand-off uses it for its
@@ -785,9 +745,12 @@
     function jawK(m){ return Math.max(1, Math.min(W * 1.08 / 64, (H * .92 - (m || 0) * 1.15) / 48)); }
     function mix(a, b, t){ var A = parseInt(a.slice(1), 16), B = parseInt(b.slice(1), 16); function c(s){ return Math.round(((A >> s) & 255) * (1 - t) + ((B >> s) & 255) * t); } return "rgb(" + c(16) + "," + c(8) + "," + c(0) + ")"; }
     /* each tooth's path and paints, once: the enamel lighter toward the edge, darker on a tooth turned away (out of the
-       lamp), the incisors' translucent edge, a highlight on a tooth that faces you, the molars' buccal grooves */
+       lamp), the incisors' translucent edge, a highlight on a tooth that faces you, the molars' buccal grooves. false
+       without the tooth library (the scene then plays without the typodont) */
     function prepare(){
-      M = TYPO.build();
+      var Y = typo();
+      if (!Y) return false;
+      M = Y.build();
       M.teeth.forEach(function(q){
         var p = new Path2D(), top = Infinity, bot = -Infinity, up = q.arch === "u", dk = Math.pow(1 - q.face, .7) * .85;
         q.pts.forEach(function(r, i){ if (i) p.lineTo(r[0], r[1]); else p.moveTo(r[0], r[1]); top = Math.min(top, r[1]); bot = Math.max(bot, r[1]); });
@@ -800,7 +763,7 @@
         if (q.gr.length) { var gp = new Path2D(); q.gr.forEach(function(l){ gp.moveTo(l[0][0], l[0][1]); gp.lineTo(l[1][0], l[1][1]); }); q.gp = gp; }
       });
       ["u", "l"].forEach(function(a){
-        var G = M.gum[a], up = a === "u", o = TYPO.gum(G, up), lo = Infinity;
+        var G = M.gum[a], up = a === "u", o = Y.gum(G, up), lo = Infinity;
         G.row.forEach(function(q){ lo = Math.min(lo, up ? q.zen[1] : -q.zen[1]); });
         var f = g.createLinearGradient(0, o.top, 0, up ? lo : -lo); f.addColorStop(0, "#B65F6C"); f.addColorStop(.6, "#D98A90"); f.addColorStop(1, "#ECA9A8");
         var sh = g.createLinearGradient(o.L, 0, o.R, 0); sh.addColorStop(0, "rgba(60,10,25,.35)"); sh.addColorStop(.14, "rgba(60,10,25,0)"); sh.addColorStop(.86, "rgba(60,10,25,0)"); sh.addColorStop(1, "rgba(60,10,25,.35)");
@@ -811,6 +774,7 @@
         var pf = g.createLinearGradient(0, y0, 0, y0 + 7.5); pf.addColorStop(0, "#8D99A6"); pf.addColorStop(1, "#5E6875");
         G.o = o; G.fill = f; G.shade = sh; G.bulge = bulge; G.plate = pl; G.pf = pf;
       });
+      return true;
     }
     function tooth(q, x, y, rot, sc, px){
       g.save(); g.translate(x, y); if (rot) g.rotate(rot); if (sc !== 1) g.scale(sc, sc);
@@ -992,7 +956,7 @@
         go();
       },
       /* the typodont comes in with its jaws open wide enough to swallow a medallion m px across */
-      jaw: function(m){ if (!M) prepare(); jaw = { t: 0, cy: 2, m: m, chews: [], glow: null }; jaw.k = jawK(m); jaw.gap0 = Math.max(14, m * 1.15 / jaw.k); go(); },
+      jaw: function(m){ if (!M && !prepare()) return; jaw = { t: 0, cy: 2, m: m, chews: [], glow: null }; jaw.k = jawK(m); jaw.gap0 = Math.max(14, m * 1.15 / jaw.k); go(); },
       /* the mouth starts to glow and pull */
       pull: function(){ if (jaw) jaw.glow = 0; },
       /* the Handpiece, from here drawn in the mouth: img at x, y (page px), size px across */
@@ -1093,11 +1057,25 @@
     run.at(LP.set + .05, fx(function(x){ x.glitter(); }));
     run.at(LP_R, function(){ el.classList.add("is-told"); });
   }
+  /* the tooth library (widget/teeth.js, beside this file) for the ModuPro's typodont: cb once it has loaded or failed */
+  var SELF = (document.currentScript && document.currentScript.src) || "", teethWait = null;
+  function needTeeth(cb){
+    if (window.SH_TEETH || teethWait === true) { cb(); return; }
+    if (teethWait) { teethWait.push(cb); return; }
+    var src = "";
+    try { src = new URL("teeth.js", SELF || document.baseURI).href; } catch (e) {}
+    if (!SELF || !src) { cb(); return; }
+    teethWait = [cb];
+    var s = document.createElement("script"); s.src = src; s.async = true;
+    s.onload = s.onerror = function(){ var q = teethWait; teethWait = true; q.forEach(function(f){ f(); }); };
+    document.head.appendChild(s);
+  }
   function handoff(d, done, opt){
     d = d || {}; opt = opt || {};
-    R.needJourneyArt(function(){
-      if ((d.to | 0) >= 2) loupes(d, done, opt); else modupro(d, done, opt);
-    });
+    var lp = (d.to | 0) >= 2, n = lp ? 1 : 2;
+    function go(){ if (--n) return; if (lp) loupes(d, done, opt); else modupro(d, done, opt); }
+    R.needJourneyArt(go);
+    if (!lp) needTeeth(go);
   }
 
   /* ---------- the Dark Matter unlock (Sam, 2026-11-20: "make it significantly more epic and rewarding feeling"; it had

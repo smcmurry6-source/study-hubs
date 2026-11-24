@@ -104,7 +104,7 @@ frame that skips the runtime) and fails if a single request leaves the browser f
 
 | Area | In a preview |
 |---|---|
-| Answers, sync, spaced review, pins | Saved to the fixtures; each account's history is generated from the hub's own question ids, the same every time |
+| Answers, sync, spaced review, pins | Saved to the fixtures; each account's history is generated from the hub's own question ids (built into the preview, so the dashboard has it before any hub is opened), the same every time |
 | XP, ranks, trophies, mastery | Each account's starting XP plus a little for every answer given in the preview; the boards are made-up names |
 | Profiles: names, device linking | Saved to the fixtures; linking codes are fake and never match |
 | Reports, suggestions, comments, likes, surveys | Saved to the fixtures, and visible on the admin page |
@@ -127,7 +127,8 @@ on purpose.
 
 Six synthetic accounts (`tools/preview/fixtures/personas.json`; ids, names and numbers all made up). Open one from the
 Preview button, or with `?persona=<id>` on any page (it starts that account fresh). `?now=2026-11-19T21:00` sets the
-clock; `?now=real` resets it.
+clock; `?now=real` resets it. While one of the page's dialogs is open, the Preview button moves to the screen's corner or
+edge that covers least of it (BUG-039), so a small phone can still tap the dialog's buttons.
 
 | id | Account | Use it for |
 |---|---|---|

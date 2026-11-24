@@ -15,8 +15,12 @@ case. Since Patient Box v2 (2026-11-20, [the task](../tasks/done/2026-11-06-pati
   pull from it too** (Sam, 2026-11-06): a figure build imports it (`createRequire(import.meta.url)("../../../widget/teeth.js")`)
   and draws its tooth with `outlineMM(n)` or the same `crownMM`, `mkRoots`, `rootOutline` and `trunkPts` the cases use,
   with the enamel over its dentin (`dejPts`: thinning to nothing at the CEJ), the pulp (`pulpPts`), a restoration or a
-  lesion by surface (`restoMM`, `cariesMM`) and a tooth's place along the arch (`archMM`), so the two can't disagree. The
-  first: the arcade's Stage & Grade tile (`stageMolar()` in `tools/figures/site/arcade.mjs`).
+  lesion by surface (`restoMM`, `cariesMM`), a molar's buccal grooves (`buccalGroovesMM`), an incisor seen from the side
+  (`proxOutlineMM(n)`, with `proxCrownMM`, `mkProxRoot` and the crown's labiolingual sizes in `LL`; incisors only so far) and
+  a tooth's place along the arch (`archMM`), so the two can't disagree. Drawn from it: the arcade's Stage & Grade tile
+  (`stageMolar()` in `tools/figures/site/arcade.mjs`), its Pocket Showdown and Cross-Section tiles (`boardTooth()`,
+  `sectionMolar()`, `sectionIncisor()`, 2026-11-24) and the ModuPro hand-off's typodont (`TYPO` in `widget/journeys.js`,
+  which fetches the library itself).
 - **`widget/cases.js` + `widget/cases.css`, the case kit** (`window.shCases`), which reads the library. One record per case
   draws every picture, the Patient Box rows and the key (`derive()`), and `validate()` rejects numbers outside clinical
   ranges, numbers that disagree with each other and impossible combinations. CI runs it on every hub and on

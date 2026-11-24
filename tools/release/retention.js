@@ -9,6 +9,8 @@
 //     and get_hub_recap gives the same answer before and after;
 //   - "Link my devices" after a trim moves every hour to the kept id instead of rebuilding from what raw pings remain;
 //   - collapses old feature events into feature_daily with people counts, and logs the run in retention_runs;
+//   - keeps a hub's Insights card the night its first day past the school year is collapsed (migration_v101), and the
+//     Insights tab and the recap give that hub the same numbers before and after;
 //   - runs twice without removing anything the second time; and that visitors can't call it.
 // Nothing here touches the live database.
 //   node tools/release/retention.js      (needs PostgreSQL 14+ server binaries: initdb, pg_ctl, psql)
@@ -144,6 +146,8 @@ try {
       (date_trunc('day', now() - interval '400 days') + interval '18 hours', 'ret-old', 'q1', 'v1', 'yr-D', 'yr-v2', 'answer', 1, false, 0, 6000, 5000),
       (date_trunc('day', now() - interval '400 days') + interval '18 hours', 'ret-old', 'q1', 'v1', 'yr-D', 'yr-v2', 'view', null, null, null, 3500, null),
       (now() - interval '10 days', 'ret-old', 'q1', 'v1', 'yr-C', 'yr-v3', 'answer', 3, true, 2, 1500, 500);
+    insert into exam_debriefs (hub, exam, visitor_id, answers, created_at) values
+      ('ret-old', 'yr-exam Final', 'yr-C', '{"ready": "4", "match": "yes"}', now() - interval '9 days');
   `);
   /* v95: a hub whose page came down (in hubs_down) and a live one, both with recent question health and answers; dn-E
      answered on both, so its XP and crowns are read before and after */
@@ -189,13 +193,22 @@ try {
   const crowns = () => one(`select sh_time_crowns('yr-C') || '/' || sh_time_crowns('yr-D')`);
   const crowns0 = crowns();
   expect('time crowns before the collapse (yr-C 144+30+50 capped pings, yr-D 20; rounded)', crowns0, '156/14');
+  /* v101: the year-spanning readers on the old hub, before its old day is collapsed: the Insights tab's line, surfaces and
+     check-ins (less the two fields that say what was collapsed), and the recap less what needs the person */
+  const EXAMS = `jsonb_build_object('ret-old', ((now() at time zone 'America/Chicago')::date - 9)::text)`;
+  const insOld = part => one(`select string_agg((x - 'collapsed_through' - 'per_person_kept_on')::text, ' | ' order by x::text) from jsonb_array_elements(sh_insights(${EXAMS})->'${part}') x where x->>'hub' = 'ret-old'`);
+  const recapOld = () => one(`select (get_hub_recap('${SECRET}', 'ret-old', null) - 'by_hour' - 'after_midnight' - 'regulars' - 'awards' - 'best_run' - 'top_answers' - 'median_answers' - 'collapsed_through')::text`);
+  const ins0 = ['hubs', 'surfaces', 'checkins'].map(insOld), recOld0 = recapOld();
+  const oldDay = one(`select max((h at time zone 'America/Chicago')::date) from activity_hourly where hub = 'ret-old' and h < now() - interval '365 days'`);
+  expect('the old hub on the Insights tab before the collapse (people, check-in median)', one(`select (x->>'people') || '/' || (select y->>'their_median_mins' from jsonb_array_elements(j->'checkins') y where y->>'hub' = 'ret-old') from (select sh_insights(${EXAMS}) as j) s, jsonb_array_elements(s.j->'hubs') x where x->>'hub' = 'ret-old'`), '2/108');
+  expect('nothing collapsed yet', one(`select coalesce(x->>'collapsed_through', 'none') || '/' || coalesce(x->>'per_person_kept_on', 'none') || '/' || coalesce(get_hub_recap('${SECRET}', 'ret-old', null)->>'collapsed_through', 'none') from jsonb_array_elements(sh_insights('{}')->'hubs') x where x->>'hub' = 'ret-old'`), 'none/none/none');
 
   /* dry run: counts only */
   const dry = JSON.parse(one(`select sh_retention_run()::text`));
   const testHours = Number(one(`select count(*) from activity_hourly where hub = 'zz-test'`));   /* 1 or 2: the 10 pings may cross an hour */
   const want = { activity_pings: 430, ui_click_reach: 4, feature_events: 4, activity_hourly_test: testHours, ui_clicks_test: 0, question_flags_ids: 1,
     hub_suggestions_ids: 1, exam_debriefs_ids: 1, survey_declines: 1, survey_answer_ids: 1, ideas_hidden: 1, link_attempts: 1,
-    activity_hourly_year: 4, activity_visits_year: 2, question_events_year: 4, question_events_down: 5, answers_packed: 64 };
+    activity_hourly_year: 4, activity_visits_year: 2, question_events_year: 4, insight_cards_kept: 1, question_events_down: 5, answers_packed: 64 };
   for (const k of Object.keys(want)) expect(`dry run counts ${k}`, dry.counts[k], want[k]);
   expect('dry run left the raw pings', one(`select count(*) from activity_pings`), 610);
   expect('dry run logged nothing', one(`select count(*) from retention_runs`), 0);
@@ -251,6 +264,15 @@ try {
     expect(`${t} has row-level security`, one(`select relrowsecurity from pg_class where oid = 'public.${t}'::regclass`), 't');
     expect(`anon can't read ${t}`, one(`select has_table_privilege('anon', 'public.${t}', 'select')`), 'f');
   }
+  /* v101: the old hub's card kept, and the readers give the same numbers after its old day is collapsed */
+  expect('the old hub\'s card kept (hub, day, people, surfaces, check-ins)', one(`select hub || '/' || (kept_on = (now() at time zone 'America/Chicago')::date) || '/' || (card->>'people') || '/' || (select count(*) from jsonb_object_keys(surfaces)) || '/' || checkins::text from insight_cards_kept`), 'ret-old/true/2/2/{"yr-exam Final": 108}');
+  expect('only one person\'s hours are left on the old hub (so the card is what keeps its people)', one(`select count(distinct visitor_id) from activity_hourly where hub = 'ret-old'`), 1);
+  ['hubs', 'surfaces', 'checkins'].forEach((part, i) => expect(`the Insights tab's ${part} for the old hub the same after the collapse`, insOld(part), ins0[i]));
+  expect('the old hub\'s recap the same after the collapse (time, days, people, sections, modes)', recapOld(), recOld0);
+  expect('what was collapsed, and when its card was kept', one(`select (x->>'collapsed_through') || '/' || (x->>'per_person_kept_on' = ((now() at time zone 'America/Chicago')::date)::text) || '/' || (get_hub_recap('${SECRET}', 'ret-old', null)->>'collapsed_through') from jsonb_array_elements(sh_insights('{}')->'hubs') x where x->>'hub' = 'ret-old'`), `${oldDay}/true/${oldDay}`);
+  expect('insight_cards_kept has row-level security', one(`select relrowsecurity from pg_class where oid = 'public.insight_cards_kept'::regclass`), 't');
+  expect('anon can\'t read insight_cards_kept', one(`select has_table_privilege('anon', 'public.insight_cards_kept', 'select')`), 'f');
+  notes.push(`the old hub's card kept the night its old day was collapsed; its Insights line, surfaces, check-ins and recap the same before and after`);
   /* v95: the down hub's question health rolled up; the live hub's stays; nobody's XP or crowns move */
   expect('the down hub\'s question events gone', one(`select count(*) from question_events where hub = 'ret-down'`), 0);
   expect('the live hub\'s question events kept', one(`select count(*) from question_events where hub = 'ret-live'`), 2);
