@@ -179,9 +179,9 @@ bridge is drawn as a bridge on teeth is, with implants under its abutment crowns
   mm short of it, or its margin within 1 mm of the bone; a bridge joining an implant to a tooth, or more than one pontic on two
   implants; a full mouth that counts an implant as a tooth (`mouth.teeth` counts teeth only; `lost` may include the teeth implants
   replaced). `derive()` reads an implant against its delivery film: bleeding or suppuration with no loss past the 2 mm of initial
-  remodeling is mucositis, with loss past it peri-implantitis; without records, bone 3 mm or more below the platform or probing 6 mm
-  or more with bleeding (the lecture's "and/or"; the 2017 consensus wants all three, so a case that should read the same both ways
-  has both); mobility, a radiolucent line, or more than half its length of bone lost is a failed implant. `tools/ci/cases.js` holds
+  remodeling is mucositis, with loss past it peri-implantitis; without records, the 2017 consensus's three together: bleeding or
+  suppuration, probing 6 mm or more and bone 3 mm or more below the platform (Sam, 2026-11-24, over the lecture's "and/or"; a record
+  without records that has bleeding and only one of the other two is refused, since the two readings would differ); mobility, a radiolucent line, or more than half its length of bone lost is a failed implant. `tools/ci/cases.js` holds
   a record for each rule and for each of `derive()`'s readings.
 - **v2.4's findings**: a denture field, type, connector, clasp, rest or seal the kit doesn't know; a lower connector on an upper
   denture or the reverse; a lingual bar with under 8 mm to the floor of the mouth; a Class I or II denture without an indirect
@@ -283,8 +283,8 @@ JADA 1964; the AAE's Cracking the Cracked Tooth Code, 2008; Cohen's).
 
 **Patient Box v2.3's clinical calls** (2026-11-24, the same way, with the PCD Implants lectures; the citations are in
 `widget/cases.js`'s header): the peri-implant states by the 2017 World Workshop's case definitions (Berglundh and Renvert, J Clin
-Periodontol 2018), with the lecture's rule for a patient without records kept where it differs (and/or, where the consensus wants
-both), the initial remodeling under 2 mm and failure past half the implant's length or with any mobility (the lecture; ICOI Pisa,
+Periodontol 2018), the consensus's rule for a patient without records too (all three together; the lecture's and/or was kept until
+Sam's call of 2026-11-24, "Go with outside sources"), the initial remodeling under 2 mm and failure past half the implant's length or with any mobility (the lecture; ICOI Pisa,
 Misch, Implant Dent 2008); the mucosa's height and how far a probe goes (Berglundh and Lindhe, J Clin Periodontol 1996; Kan, J
 Periodontol 2003; Lang, Clin Oral Implants Res 1994; Abrahamsson and Soldini, J Clin Periodontol 2006); the distances to a tooth
 and between implants (the lecture; Tarnow, J Periodontol 2000; Esposito, Clin Oral Implants Res 1993; Grunder, Int J Periodontics
