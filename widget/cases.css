@@ -209,7 +209,7 @@
 /* Patient Box v2.4 on the drawn view: a denture's pink acrylic base (smoother and more even than the gingiva, with a sheen along
    its festoon), its denture teeth (a little whiter and more even than natural ones), the cobalt-chromium framework's clasps,
    rests and proximal plates, and an overdenture abutment's dentin dome with its seal */
-.dc-view .io-base{fill:#e77f93;stroke:#b34f64;stroke-width:1;stroke-linejoin:round}.dc-view .io-base-hi{fill:none;stroke:#f6b7c3;stroke-width:1.6;stroke-linecap:round;opacity:.6}
+.dc-view .io-base{fill:#e8869a;stroke:#c25f72;stroke-width:1;stroke-linejoin:round}.dc-view .io-base-hi{fill:none;stroke:#f6b7c3;stroke-width:1.6;stroke-linecap:round;opacity:.6}
 .dc-view .io-tooth.io-dt{fill:#f6f0e1;stroke:#a39276}.dc-view .io-tooth.io-dt.low{fill:#f1eadb}
 .dc-view .io-clasp{fill:#cfd4db;stroke:#636b76;stroke-width:.9;stroke-linejoin:round}
 .dc-view .io-tooth.io-od{fill:#dcc48c;stroke:#9a7d4a}.dc-view .io-r-gi{fill:#e9e2cf;stroke:#bcae8a}

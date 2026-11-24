@@ -51,8 +51,12 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   I-bars, rests, domes and wings, each in the key. The box gets a row for each denture and the floor of the mouth.
   `rests: ["denture"]` and `["kennedy"]` say what a question can rest on (a cingulum rest only on the odontogram, a wing only on a
   film or the odontogram). Five examples and ten questions in `tools/cases/examples.json`; `tools/ci/cases.js` adds 41 records for
-  `validate()`, 14 for `answerable()` and 6 for the Kennedy class; the how-to has the module. Also: the view's stipple no longer
-  falls on a gap. No live hub has dental cases, so students see nothing yet; `sw.js` to `sh-v77` for the changed kit.
+  `validate()`, 14 for `answerable()` and 6 for the Kennedy class; the how-to has the module. Also, on every drawn view (Sam: "The way the gingiva is handled needs to
+  be better"): the gum over a missing tooth is one smooth ridge from the neighbors' margins, about 1.2 mm below their CEJs (Tan
+  2012), instead of a stepped pink block; past the gum, the embrasures between crowns and the space past the last tooth are the
+  dark of the mouth (they were pink down to the incisal edges); the pink strip under the upper incisal edges is gone; an
+  overdenture abutment stands on a broad mound; a denture base over a bounded space is a rounded collar just past the ridge, and
+  its papillae are no taller than a natural one; the stipple stays off the gaps. No live hub has dental cases, so students see nothing yet; `sw.js` to `sh-v77` for the changed kit.
 
 - **2026-11-24 (Patient Box v2.3, Claude Code)** — the case kit (`widget/cases.js`, `widget/cases.css`) gets the
   **`implant` module** and an **implant-supported bridge**, on every view ([the task](vault/tasks/2026-11-20-patient-box-v2-next-steps.md),
