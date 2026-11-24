@@ -32,6 +32,21 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-24 (`widget/v3.css` cut to what a hub on the engine draws, #548, Claude Code)** — The package "Trim
+  widget/v3.css to what the engine draws" (the inbox line). v3.css loses the rules for what only the old single-file hub
+  pages drew (down since 2026-11-19) or what a hub on the engine always hides (`widget/hub.css`'s `display:none
+  !important`): the desktop launcher and its menu, the phone bottom bar and its More sheet, the old Settings panel, the
+  name badge, the fallback top bar and the old pages' top-bar layouts, the update banner and streak toast (the engine
+  has `shToast`), the Daily Drill dialog, the inbox ribbon, the countdown pill, the accent swatches and the old pages'
+  accent targets, the docked boss, the rank glyph on an old ribbon, the lecture pager and `.notes-layout`, the class
+  picks, `.home-next` and fx.js's answer marks. 107 to 72 KB, 826 to 543 style rules (928 to 616 selectors), 46 to 31
+  `@keyframes`; every one left is still used. Nothing new on `:root` (#525's lesson). Putting the sheet in on the slow
+  phone (CPU 4x, median of 8 alternating loads): about 22 to about 15 ms. Computed styles of every element on Home,
+  Notes, Questions and More (and the panels and dialogs they open), laptop and phone, light, both darks and an accent
+  metal, 130 states and about 2.67 million styles: nothing drawn differs except what two copies of `main` also differ
+  by, and two races of the test itself; the rest is inside what the engine always hides. `widget/hub-rest.bundle.js`
+  rebuilt. Left: `widget/v3.js` still builds those parts, and `widget/hub.css` still hides them; a cleanup of both, and
+  Sam's call on the accent metal a student picked before it was cut, are in [the inbox](vault/tasks/inbox.md).
 - **2026-11-23 (Crowns given by hand, migration_v100, Claude Code)** — Sam: "Give [one account, by its leaderboard name]
   50,000 crowns". Every way to crowns until now pays XP too (a prize pays as many crowns as XP) or is worked out from XP and
   rank, so a new kind: `crown_gifts`, one row a gift, which `sh_wallet` adds to what was earned (`gifts` in its answer) and
