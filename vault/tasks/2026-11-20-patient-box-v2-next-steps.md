@@ -106,7 +106,7 @@ what v2.0 left, so it isn't lost. Its own track (Sam, 2026-11-06, [decisions](..
   restorations rechecked, the `caries` rests and validate rules, example 5. Ticked its box; added Sam's look and proximal root
   caries.
 
-- 2026-11-24: Patient Box v2.2 (branch `claude/patient-box-v2-2`, from `main` at 6038dee): proximal root caries, root tips
+- 2026-11-24: Patient Box v2.2 ([#551](https://github.com/smcmurry6-source/study-hubs/pull/551), branch `claude/patient-box-v2-2`, from `main` at 6038dee): proximal root caries, root tips
   and retained roots, resorption, sealants, temporary fillings and provisional crowns, the clinical tests (`tests`), each call
   cited in `widget/cases.js`'s header; five examples and six questions in `tools/cases/examples.json`; a record for each rule in
   `tools/ci/cases.js`; the how-to. Also fixed: a crowned tooth on the drawn chart looked natural in the dark theme. Ticked the
