@@ -65,7 +65,7 @@ var day = new Date().toISOString().slice(0, 10), key = "sh_state_sent_" + hub;
 if (ls(key) === day) return;
 try { localStorage.setItem(key, day); } catch (e) {}
 var S = { theme: ls("sh_theme") || "auto", pet: ls("sh_pref_pet") || "on", eggs: ls("sh_pref_eggs") || "on", music: ls("sh_pref_music") || "off",
-font: ls("sh_pref_font") || "default", size: ls("sh_pref_size") || "default", accent: ls("sh_pref_accent") || "default",
+font: ls("sh_pref_font") || "default", size: ls("sh_pref_size") || "default",
 nuke: ls("sh_pref_nuke") || (ls("sh_pref_nuke_alerts") === "off" ? "mine" : "on"), boss: ls("sh_pref_boss") || "on", fairy: ls("sh_pref_fairy") || "on",
 probe: ls("sh_pref_probe") || "on", celebrate: ls("sh_pref_celebrate") || "on", cheers: ls("sh_pref_cheers") || "on",
 flame: ls("sh_pref_flame") || "on", fx: ls("sh_pref_fx") || "on", "pet-adopted": ls("sh_pet_born") ? "yes" : "no", "own-name": ls("sh_display_name") ? "yes" : "no" };
@@ -1211,76 +1211,7 @@ return '<button type="button" class="sh-flair" data-sh-flair="medals" data-flair
 ' aria-label="' + esc(label) + '" title="' + esc(label) + '"><span class="sh-flair-m' + (lead.lvl >= 4 ? ' is-crown' : '') + '">' + medalSvg(lead.lvl, 18, lead.hub) + '</span>' +
 (list.length > 1 ? '<span class="sh-flair-more">+' + (list.length - 1) + '</span>' : '') + '</button>';
 }
-var ACCENTS = {
-stone:   { tier: 0, L: ["#6F6A63", "#57524C", "#ECE8E2"], D: ["#B5AEA4", "#D2CCC3", "#2B2926"] },
-antique: { tier: 1, L: ["#8A5A32", "#6E4524", "#F1E4D6"], D: ["#D39A68", "#E8BD94", "#35251A"] },
-bronze:  { tier: 2, L: ["#A5602A", "#85491B", "#F3E1D0"], D: ["#E09A5E", "#F2BE8F", "#3A2415"] },
-silver:  { tier: 3, L: ["#5F6B78", "#4A5561", "#E3E7EB"], D: ["#B7C1CC", "#D6DDE4", "#262C33"] },
-gold:    { tier: 4, L: ["#A67808", "#7F5B04", "#F6EAC6"], D: ["#E8BE45", "#F5D77E", "#3A2E0E"] },
-diamond: { tier: 5, L: ["#1F8FC7", "#16719F", "#D9F0FB"], D: ["#7FD3F7", "#B3E7FC", "#10303F"] },
-dark:    { tier: 6, L: ["#6A35E0", "#5426B8", "#E7DDFB"], D: ["#A77BFF", "#C6A8FF", "#251540"] }
-};
 function ls(k, v){ try { if (v === undefined) return localStorage.getItem(k); if (v === null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) { return null; } }
-var TEX_INK = {
-stone:   ["#1F1C19", "0 1px 0 rgba(255,255,255,.55)"],
-antique: ["#FFF6E6", "0 1px 1px rgba(30,15,0,.85)"],
-bronze:  ["#FFFFFF", "0 1px 1px rgba(40,15,0,.7)"],
-silver:  ["#1D242B", "0 1px 0 rgba(255,255,255,.7)"],
-gold:    ["#3A2503", "0 1px 0 rgba(255,246,207,.7)"],
-diamond: ["#0B3350", "0 1px 0 rgba(255,255,255,.8)"],
-dark:    ["#FFFFFF", "0 0 6px rgba(167,123,255,.9)"]
-};
-var TEX_V = 2;
-var TEX_BASE = (function(){
-var src = (__sh_script && __sh_script.src) || "";
-if (!src) { var el = document.querySelector('script[src*="ranks.js"]'); src = el ? el.src : location.href; }
-try { return new URL("../assets/tex/", src).href; } catch (e) { return "assets/tex/"; }
-})();
-function accentTex(key){ return ACCENTS[key] ? TEX_BASE + key + ".png?v=" + TEX_V : ""; }
-function accentSvg(key){
-if (!ACCENTS[key]) return "";
-var p = "tx" + key, W = 240, Hh = 48, mat = key === "antique" ? METAL.brass : METAL[key];
-var defs = cyl(p + "g", mat), top = "";
-if (key === "stone") {
-defs += '<filter id="' + p + 'tex" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">' +
-'<feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="3" seed="3" result="m"/>' +
-'<feColorMatrix in="m" type="matrix" values="0 0 0 0 .5  0 0 0 0 .48  0 0 0 0 .45  0 0 0 .9 -.2" result="mot"/>' +
-'<feBlend in="SourceGraphic" in2="mot" mode="soft-light" result="a"/>' +
-'<feTurbulence type="fractalNoise" baseFrequency="1.2" numOctaves="1" seed="7" result="g"/>' +
-'<feColorMatrix in="g" type="matrix" values="0 0 0 0 .18  0 0 0 0 .17  0 0 0 0 .16  0 0 0 14 -10.2" result="dk"/>' +
-'<feColorMatrix in="g" type="matrix" values="0 0 0 0 .95  0 0 0 0 .94  0 0 0 0 .9  0 0 0 -14 3.4" result="lt"/>' +
-'<feMerge><feMergeNode in="a"/><feMergeNode in="dk"/><feMergeNode in="lt"/></feMerge></filter>';
-} else if (key === "antique") {
-defs += '<filter id="' + p + 'tex" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">' +
-'<feTurbulence type="fractalNoise" baseFrequency="0.008 0.35" numOctaves="3" seed="2" result="grain"/>' +
-'<feColorMatrix in="grain" type="matrix" values="0 0 0 0 .25  0 0 0 0 .13  0 0 0 0 .04  0 0 0 1.8 -.75" result="gr"/>' +
-'<feBlend in="SourceGraphic" in2="gr" mode="multiply" result="aged"/>' +
-'<feColorMatrix in="aged" type="matrix" values=".92 .1 .02 0 0  .06 .86 .04 0 0  .04 .08 .72 0 0  0 0 0 1 0"/></filter>';
-} else defs += filters(p, key, true);
-if (key === "diamond") {
-defs += facets(p);
-top = '<rect width="' + W + '" height="' + Hh + '" fill="url(#' + p + 'fac)" opacity=".7"/>' +
-'<rect width="' + W + '" height="' + Hh + '" fill="url(#' + p + 'rb)" opacity=".22"/>';
-} else if (key === "dark") {
-[[18, 10, .9], [52, 34, .6], [83, 14, 1.1], [121, 38, .7], [150, 9, .8], [178, 29, 1], [209, 16, .6], [230, 40, .8], [104, 24, .5]].forEach(function(x){
-top += '<circle cx="' + x[0] + '" cy="' + x[1] + '" r="' + x[2] + '" fill="#fff" opacity=".85"/>';
-});
-}
-var svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + W + ' ' + Hh + '" width="' + W + '" height="' + Hh + '" preserveAspectRatio="none"><defs>' + defs + '</defs>' +
-'<rect width="' + W + '" height="' + Hh + '" fill="url(#' + p + 'g)" filter="url(#' + p + 'tex)"/>' + top + '</svg>';
-return svg;
-}
-function applyAccent(key){
-var el = document.getElementById("sh-rank-accent"), root = document.documentElement;
-var a = ACCENTS[key], known = +(ls("sh_rank_tier") || 0);
-if (!a || known < a.tier) { if (el) el.remove(); root.removeAttribute("data-sh-accent"); return; }
-function v(c){ return "--accent:" + c[0] + ";--accent-ink:" + c[1] + ";--accent-soft:" + c[2] + ";"; }
-var tex = "--sh-tex:url('" + accentTex(key) + "');--sh-tex-ink:" + TEX_INK[key][0] + ";--sh-tex-shadow:" + TEX_INK[key][1] + ";";
-var css = 'html:root{' + v(a.L) + tex + '}@media (prefers-color-scheme: dark){html:root:not([data-theme="light"]){' + v(a.D) + '}}html:root[data-theme="dark"]{' + v(a.D) + '}';
-root.setAttribute("data-sh-accent", key);
-if (!el) { el = document.createElement("style"); el.id = "sh-rank-accent"; document.head.appendChild(el); }
-el.textContent = css;
-}
 function svgDataUri(svg){ return 'url("data:image/svg+xml,' + encodeURIComponent(svg.replace(/ class="[^"]*"/, ' xmlns="http://www.w3.org/2000/svg"')) + '")'; }
 var RANKUP_SRC = (function(){
 var src = (__sh_script && __sh_script.src) || "";
@@ -1483,7 +1414,7 @@ flair: flair, flairFromBadges: flairFromBadges, medal: medalSvg, hubName: hubNam
 track: track, preview: preview,
 _hub: { TS: TS, ls: ls, ROMAN: ROMAN, RETIRED: RETIRED, HUB_NAMES: HUB_NAMES, playRankUp: playRankUp, trophyCard: trophyCard,
 masteryCard: masteryCard },
-celebrate: function(kind, d){ withRankUp(function(U){ if (U[kind]) U[kind](d); }); }, applyAccent: applyAccent, accentTex: accentTex, accentSvg: accentSvg, svgDataUri: svgDataUri, rankName: rankName, ACCENTS: ACCENTS,
+celebrate: function(kind, d){ withRankUp(function(U){ if (U[kind]) U[kind](d); }); }, svgDataUri: svgDataUri, rankName: rankName,
 tierFor: function(xp){ var t = 0; TIERS.forEach(function(x, i){ if (xp >= x.at) t = i; }); return t; },
 levelFor: function(xp){ var t = this.tierFor(xp), lo = TIERS[t].at, hi = t < 6 ? TIERS[t + 1].at : 125000; return Math.min(3, 1 + Math.floor((xp - lo) * 3 / (hi - lo))); },
 shade: shade

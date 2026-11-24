@@ -34,6 +34,27 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 - **2026-11-24 (Lessons refresh: 52 answer keys in Review of Systems, Claude Code)** — Ten "keyed wrong" reports in a day led to a read of all 1,369 keys against their explanations and why lines (seven agents, a course or two each): 51 of Head & Neck's 68 single-answer items and `f1-biomol-03` pointed one choice past the right answer, wrong since the build (#480), every one by exactly one place; fixed in `hubs/review-of-systems/content/questions.json`. `tools/data-fixes/2026-11-24-review-of-systems-keys.sql` recounts their `question_stats` from `question_choices` after the merge (tested twice on a throwaway copy); After merge loads the new keys. Also: when troponin reaches the blood (`f2-genpath-20`, its notes and cram line), the panoramic chin-down error (`rd-anatomy-07` and its notes), and small slips in seven why lines and explanations. Listen with the device voice: BUG-199. `LESSONS.md` refreshed (Live signals, the game economy, a standing lesson on reading keys before a drafted bank ships).
 
+- **2026-11-24 (`widget/v3.css` cut to what a hub on the engine draws, #548, Claude Code)** — The package "Trim
+  widget/v3.css to what the engine draws" (the inbox line). v3.css loses the rules for what only the old single-file hub
+  pages drew (down since 2026-11-19) or what a hub on the engine always hides (`widget/hub.css`'s `display:none
+  !important`): the desktop launcher and its menu, the phone bottom bar and its More sheet, the old Settings panel, the
+  name badge, the fallback top bar and the old pages' top-bar layouts, the update banner and streak toast (the engine
+  has `shToast`), the Daily Drill dialog, the inbox ribbon, the countdown pill, the accent swatches and the old pages'
+  accent targets, the docked boss, the rank glyph on an old ribbon, the lecture pager and `.notes-layout`, the class
+  picks, `.home-next` and fx.js's answer marks. 107 to 71 KB, 826 to 541 style rules (928 to 614 selectors), 46 to 31
+  `@keyframes`; every one left is still used. Nothing new on `:root` (#525's lesson). Putting the sheet in on the slow
+  phone (CPU 4x, median of 8 alternating loads): about 22 to about 15 ms. Computed styles of every element on Home,
+  Notes, Questions and More (and the panels and dialogs they open), laptop and phone, light and both darks (78 states;
+  130 with a pair meant to add an accent metal, which never turned it on: the stubbed data has no rank, so the metal was
+  refused), about 2.67 million styles: nothing drawn differs except what two copies of `main` also differ by, and two
+  races of the test itself; the rest is inside what the engine always hides. `widget/hub-rest.bundle.js` rebuilt. Sam's
+  call the same day ("Accent metal should stop being applied", [decisions](vault/decisions.md)): the accent metal a
+  student picked before Settings lost it (2026-11-05) is no longer applied, and a hub clears the saved one
+  (`sh_pref_accent`); `widget/ranks.js`'s metals and `applyAccent`, their textures (`assets/tex/`),
+  `tools/make-accent-tex.js`, the old Settings panel's swatches, v3.css's accent rules and the metal in the daily
+  settings snapshot came out (`rest.bundle.js` 4.9 KB smaller). Left, in [the inbox](vault/tasks/inbox.md): the cleanup
+  of the old parts `widget/v3.js` still builds and `widget/hub.css` hides (Sam: "The cleanup sounds good"), and Sam's
+  call on a saved font choice, which still applies the same way.
 - **2026-11-24 (Patient Box v2.2, Claude Code)** — the case kit (`widget/cases.js`, `widget/cases.css`, `widget/teeth.js`)
   draws and checks what v2.1 left ([the task](vault/tasks/2026-11-20-patient-box-v2-next-steps.md)), each clinical call settled
   from outside sources and cited in `cases.js`'s header (Sam, 2026-11-21: "Use outside sources to determine answers"):

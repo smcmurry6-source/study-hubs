@@ -1,5 +1,5 @@
 /* study-hubs: the hub widget of the handpiece ranks (shRanks.mount): the rank card, hub mastery and the trophy case in
-   Stats, the accent colors in Settings, Link my devices, the mastery and hub-trophy cards. It draws with widget/ranks.js's
+   Stats, Link my devices, the mastery and hub-trophy cards. It draws with widget/ranks.js's
    art and lists (shRanks, and the kit it hands over in shRanks._hub), so it runs after that file. widget/v3.js loads it
    on a hub only (from hub-rest.bundle.js on the engine, by name on an old single-file hub): the dashboard never mounts it,
    and it was 12 KB of the dashboard's page budget while it rode in rest.bundle.js (2026-11-19). */
@@ -9,10 +9,10 @@
   if (!K || R.mount) return;
   var TS = K.TS, ls = K.ls, ROMAN = K.ROMAN, RETIRED = K.RETIRED, HUB_NAMES = K.HUB_NAMES,
     playRankUp = K.playRankUp, trophyCard = K.trophyCard, masteryCard = K.masteryCard,
-    TIERS = R.TIERS, TROPHIES = R.TROPHIES, HUB_TROPHIES = R.HUB_TROPHIES, MASTERY = R.MASTERY, ACCENTS = R.ACCENTS,
+    TIERS = R.TIERS, TROPHIES = R.TROPHIES, HUB_TROPHIES = R.HUB_TROPHIES, MASTERY = R.MASTERY,
     art = R.art, artOf = R.artOf, nameOf = R.nameOf, rankName = R.rankName, isV2 = R.isV2, legacy = R.legacy,
     needJourneyArt = R.needJourneyArt, track = R.track, trophyStats = R.trophyStats, hubName = R.hubName,
-    flair = R.flair, flairFromBadges = R.flairFromBadges, applyAccent = R.applyAccent, accentTex = R.accentTex, svgDataUri = R.svgDataUri;
+    flair = R.flair, flairFromBadges = R.flairFromBadges, svgDataUri = R.svgDataUri;
   function fmt(n){ return Math.round(n || 0).toLocaleString(); }
   function linkTrack(k){ try { if (window.shTrack) window.shTrack("link:" + k); } catch (e) {} }
 
@@ -21,7 +21,8 @@
     window.__shRanksMounted = true;
     var SB = H.supabase, esc = H.esc;
     if (SB) TS.sb = SB;
-    applyAccent(ls("sh_pref_accent"));
+    /* the accent metal, cut from Settings on 2026-11-05, is no longer applied (Sam, 2026-11-24): forget a saved one */
+    ls("sh_pref_accent", null);
     if (!SB) return;
     function rpc(name, args){ return SB.rpc(name, args).then(function(r){ return r && !r.error ? r.data : null; }, function(){ return null; }); }
     var profile = null, mastery = null;
@@ -31,27 +32,6 @@
     sec.className = "shstat-sec sh-rank-sec"; sec.id = "sh-rank-sec";
     sec.innerHTML = '<div class="shstat-empty">Loading your rank…</div>';
     if (panel) { var first = panel.querySelector(".shstat-sec"); panel.insertBefore(sec, first || null); }
-
-    /* Settings: accent colors */
-    var settings = document.getElementById("shstat-settingspanel");
-    var accRow = document.createElement("div");
-    accRow.className = "shset-row sh-accent-row";
-    if (settings) { var eggsRow = settings.querySelector('[data-pref="eggs"]'); settings.insertBefore(accRow, eggsRow ? eggsRow.closest(".shset-row") : null); }
-    function drawAccents(){
-      var have = profile ? profile.tier : +(ls("sh_rank_tier") || 0), cur = ls("sh_pref_accent") || "default";
-      accRow.innerHTML = '<label>Accent color</label><div class="sh-accent-swatches">' +
-        '<button type="button" data-acc="default" aria-pressed="' + (cur === "default") + '" title="The hub\'s own color"><span class="sh-acc-dot sh-acc-default"></span>Hub</button>' +
-        Object.keys(ACCENTS).map(function(k){
-          var a = ACCENTS[k], locked = have < a.tier;
-          return '<button type="button" data-acc="' + k + '" aria-pressed="' + (cur === k) + '"' + (locked ? ' disabled title="Unlocks at ' + TIERS[a.tier].name + '"' : '') + '>' +
-            '<span class="sh-acc-dot" style="background:' + a.L[0] + ' url(\'' + accentTex(k) + '\') center/cover"></span>' + TIERS[a.tier].name + (locked ? ' <svg class="sh-acc-lock" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>' : '') + '</button>';
-        }).join("") + '</div><div class="shset-hint">Unlocked by your handpiece rank. Buttons, switches and progress bars in every hub take on that metal.</div>';
-    }
-    accRow.addEventListener("click", function(e){
-      var b = e.target.closest("[data-acc]"); if (!b || b.disabled) return;
-      var k = b.getAttribute("data-acc"); ls("sh_pref_accent", k === "default" ? null : k); applyAccent(k); drawAccents();
-    });
-    drawAccents();
 
     /* the little handpiece next to your name */
     function badgeIcon(t){
@@ -239,7 +219,7 @@
        medals recorded in render(). Cheap per-visitor reads since migration_v53's XP cache, so they still come on load
        (in the page bootstrap) and every 10 answers (Sam, 2026-11-06). The class-wide trophy rarity waits for Stats. */
     function applyOwn(p, m){
-      var raw = p; p = legacy(p);   // a v2 profile (the redesign): this panel, the accents and Timmy's house read the Handpiece's rank
+      var raw = p; p = legacy(p);   // a v2 profile (the redesign): this panel and Timmy's house read the Handpiece's rank
       profile = p; mastery = m || []; ownRaw = raw;
       if (raw.journey > 0 && !window.SH_JOURNEY_ART) needJourneyArt(function(K){ if (K) render(); });
       /* the redesigned hubs' rank pill (widget/hub-rewards.js) listens; nothing on the live pages does */
@@ -247,7 +227,7 @@
       if (window.shPet && window.shPet.syncBadges) window.shPet.syncBadges(profile.badges);
       track(raw, { busy: mockBusy, seen: function(j){ if (!window.shAutomated) rpc("mark_dark_unlock_seen", { p_visitor: H.visitor, p_journey: j }); },
         claim: window.shAutomated ? null : function(fn, args){ return rpc(fn, Object.assign({ p_visitor: H.visitor }, args)); } });
-      badgeIcon(profile.tier || 0); render(); drawAccents(); applyAccent(ls("sh_pref_accent"));
+      badgeIcon(profile.tier || 0); render();
     }
     function loadOwn(){
       if (loading) return; loading = true;

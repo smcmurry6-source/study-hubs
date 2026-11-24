@@ -1,11 +1,13 @@
-/* ============ SHARED STUDY-HUB WIDGET (search / class stats / settings / suggest / flag /
-   online-now / back-to-index / Listen / mind maps / tactical nuke) ============
-   One file, loaded by every hub via <link rel="stylesheet" href="../../widget/v3.css">.
+/* ============ SHARED STUDY-HUB WIDGET (search / class stats / suggest / flag / name / Listen / mind maps /
+   tactical nuke / easter eggs / ranks / streak flame / Timmy Time / highlighter / question health) ============
+   What widget/v3.js and the widgets it loads draw on a hub on the engine: the hub bundle puts this file in as a <style>
+   ahead of the page's one stylesheet (tools/bundle/bundles.json). Only rules for something a hub on the engine can draw
+   belong here (cut to that on 2026-11-24, after the old single-file hub pages came down).
    Colors and fonts come from the hub's own design tokens (--surface, --ink, --line, --accent,
    --font-body ...), so the widget looks like part of whichever hub it is on, in light and dark.
    Fallbacks keep it readable on a page without those tokens. */
 :root{--sh-tabbar-h:60px;} /* height of the phone bottom bar, published so a hub's own mobile CSS can stack above it */
-#shstat-root, #shstat-backdrop, .sh-archived, .shstat-streaktoast, .sh-egg, .sh-egg-board, .sh-rank-sec, .sh-accent-row, .sh-update-toast, #sh-topbar, #shname-badge, .sh-name-dlg, .sh-drill{
+#shstat-root, #shstat-backdrop, .sh-archived, .sh-egg, .sh-egg-board, .sh-rank-sec, .sh-name-dlg{
   --shw-bg: var(--surface, #fff);
   --shw-bg2: var(--surface-2, #f2f3f4);
   --shw-ink: var(--ink, #15202A);
@@ -27,34 +29,10 @@
 #shstat-root *{box-sizing:border-box;}
 #shstat-root button{font-family:inherit;}
 
-/* ---------- desktop launcher + menu ---------- */
-.shstat-launch{display:flex; align-items:center; gap:8px; height:46px; padding:0 14px 0 10px; border-radius:999px; background:var(--shw-bg); color:var(--shw-ink); border:1px solid var(--shw-line); box-shadow:var(--shw-shadow); cursor:pointer; -webkit-tap-highlight-color:transparent; transition:border-color .15s, transform .15s;}
-.shstat-launch:hover{border-color:var(--shw-line2);}
-.shstat-launch:active{transform:scale(.97);}
-.shstat-launch > svg{width:26px; height:26px; display:block;}
-.shl-live{display:inline-flex; align-items:center; gap:6px; font-size:13px; font-weight:600; color:var(--shw-ink2); font-variant-numeric:tabular-nums;}
-#shstat-root.is-menu-open .shstat-launch{border-color:var(--shw-ink);}
-
-.shstat-pillrow{display:none; flex-direction:column; align-items:stretch; gap:2px; min-width:230px; padding:6px; background:var(--shw-bg); border:1px solid var(--shw-line); border-radius:16px; box-shadow:var(--shw-shadow);}
-#shstat-root.is-menu-open .shstat-pillrow{display:flex;}
-.shm-group{display:flex; flex-direction:column; gap:2px; border-top:1px solid var(--shw-line); margin-top:4px; padding-top:4px;}
-.shm-live{display:flex; align-items:center; gap:9px; padding:8px 11px 6px; font-size:13px; color:var(--shw-ink2);}
-.shm-live b{color:var(--shw-ink); font-weight:700;}
-.shstat-pill{display:flex; align-items:center; gap:11px; width:100%; text-align:left; padding:9px 11px; border:0; border-radius:10px; background:transparent; color:var(--shw-ink); font-size:14px; font-weight:600; cursor:pointer; -webkit-tap-highlight-color:transparent;}
-.shstat-pill:hover{background:var(--shw-bg2);}
-.shstat-pill:focus-visible, .shstat-launch:focus-visible{outline:2px solid var(--shw-accent); outline-offset:2px;}
-.shstat-pill-icon{display:flex; width:20px; height:20px; color:var(--shw-ink2); flex:none;}
-.shstat-pill-icon svg{width:100%; height:100%;}
-.shm-more{display:none;}
-.spl-full{display:inline;} .spl-short{display:none;}
-.shstat-dot{width:8px; height:8px; border-radius:50%; background:#2BB673; box-shadow:0 0 0 3px rgba(43,182,115,.2); flex:none;}
-@media (prefers-reduced-motion: no-preference){ .shstat-dot{animation:shstat-pulse 2.2s ease-in-out infinite;} }
-@keyframes shstat-pulse{0%,100%{opacity:1;}50%{opacity:.45;}}
-
 /* ---------- panels ---------- */
-#shstat-panel, #shstat-flagpanel, #shstat-suggestpanel, #shstat-searchpanel, #shstat-settingspanel{display:none; width:320px; background:var(--shw-bg); color:var(--shw-ink); border:1px solid var(--shw-line); border-radius:16px; padding:16px 16px 18px; box-shadow:var(--shw-shadow); position:relative;}
-#shstat-panel, #shstat-searchpanel, #shstat-settingspanel{max-height:66vh; overflow-y:auto;}
-#shstat-panel.is-open, #shstat-flagpanel.is-open, #shstat-suggestpanel.is-open, #shstat-searchpanel.is-open, #shstat-settingspanel.is-open{display:block;}
+#shstat-panel, #shstat-flagpanel, #shstat-suggestpanel, #shstat-searchpanel{display:none; width:320px; background:var(--shw-bg); color:var(--shw-ink); border:1px solid var(--shw-line); border-radius:16px; padding:16px 16px 18px; box-shadow:var(--shw-shadow); position:relative;}
+#shstat-panel, #shstat-searchpanel{max-height:66vh; overflow-y:auto;}
+#shstat-panel.is-open, #shstat-flagpanel.is-open, #shstat-suggestpanel.is-open, #shstat-searchpanel.is-open{display:block;}
 #shstat-root h5{font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--shw-ink3); margin:0 0 9px; font-weight:700;}
 #shstat-panel .shstat-sec{margin-bottom:18px;}
 #shstat-panel .shstat-sec:last-child{margin-bottom:0;}
@@ -83,33 +61,7 @@
 .shstat-name-row{display:flex; gap:6px; margin-top:10px;}
 .shstat-name-row input{flex:1; min-width:0; background:var(--shw-bg2); border:1px solid var(--shw-line); border-radius:10px; color:var(--shw-ink); font:inherit; font-size:13.5px; padding:7px 10px;}
 .shstat-namemsg{font-size:12px; color:var(--shw-ink2); margin-top:6px; min-height:14px;}
-.shstat-streaktoast{position:fixed; z-index:10001; left:50%; top:16%; display:flex; align-items:center; gap:8px; background:var(--shw-ink); color:var(--shw-bg); font-family:var(--shw-font); font-size:14px; font-weight:700; padding:10px 18px; border-radius:999px; box-shadow:var(--shw-shadow); pointer-events:none; opacity:0; transform:translate(-50%,-50%) scale(.9); transition:opacity .25s, transform .25s; white-space:nowrap;}
-.shstat-streaktoast.is-shown{opacity:1; transform:translate(-50%,-50%) scale(1);}
-.shstat-toast-ic{display:inline-flex; width:18px; height:18px;}
-.shstat-toast-ic svg{width:100%; height:100%;}
 .shstat-confetti{position:fixed; z-index:10000; top:0; pointer-events:none; will-change:transform,opacity;}
-
-/* ---------- settings ---------- */
-.shset-row{margin-bottom:18px;}
-.shset-row:last-child{margin-bottom:0;}
-.shset-row > label{display:block; font-size:11px; letter-spacing:.07em; text-transform:uppercase; color:var(--shw-ink3); font-weight:700; margin-bottom:8px;}
-.shset-seg{display:flex; gap:6px; flex-wrap:wrap;}
-.shset-seg button{background:var(--shw-bg); border:1px solid var(--shw-line2); color:var(--shw-ink); border-radius:999px; padding:6px 12px; font-size:12.5px; font-weight:600; cursor:pointer; -webkit-tap-highlight-color:transparent;}
-.shset-seg button:hover{background:var(--shw-bg2);}
-.shset-seg button.is-active{background:var(--shw-ink); color:var(--shw-bg); border-color:var(--shw-ink);}
-#shset-volume{width:100%; margin-top:12px; accent-color:var(--shw-accent);}
-.shset-hint{font-size:12px; color:var(--shw-ink2); margin-top:8px; line-height:1.45;}
-/* Extras: All on / All off, then one compact row per optional feature */
-.shset-extras{border-top:1px solid var(--shw-line2); padding-top:16px;}
-.shset-xhead{display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;}
-.shset-xhead > label{font-size:11px; letter-spacing:.07em; text-transform:uppercase; color:var(--shw-ink3); font-weight:700;}
-.shset-x{display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:6px 10px; padding:10px 0; border-top:1px solid var(--shw-line2);}
-.shset-extras .shset-hint{margin-bottom:6px;}
-.shset-xtxt{min-width:0; flex:1 1 170px;}
-.shset-xtxt b{display:block; font-size:13px; color:var(--shw-ink);}
-.shset-xtxt small{display:block; font-size:11.5px; color:var(--shw-ink2); line-height:1.4; margin-top:2px;}
-.shset-x .shset-seg{flex:0 1 auto; max-width:100%; flex-wrap:wrap; gap:4px;}
-.shset-x .shset-seg button{padding:5px 10px; font-size:12px;}
 
 /* ---------- search ---------- */
 #shstat-searchpanel input[type="text"]{width:100%; background:var(--shw-bg2); border:1px solid var(--shw-line); border-radius:10px; color:var(--shw-ink); font:inherit; font-size:15px; padding:9px 11px; margin-bottom:12px;}
@@ -122,12 +74,6 @@
 .shstat-search-hit .sh-hit-snip{display:block; font-size:12.5px; color:var(--shw-ink2); line-height:1.4; margin-top:3px;}
 .shstat-search-hit .sh-hit-where{display:block; font-size:11px; color:var(--shw-ink3); margin-top:3px;}
 .shstat-search-hit mark{background:var(--shw-accent-soft); color:inherit; border-radius:3px; padding:0 1px;}
-.shstat-search-q{padding:9px 0; border-bottom:1px solid var(--shw-line); cursor:pointer;}
-.shstat-search-q:last-child{border-bottom:none;}
-.shstat-search-q .sq-text{font-size:13.5px; line-height:1.4;}
-.shstat-search-q .sq-lec{font-size:11px; color:var(--shw-ink3); margin-top:3px;}
-.shstat-search-q .sq-hint{font-size:12.5px; color:var(--shw-good); margin-top:6px; line-height:1.45; display:none;}
-.shstat-search-q.is-open .sq-hint{display:block;}
 .sh-search-flash{animation:sh-search-flash 1.8s ease-out;}
 @keyframes sh-search-flash{0%,30%{background:var(--accent-soft, rgba(47,111,214,.18)); box-shadow:0 0 0 6px var(--accent-soft, rgba(47,111,214,.18));}100%{background:transparent; box-shadow:0 0 0 6px transparent;}}
 
@@ -155,22 +101,6 @@
 .sh-nj-open{appearance:none; margin-top:6px; padding:6px 0; border:0; background:none; color:var(--accent-ink, #1f3b8c); font:600 13px/1.2 var(--font-body, sans-serif); text-decoration:underline; text-underline-offset:2px; cursor:pointer;}
 .sh-nj-open::after{content:" \2192";}
 .sh-qpin + .sh-qflag{margin-left:0;}
-
-/* ---------- persistent screen-name badge (fallback when a hub has no ribbon slot) ---------- */
-#shname-badge{display:inline-flex; align-items:center; gap:6px; background:var(--shw-bg); color:var(--shw-ink); border:1px solid var(--shw-line); border-radius:999px; padding:7px 13px; font-family:var(--shw-font); font-size:12.5px; font-weight:600; cursor:pointer; box-shadow:var(--shw-shadow); max-width:220px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
-#shname-badge[hidden]{display:none;}
-
-/* ---------- update-available banner ---------- */
-.sh-update-toast{position:fixed; top:0; left:0; right:0; z-index:10060; display:flex; align-items:center; justify-content:center; gap:14px; flex-wrap:wrap; padding:12px 16px; background:var(--shw-ink); color:var(--shw-bg); font-family:var(--shw-font); font-size:14px; font-weight:600; text-align:center; transform:translateY(-120%); transition:transform .35s cubic-bezier(.3,1,.4,1); box-shadow:var(--shw-shadow);}
-.sh-update-toast.is-shown{transform:translateY(0);}
-.sh-update-toast button{border:none; border-radius:999px; cursor:pointer; font-family:inherit; font-weight:700;}
-.sh-update-reload{background:var(--shw-bg); color:var(--shw-ink); padding:6px 16px; font-size:13px;}
-.sh-update-dismiss{background:transparent; color:inherit; opacity:.75; width:26px; height:26px; font-size:18px; line-height:1; padding:0; flex:none;}
-
-/* ---------- fallback top bar for a hub without a ribbon back-button slot ---------- */
-#sh-topbar{position:fixed; left:16px; top:16px; z-index:9999; display:flex; align-items:center; gap:8px; flex-wrap:wrap; max-width:calc(100vw - 32px);}
-#shhome-pill{display:inline-flex; align-items:center; gap:7px; background:var(--shw-bg); color:var(--shw-ink); text-decoration:none; border:1px solid var(--shw-line); border-radius:999px; padding:8px 14px 8px 12px; font-family:var(--shw-font); font-size:13px; font-weight:600; box-shadow:var(--shw-shadow);}
-#shhome-pill svg{width:13px; height:13px; flex:none;}
 
 /* ---------- tactical nuke ---------- */
 .sh-nuke-icon{position:relative; display:inline-block; border-radius:50%; background:#1f1204; box-shadow:0 0 0 2px rgba(0,0,0,.35);}
@@ -346,52 +276,23 @@ body.sh-nuke-active{overflow:hidden;}
   .sh-tts-voice-picker{display:block; max-width:none; margin:8px 0 0; padding:8px 10px; font-size:13px;}
 }
 
-/* ================= PHONES (<=760px): three-item bottom bar + full-width sheets ================= */
+/* ================= PHONES (<=760px): the panels as full-width sheets ================= */
 @media (max-width:760px){
   #shstat-root{left:0; right:0; bottom:0; top:auto; width:100%; align-items:stretch; gap:0;}
-  .shstat-launch{display:none;}
   #shstat-backdrop{position:fixed; inset:0; background:rgba(10,8,6,.45); z-index:9997; opacity:0; pointer-events:none; transition:opacity .2s ease;}
-  body.sh-sheet-open #shstat-backdrop, body.sh-more-open #shstat-backdrop{opacity:1; pointer-events:auto;}
+  body.sh-sheet-open #shstat-backdrop{opacity:1; pointer-events:auto;}
 
-  .shstat-pillrow, #shstat-root.is-menu-open .shstat-pillrow{
-    display:flex; flex-direction:row; position:fixed; left:0; right:0; bottom:0; z-index:9999; min-width:0; gap:0;
-    padding:4px 6px calc(4px + env(safe-area-inset-bottom,0px)); border-radius:0; border:0; border-top:1px solid var(--shw-line);
-    background:color-mix(in srgb, var(--shw-bg) 94%, transparent); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
-    box-shadow:0 -6px 20px -12px rgba(20,16,12,.3);
-  }
-  .shstat-pillrow > .shstat-pill{flex:1 1 0; flex-direction:column; justify-content:center; gap:3px; min-height:52px; padding:6px 2px; border-radius:10px; text-align:center;}
-  .shstat-pillrow > .shstat-pill .shstat-pill-icon{width:22px; height:22px;}
-  .shstat-pillrow > .shstat-pill .shstat-pill-label{font-size:11px; font-weight:700; line-height:1.1;}
-  .shm-more{display:flex;}
-  .sh-drill-chip{display:none !important;}
-  .shstat-pillrow > #shstat-drill-pill{position:relative;}
-  .shstat-pillrow > #shstat-drill-pill .shd-badge{position:absolute; top:3px; left:calc(50% + 6px); margin:0;}
-  #shstat-root.is-more-open .shm-more{color:var(--shw-accent);}
-  #shstat-root.is-more-open .shm-more .shstat-pill-icon{color:var(--shw-accent);}
-  .spl-full{display:none;} .spl-short{display:inline;}
-
-  /* the rest of the tools, as a small sheet above the bar */
-  .shm-group{display:none; position:fixed; left:10px; right:10px; bottom:calc(var(--sh-tabbar-h) + 10px + env(safe-area-inset-bottom,0px)); z-index:10000;
-    margin:0; padding:6px; border:1px solid var(--shw-line); border-radius:16px; background:var(--shw-bg); box-shadow:var(--shw-shadow);}
-  #shstat-root.is-more-open .shm-group{display:flex;}
-  .shm-group .shstat-pill{padding:12px 12px; font-size:15px;}
-
-  #shstat-panel, #shstat-flagpanel, #shstat-suggestpanel, #shstat-searchpanel, #shstat-settingspanel{
+  #shstat-panel, #shstat-flagpanel, #shstat-suggestpanel, #shstat-searchpanel{
     display:block; position:fixed; left:0; right:0; bottom:0; top:auto; width:100%;
     max-height:min(80vh,660px); overflow-y:auto; border-radius:20px 20px 0 0; z-index:10000;
     padding:20px 16px calc(24px + var(--sh-tabbar-h) + env(safe-area-inset-bottom,0px));
     transform:translateY(105%); transition:transform .28s cubic-bezier(.2,.8,.3,1); pointer-events:none; border-bottom:0;
   }
-  #shstat-panel.is-open, #shstat-flagpanel.is-open, #shstat-suggestpanel.is-open, #shstat-searchpanel.is-open, #shstat-settingspanel.is-open{transform:translateY(0); pointer-events:auto;}
-  #shstat-panel::before, #shstat-flagpanel::before, #shstat-suggestpanel::before, #shstat-searchpanel::before, #shstat-settingspanel::before{
+  #shstat-panel.is-open, #shstat-flagpanel.is-open, #shstat-suggestpanel.is-open, #shstat-searchpanel.is-open{transform:translateY(0); pointer-events:auto;}
+  #shstat-panel::before, #shstat-flagpanel::before, #shstat-suggestpanel::before, #shstat-searchpanel::before{
     content:""; position:absolute; top:8px; left:50%; width:36px; height:4px; margin-left:-18px; border-radius:99px; background:var(--shw-line2);
   }
   .shstat-close{top:12px; right:10px; font-size:24px; width:38px; height:38px;}
-
-  #sh-topbar{top:calc(14px + env(safe-area-inset-top,0px)); left:14px;}
-  #shhome-pill{padding:9px;}
-  #shhome-pill span{display:none;}
-  #shname-badge{padding:6px 11px; font-size:11.5px; max-width:130px;}
 }
 
 /* ---------- Listen player strip (pre-generated narration) ---------- */
@@ -461,22 +362,6 @@ body.sh-nuke-active{overflow:hidden;}
 .sh-egg-boss-dmg{position:absolute; top:-4px; font:800 13px/1 var(--shw-font); color:var(--shw-bad); pointer-events:none; animation:sh-egg-dmg .9s ease-out forwards; text-shadow:0 1px 0 var(--shw-bg);}
 .sh-egg-boss-dmg.is-crit{color:var(--egg-gold); font-size:15px;}
 @keyframes sh-egg-dmg{from{opacity:1; transform:translateY(0) scale(1);} to{opacity:0; transform:translateY(-30px) scale(1.25);}}
-/* docked: a solid band along the bottom edge of the hub's sticky top bar (eggs.js bossDock/fitDock bleed it to the bar's
-   edges and flush with its bottom), so it never covers a question and nothing scrolls through behind it */
-.sh-egg-boss.is-docked{position:relative; z-index:auto; left:auto; bottom:auto; width:auto; display:none; gap:8px; margin:6px 0 0; padding:5px 12px;
-  border:0; border-top:1px solid var(--shw-line); border-radius:0; box-shadow:none; background:var(--shw-bg2); font-size:12.5px; line-height:1.25;
-  opacity:1; pointer-events:auto; transform:none; transition:opacity .8s;}
-.sh-egg-boss.is-docked.is-shown{display:flex; transform:none; animation:sh-egg-dock-in .3s ease-out;}
-@keyframes sh-egg-dock-in{from{opacity:0;} to{opacity:1;}}
-.sh-egg-boss.is-docked.is-dead{opacity:0; transform:none;}
-.sh-egg-boss.is-docked .sh-egg-boss-face{width:22px; height:22px; flex:0 0 22px;}
-.sh-egg-boss.is-docked .sh-egg-boss-body{display:flex; align-items:center; gap:10px;}
-.sh-egg-boss.is-docked .sh-egg-boss-body b{flex:0 1 auto; min-width:0; max-width:38%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
-.sh-egg-boss.is-docked .sh-egg-boss-bar{order:1; flex:1 1 60px; min-width:48px; max-width:280px; height:5px; margin-top:0;}
-.sh-egg-boss.is-docked small{order:2; flex:0 1 auto; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:var(--shw-ink2); font-size:12px; font-variant-numeric:tabular-nums;}
-.sh-egg-boss.is-docked .sh-egg-boss-dmg{top:4px; animation-name:sh-egg-dmg-docked;}
-@keyframes sh-egg-dmg-docked{from{opacity:1; transform:translateY(4px) scale(1);} to{opacity:0; transform:translateY(-4px) scale(1.1);}}
-.sh-egg-boss.is-docked .sh-egg-x{width:26px; height:26px; margin:-2px -4px -2px 0; font-size:17px;}
 @keyframes sh-egg-wobble{0%,100%{transform:rotate(-4deg);} 50%{transform:rotate(4deg) scale(.96);}}
 @keyframes sh-egg-pulse{from{opacity:1;} to{opacity:.45;}}
 @keyframes sh-egg-shake{0%,100%{transform:none;} 25%{transform:translateX(-4px) rotate(-6deg);} 75%{transform:translateX(4px) rotate(6deg);}}
@@ -548,8 +433,6 @@ html.sh-8bit button, html.sh-8bit .card, html.sh-8bit [class*="card"]{box-shadow
 }
 @media (max-width:760px){
   .sh-egg-boss{bottom:calc(var(--sh-tabbar-h) + 12px + env(safe-area-inset-bottom,0px));}
-  .sh-egg-boss.is-docked{bottom:auto;}
-  .sh-egg-boss.is-docked .sh-egg-boss-say{display:none;}
 }
 @media (prefers-reduced-motion: reduce){
   .sh-mirror-flip{animation:none;}
@@ -569,8 +452,6 @@ html.sh-8bit button, html.sh-8bit .card, html.sh-8bit [class*="card"]{box-shadow
   font:700 8px/1 Georgia, 'Times New Roman', serif; letter-spacing:.02em; color:#fff; background:#2A2622; box-shadow:0 0 0 1.2px var(--sh-lv-ring, #C69A4A);}
 .sh-lv-antique{--sh-lv-ring:#C69A4A;} .sh-lv-stone{--sh-lv-ring:#BDB6AB;} .sh-lv-bronze{--sh-lv-ring:#E09A5E;} .sh-lv-silver{--sh-lv-ring:#E4E9EE;}
 .sh-lv-gold{--sh-lv-ring:#F6CD55;} .sh-lv-diamond{--sh-lv-ring:#9EE6FF;} .sh-lv-dark{--sh-lv-ring:#B57BFF;}
-.sh-has-rank[data-rank-lv]::after{content:attr(data-rank-lv); margin-left:6px; padding:1px 5px; border-radius:5px; font:700 10px/1.4 Georgia, serif; background:rgba(0,0,0,.08); color:inherit;}
-.sh-has-rank::before{content:""; display:inline-block; width:17px; height:17px; margin-right:6px; vertical-align:-3.5px; background:var(--sh-rank-img) center/contain no-repeat;}
 
 .sh-rank-sec{font-family:var(--shw-font); color:var(--shw-ink);}
 .sh-rank-card{display:flex; align-items:center; gap:14px; padding:12px 14px 12px 10px; border-radius:18px; border:1px solid var(--shw-line);
@@ -647,21 +528,6 @@ html.sh-8bit button, html.sh-8bit .card, html.sh-8bit [class*="card"]{box-shadow
 .sh-link-enter input{flex:1; min-width:0; font-family:var(--shw-mono); font-size:18px; letter-spacing:.14em; text-transform:uppercase; padding:6px 10px; border-radius:10px; border:1px solid var(--shw-line2); background:var(--shw-bg); color:var(--shw-ink);}
 .sh-link-msg{margin-top:6px; min-height:1.2em;}
 
-.sh-accent-swatches{display:flex; flex-wrap:wrap; gap:6px;}
-.sh-accent-swatches button{display:inline-flex; align-items:center; gap:6px; font:inherit; font-size:12.5px; font-weight:600; padding:6px 11px 6px 7px; border-radius:99px; border:1px solid var(--shw-line2); background:var(--shw-bg); color:var(--shw-ink); cursor:pointer;}
-.sh-accent-swatches button[aria-pressed="true"]{border-color:var(--shw-ink); box-shadow:inset 0 0 0 1px var(--shw-ink);}
-.sh-accent-swatches button:disabled{opacity:.5; cursor:not-allowed;}
-.sh-acc-dot{width:20px; height:20px; border-radius:50%; box-shadow:inset 0 0 0 1px rgba(0,0,0,.18), 0 1px 2px rgba(0,0,0,.2);}
-.sh-acc-default{background:conic-gradient(#a83a2c 0 50%, #A23F5E 0);}
-.sh-acc-lock{width:12px; height:12px;}
-/* an unlocked accent is a metal, not just a colour (widget/ranks.js applyAccent sets data-sh-accent and --sh-tex):
-   filled accent things in every hub get the rank's own texture. Text and borders keep the flat --accent. */
-html[data-sh-accent] :is(.btn.primary, .qs-btn.primary, .pill.countdown, .sh-archived-go, .shd-badge:not(.is-done)){
-  background-image:var(--sh-tex); background-size:100% 100%; color:var(--sh-tex-ink); text-shadow:var(--sh-tex-shadow); border-color:var(--accent-ink);}
-html[data-sh-accent] :is(.btn.primary, .qs-btn.primary, .pill.countdown) :is(svg, .ic){filter:drop-shadow(var(--sh-tex-shadow));}
-html[data-sh-accent] :is(.toggle.on .sw, .toggle input:checked, .qcard-choice.multi[data-selected="true"]::before, .qcard-choice.multi[data-picked="true"]::before,
-  .bar i:not([class*="tag-"] i), .weak-meter i:not([class*="tag-"] i), .shd-bar i, .sh-mastery-bar i, .shstat-hbar){
-  background-image:var(--sh-tex); background-size:100% 100%;}
 
 @media (prefers-reduced-motion: reduce){ .sh-rank-name, .sh-trophy-medal::after{animation:none !important;} }
 /* trophies are buttons: tap one to read it (secret ones give a clue) */
@@ -671,18 +537,7 @@ button.sh-trophy:hover, button.sh-trophy.is-sel{border-color:var(--shw-line); ba
 .sh-trophy-detail b{color:var(--shw-ink);}
 .sh-trophy-hint{color:var(--shw-ink3);}
 
-/* ---------- your name: top-bar badge with a pencil + the small editor it opens ---------- */
-.sh-name-edit{display:inline-flex !important; align-items:center; gap:0; min-width:0; max-width:240px;}
-.sh-name-edit[hidden]{display:none !important;}
-.sh-name-edit .sh-name-text{order:0; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
-.sh-name-edit.sh-has-rank::after{order:1; flex:none;}
-.sh-name-edit.sh-has-rank::before{flex:none;}
-.sh-name-pencil{order:2; flex:none; width:13px; height:13px; margin-left:6px; opacity:.6;}
-.sh-name-edit:hover .sh-name-pencil{opacity:1;}
-@media (max-width:640px){ .sh-name-edit{max-width:min(196px, 50vw);} }
-/* the badge is the part of a hub's top-bar row that gives way on a narrow phone */
-#sh-ribbon-name.sh-name-edit{flex:0 1 auto;}
-*:has(> #sh-ribbon-name){min-width:0; max-width:100%;}
+/* ---------- your name: the small editor (window.shEditName; the engine's name buttons open it) ---------- */
 .sh-name-dlg{position:fixed; inset:0; z-index:10050; display:flex; align-items:center; justify-content:center; padding:16px; background:rgba(10,8,6,.45); font-family:var(--shw-font);}
 .sh-name-card{position:relative; width:100%; max-width:360px; background:var(--shw-bg); color:var(--shw-ink); border:1px solid var(--shw-line); border-radius:16px; box-shadow:var(--shw-shadow); padding:20px 20px 16px;}
 .sh-name-card h4{margin:0 0 6px; font-size:17px;}
@@ -703,124 +558,6 @@ button.sh-trophy:hover, button.sh-trophy.is-sel{border-color:var(--shw-line); ba
 .shstat-linkbtn{display:inline-block; margin-top:2px; min-height:24px;}
 .sh-rank-namerow{display:flex; flex-wrap:wrap; gap:0 12px; align-items:baseline;}
 
-/* ================= daily drill (widget/drill.js) ================= */
-/* entry points: an item in the menu (a tab in the phone bar) and, on desktop, a chip beside the launcher */
-.shstat-launchrow{display:flex; align-items:center; gap:10px;}
-#shstat-drill-pill[hidden], #sh-drill-chip[hidden], .shd-badge[hidden], .sh-drill[hidden], .sh-drill [hidden]{display:none !important;}
-.shd-badge{margin-left:auto; min-width:20px; height:20px; padding:0 6px; border-radius:999px; display:inline-flex; align-items:center; justify-content:center;
-  background:var(--shw-accent); color:var(--accent-contrast, #fff); font:700 11px/1 var(--shw-font); font-variant-numeric:tabular-nums;}
-.shd-badge.is-done{background:var(--shw-good); padding:0; width:20px;}
-.shd-badge svg{width:13px; height:13px; stroke-width:2.6;}
-.sh-drill-chip{display:flex; align-items:center; gap:8px; height:46px; padding:0 16px 0 13px; border-radius:999px; cursor:pointer;
-  background:var(--shw-bg); color:var(--shw-ink); border:1px solid var(--shw-line); box-shadow:var(--shw-shadow);
-  font:600 14px/1 var(--shw-font); -webkit-tap-highlight-color:transparent; transition:border-color .15s, transform .15s;}
-.sh-drill-chip:hover{border-color:var(--shw-accent);}
-.sh-drill-chip:active{transform:scale(.97);}
-.sh-drill-chip:focus-visible{outline:2px solid var(--shw-accent); outline-offset:2px;}
-.sh-drill-chip > svg{width:19px; height:19px; color:var(--shw-accent); flex:none;}
-.shd-chip-sub{font-weight:500; color:var(--shw-ink2); font-variant-numeric:tabular-nums;}
-.shd-chip-sub:not(:empty)::before{content:"·"; margin-right:8px; color:var(--shw-ink3);}
-
-/* the drill itself: a full-screen sheet over the hub; the hub's own question card sits inside */
-html.sh-drill-open, html.sh-drill-open body{overflow:hidden;}
-html.sh-drill-open .shstat-launchrow, html.sh-drill-open .shstat-pillrow{display:none !important;} /* panels (Report) still open on top */
-.sh-drill{position:fixed; inset:0; z-index:9996; overflow-y:auto; overscroll-behavior:contain; background:rgba(10,8,6,.5);
-  padding:clamp(12px, 5vh, 48px) 16px 96px; font-family:var(--shw-font); color:var(--shw-ink);}
-.sh-drill *{box-sizing:border-box;}
-.shd-panel{max-width:720px; margin:0 auto; background:var(--shw-page); border:1px solid var(--shw-line); border-radius:22px; box-shadow:var(--shw-shadow); padding:18px 22px 22px; outline:none;}
-@media (prefers-reduced-motion: no-preference){
-  .sh-drill:not([hidden]){animation:shd-fade .18s ease-out;}
-  .sh-drill:not([hidden]) .shd-panel{animation:shd-rise .26s cubic-bezier(.2,.8,.3,1);}
-}
-@keyframes shd-fade{from{background:rgba(10,8,6,0);}}
-@keyframes shd-rise{from{opacity:0; transform:translateY(14px);}}
-.shd-top{display:flex; align-items:center; gap:12px; min-height:38px;}
-.shd-kicker{display:inline-flex; align-items:center; gap:7px; font:700 11.5px/1 var(--shw-font); letter-spacing:.08em; text-transform:uppercase; color:var(--shw-ink2);}
-.shd-kicker svg{width:16px; height:16px; color:var(--shw-accent);}
-.shd-count{margin-left:auto; font:600 13px/1 var(--shw-mono); color:var(--shw-ink2); font-variant-numeric:tabular-nums;}
-.shd-x{margin-left:auto; width:38px; height:38px; border-radius:50%; border:0; background:transparent; color:var(--shw-ink2); font-size:26px; line-height:1; cursor:pointer; flex:none;}
-.shd-count + .shd-x{margin-left:0;}
-.shd-x:hover{background:var(--shw-bg2); color:var(--shw-ink);}
-.shd-x:focus-visible, .shd-btn:focus-visible{outline:2px solid var(--shw-accent); outline-offset:2px;}
-.sh-drill h2{font-family:var(--shw-display); font-weight:500; font-size:clamp(28px, 4.4vw, 38px); line-height:1.1; letter-spacing:-.01em; margin:14px 0 6px; color:var(--shw-ink);}
-.shd-sr{position:absolute !important; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; margin:0 !important;}
-.shd-lead{font-size:16px; color:var(--shw-ink2); margin:0 0 14px; font-variant-numeric:tabular-nums;}
-.shd-how{font-size:14.5px; line-height:1.55; color:var(--shw-ink2); margin:14px 0 0; max-width:60ch;}
-.shd-how:empty{display:none;}
-.shd-mix{list-style:none; margin:0; padding:0; display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:8px;}
-.shd-mix li{display:flex; flex-direction:column; gap:2px; padding:12px 14px; border-radius:14px; background:var(--shw-bg); border:1px solid var(--shw-line); font-size:13.5px; color:var(--shw-ink2); border-top:3px solid var(--shd-c, var(--shw-accent));}
-.shd-mix li b{font:500 28px/1.05 var(--shw-display); color:var(--shw-ink);}
-.shd-mix-missed, .shd-why-missed{--shd-c:var(--shw-bad);}
-.shd-mix-due, .shd-why-due{--shd-c:var(--tag-blue, #2E62A0);}
-.shd-mix-hy, .shd-why-hy{--shd-c:var(--caution, #A2660E);}
-.shd-mix-fresh, .shd-why-fresh{--shd-c:var(--shw-good);}
-.shd-actions{display:flex; gap:10px; flex-wrap:wrap; margin-top:20px;}
-/* drill length: 10 / 20 / 30 (widget/drill.js) */
-.shd-len{display:flex; align-items:center; gap:6px; margin-top:16px; font-size:13.5px; color:var(--shw-ink2);}
-.shd-len > span{margin-right:4px;}
-.shd-len-btn{min-width:46px; min-height:38px; padding:0 12px; border-radius:999px; border:1px solid var(--shw-line); background:var(--shw-bg); color:var(--shw-ink); font:inherit; font-weight:600; cursor:pointer; font-variant-numeric:tabular-nums;}
-.shd-len-btn:hover{border-color:var(--shw-ink);}
-.shd-len-btn[aria-pressed="true"]{background:var(--shw-ink); color:var(--shw-bg); border-color:var(--shw-ink);}
-.shd-len-btn:focus-visible{outline:2px solid var(--shw-accent); outline-offset:2px;}
-.shd-btn{display:inline-flex; align-items:center; justify-content:center; gap:8px; min-height:46px; padding:0 22px; border-radius:999px; cursor:pointer;
-  font:600 15px/1 var(--shw-font); background:var(--shw-bg); color:var(--shw-ink); border:1px solid var(--shw-line2); -webkit-tap-highlight-color:transparent;}
-.shd-btn:hover{border-color:var(--shw-ink);}
-.shd-btn:disabled{opacity:.55; cursor:default;}
-.shd-btn.is-primary{background:var(--shw-ink); color:var(--shw-bg); border-color:var(--shw-ink);}
-.shd-btn.is-primary:hover{opacity:.92;}
-.shd-btn.is-quiet{background:transparent; border-color:transparent; color:var(--shw-ink2);}
-.shd-btn.is-quiet:hover{color:var(--shw-ink); background:var(--shw-bg2);}
-.shd-streak{display:flex; align-items:center; gap:8px; margin:18px 0 0; font-size:14px; color:var(--shw-ink2);}
-.shd-streak svg{width:18px; height:18px; flex:none; color:#D9772B;}
-.shd-streak b{color:var(--shw-ink);}
-.shd-bar{height:5px; border-radius:99px; background:var(--shw-bg2); overflow:hidden; margin:8px 0 14px;}
-.shd-bar i{display:block; height:100%; width:0; border-radius:inherit; background:var(--shw-accent); transition:width .35s ease;}
-.shd-why{display:inline-flex; align-items:center; gap:8px; margin:0 0 10px; padding:5px 12px 5px 10px; border-radius:999px; font-size:13px; font-weight:600;
-  color:var(--shw-ink); background:color-mix(in srgb, var(--shd-c, var(--shw-accent)) 13%, transparent);}
-.shd-why::before{content:""; width:8px; height:8px; border-radius:50%; background:var(--shd-c, var(--shw-accent)); flex:none;}
-.shd-card > .qcard{margin:0;}
-.shd-nav{position:sticky; bottom:-22px; display:flex; justify-content:flex-end; gap:10px; margin:14px -22px -22px; padding:12px 22px 22px; border-radius:0 0 22px 22px;
-  background:linear-gradient(to bottom, transparent, var(--shw-page) 30%);}
-.shd-done-mark{width:52px; height:52px; margin-top:12px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:var(--shw-good); color:#fff;}
-.shd-done-mark svg{width:28px; height:28px; stroke-width:2.4;}
-.shd-results{list-style:none; margin:18px 0 0; padding:0; border-top:1px solid var(--shw-line);}
-.shd-results li{display:flex; gap:10px; align-items:flex-start; padding:9px 0; border-bottom:1px solid var(--shw-line); font-size:14px; line-height:1.45; color:var(--shw-ink2);}
-.shd-res-ic{flex:none; width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; margin-top:0;}
-.shd-res-ic svg{width:14px; height:14px; stroke-width:2.6;}
-.shd-results .is-ok .shd-res-ic{background:color-mix(in srgb, var(--shw-good) 16%, transparent); color:var(--shw-good);}
-.shd-results .is-bad .shd-res-ic{background:color-mix(in srgb, var(--shw-bad) 16%, transparent); color:var(--shw-bad);}
-.shd-results .is-skip .shd-res-ic{background:var(--shw-bg2); color:var(--shw-ink3);}
-/* the finish screen (drill.js showDone): the check draws itself, the score counts up, the results tick in one by one,
-   and the drill streak rolls up when this set started today's streak day */
-.shd-done-mark{position:relative;}
-.shd-roll{display:inline-grid; overflow:hidden; vertical-align:bottom;}
-.shd-roll i{grid-area:1 / 1; font-style:normal; text-align:right;}
-.shd-roll .o{display:none;}
-@media (prefers-reduced-motion: no-preference){
-  .shd-done .shd-done-mark{animation:shd-pop .55s cubic-bezier(.2,1.6,.4,1) both;}
-  .shd-done .shd-done-mark path{stroke-dasharray:1; animation:sh-fx-draw .45s .28s ease-out both;}
-  .shd-done.is-fresh .shd-done-mark::after{content:""; position:absolute; inset:0; border-radius:50%; border:2px solid var(--shw-good); animation:shd-ring 1s .25s ease-out both;}
-  .shd-done .shd-results li{animation:shd-li-in .4s cubic-bezier(.2,.8,.3,1) both; animation-delay:calc(.35s + var(--i, 0) * 55ms);}
-  .shd-done .shd-res-ic{animation:shd-pop .4s cubic-bezier(.2,1.6,.4,1) both; animation-delay:calc(.45s + var(--i, 0) * 55ms);}
-  .shd-done.is-fresh .shd-streak svg{animation:shd-puff .8s 1.05s cubic-bezier(.2,1.6,.4,1) both;}
-  .shd-roll .o{display:block; animation:shd-roll-out .5s 1.1s cubic-bezier(.3,1.3,.5,1) both;}
-  .shd-roll .n{animation:shd-roll-in .5s 1.1s cubic-bezier(.3,1.3,.5,1) both;}
-}
-@keyframes shd-pop{from{transform:scale(0); opacity:0;} to{transform:none; opacity:1;}}
-@keyframes shd-ring{from{transform:scale(.9); opacity:.9;} to{transform:scale(2.1); opacity:0;}}
-@keyframes shd-li-in{from{opacity:0; transform:translateX(-10px);} to{opacity:1; transform:none;}}
-@keyframes shd-puff{0%{transform:scale(1);} 45%{transform:scale(1.5) rotate(-8deg); filter:drop-shadow(0 0 6px #F0A030);} 100%{transform:none;}}
-@keyframes shd-roll-out{to{transform:translateY(-110%); opacity:0;}}
-@keyframes shd-roll-in{from{transform:translateY(110%); opacity:0;}}
-@media (max-width:760px){
-  .sh-drill{padding:0; background:var(--shw-page);}
-  .shd-panel{max-width:none; min-height:100%; border:0; border-radius:0; box-shadow:none; padding:calc(10px + env(safe-area-inset-top,0px)) 16px 0;}
-  .shd-panel > :last-child:not(.shd-nav){margin-bottom:calc(28px + env(safe-area-inset-bottom,0px));}
-  .shd-nav{bottom:0; margin:14px -16px 0; padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px)); border-radius:0;}
-  .shd-nav .shd-btn{flex:1 1 0;}
-  .shd-actions .shd-btn{flex:1 1 auto;}
-}
-
 /* ---------- archived notice (a hub page opened after its last exam) ---------- */
 .sh-archived{position:fixed; inset:0; z-index:10050; display:flex; align-items:center; justify-content:center; padding:16px; background:rgba(10,12,16,.45); font-family:var(--shw-font);}
 .sh-archived-card{max-width:420px; width:100%; background:var(--shw-bg); color:var(--shw-ink); border:1px solid var(--shw-line); border-radius:18px; padding:20px; box-shadow:var(--shw-shadow);}
@@ -831,81 +568,7 @@ html.sh-drill-open .shstat-launchrow, html.sh-drill-open .shstat-pillrow{display
 .sh-archived-stay{background:transparent; color:var(--shw-ink2); border:1px solid var(--shw-line2);}
 .sh-archived-go{background:var(--shw-accent); color:#fff; border:1px solid transparent;}
 
-/* ================= inbox (widget/replies.js) ================= */
-/* unread count on the menu item; a dot on the launcher (desktop) and More (phones) */
-.sh-inbox-badge[hidden]{display:none !important;}
-.shstat-launch, .shm-more{position:relative;}
-.sh-inbox-dot{position:absolute; top:4px; right:4px; width:10px; height:10px; border-radius:50%; background:var(--shw-accent); box-shadow:0 0 0 2px var(--shw-bg);}
-.shm-more .sh-inbox-dot{top:6px; right:auto; left:calc(50% + 8px);}
-/* top-bar inbox button (sits beside the name in the hub ribbon, or the fallback top bar) */
-.sh-ribbon-inbox{position:relative; flex:none; appearance:none; display:inline-flex; align-items:center; justify-content:center; width:32px; height:30px; padding:0;
-  border:1px solid var(--line, rgba(0,0,0,.12)); background:var(--surface, #fff); color:var(--ink-soft, var(--ink-2, #4A5864)); border-radius:999px; cursor:pointer;}
-.sh-ribbon-inbox:hover{color:var(--ink, #15202A);}
-.sh-ribbon-inbox svg{width:16px; height:16px;}
-.sh-ribbon-inbox .sh-inbox-dot{top:-2px; right:-2px; background:var(--accent, #2F6FD6); box-shadow:0 0 0 2px var(--surface, #fff);}
-@media (max-width:760px){ .sh-ribbon-inbox{width:28px; height:26px;} .sh-ribbon-inbox svg{width:14px; height:14px;} }
-.sh-ribbon-tour{cursor:pointer;}
-@media (max-width:1000px){ .sh-ribbon-tour{display:none;} }   /* narrower screens: the top bar is full; "Take the tour" is in the menu / More sheet */
-/* ---------- the hub top bar: three layouts the widget picks from by measuring (v3.js, "the hub top bar fits its content").
-   These rules apply only once the widget has measured (data-sh-head on the header), and they outrank each hub's own
-   width breakpoints. The mode tabs never clip, never scroll out of sight and always show their labels. ---------- */
-header.hub-header[data-sh-head] #modeSwitch{overflow:visible; min-width:0;}
-header.hub-header[data-sh-head] #modeSwitch .mode-label{display:inline;}
-header.hub-header[data-sh-head] #modeSwitch .mode-icon{display:inline-flex;}
-header.hub-header[data-sh-head] .hub-title h1{display:block; white-space:nowrap;}
-/* row: one line, everything at full size */
-header.hub-header[data-sh-head="row"] .hub-header-top{flex-wrap:nowrap;}
-header.hub-header[data-sh-head="row"] .hub-title{flex:none;}
-header.hub-header[data-sh-head="row"] #modeSwitch{flex:none; order:0; margin:0;}
-header.hub-header[data-sh-head="row"] #modeSwitch button{flex:none;}
-header.hub-header[data-sh-head="row"] .hub-meta{flex:none; flex-wrap:nowrap; margin-left:auto;}
-header.hub-header[data-sh-head="row"] #sh-ribbon-name{flex-shrink:0;}
-/* stack: the title and the rest on top, the tabs on a full-width row of their own */
-header.hub-header[data-sh-head^="stack"] .hub-header-top{flex-wrap:wrap; row-gap:6px;}
-header.hub-header[data-sh-head^="stack"] .hub-title{flex:1 1 auto; min-width:0; align-items:center; flex-wrap:nowrap;}
-header.hub-header[data-sh-head^="stack"] .hub-title h1{min-width:0; overflow:hidden; text-overflow:ellipsis;}
-header.hub-header[data-sh-head^="stack"] .hub-meta{flex:none; flex-wrap:nowrap; margin-left:auto;}
-header.hub-header[data-sh-head^="stack"] #modeSwitch{order:4; flex:1 0 100%; margin:0;}
-header.hub-header[data-sh-head^="stack"] #modeSwitch button{flex:1 0 auto; justify-content:center;}
-/* stack3 (phones, large text): the title and the small round buttons on top, your name and the pills on the next row */
-header.hub-header[data-sh-head="stack3"] .hub-header-top{row-gap:0; justify-content:flex-start;}
-header.hub-header[data-sh-head="stack3"] .hub-header-top::after{content:""; order:2; flex:1 0 100%; height:0;}
-header.hub-header[data-sh-head="stack3"] .hub-title{order:0; flex:1 1 0;}
-header.hub-header[data-sh-head="stack3"] .hub-meta{display:contents;}
-header.hub-header[data-sh-head="stack3"] .hub-meta > *{order:3; margin-top:6px;}
-header.hub-header[data-sh-head="stack3"] .hub-meta > :is(.sh-ribbon-inbox, .theme-btn){order:1; margin-top:0; flex:none;}
-header.hub-header[data-sh-head="stack3"] .hub-meta > .sh-ribbon-inbox{margin-left:auto;}
-header.hub-header[data-sh-head="stack3"] .hub-meta > .sh-ribbon-tour{display:none;}
-header.hub-header[data-sh-head="stack3"] .hub-meta > .sh-ribbon-inbox:not(.sh-ribbon-tour) ~ .theme-btn{margin-left:6px;}
-/* your name gives way (it shortens, with an ellipsis) before the countdown is pushed onto another row */
-header.hub-header[data-sh-head="stack3"] #sh-ribbon-name{flex:1 1 0; min-width:min(6.5em, 100%); max-width:max-content; margin-right:6px;}
-header.hub-header[data-sh-head="stack3"] .hub-meta > .pill{margin-right:6px;}
-header.hub-header[data-sh-head="stack3"] #modeSwitch{margin-top:6px;}
-/* the tabs when labels beside icons don't fit: icon over label, then two columns */
-header.hub-header[data-sh-tabs="tall"] #modeSwitch button{flex-direction:column; gap:2px; padding:5px 2px; font-size:.76rem; line-height:1.15;}
-header.hub-header[data-sh-tabs="grid"] #modeSwitch{display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); border-radius:14px;}
-header.hub-header[data-sh-tabs="grid"] #modeSwitch button{border-radius:11px; white-space:normal; text-align:center;}
-/* touch screens: the tabs and the small round buttons get room for a thumb */
-@media (pointer:coarse){
-  header.hub-header[data-sh-head^="stack"] #modeSwitch button{min-height:40px;}
-  header.hub-header .hub-meta > :is(.theme-btn, .sh-ribbon-inbox), header.hub-header .hub-back-btn{min-width:32px; min-height:32px;}
-  header.hub-header #sh-ribbon-name{min-height:32px;}
-}
-
 /* ================= motion (widget/fx.js) ================= */
-/* answer feedback: a check or an X that draws itself on the edge of the option */
-.sh-fx-host{position:relative;}
-.sh-fx-mark{position:absolute; right:-11px; top:50%; width:22px; height:22px; margin-top:-11px; border-radius:50%; display:flex; align-items:center; justify-content:center;
-  pointer-events:none; z-index:1; color:var(--surface, #fff); box-shadow:0 0 0 2.5px var(--surface, #fff), 0 2px 6px rgba(0,0,0,.18);}
-.sh-fx-mark.is-ok{background:var(--good, #1F8A5B);}
-.sh-fx-mark.is-bad{background:var(--bad, #B3261E);}
-.sh-fx-mark svg{width:14px; height:14px; display:block; fill:none; stroke:currentColor; stroke-width:3; stroke-linecap:round; stroke-linejoin:round;}
-.sh-fx-mark.is-anim{animation:sh-fx-badge .28s cubic-bezier(.22,1.15,.36,1) var(--d, 0ms) both;}
-.sh-fx-sweep{position:absolute; inset:0; border-radius:inherit; pointer-events:none; transform-origin:left center; transform:scaleX(0);}
-.sh-fx-mark.is-anim path{stroke-dasharray:1; animation:sh-fx-draw .24s ease-out both; animation-delay:calc(var(--d, 0ms) + 90ms + var(--d2, 0ms));}
-@keyframes sh-fx-badge{from{transform:scale(.4); opacity:0;} to{transform:none; opacity:1;}}
-@keyframes sh-fx-draw{from{stroke-dashoffset:1;} to{stroke-dashoffset:0;}}
-
 /* the streak flame: from 3 right in a row, bottom-right, above the launcher (desktop) or the bottom bar (phones) */
 #sh-flame{position:fixed; right:16px; bottom:74px; z-index:9998; display:flex; align-items:center; gap:8px; padding:4px 13px 4px 4px; border-radius:999px; pointer-events:none;
   background:var(--surface, #fff); color:var(--ink, #15202A); border:1px solid var(--line, rgba(0,0,0,.12)); box-shadow:0 2px 6px rgba(20,16,12,.06), 0 12px 30px -12px rgba(20,16,12,.35);
@@ -937,10 +600,8 @@ header.hub-header[data-sh-tabs="grid"] #modeSwitch button{border-radius:11px; wh
 #sh-flame.is-fizz .sh-flame-fire .o, #sh-flame.is-fizz .sh-flame-fire .i{fill:var(--ink-faint, #8A8F96);}
 #sh-flame.is-fizz .sh-flame-ring .fg{stroke:var(--ink-faint, #8A8F96);}
 #sh-flame.is-fizz .sh-flame-n{color:var(--ink-faint, #8A8F96); text-decoration:line-through;}
-html.sh-drill-open #sh-flame{bottom:16px; z-index:9997;}
 @media (max-width:760px){
   #sh-flame{right:12px; bottom:calc(var(--sh-tabbar-h) + 12px + env(safe-area-inset-bottom, 0px)); padding-right:11px;}
-  html.sh-drill-open #sh-flame{bottom:calc(14px + env(safe-area-inset-bottom, 0px));}
 }
 @media (prefers-reduced-motion: no-preference){
   #sh-flame.is-on:not(.is-fizz) .sh-flame-fire{animation:sh-flame-flicker 1.5s ease-in-out infinite alternate;}
@@ -953,15 +614,6 @@ html.sh-drill-open #sh-flame{bottom:16px; z-index:9997;}
 @media (prefers-reduced-motion: reduce){ #sh-flame{transition:opacity .2s;} #sh-flame, #sh-flame.is-on{transform:none;} }
 @keyframes sh-flame-flicker{0%{transform:scale(1, 1) skewX(0deg);} 35%{transform:scale(.96, 1.06) skewX(-2deg);} 70%{transform:scale(1.03, .97) skewX(2deg);} 100%{transform:scale(.98, 1.04) skewX(-1deg);}}
 @keyframes sh-flame-smoke{0%{opacity:0; transform:translateY(0) scale(.6);} 25%{opacity:.55;} 100%{opacity:0; transform:translateY(-26px) scale(1.8);}}
-
-/* the exam countdown pill in a hub's ribbon: a slow glow the day before, a pulse on exam day */
-@media (prefers-reduced-motion: no-preference){
-  .pill.countdown.sh-cd-eve{animation:sh-cd-glow 2.8s ease-in-out infinite;}
-  .pill.countdown.sh-cd-day{animation:sh-cd-pulse 1.7s ease-in-out infinite;}
-}
-.pill.countdown.sh-cd-day{font-weight:800;}
-@keyframes sh-cd-glow{0%, 100%{box-shadow:0 0 0 0 transparent;} 50%{box-shadow:0 0 0 3px color-mix(in srgb, var(--accent, #2F6FD6) 20%, transparent), 0 0 14px color-mix(in srgb, var(--accent, #2F6FD6) 40%, transparent);}}
-@keyframes sh-cd-pulse{0%, 100%{transform:scale(1); box-shadow:0 0 0 0 color-mix(in srgb, var(--accent, #2F6FD6) 45%, transparent);} 50%{transform:scale(1.07); box-shadow:0 0 0 6px transparent, 0 0 18px color-mix(in srgb, var(--accent, #2F6FD6) 45%, transparent);}}
 
 /* ================= Floating Listen dock (shTTS in v3.js): shown while narration runs and its player is off screen ================= */
 .sh-tts-dock{position:fixed; z-index:9990; left:50%; transform:translateX(-50%); bottom:calc(16px + env(safe-area-inset-bottom,0px)); width:min(560px, calc(100% - 24px)); box-sizing:border-box;
@@ -1118,55 +770,14 @@ mark.sh-hl.sh-hl-c-o{background:rgba(255,140,30,.38);} [data-theme="dark"] mark.
 .sh-hl-btn.sh-hl-quiet{background:transparent; color:var(--ink, #222); border:1px solid var(--line, rgba(0,0,0,.14));}
 .sh-hl-swatch{width:12px; height:12px; border-radius:3px; background:#ffd400;}
 
-/* ---------- lecture notes (v3.js "lecture notes" block): the lecture list scrolls on its own, Previous / Next and
-   Report under each lecture's notes, figures that fit on screen with their controls. --sh-head-h and --sh-vh come
-   from v3.js (--sh-vh is the screen height in the page's own px, which 100vh isn't once the text size zooms <html>). */
+/* ---------- lecture notes (v3.js "lecture notes" block): drawn figures that fit on screen with their controls.
+   --sh-head-h and --sh-vh come from v3.js (--sh-vh is the screen height in the page's own px, which 100vh isn't once
+   the text size zooms <html>). */
 @media (min-width:861px){
-  .notes-layout > .lec-nav{top:calc(var(--sh-head-h, 56px) + 10px);max-height:calc(var(--sh-vh, 100vh) - var(--sh-head-h, 56px) - 22px);
-    overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;padding:2px 8px 6px 2px;margin-right:-8px}
   .anima .iso-plate svg{max-height:max(220px, calc((var(--sh-vh, 100vh) - var(--sh-head-h, 56px)) * .62 - 85px))}
   .anima > figure.sh-fig-pin{position:sticky;top:calc(var(--sh-head-h, 56px) + 6px);z-index:4;background:var(--surface, #fff);
     border-radius:var(--radius, 12px);box-shadow:0 10px 18px -14px rgba(0,0,0,.45)}
 }
-.sh-lec-pager{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:10px;align-items:stretch;
-  margin:26px 0 4px;padding-top:16px;border-top:1px solid var(--line, rgba(0,0,0,.12))}
-.sh-lec-pg{appearance:none;display:flex;flex-direction:column;gap:3px;min-width:0;text-align:left;cursor:pointer;
-  border:1px solid var(--line, rgba(0,0,0,.14));background:var(--surface, #fff);color:var(--ink, #222);border-radius:12px;padding:10px 14px;font:inherit}
-.sh-lec-pg:hover{border-color:var(--ink-soft, #555)}
-.sh-lec-pg-next{text-align:right;align-items:flex-end}
-.sh-lec-pg-k{font-size:.74rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft, #555)}
-.sh-lec-pg-t{font-size:.9rem;font-weight:600;line-height:1.3;max-width:100%;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
-.sh-lec-flag{appearance:none;align-self:center;display:inline-flex;align-items:center;gap:6px;cursor:pointer;border:0;background:transparent;
-  color:var(--ink-soft, #555);font:600 .8rem/1.2 inherit;padding:8px 10px;border-radius:10px;max-width:190px;text-align:left}
-.sh-lec-flag:hover{color:var(--ink, #222);background:var(--line, rgba(0,0,0,.06))}
-.sh-lec-flag svg{width:16px;height:16px;flex:none}
-@media (max-width:560px){
-  .sh-lec-pager{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
-  .sh-lec-flag{grid-column:1 / -1;grid-row:2;justify-self:center;max-width:none}
-  .sh-lec-pg-gap{display:none}
-  .sh-lec-pg-prev:only-of-type{grid-column:1}
-}
-
-/* ================= class picks on each choice (v3.js cpPaint) =================
-   After a question is answered, each choice shows the share of the class that picked it: a light fill behind the
-   choice (its width, set inline so it layers over the hub's right/wrong colors) and the percentage at the right,
-   clear of fx.js's check/X badge on the edge. The class's most common pick is bold. */
-/* The fill's color is set on the choice itself, not on :root: a custom property new to the root changes what every
-   element inherits, so putting this sheet in (the hub bundle adds it once the page is drawn) restyled the whole page,
-   about 40 ms on perf.js's slow phone. --ink is only set on :root, so the color is the same. */
-.sh-cp{--sh-cp-fill:rgba(90,100,130,.14);}
-@supports (background:color-mix(in srgb, red 10%, transparent)){ .sh-cp{--sh-cp-fill:color-mix(in srgb, var(--ink, #3a4050) 11%, transparent);} }
-.qcard .qcard-choice.sh-cp, .qcard-choice.sh-cp{position:relative; padding-right:60px;}
-.sh-cp-pct{position:absolute; right:18px; top:50%; transform:translateY(-50%); pointer-events:none;
-  font-family:var(--font-mono, ui-monospace, monospace); font-size:.78rem; font-weight:500; line-height:1; color:var(--ink-soft, #5b6270); font-variant-numeric:tabular-nums;}
-.sh-cp-top .sh-cp-pct{font-weight:800; color:var(--ink, #15202A);}
-.sh-cp-sr{position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;}
-.sh-cp-note{margin-top:4px; font-size:.74rem; line-height:1.4; color:var(--ink-faint, #7a8090);}
-
-/* Home's "Where to next" list (copied into every hub from heme-endo-exam1): at the largest text sizes on a phone its rows
-   were wider than the screen, so the page scrolled sideways. The column may shrink, and a row's button drops below its text. */
-.home-next{grid-template-columns:minmax(0, 1fr);}
-.home-next > li{flex-wrap:wrap;}
 
 /* ================= "Good question?" under the explanation (widget/qhealth.js) =================
    A small row after the explanation: thumbs up / down (tap again to take it back). A thumbs down opens the reasons;
