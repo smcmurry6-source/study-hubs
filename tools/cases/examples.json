@@ -307,6 +307,23 @@
       },
       "figs": [{ "kind": "film", "teeth": ["7", "8", "9", "10", "11"] }, { "kind": "film", "teeth": ["29", "30", "31"] }, { "kind": "view", "teeth": ["6", "7", "8", "9", "10", "11"] }, { "kind": "odontogram" }],
       "expect": { "kind": "health" }
+    },
+    "v24-front-flanges": {
+      "title": "Front teeth on partial dentures: gum-fitted, and on a full flange",
+      "spec": {
+        "full": true, "teeth": ["8", "9", "10", "11"], "age": 61, "sex": "man", "smoke": 0,
+        "cc": "I'm here for my checkup. My partials are fine.",
+        "mouth": { "teeth": 28, "involved": 0, "lost": 0 },
+        "modules": [
+          { "m": "missing", "teeth": ["9", "10", "24", "25"] },
+          { "m": "denture", "type": "partial", "arch": "upper", "connector": "ap-strap", "years": 0, "ridge": 1,
+            "clasps": { "3": "circumferential", "14": "circumferential" }, "rests": { "3": "m", "14": "m", "8": "cingulum", "11": "cingulum" } },
+          { "m": "denture", "type": "partial", "arch": "lower", "connector": "plate", "years": 9, "ridge": 4,
+            "clasps": { "20": "circumferential", "29": "circumferential" }, "rests": { "20": "m", "29": "m", "22": "incisal", "27": "incisal" } }
+        ]
+      },
+      "figs": [{ "kind": "view", "teeth": ["7", "8", "9", "10", "11", "12"] }, { "kind": "view", "teeth": ["22", "23", "24", "25", "26", "27"] }, { "kind": "view", "teeth": ["7", "8", "9", "10", "11", "12"], "out": true }, { "kind": "view", "teeth": ["22", "23", "24", "25", "26", "27"], "out": true }, { "kind": "odontogram" }],
+      "expect": { "kind": "health", "kennedy": { "upper": "Kennedy Class III", "lower": "Kennedy Class IV" } }
     }
   },
   "questions": [
@@ -515,6 +532,15 @@
         "Zirconia is more radiopaque than enamel: it would look whiter than the teeth, not fainter.",
         "Right: a provisional bridge in bis-acryl or acrylic resin is less radiopaque than dentin, so on a film it shows as a faint outline over the preparations. The final metal-ceramic or zirconia bridge will look white (Pekkan 2011).",
         "The teeth beside it look as bright as teeth do; only the bridge is faint."
+      ] },
+    { "id": "v24-ex-28", "pcase": "v24-front-flanges", "rests": ["denture"], "pfig": [{ "kind": "view", "teeth": ["7", "8", "9", "10", "11", "12"] }, { "kind": "view", "teeth": ["22", "23", "24", "25", "26", "27"] }, { "kind": "view", "teeth": ["7", "8", "9", "10", "11", "12"], "out": true }, { "kind": "view", "teeth": ["22", "23", "24", "25", "26", "27"], "out": true }, { "kind": "odontogram" }],
+      "stem": "The upper partial's #9 and #10 sit straight on the ridge with no pink flange, but the lower partial's #24 and #25 stand on a full labial flange. Why the difference?",
+      "choices": ["A flange is only used on a lower denture", "The lower teeth are on a free-end base, which needs a flange for support", "The upper ridge has barely resorbed; the lower one has resorbed and needs a flange", "Teeth set on the ridge are only used on a provisional partial denture"], "answer": 2,
+      "why": [
+        "An upper denture takes a flange wherever its ridge needs one; the upper here doesn't because its ridge has barely resorbed.",
+        "Both spaces are bounded, with teeth standing on both sides and rests carrying the load (the lower is Kennedy Class IV), so neither base is a free end. The lower flange is there for the ridge's lost bone, not for support.",
+        "Right: with the denture out, the upper ridge is nearly at the neighbors' level (the teeth came out recently), so the denture teeth can be ground to sit on it, open-faced, with no acrylic showing. The lower ridge has resorbed after 9 years: teeth fitted to it would sit too far back and too long, so a labial flange carries them forward to where the natural teeth stood and restores the lip's support (Faigenblum 2023).",
+        "A definitive partial denture often uses teeth gum-fitted to the ridge when the ridge allows it; nothing about this design makes it temporary."
       ] }
   ]
 }
