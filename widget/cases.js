@@ -151,6 +151,14 @@
    - the edentulous ridge resorbs most in the first year and slowly after it, the anterior mandible about four times as fast as the
      maxilla (Tallgren, J Prosthet Dent 1972;27:120; Atwood and Coy, J Prosthet Dent 1971;26:280; Cawood and Howell, Int J Oral
      Maxillofac Surg 1988;17:232): the denture's ridge (mm below the neighbors' crests; 1.5 by default, 0-15) on the film and the view;
+   - a front bounded space's labial flange (Faigenblum, Prim Dent J 2023;12(3):55-63; Dental Update's "Successful removable partial
+     dentures"; McCracken's): where the ridge has not resorbed significantly the front teeth are gum-fitted (open face), set on
+     the ridge with no flange, for the most natural look; where it has resorbed a little and the smile line is low, a partial
+     flange about 1 mm past the ridge's crest; where it has resorbed significantly, a full labial flange, to set the teeth back
+     where they stood and support the lip. The papers give no millimeters: the kit's reading is none to 1.5 mm (no more than a
+     socket's usual healing, Tan 2012), partial to 3 and full past it, chosen from the ridge by default (flange sets it) and
+     refused past those. A gum-fitted tooth stands in the gum as a bridge's pontic does, its margin where the ridge's crest is;
+     a complete denture's base has its flange all round. No cingulum rest on a mandibular canine (above; Sam, 2026-11-24);
    - overdenture abutments (Zarb's; Leong et al., Cureus 2024;16:e53184; Crum and Rooney, J Prosthet Dent 1978;40:610: less bone lost
      under them): a canine first, then a premolar, with at least half its bone support; root-filled, cut to a dome about 2-3 mm
      above the gingival margin and its canal's orifice sealed with amalgam, composite or glass ionomer, which do alike (Keltjens et
@@ -278,7 +286,8 @@
            rests:{ n:'m' | 'd' | 'md' | 'cingulum' | 'incisal' } }   a removable partial denture: it replaces every missing tooth of
            its arch but the third molars and a bridge's pontics (or replaces); a clasp's rest, where rests gives none, is worked out;
            connector strap | ap-strap | horseshoe | palate (upper), bar | plate (lower); floor the lingual gingival margins to the
-           floor of the mouth, mm (a lingual bar needs 8); ridge the edentulous ridge's resorption, mm; years worn
+           floor of the mouth, mm (a lingual bar needs 8); ridge the edentulous ridge's resorption, mm; years worn; flange
+           'none' | 'partial' | 'full' over a front bounded space (incisors and canines): by default from the ridge
        { m:'denture', type:'complete', arch, ridge, years, abutments:[...], seal:'amalgam' | 'composite' | 'gi' }   a complete
            denture: every tooth of the arch missing but its overdenture abutments, each root-filled (the endo module may give its
            fill), cut to a dome and sealed
@@ -316,7 +325,10 @@
   var CONNECTOR_NAME = { strap:'a palatal strap', 'ap-strap':'an anterior-posterior palatal strap', horseshoe:'a horseshoe (U-shaped) connector', palate:'a complete palatal plate', bar:'a lingual bar', plate:'a lingual plate' };
   var REST_NAME = { m:'mesial occlusal', d:'distal occlusal', md:'mesial and distal occlusal', cingulum:'cingulum', incisal:'incisal' };
     var CLASP_NAME = { circumferential:'circumferential clasp', rpi:'RPI clasp (a mesial rest, a distal proximal plate and an I-bar)' }, SEAL_NAME = { amalgam:'amalgam', composite:'composite', gi:'glass ionomer' };
-  var DKEYS = ['type', 'connector', 'years', 'floor', 'ridge', 'replaces'], LINGUAL_BAR = 8, RIDGE = 1.5;
+  var DKEYS = ['type', 'connector', 'years', 'floor', 'ridge', 'replaces', 'flange'], LINGUAL_BAR = 8, RIDGE = 1.5;
+  /* a front bounded space's labial flange by how far its ridge has resorbed (Faigenblum 2023): none (the tooth gum-fitted on the
+     ridge) to 1.5 mm, no more than a socket's usual healing; a partial flange to 3; past that a full one */
+  var FLANGES = ['none', 'partial', 'full'], FLANGE_NONE = 1.5, FLANGE_PARTIAL = 3;
   function archNums(arch){ var o = []; for(var i = arch === 'upper' ? 1 : 17, e = i + 16; i < e; i++) o.push(String(i)); return o; }
   function archOf(n){ return isUpper(n) ? 'upper' : 'lower'; }
   /* a tooth's neighbor toward the midline (mesial) or away from it (distal) in its arch; the two centrals are each other's mesial */
@@ -477,14 +489,14 @@
         else if(ar !== 'upper' && ar !== 'lower') probs.push(w + 'arch must be upper or lower');
         else if(dens[ar]) probs.push(w + 'a second denture in the ' + ar + ' arch');
         else {
-          var dd = { type:dt }; ['connector', 'years', 'floor', 'ridge'].forEach(function(k){ if(md[k] != null) dd[k] = md[k]; });
-          Object.keys(md).forEach(function(k){ if(['m', 'type', 'arch', 'connector', 'years', 'floor', 'ridge', 'abutments', 'seal', 'replaces', 'clasps', 'rests'].indexOf(k) < 0) probs.push(w + k + ' is not part of a denture'); });
+          var dd = { type:dt }; ['connector', 'years', 'floor', 'ridge', 'flange'].forEach(function(k){ if(md[k] != null) dd[k] = md[k]; });
+          Object.keys(md).forEach(function(k){ if(['m', 'type', 'arch', 'connector', 'years', 'floor', 'ridge', 'flange', 'abutments', 'seal', 'replaces', 'clasps', 'rests'].indexOf(k) < 0) probs.push(w + k + ' is not part of a denture'); });
           /* an overdenture abutment: a root-filled root under the denture, domed and its canal sealed (the endo module may give the fill) */
           if(dt === 'partial' && (md.abutments || md.seal)) probs.push(w + 'overdenture abutments go under a complete denture here (one under a partial denture isn\'t drawn yet)');
           else ods.forEach(function(n){ var ro = ensure(t, n); if(ro.nofill){ probs.push(w + '#' + n + ' is an overdenture abutment: it is root-filled (a vital one isn\'t drawn yet)'); return; }
             ro.od = md.seal || 'amalgam'; if(!ro.endo) ro.endo = { fill:'adequate' }; });
           if(dt === 'complete'){
-            ['replaces', 'clasps', 'rests', 'connector', 'floor'].forEach(function(k){ if(md[k] != null) probs.push(w + 'a complete denture has no ' + k + ' (that is a partial denture\'s)'); });
+            ['replaces', 'clasps', 'rests', 'connector', 'floor', 'flange'].forEach(function(k){ if(md[k] != null) probs.push(w + 'a complete denture has no ' + k + ' (that is a partial denture\'s' + (k === 'flange' ? ': a complete denture\'s base has its flange all round' : '') + ')'); });
             /* every tooth of the arch is gone but its overdenture abutments; the denture's fourteen teeth replace all but the third molars */
             archNums(ar).forEach(function(n){ if(ods.indexOf(n) >= 0) return; var rc = ensure(t, n);
               if(rc.implant){ probs.push(w + '#' + n + ' is an implant: an implant-retained overdenture (attachments on implants under the denture) isn\'t drawn yet'); return; }
@@ -939,6 +951,15 @@
       if(clasped.length && !(clasped.some(function(t){ return CAT(t.n).side === 'right'; }) && clasped.some(function(t){ return CAT(t.n).side === 'left'; })))
         bad(w + 'clasps on one side of the arch only: a partial denture is held on both sides (cross-arch), or it can be dislodged and swallowed');
       if(!clasped.length) bad(w + 'a partial denture with no clasps');
+      /* the labial flange over a front bounded space (Faigenblum 2023): a tooth gum-fitted on the ridge with no flange only where
+         the ridge has barely resorbed, a partial flange where it has resorbed a little, a full flange where it has resorbed more,
+         to set the tooth back where it stood and support the lip */
+      var fsp = frontSpaces(spec, ar), rr = d.ridge != null ? d.ridge : RIDGE, fw = fsp.length ? '#' + fsp.map(function(sp){ return sp.join(' and #'); }).join(', #') : '';
+      if(d.flange != null){
+        if(FLANGES.indexOf(d.flange) < 0) bad(w + 'flange must be ' + FLANGES.join(', '));
+        else if(!fsp.length) bad(w + 'flange is for a bounded space of incisors and canines, and this denture has none (a free end or a back tooth\'s space has its buccal flange)');
+        else if(d.flange === 'none' && rr > FLANGE_NONE) bad(w + fw + ' set on the ridge with no flange (gum-fitted) needs a ridge that has barely resorbed, ' + FLANGE_NONE + ' mm at most (here ' + rr + '): a partial or full labial flange (Faigenblum 2023)');
+        else if(d.flange === 'partial' && rr > FLANGE_PARTIAL) bad(w + fw + ': a ridge resorbed more than ' + FLANGE_PARTIAL + ' mm (here ' + rr + ') takes a full labial flange, to set the teeth back where they stood and support the lip (Faigenblum 2023)'); }
       if(K && (K.cls === 'I' || K.cls === 'II')){ var fm = Math.min.apply(null, K.free.map(posOf));
         if(!ts.some(function(t){ return t.rest && !t.missing && posOf(t.n) < fm; })) bad(w + 'a Class ' + K.cls + ' denture needs an indirect retainer: a rest farther forward than its free-end abutment' + (K.free.length > 1 ? 's' : '') + ' (#' + K.free.join(', #') + '), such as a cingulum rest on a canine'); }
     });
@@ -1942,6 +1963,14 @@
   }
   function names(ts){ return ts.map(function(t){ return '#' + t.n; }).join(', '); }
   function ridgeOf(spec, n){ var d = (spec.dentures || {})[archOf(n)]; return d && d.ridge != null ? d.ridge : RIDGE; }
+  /* v2.4: a partial denture's front bounded spaces: each a run of the teeth it replaces, every one an incisor or canine, with a
+     tooth standing at both ends (Kennedy's spaces that aren't free ends); and the labial flange over them, as given or by the ridge */
+  function frontSpaces(spec, ar){ var K = kennedyOf(spec, ar), nums = archNums(ar); if(!K) return [];
+    function stands(n){ var t = tooth(spec, n); return (!t.missing || t.pontic) && !t.od; }
+    return K.spaces.filter(function(sp){ var a = nums.indexOf(sp[0]), b = nums.indexOf(sp[sp.length - 1]);
+      return sp.every(function(n){ return posOf(n) <= 3; }) && nums.slice(0, a).some(stands) && nums.slice(b + 1).some(stands); }); }
+  function flangeOf(spec, ar){ var d = (spec.dentures || {})[ar] || {}, r = d.ridge != null ? d.ridge : RIDGE;
+    return d.flange || (r <= FLANGE_NONE ? 'none' : r <= FLANGE_PARTIAL ? 'partial' : 'full'); }
   /* a periapical film of the case's teeth (or the figure's): bone levels, defects, furcations, restorations, caries,
      periapical lesions and implants from the model */
   I.film = function(spec, o){
@@ -2422,22 +2451,40 @@
   function viewDenture(spec, den, cols, occ, dir, k, kt, W, up, siteMy, contact, gumAt){
     var s = '', full = den.type === 'complete', fr, under, over;
     function geo(c){ var sg = c.mr ? -1 : 1, cej = occ + dir * c.d.ch * k; return { cej:cej, V:function(pts){ return pts.map(function(p){ return [c.cx + sg * p[0] * k, cej - dir * p[1] * k]; }); }, X:function(px){ return c.cx + sg * px * k; } }; }
-    fr = full ? { under:'', over:'' } : viewFrame(spec, cols, dir, k, geo); under = fr.under; over = fr.over;
+    /* a front bounded space's flange (Faigenblum 2023): none, the tooth gum-fitted on the ridge; partial, a collar 1 mm past it;
+       full, into the vestibule */
+    var ar = archOf(cols[0].t.n), fl = full ? 'full' : flangeOf(spec, ar), fsp = {};
+    if(!full) frontSpaces(spec, ar).forEach(function(sp){ sp.forEach(function(n){ fsp[n] = 1; }); });
+    function open(n){ return fl === 'none' && !!fsp[n]; }
+    fr = full ? { under:'', over:'' } : viewFrame(spec, cols, dir, k, geo, open); under = fr.under; over = fr.over;
     var runs = [], cur = null;
     /* the denture's teeth: those it replaces, and one over each overdenture abutment (the base covers the abutment) */
     function dt(t){ return t.dent || t.od; }
     cols.forEach(function(c, i){ var on = dt(c.t) || (full && c.t.missing); if(on){ if(!cur){ cur = { a:i, b:i }; runs.push(cur); } else cur.b = i; } else cur = null; });
-    /* the denture's teeth, then the base over their necks */
-    cols.forEach(function(c){ if(!dt(c.t)) return; var G = geo(c);
-      s += path('io-tooth io-dt' + (up ? '' : ' low'), dense(crownMM(c.d), true, 4).map(function(p){ return G.V([p])[0]; })); });
+    /* the denture's teeth (a gum-fitted one is the view's: it stands in the gum as a pontic does), then the base over their necks */
+    cols.forEach(function(c){ if(!dt(c.t) || open(c.t.n)) return; var G = geo(c), o = dense(crownMM(c.d), true, 4).map(function(p){ return G.V([p])[0]; });
+      s += path('io-tooth io-dt' + (up ? '' : ' low'), o); });
     /* the base over each run: its top carved like gingiva over each denture tooth's neck (a festoon 1 mm over the cervical line
        at mid-facial, a papilla up to the contact between teeth);
        against an abutment it meets the tooth's gingival margin at its proximal surface and runs down it; its flange's border is a
        smooth rounded line, into the vestibule for a free-end or complete base (the ridge's depth and 4.3 mm more, a light line
        inside the border for its rolled edge), and over a bounded space a short collar just past the ridge's crest */
     runs.forEach(function(r){ var A = cols[r.a], B = cols[r.b], Lc = r.a > 0 ? cols[r.a - 1] : null, Rc = r.b < cols.length - 1 ? cols[r.b + 1] : null, top = [], i;
+      if(open(A.t.n) && open(B.t.n)) return;
       var cA = occ + dir * A.d.ch * k, cB = occ + dir * B.d.ch * k, xl = Lc ? Lc.cx + Lc.d.cv / 2 * k : -6, xr = Rc ? Rc.cx - Rc.d.cv / 2 * k : W + 6;
+      var front = !!(fsp[A.t.n] && fsp[B.t.n]);
+      /* over a front space the base fills the cervical embrasure beside each abutment too, up its proximal to a papilla short of
+         the contact, as between two denture teeth */
+      function sideAt(c, y, sd){ var pts = geo(c).V(dense(crownMM(c.d), true, 4)), best = null;
+        for(var q = 0; q < pts.length; q++){ var a = pts[q], b = pts[(q + 1) % pts.length]; if((a[1] - y) * (b[1] - y) > 0 || a[1] === b[1]) continue;
+          var x = a[0] + (b[0] - a[0]) * (y - a[1]) / (b[1] - a[1]); if(best == null || sd * (x - best) > 0) best = x; } return best; }
+      function abPap(ab, dn, sd){ var ca = contact(ab, sd), cb = contact(dn, -sd), py = (ca[1] + cb[1]) / 2 + dir * .4 * k,
+          cap = (occ + dir * ab.d.ch * k + occ + dir * dn.d.ch * k) / 2 - dir * 2.9 * k, yt = dir > 0 ? Math.max(py, cap) : Math.min(py, cap),
+          y0 = siteMy(ab, sd > 0 ? 2 : 0) + dir * .3 * k, out = [];
+        for(var q = 1; q < 8; q++){ var y = y0 + (yt - y0) * q / 8, x = sideAt(ab, y, sd); if(x != null) out.push([x, y]); }
+        out.push([(ca[0] + cb[0]) / 2, yt]); return out; }
       top.push(Lc ? [xl, siteMy(Lc, 2) + dir * .3 * k] : [xl, cA - dir * .4 * k]);
+      if(front && Lc) top = top.concat(abPap(Lc, A, 1));
       for(i = r.a; i <= r.b; i++){ var c = cols[i], cj = occ + dir * c.d.ch * k, L = c.cx - c.d.cw / 2 * k, R = c.cx + c.d.cw / 2 * k;
         if(!dt(c.t)){ top.push([L, cj + dir * .2 * k], [R, cj + dir * .2 * k]); continue; }
         if(i === r.a && !Lc) top.push([L, cj - dir * 2.2 * k]);
@@ -2446,19 +2493,39 @@
         if(i < r.b && dt(nc.t)){ var ca = contact(c, 1), cb = contact(nc, -1), py = (ca[1] + cb[1]) / 2 + dir * .4 * k, cap = (cj + occ + dir * nc.d.ch * k) / 2 - dir * 2.9 * k;
           top.push([(ca[0] + cb[0]) / 2, dir > 0 ? Math.max(py, cap) : Math.min(py, cap)]); }
         else if(i < r.b || !Rc) top.push([R, cj - dir * 2.2 * k]); }
+      if(front && Rc) top = top.concat(abPap(Rc, B, -1).reverse());
       top.push(Rc ? [xr, siteMy(Rc, 0) + dir * .3 * k] : [xr, cB - dir * .4 * k]);
       var e = dense(top, false, 5), g = 0, j;
       for(i = r.a; i <= r.b; i++) g = Math.max(g, gapMM(spec, cols[i].t));
-      var front = true; for(i = r.a; i <= r.b; i++) if(posOf(cols[i].t.n) > 3) front = false;
       /* over a bounded space a short flange: a rounded collar from one abutment's margin to the other's, just deep enough to
-         cover the ridge (a front tooth's .5 mm past it, set close to the ridge; a back tooth's .9) */
-      if(Lc && Rc){ var wd = xr - xl, off = (front ? .5 : .9) * k, y0 = siteMy(Lc, 2) + dir * .3 * k, y1 = siteMy(Rc, 0) + dir * .3 * k, D2 = 0, cup = [];
+         cover the ridge (a front space's partial flange 1 mm past it, Faigenblum's; a back tooth's .9) */
+      if(Lc && Rc){ var wd = xr - xl, off = (front ? 1 : .9) * k, y0 = siteMy(Lc, 2) + dir * .3 * k, y1 = siteMy(Rc, 0) + dir * .3 * k, D2 = 0, cup = [];
         function tl(x){ return y0 + (y1 - y0) * (x - xl) / wd; }
         function fe(x){ var u = 2 * (x - xl) / wd - 1; return Math.sqrt(Math.max(0, 1 - u * u)); }
         /* a half-ellipse below the line between the two margins, as deep as it must be to cover the ridge (and off past it) */
+        /* a front space's full flange (Faigenblum's, where the ridge has resorbed) covers the ridge's labial face into the sulcus,
+           2.2 mm past the deepest point of the crest: its sides run straight down from the abutments' margins,
+           its corners round, its border a shallow curve with a light line inside it for its rolled edge, and a soft light ridge
+           down from each tooth's neck for the root eminence the acrylic is carved with */
+        if(front && fl === 'full'){ var deep = null, sp = 0, bot = [], bd = [];
+          for(j = 0; j <= 40; j++){ var xq = xl + wd * j / 40, gq = gumAt(xq); if(gq != null && (deep == null || dir * (gq - deep) > 0)) deep = gq; }
+          var yb = (deep == null ? (cA + cB) / 2 + dir * g * k : deep) + dir * 2.2 * k, rc = Math.min(2.6 * k, wd * .24);
+          function bz(p0, p1, p2, p3, out){ for(var q = 1; q <= 10; q++){ var t = q / 10, m = 1 - t;
+            out.push([m * m * m * p0[0] + 3 * m * m * t * p1[0] + 3 * m * t * t * p2[0] + t * t * t * p3[0], m * m * m * p0[1] + 3 * m * m * t * p1[1] + 3 * m * t * t * p2[1] + t * t * t * p3[1]]); } }
+          function rnd2(cx, cy, a0, a1){ for(var q = 1; q <= 8; q++){ var a = a0 + (a1 - a0) * q / 8; bot.push([cx + rc * Math.cos(a), cy + dir * rc * Math.sin(a)]); } }
+          bz([xr, y1], [xr, y1 + (yb - y1) * .45], [xr + sp, yb - dir * rc - (yb - y1) * .25], [xr + sp, yb - dir * rc], bot);
+          rnd2(xr + sp - rc, yb - dir * rc, 0, Math.PI / 2);
+          for(j = 1; j < 16; j++){ var uu = j / 16; bd.push([xr + sp - rc - (wd + 2 * sp - 2 * rc) * uu, yb + dir * .3 * k * Math.sin(Math.PI * uu)]); }
+          bot = bot.concat(bd); rnd2(xl - sp + rc, yb - dir * rc, Math.PI / 2, Math.PI);
+          bz([xl - sp, yb - dir * rc], [xl - sp, yb - dir * rc - (yb - y0) * .25], [xl, y0 + (yb - y0) * .45], [xl, y0], bot);
+          s += path('io-base', e.concat(bot)) + path('io-base-hi', bd.map(function(p){ return [p[0], p[1] - dir * .9 * k]; }), true);
+          for(i = r.a; i <= r.b; i++){ var ce = cols[i], cj2 = occ + dir * ce.d.ch * k + dir * .4 * k, len = dir * (yb - cj2) * .62;
+            if(len > 2 * k) s += path('io-base-hi io-emin', [[ce.cx, cj2], [ce.cx + .15 * k, cj2 + dir * len * .5], [ce.cx, cj2 + dir * len]], true); }
+          return; }
         for(j = 2; j <= 38; j++){ var xs = xl + wd * j / 40, gs = gumAt(xs); if(gs != null) D2 = Math.max(D2, dir * (gs + dir * off - tl(xs)) / fe(xs)); }
         for(j = 1; j < 30; j++){ var xx = xr - wd * j / 30; cup.push([xx, tl(xx) + dir * D2 * fe(xx)]); }
-        s += path('io-base', e.concat(cup)); return; }
+        s += path('io-base', e.concat(cup));
+        return; }
       var D = (g + 4.3) * k, yb = (dir > 0 ? Math.max(cA, cB) : Math.min(cA, cB)) + dir * D, rc = Math.min(2.6 * k, (xr - xl) * .3, D * .45), bot = [];
       function arc(cx, cy, a0, a1){ for(var q = 0; q <= 8; q++){ var a = a0 + (a1 - a0) * q / 8; bot.push([cx + rc * Math.cos(a), cy + dir * rc * Math.sin(a)]); } }
       if(Rc){ bot.push([xr, yb - dir * rc]); arc(xr - rc, yb - dir * rc, 0, Math.PI / 2); }
@@ -2479,7 +2546,7 @@
      ends in the gingival third at the far line angle, 1.6 mm wide tapering to 0.8; an I-bar's approach runs 3.5 mm below the
      gingival margin (Krol 1973; McCracken's: 3-4 mm) and turns up at the middle of the buccal, crossing the margin at a right
      angle, to its tip in the gingival third */
-  function viewFrame(spec, cols, dir, k, geo){
+  function viewFrame(spec, cols, dir, k, geo, open){
     var under = '', over = '';
     function metal(pts, w0, w1, G, caps){ var c = G.V(pts), n = c.length, L = [], R = [], H = [], i;
       if(n < 2) return '';
@@ -2507,7 +2574,7 @@
       return o.map(function(p){ var dx = p[0], dy = p[1] - cy, l = Math.hypot(dx, dy) || 1; return [p[0] + dx / l * out, p[1] + dy / l * out]; }); }
     function down(d, sd, y0, y1, out){ var o = []; for(var j = 0; j <= 8; j++){ var y = y0 + (y1 - y0) * j / 8; o.push([(y >= 0 ? sideX(d, sd, y) : sd * d.cv / 2) + sd * out, y]); } return o; }
     cols.forEach(function(c){ var t = c.t; if(t.missing || (!t.clasp && !t.rest)) return; var G = geo(c), d = c.d, hw = d.cw / 2, ch = d.ch, post = posOf(t.n) >= 4;
-      var dM = nbr(t.n, true), dD = nbr(t.n, false), bM = dM && tooth(spec, dM).dent, bD = dD && tooth(spec, dD).dent;
+      var dM = nbr(t.n, true), dD = nbr(t.n, false), bM = dM && tooth(spec, dM).dent && !open(dM), bD = dD && tooth(spec, dD).dent && !open(dD);
       var rs = String(t.rest || ''), gm = gumMM(t)(0), gum = gumMM(t);
       /* a connector down a proximal surface ends hidden in the base, 1.2 mm past that side's margin */
       function inBase(sd){ return gum(sd * d.cw * .34) - 1.2; }
@@ -2552,8 +2619,19 @@
        if more (5 beside an overdenture abutment, whose root keeps its bone, so it stands on a mound; a single gap is one U), so the tooth beside a gap has no papilla on that side and the gum never
        steps. Past the ridge, toward the occlusal plane, is the mouth (dark), not the attached gingiva; over an overdenture
        abutment's dome too */
-    function gapCol(c){ return (c.t.missing && !c.t.pontic) || !!(c.t.implant && c.t.implant.cover); }
-    function siteMy(c, j){ var cej = occ + dir * c.d.ch * k; if(c.t.missing) return cej - dir * .3 * k;
+    /* v2.4: with a partial denture in, a front space's gum-fitted teeth (Faigenblum's open face: flange none) stand on the ridge as
+       a bridge's pontics do, each with its own margin where the ridge's crest is (the neighbors' mid-facial margins, and past them
+       as far as the ridge has resorbed), its papillae four fifths as tall as a tooth's; with the denture out, the ridge */
+    var vden = (spec.dentures || {})[archOf(ts[0].n)], gf = {};
+    if(vden && !o.out && vden.type !== 'complete' && flangeOf(spec, archOf(ts[0].n)) === 'none')
+      frontSpaces(spec, archOf(ts[0].n)).forEach(function(sp){ sp.forEach(function(n){ gf[n] = 1; }); });
+    function gapCol(c){ return (c.t.missing && !c.t.pontic && !gf[c.t.n]) || !!(c.t.implant && c.t.implant.cover); }
+    function gfMargin(c){ var i = cols.indexOf(c), a = i, b = i, ms = [];
+      while(a > 0 && gf[cols[a - 1].t.n]) a--; while(b < cols.length - 1 && gf[cols[b + 1].t.n]) b++;
+      [cols[a - 1], cols[b + 1]].forEach(function(nb){ if(nb && !nb.t.missing) ms.push(siteMy(nb, 1)); });
+      var y = ms.length ? (ms[0] + ms[ms.length - 1]) / 2 : occ + dir * c.d.ch * k - dir * 2 * k;
+      return y + dir * (vden.ridge != null ? vden.ridge : RIDGE) * k; }
+    function siteMy(c, j){ var cej = occ + dir * c.d.ch * k; if(gf[c.t.n]) return gfMargin(c) - (j === 1 ? 0 : dir * .2 * k); if(c.t.missing) return cej - dir * .3 * k;
       var rec = c.t.rec.f[siteOrder(c.t.n)[j]]; return cej + dir * rec * k + (c.t.implant ? dir * PLAT * k : j === 1 ? dir * (c.d.cej || 0) * k : 0); }
     function smooth(u){ return u <= 0 ? 0 : u >= 1 ? 1 : u * u * (3 - 2 * u); }
     var gaps = [];
@@ -2561,8 +2639,10 @@
     gaps.forEach(function(r){
       var L = r.a > 0 ? cols[r.a - 1] : null, R = r.b < cols.length - 1 ? cols[r.b + 1] : null, g = 0, m = 0, i;
       for(i = r.a; i <= r.b; i++){ g = Math.max(g, gapMM(spec, cols[i].t)); m += (occ + dir * cols[i].d.ch * k) / (r.b - r.a + 1); }
-      var cL = L ? occ + dir * L.d.ch * k : null, cR = R ? occ + dir * R.d.ch * k : null;
-      if(cL == null) cL = cR != null ? cR : m; if(cR == null) cR = cL;
+      /* the crest is measured from the neighbors' mid-facial margins, where the socket's tissue stood before it healed (Tan 2012's
+         1.24 mm is from there; with no neighbor in the view, 2 mm over the gap teeth's CEJs, the default margin) */
+      var cL = L ? siteMy(L, 1) : null, cR = R ? siteMy(R, 1) : null;
+      if(cL == null) cL = cR != null ? cR : m - dir * 2 * k; if(cR == null) cR = cL;
       r.xa = L ? L.cx + L.d.cw * .34 * k : -6; r.xb = R ? R.cx - R.d.cw * .34 * k : W + 6; r.L = L; r.R = R; r.g = g;
       var span = r.xb - r.xa, ya = L ? siteMy(L, 2) : 0, yb = R ? siteMy(R, 0) : 0;
       var rl = Math.min(Math.max((L && L.t.od ? 5 : 4.2) * k, L ? Math.abs(ya - cL - dir * g * k) * 1.6 : 0), span * .5);
@@ -2589,6 +2669,7 @@
       return [c.cx + sg * best[0] * k, cej - dir * best[1] * k]; }
     function rise(n){ var p = posOf(n); return p <= 3 ? 3.4 : p <= 5 ? 2.4 : 1.8; }
     function margins(c){ var cej = occ + dir * c.d.ch * k;
+      if(gf[c.t.n]) return [0, 1, 2].map(function(j){ return siteMy(c, j); });
       if(c.t.missing) return [cej - dir * .3 * k, cej - dir * .45 * k, cej - dir * .3 * k];
       return [0, 1, 2].map(function(j){ return siteMy(c, j); }); }
     function sx(c, j){ return c.cx + (j - 1) * c.d.cw * .34 * k; }
@@ -2611,14 +2692,15 @@
       var d = c.d, so = siteOrder(c.t.n), pv = cols[i - 1], nx = cols[i + 1], m = margins(c), Z = m[1];
       if(gapCol(c)){ gaps.forEach(function(r){ if(r.a === i) edge.push.apply(edge, r.pts.slice(r.L ? 1 : 0, r.R ? -1 : r.pts.length)); }); return; }
       var tl = pv && !gapCol(pv) ? tipOf(pv, c) : !pv ? tipOf(c, null, -1) : null, tr = nx && !gapCol(nx) ? tipOf(c, nx) : !nx ? tipOf(c, null, 1) : null;
-      /* beside a gap the U stops at the line angle's margin, where the ridge's slope begins */
-      var hl = tl || [sx(c, 0) - (sx(c, 0) - c.cx) * .47, m[0] + (m[0] - Z) * 1.16], hr = tr || [sx(c, 2) + (sx(c, 2) - c.cx) * .47, m[2] + (m[2] - Z) * 1.16];
+      /* beside a gap the U stops at the line angle's margin, where the ridge's slope begins (its far tip set so the U passes
+         through that margin, so the gum never notches the crown there) */
+      var hl = tl || [sx(c, 0) - (sx(c, 0) - c.cx) * .47, Z + (m[0] - Z) / scal(1 / 1.47)], hr = tr || [sx(c, 2) + (sx(c, 2) - c.cx) * .47, Z + (m[2] - Z) / scal(1 / 1.47)];
       /* at the view's start, the half papilla of the tooth before it, mirrored from this tooth's own */
       if(!pv){ edge.push([-6, Z]); half(c, Z, tl, []).reverse().forEach(function(p){ var q = 2 * tl[0] - p[0]; if(q > -6) edge.push([q, p[1]]); }); }
-      var Lh = half(c, Z, hl, []), Rh = half(c, Z, hr, []).reverse().slice(1);
-      if(tl) Lh = Lh.slice(1);
-      else { Lh = Lh.filter(function(p){ return p[0] > sx(c, 0) + .5; }); Lh.unshift([sx(c, 0), m[0]]); }
-      if(!tr){ Rh = Rh.filter(function(p){ return p[0] < sx(c, 2) - .5; }); Rh.push([sx(c, 2), m[2]]); }
+      /* on a gap's side the margin rises from mid-facial to the line angle's in a smooth S, level where the ridge's slope takes over,
+         so the gum rounds the line angle instead of peaking there */
+      function gapHalf(xe, ye){ var out = []; for(var q = 0; q <= 8; q++){ var u = q / 8; out.push([c.cx + (xe - c.cx) * u, Z + (ye - Z) * smooth(u)]); } return out; }
+      var Lh = tl ? half(c, Z, hl, []).slice(1) : gapHalf(sx(c, 0), m[0]).reverse(), Rh = tr ? half(c, Z, hr, []).reverse().slice(1) : gapHalf(sx(c, 2), m[2]).slice(1);
       edge.push.apply(edge, Lh.concat(Rh));
       if(!c.t.missing) so.forEach(function(si, j){ var x = sx(c, j), my = j === 1 ? Z : yOn(c, Z, j ? hr : hl, x);
         if(c.t.bop.f[si]) marks += dot('dc-blood', x, my + dir * 2.2, 2.4);
@@ -2640,6 +2722,9 @@
       function X(px){ return c.cx + sg * px * k; }
       function V(pts){ return pts.map(function(p){ return [X(p[0]), cej - dir * p[1] * k]; }); }
       if(c.t.missing && c.t.pontic){ s += path('io-tooth pfm' + oneOf(c.t.pontic, CROWNS, ' cr-') + (up ? '' : ' low'), V(TL.ponticMM(typeOf(c.t.n), { per:4 }))); return; }
+      /* a gum-fitted denture tooth: a pontic's outline, its ridge lap carried to a millimeter past its margin, under the gum */
+      if(gf[c.t.n]){ var Y0 = d.ch * .4, yr = dir * (cej - siteMy(c, 1)) / k - 1.05;
+        s += path('io-tooth io-dt' + (up ? '' : ' low'), V(dense(TL.ponticMM(typeOf(c.t.n), { per:4 }), true, 4).map(function(p){ return [p[0], p[1] < Y0 ? Y0 - (Y0 - p[1]) * (Y0 - yr) / (Y0 + 1.05) : p[1]]; }))); return; }
       if(c.t.missing || (c.t.implant && c.t.implant.cover)) return;
       /* an implant (v2.3): the abutment and the implant's threaded body behind the mucosa, seen where the margin has receded past the
          crown's margin (the platform 1.1 mm apical to it, as on the film; its recession is measured from the platform) */
