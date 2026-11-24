@@ -83,11 +83,26 @@ what v2.0 left, so it isn't lost. Its own track (Sam, 2026-11-06, [decisions](..
       suppuration; the 2017 case definitions and the lecture's failure rule in `derive()`; the distances to a tooth and between
       implants, the pocket base against the bone and the rest in `validate()`; every view draws it; examples
       `v23-implant-states` and `v23-implant-anterior`)
-- [ ] Prosthodontics and other hubs (step 5): fixed bridges are done on every view (v2.1), and since v2.3 an implant-supported
+- [x] Prosthodontics and other hubs (step 5): fixed bridges are done on every view (v2.1), and since v2.3 an implant-supported
       bridge (two implants, one pontic, never joined to a tooth; example `v23-implant-bridge`); still to do: removable partial and
-      complete dentures, a cantilever or resin-bonded bridge, and Occlusion's `CASE_IMG`
-      pictures onto the kit; with the dentures, an overdenture abutment (a root-filled retained root under a denture, which
-      v2.2's `roottip` refuses for now) and a provisional bridge (v2.2 has the provisional crown only)
+      complete dentures, a cantilever or resin-bonded bridge, and ~~Occlusion's `CASE_IMG` pictures onto the kit~~ (dropped:
+      Occlusion's page came down 2026-11-19, so no page draws them); with the dentures, an overdenture abutment (a root-filled
+      retained root under a denture, which v2.2's `roottip` refuses for now) and a provisional bridge (v2.2 has the provisional
+      crown only) (v2.4, 2026-11-24: `{ m:'denture' }`, partial with its connector, clasps, RPIs and rests and the Kennedy class
+      `derive()` works out, or complete over its overdenture abutments; the bridge module's `cantilever`, `type: "resin-bonded"`
+      and `material: "provisional"`; every view draws them; examples `v24-partial-class-i`, `v24-partial-class-ii`,
+      `v24-complete-overdenture`, `v24-cantilevers` and `v24-resin-bonded`)
+- [ ] Sam looks at v2.4's drawings with their first case (on the view, the denture's pink base and teeth, the clasp arms, the
+      RPI's plate and I-bar and the rests, and with the denture out the resorbed ridge and an overdenture abutment's dome; on the
+      film the ridge, the dome and its seal, the resin-bonded wing, the cantilever's joins and the provisional bridge; the
+      odontogram's denture marks and key), the way the first box says
+- [ ] An implant-retained overdenture (attachments on implants under a complete denture): `validate()` refuses an implant under
+      a complete denture for now; with it, a root's attachment or coping, and a vital overdenture abutment (v2.4 draws the
+      root-filled, domed and sealed one only)
+- [ ] An overdenture abutment under a partial denture, and caries on one (the commonest way they're lost: Ettinger and Qian
+      2004): v2.4 refuses both
+- [ ] A cantilever on implants, and a molar cantilevered as a premolar-sized pontic on two splinted premolars: v2.4 refuses
+      both (the molar is in the sources; the pontic's smaller size isn't drawn)
 - [ ] Sam looks at v2.3's drawings with their first case (the implant crown by material on the film, the screw access channel,
       the excess cement, the failed implant's radiolucent line along its taper, the abutment and threads on the view, the chart's
       submerged implant, the odontogram's cover screw, the implant bridge), the way the first box says
@@ -157,6 +172,18 @@ what v2.0 left, so it isn't lost. Its own track (Sam, 2026-11-06, [decisions](..
   healing abutment and one-site mucositis, and PCD Implants' old cases. **Where it stopped:** next is step 5's dentures (with the
   overdenture abutment and the four-unit implant bridge) and the cantilever and resin-bonded bridges, from `main` once this
   merges.
+- 2026-11-24: Patient Box v2.4 (branch `claude/patient-box-v2-4`, from `main` at 84f3a29): the `denture` module (partial and
+  complete, overdenture abutments, the Kennedy class by Applegate's rules) and the bridge module's cantilever, resin-bonded and
+  provisional bridges, on every view, each call cited in `widget/cases.js`'s header (McCracken's, the Glossary, Kratochvil 1963,
+  Krol 1973, Zarb's, Crum and Rooney 1978, Shillingburg's, Kern 2005 and 2011 and the rest); five examples and ten questions in
+  `tools/cases/examples.json`; a record for each rule, each question's pictures and each Kennedy class in `tools/ci/cases.js`;
+  the how-to. Also, at Sam's word ("The way the gingiva is handled needs to be better. It looks bad"), the view's gum redone on
+  every case: one smooth ridge over a gap (Tan 2012), the dark of the mouth past the gum, a mound under an overdenture abutment,
+  a rounded collar for a bounded denture base (the PR has before and after); then, at Sam's word again, the papillae (one U per
+  tooth from tip to tip, Becker 1997, Tarnow 1992) and the framework's metal (tapered bars on the crowns' outlines). Ticked step 5 (Occlusion's `CASE_IMG` struck: its
+  page came down 2026-11-19); added Sam's look, the implant overdenture, a partial overdenture and caries on an abutment, and the
+  implant and molar cantilevers. The four-unit implant bridge stays its own box. **Where it stopped:** the kit is done for this
+  package; what's left is above.
 
 ## Outcome
 

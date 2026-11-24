@@ -7,7 +7,7 @@
 // every picture kind must be one the kit draws. Patient Box v2 (2026-11-20) adds: the tooth library (widget/teeth.js) has all 32
 // teeth and draws each; every case's pictures pass checkFigs() (no bitewing of an incisor, a full-mouth view that agrees
 // with the box's counts); a question with `rests` (what its key rests on: stage, grade, extent, rt, furc, impl, kind; since v2.1 also endo, fracture, resto, and caries for decay seen from the buccal; since
-// v2.2 roottip, resorption and sealant) is answerable from the pictures and rows it shows; a question with `says` quotes numbers
+// v2.2 roottip, resorption and sealant; since v2.4 denture and kennedy) is answerable from the pictures and rows it shows; a question with `says` quotes numbers
 // the record gives, in its text.
 // The example cases in tools/cases/examples.json are checked the same way. Run by CI (check.yml).
 'use strict';
@@ -94,7 +94,7 @@ for (const hub of fs.readdirSync(path.join(root, 'hubs')).sort()) {
     // root tips
     ['a retained root', true, ['12', '13'], [{ m: 'roottip', tooth: '12', kind: 'retained' }]],
     ['a retained root with a restoration', false, ['12', '13'], [{ m: 'roottip', tooth: '12', kind: 'retained' }, { m: 'restoration', tooth: '12', surfaces: 'MO', material: 'composite' }]],
-    ['a retained root with a root canal filling (an overdenture abutment: not yet)', false, ['12', '13'], [{ m: 'roottip', tooth: '12', kind: 'retained' }, { m: 'endo', tooth: '12', fill: 'adequate' }]],
+    ['a retained root with a root canal filling (an overdenture abutment is the denture module\'s)', false, ['12', '13'], [{ m: 'roottip', tooth: '12', kind: 'retained' }, { m: 'endo', tooth: '12', fill: 'adequate' }]],
     ['a retained root with a periapical lesion', true, ['12', '13'], [{ m: 'roottip', tooth: '12', kind: 'retained' }, { m: 'endo', tooth: '12', fill: false, lesion: 4 }]],
     ['a root tip left in a molar\'s socket', true, ['13', '14', '15'], [{ m: 'roottip', tooth: '14', kind: 'fragment', len: 4, root: 'mesiobuccal' }]],
     ['a root tip longer than the root allows', false, ['13', '14', '15'], [{ m: 'roottip', tooth: '14', kind: 'fragment', len: 11, root: 'mesiobuccal' }]],
@@ -182,6 +182,53 @@ for (const hub of fs.readdirSync(path.join(root, 'hubs')).sort()) {
     ['a full mouth counting an implant as a tooth', false, ['29', '30', '31'], [{ m: 'missing', teeth: ['1', '16', '17', '32'] }, { m: 'implant', tooth: '30' }], { full: true, mouth: { teeth: 28, involved: 0, lost: 0 } }],
     ['a full mouth counting its implant apart', true, ['29', '30', '31'], [{ m: 'missing', teeth: ['1', '16', '17', '32'] }, { m: 'implant', tooth: '30' }], { full: true, mouth: { teeth: 27, involved: 0, lost: 0 } }],
   ];
+  // Patient Box v2.4 (2026-11-24): dentures, overdenture abutments, cantilever, resin-bonded and provisional bridges
+  const F = (n) => ({ full: true, mouth: { teeth: n } });
+  const LOW = ['17', '18', '19', '20', '30', '31', '32'];
+  const RPD = (more) => Object.assign({ m: 'denture', type: 'partial', arch: 'lower', connector: 'plate', clasps: { 21: 'rpi', 29: 'rpi' }, rests: { 22: 'incisal', 27: 'incisal' } }, more || {});
+  calls.push(
+    ['a lower Class I partial denture: RPIs on the free-end abutments, incisal rests on the canines', true, ['20', '21'], [{ m: 'missing', teeth: LOW }, RPD()], F(25)],
+    ['a Class I partial denture with no indirect retainer', false, ['20', '21'], [{ m: 'missing', teeth: LOW }, RPD({ rests: {} })], F(25)],
+    ['a lingual bar with 9 mm to the floor of the mouth', true, ['20', '21'], [{ m: 'missing', teeth: LOW }, RPD({ connector: 'bar', floor: 9 })], F(25)],
+    ['a lingual bar with 6 mm to the floor of the mouth (a lingual plate)', false, ['20', '21'], [{ m: 'missing', teeth: LOW }, RPD({ connector: 'bar', floor: 6 })], F(25)],
+    ['an upper connector on a lower denture', false, ['20', '21'], [{ m: 'missing', teeth: LOW }, RPD({ connector: 'strap' })], F(25)],
+    ['a cingulum rest on a mandibular canine (too little enamel)', false, ['20', '21'], [{ m: 'missing', teeth: LOW }, RPD({ rests: { 22: 'cingulum', 27: 'incisal' } })], F(25)],
+    ['a distal occlusal rest on a free-end abutment', false, ['20', '21'], [{ m: 'missing', teeth: LOW }, RPD({ rests: { 21: 'd', 22: 'incisal', 27: 'incisal' } })], F(25)],
+    ['an RPI on a bounded abutment', false, ['18', '19', '20'], [{ m: 'missing', teeth: ['17', '19', '30', '32'] }, RPD({ clasps: { 18: 'circumferential', 20: 'rpi', 29: 'circumferential', 31: 'circumferential' }, rests: {} })], F(28)],
+    ['a Class III partial denture with circumferential clasps', true, ['18', '19', '20'], [{ m: 'missing', teeth: ['17', '19', '30', '32'] }, RPD({ clasps: { 18: 'circumferential', 20: 'circumferential', 29: 'circumferential', 31: 'circumferential' }, rests: {} })], F(28)],
+    ['clasps on one side of the arch only', false, ['18', '19', '20'], [{ m: 'missing', teeth: ['17', '19', '30', '32'] }, RPD({ clasps: { 18: 'circumferential', 20: 'circumferential' }, rests: {} })], F(28)],
+    ['a tooth missing inside the arch that nothing replaces', false, ['18', '19', '20'], [{ m: 'missing', teeth: ['17', '19', '24', '30', '32'] }, RPD({ replaces: ['19', '30'], clasps: { 18: 'circumferential', 20: 'circumferential', 29: 'circumferential', 31: 'circumferential' }, rests: {} })], F(27)],
+    ['a clasp on a tooth with mobility 2', false, ['18', '19', '20'], [{ m: 'missing', teeth: ['17', '19', '30', '32'] }, { m: 'bone', teeth: ['20'], percent: 45 }, RPD({ clasps: { 18: 'circumferential', 20: 'circumferential', 29: 'circumferential', 31: 'circumferential' }, rests: {} })], Object.assign(F(28), { t: { 20: { mob: 2 } } })],
+    ['a complete overdenture on two root-filled canines', true, ['5', '6', '7'], [{ m: 'missing', teeth: ['17', '32'] }, { m: 'denture', type: 'complete', arch: 'upper', abutments: ['6', '11'], ridge: 4, years: 12 }], F(16)],
+    ['a complete denture over a tooth that is still there', false, ['5', '6', '7'], [{ m: 'missing', teeth: ['17', '32'] }, { m: 'denture', type: 'complete', arch: 'upper' }], Object.assign(F(16), { t: { 6: { missing: false } } })],
+    ['an overdenture abutment with a crown on it', false, ['5', '6', '7'], [{ m: 'missing', teeth: ['17', '32'] }, { m: 'denture', type: 'complete', arch: 'upper', abutments: ['6', '11'] }, { m: 'restoration', tooth: '6', material: 'crown', crown: 'pfm' }], F(16)],
+    ['an overdenture abutment with 60% of its bone lost', false, ['5', '6', '7'], [{ m: 'missing', teeth: ['17', '32'] }, { m: 'denture', type: 'complete', arch: 'upper', abutments: ['6', '11'] }, { m: 'bone', teeth: ['6'], percent: 60 }], F(16)],
+    ['an implant under a complete denture (an implant overdenture: not yet)', false, ['5', '6', '7'], [{ m: 'missing', teeth: ['17', '32'] }, { m: 'implant', tooth: '6', state: 'health' }, { m: 'denture', type: 'complete', arch: 'upper' }], F(16)],
+    ['a maxillary lateral cantilevered from the canine', true, ['6', '7', '8'], [{ m: 'missing', teeth: ['7'] }, { m: 'bridge', abutments: ['6'], cantilever: '7', material: 'zirconia' }]],
+    ['a central incisor cantilevered from the lateral', false, ['7', '8', '9'], [{ m: 'missing', teeth: ['8'] }, { m: 'bridge', abutments: ['7'], cantilever: '8', material: 'zirconia' }]],
+    ['a first premolar cantilevered from the second premolar and first molar, splinted', true, ['19', '20', '21'], [{ m: 'missing', teeth: ['21'] }, { m: 'bridge', abutments: ['20', '19'], cantilever: '21', material: 'pfm' }]],
+    ['a premolar cantilevered from one abutment', false, ['19', '20', '21'], [{ m: 'missing', teeth: ['21'] }, { m: 'bridge', abutments: ['20'], cantilever: '21', material: 'pfm' }]],
+    ['a premolar cantilevered distally', false, ['4', '5', '6'], [{ m: 'missing', teeth: ['4'] }, { m: 'bridge', abutments: ['5', '6'], cantilever: '4', material: 'pfm' }]],
+    ['a molar cantilevered from two premolars', false, ['3', '4', '5'], [{ m: 'missing', teeth: ['1', '2', '3'] }, { m: 'bridge', abutments: ['4', '5'], cantilever: '3', material: 'pfm' }]],
+    ['a cantilevered canine', false, ['4', '5', '6'], [{ m: 'missing', teeth: ['6'] }, { m: 'bridge', abutments: ['5', '4'], cantilever: '6', material: 'pfm' }]],
+    ['a cantilever on an implant (not yet)', false, ['6', '7', '8'], [{ m: 'missing', teeth: ['7'] }, { m: 'implant', tooth: '6', state: 'health' }, { m: 'bridge', abutments: ['6'], cantilever: '7', material: 'zirconia' }]],
+    ['a two-retainer metal resin-bonded bridge for a lateral', true, ['9', '10', '11'], [{ m: 'missing', teeth: ['10'] }, { m: 'bridge', type: 'resin-bonded', abutments: ['9', '11'], material: 'metal' }]],
+    ['a single-retainer zirconia resin-bonded cantilever for a lateral, from the central', true, ['7', '8', '9'], [{ m: 'missing', teeth: ['7'] }, { m: 'bridge', type: 'resin-bonded', abutments: ['8'], cantilever: '7', material: 'zirconia' }]],
+    ['a resin-bonded wing on a crowned abutment', false, ['9', '10', '11'], [{ m: 'missing', teeth: ['10'] }, { m: 'restoration', tooth: '9', material: 'crown', crown: 'pfm' }, { m: 'bridge', type: 'resin-bonded', abutments: ['9', '11'], material: 'metal' }]],
+    ['a resin-bonded bridge for a molar', false, ['29', '30', '31'], [{ m: 'missing', teeth: ['30'] }, { m: 'bridge', type: 'resin-bonded', abutments: ['29', '31'], material: 'metal' }]],
+    ['a resin-bonded bridge with two pontics', false, ['7', '8', '9', '10'], [{ m: 'missing', teeth: ['8', '9'] }, { m: 'bridge', type: 'resin-bonded', abutments: ['7', '10'], material: 'metal' }]],
+    ['a resin-bonded wing on a mobile abutment', false, ['9', '10', '11'], [{ m: 'missing', teeth: ['10'] }, { m: 'bone', teeth: ['11'], percent: 45 }, { m: 'bridge', type: 'resin-bonded', abutments: ['9', '11'], material: 'metal' }], { t: { 11: { mob: 2 } } }],
+    ['a resin-bonded wing over a restoration on the pontic\'s side', false, ['9', '10', '11'], [{ m: 'missing', teeth: ['10'] }, { m: 'restoration', tooth: '11', surfaces: 'M', material: 'composite' }, { m: 'bridge', type: 'resin-bonded', abutments: ['9', '11'], material: 'metal' }]],
+    ['a resin-bonded wing beside a restoration on the far side (not under the wing)', true, ['9', '10', '11'], [{ m: 'missing', teeth: ['10'] }, { m: 'restoration', tooth: '9', surfaces: 'M', material: 'composite' }, { m: 'bridge', type: 'resin-bonded', abutments: ['9', '11'], material: 'metal' }]],
+    ['a resin-bonded bridge in porcelain-fused-to-metal', false, ['9', '10', '11'], [{ m: 'missing', teeth: ['10'] }, { m: 'bridge', type: 'resin-bonded', abutments: ['9', '11'], material: 'pfm' }]],
+    ['a single-retainer resin-bonded bridge for a premolar', false, ['19', '20', '21'], [{ m: 'missing', teeth: ['20'] }, { m: 'bridge', type: 'resin-bonded', abutments: ['19'], cantilever: '20', material: 'metal' }]],
+    ['an overdenture abutment with no root canal filling', false, ['5', '6', '7'], [{ m: 'missing', teeth: ['17', '32'] }, { m: 'denture', type: 'complete', arch: 'upper', abutments: ['6', '11'] }, { m: 'endo', tooth: '6', fill: false }], F(16)],
+    ['an overdenture abutment under a partial denture (not yet)', false, ['20', '21'], [{ m: 'missing', teeth: LOW }, RPD({ abutments: ['22'] })], F(25)],
+    ['a clasp on a missing tooth', false, ['20', '21'], [{ m: 'missing', teeth: LOW }, RPD({ clasps: { 20: 'circumferential', 21: 'rpi', 29: 'rpi' } })], F(25)],
+    ['a lingual bar on an upper denture', false, ['2', '3', '4'], [{ m: 'missing', teeth: ['1', '2', '3', '16', '17', '32'] }, { m: 'denture', type: 'partial', arch: 'upper', connector: 'bar', clasps: { 4: 'rpi', 14: 'circumferential', 15: 'circumferential' }, rests: { 6: 'cingulum' } }], F(26)],
+    ['an upper Class II partial denture on a complete palate', true, ['2', '3', '4'], [{ m: 'missing', teeth: ['1', '2', '3', '16', '17', '32'] }, { m: 'denture', type: 'partial', arch: 'upper', connector: 'palate', clasps: { 4: 'rpi', 14: 'circumferential', 15: 'circumferential' }, rests: { 6: 'cingulum' } }], F(26)],
+    ['a provisional bridge', true, ['29', '30', '31'], [{ m: 'missing', teeth: ['30'] }, { m: 'bridge', abutments: ['29', '31'], material: 'provisional' }]],
+  );
   // a record: [what, passes, teeth, modules, more of the record (per-tooth t, tests)]
   for (const [what, ok, teeth, modules, extra] of calls) {
     const p = K.validate(Object.assign({ teeth, modules }, base, extra || {}));
@@ -247,6 +294,26 @@ for (const hub of fs.readdirSync(path.join(root, 'hubs')).sort()) {
     ['an implant question on a case with no implant', false, ['28', '29', '30'], [], [{ kind: 'film' }, { kind: 'chart' }], ['impl']],
     ['an implant-supported bridge on a bitewing', true, ['18', '19', '20', '21'], [{ m: 'missing', teeth: ['20'] }, { m: 'implant', teeth: ['19', '21'], retention: 'screw' }, { m: 'bridge', abutments: ['19', '21'], material: 'pfm' }], [{ kind: 'bitewing', teeth: ['14', '13', '12', '21', '20', '19', '18'] }], ['resto']],
   ];
+  // Patient Box v2.4 (2026-11-24): what a question about a denture or its class can rest on
+  const LOWI = [{ m: 'missing', teeth: ['17', '18', '19', '20', '30', '31', '32'] }, { m: 'denture', type: 'partial', arch: 'lower', connector: 'plate', clasps: { 21: 'rpi', 29: 'rpi' }, rests: { 22: 'incisal', 27: 'incisal' } }];
+  const F25 = { full: true, mouth: { teeth: 25 } }, LEFT = ['18', '19', '20', '21', '22', '23', '24'], RIGHT = ['25', '26', '27', '28', '29', '30', '31'], ARCH = ['17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31', '32'];
+  const OD = [{ m: 'missing', teeth: ['17', '32'] }, { m: 'denture', type: 'complete', arch: 'upper', abutments: ['6', '11'] }];
+  recs.push(
+    ['the Kennedy class on the odontogram', true, LEFT, LOWI, [{ kind: 'odontogram' }], ['kennedy'], [], F25],
+    ['the Kennedy class on a view of one side', false, LEFT, LOWI, [{ kind: 'view', teeth: LEFT }], ['kennedy'], [], F25],
+    ['the Kennedy class on a view of the whole arch', true, LEFT, LOWI, [{ kind: 'view', teeth: ARCH }], ['kennedy'], [], F25],
+    ['the clasps and rests on the views of both sides with the denture in', true, LEFT, LOWI, [{ kind: 'view', teeth: LEFT }, { kind: 'view', teeth: RIGHT }], ['denture'], [], F25],
+    ['the clasps and rests on a view of one side only (the other side\'s are part of the design)', false, LEFT, LOWI, [{ kind: 'view', teeth: LEFT }], ['denture'], [], F25],
+    ['the clasps and rests on the views with the denture out', false, LEFT, LOWI, [{ kind: 'view', teeth: LEFT, out: true }, { kind: 'view', teeth: RIGHT, out: true }], ['denture'], [], F25],
+    ['both overdenture abutments on their periapicals', true, ['5', '6', '7'], OD, [{ kind: 'film' }, { kind: 'film', teeth: ['10', '11', '12'] }], ['denture'], [], { full: true, mouth: { teeth: 16 } }],
+    ['one of two overdenture abutments on a periapical', false, ['5', '6', '7'], OD, [{ kind: 'film' }], ['denture'], [], { full: true, mouth: { teeth: 16 } }],
+    ['an overdenture abutment on the view with the denture in (its base covers it)', false, ['5', '6', '7'], OD, [{ kind: 'view' }], ['denture'], [], { full: true, mouth: { teeth: 16 } }],
+    ['the overdenture abutments on the view with the denture out', true, ['5', '6', '7'], OD, [{ kind: 'view', teeth: ['3', '4', '5', '6', '7', '8', '9', '10', '11', '12'], out: true }], ['denture'], [], { full: true, mouth: { teeth: 16 } }],
+    ['a cingulum rest on the view alone (it is on the lingual)', false, ['2', '3', '4', '5', '6', '7', '8'], [{ m: 'missing', teeth: ['1', '2', '3', '12', '16', '17', '32'] }, { m: 'denture', type: 'partial', arch: 'upper', connector: 'ap-strap', clasps: { 4: 'rpi', 11: 'circumferential', 13: 'circumferential', 15: 'circumferential' }, rests: { 6: 'cingulum' } }], [{ kind: 'view', teeth: ['2', '3', '4', '5', '6', '7', '8'] }, { kind: 'view', teeth: ['9', '10', '11', '12', '13', '14', '15'] }], ['denture'], [], { full: true, mouth: { teeth: 25 } }],
+    ['a resin-bonded wing on the view alone (it is on the lingual)', false, ['9', '10', '11'], [{ m: 'missing', teeth: ['10'] }, { m: 'bridge', type: 'resin-bonded', abutments: ['9', '11'], material: 'metal' }], [{ kind: 'view' }], ['resto']],
+    ['a resin-bonded wing on a periapical', true, ['9', '10', '11'], [{ m: 'missing', teeth: ['10'] }, { m: 'bridge', type: 'resin-bonded', abutments: ['9', '11'], material: 'metal' }], [{ kind: 'film' }], ['resto']],
+    ['a denture question on a case with no denture', false, ['28', '29', '30'], [], [{ kind: 'film' }], ['denture']],
+  );
   // a record: [what, answerable, teeth, modules, figs, rests (caries by default), the question's own rows, more of the record]
   for (const [what, ok, teeth, modules, figs, rests, rows, extra] of recs) {
     const spec = Object.assign({ teeth, modules }, base, extra || {}), v = K.validate(spec);
@@ -278,6 +345,27 @@ for (const hub of fs.readdirSync(path.join(root, 'hubs')).sort()) {
     if (!got || got.dx !== want) { bad++; console.error(`✗ the kit's implant rules: ${what} should be ${want}, derive() gives ${got ? got.dx : 'nothing'}`); }
   }
 }
+/* Patient Box v2.4 (2026-11-24): the Kennedy class derive() gives a partial denture's arch, by Applegate's rules (the sources are
+   in widget/cases.js's header): each record must pass validate() and give its class */
+{
+  const { K } = load('var PCASES = {};');
+  const base = { age: 62, sex: 'woman', smoke: 0, teeth: ['20', '21'], full: true };
+  const C = (cl, more) => Object.assign({ m: 'denture', type: 'partial', arch: 'lower', connector: 'plate', clasps: cl }, more || {});
+  const kds = [
+    ['both sides free-ended, a space between the incisors too', ['17', '18', '19', '20', '26', '30', '31', '32'], C({ 21: 'rpi', 29: 'rpi' }, { rests: { 22: 'incisal', 27: 'incisal' } }), 'Kennedy Class I, modification 1'],
+    ['one side free-ended', ['17', '18', '19', '20', '32'], C({ 21: 'rpi', 29: 'circumferential', 30: 'circumferential' }, { rests: { 27: 'incisal' } }), 'Kennedy Class II'],
+    ['one side free-ended, a bounded space on the other', ['17', '18', '19', '20', '30', '32'], C({ 21: 'rpi', 29: 'circumferential', 31: 'circumferential' }, { rests: { 27: 'incisal' } }), 'Kennedy Class II, modification 1'],
+    ['bounded spaces on both sides (the third molars missing, not replaced, aren\'t counted)', ['17', '19', '30', '32'], C({ 18: 'circumferential', 20: 'circumferential', 29: 'circumferential', 31: 'circumferential' }), 'Kennedy Class III, modification 1'],
+    ['a second molar missing and not replaced isn\'t counted: the first molar\'s space is free-ended', ['17', '18', '19', '32'], C({ 20: 'rpi', 29: 'circumferential', 30: 'circumferential' }, { replaces: ['19'], rests: { 27: 'incisal' } }), 'Kennedy Class II'],
+    ['one space across the midline, in front of the teeth left', ['17', '32', '23', '24', '25', '26'], C({ 22: 'circumferential', 27: 'circumferential', 20: 'circumferential', 29: 'circumferential' }, { rests: { 22: 'incisal', 27: 'incisal' } }), 'Kennedy Class IV'],
+  ];
+  for (const [what, missing, den, want] of kds) {
+    const spec = Object.assign({ mouth: { teeth: 32 - missing.length }, modules: [{ m: 'missing', teeth: missing }, den] }, base), v = K.validate(spec);
+    if (v.length) { bad++; console.error(`✗ the kit's denture rules: ${what}: the record fails validate(): ${v.join('; ')}`); continue; }
+    const got = (K.derive(spec).kennedy.lower || {}).text;
+    if (got !== want) { bad++; console.error(`✗ the kit's denture rules: ${what} should be ${want}, derive() gives ${got || 'nothing'}`); }
+  }
+}
 /* the example cases (not on any page), checked like a hub's */
 {
   const ex = JSON.parse(fs.readFileSync(path.join(root, 'tools', 'cases', 'examples.json'), 'utf8'));
@@ -295,7 +383,8 @@ function checkSet(hub, K, PCASES, named, pfigs, qlist){
     let d;
     try { d = K.derive(c.spec); } catch (e) { problems.push('derive failed: ' + e.message); }
     if (d && c.expect) {
-      const got = { kind: d.kind, stage: d.stage, grade: d.grade, extent: d.extent, dx: d.dx, rt: d.rt, impl: d.impl, triggers: d.triggers, ratio: d.ratio, maxInterdental: d.maxInterdental.v, maxRBL: d.maxRBL.pct, bopPct: d.bopPct };
+      const kennedy = {}; for (const a of Object.keys(d.kennedy || {})) kennedy[a] = d.kennedy[a].text;
+      const got = { kind: d.kind, stage: d.stage, grade: d.grade, extent: d.extent, dx: d.dx, rt: d.rt, impl: d.impl, kennedy, triggers: d.triggers, ratio: d.ratio, maxInterdental: d.maxInterdental.v, maxRBL: d.maxRBL.pct, bopPct: d.bopPct };
       for (const k of Object.keys(c.expect)) if (!same(c.expect[k], got[k])) problems.push(`expect.${k}: wrote ${JSON.stringify(c.expect[k])}, the numbers give ${JSON.stringify(got[k])}`);
     }
     // the drawings must build without throwing
