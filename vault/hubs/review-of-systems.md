@@ -104,6 +104,14 @@ check-in hours: its entry in `hubs.js`.
 
 - **Its keys were read in full on 2026-11-24** (the lessons audit, after ten "keyed wrong" reports in a day): 51 of Head & Neck's 68 single-answer items and `f1-biomol-03` pointed one choice past the right answer, from the build; fixed, with `tools/data-fixes/2026-11-24-review-of-systems-keys.sql` recounting their class numbers. Every other course and every fixed-order format was right. A new batch of drafted questions gets the same read before it ships ([build-a-hub](../how-to/build-a-hub.md)'s Check, Sam, 2026-11-24). The same audit settled two facts from standard references (Sam: "fix 5"): Gold's agar is 20% sucrose (`om-viral-01`, the Oral Micro notes' media table), and B cells finish maturing in the spleen (`f1-innate-12`, as `f1-hyper-10` and the notes say). After the merge (#552) the class's numbers on the fixed questions needed a second pass ([BUG-200](../release/bug-log.md): the new keys had set their picks aside), and reports #69-#79 got their replies; #68 (Listen) waits for [BUG-199](../release/bug-log.md). The single-answer choices are shuffled on the card, so where a key sits in `choices` gives nothing away.
 
+- **Every question was vetted on 2026-11-24** (Sam: "Vet all questions, the answer key, and explanations ... for accuracy,
+  clarity, effectiveness, completeness"): all 1,369 read in 19 slices, answered cold and checked against the notes and
+  standard references. No key was wrong; 71 questions and 27 notes lines were fixed (the list is in `DEPLOY_NOTES.md`).
+  From it: **choking is 5 back blows, then 5 abdominal thrusts** in every part (the AHA's 2025 Adult BLS guideline; the
+  lecture's "abdominal thrusts" alone is the older guidance, and the notes say so); the do-not-use list reads µg and
+  q.o.d. (the notes had mcg and q.a.d.); the cystic risk for renal cell carcinoma is the acquired cystic disease of
+  dialysis. What the read left as it is, for Sam: [the inbox](../tasks/inbox.md).
+
 - **The exam-eve boss** (2026-11-22, idea board #4, migration_v97: [game-server](../reference/game-server.md)): the Midnight
   Plaque comes up 3 pm to midnight on Wed Dec 2 and Wed Dec 9, the eves of the two mocks, at 3,000 HP each (Sam can set
   either with `eveBoss` on its exam in `hubs.js`), on Home, in the band and, on a wide screen, under Today in the Question Bank. Read how the first went the morning after (inbox).
