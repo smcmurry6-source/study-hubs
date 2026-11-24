@@ -1,5 +1,5 @@
 {
-  "about": "Patient Box v2's example cases (v2.1 added the bridge-and-post and the trauma cases, and the buccal-decay case): made-up patients assembled from modules, checked by node tools/ci/cases.js like a hub's (every module, view and check runs on them) and drawn for the screenshots in its PR. Not on any page. A new hub copies one into its content/core.json's pcases (vault/how-to/draw-a-patient-box-case.md).",
+  "about": "Patient Box v2's example cases (v2.1 added the bridge-and-post and the trauma cases, and the buccal-decay case; v2.2 the proximal root caries, root tips, resorption, sealants-and-temporaries and cracked-tooth cases): made-up patients assembled from modules, checked by node tools/ci/cases.js like a hub's (every module, view and check runs on them) and drawn for the screenshots in its PR. Not on any page. A new hub copies one into its content/core.json's pcases (vault/how-to/draw-a-patient-box-case.md).",
   "pcases": {
     "v2-full-mouth": {
       "title": "Full mouth, first visit",
@@ -95,6 +95,101 @@
       },
       "figs": [{ "kind": "view" }, { "kind": "film" }],
       "expect": { "kind": "health" }
+    },
+    "v22-root-caries": {
+      "title": "Lower right: decay under the contacts",
+      "spec": {
+        "teeth": ["28", "29", "30", "31"], "age": 71, "sex": "man", "smoke": 0, "hba1c": 5.8, "medical": "Treated for periodontitis ten years ago; takes a blood pressure medicine that dries his mouth",
+        "cc": "Food packs between my back teeth.",
+        "mouth": { "teeth": 26, "involved": 6, "lost": 0 },
+        "modules": [
+          { "m": "bone", "teeth": ["28", "29", "30"], "percent": 30, "rec": 3 },
+          { "m": "bone", "teeth": ["31"], "percent": 24, "rec": 2 },
+          { "m": "caries", "tooth": "29", "surface": "D", "depth": "dentin", "root": true },
+          { "m": "caries", "tooth": "30", "surface": "M", "depth": "dentin", "root": true, "arrested": true },
+          { "m": "restoration", "tooth": "30", "surfaces": "DO", "material": "amalgam" },
+          { "m": "bop", "rate": 0.15 }
+        ]
+      },
+      "figs": [{ "kind": "film" }, { "kind": "bitewing", "teeth": ["2", "3", "4", "5", "28", "29", "30", "31"] }, { "kind": "view" }],
+      "expect": { "kind": "periodontitis", "stage": 2, "grade": "B", "extent": "localized" }
+    },
+    "v22-root-tips": {
+      "title": "Upper left: a retained root and a root tip",
+      "spec": {
+        "full": true, "teeth": ["12", "13", "14", "15"], "age": 58, "sex": "woman", "smoke": 0,
+        "cc": "I'd like an implant where my back tooth was pulled, and this broken one fixed.",
+        "mouth": { "teeth": 27, "involved": 0, "lost": 0 },
+        "modules": [
+          { "m": "missing", "teeth": ["1", "16", "17", "32"] },
+          { "m": "roottip", "tooth": "12", "kind": "retained" },
+          { "m": "recession", "teeth": ["12"], "mm": 1 },
+          { "m": "endo", "tooth": "12", "fill": false, "lesion": 5 },
+          { "m": "roottip", "tooth": "14", "kind": "fragment", "len": 4, "root": "mesiobuccal" },
+          { "m": "restoration", "tooth": "13", "surfaces": "MO", "material": "composite" }
+        ]
+      },
+      "figs": [{ "kind": "film" }, { "kind": "view" }, { "kind": "odontogram" }],
+      "expect": { "kind": "health" }
+    },
+    "v22-resorption": {
+      "title": "Upper front teeth, years after an injury and braces",
+      "spec": {
+        "full": true, "teeth": ["7", "8", "9", "10"], "age": 29, "sex": "woman", "smoke": 0, "medical": "Braces at 13; knocked out #8 at 12 playing hockey, put back the same day",
+        "cc": "There's a pink patch on my front tooth near the gum.",
+        "mouth": { "teeth": 28, "involved": 0, "lost": 0 },
+        "modules": [
+          { "m": "missing", "teeth": ["1", "16", "17", "32"] },
+          { "m": "resorption", "tooth": "7", "type": "cervical", "side": "f", "heithersay": 3 },
+          { "m": "resorption", "tooth": "8", "type": "replacement", "side": "md", "at": "middle", "mm": 6 },
+          { "m": "resorption", "tooth": "9", "type": "internal", "at": "middle", "size": 2.5 },
+          { "m": "resorption", "tooth": "10", "type": "apical", "mm": 2.5 }
+        ],
+        "tests": [
+          { "test": "percussion", "tooth": "8", "result": "metallic" },
+          { "test": "percussion", "tooth": "9", "result": "normal" }
+        ]
+      },
+      "figs": [{ "kind": "film" }, { "kind": "view" }, { "kind": "odontogram" }],
+      "expect": { "kind": "health" }
+    },
+    "v22-sealants-temps": {
+      "title": "Lower left, between appointments",
+      "spec": {
+        "full": true, "teeth": ["18", "19", "20", "21"], "age": 27, "sex": "man", "smoke": 0,
+        "cc": "I'm back for my permanent crown, and to have my temporary fillings replaced.",
+        "mouth": { "teeth": 28, "involved": 0, "lost": 0 },
+        "modules": [
+          { "m": "missing", "teeth": ["1", "16", "17", "32"] },
+          { "m": "sealant", "teeth": ["18"], "surfaces": "OB" },
+          { "m": "sealant", "teeth": ["2", "15", "31"], "surfaces": "O" },
+          { "m": "endo", "tooth": "19", "fill": "adequate" },
+          { "m": "restoration", "tooth": "19", "surfaces": "O", "material": "temporary", "temp": "irm" },
+          { "m": "restoration", "tooth": "20", "material": "crown", "crown": "provisional" },
+          { "m": "restoration", "tooth": "21", "surfaces": "DO", "material": "temporary", "temp": "cavit" }
+        ]
+      },
+      "figs": [{ "kind": "film" }, { "kind": "bitewing", "teeth": ["12", "13", "14", "15", "21", "20", "19", "18"] }, { "kind": "view" }, { "kind": "odontogram" }],
+      "expect": { "kind": "health" }
+    },
+    "v22-cracked-tooth": {
+      "title": "Lower left first molar: pain on chewing",
+      "spec": {
+        "teeth": ["18", "19", "20"], "age": 47, "sex": "woman", "smoke": 0,
+        "cc": "It hurts when I chew on this side, a sharp zing when I let go.",
+        "modules": [
+          { "m": "restoration", "tooth": "19", "surfaces": "MOD", "material": "amalgam" },
+          { "m": "fracture", "tooth": "19", "type": "crack" }
+        ],
+        "tests": [
+          { "test": "bite", "tooth": "19", "result": "positive", "cusp": "DL", "release": true },
+          { "test": "bite", "tooth": "18", "result": "negative" },
+          { "test": "transillumination", "tooth": "19", "result": "positive" },
+          { "test": "percussion", "tooth": "19", "result": "normal" }
+        ]
+      },
+      "figs": [{ "kind": "film" }, { "kind": "view" }],
+      "expect": { "kind": "health" }
     }
   },
   "questions": [
@@ -127,6 +222,54 @@
         "Arrested root caries is dark brown to black, hard and shiny, like #21's lesion next to it, not yellow-brown.",
         "A white-spot lesion is chalky white enamel at the crown's cervical third, like #20's; a root has no enamel.",
         "#22 has no crown. The recurrent caries in this view is #18's, the dark band just below its crown's margin."
+      ] },
+    { "id": "v22-ex-6", "pcase": "v22-root-caries", "rests": ["caries"], "pbox": [["Exam", "An explorer sticks in a soft lesion on #29's distal root surface; #30's mesial root surface is dark, hard and shiny"]],
+      "stem": "A 71-year-old treated for periodontitis ten years ago. On the periapical and the bitewing, what are the dark notches on #29's distal and #30's mesial roots, below the enamel and above the bone?", "choices": ["Root caries, active on #29 and arrested on #30", "Cervical burnout", "Root caries, arrested on #29 and active on #30", "Recurrent caries at #30's amalgam"], "answer": 0,
+      "why": [
+        "Right: both roots are bared to the mouth where the interdental bone and the papilla are gone, and each has a saucer-shaped radiolucency cut into the root between the CEJ and the crest, its inner edge ill defined. A film can't tell active from arrested; the exam does: #29's is soft (active), #30's dark, hard and shiny (arrested).",
+        "Cervical burnout is a dark band at the neck between the enamel's edge and the bone crest with the root's outline intact, and it changes with the film's angle. These lesions cut into the root's outline and look the same on both films.",
+        "The exam says the opposite: soft is active, and #30's surface is hard and shiny, which is arrested.",
+        "#30's amalgam is DO: its box is on the distal, toward #31. #30's lesion is on its mesial root, nowhere near a restoration's margin."
+      ] },
+    { "id": "v22-ex-7", "pcase": "v22-root-tips", "rests": ["roottip"],
+      "stem": "She would like an implant at #14. On the periapical, what lies in the bone at #14's site?", "choices": ["A root tip left after the extraction", "A dense bone island", "A retained root with its crown decayed away", "An unerupted supernumerary tooth"], "answer": 0,
+      "why": [
+        "Right: a piece of root about 4 mm long sits where #14's mesiobuccal root was, under the healed ridge. It has a canal down its middle, and a dark PDL space and a bright lamina dura around it, which bone doesn't have. The implant has to be planned around it, or it comes out first.",
+        "A dense bone island (idiopathic osteosclerosis) is a radiopaque area with no canal, no PDL space and no lamina dura, blending into the bone around it.",
+        "That is #12: its crown is broken off about a millimeter above the CEJ, its top ragged and dark with decay, its root still in its socket. #14's site has no crown or stump; the ridge over it has healed.",
+        "A supernumerary tooth has a crown with enamel; this fragment is root only, broken across its coronal end."
+      ] },
+    { "id": "v22-ex-8", "pcase": "v22-resorption", "rests": ["resorption"],
+      "stem": "A 29-year-old. #8 was knocked out when she was 12 and put back the same day. On the periapical, what is happening along the middle of #8's root?", "choices": ["Replacement resorption (ankylosis)", "Internal resorption", "External cervical resorption", "External apical resorption"], "answer": 0,
+      "why": [
+        "Right: along the middle third of #8's root, on both sides, the PDL space and the lamina dura are gone and the bone runs straight into the root, replacing it. The tooth gives a high, metallic sound on percussion. It is the usual outcome of a replanted tooth whose PDL died while it was out of its socket.",
+        "Internal resorption is #9's: a smooth, oval widening of the canal itself, centered on it, the canal's outline lost in it.",
+        "External cervical resorption is #7's: an irregular, mottled radiolucency at the neck below the CEJ with the canal's outline still seen through it, and a pink spot through the crown.",
+        "External apical resorption is #10's (common after braces): the root shorter than it should be, its end blunted. #8's root keeps its length."
+      ] },
+    { "id": "v22-ex-9", "pcase": "v22-sealants-temps", "rests": ["resto"],
+      "stem": "A 27-year-old back for his permanent restorations. On the bitewing, what fills #19's access cavity?", "choices": ["A temporary filling over a cotton pellet", "An amalgam over an amalgam core", "Composite over a fiber post", "A provisional crown"], "answer": 0,
+      "why": [
+        "Right: #19 is root filled, and its access is sealed with a bright filling with small dark voids, the look of a hand-packed temporary (the odontogram marks it as one), over a dark cotton pellet in the chamber. The canals are filled; the tooth waits for its permanent restoration.",
+        "An amalgam is brighter and dense, with no voids, and there would be no radiolucent pellet under it.",
+        "There is no post: the canals hold gutta-percha almost to the apex, and the chamber holds a radiolucent pellet, not resin.",
+        "The provisional crown is #20's: a crown-shaped shell, darker than the tooth's own dentin, over its preparation, with a bright cement line under it."
+      ] },
+    { "id": "v22-ex-10", "pcase": "v22-sealants-temps", "rests": ["sealant"],
+      "stem": "On the odontogram and the drawn view, what is on #18's occlusal surface and in its buccal pit?", "choices": ["Sealants", "Composite restorations", "Temporary fillings", "White-spot lesions"], "answer": 0,
+      "why": [
+        "Right: the odontogram fills #18's O and B in the sealant's color, and the view shows the opaque white sealant in its buccal pit. No film shows a sealant: it is thin, and no more radiopaque than enamel.",
+        "A composite is charted in its own color (blue here), and a film would show it bright in the tooth; #18 shows nothing on the films.",
+        "The temporary fillings are #19's and #21's: sand-colored with two dots on the odontogram, and bright with voids on the films.",
+        "A white-spot lesion is chalky, demineralized enamel, charted as caries. A sealant can go over one (the ADA and AAPD guideline), but nothing here is charted as caries."
+      ] },
+    { "id": "v22-ex-11", "pcase": "v22-cracked-tooth", "rests": ["fracture"],
+      "stem": "A 47-year-old: it hurts when she chews on this side, a sharp zing when she lets go. What is the most likely cause?", "choices": ["A crack in #19", "Apical periodontitis on #19", "Recurrent caries under #19's amalgam", "A crack in #18"], "answer": 0,
+      "why": [
+        "Right: biting on #19's distolingual cusp hurts, most on release, and transillumination stops at a line across its crown: a cracked tooth. The film looks normal, as it usually does with a crack, and #19 isn't tender to percussion.",
+        "Apical periodontitis makes a tooth tender to percussion and shows a widened PDL or a lesion at the apex. #19's percussion is normal, and its apices look normal on the film.",
+        "#19's MOD amalgam shows no radiolucency at its margins on the film, and decay doesn't cause a sharp pain on release.",
+        "#18's bite test is negative."
       ] }
   ]
 }

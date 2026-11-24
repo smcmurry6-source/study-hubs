@@ -34,6 +34,22 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 - **2026-11-24 (Lessons refresh: 52 answer keys in Review of Systems, Claude Code)** — Ten "keyed wrong" reports in a day led to a read of all 1,369 keys against their explanations and why lines (seven agents, a course or two each): 51 of Head & Neck's 68 single-answer items and `f1-biomol-03` pointed one choice past the right answer, wrong since the build (#480), every one by exactly one place; fixed in `hubs/review-of-systems/content/questions.json`. `tools/data-fixes/2026-11-24-review-of-systems-keys.sql` recounts their `question_stats` from `question_choices` after the merge (tested twice on a throwaway copy); After merge loads the new keys. Also: when troponin reaches the blood (`f2-genpath-20`, its notes and cram line), the panoramic chin-down error (`rd-anatomy-07` and its notes), and small slips in seven why lines and explanations. Listen with the device voice: BUG-199. `LESSONS.md` refreshed (Live signals, the game economy, a standing lesson on reading keys before a drafted bank ships).
 
+- **2026-11-24 (Patient Box v2.2, Claude Code)** — the case kit (`widget/cases.js`, `widget/cases.css`, `widget/teeth.js`)
+  draws and checks what v2.1 left ([the task](vault/tasks/2026-11-20-patient-box-v2-next-steps.md)), each clinical call settled
+  from outside sources and cited in `cases.js`'s header (Sam, 2026-11-21: "Use outside sources to determine answers"):
+  **proximal root caries** (`root: true` on M or D: a saucer-shaped notch on a film between the CEJ and the crest, only on a
+  root bared by interdental attachment and bone loss; not on the view; an arrested one needs the exam in a row); the
+  **`roottip`** module (a retained root broken off about a millimeter above the CEJ, or a root tip in a healed socket under a
+  ridge that dips over it); **`resorption`** (internal, external cervical by Heithersay's class with its pink spot on the view,
+  external apical, replacement with the ankylosed tooth immobile and metallic on percussion); **`sealant`** (O, a mandibular
+  molar's buccal pit, a maxillary molar's or incisor's lingual; on the view and the odontogram, never a film); **temporary
+  fillings** (`material: "temporary"`, `temp` IRM or Cavit, bright with voids over a cotton pellet) and the **provisional
+  crown**; and the record's **`tests`** (bite test, transillumination, percussion), each a Patient Box row, so a crack's finding
+  is in the case, not a question's `pbox`. `rests` gains `roottip`, `resorption` and `sealant`; `tools/ci/cases.js` holds a
+  record for every rule (53 for `validate()`, 21 for `answerable()`); five examples and six questions in
+  `tools/cases/examples.json`; the how-to has the modules. Also fixed: a crowned tooth on the drawn chart looked natural in
+  the dark theme. No live hub has dental cases, so students see nothing yet; `sw.js` to `sh-v75` for the changed kit.
+
 - **2026-11-24 (Learn's typed answer and Flashcards' Undo, migration_v102, Claude Code)** — Sam: "Do typed answers in
   learn and undo in flashcards too" (the two inbox lines). **Learn:** a question's second, mastering step is typed when its
   right answer is short (six words or fewer, not "all of the above" or the like, distinct from every other choice: 163 of
