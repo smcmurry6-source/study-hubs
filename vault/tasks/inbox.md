@@ -10,6 +10,10 @@ this folder (deleting the line: the note carries it) or just does it, if it's sm
 (`- [x] ... (#123)`); ticked lines are cleared the next time someone goes through the inbox. Anything left to do from a chat
 lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the-vault.md)). See [README](README.md).
 
+- [ ] **The dashboard's progress ring reads only this device's copy of the hub** (2026-11-24, found fixing BUG-107):
+  `readProgress()` in `widget/dash.js` reads the hub's saved state on the device, so on a new or linked device (and in the
+  preview before a hub is opened) the open hub's card says "Your progress in this hub shows here" and 0 tried, though the
+  bootstrap already brings the account's answers. Draw the ring from those answers when the device has none? Live, minor.
 - [ ] **Scroll the dashboard and the shop on a real phone** (2026-11-22, the no-pausing change): an iPhone in Safari and an
   Android phone in Chrome, a long scroll of the dashboard top to bottom and of the shop's shelves, then Timmy's place at
   night. The cloud browser draws without a graphics card, so the compositor's part (the stage's sparkles and confetti, the

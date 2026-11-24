@@ -258,9 +258,18 @@
     return last !== null && now() >= last;
   }
   function spec(archived){ var a = P.answers || {}; return archived ? a.archived : a.live; }
+  /* what a hub's made-up history is drawn from: its question ids and exam dates, from the preview's build (C.hubs, every
+     hub on the engine, tools/preview/transform.js) so any page can make it, the dashboard included (BUG-107: until a hub
+     was opened the dashboard had no history and drew Timmy at 0 HP); else the hub's own export, on its page. The same
+     ids in the same order either way, so the history doesn't depend on which page made it first. */
+  function hubSource(hub){
+    var H = C.hubs && Object.prototype.hasOwnProperty.call(C.hubs, hub) ? C.hubs[hub] : null;
+    if (H && Array.isArray(H.q)) return { questions: H.q.map(function(id){ return { id: id }; }), exams: H.exams || [] };
+    return hubExport(hub);
+  }
   function answersFor(hub){
     if (!db.gen[hub]) {
-      var E = hubExport(hub);
+      var E = hubSource(hub);
       if (!E) return db.answers[hub] || [];
       var archived = hubArchived(E), s = spec(archived), rows = db.answers[hub] || [], r = rng(hash(P.id + "|" + hub));
       db.hubMeta[hub] = { archived: archived, n: E.questions.length };
@@ -282,7 +291,7 @@
     }
     return db.answers[hub] || [];
   }
-  function allAnswers(){ var out = []; Object.keys(db.answers).forEach(function(h){ (db.answers[h] || []).forEach(function(a){ out.push([h, a[0], a[1], a[2], a[3]]); }); }); return out; }
+  function allAnswers(){ var out = []; Object.keys(C.hubs || {}).forEach(answersFor); Object.keys(db.answers).forEach(function(h){ (db.answers[h] || []).forEach(function(a){ out.push([h, a[0], a[1], a[2], a[3]]); }); }); return out; }
   /* Keep the bootstrap response assembled from the same fixture shapes as its
      individual RPCs. This lets preview exercise the one-round-trip path without
      giving it a second, subtly different model of learner data. */
@@ -1876,6 +1885,9 @@
     ".shpv-pill.is-alert{background:#b91c1c;border-color:#450a0a}",
     ".shpv-pill.is-min{padding:0;width:44px;justify-content:center}",
     ".shpv-pill.is-min .shpv-pill-text{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}",
+    /* out of the way of an open dialog (dodge(), BUG-039): a round button at the spot that covers least of it */
+    ".shpv-pill.is-dodge{padding:0;width:44px;justify-content:center}",
+    ".shpv-pill.is-dodge .shpv-pill-text{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}",
     "@media (max-width:700px){.shpv-pill{bottom:calc(76px + env(safe-area-inset-bottom,0px))}}",
     ".shpv-panel{position:fixed;left:12px;bottom:64px;z-index:2147483647;width:min(400px,calc(100vw - 24px));max-height:calc(100vh - 90px);overflow:auto;padding:16px;border-radius:12px;border:2px solid #c2410c;background:#fff;color:#1a1a1a;font:14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;box-shadow:0 8px 30px rgba(0,0,0,.35);text-align:left}",
     "@media (max-width:700px){.shpv-panel{bottom:calc(128px + env(safe-area-inset-bottom,0px));max-height:calc(100vh - 150px)}}",
@@ -1933,6 +1945,80 @@
       send();
     }, /\/(index\.html)?$/.test(location.pathname) && !/\/(hubs|about|review|tools)\//.test(location.pathname) ? 7000 : 20000);   /* faster on the dashboard, where the classroom shows it */
   }
+  /* BUG-039: the pill sits over the page, so on a small phone it covered an open dialog's buttons (the exam check-in's
+     scale, a choice, Skip, Send) and a tester couldn't tap them. While one of the page's own dialogs is open, it tries its
+     usual spot and the screen's corners and edges and moves to the one that covers least of the dialog: a button or a
+     field in it counts most, its other content a little, a box as big as the screen nothing. Beside a dialog that isn't
+     modal the page stays live, so there a spot other than its usual one also counts the page's buttons under it: the pill
+     leaves its spot only to clear the dialog, never onto a button it didn't cover before. A tie keeps the earlier spot, so
+     it stays put whenever its usual spot is clear of the dialog. With no dialog open it stays where it always is (a pill
+     hopping about as the page scrolls would be worse). */
+  var DLG = 'dialog[open],[role="dialog"],[role="alertdialog"],[aria-modal="true"]';
+  var TAPPABLE = 'a[href],button,input,select,textarea,summary,label,[role="button"],[role="link"],[role="checkbox"],[role="radio"],[role="switch"],[role="tab"],[role="menuitem"],[role="option"],[role="slider"],[contenteditable=""],[contenteditable="true"],[tabindex]:not([tabindex="-1"])';
+  function dodge(pill){
+    var timer = 0, late = 0, at = "", open = false;
+    function mine(e){ return !!(e && e.closest && e.closest("#shpv-pill,#shpv-panel,.shpv-frame")); }
+    function shown(d){
+      if (!d || mine(d) || d.hidden || d.closest("[hidden]") || d.closest('[aria-hidden="true"]')) return false;
+      var r = d.getBoundingClientRect(), cs = getComputedStyle(d), vw = document.documentElement.clientWidth || innerWidth;
+      return r.width > 0 && r.height > 0 && r.right > 0 && r.bottom > 0 && r.left < vw && r.top < innerHeight &&
+        cs.visibility !== "hidden" && cs.display !== "none" && +cs.opacity !== 0;
+    }
+    function isModal(d){ if (d.getAttribute("aria-modal") === "true") return true; try { return d.matches(":modal"); } catch (e) { return false; } }
+    function openDialogs(){ return Array.prototype.filter.call(document.querySelectorAll(DLG), shown); }
+    /* page: also count the page's own buttons (a spot it would move to, beside a dialog that isn't modal) */
+    function cost(x, y, w, h, page){
+      var vw = document.documentElement.clientWidth || innerWidth, vh = innerHeight, big = vw * vh * 0.6, sum = 0;
+      [6, w / 2, w - 6].forEach(function(dx){ [6, h / 2, h - 6].forEach(function(dy){
+        var px = x + dx, py = y + dy; if (px < 0 || py < 0 || px >= vw || py >= vh) { sum += 1; return; }
+        var under = document.elementsFromPoint(px, py).filter(function(e){ return !mine(e); })[0];
+        if (!under) return;
+        var d = under.closest(DLG), t = under.closest(TAPPABLE);
+        if (!d || !shown(d)) { if (page && t) sum += 10; return; }
+        if (t && d.contains(t)) { sum += 10; return; }
+        var r = under.getBoundingClientRect(); if (r.width * r.height < big) sum += 1;
+      }); });
+      return sum;
+    }
+    function place(spot){
+      var key = spot ? spot.join(",") : "";
+      if (key === at) return;
+      at = key;
+      pill.style.left = spot ? spot[0] + "px" : ""; pill.style.top = spot ? spot[1] + "px" : "";
+      pill.style.right = spot ? "auto" : ""; pill.style.bottom = spot ? "auto" : "";
+    }
+    function run(){
+      timer = 0;
+      var dlgs = openDialogs(), page = !dlgs.some(isModal);
+      open = dlgs.length > 0;
+      if (!open) { pill.classList.remove("is-dodge"); place(null); return; }
+      /* where it rests, at its own size: clear there, nothing changes */
+      var shrunk = pill.classList.contains("is-dodge"), moved = at;
+      if (shrunk || moved) { pill.classList.remove("is-dodge"); place(null); }
+      var r = pill.getBoundingClientRect();
+      if (!cost(r.left, r.top, r.width, r.height)) return;
+      pill.classList.add("is-dodge");
+      r = pill.getBoundingClientRect();
+      var vw = document.documentElement.clientWidth || innerWidth, vh = innerHeight, s = 44, m = 12;
+      var spots = [null, [vw - s - m, m], [m, m], [vw - s - m, vh - s - m], [m, vh - s - m], [vw - s - m, Math.round((vh - s) / 2)], [m, Math.round((vh - s) / 2)]];
+      var best = null, low = Infinity;
+      spots.forEach(function(sp){
+        var c = sp ? cost(sp[0], sp[1], s, s, page) : cost(r.left, r.top, r.width, r.height);
+        if (c < low) { low = c; best = sp; }
+      });
+      place(best);
+    }
+    /* soon after the page changes, and again once a dialog's opening animation has settled */
+    function soon(){ if (!timer) timer = setTimeout(run, 120); clearTimeout(late); late = setTimeout(run, 600); }
+    try {
+      new MutationObserver(function(list){
+        for (var i = 0; i < list.length; i++) if (!mine(list[i].target)) { soon(); return; }
+      }).observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ["open", "hidden", "class", "aria-hidden"] });
+    } catch (e) {}
+    addEventListener("resize", soon);
+    document.addEventListener("scroll", function(){ if (open) soon(); }, true);   /* a dialog's own scrolling moves its buttons */
+    soon();
+  }
   function mount(){
     if (document.getElementById("shpv-pill")) return;
     fakeOnline();
@@ -1945,6 +2031,7 @@
     document.body.appendChild(pill);
     var panel = el("div", { id: "shpv-panel", "class": "shpv-panel", role: "dialog", "aria-modal": "false", "aria-labelledby": "shpv-title", hidden: "" });
     document.body.appendChild(panel);
+    dodge(pill);
     var nowSet = jget(K.now, null), isReview = /\/review\//.test(location.pathname);
     panel.innerHTML =
       '<button type="button" class="shpv-x" data-pv="close" aria-label="Close preview controls">&times;</button>' +
