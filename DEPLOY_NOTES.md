@@ -32,7 +32,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
-- **2026-11-25 (The medals' last SMIL, the scrollbar's room, the progress ring on a new device, Claude Code, #PRNUM)** —
+- **2026-11-25 (The medals' last SMIL, the scrollbar's room, the progress ring on a new device, Claude Code, #564)** —
   Three inbox lines, measured at 4x CPU as [motion-cost](vault/reference/motion-cost.md) does. **The Diamond and Dark
   Matter medals:** their sparkles, Dark Matter's twinkling stars and its glow were SMIL in `art()` (`widget/ranks.js`), which
   made the browser draw the page on every frame wherever an animated medal was; they are CSS `transform` and `opacity` now,

@@ -26,7 +26,7 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   `ns-sens-14`'s distractors are easy; `da-tmj-16` nearly repeats `da-anomalies-11`; three Dental Anatomy explanations
   mention a class guide that disagrees.
 - [x] **The dashboard's progress ring reads only this device's copy of the hub** (2026-11-24, found fixing BUG-107; done
-  in #PRNUM: the bootstrap brought no answers to the dashboard, which asked for no hub, so it now asks for the open tab's hub
+  in #564: the bootstrap brought no answers to the dashboard, which asked for no hub, so it now asks for the open tab's hub
   when this device has none of it, and draws the ring from those answers):
   `readProgress()` in `widget/dash.js` reads the hub's saved state on the device, so on a new or linked device (and in the
   preview before a hub is opened) the open hub's card says "Your progress in this hub shows here" and 0 tried, though the
@@ -57,12 +57,12 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   scrollbar went (about 250 ms, desktops with classic scrollbars), and the set's file fetched after the shop's art (one
   round trip). All four cut: long tasks 1.4 s → 0.9 s (phone size, 4x), settled 1.85 s → 1.45 s.
 - [x] **Timmy's place and Focus mode hide the page's scrollbar the way the shop did** (2026-11-24, the shop's opening; done
-  in #PRNUM, the other way round: measured, keeping the room restyles the whole page and costs more than the new width, so
+  in #564, the other way round: measured, keeping the room restyles the whole page and costs more than the new width, so
   the place and the figure zoom, `hx-fz-open`, stay as they were and the shop's `tsh-gut` came out; [motion-cost](../reference/motion-cost.md)):
   `html.tpv-open` (`widget/place.css`) and `html.hx-fz-open` (`widget/hub.css`) set `overflow: hidden`, so on a desktop
   with classic scrollbars the page behind is laid out again at a new width. Do as the shop now does (`tsh-gut` in
   `widget/shop.js` and `widget/shop.css`: `scrollbar-gutter: stable` when the page had a scrollbar) and measure.
-- [x] **The Diamond and Dark Matter medals still move with SMIL** (2026-11-24, the place at night; done in #PRNUM: CSS, the
+- [x] **The Diamond and Dark Matter medals still move with SMIL** (2026-11-24, the place at night; done in #564: CSS, the
   nebula still, a hub's Stats 94-95% → 5-13% busy): `widget/ranks.js`
   `art()` with `animate` gives them SMIL sparkles, stars, a glow and (Dark Matter) a moving texture filter, which no
   stylesheet stops and which draw the page on every frame wherever an animated medal is (the place's panel, a hub's Stats,
