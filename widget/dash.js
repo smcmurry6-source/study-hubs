@@ -203,6 +203,40 @@
       return { seen: seen, answered: answered, pct: pct, pctLabel: label, days: days, best: +s.bestStreak || 0 };
     }catch(e){ return null; }
   }
+  /* the ring's numbers from the server when this device holds none for a hub (a new or linked device, cleared storage, a
+     preview before a hub is opened): the page's one bootstrap asks for the open tab's hub (ringAsk), whose answers it
+     brings ([qid, time, right], as a hub's first load gets them) and every hub's mastery (questions tried, right on the
+     latest try). The answers give the numbers the hub will keep once it is opened on this device (SH_SYNC.merge in
+     widget/hub.js: tries, right, questions); another tab's hub has the mastery. Only the ring and its button read them:
+     the check-in, the streak and the week stay on what this device studied. */
+  var SRV = { ans: {}, mastery: {} };
+  function ringAsk(){
+    var h = HUBS.filter(function(x){ return x.id === selected; })[0];
+    return h && !readProgress(h) ? h.id : null;
+  }
+  function serverFill(data, hubId){
+    if (!data || typeof data !== "object") return;
+    if (hubId && Array.isArray(data.answers)) {
+      var qs = {}, tries = 0, right = 0;
+      data.answers.forEach(function(r){ if (!Array.isArray(r) || r.length < 3 || r[0] == null || r[0] === "") return; tries++; if (r[2] === 1 || r[2] === true) right++; qs[String(r[0])] = 1; });
+      if (tries) SRV.ans[hubId] = { seen: Object.keys(qs).length, answered: tries, pct: Math.round(right / tries * 100),
+        pctLabel: "right across " + num(tries) + (tries === 1 ? " answer" : " answers"), days: [], best: 0 };
+    }
+    if (Array.isArray(data.mastery)) data.mastery.forEach(function(m){
+      var n = m && +m.seen; if (!m || !m.hub || !(n > 0)) return;
+      SRV.mastery[m.hub] = { seen: n, answered: n, pct: Math.round(Math.min(n, +m.latest_correct || 0) / n * 100), pctLabel: "right on your latest try", days: [], best: 0 };
+    });
+  }
+  function ringProgress(hub){ return readProgress(hub) || SRV.ans[hub.id] || SRV.mastery[hub.id] || null; }
+  /* the bootstrap came in after the panel was drawn: only the ring and the button's words, not the whole panel */
+  function ringLate(){
+    var hub = HUBS.filter(function(x){ return x.id === selected; })[0], el = $("hubPanel"), old = el && q(".dx-ring", el);
+    if (!hub || !old || readProgress(hub) || !ringProgress(hub)) return;
+    var w = document.createElement("div"); w.innerHTML = ringHTML(hub);
+    var nu = w.firstChild; old.parentNode.replaceChild(nu, old);
+    var go = q(".dx-start", el); if (go && go.firstChild && go.firstChild.nodeType === 3) go.firstChild.nodeValue = "Continue studying";
+    requestAnimationFrame(function(){ requestAnimationFrame(function(){ var arc = q(".arc", nu); if (arc) arc.style.strokeDashoffset = arc.getAttribute("data-to"); }); });
+  }
   var LAST = (function(){ try{ return JSON.parse(ls("sh_dash_last") || "null"); }catch(e){ return null; } })();
   /* Daily drill (widget/drill.js) on this device: today's set is sh_drill_<hub>, questions due for review are in sh_srs_<hub> */
   function drillStatus(hub){
@@ -650,7 +684,7 @@
   /* your progress in the open hub, as a ring */
   var RING = 2 * Math.PI * 34;
   function ringHTML(hub){
-    var p = readProgress(hub), pct = p ? p.pct : 0;
+    var p = ringProgress(hub), pct = p ? p.pct : 0;
     return '<div class="dx-ring" role="img" aria-label="' + (p ? pct + "% " + esc(p.pctLabel) + ", " + num(p.seen) + " questions tried" : "No questions tried in this hub yet") + '">' +
       '<span class="dx-ring-dial"><svg viewBox="0 0 80 80" aria-hidden="true" focusable="false"><circle class="trk" cx="40" cy="40" r="34"/>' +
         '<circle class="arc" cx="40" cy="40" r="34" stroke-dasharray="' + RING.toFixed(1) + '" stroke-dashoffset="' + RING.toFixed(1) + '" data-to="' + (RING * (1 - pct / 100)).toFixed(1) + '"/></svg>' +
@@ -776,7 +810,7 @@
   }
   function renderPanel(){
     var hub = HUBS.filter(function(h){ return h.id === selected; })[0], el = $("hubPanel"); if (!hub) return;
-    var x = nextExam(hub), d = x ? daysUntil(x.date) : null, cls = CLASSES[hub.cls] || {}, p = readProgress(hub);
+    var x = nextExam(hub), d = x ? daysUntil(x.date) : null, cls = CLASSES[hub.cls] || {}, p = ringProgress(hub);
     var others = (hub.exams || []).filter(function(e){ return e !== x && e.date; });
     var opened = LAST && LAST.id === hub.id ? relDay(new Date(LAST.t)) : null, checks = checkinButtonsHTML(hub);
     el.className = "dx-hub tinted"; el.setAttribute("style", tintVars(hub.id));
@@ -1942,15 +1976,17 @@
   function dashboardBootstrap(sb){
     var boot = { data: null, ready: Promise.resolve(null), linkName: localName || "" };
     if (!sb || !VISITOR) { window.shBootstrap = boot; return boot; }
+    var ask = ringAsk();   /* the open hub, when this device has nothing of it: its answers and the mastery for the ring */
     try {
       boot.ready = rpc2(sb, "get_widget_bootstrap", {
-        p_visitor: VISITOR, p_hub: null, p_cavity_week: null, p_episode: null, p_include_pins: false, p_dashboard: true,
+        p_visitor: VISITOR, p_hub: ask, p_cavity_week: null, p_episode: null, p_include_pins: false, p_dashboard: true,
         p_luck_hub: luckFor ? luckFor.hub : null, p_luck_date: luckFor ? luckFor.date : null, p_link_name: boot.linkName || null
       }).then(function(r){
         if (!r || r.error || !r.data || typeof r.data !== "object") return null;
         boot.data = r.data;
         /* first, so Timmy's hello and the "you" card already have a name changed on a linked device */
         try { nameFromServer(r.data.display_name, boot.linkName, r.data.name_custom); } catch (e) {}
+        if (ask) try { serverFill(r.data, ask); ringLate(); } catch (e) {}
         return boot.data;
       }, function(){ return null; });
     } catch (e) {}

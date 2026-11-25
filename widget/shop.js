@@ -409,19 +409,18 @@
   function open(o){
     o = o || {};
     if (DLG) return api;
-    /* the page's scrollbar goes while the shop is open; where it takes room (a desktop's), its room is kept, or the whole
-       page behind is laid out again at the new width (about 250 ms on a slowed laptop). Read before anything changes. */
-    var gut = W.innerWidth > D.documentElement.clientWidth;
+    /* the page's scrollbar goes while the shop is open, and its room with it. Keeping the room (scrollbar-gutter: stable on
+       <html>, 2026-11-24) cost more than it saved: a change to the root's gutter restyles the whole page behind, about 260 ms
+       of a slowed laptop each way, while the page laid out again 15 px wider takes 1-40 ms (vault/reference/motion-cost.md) */
     css();
     var dlg = D.createElement("dialog"); dlg.className = "tsh-dlg"; dlg.setAttribute("aria-labelledby", "tshT");
     dlg.innerHTML = '<div class="tsh-dlgin"><button type="button" class="tsh-x" data-shop="close" aria-label="Close the shop">' + IC.x + '</button><div class="tsh-dlgbody"><h2 class="sr" id="tshT">Timmy’s Shop</h2><p class="tsh-note" role="status">Opening the shop…</p></div></div>';
     D.body.appendChild(dlg); DLG = { dlg: dlg, back: D.activeElement, onClose: o.onClose || null };
-    var shut = function(){ if (!DLG) return; var d = DLG; DLG = null; if (d.dlg.parentNode) d.dlg.parentNode.removeChild(d.dlg); D.documentElement.classList.remove("tsh-open", "tsh-gut"); try { if (d.back && d.back.isConnected) d.back.focus(); } catch (e) {} if (d.onClose) try { d.onClose(); } catch (e) {} };
+    var shut = function(){ if (!DLG) return; var d = DLG; DLG = null; if (d.dlg.parentNode) d.dlg.parentNode.removeChild(d.dlg); D.documentElement.classList.remove("tsh-open"); try { if (d.back && d.back.isConnected) d.back.focus(); } catch (e) {} if (d.onClose) try { d.onClose(); } catch (e) {} };
     dlg.addEventListener("close", shut);
     dlg.addEventListener("click", function(e){ if (e.target === dlg) close(); });
     $('[data-shop="close"]', dlg).addEventListener("click", close);
     try { dlg.showModal(); } catch (e) { dlg.setAttribute("open", ""); }
-    if (gut) D.documentElement.classList.add("tsh-gut");
     D.documentElement.classList.add("tsh-open");
     mount($(".tsh-dlgbody", dlg), { level: 3, title: "tshT" });
     return api;

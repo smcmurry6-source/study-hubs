@@ -30,14 +30,18 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   **Could be better, not wrong:** `em-cardiac-17`'s INR choices (2.4 against 4.6, 5.2, 6.0) never test the 3.5 line;
   `ns-sens-14`'s distractors are easy; `da-tmj-16` nearly repeats `da-anomalies-11`; three Dental Anatomy explanations
   mention a class guide that disagrees.
-- [ ] **The dashboard's progress ring reads only this device's copy of the hub** (2026-11-24, found fixing BUG-107):
+- [x] **The dashboard's progress ring reads only this device's copy of the hub** (2026-11-24, found fixing BUG-107; done
+  in #564: the bootstrap brought no answers to the dashboard, which asked for no hub, so it now asks for the open tab's hub
+  when this device has none of it, and draws the ring from those answers):
   `readProgress()` in `widget/dash.js` reads the hub's saved state on the device, so on a new or linked device (and in the
   preview before a hub is opened) the open hub's card says "Your progress in this hub shows here" and 0 tried, though the
   bootstrap already brings the account's answers. Draw the ring from those answers when the device has none? Live, minor.
 - [ ] **Scroll the dashboard and the shop on a real phone** (2026-11-22, the no-pausing change): an iPhone in Safari and an
   Android phone in Chrome, a long scroll of the dashboard top to bottom and of the shop's shelves, then Timmy's place at
   night. The cloud browser draws without a graphics card, so the compositor's part (the stage's sparkles and confetti, the
-  place card's layer) couldn't be measured there ([motion-cost](../reference/motion-cost.md)). Jitter that is left goes in
+  place card's layer) couldn't be measured there ([motion-cost](../reference/motion-cost.md)), and a Diamond or Dark Matter
+  medal moving in the place's panel (its sparkles, stars and glow are CSS inside the drawing since 2026-11-25, which WebKit
+  may still draw on its main thread). Jitter that is left goes in
   the bug log with what was on screen. At night, look at the place's stars on the iPhone too: they still twinkle one by
   one (2026-11-24: in Chromium they cost 2-3% of a slowed phone, and twinkling them in three groups cost more, but WebKit
   draws every shape that moves inside a drawing on its main thread, so an iPhone may differ).
@@ -57,11 +61,14 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   600 ms); then the dashboard's `focus()` behind the shop on `sh:shop` (about 200 ms), the page's width changing when its
   scrollbar went (about 250 ms, desktops with classic scrollbars), and the set's file fetched after the shop's art (one
   round trip). All four cut: long tasks 1.4 s → 0.9 s (phone size, 4x), settled 1.85 s → 1.45 s.
-- [ ] **Timmy's place and Focus mode hide the page's scrollbar the way the shop did** (2026-11-24, the shop's opening):
+- [x] **Timmy's place and Focus mode hide the page's scrollbar the way the shop did** (2026-11-24, the shop's opening; done
+  in #564, the other way round: measured, keeping the room restyles the whole page and costs more than the new width, so
+  the place and the figure zoom, `hx-fz-open`, stay as they were and the shop's `tsh-gut` came out; [motion-cost](../reference/motion-cost.md)):
   `html.tpv-open` (`widget/place.css`) and `html.hx-fz-open` (`widget/hub.css`) set `overflow: hidden`, so on a desktop
   with classic scrollbars the page behind is laid out again at a new width. Do as the shop now does (`tsh-gut` in
   `widget/shop.js` and `widget/shop.css`: `scrollbar-gutter: stable` when the page had a scrollbar) and measure.
-- [ ] **The Diamond and Dark Matter medals still move with SMIL** (2026-11-24, the place at night): `widget/ranks.js`
+- [x] **The Diamond and Dark Matter medals still move with SMIL** (2026-11-24, the place at night; done in #564: CSS, the
+  nebula still, a hub's Stats 94-95% → 5-13% busy): `widget/ranks.js`
   `art()` with `animate` gives them SMIL sparkles, stars, a glow and (Dark Matter) a moving texture filter, which no
   stylesheet stops and which draw the page on every frame wherever an animated medal is (the place's panel, a hub's Stats,
   the trophy case, the cards). Make the sparkles, stars and glow CSS like the shine (`sh-rank-gl…`), hold the texture still,
