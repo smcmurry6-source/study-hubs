@@ -50,3 +50,4 @@
 # migration_v100 (Shiny Gold Crowns given by hand, crowns only: crown_gifts, sh_gift_crowns, sh_wallet's gifts, the visitor_links_gifts trigger) was applied on 2026-11-23 at about 01:03 UTC, 7:03 pm Central on 2026-11-22 (through the connector as v100_crown_gifts; all 3 function bodies md5-checked before and after).
 # migration_v102 (Learn's typed answer: sh_answer takes the context 'typed', a matched answer graded from the key, a self-marked one paid as a self-graded card, neither in the class's stats or picks) was applied on 2026-11-24 at about 00:55 UTC, 6:55 pm Central on 2026-11-23 (through the connector as migration_v102_learn_typed_answer; sh_answer's body md5-checked against v80's before and against the file after, its grants unchanged).
 migration_v101.sql
+migration_v103.sql

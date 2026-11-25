@@ -79,15 +79,36 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
 - [ ] **The weekly pennant's first week, read after a Monday sweep** (2026-11-22): once `migration_v98` has run a week, how
   many pennants were made and how many by the sweep (`select how, count(*) from week_pennants group by 1`, totals only): a
   large sweep share means the page's claim is missing them (`widget/pet.js` `weekClaim`).
-- [ ] **The boards order people tied on a place by chance** (2026-11-22, #533's CI): `get_rank_board_v2`,
+- [x] **The boards order people tied on a place by chance** (done in #563, `migration_v103`, applied after the merge: a tie
+  by the name shown, case aside, then the id, on the Ranks, streaks, right-in-a-row, arcade and fairy boards, at a board's
+  limit too; the Crowns board had it already; `tools/release/xp.js` section 21, and section 16 compares the boards as they
+  come back) (2026-11-22, #533's CI): `get_rank_board_v2`,
   `get_leaderboard_v2` and the others end `order by rnk` alone, so tied people can trade places between loads (and at a
   board's limit, who shows can change). Cosmetic and older than v96: add a stable second key (the name, then the id) when
   someone next changes a board function.
-- [ ] **Does Link my devices time out for someone with thousands of answers?** (2026-11-22, applying `migration_v96`): on
+- [x] **Does Link my devices time out for someone with thousands of answers?** (yes: done in #563, `migration_v103`,
+  applied after the merge. The Postgres logs held 24 links that ran out of the 3 s from 2026-11-18, 19 of them that
+  overloaded day, 4 on the 19th and 1 on the 23rd, and the 7 that finished took 2.0 s on average, up to 2.7 s. A link rebuilt
+  XP twice (the answers' update trigger, then its own rebuild); now once, and the replay looks a boost up inline: 770 → 350
+  ms on a throwaway copy with a 10,000-answer visitor, the same results row for row
+  ([game-server](../reference/game-server.md)). The rebuild timed on the live database at 1-5 am Central, rolled back:
+  #563's Release section) (2026-11-22, applying `migration_v96`): on
   the live database `sh_xp_rebuild` took 25 s for 10 people the first time (cold cache), then about 1 s for 4 others.
   `redeem_link_code` runs a rebuild under anon's 3 s `statement_timeout`, so time one rebuild of a heavy visitor (read-only:
   inside a transaction that rolls back, under `set local statement_timeout`, while the class is quiet) or look for
   `redeem_link_code` timeouts in the Postgres logs. A lead, not a confirmed bug.
+- [ ] **Link my devices says "That code didn't work" when the server ran out of time** (2026-11-25, found in #563): both
+  callers (`widget/ranks-hub.js`'s Link my devices and `widget/linkask.js`'s "Is this your other device?") turn a failed
+  call into null, so a call the database stopped (anon's 3 s, a busy spell) reads as a wrong code and the person makes a
+  fresh one. After a timeout the code still works (the whole call rolls back, the code's delete with it). Tell the two
+  apart: on an error, something like "The server was slow just now. Try the same code again in a minute.", and a
+  `link:busy` / `link-ask:busy` event instead of `fail` ([event-taxonomy](../reference/event-taxonomy.md)'s `link` row too).
+- [ ] **Read Link my devices' times a week after `migration_v103` is applied** (2026-11-25, #563): before it, the 7 links
+  that finished from 2026-11-18 took 2.0 s on average (2.7 s at most) and the logs held 24 timeouts. A week after: the
+  week's calls and mean time (`select calls, total_exec_time, max_exec_time from extensions.pg_stat_statements where
+  toplevel and query ilike '%redeem_link_code%'`, less the calls and total written in #563 at the apply), and the
+  Postgres logs for `canceling statement due to statement timeout` with `redeem_link_code` in `parsed.context` (one 24-hour
+  slice a call). Totals only. If a link still runs out of time, the next cut is the rebuild's rewrite of every award row.
 - [ ] **The mastery read is slower a call than before the optimization pass** (2026-11-20, its readout): `get_hub_mastery`
   236 → 349 ms on the server on average (673 calls since phase 1), the evening's median 242 → 709 ms on 77 calls, 11% of the
   database's time. Since #459 the page works out the rank between answers, so the reads left are the ones when a hub's page
@@ -172,8 +193,22 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   T-16 and T-17** (Chairside's core, then its art and sound, each rebased onto the engine move), then close as landed. **The
   other ten are finished as they are**: #87, #91, #94, #98, #99, #103, #104, #106, #110 and #111, each with the small fix,
   checker or quote pass, or read section 6 gives it. None merges `main` in on its own, and once T-07 has landed they merge
-  without a page rebuild. Merging any of them is Sam's call ([boards](../hubs/boards.md),
+  without a page rebuild. **T-07 landed 2026-11-25 (#562).** Of the twelve still open, only #111 touches a file T-07 replaced
+  (the generated `hubs/boards/index.html`): take `claude/boards-hub`'s settings page and run `node tools/build-boards.js`. Merging any of them is Sam's call ([boards](../hubs/boards.md),
   [the task](2026-11-22-boards-onto-the-engine.md)).
-- [ ] **Boards: the High Likelihood check skips boards when its first unit is published** (Sam, 2026-11-21: "I have no idea so
+- [x] **Boards: the High Likelihood check skips boards when its first unit is published** (Sam, 2026-11-21: "I have no idea so
   maybe just take it out for now"): on `claude/boards-hub`, `tools/ci/smoke.js`'s check for a lecture with questions but no
-  topics skips the boards hub, and `LIKELY_TOPICS` stays empty ([boards](../hubs/boards.md)).
+  topics skips the boards hub, and `LIKELY_TOPICS` stays empty ([boards](../hubs/boards.md)). Done in T-07 (#562): `boards` is
+  in `LIKELY_SKIP`, and the build writes `"likelyTopics": []`.
+- [ ] **Boards: which INBDE component anat, physio, micro and gpath go under** (2026-11-25, T-07, #562): Sam's call, needed
+  before the first of them is published. The engine groups the units by the INBDE's three components (`GROUPS` in
+  `src/boards/config.js` on `claude/boards-hub`: D&TP, OHM, P&P, from each unit's home CCs), and these four foundation units
+  have no home CC. The build refuses to publish a unit in no group ([boards](../hubs/boards.md)).
+- [ ] **Boards: the T-06 brief's `--out` command** (2026-11-25, T-07, #562): `docs/boards/tasks/T-06.md` on `claude/boards-hub`
+  still says `--out /tmp/boards-medcx/index.html`; since T-07, `--out` takes a folder (`--out /tmp/boards-medcx`, which gets
+  `content/` and `game/`). Fix it in the next PR that touches that brief.
+- [ ] **Boards: bring T-07's shared-tool changes to `main`** (2026-11-25, #562): on `claude/boards-hub`, `tools/hub-next/build.mjs`
+  exports `buildFrom()` and lets a hub whose lectures are all still coming have no questions; `tools/ci/smoke.js` takes its
+  one-hub checks from the first hub with questions (`firstHub`); `tools/timmy/test.mjs` picks a hub with published content.
+  Each keeps Review of Systems the same. They come to `main` with the boards merge, or sooner in their own PR. Either way,
+  merge them by hand, not by taking one side.

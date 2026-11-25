@@ -704,10 +704,31 @@ crowns and nothing else.
   weren't earned by studying.
 - The first, 2026-11-23: 50,000 crowns to one account, at Sam's request.
 
+## The boards' tie order, and Link my devices' one rebuild (migration_v103)
+
+- **A tie on a board is in one order**: by the name the board shows (case aside), then the id, on the Ranks board
+  (`get_rank_board_v2`, PL/pgSQL since v103), the streaks board (`get_leaderboard_v2`), the right-in-a-row records
+  (`get_correct_streak_stats_v2`), a hub's arcade board (`get_arcade_leaderboard_v2`) and the fairy board
+  (`get_fairy_board`), as the Crowns board (`get_crowns_board_v2`) already was. Until then a tie came back in whatever order
+  the database read the rows, so tied people could swap between two loads, and where a board stops at a number of rows (the
+  streaks board, the fairy board, the records) who made the cut could change. A board that stops at a number of rows ranks
+  first and works the names out only for a place within its limit. **A new board does the same**: order by the place, then
+  `lower(<the name shown>)`, then the id. Not changed: Studying now (by name, at most 50), the cavity week (by the time
+  claimed), and the boards from before the game layer, which no page calls.
+- **Link my devices rebuilds XP once**: `redeem_link_code` sets `sh.linking` while it moves the second device's answers, so
+  the answers' update trigger (`sh_xp_on_update`) skips its rebuild then, and the one rebuild at its end covers both ids.
+  `sh_xp_replay` looks a boost up inline (`sh_xp_mult`'s own query) instead of calling `sh_xp_mult` for every answer. The
+  results are the same row for row. Why: anon's calls stop after 3 s, and on the live database the links that finished
+  from 2026-11-18 took 2.0 s on average (up to 2.7 s), while the Postgres logs held 24 that ran out of time and were rolled
+  back (19 of them on the overloaded 2026-11-18). On a throwaway copy with a 10,000-answer visitor (the size of the top five
+  on the live site) a link went from 770 to 350 ms. **Keep it that way**: anything added to `redeem_link_code` that changes
+  answers runs inside `sh.linking`, or it pays for another whole rebuild; and anything that makes the rebuild slower makes
+  linking slower for the people with the most answers, who are the ones most likely to link.
+
 ## Tests
 
 `node tools/release/xp.js` builds a throwaway database from `supabase/schema.sql` with made-up history, applies the pending
-migrations as the release will, and checks all of the above (about 750 checks, the prizes of migration_v68 in section 14c, the mystery box, Studying now and the Crowns board of migration_v99 in section 18, the crowns given by hand of migration_v100 in section 19, the collections of migration_v75 in 14d, the exam-eve boss of migration_v97 in 14f, the shop's client in section 13b and Learn and Flashcards' in 14b: a replayed call, a double tap and a linked device
+migrations as the release will, and checks all of the above (about 750 checks, the prizes of migration_v68 in section 14c, the mystery box, Studying now and the Crowns board of migration_v99 in section 18, the crowns given by hand of migration_v100 in section 19, the boards' tie order and the one rebuild of Link my devices of migration_v103 in section 21, the collections of migration_v75 in 14d, the exam-eve boss of migration_v97 in 14f, the shop's client in section 13b and Learn and Flashcards' in 14b: a replayed call, a double tap and a linked device
 among them, the rebuild against the live calls, the catalog against `tools/figures/site/sets.mjs`, three years of shelves
 day by day, a place opened from a board row, and a random visit going through the whole class, in 14a). `node tools/release/rls.js` applies the pending migrations too, seeds
 the new tables and calls every function a visitor can run with one visitor's id, failing if another visitor's id comes back;
