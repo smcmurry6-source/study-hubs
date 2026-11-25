@@ -75,6 +75,28 @@ laptop-size one; `main` 19 and 20), with fewer long tasks on the phone.
   place's panel (`art()` in `widget/ranks.js`), which made the browser draw the page on every frame. As a CSS transform,
   with the same path and timing, the view is 11% busy (laptop size 87-90% → 33-38%), 12 frames drawn in 3 s instead of 150.
 
+## Timmy's place's customizer (2026-11-25)
+
+Sam: "a better way to do the customization for Timmys place. Its clunky and inefficient" ([decisions](../decisions.md)).
+
+- **What was slow.** Customize waited for every set's file before it drew anything; every tap (a spot, a piece) drew the
+  whole stage and the whole panel again in the tap's own frame, and every card's picture with it. On a slowed laptop a
+  piece for someone who owns a lot took 600 ms to answer, and a slowed phone spent 5.7 s in long tasks over one walk
+  through it.
+- **What changed** (`widget/place.js`): a tap marks what it changed in place (the card's tick, the tab, the spot, the
+  line saying what's on) and paints; the stage follows after that frame (`czAfter`: `requestAnimationFrame`, then
+  `setTimeout(0)`, several quick taps folded into one draw). An outfit swaps only Timmy's group (`swapTimmy`); a switch of
+  what you change only moves the camera and the stage's marks (`stageFocus`). Each kind's list is drawn once and kept
+  (`V.panes`, drawn again only when `czSig` changes), with its scroll, and its pictures come in 8 ms slices as they near
+  the screen. Customize opens with the kit's own pieces at once; a set's pieces show as named cards until its file comes.
+  Where the list is scrolled to is kept from its scroll events, so a tap reads no layout.
+- **The numbers** (`Emulation.setCPUThrottlingRate` 4, the preview's `returning` persona on a phone / `high-xp` on a laptop;
+  each tap's Event Timing duration, the median of its kind): a piece of Timmy's outfit 272 → 80 ms / 600 → 144 ms; a yard
+  piece 240 → 88 / 440 → 128; switching what you change 176 → 64 / 304 → 192; Customize open to its first card 226 → 91 /
+  265 → 90. Long tasks over the same walk: 2.9 → 2.1 s (phone, `returning`), 5.7 → 4.4 s (phone, `high-xp`).
+- **What's left:** a home, scene or yard pick still draws the whole stage once, after the tap's frame (the kit could swap
+  one piece, [the inbox](../tasks/inbox.md)).
+
 ## The rules
 
 1. **Free motion can run all the time.** Free means a `transform` or `opacity` animation on an HTML box (or a whole
@@ -109,6 +131,13 @@ laptop-size one; `main` 19 and 20), with fewer long tasks on the phone.
    some ([the inbox](../tasks/inbox.md)).
 10. **Twinkling in a group isn't cheaper than one by one** when the group is spread out: what repaints is the group's whole
    box.
+11. **A tap answers in its own frame.** Mark what it changed in place (a class, an `aria-pressed`, a line of text) and let
+   the browser paint; the heavy drawing comes after (`requestAnimationFrame`, then `setTimeout(0)`: Timmy's place's
+   `czAfter`). Draw again only what changed, keep a list you've drawn, and don't wait for every file before drawing the
+   first thing.
+12. **Don't read layout in a tap** (`scrollTop`, `getBoundingClientRect`, `offsetWidth`) after writing to the page: it
+   makes the browser restyle and lay out then and there. Keep what you need from an event (a scroll listener's
+   `scrollTop`) or read it before the first write.
 
 ## How to measure
 
@@ -126,6 +155,10 @@ fast. Measure in a scripted browser on the preview (`node tools/preview/serve.js
 - **What moves:** `document.getAnimations()` (and each shadow root's) lists CSS animations and what they animate, but
   not what moves inside an image: look for `<img>` whose SVG source has `animation:` in it. Nor SMIL:
   `querySelectorAll('animate, animateTransform, animateMotion')`, in the page and in each shadow root.
+- **A tap:** a `PerformanceObserver` on `event` entries (`durationThreshold: 16`) gives each tap's time to the next paint
+  (what INP counts), and a `MutationObserver` on the stage's shadow root the time until the stage changed; a trace of one
+  tap (`EventDispatch` and the `UpdateLayoutTree` and `Layout` inside it) shows a forced layout. Playwright's click
+  does its own hit tests (`elementsFromPoint` in a CPU profile): leave them out.
 - **Frames drawn:** count the trace's `Commit` events on the main thread. With nothing moving on the main thread there are a
   few a second; 60 a second with nothing changing in the page means something redraws every frame (SMIL, a script's
   `requestAnimationFrame`, an animation the browser can't run by itself).

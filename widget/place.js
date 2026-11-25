@@ -7,7 +7,7 @@
 
    The drawings are a kit, widget/hub-art/place.js (window.SH_PLACE, built from tools/figures/site/place.mjs), fetched
    here the first time a place is drawn; each seasonal set and the rank sets are a file of their own
-   (widget/hub-art/place/<set>.js), fetched only when a piece of that set stands at the place or is in the drawer.
+   (widget/hub-art/place/<set>.js), fetched only when a piece of that set stands at the place or is in Customize's list.
 
    What it shows:
      - the card (shPlace.card): the place as a picture with Timmy at the door; tapping it opens the full view;
@@ -1111,7 +1111,7 @@
   function rarOf(r){ r = String(r || "common").toLowerCase(); return r.charAt(0).toUpperCase() + r.slice(1); }
   function rframe(r){
     if (!SA) return "";
-    /* the frames hold still here (in the shop they move): a drawer has dozens of them, each an image, and an image
+    /* the frames hold still here (in the shop they move): Customize's list has dozens of them, each an image, and an image
        that moves inside is drawn again on every frame, which made the list jitter as it scrolled (2026-11-14) */
     var key = rarOf(r);
     if (!FRAMES[key]) FRAMES[key] = img(SA.frame(key), "", "tpv-rframe");
@@ -1263,7 +1263,8 @@
       '<div class="tpv-list" role="group" aria-labelledby="tpvCzH"></div>' +
       '<div class="tpv-row tpv-foot"><button type="button" class="tpv-btn" data-tp="surprise">' + ICON.dice + '<span>Surprise me</span></button><button type="button" class="tpv-btn" data-tp="shop" aria-label="Get more in the shop">' + ICON.bag + "<span>Shop</span></button>" +
       '<button type="button" class="tpv-btn tpv-gold tpv-done" data-tp="done">' + ICON.check + "<span>Done</span></button></div></div>";
-    czDrop(); V.panes = {}; V.czKind = "";
+    czDrop(); V.panes = {}; V.czKind = ""; V.lt = 0;
+    var ls = $(".tpv-list", el); ls.addEventListener("scroll", function(){ V.lt = ls.scrollTop; }, { passive: true });
     $(".tpv-cz", el).addEventListener("click", czClick);
   }
   function czClick(e){
@@ -1280,19 +1281,20 @@
   /* each kind's list is drawn the first time its tab opens and kept (with where it was scrolled to), so going back to a
      tab only shows it again; it is drawn again only when what it shows changed (czSig: what you own, a set's drawing
      come, the scene a home or yard piece is drawn on, what's New). In the yard, the spots the long lane can't take hide
-     it (is-narrow). Everything else is marked in place */
+     it (is-narrow). Everything else is marked in place. Where the list is scrolled to is kept from its scroll events (V.lt),
+     so a tap reads no layout, and the list is scrolled only when the pane's place differs */
   function czSig(kind){ var mine = ownedOf(kind); return [mine.length, mine.filter(function(x){ return x.later; }).length, S.locked.length, V.seen, kind === "home" || kind === "yard" ? czScene() : ""].join("|"); }
   function czSync(){
     var el = $(".tpv-cz", V.dlg); if (!el) return;
     $$(".tpv-cat", el).forEach(function(b){ b.setAttribute("aria-pressed", String(b.dataset.pick === V.cat)); });
     var list = $(".tpv-list", el), kind = kindOf(V.cat), P = V.panes || (V.panes = {}), cur = P[kind], sig = czSig(kind), moved = V.czKind !== kind;
-    if (moved && P[V.czKind]) { P[V.czKind].top = list.scrollTop; P[V.czKind].el.hidden = true; }
-    var top = moved ? (cur && cur.top) || 0 : list.scrollTop, drawn = !cur || cur.sig !== sig;
+    if (moved && P[V.czKind]) { P[V.czKind].top = V.lt || 0; P[V.czKind].el.hidden = true; }
+    var top = moved ? (cur && cur.top) || 0 : V.lt || 0, drawn = !cur || cur.sig !== sig;
     if (!cur) { cur = P[kind] = { el: D.createElement("div"), top: 0 }; cur.el.className = "tpv-pane"; list.appendChild(cur.el); }
     if (drawn) { czList(cur, kind); cur.sig = sig; }
     cur.el.hidden = false;
     cur.el.classList.toggle("is-narrow", kind === "yard" && V.spot !== "side" && V.spot !== "corner");
-    if (moved || drawn) list.scrollTop = top;
+    if ((moved || drawn) && top !== (V.lt || 0)) { list.scrollTop = top; V.lt = list.scrollTop; }
     V.czKind = kind;
     czMarks();
   }

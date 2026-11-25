@@ -10,6 +10,11 @@ this folder (deleting the line: the note carries it) or just does it, if it's sm
 (`- [x] ... (#123)`); ticked lines are cleared the next time someone goes through the inbox. Anything left to do from a chat
 lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the-vault.md)). See [README](README.md).
 
+- [ ] **Timmy's place, after the quicker Customize** (2026-11-25): the design system page's customizer mock
+  (`tools/preview/design/design.js`) still shows the old dock and drawer; a home, scene or yard pick still draws the whole
+  stage once after the tap's frame (the kit could swap the one piece, as an outfit swaps only Timmy:
+  [motion-cost](../reference/motion-cost.md)); the launch trailer's place shot (`tools/trailer/shots.mjs`) taps the new tabs
+  but hasn't been recorded again to check it.
 - [ ] **Review of Systems: Sam's calls from the full read of the bank** (2026-11-24, every question vetted). **Changed from
   current references, say if the course's own wording should come back:** choking is back blows and abdominal thrusts (AHA
   2025; the lecture: abdominal thrusts); the do-not-use list is µg and q.o.d. (the notes had mcg and q.a.d.); `om-caries-15`

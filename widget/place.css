@@ -62,7 +62,7 @@ dialog.tpv::backdrop { background: rgba(20, 14, 20, .72); }
 .tpv-num.tx { color: #FFE9A3; background: linear-gradient(180deg, #8A79D2, #4A3B8F); box-shadow: 0 0 0 2px #FFE9A3, 0 0 0 4px #3B2E3A, 0 5px 14px rgba(0, 0, 0, .4); }
 .tpv-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .tpv-acts { display: flex; align-items: center; gap: 10px; flex: none; }
-/* Visit | Customize, and the drawer's tabs: a dark track, the one that's on a gold pill */
+/* Visit | Customize: a dark track, the one that's on a gold pill */
 .tpv-seg { display: inline-flex; padding: 4px; gap: 2px; border-radius: 999px; background: rgba(0, 0, 0, .34); box-shadow: inset 0 0 0 1px rgba(255, 224, 138, .32); }
 .tpv-seg[hidden] { display: none; }
 .tpv-seg button { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 40px; padding: 0 16px; border: 0; border-radius: 999px; background: transparent;
