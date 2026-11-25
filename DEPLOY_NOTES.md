@@ -43,6 +43,18 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   96-152 (was 176-304); numbers and the new rules in [motion-cost](vault/reference/motion-cost.md). Saving is unchanged
   (`equip_item` on each pick, no migration), every button keeps a fixed `data-tp`. The About page's Customize paragraph is
   rewritten; `sw.js` is `sh-v81`. Left for later: [the inbox](vault/tasks/inbox.md).
+- **2026-11-25 (the boards' tie order and Link my devices' timing, Claude Code)** — two lines of the to-do list, one
+  migration (`migration_v103.sql`, applied after the merge at 1-5 am Central). **The boards**: people tied on a place on
+  the Ranks, streaks, right-in-a-row, arcade and fairy boards came back in whatever order the database read them, so they
+  could swap between loads (and at a board's limit, who showed could change); now a tie is by the name shown, case aside,
+  then the id, as the Crowns board already was (`get_rank_board_v2` is PL/pgSQL now). **Link my devices** ran out of
+  anon's 3 s for people with many answers: the Postgres logs held 24 timed-out links from 2026-11-18 (19 of them that
+  overloaded day), and the 7 that finished took 2.0 s on average, up to 2.7 s. It rebuilt XP twice (the answers' update
+  trigger, then its own rebuild); now once (`sh.linking`, which `sh_xp_on_update` skips on), and the rebuild's replay looks
+  a boost up inline instead of a PL/pgSQL call per answer: 770 → 350 ms on a throwaway copy with a 10,000-answer visitor,
+  every total, award and day the same. `tools/release/xp.js` section 21; section 16 compares the boards in the order they
+  come back. Left on the to-do list: the page's "That code didn't work" after a timeout, and reading the link times a week
+  after the apply ([game-server](vault/reference/game-server.md)).
 - **2026-11-24 (Listen in the device's voice: BUG-199, #561, Claude Code)** — A hub without recordings (every hub since 11-22) read a whole part as one `SpeechSynthesisUtterance` (Review of Systems' As taught: about 27,000 characters) at a fixed rate, with no speed control (report #68: "won't play or give options to speed up or slow down"). Now `widget/v3.js` speaks a heading, sentence or list item at a time, one after another (never over 200 characters: Chrome's network voices stop or fail on a long one), with the recording player's 1x to 2x select beside the voice picker (`utterance.rate`, the same saved speed); Pause and Resume cancel and speak again from the word reached; a tapped word starts there; an error retries on a local voice, then moves on, and stops with a toast after three or a voice that never starts. New events `tts:voice-error=<code>`, and `tts:secs` / `tts:end` for the device voice ([event-taxonomy](vault/reference/event-taxonomy.md)). The Listen button now says "Pause" while it reads (`widget/hub.css` looked for a class nobody set). About page and Ask Timmy's site help updated. Tested on a stubbed `speechSynthesis`; real iPhone, Windows and Android Chrome still to retest ([bug log](vault/release/bug-log.md)). Report #68 was resolved with its reply on 2026-11-25 (03:36 UTC), after #561's After merge run passed (Sam: "Send the replies when fixed").
 - **2026-11-24 (Review of Systems: every question vetted, Claude Code)** — Sam: "Vet all questions, the answer key, and
   explanations in review of systems for accuracy, clarity, effectiveness, completeness. Make any necessary changes." All

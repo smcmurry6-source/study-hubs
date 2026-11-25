@@ -11,6 +11,8 @@
 //     (2 seconds, 30 a minute), and every source: a day studied, the 20th answer, a finished mock, the
 //     mastery medals and their double XP, Timmy Time minutes, a finished arcade game, a fixed report;
 //   - a replayed call, a double tap and a linked device pay once, and the rebuild gives exactly what the live calls paid;
+//   - the boards keep people tied on a place in one order (the name shown, then the id), at a board's limit too, and Link
+//     my devices rebuilds XP once, with what a rebuild gives (migration_v103, section 21);
 //   - "Is this your other device?" (name_shared, migration_v87) asks only about another device used in the last 21 days;
 //   - Shiny Gold Crowns (from base XP, the grants since the switch, minus spending), the shop's rotation and seasons,
 //     buy_item (a double tap, a replayed call, a balance too low, not on sale today, owned, one snack a day, boosts that
@@ -1942,6 +1944,76 @@ try {
     notes.push('fewer calls (migration_v82): class numbers in one call, the analytics in one call, the shop\'s day stored, the bootstrap built once, the answers, the class name by lookup');
   }
 
+  /* ---------- 21. the boards keep a tie in one order, and Link my devices rebuilds once (migration_v103). Before section
+     16, which packs every answer away: the replay check reads them ---------- */
+  if (one(`select position('sh.linking' in prosrc) > 0 from pg_proc where proname = 'redeem_link_code'`) === 't') {
+    // the replay looks a boost up inline now: every award it works out, for every made-up visitor so far, is its base times
+    // what sh_xp_mult says at that moment, boosted ones included
+    const rp = rows(`select count(*)::int as n, (count(*) filter (where r.xp <> r.base * sh_xp_mult(r.visitor_id, r.at)))::int as off,
+        (count(*) filter (where r.base > 0 and r.xp = 2 * r.base))::int as doubled
+      from sh_xp_replay(array(select distinct visitor_id from personal_answers)) r`)[0];
+    ok(rp.n > 100 && rp.doubled > 0 && rp.off === 0,
+      `the replay's boost lookup pays what sh_xp_mult says on every award (${rp.n} awards, ${rp.doubled} doubled by a boost, ${rp.off} differ)`);
+
+    // a link rebuilds once: not when the answers move (sh.linking), at the end, and what it leaves is what a rebuild leaves
+    const out = (t) => { const s = sql(t).map(x => x.join('')).join('\n'); return k => (new RegExp('(?:^|\\n)' + k + ':([^\\n]*)').exec(s) || [])[1]; };
+    const calls = `pg_stat_get_xact_function_calls('public.sh_xp_rebuild(text[])'::regprocedure)`;
+    const pair = sql(`select visitor_id from personal_answers group by 1 order by count(*) desc, 1 limit 2`).map(r => r[0]);
+    const state = v => `(select md5(string_agg(x.j, '|' order by x.j)) from (
+        select 'v' || row_to_json(a)::text as j from xp_visitors a where a.visitor_id = ${q(v)}
+        union all select 'd' || row_to_json(b)::text from xp_days b where b.visitor_id = ${q(v)}
+        union all select 's' || row_to_json(c)::text from xp_seen c where c.visitor_id = ${q(v)}
+        union all select 'w' || json_build_array(e.key, e.src, e.hub, e.base, e.xp, e.at, e.d)::text from xp_awards e where e.visitor_id = ${q(v)}) x)`;
+    const lk = out(`begin; set local track_functions = 'pl';
+      select 'R:' || redeem_link_code(create_link_code(${q(pair[0])}), ${q(pair[1])});
+      select 'N:' || ${calls}; select 'F:' || coalesce(current_setting('sh.linking', true), '');
+      select 'A:' || ${state(pair[0])}; select 'X:' || (select xp from xp_visitors where visitor_id = ${q(pair[0])});
+      select sh_xp_rebuild(array[${q(pair[0])}]); select 'B:' || ${state(pair[0])};
+      rollback;`);
+    eq([lk('R'), lk('N'), lk('F')], [pair[0], '1', 'off'], `Link my devices rebuilds XP once, at its end (${pair.join(' + ')}), and turns sh.linking back off`);
+    ok(lk('A') && lk('A') === lk('B') && +lk('X') > 0, 'what the link leaves (XP, days, the questions seen, every award) is exactly what a rebuild gives');
+    const up = out(`begin; set local track_functions = 'pl';
+      update personal_answers set correct = correct where id = (select min(id) from personal_answers where visitor_id = ${q(pair[0])});
+      select 'N:' || ${calls}; rollback;`);
+    eq(up('N'), '1', 'outside a link, an answer changed still rebuilds its person (the update trigger)');
+
+    // ties: four made-up people on one place of every board, two with one name and one in lower case
+    const TIES = [['xp-TIE-c', 'Tie Charlie'], ['xp-TIE-b', 'tie bravo'], ['xp-TIE-a2', 'Tie Alpha'], ['xp-TIE-a1', 'Tie Alpha']];
+    const ids = `array[${TIES.map(t => q(t[0])).join(', ')}]`;
+    const want = ['xp-TIE-a1', 'xp-TIE-a2', 'xp-TIE-b', 'xp-TIE-c'];   /* by the name shown, case aside, then the id */
+    const key = Object.fromEntries(want.map(v => [v, one(`select sh_visit_key(${q(v)})`)]));
+    const K = want.map(v => key[v]);
+    const seed = `insert into visitor_names (visitor_id, display_name) values ${TIES.map(t => `(${q(t[0])}, ${q(t[1])})`).join(', ')};
+      insert into xp_visitors (visitor_id, xp, days, answers, correct, best_days) select v, 99999999, 1000, 777, 1, 1000 from unnest(${ids}) v;
+      insert into xp_days (visitor_id, d, n, c, raw) select v, (now() at time zone 'America/Chicago')::date - g, 1, 1, 1 from unnest(${ids}) v, generate_series(0, 999) g;
+      insert into correct_streaks (visitor_id, current_streak, best_streak) select v, 99999, 99999 from unnest(${ids}) v;
+      insert into arcade_scores (hub, game, visitor_id, score) select 'xt-tie', 'board', v, 500 from unnest(${ids}) v;
+      insert into egg_events (kind, hub, visitor_id) select 'fairy', 'xh', v from unnest(${ids}) v, generate_series(1, 500);`;
+    // the same rows again, deleted and put back in the other order, so the database reads them in a different order
+    const shuffle = ['visitor_names', 'xp_visitors', 'xp_days', 'correct_streaks'].map(t => `create temp table zz_${t} on commit drop as select * from ${t} where visitor_id like 'xp-TIE-%';
+        delete from ${t} where visitor_id like 'xp-TIE-%'; insert into ${t} select * from zz_${t} order by visitor_id desc;`).join('\n') + `
+      delete from arcade_scores where visitor_id like 'xp-TIE-%'; insert into arcade_scores (hub, game, visitor_id, score) select 'xt-tie', 'board', v, 500 from unnest(${ids}) v order by v desc;
+      delete from egg_events where visitor_id like 'xp-TIE-%'; insert into egg_events (kind, hub, visitor_id) select 'fairy', 'xh', v from unnest(${ids}) v, generate_series(1, 500) order by v desc;`;
+    const boards = `(json_build_object(
+      'rank', (select json_agg(json_build_array(r.rnk, r.visit, r.is_me)) from get_rank_board_v2('xp-TIE-a2', 1) r),
+      'streak2', (select json_agg(json_build_array(r.display_name, r.visit)) from get_leaderboard_v2(2) r),
+      'streak', (select json_agg(r.visit) from get_leaderboard_v2(50) r),
+      'correct', (select json_agg(json_build_array(r.kind, r.visit)) from get_correct_streak_stats_v2() r),
+      'arcade', (select json_agg(json_build_array(r.rnk, r.visit)) from get_arcade_leaderboard_v2('xt-tie', 'board', null, 10) r),
+      'fairy2', (select json_agg(r.display_name) from get_fairy_board(2) r),
+      'fairy3', (select json_agg(r.display_name) from get_fairy_board(3) r)))::text`;
+    const bd = out(`begin; ${seed} select 'P:' || ${boards}; ${shuffle} select 'Q:' || ${boards}; rollback;`);
+    const b1 = JSON.parse(bd('P') || '{}'), b2 = JSON.parse(bd('Q') || '{}');
+    eq(b1.rank, K.map(k => [1, k, k === key['xp-TIE-a2']]), 'the Ranks board: four people tied on first place, by the name shown (case aside), then the id; your own row among them');
+    eq([b1.streak2, (b1.streak || []).slice(0, 4)], [[['Tie Alpha', K[0]], ['Tie Alpha', K[1]]], K],
+      'the streaks board: a tie in the same order, and at its limit (2 rows) the first two of it');
+    eq(b1.correct, [['active', K[0]], ['record', K[0]]], 'the right-in-a-row records: of four tied, the first by name, then id');
+    eq(b1.arcade, K.map(k => [1, k]), 'the arcade board: a tie on first place in the same order');
+    eq([b1.fairy2, b1.fairy3], [['Tie Alpha', 'Tie Alpha'], ['Tie Alpha', 'Tie Alpha', 'tie bravo']], 'the fairy board: at its limit, the first of a tie by name');
+    eq(b2, b1, 'every board the same after the tied rows are deleted and put back in the other order');
+    notes.push('the boards keep a tie in one order (migration_v103): by the name shown, then the id, at a board\'s limit too; Link my devices rebuilds once, with the same result; the replay\'s inline boost lookup pays as sh_xp_mult');
+  } else problems.push('migration_v103 (the boards\' tie order, Link my devices rebuilding once) is not in the schema or the pending list');
+
   /* ---------- 16. an archived hub's answers packed away (migration_v96) ---------- */
   {
     // every made-up visitor of the suites above, and everything a page or a board shows them; before and after the pack
@@ -1954,12 +2026,13 @@ try {
           'pet', (select json_agg(d order by d.d) from get_pet_days_v2(i.v) d where d.d > (now() at time zone 'America/Chicago')::date - 61),
           'awards', (select json_agg(json_build_array(t.src, t.base, t.xp) order by t.src) from xp_award_totals t
                      where t.visitor_id = i.v and (t.base <> 0 or t.xp <> 0))) order by i.v) from ${ids} i),
-      -- each board's rows in a fixed order: the boards don't order people tied on a place, and the pack's deletes can
-      -- change the order the database hands ties back in (a CI run, 2026-11-22), which no page shows as a change
-      'boards', json_build_array((select json_agg(r order by r::text) from get_rank_board_v2(null, 500) r),
-        (select json_agg(r order by r::text) from get_leaderboard_v2(500) r),
-        (select json_agg(r order by r::text) from get_correct_streak_stats_v2() r), (select json_agg(r order by r::text) from get_trophy_stats_v2() r),
-        (select json_agg(r order by r::text) from get_arcade_leaderboard_v2('xh', 'board', 'xp-Q', 50) r)))`;
+      -- each board's rows in the order the board gives them: the pack's deletes change the order the database reads rows
+      -- in, which until migration_v103 could move people tied on a place (a CI run, 2026-11-22); since v103 a tie is in
+      -- one order (the name shown, then the id), so the boards must come back exactly the same. The trophy rates by text
+      'boards', json_build_array((select json_agg(r) from get_rank_board_v2(null, 500) r),
+        (select json_agg(r) from get_leaderboard_v2(500) r),
+        (select json_agg(r) from get_correct_streak_stats_v2() r), (select json_agg(r order by r::text) from get_trophy_stats_v2() r),
+        (select json_agg(r) from get_arcade_leaderboard_v2('xh', 'board', 'xp-Q', 50) r)))`;
     const snap = () => json(snapSql);
     // and what rebuilding everyone gives before the pack (rolled back): a rebuild after it must give the same
     const rebuilt = () => JSON.parse(sql(`begin; select sh_xp_rebuild(array(select v from ${ids} x)); select (${snapSql})::text; rollback;`).map(x => x.join('')).join('').replace(/^[^{]*/, ''));
