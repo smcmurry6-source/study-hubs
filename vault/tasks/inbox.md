@@ -115,8 +115,8 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   `sh_xp_rebuild` of the visitor with the most answers took over 5 s on the live database at 1:36 am Central (rolled back,
   nothing else running), against anon's 3 s and 324 ms on a throwaway copy, and after v103 (08:14 UTC) it still did. The
   rebuild timed statement by statement right after took 1.2 s warm (the replay's insert into `xp_awards` 0.61 s, the
-  `xp_days` insert 0.32 s, the `xp_seen` insert 0.19 s: [game-server](../reference/game-server.md)), so a warm link fits
-  and a first, cold one for a heavy visitor doesn't. First tell cold pages from the shared CPU: at a quiet hour, one full
+  `xp_days` insert 0.32 s, the `xp_seen` insert 0.19 s: [game-server](../reference/game-server.md)), and one full warm call
+  0.80 s, so a warm link fits and a first, cold one for a heavy visitor may not. First tell cold pages from the shared CPU: at a quiet hour, one full
   `sh_xp_rebuild` twice in a row in one rolled-back call, with `explain (analyze, buffers)` on the replay's insert for its
   shared reads. Then the cut: answer the link at once and rebuild in a pg_cron job a minute later, or move the second
   device's awards instead of rebuilding when their days don't overlap, or rebuild only the rows that change. The

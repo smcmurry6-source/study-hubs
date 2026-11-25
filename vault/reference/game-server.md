@@ -734,8 +734,8 @@ crowns and nothing else.
   insert 0.19 s, the deletes 0.09 s, the rest under 20 ms; the replay function alone 0.57 s, then 0.33 s. So warm, the
   heaviest visitor's link fits under anon's 3 s, but both full calls that night that ran past 5 s were the first touch of
   the write path (the night's first heavy call, and the first after the migration replaced `sh_xp_replay`): a first, cold
-  Link my devices for a heavy visitor can still run out of time. Cold pages or a slow minute on the shared CPU, the timings
-  can't tell apart. The next cut is on the to-do list
+  Link my devices for a heavy visitor can still run out of time. One full warm call right after took 0.80 s (rolled back),
+  well under anon's 3 s. Cold pages or a slow minute on the shared CPU, the timings can't tell apart. The next cut is on the to-do list
   ([inbox](../tasks/inbox.md)). **Time this plain**: on the live database `explain analyze`'s per-node timing triples the
   replay's window plan (1,126 against 352 ms).
 
