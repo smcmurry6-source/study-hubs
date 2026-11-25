@@ -190,12 +190,15 @@
   function flameHide(){ if (flame) { clearTimeout(flOut); flame.classList.remove("is-on", "is-fizz"); } }
 
   /* ---------- mock exam results ---------- */
+  /* the results card's "See what I missed": the mock's own "Show only the misses" (widget/hub-bank.js, [data-onlymissed]),
+     turned on; until 2026-11-25 it looked for the old pages' #mockMissed and #examMissedList and did nothing (BUG-202) */
   function showMissed(){
     setTimeout(function(){
-      var b = document.getElementById("mockMissed");
-      if (b) { if (b.getAttribute("aria-pressed") !== "true") b.click(); return; }
-      var l = document.getElementById("examMissedList"), h = l && l.previousElementSibling;
-      if (l) (h || l).scrollIntoView({ behavior: still() ? "auto" : "smooth", block: "start" });
+      var b = document.querySelector("[data-onlymissed]");
+      if (!b) return;
+      if (b.getAttribute("aria-pressed") !== "true") b.click();
+      var n = document.querySelector("[data-onlymissed]") || b;
+      try { n.scrollIntoView({ behavior: still() ? "auto" : "smooth", block: "start" }); } catch (e) {}
     }, 80);
   }
   function mockDone(e){

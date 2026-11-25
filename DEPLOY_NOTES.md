@@ -47,7 +47,14 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   `widget/ranks-hub.js` reads the rank on `sh:stats-open`; `widget/hub.css` loses the rules that hid the parts that are
   gone. v3.js 4,076 to 3,406 lines, drill.js 437 to 146, fx.js 335 to 229; `widget/hub-rest.bundle.js` 448 to 396 KB
   (125 to 110 KB gzipped). Fixed on the way (BUG-202): a mock's results card's "See what I missed" looked for the old
-  pages' list and did nothing; it now turns on the mock's "Show only the misses". STYLE_RESULT Bundles rebuilt,
+  pages' list and did nothing; it now turns on the mock's "Show only the misses". Computed styles of every element on the
+  dashboard and Review of Systems' Home, Notes, Questions, an answered question, the drill, More, Settings, Stats, Search,
+  Suggest, Report and the boards, laptop and phone, light, dark and the device's dark (78 states; `main` twice, with a
+  fixed random seed and every animation held at its start): the dashboard is identical, and nothing drawn on the hub
+  differs except what the two runs of `main` differ by (Timmy's bubble, a meter's bump, the drill's two sets), the
+  inherited `--sh-head-h` (0px) that is gone, and the rank pictures' gradient ids, one lower since the name badge no
+  longer draws one first. The first comparison caught one slip of this work, fixed before the PR: the Report and Pin
+  buttons had moved out of the question card's tools (`.qcard-top`), which the engine draws too. Bundles rebuilt,
   `sw.js` sh-v81; the smoke test's largest-text Settings check reads the hub's own Settings page (`#more/settings`).
   Left, in [the inbox](vault/tasks/inbox.md): the same cleanup in `widget/tour.js`, `widget/linkask.js`,
   `widget/clicks.js` and `widget/eggs.js`, and Sam's call on the study-music loops (`widget/audio/`), which nothing plays now.

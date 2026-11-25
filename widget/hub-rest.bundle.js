@@ -1636,10 +1636,11 @@ flOut = setTimeout(function(){ el.classList.remove("is-on", "is-fizz"); }, still
 function flameHide(){ if (flame) { clearTimeout(flOut); flame.classList.remove("is-on", "is-fizz"); } }
 function showMissed(){
 setTimeout(function(){
-var b = document.getElementById("mockMissed");
-if (b) { if (b.getAttribute("aria-pressed") !== "true") b.click(); return; }
-var l = document.getElementById("examMissedList"), h = l && l.previousElementSibling;
-if (l) (h || l).scrollIntoView({ behavior: still() ? "auto" : "smooth", block: "start" });
+var b = document.querySelector("[data-onlymissed]");
+if (!b) return;
+if (b.getAttribute("aria-pressed") !== "true") b.click();
+var n = document.querySelector("[data-onlymissed]") || b;
+try { n.scrollIntoView({ behavior: still() ? "auto" : "smooth", block: "start" }); } catch (e) {}
 }, 80);
 }
 function mockDone(e){
@@ -3445,7 +3446,7 @@ var pendingFlagQid = null, pendingFlagLec = null, pendingFlagW = -1, pendingFlag
 function addFlagButton(card){
 if (card.__shFlagBtn) return; card.__shFlagBtn = true;
 var qid = card.getAttribute("data-qid"); if (!qid) return;
-var top = card;
+var top = card.querySelector(".qcard-top") || card;
 var b = document.createElement("button");
 b.type = "button"; b.className = "sh-qflag"; b.innerHTML = FLAG_ICON_SM + "Report";
 b.setAttribute("aria-label", "Report a problem with this question");

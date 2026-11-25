@@ -845,7 +845,7 @@
   function addFlagButton(card){
     if (card.__shFlagBtn) return; card.__shFlagBtn = true;
     var qid = card.getAttribute("data-qid"); if (!qid) return;
-    var top = card;
+    var top = card.querySelector(".qcard-top") || card;   /* the card's tools (hub-bank.js, .qc-tools.qcard-top) */
     var b = document.createElement("button");
     b.type = "button"; b.className = "sh-qflag"; b.innerHTML = FLAG_ICON_SM + "Report";
     b.setAttribute("aria-label", "Report a problem with this question");
