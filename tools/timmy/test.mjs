@@ -97,6 +97,8 @@ for (const c of corpora) {
   const kinds = {}; for (const u of c.units.values()) kinds[u.kind] = (kinds[u.kind] || 0) + 1;
   /* hints come from a professor's recordings; a hub built from few (Review of Systems: only Medical Emergencies had them, 18) has fewer than 21 to send */
   const nHints = ((DATA[c.hub].study || {}).hints || []).length;
+  /* a hub on the engine with nothing published yet (Boards, until its first unit is taught) has only its exams to send */
+  if (!list.length) { notes.push(`${c.hub}: nothing published yet, so only its exams (${JSON.stringify(kinds)})`); continue; }
   ok(kinds.notes > 100 && kinds.review > 10 && kinds.cram > 50 && (kinds.hint || 0) >= Math.min(21, nHints) && kinds.likely > 10 && kinds.exam >= 1, `${c.hub}: every kind of content is there (${JSON.stringify(kinds)})`);
   ok([...c.units.keys()].every(id => /^(N\d+\.\d+|N\d+t\d+|R\d+\.\d+|C\d+\.\d+|H\d+|K\d+|X\d+)$/.test(id)), `${c.hub}: every unit id has the documented shape`);
   /* a guard against content that runs away, not the model's limit (1M tokens). 110,000 until 2026-11-20, when the Review of
@@ -116,7 +118,10 @@ const siteText = JSON.stringify(SITE);
 ok(!/class="spoil"/.test(siteText), "no spoiler markup in the site help");
 
 /* ====================================================================== 3. one turn, with fakes */
-const HUB = HUBS.includes("perio") ? "perio" : HUBS[0];
+/* a hub with published notes and questions (Boards is on the engine with nothing published until its first unit is) */
+const published = h => { const c = corpora.find(x => x.hub === h), q = read(h, "questions");
+  return [...c.units.values()].some(u => u.kind === "notes" && u.text.split(" ").length > 30) && (Array.isArray(q) ? q : q.questions).length > 0; };
+const HUB = HUBS.includes("perio") ? "perio" : HUBS.find(published);
 const C = corpora.find(c => c.hub === HUB);
 const realUnit = [...C.units.values()].find(u => u.kind === "notes" && u.text.split(" ").length > 30);
 const words = realUnit.text.split(" ");
