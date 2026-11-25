@@ -12,8 +12,16 @@ of the sustainability task, T-16 and T-17 once their dependencies are in, T-15 l
 Content work (items, notes, facts) goes on alongside; the next content brief is T-18 (the `items-pharm` brief Session 7's
 step 5 called T-07).
 
+**T-07 is done (2026-11-24):** `hubs/boards/` is a hub on the engine. `tools/build-boards.js` writes `hubs/boards/content/`
+from `src/boards/` (run it after any change there and commit both; CI runs `--check`), `hubs/boards/index.html` is a
+hand-written settings page, and `tools/ci/smoke.js` walks boards as an engine hub. `config.UNITS` lists pharm and medcx
+(still preview: their titles show as coming), and `config.GROUPS` puts each unit under its INBDE component; anat, physio,
+micro and gpath have no home CC, so their group is decided before the first of them is published. Until T-08 and T-09
+the engine shows Core and Deep dive as "Plain English" and "As taught", and the dateless exam card counts down "NaN";
+until T-15 the masthead is blank. Next: T-08 to T-12 and T-14, in any order.
+
 What follows is the earlier handoff (2026-10-14, after Session 7); where it talks about rebuilding
-`hubs/boards/index.html`, the generated page, that ends with T-07.
+`hubs/boards/index.html`, the generated page, read it as rebuilding `hubs/boards/content/` (T-07).
 
 
 Start here. Branch `claude/boards-hub`, draft PR #70. Read, in order: `DECISIONS.md`, `PLAN_V2.md` (approved), then

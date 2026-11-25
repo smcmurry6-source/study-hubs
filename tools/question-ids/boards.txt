@@ -1,0 +1,3 @@
+# Question ids for hubs/boards: every id this hub has ever shipped, one per line, never reused.
+# "<id> retired" marks a question deleted on purpose. Rules: vault/rules/question-ids-are-permanent.md
+# Empty until the first unit is published (tools/build-boards.js publishes only checked items of taught units).

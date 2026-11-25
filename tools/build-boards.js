@@ -1,25 +1,28 @@
 #!/usr/bin/env node
-// Boards hub build (BUILD_SPEC 2.2): src/boards/ -> hubs/boards/index.html (+ hubs/boards/game/<bundle>.js).
+// Boards hub converter (docs/boards/ENGINE_PLAN.md section 4): src/boards/ -> hubs/boards/content/, the hub's content for
+// the engine (widget/hub.js), plus hubs/boards/game/<bundle>.js for Chairside's bundles once src/boards/game/ has them.
 // Dependency-free Node 22; works with Windows paths and CRLF checkouts.
 //
-//   node tools/build-boards.js                    validate, then write hubs/boards/index.html
-//   node tools/build-boards.js --check            build in memory, compare with the committed files (CI); exit 1 if stale
+//   node tools/build-boards.js                    validate, then write hubs/boards/content/ (core, questions, notes,
+//                                                 study and facts .json), laid out by tools/hub-next/build.mjs
+//   node tools/build-boards.js --check            build both steps in memory, compare with the committed files (CI); exit 1 if stale
 //   node tools/build-boards.js --report           also print the blueprint report (FK x CC, case share, cue/negative/longest-key rates)
 //   node tools/build-boards.js --unit medcx       validate one unit and print its counts (writes nothing)
-//   node tools/build-boards.js --include-drafts   local preview: also publish unchecked items and preview units
-//                                                 (never commit that output: CI's --check fails on it)
+//   node tools/build-boards.js --include-drafts --out <dir>
+//                                                 local preview: also publish unchecked items and preview units, into
+//                                                 <dir>/content/ (never into hubs/boards/)
 //   node tools/build-boards.js --quiet            errors only (no warnings)
-//   --units-dir <dir>   build from another units folder (test fixtures); every unit in it, ordered by unit.num
-//   --out <file>        write the page somewhere else (game bundles go to <dir of file>/game/)
+//   --units-dir <dir>   build from another units folder (test fixtures; needs --out); every unit in it, ordered by unit.num
+//   --out <dir>         write the content to <dir>/content/ and game bundles to <dir>/game/ instead of hubs/boards/
 //
-// The page is generated: edit src/boards/ and rebuild. A merge conflict in hubs/boards/index.html is resolved by
-// rebuilding, never by hand.
+// hubs/boards/content/ is generated: edit src/boards/ and rebuild, never the JSON. A merge conflict in it is resolved in
+// the sources, then by rebuilding. hubs/boards/index.html is the hand-written settings page (SH_HUB).
 'use strict';
 
 const fs = require('fs');
 const path = require('path');
-const crypto = require('crypto');
 const zlib = require('zlib');
+const { pathToFileURL } = require('url');
 
 const ROOT = path.resolve(__dirname, '..');
 const SRC = path.join(ROOT, 'src', 'boards');
@@ -41,7 +44,7 @@ function parseArgs(argv) {
     else if (a === '--include-drafts') o.drafts = true;
     else if (a === '--quiet') o.quiet = true;
     else if (a === '--units-dir') o.unitsDir = path.resolve(val(i++, 'a folder'));
-    else if (a === '--out') o.out = path.resolve(val(i++, 'a file path'));
+    else if (a === '--out') o.out = path.resolve(val(i++, 'a folder'));
     else if (a === '-h' || a === '--help') o.help = true;
     else { console.error(`Unknown argument ${a} (try --help)`); process.exit(2); }
   }
@@ -53,20 +56,16 @@ const rel = p => { const r = path.relative(ROOT, p); return r.startsWith('..') |
 const readText = p => fs.readFileSync(p, 'utf8').replace(/^﻿/, '').replace(/\r\n?/g, '\n');
 const exists = p => fs.existsSync(p);
 const kb = n => (n / 1024).toFixed(1) + ' KB';
-const sha8 = s => crypto.createHash('sha1').update(s).digest('hex').slice(0, 8);
-// JSON that is safe inside an inline <script>: no "<" (so no </script> or <!--), no raw line separators.
-const js = v => JSON.stringify(v).replace(/</g, '\\u003c').replace(/\u2028/g, '\\u2028').replace(/\u2029/g, '\\u2029');
-const jsLines = arr => arr.length ? '[\n' + arr.map(js).join(',\n') + '\n]' : '[]';
-const jsMap = obj => { const k = Object.keys(obj); return k.length ? '{\n' + k.map(x => js(x) + ':' + js(obj[x])).join(',\n') + '\n}' : '{}'; };
 const pick = (o, keys) => { const r = {}; for (const k of keys) if (o[k] !== undefined && o[k] !== null) r[k] = o[k]; return r; };
 const stripTags = h => String(h).replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/\s+/g, ' ').trim();
 function freshRequire(p) { const abs = path.resolve(p); delete require.cache[abs]; return require(abs); }
 
-// Fields that go into the page, in this order (stable output). `checked`, `bench` and authoring notes stay in the sources.
+// Fields that go into questions.json and core.json's cases, in this order (stable output). The engine doesn't read every
+// one of them yet (refs, sec, exam, fixed, pin, the blueprint fields: ENGINE_PLAN section 2); `checked`, `bench`, a
+// case's `beats` and authoring notes stay in the sources.
 const ITEM_FIELDS = ['id', 'lec', 'type', 'fmt', 'pbox', 'img', 'stem', 'choices', 'answer', 'fixed', 'pin', 'ex', 'why', 'cue', 'refs',
   'exam', 'ov', 'cc', 'cc2', 'fk', 'fk2', 'cog', 'diff', 'concept', 'sec', 'hy', 'case', 'phase', 'added'];
-const CASE_FIELDS = ['id', 'units', 'box', 'stim', 'items', 'beats', 'exam', 'added'];
-const UNIT_FIELDS = ['id', 'num', 'title', 'short', 'exam', 'status', 'audio', 'added'];
+const CASE_FIELDS = ['id', 'units', 'box', 'stim', 'items', 'exam', 'added'];
 const VOID = new Set(['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'source', 'track', 'wbr']);
 
 // ---------- the build ----------
@@ -191,37 +190,76 @@ function build(opt) {
     };
   }
 
-  // 4. emit the page
-  const pubUnits = units.filter(u => u.meta);
-  const LECTURES = pubUnits.map(u => pick(u.meta, UNIT_FIELDS));
-  const QUESTIONS = pubItems.map(it => pick(it, ITEM_FIELDS));
-  const CASES = pubCases.map(c => pick(c, CASE_FIELDS));
-  const READINGS = {}, READINGS_DEEP = {}, SECTIONS = [];
-  for (const u of pubUnits) {
-    const n = notesByUnit[u.id];
-    if (!taught.has(u.id) || !n) continue;
-    READINGS[u.id] = u.core.trim();
-    if (u.deep) READINGS_DEEP[u.id] = u.deep.trim();
-    SECTIONS.push(...searchSections(u, n.core));
+  // 4. the content for the engine (hubs/boards/content/, drawn by widget/hub.js; ENGINE_PLAN section 2)
+  const groupOf = {};
+  for (const g of config.GROUPS || []) for (const id of g.units || []) {
+    if (groupOf[id]) fail('config.js GROUPS', `${id} is in two groups`);
+    groupOf[id] = g.id;
   }
-  // source chips for the fact ids the page cites (items' refs and the notes' data-ref)
-  const REFS = {};
+  const pubUnits = units.filter(u => u.meta);
+  const lectures = pubUnits.map(u => {
+    const m = u.meta, ex = (m.exam || []).slice();
+    if (!groupOf[u.id]) fail('config.js GROUPS', `${u.id} is in no group: put it under one of the INBDE components`);
+    return pick({ id: u.id, num: m.num, label: 'U' + m.num, title: m.title, short: m.short, group: groupOf[u.id],
+      status: taught.has(u.id) ? 'taught' : 'upcoming', tag: ex.includes('adex') ? 'BOTH' : 'INBDE', exam: ex,
+      who: ex.includes('adex') ? 'INBDE and ADEX' : 'INBDE only', from: 'written from primary sources', added: m.added },
+      ['id', 'num', 'label', 'title', 'short', 'group', 'status', 'tag', 'exam', 'who', 'from', 'added']);
+  });
+  const questions = pubItems.map(it => {
+    const q = pick(it, ITEM_FIELDS);
+    if (q.pbox) q.pbox = boxRows(q.pbox);
+    q.src = 'ref';
+    return q;
+  });
+  const cases = pubCases.map(c => {
+    const o = pick(c, CASE_FIELDS);
+    o.box = boxRows(c.box || {});
+    return o;
+  });
+  const full = {}, plain = {};
+  for (const u of pubUnits) {
+    if (!taught.has(u.id) || !notesByUnit[u.id]) continue;
+    // Core is the engine's Plain English level and Deep dive its As taught (the hub labels them: T-08); Core alone is both
+    if (u.deep) { full[u.id] = u.deep.trim(); plain[u.id] = u.core.trim(); } else full[u.id] = u.core.trim();
+  }
+  // the public part of each cited fact (items' refs and the notes' data-ref): facts, each fact id's sources, and sources,
+  // each source's name, publisher, link and date. The claims and the quotes stay in src/boards/facts/ (T-11 draws the
+  // source chips from this file)
+  const facts = { facts: {}, sources: {} };
   const cite = id => {
-    if (/^https:/.test(id) || REFS[id]) return;
+    if (/^https:/.test(id) || facts.facts[id]) return;
     const f = db.facts.get(id); if (!f) return;
-    REFS[id] = { claim: f.claim, src: (f.cites || []).map(c => { const s = db.sources[c.src] || {}; return pick({ t: s.title, org: s.org, u: s.url, loc: c.loc, date: s.date }, ['t', 'org', 'u', 'loc', 'date']); }) };
+    facts.facts[id] = [...new Set((f.cites || []).map(c => c.src))];
+    for (const k of facts.facts[id]) if (!facts.sources[k]) { const s = db.sources[k] || {}; facts.sources[k] = pick({ name: s.title, org: s.org, url: s.url, date: s.date }, ['name', 'org', 'url', 'date']); }
   };
-  for (const it of QUESTIONS) (it.refs || []).forEach(cite);
-  for (const u of pubUnits) if (READINGS[u.id]) for (const r of notesByUnit[u.id].refs) cite(r);
-  const usedFigs = new Set([...QUESTIONS.map(q => q.img).filter(Boolean), ...CASES.flatMap(c => c.stim || [])]);
-  for (const u of pubUnits) if (READINGS[u.id]) for (const k of notesByUnit[u.id].figs) usedFigs.add(k);
-  const FIGURES = {}; for (const k of Object.keys(figures).sort()) if (usedFigs.has(k)) FIGURES[k] = figures[k];
+  for (const q of questions) (q.refs || []).forEach(cite);
+  for (const u of pubUnits) if (full[u.id]) for (const r of notesByUnit[u.id].refs) cite(r);
+  // figures: the engine draws a hub's from content/figures.js, which the boards build doesn't write yet
+  const usedFigs = new Set([...questions.map(q => q.img).filter(Boolean), ...cases.flatMap(c => c.stim || [])]);
+  for (const u of pubUnits) if (full[u.id]) for (const k of notesByUnit[u.id].figs) usedFigs.add(k);
+  if (usedFigs.size) fail('src/boards/figures', `published items or notes use ${[...usedFigs].join(', ')}, and the boards build doesn't write content/figures.js yet`);
+  // the mock: every published unit's questions, up to 30 each, at the standalone pace, until T-14's exam blocks
+  const blueprint = {};
+  for (const l of lectures) { const n = questions.filter(q => q.lec === l.id).length; if (n) blueprint[l.id] = Math.min(n, 30); }
+  const nMock = Object.values(blueprint).reduce((a, b) => a + b, 0);
+  const core = {
+    hub: config.HUB, title: config.TITLE, stateKey: config.STATE_KEY, audio: 'off',
+    exams: [{ id: 'inbde', label: 'INBDE' }, { id: 'adex', label: 'ADEX' }], examNote: config.EXAM_NOTE,
+    groups: (config.GROUPS || []).map(g => pick(g, ['id', 'title', 'code'])),
+    lectures, likelyTopics: [], cases,
+    mock: { blueprint, limit: nMock * ((config.MOCK || {}).standaloneSec || 63),
+      blocks: { standalone: { sec: (config.MOCK || {}).standaloneSec }, cases: { sec: (config.MOCK || {}).caseSec } } },
+    srcLabel: { ref: 'Board fact' },
+  };
+  const D = {
+    'core.json': core, 'questions.json': questions, 'notes.json': { full, plain },
+    'study.json': { hints: [], cram: {}, review: [], sequences: [], sortSets: [] },
+  };
 
   // 5. game bundles (src/boards/game/<bundle>/*.js -> hubs/boards/game/<bundle>.js)
-  const outFile = opt.out || path.join(ROOT, 'hubs', 'boards', 'index.html');
-  const gameOut = path.join(path.dirname(outFile), 'game');
+  const outDir = opt.out || path.join(ROOT, 'hubs', 'boards');
+  const contentDir = path.join(outDir, 'content'), gameOut = path.join(outDir, 'game');
   const outputs = new Map();  // abs path -> content
-  const GAME_BUNDLES = {};
   const gameSrc = path.join(SRC, 'game');
   if (exists(gameSrc)) for (const b of fs.readdirSync(gameSrc).sort()) {
     const bdir = path.join(gameSrc, b);
@@ -234,82 +272,35 @@ function build(opt) {
     const gz = zlib.gzipSync(content, { level: 9 }).length, limit = (config.GAME_GZIP_LIMIT || {})[b];
     if (limit && gz > limit) fail(`game/${b}.js`, `${kb(gz)} gzipped, over the ${kb(limit)} limit`);
     outputs.set(path.join(gameOut, b + '.js'), content);
-    GAME_BUNDLES[b] = `game/${b}.js?v=${sha8(content)}`;
   }
 
-  const CONFIG = {
-    hub: config.HUB, title: config.TITLE, subtitle: config.SUBTITLE, examNote: config.EXAM_NOTE, stateKey: config.STATE_KEY,
-    enabledTypes: config.ENABLED_TYPES, budget: config.BUDGET, mock: config.MOCK,
-    modes: config.MODES.map(m => ({ id: m.id, label: m.label, subs: m.subs })), drafts: !!opt.drafts,
-  };
-  const dataParts = [
-    ['SH_SRS', `window.SH_SRS = ${js(config.SRS)};`],
-    ['CONFIG', `var CONFIG = ${js(CONFIG)};`],
-    ['LECTURES', `var LECTURES = ${jsLines(LECTURES)};`],
-    ['QUESTIONS', `var QUESTIONS = ${jsLines(QUESTIONS)};`],
-    ['CASES', `var CASES = ${jsLines(CASES)};`],
-    ['READINGS', `var READINGS = ${jsMap(READINGS)};`],
-    ['READINGS_DEEP', `var READINGS_DEEP = ${jsMap(READINGS_DEEP)};`],
-    ['READINGS_PLAIN', 'var READINGS_PLAIN = {};'],
-    /* High Likelihood Exam Questions (vault/rules/high-likelihood-topics.md): empty while no unit is published; a published
-       unit needs its ranked topics (what ranks them for a board exam is Sam's call, vault/tasks/ on main) */
-    ['LIKELY_TOPICS', 'var LIKELY_TOPICS = [];'],
-    ['SECTIONS', `var SECTIONS = ${jsLines(SECTIONS)};`],
-    ['REFS', `var REFS = ${jsMap(REFS)};`],
-    ['FIGURES', `var FIGURES = ${jsMap(FIGURES)};`],
-    ['GAME_BUNDLES', `var GAME_BUNDLES = ${js(GAME_BUNDLES)};`],
-  ];
-  const appDir = path.join(SRC, 'app');
-  const appFiles = fs.readdirSync(appDir).filter(f => f.endsWith('.js')).sort();
-  const appParts = appFiles.map(f => [f, `/* ==== app/${f} ==== */\n${readText(path.join(appDir, f)).trim()}\n`]);
-  const MARK = 'window.SH_EXPORT = {';
-  for (const [f, s] of appParts) {
-    if (/<\/script/i.test(s)) fail(`src/boards/app/${f}`, 'contains "</script" (write it as "<\\/script")');
-    const n = s.split(MARK).length - 1;
-    if (f === appFiles[appFiles.length - 1] ? n !== 1 : n !== 0) fail(`src/boards/app/${f}`, `"${MARK}" must appear exactly once, as the last statement of the last app file (99-export.js)`);
-    else if (n === 1) {
-      // nothing but whitespace and comments may follow the "};" that closes the SH_EXPORT object (its first line-start "};")
-      const tail = s.slice(s.indexOf(MARK)), end = tail.search(/\n\};/);
-      const after = end < 0 ? null : tail.slice(end + 3).replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '').trim();
-      if (after !== '') fail(`src/boards/app/${f}`, `"${MARK}" must be the last statement: end the file with the "};" that closes it`);
-    }
-  }
-  if (!appFiles.length || appFiles[appFiles.length - 1] !== '99-export.js') fail('src/boards/app', '99-export.js must be the last app file');
-  const script = `'use strict';\n(function(){\n/* ==== data (generated from src/boards: units, facts, figures) ==== */\n` +
-    dataParts.map(p => p[1]).join('\n') + '\n\n' + appParts.map(p => p[1]).join('\n') + '})();\n';
-
-  const cssDir = path.join(SRC, 'css');
-  const cssFiles = fs.readdirSync(cssDir).filter(f => f.endsWith('.css')).sort((a, b) => cssRank(a) - cssRank(b) || (a < b ? -1 : 1));
-  const style = cssFiles.map(f => `/* ==== css/${f} ==== */\n${readText(path.join(cssDir, f)).trim()}\n`).join('\n');
-  if (/<\/style/i.test(style)) fail('src/boards/css', 'contains "</style"');
-
-  const nav = config.MODES.map((m, i) => `      <button role="tab" type="button" data-mode="${m.id}" aria-selected="${i === 0}"><span class="mode-icon" data-ic="${m.icon}"></span><span class="mode-label">${escHtml(m.label)}</span></button>`).join('\n');
-  const body = config.MODES.map((m, i) => `    <section class="mode-panel" id="panel-${m.id}" data-mode-panel="${m.id}"${i ? ' hidden' : ''}></section>`).join('\n');
-  const banner = '<!--\n  GENERATED FILE: built by tools/build-boards.js from src/boards/. Do not edit it by hand.\n' +
-    '  Edit src/boards/ and run: node tools/build-boards.js   (CI runs --check and fails when this file is stale.)\n' +
-    '  Merge conflict in this file? Resolve the sources, then rebuild.' + (opt.drafts ? '\n  DRAFT PREVIEW (--include-drafts): unchecked items are in this build. Never commit it.' : '') + '\n-->';
-  const slots = {
-    BANNER: banner, TITLE: escHtml(config.TITLE), SUBTITLE: escHtml(config.SUBTITLE), DESCRIPTION: escHtml(config.DESCRIPTION),
-    EXAM_NOTE: escHtml(config.EXAM_NOTE), NAV: nav, BODY: body, STYLE: style, SCRIPT: script, HUB: config.HUB,
-  };
-  let html = readText(path.join(SRC, 'shell.html'));
-  for (const k of Object.keys(slots)) if (!html.includes(`{{${k}}}`)) fail('src/boards/shell.html', `missing the {{${k}}} slot`);
-  html = html.replace(/\{\{([A-Z_]+)\}\}/g, (m, k) => (k in slots ? slots[k] : (fail('src/boards/shell.html', `unknown slot ${m}`), m)));
-  if (html.split(MARK).length !== 2) fail('hubs/boards/index.html', `"${MARK}" must appear exactly once (CI lint hook)`);
-  if (!html.includes(`data-hub="${config.HUB}"`)) fail('src/boards/shell.html', 'the widget tag (data-hub) is missing');
-  outputs.set(outFile, html);
-
-  // 6/7. size report and limits
-  const bytes = Buffer.byteLength(html);
-  const sizes = [['style', Buffer.byteLength(style)], ...dataParts.map(([k, s]) => [k, Buffer.byteLength(s)]), ['app', Buffer.byteLength(appParts.map(p => p[1]).join(''))], ['total', bytes]];
-  if (bytes > config.SIZE_LIMIT) fail(rel(outFile), `${kb(bytes)}, over the ${kb(config.SIZE_LIMIT)} limit`);
-
-  return { config, units, scope, counts, findings: L.findings, lintErrors, lintWarns, lintItems: res.items, problems, notices, outputs, sizes, gameOut,
-    gzip: zlib.gzipSync(html).length, pub: { items: pubItems, cases: pubCases, units: LECTURES } };
+  return { config, units, scope, counts, findings: L.findings, lintErrors, lintWarns, lintItems: res.items, problems, notices, outputs,
+    contentDir, gameOut, D, facts, pub: { items: pubItems, cases: pubCases, units: lectures } };
 }
 
-function cssRank(f) { return f === 'tokens.css' ? 0 : f === 'base.css' ? 1 : f === 'phone.css' ? 3 : 2; }
-function escHtml(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+// Laying the content out (tools/hub-next/build.mjs buildFrom: the question index, High yield, a question or a lecture to a
+// line), so what this writes is what that build would, and facts.json, a fact or a source to a line.
+async function layOut(r) {
+  const { buildFrom } = await import(pathToFileURL(path.join(ROOT, 'tools', 'hub-next', 'build.mjs')).href);
+  const { out } = buildFrom(r.config.HUB, JSON.parse(JSON.stringify(r.D)));
+  for (const [name, text] of Object.entries(out)) r.outputs.set(path.join(r.contentDir, name), text);
+  const map = m => { const k = Object.keys(m).sort(); return k.length ? '{\n' + k.map(x => '  ' + JSON.stringify(x) + ': ' + JSON.stringify(m[x])).join(',\n') + '\n }' : '{}'; };
+  r.outputs.set(path.join(r.contentDir, 'facts.json'), `{\n "facts": ${map(r.facts.facts)},\n "sources": ${map(r.facts.sources)}\n}\n`);
+  const bytes = [...r.outputs].filter(([p]) => p.startsWith(r.contentDir)).reduce((n, [, t]) => n + Buffer.byteLength(t), 0);
+  if (bytes > r.config.SIZE_LIMIT) r.problems.push(`${rel(r.contentDir)}: ${kb(bytes)}, over the ${kb(r.config.SIZE_LIMIT)} limit`);
+  r.sizes = [...r.outputs].map(([p, t]) => [path.basename(p), Buffer.byteLength(t)]);
+}
+
+// The engine's patient box: rows of [label, text] (widget/hub-bank.js pboxHTML), from a box's patient, cc, hx and findings
+function boxRows(b) {
+  const rows = [];
+  if (b.patient) rows.push(['Patient', String(b.patient)]);
+  if (b.cc) rows.push(['Chief complaint', String(b.cc)]);
+  if ((b.hx || []).length) rows.push(['History', b.hx.join('; ')]);
+  if ((b.findings || []).length) rows.push(['Findings', b.findings.join('; ')]);
+  return rows;
+}
+
 
 // ---------- notes (BUILD_SPEC 5.2) ----------
 function parseNotes(html) {
@@ -379,30 +370,6 @@ function validateNotes(u, { db, figures, fail, note }) {
   return out;
 }
 
-// SH_EXPORT.sections for the widget's search: each paragraph and list line (Notes), high-yield line (Notes, titled
-// "High-yield") and review-table row (Review). The widget only lists the kinds Notes / Review / Exam hints / Cram sheet.
-function searchSections(u, parsed) {
-  const out = [], where = s => `${u.meta.short} · ${s.title}`;
-  for (const m of parsed.hy.matchAll(/<li\b[^>]*>([\s\S]*?)<\/li>/g)) {
-    const t = stripTags(m[1]); if (t.length > 2) out.push({ kind: 'Notes', title: 'High-yield', where: u.meta.title, text: t, lec: u.id, go: { unit: u.id, sec: null } });
-  }
-  for (const s of parsed.sections) {
-    const noTables = s.html.replace(/<table\b[\s\S]*?<\/table>/g, ' ');
-    for (const m of noTables.matchAll(/<(p|li)\b[^>]*>([\s\S]*?)<\/\1>/g)) {
-      const t = stripTags(m[2]); if (t.length > 2) out.push({ kind: 'Notes', where: where(s), text: t, lec: u.id, go: { unit: u.id, sec: s.id } });
-    }
-    for (const t of s.html.matchAll(/<table\b[\s\S]*?<\/table>/g)) {
-      const cap = stripTags((t[0].match(/<caption\b[^>]*>([\s\S]*?)<\/caption>/) || [])[1] || '');
-      for (const r of t[0].matchAll(/<tr\b[^>]*>([\s\S]*?)<\/tr>/g)) {
-        if (/<th\b/.test(r[1]) && !/<td\b/.test(r[1])) continue;
-        const cells = [...r[1].matchAll(/<t[dh]\b[^>]*>([\s\S]*?)<\/t[dh]>/g)].map(c => stripTags(c[1])).filter(Boolean);
-        if (cells.length) out.push({ kind: 'Review', where: where(s) + (cap ? ' · ' + cap : ''), title: cells[0], text: cells.join(' · '), lec: u.id, go: { unit: u.id, sec: s.id } });
-      }
-    }
-  }
-  return out;
-}
-
 // ---------- report (--report) ----------
 function report(r) {
   const lines = [];
@@ -430,14 +397,21 @@ function report(r) {
 }
 
 // ---------- main ----------
-function main() {
+async function main() {
   const opt = parseArgs(process.argv.slice(2));
   if (opt.help) { const ls = readText(__filename).split('\n'), end = ls.findIndex((l, i) => i > 0 && !l.startsWith('//')); console.log(ls.slice(1, end).map(l => l.replace(/^\/\/ ?/, '')).join('\n')); return 0; }
   if (opt.check && opt.unit) { console.error('build-boards: --unit validates one unit and writes nothing; it does not combine with --check (run --check on its own).'); return 2; }
   if (opt.check && opt.drafts) { console.error('build-boards: --include-drafts is a local preview; it refuses to run with --check (CI compares the clean build).'); return 2; }
+  if (opt.check && (opt.out || opt.unitsDir)) { console.error('build-boards: --check compares the real build with hubs/boards/; it takes no --out or --units-dir.'); return 2; }
+  const real = path.join(ROOT, 'hubs', 'boards');
+  if (opt.out && (opt.out === real || opt.out.startsWith(real + path.sep))) { console.error(`build-boards: --out is for a preview folder outside ${rel(real)} (plain node tools/build-boards.js writes the hub).`); return 2; }
+  if (!opt.unit && (opt.drafts || opt.unitsDir) && !opt.out) { console.error(`build-boards: ${opt.drafts ? '--include-drafts' : '--units-dir'} writes a preview, never the hub: add --out <dir> (a scratch folder).`); return 2; }
 
   let r;
   try { r = build(opt); } catch (e) { console.error(`build-boards: ${e.stack || e.message}`); return 1; }
+  if (!r.lintErrors.length && !r.problems.length && !opt.unit) {
+    try { await layOut(r); } catch (e) { r.problems.push(`tools/hub-next/build.mjs: ${e.message}`); }
+  }
 
   for (const f of r.findings) if (!opt.quiet || f.sev === 'error') console.log(lint.formatFinding(f));
   if (!opt.quiet) for (const n of r.notices) console.log(`warn  ${n}`);
@@ -447,25 +421,26 @@ function main() {
     const c = r.counts[u.id];
     return `  ${u.id} (${c.status}): ${c.published} of ${c.source} items published (${c.standalone} standalone, ${c.caseItems} in cases; ${c.cases} cases homed here)` +
       (c.published ? `; FK ${fmtTally(c.fk)}; CC ${fmtTally(c.cc)}; cog ${fmtTally(c.cog)}; exam ${fmtTally(c.exam)}` : '');
-  }).join('\n') : '  no units yet (the hub shows "first units coming soon")';
+  }).join('\n') : '  no units yet (the hub shows no units until the first one is listed in config.UNITS)';
   console.log(`\nboards: ${r.units.length} units, ${r.pub.items.length} items and ${r.pub.cases.length} cases published${opt.drafts ? ' (DRAFTS INCLUDED)' : ''}\n${unitsLine}`);
   if (opt.report) console.log('\nReport\n' + report(r));
-  console.log('\nSize: ' + r.sizes.map(([k, n]) => `${k} ${kb(n)}`).join(', ') + `; gzipped ${kb(r.gzip)}`);
+  if (r.sizes) console.log('\nSize: ' + r.sizes.map(([k, n]) => `${k} ${kb(n)}`).join(', '));
   console.log(`lint: ${r.lintErrors.length} errors, ${r.lintWarns.length} warnings; build: ${r.problems.length} errors, ${r.notices.length} warnings`);
 
   if (r.lintErrors.length || r.problems.length) { console.error('\n✗ build failed: fix the errors above (nothing was written)'); return 1; }
   if (opt.unit) { console.log(`\n✓ unit ${opt.unit} is valid (--unit writes nothing)`); return 0; }
 
+  // files in the folders this writes that it no longer builds (a game bundle dropped, a content file renamed)
+  const leftovers = () => [[r.contentDir, /\.json$/], [r.gameOut, /\.js$/]].flatMap(([d, re]) =>
+    exists(d) ? fs.readdirSync(d).filter(f => re.test(f)).map(f => path.join(d, f)).filter(p => !r.outputs.has(p)) : []);
   if (opt.check) {
     const stale = [];
     for (const [p, content] of r.outputs) {
       const cur = exists(p) ? readText(p) : null;
       if (cur !== content) stale.push(rel(p) + (cur == null ? ' (missing)' : ''));
     }
-    if (exists(r.gameOut)) for (const f of fs.readdirSync(r.gameOut).filter(f => f.endsWith('.js'))) {
-      const p = path.join(r.gameOut, f); if (!r.outputs.has(p)) stale.push(rel(p) + ' (no longer built: delete it)');
-    }
-    if (stale.length) { console.error(`\n✗ the generated boards hub is stale; run node tools/build-boards.js and commit:\n${stale.map(s => '  ' + s).join('\n')}`); return 1; }
+    for (const p of leftovers()) stale.push(rel(p) + ' (no longer built: delete it)');
+    if (stale.length) { console.error(`\n✗ the boards hub's content is stale; run node tools/build-boards.js and commit:\n${stale.map(s => '  ' + s).join('\n')}`); return 1; }
     console.log(`\n✓ ${[...r.outputs.keys()].map(rel).join(', ')} up to date with src/boards`);
     return 0;
   }
@@ -475,14 +450,12 @@ function main() {
     const cur = exists(p) ? readText(p) : null;   // a CRLF checkout of an unchanged file is left alone
     if (cur !== content) fs.writeFileSync(p, content);
   }
-  if (exists(r.gameOut)) for (const f of fs.readdirSync(r.gameOut).filter(f => f.endsWith('.js'))) {
-    const p = path.join(r.gameOut, f); if (!r.outputs.has(p)) { fs.unlinkSync(p); console.log(`removed ${rel(p)} (no longer built)`); }
-  }
-  console.log(`\n✓ wrote ${[...r.outputs.keys()].map(rel).join(', ')}${opt.drafts ? '  (DRAFT PREVIEW: do not commit)' : ''}`);
+  for (const p of leftovers()) { fs.unlinkSync(p); console.log(`removed ${rel(p)} (no longer built)`); }
+  console.log(`\n✓ wrote ${[...r.outputs.keys()].map(rel).join(', ')}${opt.drafts ? '  (DRAFT PREVIEW: not the hub)' : ''}`);
   return 0;
 }
 
 function fmtTally(t) { return Object.keys(t).sort().map(k => `${k} ${t[k]}`).join(', '); }
 
-if (require.main === module) process.exitCode = main();
-module.exports = { build, parseNotes, tagBalance, searchSections };
+if (require.main === module) main().then(c => { process.exitCode = c; }, e => { console.error(e.stack || e.message); process.exitCode = 1; });
+module.exports = { build, layOut, parseNotes, tagBalance, boxRows };

@@ -3,7 +3,9 @@
  * The content step for the hubs on the engine (widget/hub.js).
  *
  * A hub on the engine keeps its content in hubs/<hub>/content/, and since the redesign's release (2026-11) those files
- * are where the content is edited: there is no single-file hub to copy from any more.
+ * are where the content is edited: there is no single-file hub to copy from any more. The one exception is the boards
+ * hub (on the claude/boards-hub branch): its content is written by tools/build-boards.js from src/boards/, through
+ * buildFrom() below, so it is edited there and never here.
  *
  *   core.json       the hub's facts for Home: lectures, exam info, course dates, likely topics, mock blueprint, the
  *                   podcast, and a compact question index ([id, lec, likely, src]) so Home draws before the bank loads
@@ -115,8 +117,22 @@ function build(hub){
     cur[f] = readFileSync(path, "utf8");
     try { D[f] = JSON.parse(cur[f]); } catch (e) { throw new Error(`hubs/${hub}/content/${f} is not valid JSON: ${e.message}`); }
   }
+  const vPath = join(dir, "variants.json");
+  if (existsSync(vPath)) {
+    cur["variants.json"] = readFileSync(vPath, "utf8");
+    try { D["variants.json"] = JSON.parse(cur["variants.json"]); } catch (e) { throw new Error(`hubs/${hub}/content/variants.json is not valid JSON: ${e.message}`); }
+  }
+  /* the hub's scripts parse */
+  for (const f of ["figures.js", "arcade.js"]) if (existsSync(join(dir, f))) new vm.Script(readFileSync(join(dir, f), "utf8"), { filename: `hubs/${hub}/content/${f}` });
+  return Object.assign({ dir, cur }, buildFrom(hub, D));
+}
+/* The same build on content held in memory ({ "core.json": data, ... }, as parsed JSON): what each file should say, laid
+   out. tools/build-boards.js uses it to write the boards hub's content from src/boards/ and to check it (--check). */
+export function buildFrom(hub, D){
   const core = D["core.json"], questions = D["questions.json"], notes = D["notes.json"], study = D["study.json"];
-  if (!Array.isArray(questions) || !questions.length) throw new Error(`hubs/${hub}/content/questions.json has no questions`);
+  /* a hub with no taught lecture yet (boards, before its first unit is published) may have no questions */
+  const building = (core.lectures || []).every((l) => l.status && l.status !== "taught");
+  if (!Array.isArray(questions) || (!questions.length && !building)) throw new Error(`hubs/${hub}/content/questions.json has no questions`);
   if (core.hub !== hub) throw new Error(`hubs/${hub}/content/core.json says its hub is "${core.hub}"`);
   /* a question's High likelihood flag (likely: the first predicted topic that lists it, which the bank's filter and tag,
      the mock's share and the drill read) is worked out from core.json's likelyTopics, so it can't fall behind them
@@ -136,10 +152,7 @@ function build(hub){
   questions.forEach((q) => { if (firstTopic[q.id]) q.likely = flag(firstTopic[q.id]); else delete q.likely; });
   /* the other wordings: checked, laid out a question to a line, and counted in core.json (the engine fetches the file only
      when the count is there) */
-  const vPath = join(dir, "variants.json");
-  if (existsSync(vPath)) {
-    cur["variants.json"] = readFileSync(vPath, "utf8");
-    try { D["variants.json"] = JSON.parse(cur["variants.json"]); } catch (e) { throw new Error(`hubs/${hub}/content/variants.json is not valid JSON: ${e.message}`); }
+  if (D["variants.json"]) {
     const bad = checkVariants(questions, D["variants.json"]);
     if (bad.length) throw new Error(`hubs/${hub}/content/variants.json:\n  ` + bad.join("\n  "));
     core.variants = Object.keys(D["variants.json"]).length;
@@ -161,9 +174,7 @@ function build(hub){
   if (D["variants.json"]) { const V = D["variants.json"]; out["variants.json"] = "{\n" + Object.keys(V).map((id) => one(id) + ": " + one(V[id])).join(",\n") + "\n}\n"; }
   /* the layout never changes what a file says */
   for (const f of ["core.json", "questions.json", "study.json", "variants.json"]) if (out[f] && one(JSON.parse(out[f])) !== one(D[f])) throw new Error(`hubs/${hub}/content/${f}: the layout changed its data (tools/hub-next/build.mjs, layout)`);
-  /* the hub's scripts parse */
-  for (const f of ["figures.js", "arcade.js"]) if (existsSync(join(dir, f))) new vm.Script(readFileSync(join(dir, f), "utf8"), { filename: `hubs/${hub}/content/${f}` });
-  return { dir, cur, out, n: questions.length };
+  return { out, n: questions.length };
 }
 
 const isMain = process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url);

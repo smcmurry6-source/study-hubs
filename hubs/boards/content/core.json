@@ -1,0 +1,31 @@
+{
+ "hub": "boards",
+ "title": "Boards Hub",
+ "stateKey": "boards-state-v1",
+ "audio": "off",
+ "exams": [
+  {"id":"inbde","label":"INBDE"},
+  {"id":"adex","label":"ADEX"}
+ ],
+ "examNote": "INBDE + ADEX ~Aug 2028",
+ "groups": [
+  {"id":"dtp","title":"Diagnosis and Treatment Planning","code":"D&TP"},
+  {"id":"ohm","title":"Oral Health Management","code":"OHM"},
+  {"id":"pp","title":"Practice and Profession","code":"P&P"}
+ ],
+ "lectures": [
+  {"id":"pharm","num":15,"label":"U15","title":"Pharmacology and therapeutics","short":"Pharm","group":"ohm","status":"upcoming","tag":"BOTH","exam":["inbde","adex"],"who":"INBDE and ADEX","from":"written from primary sources","added":"2026-10-13"},
+  {"id":"medcx","num":16,"label":"U16","title":"Medically complex patients and emergencies","short":"Med cx","group":"dtp","status":"upcoming","tag":"BOTH","exam":["inbde","adex"],"who":"INBDE and ADEX","from":"written from primary sources","added":"2026-10-13"}
+ ],
+ "likelyTopics": [],
+ "cases": [],
+ "mock": {
+  "blueprint": {},
+  "limit": 0,
+  "blocks": {"standalone":{"sec":63},"cases":{"sec":95}}
+ },
+ "srcLabel": {
+  "ref": "Board fact"
+ },
+ "index": []
+}
