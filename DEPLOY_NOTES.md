@@ -32,7 +32,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
-- **2026-11-25 (Timmy's place: a quicker Customize, Claude Code)** — Sam: "I also want a better way to do the customization
+- **2026-11-25 (Timmy's place: a quicker Customize, #567, Claude Code)** — Sam: "I also want a better way to do the customization
   for Timmys place. Its clunky and inefficient". Customize is one panel now: four tabs (Timmy, Home, Scene, Yard, with the
   yard's five spots as a row under its tab) over one list of what you own of that kind, grouped New since you last looked,
   Classics, each collection and season, Rank rewards (locked ones say what unlocks them). It opens on the newest piece you
