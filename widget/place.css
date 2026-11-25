@@ -177,78 +177,79 @@ dialog.tpv::backdrop { background: rgba(20, 14, 20, .72); }
 .tpv-host > :nth-child(n+4), .tpv-guest > :nth-child(n+4) { animation-delay: 210ms; }
 @keyframes tpv-rise { from { opacity: 0; transform: translateY(10px); } }
 
-/* Customize: the dock (what's in every spot) and the drawer (what you own of one kind) */
-.tpv-dock { display: grid; gap: 10px; }
-.tpv-dmain { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
-.tpv-dyard { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
-.tpv-dlab { grid-column: 1 / -1; font-size: 12px; font-weight: var(--w-head); letter-spacing: .12em; text-transform: uppercase; color: var(--ar-soft); }
-.tpv-tile { display: grid; gap: 4px; justify-items: center; min-width: 0; padding: 6px 4px 8px; border: 2px solid transparent; border-radius: var(--r-row); background: var(--ar-row);
-  font-size: var(--fs-meta); font-weight: var(--w-strong); line-height: 1.2; text-align: center; cursor: pointer;
-  transition: transform var(--t-press, 120ms) ease-out, background var(--t-hover, 120ms) ease-out, border-color var(--t-hover, 120ms) ease-out; }
-.tpv-tile.is-slot { padding: 4px 2px 6px; font-size: 12px; font-weight: var(--w-body); }
-.tpv-tile:hover { background: var(--active); }
-.tpv-tile:active { transform: translateY(2px); }
-.tpv-tile.on { border-color: var(--ar-gold); background: var(--active); box-shadow: 0 0 0 3px rgba(255, 224, 138, .2), 0 6px 14px rgba(0, 0, 0, .3); color: var(--ar-gold); }
-.tpv-tile.is-slot.on { font-weight: var(--w-strong); }
-.tpv-tpic { position: relative; display: block; width: 100%; aspect-ratio: 3 / 2; overflow: hidden; color: var(--muted); }
-.tpv-tile.is-slot .tpv-tpic { aspect-ratio: 1; }
-.tpv-tpic img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
-.tpv-tpic svg { position: absolute; inset: 0; margin: auto; }
-.tpv-drawer { margin: 16px 0 0; padding: 16px 0 0; border-top: 1px solid var(--rule); }
-.tpv-dhead { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
-.tpv-dhead h3 { margin: 0; font-size: var(--fs-section); font-weight: var(--w-head); line-height: 1.2; color: var(--ar-gold); }
-.tpv-dhead p { margin: 3px 0 0; font-size: var(--fs-meta); color: var(--muted); }
-.tpv-dhead .tpv-btn { flex: none; min-height: 36px; padding: 0 12px; font-size: var(--fs-meta); }
-/* up to four tabs (Classics, Collections, Seasonal, Rank): snug enough for one row on a phone, a second row rather than
-   cut off on a narrower one */
-.tpv-tabs { margin: 12px 0 0; max-width: 100%; flex-wrap: wrap; border-radius: 21px; }
-.tpv-seg.tpv-tabs button { min-height: 34px; padding: 0 9px; gap: 5px; font-size: var(--fs-meta); }
-.tpv-seth { margin: 14px 0 0; font-size: var(--fs-label); font-weight: var(--w-head); }
-.tpv-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 8px; margin: 12px 0 0; }
-.tpv-card { position: relative; display: grid; gap: 4px; justify-items: center; align-content: start; min-width: 0; padding: 8px 6px 10px; border: 2px solid var(--border); border-radius: var(--r-row);
-  background: var(--ar-row); font-size: var(--fs-meta); line-height: 1.25; text-align: center; cursor: pointer;
-  transition: transform var(--t-press, 120ms) ease-out, background var(--t-hover, 120ms) ease-out, border-color var(--t-hover, 120ms) ease-out; }
-button.tpv-card:hover { background: var(--active); border-color: rgba(255, 255, 255, .45); transform: translateY(-2px); }
+/* Customize (2026-11-25): four tabs, the yard's spots under Yard, the line that says what's there now, one list of what
+   you own of that kind, and the foot. The list is the only part that scrolls, so the tabs and Done never leave the
+   screen. Flat: a selected tab, spot or card is the gold, never a glow; depth is a step in tone */
+.tpv-side.is-cz { display: flex; flex-direction: column; padding: 0; overflow: hidden; }
+.tpv-cz { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; }
+.tpv-cats { flex: none; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 2px; margin: 18px 20px 0; padding: 4px; border-radius: 999px;
+  background: var(--ar-deep); box-shadow: inset 0 0 0 1px rgba(255, 224, 138, .32); }
+.tpv-cat { min-width: 0; min-height: 44px; padding: 0 6px; border: 0; border-radius: 999px; background: transparent; color: var(--ar-soft);
+  font-size: var(--fs-label); font-weight: var(--w-head); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer;
+  transition: color var(--t-hover, 120ms) ease-out, background var(--t-hover, 120ms) ease-out; }
+.tpv-cat:hover { color: #fff; background: rgba(255, 255, 255, .08); }
+.tpv-cat[aria-pressed="true"] { background: var(--ar-gold); color: var(--ar-ink); }
+.tpv-spots { flex: none; display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 6px; margin: 10px 20px 0; }
+.tpv-spots[hidden] { display: none; }
+.tpv-spot { display: grid; gap: 3px; justify-items: center; min-width: 0; padding: 5px 2px 6px; border: 2px solid transparent; border-radius: var(--r-row); background: var(--ar-row);
+  color: #fff; font-size: 12px; font-weight: var(--w-body); line-height: 1.2; text-align: center; cursor: pointer;
+  transition: background var(--t-hover, 120ms) ease-out, border-color var(--t-hover, 120ms) ease-out; }
+.tpv-spot:hover { background: var(--active); }
+.tpv-spot.on { border-color: var(--ar-gold); background: var(--active); color: var(--ar-gold); font-weight: var(--w-strong); }
+.tpv-spic { position: relative; display: block; width: 100%; max-width: 64px; aspect-ratio: 1; color: var(--muted); }
+.tpv-spic img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
+.tpv-spic svg { position: absolute; inset: 0; margin: auto; }
+.tpv-spot.is-empty .tpv-spic { border: 2px dashed rgba(255, 255, 255, .3); border-radius: 10px; }
+.tpv-sname { max-width: 100%; overflow-wrap: anywhere; }
+.tpv-czhead { flex: none; display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; margin: 14px 20px 0; }
+.tpv-czhead h3 { margin: 0; font-size: var(--fs-section); font-weight: var(--w-head); line-height: 1.2; color: var(--ar-gold); }
+.tpv-now { margin: 0; font-size: var(--fs-meta); color: var(--muted); }
+.tpv-list { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; margin: 6px 0 0; padding: 0 20px 18px; scrollbar-color: rgba(255, 255, 255, .28) transparent; }
+.tpv-pane.is-narrow .is-wide, .tpv-pane.is-narrow .tpv-lanenote { display: none; }   /* a spot the long lane can't take */
+.tpv-seth { margin: 16px 0 10px; font-size: var(--fs-label); font-weight: var(--w-head); color: #fff; }
+.tpv-grp.is-new .tpv-seth { color: var(--ar-gold); }
+.tpv-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(108px, 1fr)); gap: 14px 10px; }
+/* a piece in its rarity's frame, the shop's own card art (widget/hub-art/shop.js): the picture in the frame's window, the
+   name and the tier on its name plate. Until the frames come, the card is the plate alone, edged in its tier's color,
+   at the same size, so nothing moves when they do */
+.tpv .tpv-card { position: relative; display: block; min-width: 0; aspect-ratio: 4 / 5; padding: 0; border: 0; border-radius: 9% / 7.2%; background: none; color: #3B2E3A;
+  text-align: center; cursor: pointer; container-type: inline-size; isolation: isolate; transition: transform var(--t-press, 120ms) ease-out; }
+button.tpv-card:hover { transform: translateY(-3px) rotate(-1deg); }
 button.tpv-card:active { transform: translateY(1px); }
-.tpv-card.on { border-color: var(--ar-gold); background: var(--active); box-shadow: 0 0 0 3px rgba(255, 224, 138, .2), 0 6px 14px rgba(0, 0, 0, .3); }
+.tpv-card.on { box-shadow: 0 0 0 3px var(--ar-gold), 0 0 0 6px rgba(255, 224, 138, .3); }
 /* the one in use: a gold tick on its corner */
-.tpv-card.on::after { content: ""; position: absolute; right: -7px; top: -7px; width: 22px; height: 22px; border-radius: 50%; box-shadow: 0 0 0 2px var(--ar-bg);
+.tpv-card.on::after { content: ""; position: absolute; z-index: 2; right: -7px; top: -7px; width: 22px; height: 22px; border-radius: 50%; box-shadow: 0 0 0 2px var(--ar-bg);
   background: var(--ar-gold) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M5 10.5l3.3 3.3L15 6.6' fill='none' stroke='%233b2e3a' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 16px no-repeat; }
-.tpv-card.is-locked { cursor: default; border-style: dashed; background: transparent; }
-.tpv-card.is-locked .tpv-cpic { opacity: .45; filter: grayscale(1); }
-.tpv-cpic { position: relative; display: block; width: 100%; aspect-ratio: 1; overflow: hidden; }
+.tpv-rf { --rf: #5F5A55; position: absolute; inset: 0; z-index: -1; display: block; border-radius: inherit; }
+.tpv-rf[data-r="Uncommon"] { --rf: #1C6E52; } .tpv-rf[data-r="Rare"] { --rf: #1C5C88; } .tpv-rf[data-r="Epic"] { --rf: #4E3492; } .tpv-rf[data-r="Legendary"] { --rf: #7A5600; }
+.tpv-rf:empty { background: #F4EFE6; box-shadow: inset 0 0 0 4px var(--rf); }
+.tpv-rframe { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
+.tpv-cpic { position: absolute; left: 11%; right: 11%; top: 7%; height: 52%; display: block; }
 .tpv-cpic img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
-.tpv-cname { font-size: 13px; line-height: 1.25; font-weight: var(--w-strong); overflow-wrap: break-word; hyphens: auto; }
-.tpv-how { font-size: 12px; color: var(--muted); }
-.tpv-rar { padding: 1px 8px; border-radius: var(--r-pill); font-size: 12px; font-style: normal; font-weight: var(--w-strong); background: rgba(255, 255, 255, .16); color: #fff; }
-.tpv-rar.r-uncommon { background: var(--mint); color: var(--mint-ink); }
-.tpv-rar.r-rare { background: #e2effb; color: #1c5486; }
-.tpv-rar.r-epic { background: var(--lilac); color: var(--lilac-ink); }
-.tpv-rar.r-legendary { background: var(--sun); color: var(--sun-ink); }
-/* a piece in its rarity's frame: the shop's own card art (widget/hub-art/shop.js) behind it, the picture in the frame's
-   window, the name and the tier on its name plate. The ornament says the tier, and the tier is printed too */
-.tpv-dcards.is-framed .tpv-cards { grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); gap: 14px 10px; margin-top: 14px; }
-.tpv-card.is-framed { display: block; aspect-ratio: 4 / 5; padding: 0; border: 0; border-radius: 9% / 7.2%; background: none; color: #3B2E3A; container-type: inline-size; isolation: isolate; }
-button.tpv-card.is-framed:hover { background: none; transform: translateY(-3px) rotate(-1deg); }
-.tpv-card.is-framed.on { background: none; box-shadow: 0 0 0 3px var(--ar-gold), 0 0 0 7px rgba(255, 224, 138, .28), 0 8px 18px rgba(0, 0, 0, .4); }
-.tpv-rframe { position: absolute; inset: 0; z-index: -1; display: block; width: 100%; height: 100%; }
-.is-framed .tpv-cpic { position: absolute; left: 11%; right: 11%; top: 7%; width: auto; height: 52%; aspect-ratio: auto; overflow: visible; }
-.is-framed .tpv-cpic.k-scene img { object-fit: cover; border-radius: 10px; border: 2px solid #3B2E3A; }
+.tpv-cpic.k-scene img { object-fit: cover; border-radius: 10px; border: 2px solid #3B2E3A; }
+.tpv-card.is-later .tpv-cpic, .tpv-cpic[data-want] { border-radius: 12px; background: rgba(59, 46, 58, .08); }
 .tpv-ctext { position: absolute; left: 9%; right: 9%; top: 63%; bottom: 7.5%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; }
-.is-framed .tpv-cname { font-size: clamp(11px, 10cqw, 13.5px); font-weight: 800; line-height: 1.12; }
+.tpv-cname { font-size: clamp(11px, 10cqw, 13.5px); font-weight: 800; line-height: 1.12; overflow-wrap: break-word; hyphens: auto; }
 .tpv-cmeta { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 2px 5px; }
-.is-framed .tpv-rar { --rar: #5F5A55; padding: 1px 7px; font-size: clamp(11px, 8.6cqw, 12px); font-weight: 800; letter-spacing: .02em; color: #fff; background: var(--rar); white-space: nowrap; }
-.is-framed .tpv-rar.r-uncommon { --rar: #1C6E52; } .is-framed .tpv-rar.r-rare { --rar: #1C5C88; } .is-framed .tpv-rar.r-epic { --rar: #4E3492; } .is-framed .tpv-rar.r-legendary { --rar: #7A5600; }
-/* how you got it (a gift, a rank's reward): a stamp on the card's corner */
-.is-framed .tpv-how { position: absolute; left: -4px; top: -6px; z-index: 2; padding: 1px 8px; border-radius: 999px; border: 2px solid #3B2E3A; background: #FFE27A; color: #3B2E3A;
+.tpv-rar { --rar: #5F5A55; padding: 1px 7px; border-radius: var(--r-pill); font-size: clamp(11px, 8.6cqw, 12px); font-style: normal; font-weight: 800; letter-spacing: .02em;
+  color: #fff; background: var(--rar); white-space: nowrap; }
+.tpv-rar.r-uncommon { --rar: #1C6E52; } .tpv-rar.r-rare { --rar: #1C5C88; } .tpv-rar.r-epic { --rar: #4E3492; } .tpv-rar.r-legendary { --rar: #7A5600; }
+/* a stamp on the card's corner: New, how you got it (a gift, a rank's reward) or the rank still to reach */
+.tpv-stamp { position: absolute; left: -4px; top: -6px; z-index: 2; padding: 1px 8px; border-radius: 999px; border: 2px solid #3B2E3A; background: #FFE27A; color: #3B2E3A;
   font-size: 11px; font-weight: 800; white-space: nowrap; transform: rotate(-6deg); box-shadow: 0 2px 0 #3B2E3A; }
-.tpv-card.is-framed.is-locked { border: 0; background: none; }
-.is-framed.is-locked .tpv-rframe { filter: grayscale(1); opacity: .7; }
-.is-framed.is-locked .tpv-cpic { opacity: 1; filter: none; }
-.is-framed.is-locked .tpv-cpic img { filter: brightness(0); opacity: .38; }
-.is-framed.is-locked .tpv-cname { color: #6B5A68; }
-.is-framed.is-locked .tpv-how { background: #fff; }
-.tpv-extra { margin: 16px 0 0; }
+.tpv-stamp.is-new { background: #C2412D; color: #fff; }
+/* Leave it empty: the plate drawn as a dashed outline */
+.tpv .tpv-card.is-clear { color: #fff; }
+.tpv-card.is-clear .tpv-rf { background: transparent; box-shadow: none; border: 2px dashed rgba(255, 255, 255, .4); }
+.tpv-card.is-clear .tpv-cpic { display: grid; place-items: center; color: var(--ar-soft); }
+.tpv-card.is-clear .tpv-cpic svg { position: static; width: 34%; height: auto; }
+.tpv-card.is-locked { cursor: default; }
+.tpv-card.is-locked .tpv-rframe { filter: grayscale(1); opacity: .7; }
+.tpv-card.is-locked .tpv-cpic img { filter: brightness(0); opacity: .38; }
+.tpv-card.is-locked .tpv-cname { color: #6B5A68; }
+.tpv-card.is-locked .tpv-stamp { background: #fff; }
+.tpv-extras:empty { display: none; }
+.tpv-extra { margin: 18px 0 0; }
 .tpv-extra h4 { margin: 0 0 8px; font-size: var(--fs-label); font-weight: var(--w-head); }
 .tpv-opts { display: flex; flex-wrap: wrap; gap: 8px; }
 .tpv-upg { display: grid; gap: 0; min-height: var(--control-h); padding: 4px 14px; border: 2px solid var(--border); border-radius: var(--r-row); background: var(--ar-row);
@@ -261,9 +262,8 @@ button.tpv-card.is-framed:hover { background: none; transform: translateY(-3px) 
 .tpv-swatch { width: 42px; height: 42px; padding: 0; border: 2px solid rgba(255, 255, 255, .35); border-radius: 50%; background: var(--sw); cursor: pointer; transition: transform var(--t-press, 120ms) ease-out; }
 .tpv-swatch:hover { transform: scale(1.08); }
 .tpv-swatch.on { border-color: var(--ar-gold); box-shadow: 0 0 0 3px var(--ar-bg) inset, 0 0 0 3px rgba(255, 224, 138, .25); }
-/* the customizer's foot stays in reach under the drawer: Surprise me, the shop, Done */
-.tpv-foot { position: sticky; bottom: -20px; z-index: 1; margin: 18px -20px -20px; padding: 14px 20px 18px; border-top: 1px solid var(--rule);
-  background: linear-gradient(180deg, rgba(42, 34, 51, .86), var(--ar-bg) 40%); backdrop-filter: blur(6px); }
+/* the foot, always on the screen under the list: Surprise me, the shop, Done */
+.tpv-foot { flex: none; margin: 0; padding: 12px 20px 16px; border-top: 1px solid var(--rule); background: var(--ar-bg); }
 .tpv-foot .tpv-done { margin-left: auto; }
 
 /* the medal board's big view, over the place */
@@ -399,8 +399,8 @@ dialog.tpv.is-trip::backdrop { background: transparent; }
 @media (prefers-reduced-motion: reduce) {
   .tpv-top::before, .tpv-stagewrap::before, .tpv-stagewrap::after, .tpv-meter i, .tpv-host > *, .tpv-guest > * { animation: none; }
   .tpv-clouds { display: none; }
-  .tpv-vnav, .tpv-chip, .tpv-btn, .tpv-tile, .tpv-card, .tpv-x, .tpv-swatch, .tpv-seg button { transition: none; }
-  .tpv-x:hover, button.tpv-card:hover, button.tpv-card.is-framed:hover, .tpv-swatch:hover { transform: none; }
+  .tpv-vnav, .tpv-chip, .tpv-btn, .tpv-cat, .tpv-spot, .tpv-card, .tpv-x, .tpv-swatch, .tpv-seg button { transition: none; }
+  .tpv-x:hover, button.tpv-card:hover, .tpv-swatch:hover { transform: none; }
 }
 html.hx-still .tpv-top::before, html.hx-still .tpv-stagewrap::before, html.hx-still .tpv-stagewrap::after, html.hx-still .tpv-meter i,
 html.hx-still .tpv-host > *, html.hx-still .tpv-guest > * { animation: none; }
@@ -430,8 +430,19 @@ html.hx-still .tpv-host > *, html.hx-still .tpv-guest > * { animation: none; }
   .tpv-grank svg { width: 76px; height: 76px; }
   .tpv-gplate .tpv-gk { align-self: end; }
   .tpv-gplate .tpv-gr { align-self: start; }
-  .tpv-foot { position: static; margin: 18px 0 0; padding: 14px 0 0; background: none; backdrop-filter: none; }
-  .tpv-foot .tpv-btn { flex: 1 1 auto; }
+  /* Customize on a phone: the tabs, the spots and the line over the list, the foot under it, snug */
+  .tpv-cats { margin: 10px 12px 0; }
+  .tpv-spots { gap: 4px; margin: 8px 12px 0; }
+  .tpv-spot { gap: 2px; padding: 4px 1px 5px; font-size: 11.5px; }
+  .tpv-spic { max-width: 32px; }
+  .tpv-sname { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .tpv-czhead { margin: 10px 16px 0; }
+  .tpv-czhead h3 { font-size: var(--fs-label); }
+  .tpv-list { padding: 0 12px 14px; }
+  .tpv-seth { margin: 12px 0 8px; }
+  .tpv-cards { grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 12px 8px; }
+  .tpv-foot { flex-wrap: nowrap; gap: 6px; padding: 8px 12px 10px; }
+  .tpv-foot .tpv-btn { flex: 1 1 auto; min-width: 0; padding: 0 10px; }
   .tpv-foot .tpv-done { margin-left: 0; }
 }
 /* a narrow dialog (a phone at X-Large or XX-Large text, which zooms the page): the name and Close on the first row, Visit /

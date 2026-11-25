@@ -14,7 +14,9 @@
      - the full view (shPlace.open): Timmy hops between spots on the ground, waves, talks from a bubble over his head,
        and looks, moves and behaves as his HP says (the kit's HEALTH table); tapping things plays their eggs; the medal
        board opens the big view of every hub's medal;
-     - the customizer: what stands where, from what you own, saved at once through equip_item;
+     - the customizer: what stands where, from what you own, saved at once through equip_item. Four tabs (Timmy, Home,
+       Scene, Yard, with the yard's five spots under its tab) over one list of what you own of that kind, newest first;
+       a tap answers at once and redraws only what changed (Sam, 2026-11-24, "Customize" below);
      - Collections (open({ collections: true }), or its button by Customize and Shop): every season's set, every
        year-round collection and the rare costumes, with what you own of each, and the bonus a finished one pays
        (migration_v75: get_my_collections, claim_collections_v2).
@@ -76,11 +78,12 @@
   function byK(list, k){ for (var i = 0; i < list.length; i++) if (list[i].k === k) return list[i]; return null; }
 
   /* ---------- what the place knows: whose it is, what's owned, what stands where, the rank and the medals ---------- */
-  var S = { sb: null, visitor: null, game: false, eq: {}, own: {}, locked: [], seasons: [], coll: null, collPays: 0, profile: null, flair: null, tints: null, asked: false };
+  var S = { sb: null, visitor: null, game: false, eq: {}, own: {}, at: {}, locked: [], seasons: [], coll: null, collPays: 0, profile: null, flair: null, tints: null, asked: false };
   var YARD_SLOTS = ["left", "front", "corner", "side", "right"], UPS = ["windows", "porch", "chimney", "flag"];
   function takeShop(sh){
     if (!sh || typeof sh !== "object" || !sh.inventory) return false;
-    S.game = true; S.eq = copy(sh.equipped); S.own = {}; (sh.inventory || []).forEach(function(x){ if (x && x.id) S.own[x.id] = x.how || "bought"; });
+    S.game = true; S.eq = copy(sh.equipped); S.own = {}; S.at = {};
+    (sh.inventory || []).forEach(function(x){ if (x && x.id) { S.own[x.id] = x.how || "bought"; var t = x.at ? Date.parse(x.at) : NaN; if (t === t) S.at[x.id] = t; } });
     S.locked = (sh.locked || []).filter(function(x){ return x && x.id; });
     S.seasons = Array.isArray(sh.seasons) ? sh.seasons.slice() : [];
     return true;
@@ -408,7 +411,7 @@
       '<div class="tpv-body"><div class="tpv-stagewrap"><div class="tpv-frame"><div class="tpv-stage"></div>' +
       '<button type="button" class="tpv-chip tpv-zoom" data-tp="zoom" aria-pressed="true" hidden>' + ICON.zoom + "<span>Close-up</span></button></div>" + navHTML(nav) + '<p class="tpv-wait" role="status">Opening the door…</p></div><div class="tpv-side"></div></div><div class="tpv-over" hidden></div></div>';
     D.body.appendChild(dlg);
-    V = { dlg: dlg, m: o.place ? theirs(o.place) : mine(), mode: "play", pick: /^(home|scene|timmy|left|front|corner|side|right)$/.test(o.pick || "") ? o.pick : "home", wide: false, src: {}, at: "door", pos: null, dir: 1, busy: false, next: null, raf: 0, camRaf: 0, cam: null, bub: null,
+    V = { dlg: dlg, m: o.place ? theirs(o.place) : mine(), mode: "play", pick: "home", cat: "", spot: "", ask: /^(home|scene|timmy|left|front|corner|side|right)$/.test(o.pick || "") ? o.pick : "", wide: false, at: "door", pos: null, dir: 1, busy: false, next: null, raf: 0, camRaf: 0, cam: null, bub: null,
       lastTap: 0, wander: 0, visible: true, back: o.back !== undefined ? o.back : D.activeElement, onClose: o.onClose || null, nav: nav };
     dlg.addEventListener("close", function(){ if (V && V.dlg === dlg) shut(); });   /* only this window: on a tour the next one may be open already */
     dlg.addEventListener("cancel", function(e){ if (!$(".tpv-over", dlg).hidden) { e.preventDefault(); overClose(); } });
@@ -416,7 +419,7 @@
     $('[data-tp="close"]', dlg).addEventListener("click", close);
     $('[data-tp="play"]', dlg).addEventListener("click", function(){ setMode("play"); });
     $('[data-tp="customize"]', dlg).addEventListener("click", function(){ setMode("customize"); });
-    $('[data-tp="zoom"]', dlg).addEventListener("click", function(){ V.wide = !V.wide; build(); });
+    $('[data-tp="zoom"]', dlg).addEventListener("click", function(){ V.wide = !V.wide; stageFocus(); });
     if (nav) {
       $('[data-tp="visit-home"]', dlg).addEventListener("click", function(){ hop("home"); });
       ["prev", "next"].forEach(function(k){ var b = $('[data-tp="visit-' + k + '"]', dlg); if (b) b.addEventListener("click", function(){ hop(k === "prev" ? navPrev(nav) : navNext(nav), k); }); });
@@ -431,10 +434,14 @@
     first.then(function(){ if (V && !V.m.visiting) V.m = mine(); return ready(V && V.m); }).then(function(){
       if (!V) return;
       $(".tpv-wait", dlg).hidden = true;
-      build({ hello: !o.collections && !o.pennants });
-      if (o.customize && canChange()) setMode("customize");
-      else if (o.collections && !V.m.visiting && S.game) openCollections({ only: true });
-      else if (o.pennants && !V.m.visiting) openPennants({ only: true });
+      /* straight into Customize (the shop's "Put it on", coming back from the shop): drawn once, already in it */
+      if (o.customize && canChange()) { V.mode = "customize"; czStart(); build({ now: true }); czLoad(); }
+      else {
+        build({ hello: !o.collections && !o.pennants });
+        if (canChange()) czWarm();
+        if (o.collections && !V.m.visiting && S.game) openCollections({ only: true });
+        else if (o.pennants && !V.m.visiting) openPennants({ only: true });
+      }
       tripOut(dlg);
     }, function(){ if (V) { tripGone(dlg); var w = $(".tpv-wait", dlg); w.hidden = false; w.textContent = "Timmy’s place couldn’t be opened just now. Try again in a moment."; } });
     return api;
@@ -444,10 +451,13 @@
     if (!V) return;
     var v = V; V = null;
     cancelAnimationFrame(v.raf); cancelAnimationFrame(v.camRaf); clearInterval(v.wander); clearTimeout(v.sayT); clearTimeout(v.waveT); clearTimeout(v.mt);
-    if (v.io) v.io.disconnect();
+    if (v.panes) Object.keys(v.panes).forEach(function(k){ if (v.panes[k].io) v.panes[k].io.disconnect(); });
     if (W.shBowl && W.shBowl.showing()) W.shBowl.close();
+    if (v.mode === "customize") czSeen();
     if (v.dlg.parentNode) v.dlg.parentNode.removeChild(v.dlg);
     D.documentElement.classList.remove("tpv-open");
+    /* the cards on the page behind (and the still kept for the dashboard) are drawn again once, now, not at every pick */
+    if (v.dirty) repaintCards();
     try { if (v.back && v.back.isConnected && v.back.focus) v.back.focus(); } catch (e) {}
     clearTimeout(v.navT);
     if (v.onClose) v.onClose(v.nav ? v.nav.at : undefined);   /* a tour says which place it ended at, for the focus */
@@ -456,14 +466,19 @@
      2026-11-22: "I also hate that animations pause"). Until then it held still while anything in the window scrolled
      and rested 5 s after a change in Customize, and each of those restyled every shape on the stage (:host(.is-rest) *),
      which cost more than the motion it saved. */
+  /* Customize opens at once: the panel is drawn from what's already here, and a piece whose set's drawing is still on its
+     way shows its frame and name until it comes (czLoad). Until 2026-11-25 it waited for every owned set's file and the
+     shop's frames first ("Getting Timmy's things out…": about a second on a slowed phone) */
   function setMode(mode){
-    if (!V || (mode === "customize" && !canChange())) return;
+    if (!V || (mode === "customize" && !canChange()) || V.mode === mode) return;
+    var was = V.mode;
     V.mode = mode;
-    if (mode !== "customize") { build(); return; }
-    /* the drawer shows everything owned, and the rank pieces still to earn: fetch those sets' drawings first */
-    V.loading = true; build();
-    var done = function(){ if (V) { V.loading = false; build(); } };
-    Promise.all([needPacks(Object.keys(S.own).concat(S.locked.map(function(x){ return x.id; }))), shopArt()]).then(done, done);
+    if (was === "customize") czSeen();
+    if (mode === "customize") czStart();
+    /* the panel now, and the stage (its tap areas on or off) once that is on the screen */
+    chrome(); side();
+    czAfter({ stage: true });
+    if (mode === "customize") czLoad();
   }
 
   /* the camera: in Customize the view moves in on what's being changed (the home, a yard spot, Timmy), and back out for
@@ -493,14 +508,22 @@
     V.camRaf = requestAnimationFrame(step);
   }
 
-  /* draw the stage (the scene inline, in a shadow root so the kit's CSS stays with it) and the panel beside it */
+  /* draw the stage and the panel beside it */
   function build(opt){
+    if (!V || !TP) return;
+    stage(opt);
+    side(V.o);
+  }
+  /* the stage: the scene inline, in a shadow root so the kit's CSS stays with it. In Customize it carries a tap area for
+     each yard spot, the house and Timmy (on top, following him), and the empty spots are dashed, whatever is being
+     changed: picking another spot or tab moves the camera and the highlight (czFocus) and never draws the scene again */
+  function stage(opt){
     if (!V || !TP) return;
     opt = opt || {};
     var dlg = V.dlg, host = $(".tpv-stage", dlg), m = V.m, custom = V.mode === "customize" && canChange();
     if (!custom) V.mode = "play";
     if (!host.shadowRoot) host.attachShadow({ mode: "open" });
-    var sr = host.shadowRoot, still = isStill(), o = optsOf(m, { marks: custom && V.pick !== "timmy" && V.pick !== "home" && V.pick !== "scene" }), L = TP.layout(o), vb = TP.VIEWBOX;
+    var sr = host.shadowRoot, still = isStill(), o = optsOf(m, { marks: custom }), L = TP.layout(o), vb = TP.VIEWBOX;
     cancelAnimationFrame(V.raf); V.busy = false; V.next = null; V.bub = null;
     if (!L.spots[V.at]) V.at = "door";
     var H = HL(); if (H.stay) V.at = "door";
@@ -509,13 +532,14 @@
     var hits = !custom ? "" : '<svg class="tp-hit" viewBox="' + vb.join(" ") + '" aria-label="Spots you can change">' +
       Object.keys(r.slots).map(function(k){ var it = o.yard[k], name = byK(TP.SLOTS, k).n;
         return '<path class="tp-hitarea' + (V.pick === k ? " on" : "") + '" data-pick="' + k + '" d="' + r.slots[k] + '" tabindex="0" role="button" aria-label="' + esc(name + ": " + (it ? byK(TP.YARD, it).n : "empty") + ". Change it") + '"/>'; }).join("") +
-      '<path class="tp-hitarea tp-hithome' + (V.pick === "home" ? " on" : "") + '" data-pick="home" d="' + r.homeHit + '" tabindex="0" role="button" aria-label="' + esc(home.n + ". Change it") + '"/></svg>';
+      '<path class="tp-hitarea tp-hithome' + (V.pick === "home" ? " on" : "") + '" data-pick="home" d="' + r.homeHit + '" tabindex="0" role="button" aria-label="' + esc(home.n + ". Change it") + '"/>' +
+      (g ? '<rect class="tp-hitarea tp-hittimmy' + (V.pick === "timmy" ? " on" : "") + '" data-pick="timmy" width="34" height="48" rx="10" tabindex="0" role="button" aria-label="' + esc(czTimmyName() + ". Change his outfit") + '"/>' : "") + "</svg>";
     host.classList.toggle("is-night", !!(o.night || sc.alwaysNight));
     sr.innerHTML = "<style>" + TP.CSS + "\n" + STAGE_CSS + "</style>" + '<div class="tp-box' + (still ? " tp-still" : "") + '">' +
       r.svg.replace(' aria-hidden="true" focusable="false"', ' role="group" aria-label="' + esc(sceneAlt(m)) + '"') + hits + '<div class="tp-bubble" role="status" aria-live="polite"></div></div>';
-    V.sr = sr; V.layout = L; V.o = o; V.depth = $(".tp-depth", sr); V.tg = $(".tp-timmy", sr); V.tw = V.tg && V.tg.parentNode; V.face = V.tg && $(".tp-tface", V.tg);
+    V.sr = sr; V.layout = L; V.o = o; V.depth = $(".tp-depth", sr); V.tg = $(".tp-timmy", sr); V.tw = V.tg && V.tg.parentNode; V.face = V.tg && $(".tp-tface", V.tg); V.th = $(".tp-hittimmy", sr);
     V.pos = L.spots[V.at].slice(); setTimmy(V.pos, 0, 1, 1);
-    camTo($$("svg.tp-scene, svg.tp-hit", sr), camFor(o), still || opt.hello);
+    camTo($$("svg.tp-scene, svg.tp-hit", sr), camFor(o), still || opt.hello || opt.now);
     if (V.tg) {
       V.tg.setAttribute("role", "button"); V.tg.setAttribute("tabindex", "0"); V.tg.setAttribute("data-tp", "timmy");
       V.tg.setAttribute("aria-label", m.visiting ? "Timmy. Tap him and he waves" : "Timmy, " + H.n.toLowerCase() + ", " + hpOf(m) + " HP. Tap him and he waves");
@@ -530,7 +554,7 @@
       keyed(n, function(){ playEgg(n); });
     });
     $$(".tp-hitarea", sr).forEach(function(p){
-      var go = function(){ V.pick = p.dataset.pick; build(); var n = V && V.sr && $('.tp-hitarea[data-pick="' + V.pick + '"]', V.sr); if (n) n.focus(); };
+      var go = function(){ czGo(p.dataset.pick); };
       p.addEventListener("click", function(e){ e.stopPropagation(); go(); }); keyed(p, go);
     });
     /* the top bar and the panel */
@@ -538,11 +562,7 @@
     /* a top-ten visit: the number badge after the name (gold, silver and bronze for the first three), read out as words */
     $("#tpvT", dlg).innerHTML = m.visiting && m.name ? esc(m.name + "’s place") + (m.top ? ' <span class="tpv-num t' + (m.top <= 3 ? m.top : "x") + '" title="Number ' + m.top + ' on the leaderboard">' +
       '<span aria-hidden="true"><i>#</i>' + m.top + '</span><span class="tpv-sr">, number ' + m.top + " on the leaderboard</span></span>" : "") : "Timmy’s place";
-    var seg = $(".tpv-seg", dlg); seg.hidden = !canChange();
-    $('[data-tp="play"]', dlg).setAttribute("aria-pressed", String(!custom)); $('[data-tp="customize"]', dlg).setAttribute("aria-pressed", String(custom));
-    var zb = $(".tpv-zoom", dlg); zb.hidden = !custom || V.pick === "scene"; zb.setAttribute("aria-pressed", String(!V.wide));
-    dlg.classList.toggle("is-custom", custom);
-    side(o);
+    chrome(true);
     if (opt.burst && !still) burstAt(opt.burst, o);
     if (opt.burst && opt.burst !== "home" && L.spots[opt.burst]) setTimeout(function(){ if (V) goTo(opt.burst); }, still ? 0 : 450);
     if (opt.say) say(opt.say);
@@ -631,6 +651,7 @@
     var q = TP.project(p[0], p[1], p[2] || 0);
     V.tg.setAttribute("transform", "translate(" + q[0].toFixed(1) + " " + (q[1] - arc).toFixed(1) + ")");
     V.face.setAttribute("transform", "scale(" + (V.dir * kx).toFixed(3) + " " + ky.toFixed(3) + ")");
+    if (V.th) { V.th.setAttribute("x", (q[0] - 17).toFixed(1)); V.th.setAttribute("y", (q[1] - arc - 47).toFixed(1)); }
     /* drawn in the scene's depth order: in front of what's behind him, behind what's in front */
     var z = TP.timmyZ ? TP.timmyZ(V.layout, p) : p[0] + p[1] + .3, c = V.depth.firstChild;
     while (c && (c === V.tw || +c.getAttribute("data-z") <= z)) c = c.nextSibling;
@@ -986,33 +1007,34 @@
     if (parts && o && o.say) parts.say = o.say;
     try { P.setOutfit(id, parts); } catch (e) {}
   }
+  /* the bar's Timmy follows once you stop trying things on, not at every one */
+  var followT = 0;
+  function follow(){ clearTimeout(followT); followT = setTimeout(function(){ needPacks(equippedIds({ eq: S.eq })).then(barFollow, barFollow); }, 350); }
   var chain = Promise.resolve(), pending = 0;
   function equip(slot, id, fx){
     if (!canChange()) return;
-    S.eq = applied(S.eq, slot, id || null); V.m = mine();
+    S.eq = applied(S.eq, slot, id || null); V.m = mine(); V.dirty = true;
     track("place:equip:" + slot);
-    if (slot === "outfit") needPacks([id]).then(barFollow, barFollow);
-    if (fx !== false) { needPacks([id]).then(function(){ if (V) build(fx || {}); repaintCards(); }); }
+    if (slot === "outfit") follow();
+    if (fx !== false) czAfter(slot === "outfit" ? { timmy: true, fx: fx || {} } : { stage: true, fx: fx || {} });
     pending++;
     chain = chain.then(function(){ return S.sb.rpc("equip_item", { p_visitor: S.visitor, p_slot: slot, p_item: id || null }); }).then(function(r){ pending--; return r; }, function(){ pending--; return null; }).then(function(r){
       var d = r && r.data;
       if (!r || r.error || !d || !d.ok) throw new Error("refused");
-      if (!pending && JSON.stringify(sorted(d.equipped || {})) !== JSON.stringify(sorted(S.eq))) { S.eq = copy(d.equipped); if (V && !V.m.visiting) { V.m = mine(); build(); } repaintCards(); if (slot === "outfit") needPacks(equippedIds({ eq: S.eq })).then(barFollow, barFollow); }
+      if (!pending && JSON.stringify(sorted(d.equipped || {})) !== JSON.stringify(sorted(S.eq))) { S.eq = copy(d.equipped); if (V && !V.m.visiting) { V.m = mine(); V.dirty = true; czMarks(); czAfter({ stage: true }); } else repaintCards(); follow(); }
     }).then(null, function(){
       /* it didn't save: show what the server has, and say so */
       return S.sb.rpc("get_my_shop", { p_visitor: S.visitor }).then(function(r){ if (r && !r.error) takeShop(r.data); }, function(){}).then(function(){
-        if (slot === "outfit") needPacks(equippedIds({ eq: S.eq })).then(barFollow, barFollow);
-        if (V && !V.m.visiting) { V.m = mine(); needPacks(equippedIds(V.m)).then(function(){ if (V) build({ say: "That didn’t save, so I put it back." }); }); }
-        repaintCards();
+        if (slot === "outfit") follow();
+        if (V && !V.m.visiting) { V.m = mine(); V.dirty = true; czMarks(); czAfter({ stage: true, fx: { say: "That didn’t save, so I put it back." } }); }
+        else repaintCards();
       });
     });
   }
   function sorted(o){ var c = {}; Object.keys(o).sort().forEach(function(k){ c[k] = o[k]; }); return c; }
   function repaintCards(){ CARDS = CARDS.filter(function(x){ return x.host.isConnected; }); CARDS.forEach(function(x){ x.paint(); }); }
 
-  /* ---------- the panel beside the stage: Visit (his health, the medals) or Customize (the dock and the drawer) ---------- */
-  var DOCK_N = { right: "Back", side: "Side", left: "Path, left", front: "Path, right", corner: "Front" };
-  var DRAWER = { home: ["Homes", "The cottage is every Timmy’s first home."], scene: ["Scenes", "Where the whole place stands."], timmy: ["Timmy’s wardrobe", "Pick an outfit off the rail."] };
+  /* ---------- the panel beside the stage: Visit (his health, the medals) or Customize (below) ---------- */
   /* what a locked rank piece says it needs, by the server's gtier: the Handpiece's names alone, the later journeys' with
      the journey first ("Reach ModuPro Gold"), as widget/ranks.js nameOf() names them */
   var RANKS = (function(){ var m = ["Stone", "Antique", "Bronze", "Silver", "Gold", "Diamond", "Dark Matter"], out = [""].concat(m.slice(1));
@@ -1098,88 +1120,304 @@
   function rarTag(r){ return '<i class="tpv-rar r-' + String(r || "free").toLowerCase() + '">' + esc(r || "Default") + "</i>"; }
   function owned(x){ return !x.id || !!S.own[x.id]; }
   function howTag(x){ var how = x.id ? S.own[x.id] : ""; return how === "gift" ? "A gift" : how === "rank" ? (x.rankName || "Rank") + " rank" : ""; }
-  function side(o){
-    var el = $(".tpv-side", V.dlg), m = V.m, H = HL();
-    if (V.mode !== "customize" && m.visiting) { guestCard(el, m); return; }
-    if (V.mode !== "customize") { hostCard(el, m, H); return; }
-    if (V.loading) { el.innerHTML = '<p class="tpv-note" role="status">Getting Timmy’s things out…</p>'; return; }
-    var pick = V.pick, h = byK(TP.HOMES, o.home), lane = !!(o.yard.side && byK(TP.YARD, o.yard.side).wide), e = S.eq;
-    if (pick === "corner" && lane) pick = V.pick = "side";
-    /* the dock: what's in every spot right now, as pictures */
-    var tile = function(k, label, pic, full, small){ return '<button type="button" class="tpv-tile' + (small ? " is-slot" : "") + (pick === k ? " on" : "") + (pic ? "" : " is-empty") + '" data-tp="pick-' + k + '" data-pick="' + k + '" aria-pressed="' + (pick === k) + '" aria-label="' + esc(full) + '"><span class="tpv-tpic">' +
-      (pic || '<svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><path d="M10 4v12M4 10h12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>') + "</span><span>" + esc(label) + "</span></button>"; };
-    var curOut = byK(TP.OUTFITS, key("outfit", e.outfit)), sc = byK(TP.SCENES, o.scene);
-    var dock = '<div class="tpv-dock" role="group" aria-label="What to change"><div class="tpv-dmain">' +
-      tile("home", "Home", thumb("home", o.home, { scene: o.scene }), "Home: " + h.n) + tile("scene", "Scene", thumb("scene", o.scene), "Scene: " + sc.n) + tile("timmy", "Timmy", thumb("outfit", curOut ? curOut.k : ""), "Timmy: " + (curOut ? curOut.n : "no outfit")) + "</div>" +
-      '<div class="tpv-dyard"><span class="tpv-dlab">The yard</span>' + TP.SLOTS.filter(function(q){ return !(q.k === "corner" && lane); }).map(function(q){ var it = byK(TP.YARD, o.yard[q.k] || "");
-        return tile(q.k, DOCK_N[q.k] || q.n, it ? thumb("yard", it.k, { scene: o.scene }) : "", q.n + ": " + (it ? it.n : "empty"), true); }).join("") + "</div></div>";
-    /* the drawer: one kind of thing, what you own of it, in up to four tabs (the classics, the year-round collections,
-       the seasonal sets, the rank rewards). A collection's piece carries coll (sets.mjs COLLECTIONS). */
-    var kind = pick === "home" || pick === "scene" ? pick : pick === "timmy" ? "outfit" : "yard", sl = kind === "yard" ? byK(TP.SLOTS, pick) : null;
-    var all = kind === "home" ? TP.HOMES : kind === "scene" ? TP.SCENES : kind === "outfit" ? TP.OUTFITS : TP.YARD.filter(function(y){ return !y.wide || pick === "side" || pick === "corner"; });
-    var curK = kind === "home" ? o.home : kind === "scene" ? o.scene : kind === "outfit" ? (curOut ? curOut.k : "") : o.yard[pick] || "";
-    var mineOf = all.filter(owned), cur = byK(all, curK);
-    var lockedOf = S.locked.filter(function(x){ return x.kind === kind; }).map(function(x){ var q = byK(all, key(kind, x.id)) || { k: x.id, n: (TP.setInfo(x.id) || {}).n || x.name, rarity: "" }; return { x: q, tier: x.rank_tier }; });
-    var groups = [["classic", "Classics", mineOf.filter(function(x){ return !x.set; })], ["coll", "Collections", mineOf.filter(function(x){ return x.coll; })], ["sets", "Seasonal", mineOf.filter(function(x){ return x.set && x.set !== "rank" && !x.coll; })], ["rank", "Rank", mineOf.filter(function(x){ return x.set === "rank"; })]]
-      .filter(function(g){ return g[2].length || g[0] === "classic" || (g[0] === "rank" && lockedOf.length); });
-    var src = V.src[kind]; if (!src || V.srcFor !== pick + ":" + curK) src = cur && cur.coll ? "coll" : cur && cur.set && cur.set !== "rank" ? "sets" : cur && cur.set === "rank" ? "rank" : src || "classic";
-    if (!groups.some(function(g){ return g[0] === src; })) src = groups[0][0];
-    V.src[kind] = src; V.srcFor = pick + ":" + curK;
-    var tabs = groups.length < 2 ? "" : '<div class="tpv-seg tpv-tabs" role="group" aria-label="Which pieces">' + groups.map(function(g){ return '<button type="button" data-tp="src-' + g[0] + '" data-src="' + g[0] + '" aria-pressed="' + (g[0] === src) + '">' + g[1] + ' <span class="num">' + (g[2].length + (g[0] === "rank" ? lockedOf.length : 0)) + "</span></button>"; }).join("") + "</div>";
-    var pic = function(x){ return kind === "outfit" ? thumb("outfit", x.k) : kind === "scene" ? thumb("scene", x.k) : thumb(kind, x.k, { scene: o.scene }); };
-    var SEP = '<span class="tpv-sr">, </span>', framed = !!SA, kc = kind === "scene" ? " k-scene" : "";
-    var face = function(r, picHtml, name, tag, how){ return rframe(r) + '<span class="tpv-cpic' + kc + '">' + picHtml + '</span><span class="tpv-ctext"><span class="tpv-cname">' + esc(name) + "</span>" + SEP + '<span class="tpv-cmeta">' + tag + "</span></span>" +
-      (how ? SEP + '<span class="tpv-how">' + esc(how) + "</span>" : ""); };
-    var cardOf = function(x, on, tag){
-      if (framed) return '<button type="button" class="tpv-card is-framed' + (on ? " on" : "") + '" data-tp="piece" data-item="' + esc(x.id || "") + '" aria-pressed="' + !!on + '">' + face(x.rarity, pic(x), cardName(x.n), tag || rarTag(x.rarity), howTag(x)) + "</button>";
-      return '<button type="button" class="tpv-card' + (on ? " on" : "") + '" data-tp="piece" data-item="' + esc(x.id || "") + '" aria-pressed="' + !!on + '"><span class="tpv-cpic">' + pic(x) + '</span><span class="tpv-cname">' + esc(cardName(x.n)) + "</span>" + (tag || rarTag(x.rarity)) + (howTag(x) ? '<span class="tpv-how">' + esc(howTag(x)) + "</span>" : "") + "</button>"; };
-    var lockCard = function(q){
-      if (framed) return '<span class="tpv-card is-framed is-locked">' + face(q.x.rarity, byK(all, q.x.k) ? pic(q.x) : "", cardName(q.x.n), q.x.rarity ? rarTag(q.x.rarity) : "", "Reach " + (RANKS[q.tier] || "the next rank")) + "</span>";
-      return '<span class="tpv-card is-locked"><span class="tpv-cpic">' + (byK(all, q.x.k) ? pic(q.x) : "") + '</span><span class="tpv-cname">' + esc(cardName(q.x.n)) + '</span><span class="tpv-how">Reach ' + esc(RANKS[q.tier] || "the next rank") + "</span></span>"; };
-    var bare = function(){ var on = !curK;
-      if (framed) return '<button type="button" class="tpv-card is-framed' + (on ? " on" : "") + '" data-tp="piece" data-item="" aria-pressed="' + on + '">' + face("", thumb("outfit", ""), "Just Timmy", rarTag(""), "") + "</button>";
-      return '<button type="button" class="tpv-card' + (on ? " on" : "") + '" data-tp="piece" data-item="" aria-pressed="' + on + '"><span class="tpv-cpic">' + thumb("outfit", "") + '</span><span class="tpv-cname">Just Timmy</span>' + rarTag("") + "</button>"; };
-    var shown = (groups.filter(function(g){ return g[0] === src; })[0] || groups[0])[2], cards;
-    if (src === "sets" || src === "coll") cards = ((TP.SETS ? (src === "coll" ? TP.SETS.collections : TP.SETS.seasons) : null) || []).map(function(se){ var got = shown.filter(function(x){ return x.set === se.k; }); return got.length ? '<h4 class="tpv-seth">' + esc(se.n) + '</h4><div class="tpv-cards">' + got.map(function(x){ return cardOf(x, x.k === curK); }).join("") + "</div>" : ""; }).join("");
-    else cards = '<div class="tpv-cards">' +
-      (src === "classic" && kind === "outfit" ? bare() : "") +
-      shown.map(function(x){ return cardOf(x, x.k === curK); }).join("") + (src === "rank" ? lockedOf.map(lockCard).join("") : "") + "</div>" +
-      (src === "rank" ? '<p class="tpv-note">Rank pieces are earned, never sold: an outfit and a yard piece at every full rank-up.</p>' : "");
-    var head = sl ? [sl.n, cur ? "Here now: " + lowerFirst(cur.n) + "." : "Nothing here yet. Pick something for it."]
-      : [DRAWER[pick][0], pick === "timmy" ? (cur ? "Wearing " + lowerFirst(cur.n) + "." : DRAWER.timmy[1]) : (cur ? "Now: " + lowerFirst(cur.n) + ". " : "") + DRAWER[pick][1]];
-    var body = '<div class="tpv-dhead"><div><h3>' + esc(head[0]) + "</h3><p>" + esc(head[1]) + "</p></div>" + (sl && cur ? '<button type="button" class="tpv-btn" data-tp="clear" data-item="">Clear this spot</button>' : "") + "</div>" + tabs + '<div class="tpv-dcards' + (framed ? " is-framed" : "") + '">' + cards + "</div>";
-    if (kind === "home") {
-      var ups = TP.UPGRADES.filter(function(u){ return h.ups.indexOf(u.k) >= 0 && S.own[u.id]; }), paints = h.ups.indexOf("paint") < 0 ? [] : TP.PAINTS.filter(function(p){ return !p.id || S.own[p.id]; });
-      if (ups.length) body += '<div class="tpv-extra"><h4>Upgrades for ' + esc(lowerFirst(h.n)) + '</h4><div class="tpv-opts">' + ups.map(function(u){
-        var on = !!o.up[u.k], ownName = h.upn && h.upn[u.k], same = cardName(ownName).toLowerCase() === cardName(u.n).toLowerCase();
-        return '<button type="button" class="tpv-upg' + (on ? " on" : "") + '" aria-pressed="' + on + '" data-tp="up-' + u.k + '" data-up="' + u.k + '"><b>' + esc(cardName(u.n)) + "</b>" + (same || !ownName ? "" : "<small>" + esc(ownName) + "</small>") + "</button>"; }).join("") + "</div></div>";
-      if (paints.length > 1) body += '<div class="tpv-extra"><h4>' + esc(h.upn && h.upn.paint || "Paint") + '</h4><div class="tpv-opts tpv-paints">' + paints.map(function(p){ var bold = /mushroom|castle|lighthouse/.test(o.home) || !!h.set, c = h.set && p.k === "cream" ? "#F4EFE6" : bold ? p.bold : p.c, nm = bold ? p.boldName : p.n;
-        return '<button type="button" class="tpv-swatch' + (o.paint === p.k ? " on" : "") + '" data-tp="paint" data-paint="' + p.k + '" aria-pressed="' + (o.paint === p.k) + '" aria-label="' + esc(nm) + '" title="' + esc(nm) + '" style="--sw:' + c + '"></button>'; }).join("") + "</div></div>";
-    }
-    if (kind === "yard" && (pick === "side" || pick === "corner") && mineOf.some(function(y){ return y.wide; })) body += '<p class="tpv-note">The bowling lane is long: it takes the side yard and the front corner together.</p>';
-    body += '<div class="tpv-row tpv-foot"><button type="button" class="tpv-btn" data-tp="surprise">' + ICON.dice + '<span>Surprise me</span></button><button type="button" class="tpv-btn" data-tp="shop" aria-label="Get more in the shop">' + ICON.bag + "<span>Shop</span></button>" +
-      '<button type="button" class="tpv-btn tpv-gold tpv-done" data-tp="done">' + ICON.check + "<span>Done</span></button></div>";
-    var keep = $(".tpv-dcards", el), top = keep && V.kept === kind + src ? keep.scrollTop : 0; V.kept = kind + src;
-    el.innerHTML = dock + '<div class="tpv-drawer d-' + kind + '">' + body + "</div>";
-    if (top) $(".tpv-dcards", el).scrollTop = top;
-    $$("[data-src]", el).forEach(function(b){ b.addEventListener("click", function(){ V.src[kind] = b.dataset.src; V.srcFor = pick + ":" + curK; side(o); var n = $('[data-src="' + b.dataset.src + '"]', el); if (n) n.focus(); }); });
-    $$("[data-pick]", el).forEach(function(b){ b.addEventListener("click", function(){ V.pick = b.dataset.pick; build(); var n = V && $('.tpv-tile[data-pick="' + V.pick + '"]', V.dlg); if (n) n.focus({ preventScroll: true }); }); });
-    $$("[data-item]", el).forEach(function(b){ b.addEventListener("click", function(){
-      var id = b.dataset.item || null, x = id ? byK(all, key(kind, id)) : null;
-      if (kind === "home") { if ((e.home || null) === id) return; equip("home", id, { burst: "home", say: (x ? x.n : "The cottage") + ". Home sweet home." }); }
-      else if (kind === "scene") { if ((e.scene || null) === id) return; equip("scene", id, { say: (x ? x.n : "The hill") + ". Let’s look around." }); }
-      else if (kind === "outfit") { if ((e.outfit || null) === id) return; equip("outfit", id, { say: x && x.say && x.say[0] ? x.say[0] : x ? "How do I look?" : "Back to just me." }); if (!isStill()) setTimeout(function(){ if (V) flip(true); }, 400); }
-      else {
-        var slot = x && x.wide ? "side" : pick; if (x && x.wide) V.pick = "side";
-        if ((e["yard-" + slot] || null) === id) return;
-        equip("yard-" + slot, id, id ? { burst: slot, say: "New: " + lowerFirst(x.n) + "." } : {});
-      }
-    }); });
-    $$("[data-up]", el).forEach(function(b){ b.addEventListener("click", function(){ var u = byK(TP.UPGRADES, b.dataset.up), on = !e[u.k]; equip(u.k, on ? u.id : null, on ? { burst: "home" } : {}); }); });
-    $$("[data-paint]", el).forEach(function(b){ b.addEventListener("click", function(){ var p = byK(TP.PAINTS, b.dataset.paint); equip("paint", p.id || null, {}); }); });
-    var su = $('[data-tp="surprise"]', el); if (su) su.addEventListener("click", surprise);
-    var sh = $('[data-tp="shop"]', el); if (sh) sh.addEventListener("click", toShop);
-    var dn = $('[data-tp="done"]', el); if (dn) dn.addEventListener("click", function(){ setMode("play"); var n = V && $('[data-tp="customize2"]', V.dlg); if (n) n.focus(); });
+  /* ---------- Customize (Sam, 2026-11-24: "I also want a better way to do the customization for Timmys place. Its
+     clunky and inefficient"). One panel: four tabs, Timmy, Home, Scene and Yard (the yard's five spots in a row under
+     its tab), over one list of what you own of that kind: what came since you last looked first, marked New, then the
+     classics, each collection and season under its own name, and the rank rewards with the ones still to earn. A tap
+     answers in the frame it was made in (the card it pressed, the line under the heading, the spot's picture), and the
+     stage follows once that frame is on the screen, drawing again only what changed (Timmy alone for an outfit);
+     another tab or spot only moves the camera. The stage's own tap areas (each spot, the house, Timmy) pick too. Every
+     pick still saves at once through equip_item, in order (equip, above). Until 2026-11-25 the panel was a dock of
+     eight tiles over a drawer with up to four tabs by where a piece came from, both drawn again whole with the stage at
+     every tap, after every owned set's file had come: vault/reference/motion-cost.md has the numbers. ---------- */
+  var SPOT_N = { right: "Back", side: "Side", left: "Path, left", front: "Path, right", corner: "Front" };
+  var CATS = [["timmy", "Timmy"], ["home", "Home"], ["scene", "Scene"], ["yard", "Yard"]], FIRST_EMPTY = ["front", "left", "right", "side", "corner"];
+  var SEP = '<span class="tpv-sr">, </span>';
+  var PLUS = '<svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true" focusable="false"><path d="M10 4v12M4 10h12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+  function kindOf(cat){ return cat === "timmy" ? "outfit" : cat; }
+  function kindList(kind){ return kind === "home" ? TP.HOMES : kind === "scene" ? TP.SCENES : kind === "outfit" ? TP.OUTFITS : TP.YARD; }
+  function slotOf(){ return V.cat === "timmy" ? "outfit" : V.cat === "yard" ? "yard-" + V.spot : V.cat; }
+  function laneOn(){ var s = S.eq["yard-side"]; return !!(s && isWide(s)); }
+  function kindById(id){ var r = "", i = TP.setInfo(id); if (i) return i.kind;
+    [["home", TP.HOMES], ["scene", TP.SCENES], ["outfit", TP.OUTFITS], ["yard", TP.YARD]].some(function(p){ if (p[1].some(function(x){ return x.id === id; })) { r = p[0]; return true; } return false; }); return r; }
+  function czName(kind, id){
+    if (!id) return kind === "home" ? (byK(TP.HOMES, "cottage") || {}).n || "The cottage" : kind === "scene" ? (byK(TP.SCENES, "hill") || {}).n || "The hill" : "";
+    var x = byK(kindList(kind), key(kind, id)); return x ? x.n : (TP.setInfo(id) || {}).n || id;
+  }
+  function czTimmyName(){ var id = S.eq.outfit; return id ? "Timmy, wearing " + lowerFirst(czName("outfit", id)) : "Timmy"; }
+  function czScene(){ return key("scene", S.eq.scene) || "hill"; }
+  /* what you own of a kind: the kit's pieces, and a set's piece whose file isn't here yet (the kit names every set piece
+     before its drawing comes: setInfo), drawn as its frame and name until it does */
+  function ownedOf(kind){
+    var have = {}, out = kindList(kind).filter(function(x){ if (x.id) have[x.id] = 1; return owned(x); });
+    Object.keys(S.own).forEach(function(id){ var i = !have[id] && TP.setInfo(id);
+      if (i && i.kind === kind) out.push({ k: id, id: id, n: i.n, rarity: i.rarity, set: i.set, coll: !!i.coll, rank: i.rank, rankName: i.rankName, later: true }); });
+    return out;
+  }
+  /* New: what came (bought, a gift, a rank's reward) since you last left Customize, by the server's own times, so a
+     device's clock can't hide one. A first visit counts the last three days */
+  function seenAt(){ var t = Date.parse(ls("sh_place_seen") || ""); return t === t ? t : Date.now() - 3 * 864e5; }
+  function isNew(x){ var t = x.id && S.at[x.id]; return !!t && t > V.seen; }
+  function czSeen(){ var t = 0; Object.keys(S.at).forEach(function(id){ if (S.at[id] > t) t = S.at[id]; }); lsSet("sh_place_seen", new Date(t || Date.now()).toISOString()); }
+  /* where Customize opens: what was asked for (the shop's "Put it on"), else the newest piece you haven't seen, else where
+     you were last time, else Timmy; in the yard, the spot asked for or the first empty one */
+  function czWhich(){
+    var ask = V.ask, last = String(ls("sh_place_cz") || "").split(":"), seen = seenAt(), nw = "", kind = "";
+    if (!ask) Object.keys(S.at).forEach(function(id){ var kd = S.at[id] > seen && kindById(id); if (kd && (!nw || S.at[id] > S.at[nw])) { nw = id; kind = kd; } });
+    var inYard = YARD_SLOTS.indexOf(ask) >= 0;
+    var cat = ask ? (inYard ? "yard" : ask) : kind ? (kind === "outfit" ? "timmy" : kind) : /^(timmy|home|scene|yard)$/.test(last[0]) ? last[0] : "timmy";
+    var spot = inYard ? ask : !kind && last[0] === "yard" && YARD_SLOTS.indexOf(last[1]) >= 0 ? last[1] : "";
+    if (!spot) spot = FIRST_EMPTY.filter(function(k){ return !S.eq["yard-" + k] && !(k === "corner" && laneOn()); })[0] || "front";
+    return { cat: cat, spot: spot };
+  }
+  function czStart(){ var w = czWhich(); V.ask = ""; V.seen = seenAt(); czSet(w.cat, w.spot); }
+  function czSet(cat, spot){
+    if (spot) V.spot = spot;
+    if (cat === "yard" && V.spot === "corner" && laneOn()) V.spot = "side";
+    V.cat = cat; V.pick = cat === "yard" ? V.spot : cat;
+    lsSet("sh_place_cz", cat + (cat === "yard" ? ":" + V.spot : ""));
+  }
+  /* a tab, a spot, or a tap area on the stage */
+  function czGo(pick){
+    if (!V || V.mode !== "customize") return;
+    var was = V.pick, cat = YARD_SLOTS.indexOf(pick) >= 0 ? "yard" : pick;
+    if (!/^(timmy|home|scene|yard)$/.test(cat)) return;
+    if (cat === V.cat && (pick === "yard" || pick === V.spot || cat !== "yard")) { if (pick === "timmy" && was === "timmy") tapTimmy(); return; }
+    czSet(cat, cat === "yard" && pick !== "yard" ? pick : "");
+    czSync(); czLoad();
+    czAfter({ focus: true });
+  }
+  /* the stage's part of a tap waits until the panel's answer is on the screen: a frame, then the next task (a frame's own
+     callback runs before its paint). Taps in between fold into one, so the stage is drawn once, for the last of them */
+  function czAfter(job){
+    var q = V.job || (V.job = {}), v = V;
+    Object.keys(job).forEach(function(k){ q[k] = job[k]; });
+    if (V.jobT) return;
+    V.jobT = 1;
+    requestAnimationFrame(function(){ setTimeout(function(){ if (V !== v) return; v.jobT = 0; var j = v.job; v.job = null; if (j) czRun(j); }, 0); });
+  }
+  function czRun(j){
+    var fx = j.fx || {};
+    if (!j.stage && !j.timmy) { stageFocus(); return; }
+    needPacks(equippedIds(V.m)).then(function(){
+      if (!V) return;
+      if (j.stage || !swapTimmy()) { var was = V.wide; if (fx.wide) V.wide = true; stage(fx); V.wide = was; chrome(); }
+      else { if (fx.say) say(fx.say); if (j.focus) stageFocus(); }
+      if (fx.flip && !isStill()) setTimeout(function(){ if (V) flip(true); }, fx.burst ? 500 : 400);
+    });
+  }
+  /* a new outfit: only Timmy is drawn again, where he stands */
+  function swapTimmy(){
+    if (!V || !V.tg || !V.tg.isConnected) return false;
+    var g = timmyG(V.m); if (!g) return false;
+    V.tg.innerHTML = g; V.face = $(".tp-tface", V.tg);
+    setTimmy(V.pos || V.layout.spots[V.at], 0, 1, 1);
+    if (V.th) V.th.setAttribute("aria-label", czTimmyName() + ". Change his outfit");
+    return true;
+  }
+  /* another tab or spot: the camera moves in on it and its tap area lights up; nothing on the stage is drawn again */
+  function stageFocus(){
+    if (!V || !V.sr || !V.o) return;
+    $$(".tp-hitarea", V.sr).forEach(function(p){ p.classList.toggle("on", p.dataset.pick === V.pick); });
+    camTo($$("svg.tp-scene, svg.tp-hit", V.sr), camFor(V.o), isStill());
+    chrome();
+  }
+  /* the top bar's Visit | Customize and the Close-up chip; with the stage (withStage), the window's own mode too, which
+     sizes the stage: so a tap on Customize paints the panel first and the stage's new size comes with its new drawing */
+  function chrome(withStage){
+    var dlg = V.dlg, custom = V.mode === "customize";
+    $(".tpv-seg", dlg).hidden = !canChange();
+    $('[data-tp="play"]', dlg).setAttribute("aria-pressed", String(!custom)); $('[data-tp="customize"]', dlg).setAttribute("aria-pressed", String(custom));
+    var zb = $(".tpv-zoom", dlg); zb.hidden = !custom || V.pick === "scene"; zb.setAttribute("aria-pressed", String(!V.wide));
+    if (withStage) dlg.classList.toggle("is-custom", custom);
+  }
+  /* what the open tab needs, fetched as it's wanted: the shop's frames, and the files of the sets you own pieces of
+     this kind from (and the rank pieces still to earn). Each is drawn in where it goes as it comes */
+  function czLoad(){
+    var v = V, kind = kindOf(V.cat);
+    var ids = Object.keys(S.own).concat(S.locked.filter(function(x){ return x.kind === kind; }).map(function(x){ return x.id; })).filter(function(id){ var i = TP.setInfo(id); return i && i.kind === kind; });
+    if (!SA && memo.shopArt !== 0) shopArt().then(function(){ if (V === v && SA) czFrames(); });
+    needPacks(ids).then(function(){ if (V === v && V.mode === "customize" && kindOf(V.cat) === kind) czSync(); });
+  }
+  /* while you look around in Visit, what Customize shows first comes in the background */
+  function czWarm(){
+    var v = V;
+    setTimeout(function(){
+      var go = function(){
+        if (V !== v || !canChange() || V.mode === "customize") return;
+        var kind = kindOf(czWhich().cat);
+        shopArt(); needPacks(Object.keys(S.own).filter(function(id){ var i = TP.setInfo(id); return i && i.kind === kind; }));
+      };
+      if (W.requestIdleCallback) W.requestIdleCallback(go, { timeout: 2500 }); else go();
+    }, 1500);
+  }
+  function czFrames(){ $$(".tpv-cz .tpv-rf", V.dlg).forEach(function(n){ if (!n.firstChild) n.innerHTML = rframe(n.getAttribute("data-r")); }); }
+
+  /* the panel: drawn once when Customize opens, then changed in place */
+  function czShell(el){
+    el.classList.add("is-cz");
+    el.innerHTML = '<div class="tpv-cz">' +
+      '<div class="tpv-cats" role="group" aria-label="What to change">' + CATS.map(function(c){ return '<button type="button" class="tpv-cat" data-tp="pick-' + c[0] + '" data-pick="' + c[0] + '" aria-pressed="false">' + c[1] + "</button>"; }).join("") + "</div>" +
+      '<div class="tpv-spots" role="group" aria-label="The yard’s spots" hidden></div>' +
+      '<div class="tpv-czhead"><h3 id="tpvCzH"></h3><p class="tpv-now" role="status"></p></div>' +
+      '<div class="tpv-list" role="group" aria-labelledby="tpvCzH"></div>' +
+      '<div class="tpv-row tpv-foot"><button type="button" class="tpv-btn" data-tp="surprise">' + ICON.dice + '<span>Surprise me</span></button><button type="button" class="tpv-btn" data-tp="shop" aria-label="Get more in the shop">' + ICON.bag + "<span>Shop</span></button>" +
+      '<button type="button" class="tpv-btn tpv-gold tpv-done" data-tp="done">' + ICON.check + "<span>Done</span></button></div></div>";
+    czDrop(); V.panes = {}; V.czKind = "";
+    $(".tpv-cz", el).addEventListener("click", czClick);
+  }
+  function czClick(e){
+    var b = e.target.closest("button"); if (!b || !V || b.disabled) return;
+    var tp = b.getAttribute("data-tp");
+    if (b.hasAttribute("data-pick")) czGo(b.getAttribute("data-pick"));
+    else if (b.hasAttribute("data-item")) czPick(b.getAttribute("data-item") || null);
+    else if (b.hasAttribute("data-up")) czUp(b.getAttribute("data-up"));
+    else if (b.hasAttribute("data-paint")) czPaint(b.getAttribute("data-paint"));
+    else if (tp === "surprise") surprise();
+    else if (tp === "shop") toShop();
+    else if (tp === "done") { setMode("play"); var n = V && $('[data-tp="customize2"]', V.dlg); if (n) n.focus(); }
+  }
+  /* each kind's list is drawn the first time its tab opens and kept (with where it was scrolled to), so going back to a
+     tab only shows it again; it is drawn again only when what it shows changed (czSig: what you own, a set's drawing
+     come, the scene a home or yard piece is drawn on, what's New). In the yard, the spots the long lane can't take hide
+     it (is-narrow). Everything else is marked in place */
+  function czSig(kind){ var mine = ownedOf(kind); return [mine.length, mine.filter(function(x){ return x.later; }).length, S.locked.length, V.seen, kind === "home" || kind === "yard" ? czScene() : ""].join("|"); }
+  function czSync(){
+    var el = $(".tpv-cz", V.dlg); if (!el) return;
+    $$(".tpv-cat", el).forEach(function(b){ b.setAttribute("aria-pressed", String(b.dataset.pick === V.cat)); });
+    var list = $(".tpv-list", el), kind = kindOf(V.cat), P = V.panes || (V.panes = {}), cur = P[kind], sig = czSig(kind), moved = V.czKind !== kind;
+    if (moved && P[V.czKind]) { P[V.czKind].top = list.scrollTop; P[V.czKind].el.hidden = true; }
+    var top = moved ? (cur && cur.top) || 0 : list.scrollTop, drawn = !cur || cur.sig !== sig;
+    if (!cur) { cur = P[kind] = { el: D.createElement("div"), top: 0 }; cur.el.className = "tpv-pane"; list.appendChild(cur.el); }
+    if (drawn) { czList(cur, kind); cur.sig = sig; }
+    cur.el.hidden = false;
+    cur.el.classList.toggle("is-narrow", kind === "yard" && V.spot !== "side" && V.spot !== "corner");
+    if (moved || drawn) list.scrollTop = top;
+    V.czKind = kind;
+    czMarks();
+  }
+  function czPane(){ var p = V && V.panes && V.panes[kindOf(V.cat)]; return p ? p.el : null; }
+  function czDrop(){ if (V && V.panes) Object.keys(V.panes).forEach(function(k){ if (V.panes[k].io) V.panes[k].io.disconnect(); }); if (V) V.panes = null; }
+  function czMarks(){
+    var el = V && $(".tpv-cz", V.dlg), pane = czPane(); if (!el) return;
+    var cur = S.eq[slotOf()] || "", sp = $(".tpv-spots", el);
+    if (pane) $$("button[data-item]", pane).forEach(function(b){ var on = (b.getAttribute("data-item") || "") === cur; if (b.classList.contains("on") !== on) { b.classList.toggle("on", on); b.setAttribute("aria-pressed", String(on)); } });
+    sp.hidden = V.cat !== "yard"; if (V.cat === "yard") czSpots(sp);
+    czHead(el);
+    var ex = pane && $(".tpv-extras", pane); if (ex) keepFocus(ex, function(){ ex.innerHTML = czExtras(); });
+  }
+  /* the yard's spots: what stands in each, as a picture, and which one you're changing */
+  function czSpots(sp){
+    var lane = laneOn(), list = TP.SLOTS.filter(function(q){ return !(q.k === "corner" && lane); }), sc = czScene();
+    if (sp.childElementCount !== list.length) sp.innerHTML = list.map(function(q){ return '<button type="button" class="tpv-spot" data-tp="pick-' + q.k + '" data-pick="' + q.k + '" aria-pressed="false"><span class="tpv-spic" aria-hidden="true"></span><span class="tpv-sname">' + esc(SPOT_N[q.k] || q.n) + "</span></button>"; }).join("");
+    list.forEach(function(q){
+      var b = $('[data-pick="' + q.k + '"]', sp); if (!b) return;
+      var id = S.eq["yard-" + q.k] || "", it = id ? byK(TP.YARD, key("yard", id)) : null, nm = id ? czName("yard", id) : "", on = V.spot === q.k, s = id + "|" + sc + "|" + !!it;
+      if (b.classList.contains("on") !== on) { b.classList.toggle("on", on); b.setAttribute("aria-pressed", String(on)); }
+      b.classList.toggle("is-empty", !id);
+      b.setAttribute("aria-label", q.n + ": " + (nm ? lowerFirst(nm) : "empty"));
+      if (b._s !== s) { b._s = s; b.firstChild.innerHTML = it ? thumb("yard", it.k, { scene: sc }) : id ? "" : PLUS; }
+    });
+  }
+  function czHead(el){
+    var kind = kindOf(V.cat), id = S.eq[slotOf()] || "", nm = lowerFirst(czName(kind, id)), h = $("#tpvCzH", el), p = $(".tpv-now", el);
+    var t = V.cat === "timmy" ? ["Timmy’s outfit", id ? "Wearing " + nm + "." : "Just Timmy, nothing on."]
+      : V.cat === "home" ? ["Home", "Now: " + nm + "."]
+      : V.cat === "scene" ? ["Scene", "Now: " + nm + ". It’s where the whole place stands."]
+      : [(byK(TP.SLOTS, V.spot) || {}).n || "The yard", id ? "Here now: " + nm + "." : "Empty. Pick something for it."];
+    if (h.textContent !== t[0]) h.textContent = t[0];
+    if (p.textContent !== t[1]) p.textContent = t[1];
+  }
+  /* the list: New first, then the classics, each collection, each season, the rank rewards. Pictures already drawn come
+     at once; the rest are drawn as they near the screen, a few at a time (czPics) */
+  function czList(pane, kind){
+    var el = pane.el, mine = ownedOf(kind), fresh = mine.filter(isNew).sort(function(a, b){ return S.at[b.id] - S.at[a.id]; }), rest = mine.filter(function(x){ return !isNew(x); });
+    var locked = S.locked.filter(function(x){ return x.kind === kind; }), done = {}, html = "";
+    var group = function(title, list, extra, locks, cls){
+      var cards = extra + list.map(function(x){ done[x.id || x.k] = 1; return czCard(kind, x, cls === "is-new"); }).join("") + (locks || []).map(function(q){ return czLock(kind, q); }).join("");
+      return cards ? '<div class="tpv-grp' + (cls ? " " + cls : "") + '"><h4 class="tpv-seth">' + esc(title) + '</h4><div class="tpv-cards">' + cards + "</div></div>" : "";
+    };
+    if (fresh.length) html += group("New since you last looked", fresh, "", null, "is-new");
+    html += group("Classics", rest.filter(function(x){ return !x.set; }), kind === "outfit" ? czCard(kind, { k: "", id: "", n: "Just Timmy", rarity: "" }) : kind === "yard" ? czClear() : "");
+    var sets = TP.SETS || {};
+    (sets.collections || []).concat(sets.seasons || []).forEach(function(se){ html += group(se.n, rest.filter(function(x){ return x.set === se.k; }), ""); });
+    var rk = rest.filter(function(x){ return x.set === "rank"; });
+    if (rk.length || locked.length) html += group("Rank rewards", rk, "", locked) + '<p class="tpv-note">Rank pieces are earned, never sold: an outfit and a yard piece at every full rank-up.</p>';
+    var left = rest.filter(function(x){ return !done[x.id || x.k]; }); if (left.length) html += group("More", left, "");
+    if (kind === "home") html += '<div class="tpv-extras">' + czExtras() + "</div>";
+    if (kind === "yard" && mine.some(function(y){ return y.wide; })) html += '<p class="tpv-note tpv-lanenote">The bowling lane is long: it takes the side yard and the front corner together.</p>';
+    el.innerHTML = html;
+    czPics(pane, kind);
+  }
+  function picOf(kind, k){ return kind === "outfit" ? thumb("outfit", k) : kind === "scene" ? thumb("scene", k) : thumb(kind, k, { scene: czScene() }); }
+  function picReady(kind, k){ var o = kind === "outfit" || kind === "scene" ? null : { scene: czScene() }; return THUMBS[kind + ":" + k + ":" + JSON.stringify(o || {})]; }
+  function czCard(kind, x, fresh){
+    var id = x.id || "", on = id === (S.eq[slotOf()] || ""), r = x.rarity || "", pic = x.later ? "" : picReady(kind, x.k), how = fresh ? "" : howTag(x);
+    return '<button type="button" class="tpv-card' + (on ? " on" : "") + (x.later ? " is-later" : "") + (x.wide ? " is-wide" : "") + '" data-tp="piece" data-item="' + esc(id) + '" aria-pressed="' + on + '">' +
+      '<span class="tpv-rf" data-r="' + rarOf(r) + '">' + (SA ? rframe(r) : "") + "</span>" +
+      '<span class="tpv-cpic' + (kind === "scene" ? " k-scene" : "") + '"' + (pic || x.later ? "" : ' data-want="' + esc(x.k) + '"') + ">" + (pic || "") + "</span>" +
+      '<span class="tpv-ctext"><span class="tpv-cname">' + esc(cardName(x.n)) + "</span>" + SEP + '<span class="tpv-cmeta">' + rarTag(r) + "</span></span>" +
+      (fresh ? SEP + '<span class="tpv-stamp is-new">New</span>' : how ? SEP + '<span class="tpv-stamp">' + esc(how) + "</span>" : "") + "</button>";
+  }
+  function czClear(){
+    var on = !S.eq[slotOf()];
+    return '<button type="button" class="tpv-card is-clear' + (on ? " on" : "") + '" data-tp="clear" data-item="" aria-pressed="' + on + '"><span class="tpv-rf" data-r="Common"></span><span class="tpv-cpic">' + PLUS + '</span><span class="tpv-ctext"><span class="tpv-cname">Leave it empty</span></span></button>';
+  }
+  function czLock(kind, q){
+    var x = byK(kindList(kind), key(kind, q.id)), i = TP.setInfo(q.id) || {}, n = x ? x.n : i.n || q.name || "", r = (x && x.rarity) || i.rarity || "", pic = x ? picReady(kind, x.k) : "";
+    return '<span class="tpv-card is-locked' + (x ? "" : " is-later") + '"><span class="tpv-rf" data-r="' + rarOf(r) + '">' + (SA ? rframe(r) : "") + "</span>" +
+      '<span class="tpv-cpic"' + (x && !pic ? ' data-want="' + esc(x.k) + '"' : "") + ">" + (pic || "") + "</span>" +
+      '<span class="tpv-ctext"><span class="tpv-cname">' + esc(cardName(n)) + "</span>" + SEP + '<span class="tpv-cmeta">' + (r ? rarTag(r) : "") + "</span></span>" +
+      SEP + '<span class="tpv-stamp">Reach ' + esc(RANKS[q.rank_tier] || "the next rank") + "</span></span>";
+  }
+  /* a card's picture is drawn when it nears the screen, in slices of a frame so a long list never holds a tap up */
+  function czPics(pane, kind){
+    if (pane.io) pane.io.disconnect();
+    var el = pane.el, want = $$(".tpv-cpic[data-want]", el); if (!want.length) return;
+    var fill = function(n){ var k = n.getAttribute("data-want"); if (!n.isConnected || k == null) return; n.removeAttribute("data-want"); n.innerHTML = picOf(kind, k); };
+    if (!W.IntersectionObserver) { want.forEach(fill); return; }
+    var q = [], run = 0, v = V;
+    var pump = function(){ if (V !== v) return; var t = performance.now(); while (q.length && performance.now() - t < 8) fill(q.shift()); if (q.length) requestAnimationFrame(pump); else run = 0; };
+    var io = pane.io = new IntersectionObserver(function(es){ es.forEach(function(e){ if (e.isIntersecting) { io.unobserve(e.target); q.push(e.target); } }); if (q.length && !run) { run = 1; requestAnimationFrame(pump); } }, { root: el.parentNode, rootMargin: "320px 0px" });
+    want.forEach(function(n){ io.observe(n); });
+  }
+  /* the home's upgrades and paint, under the homes */
+  function czExtras(){
+    var hk = key("home", S.eq.home) || (S.eq.home ? "" : "cottage"), h = hk && byK(TP.HOMES, hk); if (!h || !h.ups) return "";
+    var out = "", paint = S.eq.paint ? String(S.eq.paint).replace(/^paint-/, "") : "cream";
+    var ups = TP.UPGRADES.filter(function(u){ return h.ups.indexOf(u.k) >= 0 && S.own[u.id]; }), paints = h.ups.indexOf("paint") < 0 ? [] : TP.PAINTS.filter(function(p){ return !p.id || S.own[p.id]; });
+    if (ups.length) out += '<div class="tpv-extra"><h4>Upgrades for ' + esc(lowerFirst(h.n)) + '</h4><div class="tpv-opts">' + ups.map(function(u){
+      var on = !!S.eq[u.k], ownName = h.upn && h.upn[u.k], same = cardName(ownName).toLowerCase() === cardName(u.n).toLowerCase();
+      return '<button type="button" class="tpv-upg' + (on ? " on" : "") + '" data-tp="up-' + u.k + '" data-up="' + u.k + '" aria-pressed="' + on + '"><b>' + esc(cardName(u.n)) + "</b>" + (same || !ownName ? "" : "<small>" + esc(ownName) + "</small>") + "</button>"; }).join("") + "</div></div>";
+    if (paints.length > 1) out += '<div class="tpv-extra"><h4>' + esc(h.upn && h.upn.paint || "Paint") + '</h4><div class="tpv-opts tpv-paints">' + paints.map(function(p){ var bold = /mushroom|castle|lighthouse/.test(hk) || !!h.set, c = h.set && p.k === "cream" ? "#F4EFE6" : bold ? p.bold : p.c, nm = bold ? p.boldName : p.n;
+      return '<button type="button" class="tpv-swatch' + (paint === p.k ? " on" : "") + '" data-tp="paint" data-paint="' + p.k + '" aria-pressed="' + (paint === p.k) + '" aria-label="' + esc(nm) + '" title="' + esc(nm) + '" style="--sw:' + c + '"></button>'; }).join("") + "</div></div>";
+    return out;
+  }
+  function keepFocus(box, fn){
+    var a = D.activeElement, sel = a && box.contains(a) ? (a.dataset.up ? '[data-up="' + a.dataset.up + '"]' : a.dataset.paint ? '[data-paint="' + a.dataset.paint + '"]' : "") : "";
+    fn(); if (sel) { var n = $(sel, box); if (n) try { n.focus({ preventScroll: true }); } catch (e) {} }
+  }
+  /* a pick: marked on the panel now, saved, and the stage follows after this frame */
+  function czPick(id){
+    if (!canChange()) return;
+    var kind = kindOf(V.cat), x = id ? byK(kindList(kind), key(kind, id)) : null, nm = id ? czName(kind, id) : "";
+    if (kind === "yard" && x && x.wide && V.spot !== "side") czSet("yard", "side");
+    var slot = slotOf();
+    if ((S.eq[slot] || null) === (id || null)) return;
+    var fx = kind === "home" ? { burst: "home", say: (nm || "The cottage") + ". Home sweet home." }
+      : kind === "scene" ? { say: (nm || "The hill") + ". Let’s look around." }
+      : kind === "outfit" ? { say: x && x.say && x.say[0] ? x.say[0] : id ? "How do I look?" : "Back to just me.", flip: true }
+      : id ? { burst: V.spot, say: "New: " + lowerFirst(nm) + "." } : {};
+    equip(slot, id, fx);
+    czSync();
+  }
+  function czUp(k){ var u = byK(TP.UPGRADES, k); if (!u) return; var on = !S.eq[u.k]; equip(u.k, on ? u.id : null, on ? { burst: "home" } : {}); czMarks(); }
+  function czPaint(k){ var p = byK(TP.PAINTS, k); if (!p) return; var cur = S.eq.paint ? String(S.eq.paint).replace(/^paint-/, "") : "cream"; if (cur === p.k) return; equip("paint", p.id || null, {}); czMarks(); }
+  function side(){
+    var el = $(".tpv-side", V.dlg), m = V.m;
+    if (V.mode !== "customize") { czDrop(); el.classList.remove("is-cz"); if (m.visiting) guestCard(el, m); else hostCard(el, m, HL()); return; }
+    if (!$(".tpv-cz", el)) czShell(el);
+    czSync();
   }
   /* Timmy's shop (widget/shop.js, phase 4 part B), fetched the first time it's wanted; it opens over the place, and what
      you buy there is handed back here (setup({ shop }) and repaint()) */
@@ -1204,8 +1442,8 @@
     var todo = Object.keys(want).filter(function(sl){ return (S.eq[sl] || null) !== want[sl]; });
     if (!todo.length) { say("I like it the way it is."); return; }
     todo.forEach(function(sl){ equip(sl, want[sl], false); });
-    var was = V.wide; V.wide = true;
-    needPacks(equippedIds(V.m)).then(function(){ if (!V) return; build({ burst: "home", say: "A whole new look! What do you think?" }); V.wide = was; repaintCards(); if (!isStill()) setTimeout(function(){ if (V) flip(true); }, 500); });
+    czMarks();
+    czAfter({ stage: true, fx: { burst: "home", say: "A whole new look! What do you think?", flip: true, wide: true } });
   }
 
   var api = W.shPlace = { setup: setup, card: card, open: open, close: close, ready: ready, repaint: repaint, seasonOn: seasonOn, STILL: STILL,
@@ -1213,6 +1451,6 @@
        names what was finished (collName(k)) */
     claimCollections: claimColl, collName: collName,
     /* for the tests: what stands where, and whether the customizer can be used */
-    state: function(){ var oc = V && $(".tpv-over", V.dlg); return { game: S.game, equipped: copy(S.eq), owned: Object.keys(S.own).length, locked: S.locked.length, open: !!V, mode: V ? V.mode : "", at: V ? V.at : "",
+    state: function(){ var oc = V && $(".tpv-over", V.dlg); return { game: S.game, equipped: copy(S.eq), owned: Object.keys(S.own).length, locked: S.locked.length, open: !!V, mode: V ? V.mode : "", at: V ? V.at : "", cat: V ? V.cat : "", spot: V ? V.spot : "",
       collections: oc && !oc.hidden ? $$(".tco", oc).length : 0, collPaid: S.coll ? Object.keys(S.coll).filter(function(k){ return S.coll[k].paid; }).length : null }; } };
 })();
