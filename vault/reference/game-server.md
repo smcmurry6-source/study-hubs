@@ -724,6 +724,15 @@ crowns and nothing else.
   on the live site) a link went from 770 to 350 ms. **Keep it that way**: anything added to `redeem_link_code` that changes
   answers runs inside `sh.linking`, or it pays for another whole rebuild; and anything that makes the rebuild slower makes
   linking slower for the people with the most answers, who are the ones most likely to link.
+- **Timed on the live database** on 2026-11-25 at 1:36 am Central, before v103 was applied (nobody studying, no other query
+  running), in a rolled-back call: one `sh_xp_rebuild` of the visitor with the most answers ran past 5 seconds and was
+  canceled, inside `sh_xp_replay`'s insert into `xp_awards`; the throwaway copy's made-up 10,000-answer visitor takes 324
+  ms. Replay only, the same night: the five heaviest visitors' replay takes 0.35-0.57 s after v103 (0.5-0.7 s before), all
+  from cache (no disk reads); two calls that night ran 4 s and past 5 s with no disk reads either, so a slow minute on the
+  shared CPU, not the size of anyone's history, is what can still send a rebuild past anon's 3 s. v103 halves the work for
+  everyone; the heaviest visitors' links can still run out of time on a slow minute, and the next cut is on the to-do list
+  ([inbox](../tasks/inbox.md)). **Time this plain**: on the live database `explain analyze`'s per-node timing triples the
+  replay's window plan (1,126 against 352 ms).
 
 ## Tests
 

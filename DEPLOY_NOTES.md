@@ -32,6 +32,17 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-25 (migration_v101 and v103 applied, Claude Code)** — At 2:10 and 2:13 am Central, through the connector in one
+  call each, with the class asleep. **v101** (#545: the year-spanning readers read the totals; `insight_cards_kept`,
+  `sh_insights`, `get_hub_recap`, `sh_retention_run`): nothing changes until the first collapse (about 2027-09-13); the three
+  bodies md5-checked before and after, the new table admin-only; `sh_insights` 4.95 s cold, 1.0 s warm (the admin cache job
+  gives it 10 s). **v103** (#563: the boards keep a tie in one order; Link my devices rebuilds XP once): all nine bodies
+  md5-checked before and the eight replaced after, `get_rank_board_v2` PL/pgSQL, the five boards answered as anon. Timed
+  live the same night ([game-server](vault/reference/game-server.md)): the heaviest visitors' replay is 0.35-0.57 s after
+  v103 (0.5-0.7 s before), all from cache, but a rebuild can still run past anon's 3 s on a slow minute of the shared CPU, so
+  Link my devices can still time out for the very heaviest; the next cut is a new inbox line. `supabase/schema.sql` has both
+  files, `supabase/pending-migrations.txt` lists none, and `redeem_link_code`'s numbers at the apply are in the week-after
+  inbox line.
 - **2026-11-25 (the old pages' parts out of `widget/v3.js`, #568, Claude Code)** — The package "Take the old pages' parts
   out of `widget/v3.js`" (the inbox line; Sam, 2026-11-24: "The cleanup sounds good"). v3.js no longer builds what only the
   old single-file hub pages (down since 2026-11-19) drew or what a hub on the engine always hid: the desktop launcher and
