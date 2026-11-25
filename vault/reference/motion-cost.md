@@ -63,10 +63,9 @@ laptop-size one; `main` 19 and 20), with fewer long tasks on the phone.
 - **Never `focus()` something behind an open modal.** The dashboard's wallet row (`drawWallet` in `widget/dash.js`) did on
   every `sh:shop`: an inert button can't take focus, but asking made the browser restyle and lay out the whole dashboard
   (about 200 ms on a slowed phone). The row is drawn again only when its balance or dot changes.
-- **A window that hides the page's scrollbar keeps its room** (`tsh-gut`, `scrollbar-gutter: stable`, in `widget/shop.js`
-  and `widget/shop.css`): with a classic scrollbar (a Windows desktop) its going changed the page's width, and the whole
-  dashboard was laid out again (about 250 ms on a slowed laptop). Headless Chromium hides scrollbars: launch it with
-  `ignoreDefaultArgs: ['--hide-scrollbars']` to see this.
+- ~~**A window that hides the page's scrollbar keeps its room**~~ (`tsh-gut`, `scrollbar-gutter: stable`): measured
+  again on 2026-11-25, keeping the room cost more than it saved, and it came out (below). Headless Chromium hides
+  scrollbars: launch it with `ignoreDefaultArgs: ['--hide-scrollbars']` to see a classic one.
 - On a slowed phone the shop's long tasks went from 1.4 s to 0.9 s. What is left is the shop itself: the modal's opening
   restyles the page behind (it becomes inert), the first draw of about 25 pieces, and its paint.
 - **The place at night wasn't the stars.** With its view open, a slowed phone's main thread was 95-97% busy; the 30 stars
@@ -74,6 +73,27 @@ laptop-size one; `main` 19 and 20), with fewer long tasks on the phone.
   sky, so every frame repaints all of it, not 30 dots). The rest was one SMIL `<animate>`: the rank medal's shine in the
   place's panel (`art()` in `widget/ranks.js`), which made the browser draw the page on every frame. As a CSS transform,
   with the same path and timing, the view is 11% busy (laptop size 87-90% → 33-38%), 12 frames drawn in 3 s instead of 150.
+
+## The last SMIL, and the scrollbar's room (2026-11-25)
+
+- **The Diamond and Dark Matter medals' sparkles, Dark Matter's twinkling stars and its glow** were SMIL (`art()` in
+  `widget/ranks.js`). They are CSS now, `transform` and `opacity` with the same values and timing, their keyframes in the
+  drawing (`MOVE`), and the Dark Matter nebula holds still (it drifted with an `<animate>` on its noise, which redrew the
+  whole filter). Frame by frame the moving medals are the same as before, except that a sparkle starts in the middle of its
+  cycle (a negative delay) where SMIL's `begin` left it standing at full size for its first second or two, and the nebula is
+  the still medal's. At 4x CPU, with the medal moving: a hub's Stats (the rank card and the trophy case) 94-95% busy → 5-13%,
+  Timmy's place 90-97% → 69-85%, which is what a Gold account's place measures (its rank's shine was already CSS): the rest is
+  the place's own pieces, drawn without a graphics card in the cloud browser. No looping SMIL is left in `widget/`.
+- **Don't keep a hidden scrollbar's room with `scrollbar-gutter`.** The to-do was to give Timmy's place and the figure zoom
+  the shop's `tsh-gut`. Measured with classic scrollbars at 4x CPU, the page laid out again 15 px wider costs 1-40 ms (the
+  dashboard and a hub's notes, 820 to 1,440 px wide), while putting `scrollbar-gutter: stable` on `<html>` and taking it off
+  restyles the whole page behind, 30-230 ms each way. The same code with the gutter rule switched off by a stylesheet, three
+  runs each, opening and closing: the figure zoom about 90 ms less style work, the place about 360 ms, the shop about 260 ms,
+  with the same layout and paint. So the place and the figure zoom stay as they were, and the shop's `tsh-gut` came out. The
+  page behind moves half a scrollbar's width under the window's backdrop, as it did before 2026-11-24. (`clientWidth` doesn't
+  count a kept gutter, so a window opening over another that keeps one can't see it there.)
+- **The dashboard's progress ring** on a device that holds nothing of the open hub: the page's one bootstrap asks for that
+  hub (`ringAsk()` in `widget/dash.js`), as a hub's first load does, so it adds no request.
 
 ## The rules
 
@@ -105,10 +125,12 @@ laptop-size one; `main` 19 and 20), with fewer long tasks on the phone.
 9. **No SMIL that loops** (`<animate>`, `<animateTransform>`): no stylesheet stops it (not `animation: none`, not
    `.is-away`, not reduced motion), and the browser draws the page on every frame on its main thread while it is there.
    Use a CSS animation of `transform` or `opacity`, its `@keyframes` in a `<style>` inside the drawing so it moves wherever
-   the drawing goes (the medal's shine in `widget/ranks.js` is the pattern). The Diamond and Dark Matter medals still have
-   some ([the inbox](../tasks/inbox.md)).
+   the drawing goes (the medal's shine, sparkles, stars and glow in `widget/ranks.js` are the pattern). None is left in
+   `widget/` (2026-11-25).
 10. **Twinkling in a group isn't cheaper than one by one** when the group is spread out: what repaints is the group's whole
    box.
+11. **A window that hides the page's scrollbar just hides it** (`overflow: hidden` on `<html>`): keeping its room with
+   `scrollbar-gutter: stable` restyles the whole page each way, far more than laying it out again a scrollbar wider (2026-11-25).
 
 ## How to measure
 
@@ -126,6 +148,9 @@ fast. Measure in a scripted browser on the preview (`node tools/preview/serve.js
 - **What moves:** `document.getAnimations()` (and each shadow root's) lists CSS animations and what they animate, but
   not what moves inside an image: look for `<img>` whose SVG source has `animation:` in it. Nor SMIL:
   `querySelectorAll('animate, animateTransform, animateMotion')`, in the page and in each shadow root.
+- **The same drawing, before and after a change:** freeze both at the same moments and diff the screenshots: SMIL with the
+  `<svg>`'s `pauseAnimations()` and `setCurrentTime(t)`, CSS with each of `document.getAnimations()`'s `pause()` and
+  `currentTime = t * 1000`. A change to how something moves, not to what it draws, diffs to nothing.
 - **Frames drawn:** count the trace's `Commit` events on the main thread. With nothing moving on the main thread there are a
   few a second; 60 a second with nothing changing in the page means something redraws every frame (SMIL, a script's
   `requestAnimationFrame`, an animation the browser can't run by itself).

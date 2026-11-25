@@ -32,6 +32,22 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-25 (The medals' last SMIL, the scrollbar's room, the progress ring on a new device, Claude Code, #PRNUM)** —
+  Three inbox lines, measured at 4x CPU as [motion-cost](vault/reference/motion-cost.md) does. **The Diamond and Dark
+  Matter medals:** their sparkles, Dark Matter's twinkling stars and its glow were SMIL in `art()` (`widget/ranks.js`), which
+  made the browser draw the page on every frame wherever an animated medal was; they are CSS `transform` and `opacity` now,
+  same values and timing, keyframes inside the drawing, and the Dark Matter nebula holds still. Frozen frame by frame they
+  match main, except that each sparkle starts mid-cycle and the nebula is the still medal's. A hub's Stats 94-95% busy →
+  5-13%; Timmy's place 90-97% → 69-85%, what a Gold account's place measures (the rest is the place's own pieces in the
+  cloud's software drawing). No looping SMIL is left in `widget/`. **The scrollbar:** keeping a hidden scrollbar's room
+  (`scrollbar-gutter: stable`, the shop's `tsh-gut`) turned out to cost more than it saves: changing the root's gutter
+  restyles the whole page behind, 30-230 ms each way on a slowed laptop, while laying the page out again 15 px wider takes
+  1-40 ms. So Timmy's place and the figure zoom (the line's "Focus mode": `hx-fz-open`) stay as they were, and the shop's
+  `tsh-gut` came out (about 260 ms less style work on opening and closing it). **The progress ring:** on a device that holds
+  nothing of the open tab's hub (a new or linked device, cleared storage, the preview), the dashboard's one bootstrap asks
+  for that hub, and the ring and its button are drawn from the account's answers (`ringAsk()`, `serverFill()` in
+  `widget/dash.js`): the same numbers the hub keeps once it is opened there; another tab's hub uses the mastery that comes
+  with it. The check-in pop-up, the streak and the week still read only this device.
 - **2026-11-24 (Review of Systems: every question vetted, Claude Code)** — Sam: "Vet all questions, the answer key, and
   explanations in review of systems for accuracy, clarity, effectiveness, completeness. Make any necessary changes." All
   1,369 questions were read in 19 slices (a course or part of one each): answered cold, then the key, the explanation and

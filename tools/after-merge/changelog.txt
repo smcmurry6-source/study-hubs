@@ -107,3 +107,4 @@ review-of-systems | Fixed 52 answer keys that pointed one choice past the right 
 review-of-systems | The font choice from the old Settings is retired too: if you had picked one, the hub shows its own font again.
 all | Fixed: the "Good question?" thumbs under an answer showed their words beside them. They're two small buttons again.
 review-of-systems | Every question was read again, with its key, explanation and each choice's reason: all 1,369 keys held, and 71 questions got fixes (wrong or thin reason lines, explanations that didn't answer the question, wording that gave the answer away). Choking now follows the 2025 guideline everywhere: back blows and abdominal thrusts.
+all | Your progress ring on the dashboard now shows on a new or linked device too, counted from your saved answers.

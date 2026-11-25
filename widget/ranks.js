@@ -171,10 +171,10 @@
       f = '<filter id="' + p + 'tex" x="-5%" y="-30%" width="110%" height="160%" color-interpolation-filters="sRGB">' +
         light + '<feComposite in="SourceGraphic" in2="spi" operator="arithmetic" k1="0" k2="1" k3=".9" k4="0"/></filter>';
     } else if (t === "dark") {
+      /* the nebula holds still: it drifted with a SMIL <animate> on its noise, which redrew the whole filter, and the page
+         with it, on every frame (2026-11-24, vault/reference/motion-cost.md) */
       f = '<filter id="' + p + 'tex" x="-5%" y="-30%" width="110%" height="160%" color-interpolation-filters="sRGB">' +
-        '<feTurbulence type="fractalNoise" baseFrequency="0.035 0.06" numOctaves="4" seed="21" result="neb">' +
-        (rich === "anim" ? '<animate attributeName="baseFrequency" dur="18s" values="0.035 0.06;0.045 0.05;0.035 0.06" repeatCount="indefinite"/>' : '') +
-        '</feTurbulence>' +
+        '<feTurbulence type="fractalNoise" baseFrequency="0.035 0.06" numOctaves="4" seed="21" result="neb"/>' +
         '<feColorMatrix in="neb" type="matrix" values="1.9 0 .4 0 -.55  0 .6 .9 0 -.35  .6 .2 2.1 0 -.35  1.6 0 1 0 -.95" result="nc"/>' +
         '<feComposite in="nc" in2="SourceAlpha" operator="in" result="nci"/>' +
         '<feBlend in="nci" in2="SourceGraphic" mode="screen" result="nebula"/>' +
@@ -197,12 +197,19 @@
       ['#FF7AD9', '#FFD36B', '#8CFFB0', '#6BD6FF', '#B28CFF', '#FF7AD9'].map(function(c, i){ return '<stop offset="' + (i / 5) + '" stop-color="' + c + '"/>'; }).join("") + '</linearGradient>';
     return s;
   }
+  /* a sparkle grows from nothing and goes again in the first third of its 3.2 s, d seconds into the cycle. Its motion is a
+     CSS scale (sh-rank-sp, its keyframes in MOVE) where it was SMIL, which no stylesheet stops and which made the browser
+     draw the page on every frame (2026-11-24, vault/reference/motion-cost.md). A negative delay puts it d seconds into
+     its cycle from the start: SMIL's begin left it standing at full size until then. */
   function sparkle(x, y, r, d, anim){
     var star = '<path d="M0 ' + (-r) + ' L' + (r * .22) + ' ' + (-r * .22) + ' L' + r + ' 0 L' + (r * .22) + ' ' + (r * .22) + ' L0 ' + r + ' L' + (-r * .22) + ' ' + (r * .22) + ' L' + (-r) + ' 0 L' + (-r * .22) + ' ' + (-r * .22) + ' Z" fill="#fff"/>';
-    return '<g transform="translate(' + x + ' ' + y + ')"><g>' + star +
-      (anim ? '<animateTransform attributeName="transform" type="scale" values="0;1;0;0" keyTimes="0;.12;.3;1" dur="3.2s" begin="' + d + 's" repeatCount="indefinite"/>' : '') +
-      '</g></g>';
+    return '<g transform="translate(' + x + ' ' + y + ')"><g' + (anim ? ' style="animation:sh-rank-sp 3.2s linear ' + (d ? (d - 3.2).toFixed(1) : 0) + 's infinite"' : '') + '>' + star + '</g></g>';
   }
+  /* the keyframes of a Diamond or Dark Matter medal's sparkles, Dark Matter's twinkling stars and its glow, as CSS
+     (transform and opacity) where they were SMIL, with the same values and timing. They ride in the drawing, as the
+     shine's do, so it moves wherever it is put (a page, a shadow root) */
+  var MOVE = '<style>@keyframes sh-rank-sp{0%{transform:scale(0)}12%{transform:scale(1)}30%,100%{transform:scale(0)}}' +
+    '@keyframes sh-rank-tw{0%,100%{opacity:1}50%{opacity:.2}}@keyframes sh-rank-gw{0%,100%{opacity:.55}50%{opacity:.95}}</style>';
 
   function art(tier, px, opt){
     opt = opt || {};
@@ -239,8 +246,8 @@
     if (t === "dark" && rich) {
       var stars = "", seed = 7;
       for (var i = 0; i < (B ? 44 : 26); i++){ seed = (seed * 9301 + 49297) % 233280; var sx = B ? B[0] + (seed / 233280) * B[2] : (seed / 233280) * 150 - 4; seed = (seed * 9301 + 49297) % 233280; var sy = B ? B[1] + (seed / 233280) * B[3] : (seed / 233280) * 34 - 15;
-        stars += '<circle cx="' + sx.toFixed(1) + '" cy="' + sy.toFixed(1) + '" r="' + (i % 5 === 0 ? .9 : .45) + '" fill="#fff" opacity="' + (i % 3 ? .75 : 1) + '">' +
-          (anim && i % 4 === 0 ? '<animate attributeName="opacity" values="1;.2;1" dur="' + (2 + i % 3) + 's" repeatCount="indefinite"/>' : '') + '</circle>'; }
+        stars += '<circle cx="' + sx.toFixed(1) + '" cy="' + sy.toFixed(1) + '" r="' + (i % 5 === 0 ? .9 : .45) + '" fill="#fff" opacity="' + (i % 3 ? .75 : 1) + '"' +
+          (anim && i % 4 === 0 ? ' style="animation:sh-rank-tw ' + (2 + i % 3) + 's linear infinite"' : '') + '/>'; }
       over += '<g clip-path="url(#' + p + 'clip)">' + stars + '</g>';
     }
     // rim light: a thin bright line along the top of the body
@@ -263,8 +270,8 @@
     if (t === "dark" && rich) over += K ? sparkle(K[0][0], K[0][1], K[0][2] * .85, .4, anim) + sparkle(K[1][0], K[1][1], K[1][2] * .85, 1.7, anim)
       : sparkle(20, -12, 4, .4, anim) + sparkle(110, 10, 3, 1.7, anim);
 
-    var under = t === "dark" && rich ? '<g filter="url(#' + p + 'glow)" opacity=".85">' + MASK +
-      (anim ? '<animate attributeName="opacity" values=".55;.95;.55" dur="3s" repeatCount="indefinite"/>' : '') + '</g>' : '';
+    if (anim && (t === "diamond" || t === "dark")) over += MOVE;
+    var under = t === "dark" && rich ? '<g filter="url(#' + p + 'glow)" opacity=".85"' + (anim ? ' style="animation:sh-rank-gw 3s linear infinite"' : '') + '>' + MASK + '</g>' : '';
     // shadow under the tool
     var shadow = !rich ? '' : S ? (S.shadow ? '<ellipse cx="' + S.shadow[0] + '" cy="' + S.shadow[1] + '" rx="' + S.shadow[2] + '" ry="' + S.shadow[3] + '" fill="#000" opacity=".35"/>' : '')
       : '<ellipse cx="72" cy="27" rx="64" ry="5" fill="#000" opacity=".35"/>';
