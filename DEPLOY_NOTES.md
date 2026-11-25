@@ -37,7 +37,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   yard's five spots as a row under its tab) over one list of what you own of that kind, grouped New since you last looked,
   Classics, each collection and season, Rank rewards (locked ones say what unlocks them). It opens on the newest piece you
   haven't seen, else where you were last (`sh_place_cz`), the Yard tab on the first empty spot; tapping the house, the
-  yard or Timmy on the stage opens his tab; Surprise me, Shop and Done stay at the panel's foot on a phone too. Every tap
+  yard or Timmy on the stage opens that tab; Surprise me, Shop and Done stay at the panel's foot on a phone too. Every tap
   marks the card at once and the stage follows after the frame (an outfit swaps only Timmy); each kind's list is kept;
   Customize no longer waits for every set's file. At 4x slowdown a piece answers in 88-168 ms (was 240-600), a tab in
   96-152 (was 176-304); numbers and the new rules in [motion-cost](vault/reference/motion-cost.md). Saving is unchanged
