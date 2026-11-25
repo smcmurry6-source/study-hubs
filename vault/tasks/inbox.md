@@ -72,34 +72,34 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
 - [ ] **The weekly pennant's first week, read after a Monday sweep** (2026-11-22): once `migration_v98` has run a week, how
   many pennants were made and how many by the sweep (`select how, count(*) from week_pennants group by 1`, totals only): a
   large sweep share means the page's claim is missing them (`widget/pet.js` `weekClaim`).
-- [x] **The boards order people tied on a place by chance** (done in #PRNUM, `migration_v103`, applied after the merge: a tie
+- [x] **The boards order people tied on a place by chance** (done in #563, `migration_v103`, applied after the merge: a tie
   by the name shown, case aside, then the id, on the Ranks, streaks, right-in-a-row, arcade and fairy boards, at a board's
   limit too; the Crowns board had it already; `tools/release/xp.js` section 21, and section 16 compares the boards as they
   come back) (2026-11-22, #533's CI): `get_rank_board_v2`,
   `get_leaderboard_v2` and the others end `order by rnk` alone, so tied people can trade places between loads (and at a
   board's limit, who shows can change). Cosmetic and older than v96: add a stable second key (the name, then the id) when
   someone next changes a board function.
-- [x] **Does Link my devices time out for someone with thousands of answers?** (yes: done in #PRNUM, `migration_v103`,
+- [x] **Does Link my devices time out for someone with thousands of answers?** (yes: done in #563, `migration_v103`,
   applied after the merge. The Postgres logs held 24 links that ran out of the 3 s from 2026-11-18, 19 of them that
   overloaded day, 4 on the 19th and 1 on the 23rd, and the 7 that finished took 2.0 s on average, up to 2.7 s. A link rebuilt
   XP twice (the answers' update trigger, then its own rebuild); now once, and the replay looks a boost up inline: 770 → 350
   ms on a throwaway copy with a 10,000-answer visitor, the same results row for row
   ([game-server](../reference/game-server.md)). The rebuild timed on the live database at 1-5 am Central, rolled back:
-  #PRNUM's Release section) (2026-11-22, applying `migration_v96`): on
+  #563's Release section) (2026-11-22, applying `migration_v96`): on
   the live database `sh_xp_rebuild` took 25 s for 10 people the first time (cold cache), then about 1 s for 4 others.
   `redeem_link_code` runs a rebuild under anon's 3 s `statement_timeout`, so time one rebuild of a heavy visitor (read-only:
   inside a transaction that rolls back, under `set local statement_timeout`, while the class is quiet) or look for
   `redeem_link_code` timeouts in the Postgres logs. A lead, not a confirmed bug.
-- [ ] **Link my devices says "That code didn't work" when the server ran out of time** (2026-11-25, found in #PRNUM): both
+- [ ] **Link my devices says "That code didn't work" when the server ran out of time** (2026-11-25, found in #563): both
   callers (`widget/ranks-hub.js`'s Link my devices and `widget/linkask.js`'s "Is this your other device?") turn a failed
   call into null, so a call the database stopped (anon's 3 s, a busy spell) reads as a wrong code and the person makes a
   fresh one. After a timeout the code still works (the whole call rolls back, the code's delete with it). Tell the two
   apart: on an error, something like "The server was slow just now. Try the same code again in a minute.", and a
   `link:busy` / `link-ask:busy` event instead of `fail` ([event-taxonomy](../reference/event-taxonomy.md)'s `link` row too).
-- [ ] **Read Link my devices' times a week after `migration_v103` is applied** (2026-11-25, #PRNUM): before it, the 7 links
+- [ ] **Read Link my devices' times a week after `migration_v103` is applied** (2026-11-25, #563): before it, the 7 links
   that finished from 2026-11-18 took 2.0 s on average (2.7 s at most) and the logs held 24 timeouts. A week after: the
   week's calls and mean time (`select calls, total_exec_time, max_exec_time from extensions.pg_stat_statements where
-  toplevel and query ilike '%redeem_link_code%'`, less the calls and total written in #PRNUM at the apply), and the
+  toplevel and query ilike '%redeem_link_code%'`, less the calls and total written in #563 at the apply), and the
   Postgres logs for `canceling statement due to statement timeout` with `redeem_link_code` in `parsed.context` (one 24-hour
   slice a call). Totals only. If a link still runs out of time, the next cut is the rebuild's rewrite of every award row.
 - [ ] **The mastery read is slower a call than before the optimization pass** (2026-11-20, its readout): `get_hub_mastery`
