@@ -42,7 +42,33 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   Customize no longer waits for every set's file. At 4x slowdown a piece answers in 88-168 ms (was 240-600), a tab in
   96-152 (was 176-304); numbers and the new rules in [motion-cost](vault/reference/motion-cost.md). Saving is unchanged
   (`equip_item` on each pick, no migration), every button keeps a fixed `data-tp`. The About page's Customize paragraph is
-  rewritten; `sw.js` is `sh-v81`. Left for later: [the inbox](vault/tasks/inbox.md).
+  rewritten; `sw.js` is `sh-v82`. Left for later: [the inbox](vault/tasks/inbox.md).
+- **2026-11-25 (the old pages' parts out of `widget/v3.js`, #568, Claude Code)** — The package "Take the old pages' parts
+  out of `widget/v3.js`" (the inbox line; Sam, 2026-11-24: "The cleanup sounds good"). v3.js no longer builds what only the
+  old single-file hub pages (down since 2026-11-19) drew or what a hub on the engine always hid: the desktop launcher and
+  its menu, the phone bar and its More sheet, the name badge, the inbox ribbon and its tour button, the old Settings panel
+  (with its background music and the study-music player, `window.shMusic`), and its old-page paths: the fixed top bar
+  (`#sh-topbar`, `reserveTopClearance`), the top-bar fitter for `header.hub-header` (`--sh-head-h`, always 0 on the
+  engine: `widget/v3.css`'s two rules that used it now read the same without it), the class picks' paint (`.sh-cp`; the
+  engine draws its own), the lecture pager, and the dark streak pill and update banner for a page without `shToast`.
+  `widget/drill.js` keeps only the picking (`shDrill.set/more/mark/streak`: the Daily Drill is a set of the Question Bank,
+  `#questions/drill`), not its dialog; `widget/fx.js` loses its marks on the old choices (`.qcard-choice`) and the
+  countdown pill. `widget/hub.js` opens Search, Class stats and Suggest with `window.shWidgetPanel()` instead of clicking
+  the hidden launcher's pills (so `widget/clicks.js` no longer counts those clicks as `widget:#shstat-*-pill` too), and
+  `widget/ranks-hub.js` reads the rank on `sh:stats-open`; `widget/hub.css` loses the rules that hid the parts that are
+  gone. v3.js 4,076 to 3,406 lines, drill.js 437 to 146, fx.js 335 to 229; `widget/hub-rest.bundle.js` 448 to 396 KB
+  (125 to 110 KB gzipped). Fixed on the way (BUG-202): a mock's results card's "See what I missed" looked for the old
+  pages' list and did nothing; it now turns on the mock's "Show only the misses". Computed styles of every element on the
+  dashboard and Review of Systems' Home, Notes, Questions, an answered question, the drill, More, Settings, Stats, Search,
+  Suggest, Report and the boards, laptop and phone, light, dark and the device's dark (78 states; `main` twice, with a
+  fixed random seed and every animation held at its start): the dashboard is identical, and nothing drawn on the hub
+  differs except what the two runs of `main` differ by (Timmy's bubble, a meter's bump, the drill's two sets), the
+  inherited `--sh-head-h` (0px) that is gone, and the rank pictures' gradient ids, one lower since the name badge no
+  longer draws one first. The first comparison caught one slip of this work, fixed before the PR: the Report and Pin
+  buttons had moved out of the question card's tools (`.qcard-top`), which the engine draws too. Bundles rebuilt,
+  `sw.js` sh-v81; the smoke test's largest-text Settings check reads the hub's own Settings page (`#more/settings`).
+  Left, in [the inbox](vault/tasks/inbox.md): the same cleanup in `widget/tour.js`, `widget/linkask.js`,
+  `widget/clicks.js` and `widget/eggs.js`, and Sam's call on the study-music loops (`widget/audio/`), which nothing plays now.
 - **2026-11-25 (The medals' last SMIL, the scrollbar's room, the progress ring on a new device, Claude Code, #564)** —
   Three inbox lines, measured at 4x CPU as [motion-cost](vault/reference/motion-cost.md) does. **The Diamond and Dark
   Matter medals:** their sparkles, Dark Matter's twinkling stars and its glow were SMIL in `art()` (`widget/ranks.js`), which

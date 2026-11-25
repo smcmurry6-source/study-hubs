@@ -7,12 +7,12 @@
   "use strict";
   var R = window.shRanks, K = R && R._hub;
   if (!K || R.mount) return;
-  var TS = K.TS, ls = K.ls, ROMAN = K.ROMAN, RETIRED = K.RETIRED, HUB_NAMES = K.HUB_NAMES,
+  var TS = K.TS, ls = K.ls, RETIRED = K.RETIRED, HUB_NAMES = K.HUB_NAMES,
     playRankUp = K.playRankUp, trophyCard = K.trophyCard, masteryCard = K.masteryCard,
     TIERS = R.TIERS, TROPHIES = R.TROPHIES, HUB_TROPHIES = R.HUB_TROPHIES, MASTERY = R.MASTERY,
     art = R.art, artOf = R.artOf, nameOf = R.nameOf, rankName = R.rankName, isV2 = R.isV2, legacy = R.legacy,
     needJourneyArt = R.needJourneyArt, track = R.track, trophyStats = R.trophyStats, hubName = R.hubName,
-    flair = R.flair, flairFromBadges = R.flairFromBadges, svgDataUri = R.svgDataUri;
+    flair = R.flair, flairFromBadges = R.flairFromBadges;
   function fmt(n){ return Math.round(n || 0).toLocaleString(); }
   function linkTrack(k){ try { if (window.shTrack) window.shTrack("link:" + k); } catch (e) {} }
 
@@ -32,16 +32,6 @@
     sec.className = "shstat-sec sh-rank-sec"; sec.id = "sh-rank-sec";
     sec.innerHTML = '<div class="shstat-empty">Loading your rank…</div>';
     if (panel) { var first = panel.querySelector(".shstat-sec"); panel.insertBefore(sec, first || null); }
-
-    /* the little handpiece next to your name */
-    function badgeIcon(t){
-      var uri = svgDataUri(art(t, 20));
-      ["sh-ribbon-name", "shname-badge"].forEach(function(id){
-        var el = document.getElementById(id); if (!el) return;
-        el.classList.add("sh-has-rank"); el.style.setProperty("--sh-rank-img", uri); el.setAttribute("data-rank", TIERS[t].name);
-        if (profile && profile.level) el.setAttribute("data-rank-lv", ROMAN[profile.level - 1]);
-      });
-    }
 
     function masteryFor(){
       var ex = window.SH_EXPORT || {}, bank = (ex.questions || []).length, off = 0;
@@ -227,7 +217,7 @@
       if (window.shPet && window.shPet.syncBadges) window.shPet.syncBadges(profile.badges);
       track(raw, { busy: mockBusy, seen: function(j){ if (!window.shAutomated) rpc("mark_dark_unlock_seen", { p_visitor: H.visitor, p_journey: j }); },
         claim: window.shAutomated ? null : function(fn, args){ return rpc(fn, Object.assign({ p_visitor: H.visitor }, args)); } });
-      badgeIcon(profile.tier || 0); render();
+      render();
     }
     function loadOwn(){
       if (loading) return; loading = true;
@@ -267,9 +257,8 @@
       var r = e.detail && e.detail.res;
       if (r && typeof r.total === "number" && ownRaw && ownRaw.next_at != null && r.total >= ownRaw.next_at) { sinceLoad = 0; setTimeout(loadOwn, 900); }
     });
-    document.addEventListener("click", function(e){
-      if (e.target.closest && e.target.closest("#shstat-stats-pill")) setTimeout(function(){ if (panelOpen()) load(); }, 50);
-    });
+    /* Class stats opened (widget/v3.js, shWidgetPanel("stats")): the rank in it, read fresh */
+    document.addEventListener("sh:stats-open", function(){ setTimeout(function(){ if (panelOpen()) load(); }, 50); });
     document.addEventListener("sh:mock-done", function(e){
       var d = e.detail || {};
       /* d.session: the game layer's server saved the score itself when the mock's session finished (xp_session_finish) */

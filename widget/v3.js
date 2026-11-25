@@ -47,94 +47,14 @@
   /* shared with the hubs' own arcades so a page never builds a second client */
   window.shSupabase = supabase;
 
-  /* ---------- back-to-index button ----------
-     Prefers a slot each hub's own sticky header/ribbon markup provides
-     (#sh-ribbon-back) so the button sits inline with content that's already
-     there, instead of a second fixed bar stacked above it -- that separate
-     bar pushed every hub's own header down by its own height just to show
-     one link. Falls back to the old fixed #sh-topbar bar (plus the
-     reserveTopClearance dance below) for any hub that hasn't added the slot
-     yet, so nothing breaks if one is ever added without it. ---------- */
+  /* ---------- back to the dashboard: the hub's bar has the slot (#sh-ribbon-back, widget/hub.js); this draws its arrow.
+     The old pages' fixed top bar (#sh-topbar) and the clearance it reserved came out on 2026-11-25. ---------- */
   var BACK_ICON = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 8H3"/><path d="M7 4 3 8l4 4"/></svg>';
   var ribbonBack = document.getElementById("sh-ribbon-back");
-  var usingRibbon = !!ribbonBack;
-  if (usingRibbon) {
+  if (ribbonBack) {
     ribbonBack.innerHTML = BACK_ICON;
     if (!ribbonBack.getAttribute("href")) ribbonBack.setAttribute("href", "../../index.html");
-  } else {
-    var topbar = document.createElement("div");
-    topbar.id = "sh-topbar";
-    document.body.appendChild(topbar);
-    (function(){
-      var a = document.createElement("a");
-      a.id = "shhome-pill";
-      a.href = "../../index.html";
-      a.innerHTML = BACK_ICON + '<span>All hubs</span>';
-      topbar.appendChild(a);
-    })();
   }
-
-  /* ---------- reserve top clearance so the fixed "All hubs" pill / name badge
-     never sits on top of each hub's own sticky header/title. Every hub uses
-     exactly one <header> element for its top bar (position:sticky;top:0), so
-     that's the one hub-agnostic anchor point we push down + re-pin, rather
-     than hand-tuning per-hub CSS. Re-measured on resize (mobile breakpoint
-     changes pill size) and whenever the name badge's visibility changes.
-
-     Pushing the header's sticky offset down opens up a plain top:0..clearance
-     band that the header's own box no longer covers. Once the header is
-     actually stuck (scrolled), whatever page content is passing underneath
-     keeps painting through that band behind the fixed pill/badge — a solid
-     backdrop the same color as the page fixes it, so it reads as one
-     continuous bar instead of scrolled content bleeding through above the
-     header. ---------- */
-  function reserveTopClearance(){
-    if (usingRibbon) return; // back button + name badge live in the hub's own ribbon -- nothing fixed to reserve space for
-    try{
-      var bar = document.getElementById("sh-topbar");
-      if(!bar) return;
-      var bottom = bar.getBoundingClientRect().bottom;
-      if(bottom <= 0) return;
-      var clearance = Math.ceil(bottom + 10);
-      var styleEl = document.getElementById("sh-top-clearance-style");
-      if(!styleEl){
-        styleEl = document.createElement("style");
-        styleEl.id = "sh-top-clearance-style";
-        document.head.appendChild(styleEl);
-      }
-      var header = document.querySelector("header");
-      var headerRule = "";
-      if(header && getComputedStyle(header).position === "sticky"){
-        headerRule = "header{top:" + clearance + "px !important;}";
-      }
-      styleEl.textContent = "body{padding-top:" + clearance + "px;}" + headerRule;
-
-      var backdrop = document.getElementById("sh-top-backdrop");
-      if(!backdrop){
-        backdrop = document.createElement("div");
-        backdrop.id = "sh-top-backdrop";
-        document.body.appendChild(backdrop);
-      }
-      var pageBg = getComputedStyle(document.body).backgroundColor;
-      backdrop.style.cssText = "position:fixed;top:0;left:0;right:0;height:" + clearance +
-        "px;background:" + pageBg + ";z-index:9998;pointer-events:none;";
-    }catch(e){ /* purely cosmetic, never block the hub */ }
-  }
-  window.shReserveTopClearance = reserveTopClearance;
-  reserveTopClearance();
-  window.addEventListener("resize", (function(){
-    var t = null;
-    return function(){ clearTimeout(t); t = setTimeout(reserveTopClearance, 150); };
-  })());
-  /* a light/dark ("nightshift") toggle flips a class on <body> in every hub;
-     re-measure so the backdrop color picks up the new background instead of
-     staying stuck on whatever theme was active on page load. */
-  try{
-    new MutationObserver((function(){
-      var t = null;
-      return function(){ clearTimeout(t); t = setTimeout(reserveTopClearance, 50); };
-    })()).observe(document.body, { attributes: true, attributeFilter: ["class"] });
-  }catch(e){}
 
   /* ---------- text-to-speech (lecture reading panels) — independent of Supabase,
      so it still works even if the stats layer fails to init. Each hub's own
@@ -718,16 +638,10 @@
     return { supported: !!synth, speak: speak, stop: stop, listening: listening, audio: audioEl };
   })();
 
-  /* ---------- universal settings: font, text size, screen name — applied
-     immediately (independent of Supabase) so a returning visitor's choices
-     take effect on load, not just after opening the Settings panel. Each hub
-     already exposes --font-body/--font-display/--font-mono as root CSS custom
-     properties (the shared design-token pattern), so remapping --font-body
-     here reaches every hub without touching their own stylesheets. ---------- */
+  /* ---------- the settings this file still applies: text size and the screen name, on load (the hub's Settings page,
+     widget/hub.js, changes them; the old Settings panel, with its font and background music, came out on 2026-11-25) ---------- */
   var SH_FONT_KEY = "sh_pref_font";
   var SH_SIZE_KEY = "sh_pref_size";
-  var SH_MUSIC_KEY = "sh_pref_music";
-  var SH_VOLUME_KEY = "sh_pref_volume";
   var SH_NAME_KEY = "sh_display_name";
   var SH_VISITS_KEY = "sh_visit_count";
   var SH_NUKE_PREF_KEY = "sh_pref_nuke";   // on | mine (no classmates' strikes) | off (was sh_pref_nuke_alerts on/off)
@@ -749,23 +663,9 @@
     try { document.dispatchEvent(new CustomEvent("sh:pref", { detail: { key: key, val: val } })); } catch (e) {}
   }
 
-  /* ---------- Extras: everything optional, each with its own switch in Settings, plus All on / All off.
-     The dashboard's Settings (index.html, EXTRAS) keeps the same list and keys; keep the two in step.
-     sh_pref_eggs ("Hidden secrets") now covers only the easter eggs that have no switch of their own. ---------- */
-  var EXTRAS = [
-    { key: "sh_pref_boss", label: "Plaque bosses", hint: "A boss the whole class fights with right answers when 5+ people are online, and the Midnight Plaque on an exam's eve, 3 pm to midnight." },
-    { key: "sh_pref_fairy", label: "Tooth Fairy", hint: "Flies across the page now and then. Catch her for the fairy board." },
-    { key: "sh_pref_probe", label: "Golden Probe", hint: "One question a day is golden. First to get it right wins." },
-    { key: "sh_pref_nuke", label: "Tactical nukes", opts: [["on", "On"], ["mine", "Mine only"], ["off", "Off"]],
-      hint: "100 right in a row unlocks a strike. Mine only: you won't see classmates' strikes." },
-    { key: "sh_pref_celebrate", label: "Rank-up and trophy cards", hint: "The rank-up cutscene, level-up, trophy and medal cards." },
-    { key: "sh_pref_cheers", label: "Streak cheers", hint: "Confetti and a toast every 5 right in a row." },
-    { key: "sh_pref_flame", label: "Streak flame", hint: "The flame that counts your run from 3 in a row." },
-    { key: "sh_pref_fx", label: "Answer animations", hint: "Pops, shakes, sweeps and fades. Off keeps the check and X marks." },
-    { key: "sh_pref_pet", label: "Timmy Tooth", opts: [["on", "Everywhere"], ["dash", "Dashboard only"], ["off", "Off"]],
-      hint: "Your cartoon tooth buddy. He hides during mock exams." },
-    { key: "sh_pref_eggs", label: "Hidden secrets", hint: "Holidays, magic words and the other easter eggs. Clues are in the trophy case." }
-  ];
+  /* ---------- Extras: everything optional, each with its own switch on the hub's Settings page (widget/hub.js, EXTRAS) and
+     the dashboard's (widget/dash.js, EXTRAS), with the same keys. sh_pref_eggs ("Hidden secrets") now covers only the easter
+     eggs that have no switch of their own. ---------- */
   /* one time: Surprises off used to hide the bosses, fairy, probe, flame and the celebration cards, and
      nuke alerts off meant "mine only"; carry both over to the new switches */
   (function(){
@@ -779,17 +679,6 @@
       localStorage.setItem("sh_pref_extras_v", "1");
     } catch (e) {}
   })();
-  function extrasHTML(){
-    function seg(key, opts){
-      return '<div class="shset-seg" data-key="' + key + '">' + opts.map(function(o){ return '<button type="button" data-val="' + o[0] + '">' + o[1] + '</button>'; }).join("") + '</div>';
-    }
-    return '<div class="shset-extras"><div class="shset-xhead"><label>Extras</label>' +
-      '<div class="shset-seg" data-extras-all><button type="button" data-val="on">All on</button><button type="button" data-val="off">All off</button></div></div>' +
-      '<div class="shset-hint">The fun stuff that isn\'t studying. Switch it all off here, or one at a time below. None of it shows during a mock exam.</div>' +
-      EXTRAS.map(function(x){
-        return '<div class="shset-x"><div class="shset-xtxt"><b>' + x.label + '</b><small>' + x.hint + '</small></div>' + seg(x.key, x.opts || [["on", "On"], ["off", "Off"]]) + '</div>';
-      }).join("") + '</div>';
-  }
   function extraOn(key){ return prefGet(key, "on") !== "off"; }
   function nukePref(){ return prefGet(SH_NUKE_PREF_KEY, "on"); }
 
@@ -879,22 +768,10 @@
   };
 
   /* ---------- class performance stats (aggregate, anonymous, batched) ----------
-     A hub's "X% of the class got this right" placeholder (every hub that
-     has one just says "Loading class data..." forever and nothing ever
-     fills it in -- there was no code anywhere that fetched it). Two-part
-     API so each hub keeps its own card markup/classnames:
-
-     - window.shGetClassStats(qids, cb, withChoices) -- low-level: cb receives a
-       {qid: {total, correct}} map (plus choices: {authored index: picks}
-       with withChoices). Calls made within a short window all
-       get coalesced into one get_question_class_stats RPC instead of one
-       round trip per question.
-     - window.shWireClassStats(cardSelector) -- high-level: pass the CSS
-       selector for a hub's own question-card wrapper (must carry
-       data-qid) and this finds every [data-role="classdata-result"]
-       inside matching cards -- present ones now, future ones via a
-       MutationObserver so it keeps working as more cards render (quiz
-       bank, search results, wherever) -- and fills each in. ---------- */
+     window.shGetClassStats(qids, cb, withChoices): cb receives a {qid: {total, correct}} map (plus choices: {authored
+     index: picks} with withChoices). Calls made within a short window are coalesced into one request instead of one round
+     trip per question. The engine draws the class's % and the picks beside each choice from it (widget/hub-bank.js,
+     classPicks); the old pages' own painting of them came out on 2026-11-25. ---------- */
   var classStatsPending = [];
   var classStatsCallbacks = [];
   var classChoicesPending = [];
@@ -961,91 +838,6 @@
     clearTimeout(classStatsTimer);
     classStatsTimer = setTimeout(flushClassStats, 150);
   };
-  /* ---------- class picks on each choice (Sam, 2026-11-04): once a question card is answered, every choice shows the
-     share of the class that picked it, as a percentage and a light fill behind the choice, so the most common picks
-     (and the most common wrong answer) stand out. Reads question_choices (record_choice / record_choices, by authored
-     index) through shGetClassStats(..., true), so hubs need no changes: their choice buttons already carry the
-     authored index in one of CP_ATTRS.
-     - A card drawn unanswered fetches the counts as it renders; when it's answered (the hub's answered event, sent
-       with the pick) your own pick is added locally, so the numbers include you without racing record_choice.
-     - A card drawn already answered (mock exam results) waits a moment so the picks just sent are counted, then uses
-       the server's numbers as they are.
-     - Multiple choice: picks of a choice / all picks. Select-all: how often a choice was ticked / answers to the
-       question (question_stats.attempts, never below the most-ticked choice).
-     - Shown from 2 answers (you and one other); the note under the explanation gives the count. ---------- */
-  var CP_ATTRS = ["data-idx", "data-multi-idx", "data-mock-pick", "data-mock-multi", "data-exam-choice"];
-  var CP_MIN = 2;
-  function cpIdx(b){
-    for (var i = 0; i < CP_ATTRS.length; i++) { var v = b.getAttribute(CP_ATTRS[i]); if (v !== null && v !== "" && !isNaN(+v)) return +v; }
-    return null;
-  }
-  function cpButtons(card){ return Array.prototype.filter.call(card.querySelectorAll(".qcard-choice"), function(b){ return cpIdx(b) !== null; }); }
-  function cpIsMulti(card, btns){
-    if (card.getAttribute("data-qtype") === "multi") return true;
-    return btns.some(function(b){ return b.hasAttribute("data-multi-idx") || b.hasAttribute("data-mock-multi"); });
-  }
-  /* the card shows its answer: the hub has marked a choice right or wrong (perio marks data-state) */
-  function cpRevealed(card){
-    return card.classList.contains("is-answered") ||
-      !!card.querySelector(".qcard-choice.is-correct, .qcard-choice.is-wrong, .qcard-choice.is-missed-right, .qcard-choice[data-state]");
-  }
-  function cpPaint(card){
-    var s = card.__shCp;
-    if (!s || s.done || !s.r || !card.isConnected) return;
-    var btns = cpButtons(card);
-    if (!btns.length || !s.r.choices) return;
-    s.done = true;
-    var multi = cpIsMulti(card, btns), own = s.late ? [] : (s.own || []), counts = {}, sum = 0, max = 0;
-    btns.forEach(function(b){ var i = cpIdx(b); counts[i] = +s.r.choices[i] || 0; });
-    own.forEach(function(i){ if (i in counts) counts[i]++; });
-    Object.keys(counts).forEach(function(k){ sum += counts[k]; if (counts[k] > max) max = counts[k]; });
-    var total = multi ? Math.max((+s.r.total || 0) + (own.length ? 1 : 0), max) : sum;
-    if (total < CP_MIN) return;
-    var still = (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) || extraPref("sh_pref_fx") === "off";
-    btns.forEach(function(b){
-      var c = counts[cpIdx(b)], p = Math.round(100 * c / total);
-      b.classList.add("sh-cp");
-      if (c === max && c > 0) b.classList.add("sh-cp-top");
-      /* inline, so it layers over whatever background the hub gives a right / wrong / selected choice */
-      b.style.backgroundImage = "linear-gradient(var(--sh-cp-fill), var(--sh-cp-fill))";
-      b.style.backgroundRepeat = "no-repeat";
-      b.style.backgroundPosition = "0 0";
-      b.style.backgroundSize = (still ? p : 0) + "% 100%";
-      var lab = document.createElement("span");
-      lab.className = "sh-cp-pct";
-      lab.innerHTML = '<span class="sh-cp-sr">, picked by </span>' + p + '%<span class="sh-cp-sr"> of the class</span>';
-      b.appendChild(lab);
-      if (!still) requestAnimationFrame(function(){ requestAnimationFrame(function(){
-        b.style.transition = "background-size .7s cubic-bezier(.22,.8,.3,1)";
-        b.style.backgroundSize = p + "% 100%";
-      }); });
-    });
-    var row = card.querySelector(".qcard-classdata-row") || card.querySelector('[data-role="explain"]');
-    if (row && !row.querySelector(".sh-cp-note")) {
-      var note = document.createElement("div");
-      note.className = "sh-cp-note";
-      note.textContent = "The % on each choice is how often the class " + (multi ? "ticked" : "picked") + " it (" + total + " answer" + (total === 1 ? "" : "s") + (own.length ? ", yours included" : "") + ").";
-      row.appendChild(note);
-    }
-  }
-  function extraPref(k){ try { return localStorage.getItem(k) || "on"; } catch (e) { return "on"; } }
-  /* the hub's answered event carries the pick: find the card it came from (answered, not painted yet) and paint it */
-  document.addEventListener(ANSWERED_EVENT, function(e){
-    var d = (e && e.detail) || {}, qid = String(d.qid || "");
-    if (!qid) return;
-    var own = typeof d.choice === "number" ? [d.choice] : Array.isArray(d.picks) ? d.picks.filter(function(x){ return typeof x === "number"; }) : [];
-    setTimeout(function(){
-      var sel = '.qcard[data-qid="' + (window.CSS && CSS.escape ? CSS.escape(qid) : qid.replace(/"/g, '\\"')) + '"]';
-      try {
-        document.querySelectorAll(sel).forEach(function(card){
-          var s = card.__shCp;
-          if (!s || s.late || s.own || !cpRevealed(card)) return;
-          s.own = own;
-          cpPaint(card);
-        });
-      } catch (err) {}
-    }, 0);
-  });
   /* a small Report button on every question card; it opens the flag panel already
      tagged with that question's id, so reports arrive with context */
   var FLAG_ICON_SM = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 21V4"/><path d="M6 4.5c3.5-2 6.5 2 10 0v8c-3.5 2-6.5-2-10 0"/></svg>';
@@ -1053,7 +845,7 @@
   function addFlagButton(card){
     if (card.__shFlagBtn) return; card.__shFlagBtn = true;
     var qid = card.getAttribute("data-qid"); if (!qid) return;
-    var top = card.querySelector(".qcard-top") || card;
+    var top = card.querySelector(".qcard-top") || card;   /* the card's tools (hub-bank.js, .qc-tools.qcard-top) */
     var b = document.createElement("button");
     b.type = "button"; b.className = "sh-qflag"; b.innerHTML = FLAG_ICON_SM + "Report";
     b.setAttribute("aria-label", "Report a problem with this question");
@@ -1131,110 +923,31 @@
     b.addEventListener("click", function(ev){ ev.stopPropagation(); window.shPins.toggle(qid); });
     top.appendChild(b);
   }
+  /* Report and Pin on every question card (cardSelector: ".qcard[data-qid]", widget/hub.js): the cards on the page now,
+     and every one drawn later. The name is from when it also filled in the old pages' class numbers. */
   window.shWireClassStats = function(cardSelector){
-    // Dedup key is the *element*, not the qid: the same question re-appears
-    // in fresh card instances all the time (switching a filter, revisiting a
-    // tab, the same question turning up again in the game) since most views
-    // replace a container's innerHTML wholesale rather than reusing nodes.
-    // Keying "seen" on qid alone marked the question done forever after its
-    // very first render anywhere on the page, so every later re-render of
-    // that same question got silently skipped and sat stuck on
-    // "Loading class data..." -- which is exactly what was reported.
-    function handleCard(card){
-      addFlagButton(card);
-      var qid = card.getAttribute("data-qid");
-      if (!qid) return;
-      var el = card.querySelector('[data-role="classdata-result"]');
-      var wantText = !!(el && !el.__shClassDataWired);
-      /* class picks on each choice (above): cards with choice buttons, once per card element */
-      var wantPicks = !card.__shCp && cpButtons(card).length > 0;
-      if (!wantText && !wantPicks) return;
-      if (wantText) el.__shClassDataWired = true;
-      var late = wantPicks && cpRevealed(card);
-      if (wantPicks) card.__shCp = { late: late, r: null, own: null, done: false };
-      var loaded = false, revealObserver = null, lineObserver = null;
-      function load(){
-        if (loaded) return;
-        loaded = true;
-        if (revealObserver) revealObserver.disconnect();
-        if (lineObserver) lineObserver.disconnect();
-        window.shGetClassStats([qid], function(byQid){
-          var r = byQid[qid];
-          if (wantPicks) { card.__shCp.r = r || { total: 0, correct: 0 }; if (late || card.__shCp.own) cpPaint(card); }
-          if (!wantText) return;
-          if (!r || !r.total) { el.textContent = "Not enough class data yet"; return; }
-          var pct = Math.round((r.correct / r.total) * 100);
-          el.textContent = pct + "% of the class got this right (n=" + r.total + ")";
-          el.classList.remove("is-ok", "is-bad");
-          if (pct >= 70) el.classList.add("is-ok");
-          else if (pct < 50) el.classList.add("is-bad");
-        }, wantPicks);
-      }
-      /* drawn already answered (mock results right after Submit): give the picks just sent a moment to land */
-      if (late) setTimeout(load, 1200);
-      else {
-        /* The class percentage lives inside the explanation. Do not fetch it
-           for every unopened question at page load; begin when it is revealed:
-           a choice is marked (the picks), or the class line itself comes into
-           view (cards with no choices to mark, such as Perio's "Show answer"
-           recall cards, would otherwise sit on "Loading class data..."). */
-        if (wantPicks) {
-          revealObserver = new MutationObserver(function(){ if (cpRevealed(card)) load(); });
-          revealObserver.observe(card, { attributes:true, subtree:true, attributeFilter:["class", "data-state"] });
-        }
-        if (wantText) {
-          if (window.IntersectionObserver) {
-            lineObserver = new IntersectionObserver(function(entries){ if (entries.some(function(x){ return x.isIntersecting; })) load(); });
-            lineObserver.observe(el);
-          } else if (!wantPicks) load();
-        }
-        if (wantPicks && cpRevealed(card)) load();
-      }
-    }
     try {
-      document.querySelectorAll(cardSelector).forEach(handleCard);
+      document.querySelectorAll(cardSelector).forEach(addFlagButton);
       new MutationObserver(function(muts){
         muts.forEach(function(m){
           (m.addedNodes || []).forEach(function(node){
             if (node.nodeType !== 1) return;
-            if (node.matches && node.matches(cardSelector)) handleCard(node);
-            if (node.querySelectorAll) node.querySelectorAll(cardSelector).forEach(handleCard);
+            if (node.matches && node.matches(cardSelector)) addFlagButton(node);
+            if (node.querySelectorAll) node.querySelectorAll(cardSelector).forEach(addFlagButton);
           });
         });
       }).observe(document.body, { childList: true, subtree: true });
     } catch (e) { /* cosmetic-only feature, never block the hub */ }
   };
 
-  /* ---------- your name: always shown in the top bar (custom, or the random class name such as
-     "Gleaming Molar"), with a pencil. Tapping it opens a small editor right there; the Settings and
-     Stats name boxes use the same save/reset code. ---------- */
-  var nameBadge = document.getElementById("sh-ribbon-name");
-  if (!nameBadge) {
-    nameBadge = document.createElement("button");
-    nameBadge.id = "shname-badge";
-    nameBadge.type = "button";
-    nameBadge.hidden = true;
-    (document.getElementById("sh-topbar") || document.body).appendChild(nameBadge);
-  }
-  nameBadge.classList.add("sh-name-edit");
-  var PENCIL_SVG = '<svg class="sh-name-pencil" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></svg>';
-  function renderNameBadge(){
-    var n = currentName() || resolvedAnonName;
-    if (n) {
-      nameBadge.innerHTML = '<span class="sh-name-text">' + esc(n) + '</span>' + PENCIL_SVG;
-      nameBadge.title = "Change the name classmates see on the leaderboards";
-      nameBadge.setAttribute("aria-label", "Your name: " + n + ". Change it");
-      nameBadge.hidden = false;
-    } else { nameBadge.hidden = true; }
-    if (window.shReserveTopClearance) window.shReserveTopClearance();
-  }
+  /* ---------- your name: the custom one, or the random class name such as "Gleaming Molar". The hub's Settings page and
+     the Class stats panel change it (window.shEditName opens the small editor; the Stats panel's box saves through the
+     same code). The old pages' name badge in their top bar came out on 2026-11-25. ---------- */
+  /* the Class stats panel's name box */
   function syncNameInputs(){
-    var n = currentName();
-    ["shset-name-input", "shstat-name-input"].forEach(function(id){
-      var el = document.getElementById(id); if (!el) return;
-      el.value = n;
-      if (resolvedAnonName) el.placeholder = "Right now you're " + resolvedAnonName;
-    });
+    var el = document.getElementById("shstat-name-input"); if (!el) return;
+    el.value = currentName();
+    if (resolvedAnonName) el.placeholder = "Right now you're " + resolvedAnonName;
   }
   /* The server keeps one name for linked devices (they share an id), and each device keeps a copy (sh_display_name).
      A name picked here is marked unsaved (sh_name_unsaved) until the server has answered, so a page that loads while it
@@ -1256,7 +969,7 @@
     sendName(name);
     shTrackSafe("name:set");
     prefSet(SH_NAME_KEY, name);
-    renderNameBadge(); syncNameInputs();
+    syncNameInputs();
     try { document.dispatchEvent(new CustomEvent("sh:name", { detail: { name: name } })); } catch (e) {}
     /* another, unlinked device already uses this name: ask whether it's theirs (widget/linkask.js) */
     if (window.shLinkAsk) window.shLinkAsk.check(name);
@@ -1267,10 +980,10 @@
     shTrackSafe("name:reset");
     if (supabase) try {
       supabase.rpc("clear_display_name", { p_visitor: VISITOR_ID }).then(function(res){
-        if (res && !res.error && res.data) { resolvedAnonName = res.data; renderNameBadge(); syncNameInputs(); }
+        if (res && !res.error && res.data) { resolvedAnonName = res.data; syncNameInputs(); }
       }, function(){});
     } catch (e) {}
-    renderNameBadge(); syncNameInputs();
+    syncNameInputs();
     try { document.dispatchEvent(new CustomEvent("sh:name", { detail: { name: "" } })); } catch (e) {}
   }
   var nameDlg = null, nameBack = null;
@@ -1317,7 +1030,7 @@
   document.addEventListener("click", function(e){
     var b = e.target && e.target.closest && e.target.closest("[data-sh-link]"); if (!b) return;
     var from = b.getAttribute("data-sh-link") || "", back = b;
-    if (nameDlg && nameDlg.contains(b)) { back = (nameBack && nameBack.isConnected) ? nameBack : nameBadge; closeNameEditor(); }
+    if (nameDlg && nameDlg.contains(b)) { back = (nameBack && nameBack.isConnected) ? nameBack : null; closeNameEditor(); }
     var t0 = Date.now();
     (function go(){
       if (window.shLinkAsk && window.shLinkAsk.link) { window.shLinkAsk.link({ back: back, from: from }); return; }
@@ -1325,8 +1038,6 @@
       setTimeout(go, 200);
     })();
   });
-  renderNameBadge();
-  nameBadge.addEventListener("click", openNameEditor);
 
   // Welcome-back toast for a returning, named visitor — once per page load,
   // a beat after load so it doesn't collide with anything else appearing.
@@ -1340,69 +1051,14 @@
       if (said) return; said = true;
       setTimeout(function(){
         var n = currentName(); if (!n) return;
-        if (window.shToast) showStreakToast("Good to see you, " + n + ".", null, { kind: "hi", ms: 3400 }); else showStreakToast("Welcome back, " + n);
+        showStreakToast("Good to see you, " + n + ".", null, { kind: "hi", ms: 3400 });
       }, Math.max(0, 900 - (Date.now() - t0)));
     }
     /* the bootstrap is asked for further down this file: wait a tick, so nameFromServer runs first */
     setTimeout(function(){ if (bootstrap && bootstrap.ready) bootstrap.ready.then(say, say); setTimeout(say, 3000); }, 0);
   })();
 
-  /* ---------- background music (procedural — no external audio files, so
-     there's nothing to host or license. Web Audio only starts from a real
-     user gesture per browser autoplay rules, so this only ever plays when
-     triggered from a click — see the Settings panel wiring below. ---------- */
-  var shMusic = (function(){
-    // Real recorded tracks (widget/audio/*.mp3) played through <audio> elements,
-    // replacing the earlier oscillator-synthesized options. AUDIO_BASE is derived
-    // from this script's own resolved URL (not the hub page's URL) so it works
-    // the same from every hub regardless of folder depth.
-    var AUDIO_BASE = (function(){
-      try { return new URL("audio/", thisScript.src).href; } catch (e) { return "audio/"; }
-    })();
-    var TRACKS = {
-      rain: "rain.mp3",
-      waves: "waves.mp3",
-      cafe: "cafe.mp3",
-      lofi: "lofi.mp3",
-      piano: "piano.mp3"
-    };
-    var els = {}; // one <audio> element per track, created lazily and reused
-    var current = null;
-    var volume = (parseInt(prefGet(SH_VOLUME_KEY, "35"), 10) / 100) * 0.85;
-    function elFor(track){
-      if (els[track]) return els[track];
-      var a = new Audio(AUDIO_BASE + TRACKS[track]);
-      a.loop = true;
-      a.preload = "none";
-      a.volume = volume;
-      els[track] = a;
-      return a;
-    }
-    function stopAll(){
-      Object.keys(els).forEach(function(t){
-        try { els[t].pause(); els[t].currentTime = 0; } catch (e) {}
-      });
-      current = null;
-    }
-    function setTrack(track){
-      if (track === "off" || !TRACKS[track]) { stopAll(); return; }
-      if (current === track && !els[track].paused) return;
-      stopAll();
-      var a = elFor(track);
-      try { a.currentTime = 0; } catch (e) {}
-      var p = a.play();
-      if (p && p.catch) p.catch(function(){}); // autoplay-policy rejection is fine -- setTrack always runs inside a user gesture here, so the next click retries cleanly
-      current = track;
-    }
-    function setVolume(v){
-      volume = v * 0.85;
-      Object.keys(els).forEach(function(t){ els[t].volume = volume; });
-    }
-    return { setTrack: setTrack, setVolume: setVolume };
-  })();
-
-  /* ---------- tactical-nuke sound effects (widget/sfx/*.mp3) — same
-     script-relative-URL pattern as the background-music tracks above, so it
+  /* ---------- tactical-nuke sound effects (widget/sfx/*.mp3), from a URL relative to this script, so it
      works from every hub regardless of folder depth. One-shot clips, not
      loops: each play() call rewinds and re-triggers so a rapid re-arm still
      sounds right. ---------- */
@@ -1433,7 +1089,7 @@
     return { play: play, stop: stop, preload: function(name){ try { elFor(name).load(); } catch (e) {} } };
   })();
 
-  /* ---------- update-available banner — raw fetch (not the supabase client),
+  /* ---------- update-available notice — raw fetch (not the supabase client),
      so it still works even if createClient/realtime failed above. Every deploy
      logs a changelog row, so a fresh row appearing after this page loaded IS
      "an update was pushed" — piggybacks on that instead of a separate version file. ---------- */
@@ -1442,19 +1098,9 @@
     /* The newest row's time is kept on the device for half an hour (2026-11-19, the database optimization pass), shared
        by every tab, hub and the dashboard (widget/dash.js reads and writes the same key): the page still looks every
        four minutes, but asks the database only when what the device has is older than that. This read was 5% of every
-       request the class made. The banner comes at most half an hour after a deploy instead of four minutes. */
+       request the class made. The notice comes at most half an hour after a deploy instead of four minutes. */
     var KEEP_MS = 30 * 60 * 1000, KEEP_KEY = "sh_changelog_seen";
     var baseline = null, toastEl = null;
-    function ensureToast(){
-      if (toastEl) return toastEl;
-      toastEl = document.createElement("div");
-      toastEl.className = "sh-update-toast";
-      toastEl.innerHTML = '<span>This hub has been updated.</span><button type="button" class="sh-update-reload">Reload</button><button type="button" class="sh-update-dismiss" aria-label="Dismiss">&times;</button>';
-      document.body.appendChild(toastEl);
-      toastEl.querySelector(".sh-update-reload").addEventListener("click", function(){ location.reload(); });
-      toastEl.querySelector(".sh-update-dismiss").addEventListener("click", function(){ toastEl.classList.remove("is-shown"); });
-      return toastEl;
-    }
     function kept(){
       try {
         var k = JSON.parse(localStorage.getItem(KEEP_KEY) || "null"), now = Date.now();
@@ -1464,9 +1110,8 @@
     function take(latest){
       if (baseline === null) { baseline = latest; return; }
       if (!(new Date(latest) > new Date(baseline))) return;
-      /* the redesign's pages: a sticker toast that stays until it's closed (widget/toast.js); an old page: the bar */
-      if (window.shToast) { if (!toastEl) toastEl = window.shToast("This hub has been updated.", { kind: "update", sticky: true, action: { label: "Reload", run: function(){ location.reload(); } } }); }
-      else ensureToast().classList.add("is-shown");
+      /* a sticker toast that stays until it's closed (widget/toast.js, in the engine's bundle); once per page */
+      if (window.shToast && !toastEl) toastEl = window.shToast("This hub has been updated.", { kind: "update", sticky: true, action: { label: "Reload", run: function(){ location.reload(); } } });
     }
     function check(){
       var have = kept();
@@ -1487,7 +1132,7 @@
     setInterval(check, POLL_MS);
   })();
 
-  /* No early return here when supabase-js is missing (CDN blocked, offline): search, settings,
+  /* No early return here when supabase-js is missing (CDN blocked, offline): search,
      mind maps and the panels below are local and must keep working. Every network call
      below checks `supabase` itself. */
 
@@ -1714,11 +1359,11 @@
   }
   bootstrap.ready.then(function(data){
     var took = data ? nameFromServer(data.display_name, bootstrap.linkName, data.name_custom) : null;
-    if (data && data.display_name) { resolvedAnonName = data.display_name; renderNameBadge(); syncNameInputs(); try { document.dispatchEvent(new CustomEvent("sh:name", { detail: took !== null ? { name: took } : {} })); } catch (e) {} return; }
+    if (data && data.display_name) { resolvedAnonName = data.display_name; syncNameInputs(); try { document.dispatchEvent(new CustomEvent("sh:name", { detail: took !== null ? { name: took } : {} })); } catch (e) {} return; }
     /* Compatibility while the migration is being deployed; current schemas use
        the bootstrap field above and make no second eager read. */
     if (supabase) try { supabase.rpc("get_display_name", { p_visitor: VISITOR_ID }).then(function(res){
-      if (res && !res.error && res.data) { resolvedAnonName = res.data; renderNameBadge(); syncNameInputs(); try { document.dispatchEvent(new CustomEvent("sh:name", { detail: {} })); } catch (e) {} }
+      if (res && !res.error && res.data) { resolvedAnonName = res.data; syncNameInputs(); try { document.dispatchEvent(new CustomEvent("sh:name", { detail: {} })); } catch (e) {} }
     }, function(){}); } catch (e) {}
   });
   function displayName(){ return currentName() || resolvedAnonName || "Someone"; }
@@ -1881,7 +1526,6 @@
   }
   function currentSection(){
     try {
-      if (window.shDrill && window.shDrill.isOpen()) return "drill/daily";
       if (window.shPodcast && window.shPodcast.playing()) return "podcast/" + window.shPodcast.id();
       if (typeof window.SH_SECTION === "function") {
         var custom = window.SH_SECTION();
@@ -2557,24 +2201,12 @@
   safeRpc("record_mode_open", { p_hub: HUB, p_mode: DEFAULT_MODE });
 
   /* ---------- confetti + streak toast ---------- */
-  /* on the redesign's pages it's the sticker toast (widget/toast.js, window.shToast; 2026-11-20): showStreakToast(text, icon,
-     { kind, title }); an old single-file page keeps the dark pill below */
+  /* the sticker toast (widget/toast.js, window.shToast, which runs first in the engine's bundle; 2026-11-20):
+     showStreakToast(text, icon, { kind, title, ms }). The old pages' dark pill came out on 2026-11-25. */
   function showStreakToast(text, iconHTML, o){
-    if (window.shToast) {
-      o = o || {};
-      window.shToast(text, { kind: o.kind, title: o.title, icon: iconHTML || undefined, ms: o.ms });
-      return;
-    }
-    var t = document.createElement("div");
-    t.className = "shstat-streaktoast";
-    t.textContent = text;
-    if (iconHTML) t.insertAdjacentHTML("afterbegin", '<span class="shstat-toast-ic">' + iconHTML + '</span>');
-    document.body.appendChild(t);
-    requestAnimationFrame(function(){ t.classList.add("is-shown"); });
-    setTimeout(function(){
-      t.classList.remove("is-shown");
-      setTimeout(function(){ t.remove(); }, 300);
-    }, 1600);
+    if (!window.shToast) return;
+    o = o || {};
+    window.shToast(text, { kind: o.kind, title: o.title, icon: iconHTML || undefined, ms: o.ms });
   }
   function fireConfetti(){
     /* a holiday (widget/eggs.js) swaps the colors and the paper strips for little shapes (candy corn, leaves, snow...) */
@@ -2863,85 +2495,12 @@
     requestAnimationFrame(tick);
   }
 
-  /* ---------- floating widget ---------- */
+  /* ---------- the widget's panels: Search, Suggest, Report and Class stats ----------
+     They open from the hub's own buttons (widget/hub.js: the bar's search button, More, Stats and trophies) through
+     window.shWidgetPanel and window.shOpenFlag. The old pages' launcher and its menu, the phone bar and its More sheet, the
+     inbox and tour buttons in their top bar, the top-bar fitter and the old Settings panel came out on 2026-11-25. */
   /* drawn to match the hubs' own icon sets: 24px grid, 1.8 stroke, round caps */
   function shIcon(d){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + d + '</svg>'; }
-  var ICON_SEARCH = shIcon('<circle cx="10.5" cy="10.5" r="6"/><path d="m15 15 5 5"/>');
-  var ICON_STATS = shIcon('<rect x="4" y="12" width="4" height="8" rx="1.2"/><rect x="10" y="5" width="4" height="15" rx="1.2"/><rect x="16" y="9" width="4" height="11" rx="1.2"/>');
-  var ICON_BULB = shIcon('<path d="M5 6.5A2.5 2.5 0 0 1 7.5 4h9A2.5 2.5 0 0 1 19 6.5v6a2.5 2.5 0 0 1-2.5 2.5H11l-4 3.5V15h0a2 2 0 0 1-2-2z"/><path d="M12 7.5v5M9.5 10h5"/>');
-  var ICON_COMPASS = shIcon('<circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5z"/>');
-  var ICON_INBOX = shIcon('<path d="M3.5 13.5 6 5.5A2 2 0 0 1 7.9 4h8.2A2 2 0 0 1 18 5.5l2.5 8"/><path d="M3.5 13.5V18a2 2 0 0 0 2 2h13a2 2 0 0 0 2-2v-4.5H15a3 3 0 0 1-6 0z"/>');
-  /* the inbox also sits in the hub's top bar, beside your name, so it's one tap away on every page (widget/replies.js opens it) */
-  (function(){
-    if (!nameBadge || !nameBadge.parentNode) return;
-    var btn = document.createElement("button");
-    btn.type = "button"; btn.className = "sh-ribbon-inbox"; btn.setAttribute("data-sh-inbox", "");
-    btn.setAttribute("aria-label", "Inbox"); btn.title = "Inbox";
-    btn.innerHTML = ICON_INBOX + '<span class="sh-inbox-badge sh-inbox-dot" hidden></span>';
-    var theme = document.getElementById("themeBtn");
-    if (theme && theme.parentNode === nameBadge.parentNode) theme.parentNode.insertBefore(btn, theme);
-    else nameBadge.parentNode.insertBefore(btn, nameBadge.nextSibling);
-    /* and the guided tour (widget/tour.js) beside it; on phones it lives in the More sheet instead */
-    var tour = document.createElement("button");
-    tour.type = "button"; tour.className = "sh-ribbon-inbox sh-ribbon-tour"; tour.setAttribute("data-sh-tour", "");
-    tour.setAttribute("aria-label", "Take the tour"); tour.title = "Take the tour of this hub";
-    tour.innerHTML = ICON_COMPASS;
-    btn.parentNode.insertBefore(tour, btn);
-  })();
-  /* ---------- the hub top bar fits its content, measured, not guessed from the screen width (2026-11-04).
-     Whether the bar fits depends on what's in it (the hub's name, your name and rank, the countdown's wording, the
-     streak and tour buttons, the font, the text-size setting, which zooms <html> where media queries can't see it), so
-     the old width breakpoints left the mode tabs clipped behind an invisible scrollbar or past the screen's edge. The
-     widget tries each layout in order and keeps the first that fits (v3.css draws them):
-       data-sh-head  row    : title, tabs and the rest on one line, every tab at full size
-                     stack  : title and the rest on top, the tabs on their own full-width row
-                     stack3 : the title (and the small buttons) on top, your name and the pills on a row of their own, then the tabs
-       data-sh-tabs  inline : icon beside label   tall : icon over label   grid : two columns
-     No tab ever hides its label, shrinks out of sight or scrolls. ---------- */
-  if (!EXPORT_ONLY) (function(){
-    var head = document.querySelector("header.hub-header");
-    var top = head && head.querySelector(".hub-header-top");
-    var tabs = head && head.querySelector("#modeSwitch");
-    if (!top || !tabs) return;
-    var title = top.querySelector(".hub-title"), meta = top.querySelector(".hub-meta");
-    var docEl = document.documentElement, lastW = -1, queued = false;
-    function over(el){ return !!el && el.scrollWidth > el.clientWidth + 1; }
-    function tabsOver(){
-      if (over(tabs)) return true;
-      var bs = tabs.querySelectorAll("button");
-      for (var i = 0; i < bs.length; i++) if (bs[i].offsetParent && over(bs[i])) return true;
-      return false;
-    }
-    function set(h, t){ head.setAttribute("data-sh-head", h); head.setAttribute("data-sh-tabs", t); }
-    function wrapped(a, b){ return !!(a && b) && b.offsetParent !== null && b.offsetTop > a.offsetTop + a.offsetHeight / 2; }
-    function fit(){
-      queued = false;
-      lastW = top.clientWidth;
-      set("row", "inline");
-      if (!over(top) && !over(meta) && !tabsOver()) return done();
-      set("stack", "inline");
-      if (wrapped(title, meta) || over(meta)) set("stack3", "inline");
-      var h = head.getAttribute("data-sh-head");
-      if (tabsOver()) { set(h, "tall"); if (tabsOver()) set(h, "grid"); }
-      done();
-    }
-    function done(){ docEl.style.setProperty("--sh-head-h", head.offsetHeight + "px"); }
-    function queue(){ if (!queued) { queued = true; requestAnimationFrame(fit); } }
-    fit();
-    if (window.ResizeObserver) new ResizeObserver(function(){ if (top.clientWidth !== lastW) queue(); }).observe(top);
-    window.addEventListener("resize", queue);
-    /* names, ranks, the countdown and the streak fill in after load; a hidden pill can appear */
-    new MutationObserver(queue).observe(top, { childList: true, subtree: true, characterData: true, attributeFilter: ["hidden"] });
-    if (document.fonts && document.fonts.ready) document.fonts.ready.then(queue);
-    window.addEventListener("load", queue);
-  })();
-  var ICON_FLAG = shIcon('<path d="M6 21V4"/><path d="M6 4.5c3.5-2 6.5 2 10 0v8c-3.5 2-6.5-2-10 0"/>');
-  var ICON_GEAR = shIcon('<path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/>');
-  var ICON_MORE = shIcon('<circle cx="6" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="18" cy="12" r="1.3"/>');
-  /* the site's mark: the four class ring bands, as on the dashboard wordmark */
-  var ICON_MARK = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="3" height="14" rx="1.5" fill="#C28A2E"/><rect x="8.6" y="5" width="3" height="14" rx="1.5" fill="#C85A7C"/><rect x="13.2" y="5" width="3" height="14" rx="1.5" fill="#2E8A80"/><rect x="17.8" y="5" width="3" height="14" rx="1.5" fill="#C06544"/></svg>';
-  var ICON_BOLT = shIcon('<path d="M13 3 5 13.5h6L10 21l8-10.5h-6z"/>');
-  var ICON_HEADPHONES = shIcon('<path d="M4 15v-3a8 8 0 0 1 16 0v3"/><rect x="3" y="14" width="4.5" height="6.5" rx="1.6"/><rect x="16.5" y="14" width="4.5" height="6.5" rx="1.6"/>');
   var ICON_FLAME = shIcon('<path d="M12 21c3.6 0 6-2.4 6-5.6 0-3.4-2.4-5.3-3.4-8.4-.4 1.9-1.4 3.1-2.6 3.7.2-2.7-.9-5.3-3.2-6.7.3 3.1-2.8 5.4-2.8 9.3C6 18.6 8.4 21 12 21z"/>');
 
   var backdrop = document.createElement("div");
@@ -2978,74 +2537,11 @@
     '<div class="shstat-sec"><h5>Toughest questions (class-wide)</h5><div id="shstat-tough"><div class="shstat-empty">Loading…</div></div></div>' +
     '<div class="shstat-sec"><h5>Most opened</h5><div id="shstat-modes"><div class="shstat-empty">Loading…</div></div></div>' +
     '<div class="shstat-sec"><h5>Busiest times</h5><div id="shstat-hist-wrap"><div class="shstat-empty">Loading…</div></div></div>' +
-    '</div>' +
-    '<div id="shstat-settingspanel"><button class="shstat-close" type="button" aria-label="Close">&times;</button>' +
-    '<h5>Settings</h5>' +
-    '<div class="shset-row"><label>Screen name</label>' +
-    '<div class="shstat-name-row"><input type="text" id="shset-name-input" maxlength="24" placeholder="What should we call you?"><button id="shset-name-save" type="button">Save</button></div>' +
-    '<div class="shstat-namemsg" id="shset-name-msg"></div>' +
-    '<button type="button" class="sh-name-linkbtn shstat-linkbtn" data-sh-link="settings">Link my devices</button></div>' +
-    '<div class="shset-row"><label>Reading font</label>' +
-    '<div class="shset-seg" data-pref="font">' +
-    '<button type="button" data-val="default">Default</button>' +
-    '<button type="button" data-val="serif">Serif</button>' +
-    '<button type="button" data-val="sans">Sans</button>' +
-    '</div></div>' +
-    '<div class="shset-row"><label>Text size</label>' +
-    '<div class="shset-seg" data-pref="size">' +
-    '<button type="button" data-val="small">Small</button>' +
-    '<button type="button" data-val="default">Default</button>' +
-    '<button type="button" data-val="large">Large</button>' +
-    '<button type="button" data-val="xlarge">X-Large</button>' +
-    '<button type="button" data-val="xxlarge">XX-Large</button>' +
-    '</div></div>' +
-    '<div class="shset-row"><label>Background music</label>' +
-    '<div class="shset-seg" data-pref="music">' +
-    '<button type="button" data-val="off">Off</button>' +
-    '<button type="button" data-val="rain">Soft rain</button>' +
-    '<button type="button" data-val="waves">Ocean waves</button>' +
-    '<button type="button" data-val="cafe">Coffee shop</button>' +
-    '<button type="button" data-val="lofi">Lo-fi keys</button>' +
-    '<button type="button" data-val="piano">Piano</button>' +
-    '</div>' +
-    '<input type="range" id="shset-volume" min="0" max="100" aria-label="Music volume">' +
-    '<div class="shset-hint">Browsers block audio from autoplaying — reopen Settings each visit to resume it.</div>' +
-    '</div>' +
-    extrasHTML() +
-    '</div>' +
-    /* Desktop: one launcher button that opens this menu. Phones: the menu is a three-item
-       bottom bar (Search, Stats, More) and More opens the rest as a small sheet. */
-    '<div class="shstat-pillrow" id="shstat-menu">' +
-      '<button class="shstat-pill shm-primary" id="shstat-search-pill" type="button"><span class="shstat-pill-icon">' + ICON_SEARCH + '</span><span class="shstat-pill-label">Search</span></button>' +
-      '<button class="shstat-pill shm-primary" id="shstat-drill-pill" type="button" data-sh-drill hidden><span class="shstat-pill-icon">' + ICON_BOLT + '</span><span class="shstat-pill-label"><span class="spl-full">Daily drill</span><span class="spl-short">Drill</span></span><span class="shd-badge" hidden></span></button>' +
-      '<button class="shstat-pill shm-primary" id="shstat-stats-pill" type="button"><span class="shstat-pill-icon">' + ICON_STATS + '</span><span class="shstat-pill-label"><span class="spl-full">Class stats</span><span class="spl-short">Stats</span></span></button>' +
-      '<button class="shstat-pill shm-more" id="shstat-more-pill" type="button" aria-expanded="false"><span class="shstat-pill-icon">' + ICON_MORE + '</span><span class="shstat-pill-label">More</span><span class="sh-inbox-badge sh-inbox-dot" hidden></span></button>' +
-      '<div class="shm-group">' +
-        '<div class="shm-live" id="shstat-online-pill"><span class="shstat-dot"></span><span><b id="shstat-online-n">1</b> studying now</span></div>' +
-        '<button class="shstat-pill" id="shstat-podcast-pill" type="button" data-sh-podcast-open hidden><span class="shstat-pill-icon">' + ICON_HEADPHONES + '</span><span class="shstat-pill-label">Timmy Time</span></button>' +
-        '<button class="shstat-pill" id="shstat-inbox-pill" type="button" data-sh-inbox><span class="shstat-pill-icon">' + ICON_INBOX + '</span><span class="shstat-pill-label">Inbox</span><span class="shd-badge sh-inbox-badge" hidden></span></button>' +
-        '<button class="shstat-pill" id="shstat-settings-pill" type="button"><span class="shstat-pill-icon">' + ICON_GEAR + '</span><span class="shstat-pill-label">Settings</span></button>' +
-        '<button class="shstat-pill" id="shstat-suggest-pill" type="button"><span class="shstat-pill-icon">' + ICON_BULB + '</span><span class="shstat-pill-label">Suggest something</span></button>' +
-        '<button class="shstat-pill" id="shstat-flag-pill" type="button"><span class="shstat-pill-icon">' + ICON_FLAG + '</span><span class="shstat-pill-label">Report an issue</span></button>' +
-        '<button class="shstat-pill" id="shstat-tour-pill" type="button" data-sh-tour><span class="shstat-pill-icon">' + ICON_COMPASS + '</span><span class="shstat-pill-label">Take the tour</span></button>' +
-      '</div>' +
-    '</div>' +
-    /* desktop: today's drill sits beside the launcher until it's done (widget/drill.js fills it in) */
-    '<div class="shstat-launchrow">' +
-      '<button class="sh-drill-chip" id="sh-drill-chip" type="button" data-sh-drill hidden>' + ICON_BOLT + '<span>Daily drill</span><span class="shd-chip-sub"></span></button>' +
-      '<button class="shstat-launch" id="shstat-launch" type="button" aria-expanded="false" aria-controls="shstat-menu" aria-label="1 studying now. Study tools: search, daily drill, class stats, inbox, settings">' + ICON_MARK + '<span class="shl-live"><span class="shstat-dot"></span><span id="shstat-launch-n">1</span></span><span class="sh-inbox-badge sh-inbox-dot" hidden></span></button>' +
     '</div>';
   document.body.appendChild(root);
 
   function renderOnline(){
-    var n = document.getElementById("shstat-online-n");
-    if (n) n.textContent = onlineCount;
-    var n2 = document.getElementById("shstat-launch-n");
-    if (n2) n2.textContent = onlineCount;
-    /* the button shows the count, so its spoken name starts with it (voice control: say what you see; BUG-003) */
-    var lb = document.getElementById("shstat-launch");
-    if (lb) lb.setAttribute("aria-label", onlineCount + " studying now. Study tools: search, daily drill, class stats, inbox, settings");
-    /* the redesigned hubs (widget/hub.js) show the count in their own bar */
+    /* the hub shows the count in its own bar (widget/hub.js) */
     try { document.dispatchEvent(new CustomEvent("sh:online", { detail: { n: onlineCount } })); } catch (e) {}
   }
 
@@ -3192,12 +2688,10 @@
     wrap.querySelector(".sh-nj-open").addEventListener("click", function(ev){
       ev.stopPropagation();
       shTrackSafe("notes-jump:open");
-      try { if (window.shDrill && window.shDrill.isOpen && window.shDrill.isOpen()) window.shDrill.close(); } catch (e) {}
       try { if (window.shCloseWidgetPanels) window.shCloseWidgetPanels(); } catch (e) {}
       try { window.SH_GOTO(m.s.go); } catch (e) {}
     });
-    var row = ex.querySelector(".qcard-classdata-row");
-    if (row && row.parentNode === ex) ex.insertBefore(wrap, row); else ex.appendChild(wrap);
+    ex.appendChild(wrap);
     shTrackSafe("notes-jump:shown");
   }
   /* the card the student last tapped or typed in; answering a card fires the hub's answered event inside that tap */
@@ -3388,53 +2882,53 @@
   var flagPanel = document.getElementById("shstat-flagpanel");
   var suggestPanel = document.getElementById("shstat-suggestpanel");
   var searchPanel = document.getElementById("shstat-searchpanel");
-  var settingsPanel = document.getElementById("shstat-settingspanel");
   function closeOtherPanels(keep){
     if (keep !== panel) panel.classList.remove("is-open");
     if (keep !== flagPanel) flagPanel.classList.remove("is-open");
     if (keep !== suggestPanel) suggestPanel.classList.remove("is-open");
     if (keep !== searchPanel) searchPanel.classList.remove("is-open");
-    if (keep !== settingsPanel) settingsPanel.classList.remove("is-open");
   }
   function updateSheetState(){
     var open = panel.classList.contains("is-open") || flagPanel.classList.contains("is-open") ||
-      suggestPanel.classList.contains("is-open") || searchPanel.classList.contains("is-open") ||
-      settingsPanel.classList.contains("is-open");
+      suggestPanel.classList.contains("is-open") || searchPanel.classList.contains("is-open");
     document.body.classList.toggle("sh-sheet-open", open);
   }
-  /* launcher (desktop) and More (phones) */
-  var launchBtn = document.getElementById("shstat-launch"), moreBtn = document.getElementById("shstat-more-pill");
-  function setMenu(open){ root.classList.toggle("is-menu-open", open); launchBtn.setAttribute("aria-expanded", String(open)); if (!open) setMore(false); }
-  function setMore(open){ root.classList.toggle("is-more-open", open); document.body.classList.toggle("sh-more-open", open); moreBtn.setAttribute("aria-expanded", String(open)); }
-  launchBtn.addEventListener("click", function(){ var open = !root.classList.contains("is-menu-open"); if (open) { closeOtherPanels(null); updateSheetState(); } setMenu(open); });
-  moreBtn.addEventListener("click", function(){ setMore(!root.classList.contains("is-more-open")); });
-  /* picking a tool closes the menu; its panel opens in its place */
-  root.querySelectorAll("#shstat-menu .shstat-pill:not(.shm-more)").forEach(function(b){ b.addEventListener("click", function(){ setMenu(false); }); });
-  document.addEventListener("click", function(e){ if (!root.contains(e.target)) setMenu(false); });
-  document.addEventListener("keydown", function(e){ if (e.key === "Escape") { setMenu(false); closeOtherPanels(null); updateSheetState(); } });
+  document.addEventListener("keydown", function(e){ if (e.key === "Escape") { closeOtherPanels(null); updateSheetState(); } });
 
   backdrop.addEventListener("click", function(){
-    setMenu(false);
     closeOtherPanels(null);
     updateSheetState();
   });
-  /* the daily drill opens full screen, so the menu and any panel close first */
-  window.shCloseWidgetPanels = function(){ setMenu(false); closeOtherPanels(null); updateSheetState(); };
-  document.getElementById("shstat-stats-pill").addEventListener("click", function(){
-    closeOtherPanels(panel);
-    var open = panel.classList.toggle("is-open");
-    if (open) { loadStats(); loadPersonalStats(); loadBusiestTimes(); }
-    updateSheetState();
-  });
+  /* the Inbox, the tour and "Open this in the notes" close any panel first */
+  window.shCloseWidgetPanels = function(){ closeOtherPanels(null); updateSheetState(); };
+  /* window.shWidgetPanel("search" | "stats" | "suggest"): the hub's buttons open a panel with it (widget/hub.js). It opens
+     the panel, or closes it if it's open, as the old launcher's buttons did; until 2026-11-25 the hub clicked those
+     (hidden) buttons. Opening Class stats reads its numbers and tells widget/ranks-hub.js (sh:stats-open), which draws the
+     rank in it. */
+  var PANEL_OPEN = {
+    stats: function(){
+      closeOtherPanels(panel);
+      var open = panel.classList.toggle("is-open");
+      if (open) { loadStats(); loadPersonalStats(); loadBusiestTimes(); }
+      updateSheetState();
+      if (open) try { document.dispatchEvent(new CustomEvent("sh:stats-open")); } catch (e) {}
+    },
+    search: function(){
+      closeOtherPanels(searchPanel);
+      var open = searchPanel.classList.toggle("is-open");
+      if (open && searchInput) searchInput.focus();
+      updateSheetState();
+    },
+    suggest: function(){
+      closeOtherPanels(suggestPanel);
+      suggestPanel.classList.toggle("is-open");
+      updateSheetState();
+      var tk = suggestTickNow(); if (tk) tk.sync(document.getElementById("shstat-suggest-text").value);
+    }
+  };
+  window.shWidgetPanel = function(k){ if (PANEL_OPEN[k]) PANEL_OPEN[k](); };
   document.querySelector("#shstat-panel .shstat-close").addEventListener("click", function(){
     panel.classList.remove("is-open");
-    updateSheetState();
-  });
-
-  document.getElementById("shstat-search-pill").addEventListener("click", function(){
-    closeOtherPanels(searchPanel);
-    var open = searchPanel.classList.toggle("is-open");
-    if (open && searchInput) searchInput.focus();
     updateSheetState();
   });
   document.querySelector("#shstat-searchpanel .shstat-close").addEventListener("click", function(){
@@ -3467,12 +2961,6 @@
     updateSheetState();
     var ta = document.getElementById("shstat-flag-text"); if (ta) ta.focus();
   };
-  document.getElementById("shstat-flag-pill").addEventListener("click", function(){
-    setFlagContext(null);
-    closeOtherPanels(flagPanel);
-    flagPanel.classList.toggle("is-open");
-    updateSheetState();
-  });
   document.querySelector("#shstat-flagpanel .shstat-close").addEventListener("click", function(){
     flagPanel.classList.remove("is-open");
     updateSheetState();
@@ -3511,12 +2999,6 @@
     return suggestTick;
   }
   document.getElementById("shstat-suggest-text").addEventListener("input", function(e){ var tk = suggestTickNow(); if (tk) tk.sync(e.target.value); });
-  document.getElementById("shstat-suggest-pill").addEventListener("click", function(){
-    closeOtherPanels(suggestPanel);
-    suggestPanel.classList.toggle("is-open");
-    updateSheetState();
-    var tk = suggestTickNow(); if (tk) tk.sync(document.getElementById("shstat-suggest-text").value);
-  });
   document.querySelector("#shstat-suggestpanel .shstat-close").addEventListener("click", function(){
     suggestPanel.classList.remove("is-open");
     updateSheetState();
@@ -3546,34 +3028,6 @@
     }, function(){ btn.disabled = false; msg.textContent = "Couldn't send — try again later."; });
   });
 
-  /* ---------- settings panel ---------- */
-  var SEG_PREF_MAP = {
-    font: { key: SH_FONT_KEY, def: "default" },
-    size: { key: SH_SIZE_KEY, def: "default" },
-    music: { key: SH_MUSIC_KEY, def: "off" }
-  };
-  function syncSettingsSegUI(){
-    document.querySelectorAll(".shset-seg").forEach(function(seg){
-      var pref = seg.getAttribute("data-pref"), key = seg.getAttribute("data-key");
-      var map = key ? { key: key, def: "on" } : SEG_PREF_MAP[pref];
-      var cur = map ? prefGet(map.key, map.def) : seg.hasAttribute("data-extras-all") ? extrasAll() : null;
-      if (cur === null) return;
-      seg.querySelectorAll("button").forEach(function(b){
-        b.classList.toggle("is-active", b.getAttribute("data-val") === cur);
-      });
-    });
-    var volEl = document.getElementById("shset-volume");
-    if (volEl) volEl.value = prefGet(SH_VOLUME_KEY, "35");
-  }
-  /* "on" or "off" when every extra is, else "" (a mix: neither All button lit) */
-  function extrasAll(){
-    var v = EXTRAS.map(function(x){ return prefGet(x.key, "on"); });
-    return v.every(function(x){ return x === "on"; }) ? "on" : v.every(function(x){ return x === "off"; }) ? "off" : "";
-  }
-  function syncSettingsUI(){
-    syncNameInputs();
-    syncSettingsSegUI();
-  }
   /* ====================================================================
      MIND MAP -- a generic, data-driven hierarchical diagram renderer
      shared by every hub. A hub supplies a plain tree of
@@ -3680,57 +3134,6 @@
     }
   };
 
-  window.shOpenSettings = function(){
-    closeOtherPanels(settingsPanel);
-    settingsPanel.classList.add("is-open");
-    updateSheetState();
-    syncSettingsUI();
-    var savedTrack = prefGet(SH_MUSIC_KEY, "off");
-    if (savedTrack !== "off") shMusic.setTrack(savedTrack); // resume within this click's user-gesture window
-  };
-  document.getElementById("shstat-settings-pill").addEventListener("click", function(){
-    if (settingsPanel.classList.contains("is-open")) {
-      settingsPanel.classList.remove("is-open");
-      updateSheetState();
-    } else {
-      window.shOpenSettings();
-    }
-  });
-  document.querySelector("#shstat-settingspanel .shstat-close").addEventListener("click", function(){
-    settingsPanel.classList.remove("is-open");
-    updateSheetState();
-  });
-  document.querySelectorAll(".shset-seg").forEach(function(seg){
-    seg.addEventListener("click", function(e){
-      var btn = e.target.closest("button[data-val]");
-      if (!btn) return;
-      var pref = seg.getAttribute("data-pref"), key = seg.getAttribute("data-key");
-      var val = btn.getAttribute("data-val");
-      if (key) prefSet(key, val);
-      else if (seg.hasAttribute("data-extras-all")) EXTRAS.forEach(function(x){ prefSet(x.key, val); });
-      else if (pref === "font") { prefSet(SH_FONT_KEY, val); applyFontPref(); }
-      else if (pref === "size") { prefSet(SH_SIZE_KEY, val); applySizePref(); }
-      else if (pref === "music") { prefSet(SH_MUSIC_KEY, val); shMusic.setTrack(val); }
-      syncSettingsSegUI();
-    });
-  });
-  var settingsVolumeEl = document.getElementById("shset-volume");
-  if (settingsVolumeEl) {
-    settingsVolumeEl.addEventListener("input", function(){
-      prefSet(SH_VOLUME_KEY, settingsVolumeEl.value);
-      shMusic.setVolume(parseInt(settingsVolumeEl.value, 10) / 100);
-    });
-  }
-  var setNameSaveBtn = document.getElementById("shset-name-save");
-  if (setNameSaveBtn) {
-    setNameSaveBtn.addEventListener("click", function(){
-      var nameInput = document.getElementById("shset-name-input");
-      var nameMsg = document.getElementById("shset-name-msg");
-      var name = (nameInput.value || "").trim();
-      if (!saveName(name)) { nameMsg.textContent = "Type a name first."; return; }
-      nameMsg.textContent = "Saved. Hi, " + name + "!";
-    });
-  }
   /* ---------- the rank and mastery after every tenth answer, worked out on the page (2026-11-19) ----------
      The database optimization pass, phase 2. widget/ranks.js read get_rank_profile_v2 and get_hub_mastery again after
      every tenth answer: two reads every ten answers, from every student. On the game layer each answer's reply carries
@@ -3848,8 +3251,9 @@
     if (window.shQH) window.shQH.mount({ hub: HUB, answeredEvent: ANSWERED_EVENT, visitor: VISITOR_ID, visit: VISIT_ID, supabase: supabase,
       sbUrl: supabase ? SB_URL : "", sbKey: SB_KEY, automated: AUTOMATED, hist: function(){ return qhHist; } });
   });
-  /* guided tour (widget/tour.js): asked once on a first hub visit; the Tour button and "Take the tour" start it any time.
-     A hub that never asks on arrival (SH_TOUR.prompt === false: the redesigned hubs) loads it when the tour is started. */
+  /* guided tour (widget/tour.js): a hub that never asks on arrival (SH_TOUR.prompt === false: every hub on the engine) loads
+     it when the tour is started (window.shLoadTour, from More's "Take the tour"). The old pages' Tour buttons
+     ([data-sh-tour]) came out on 2026-11-25. */
   var tourLoading = false;
   function loadTour(then){
     if (window.shTour) { if (then) then(); return; }
@@ -3860,11 +3264,8 @@
   }
   window.shLoadTour = loadTour;
   if (!EXPORT_ONLY && !(window.SH_TOUR && window.SH_TOUR.prompt === false)) loadTour();
-  document.addEventListener("click", function(e){
-    var b = e.target.closest && e.target.closest("[data-sh-tour]");
-    if (b) setTimeout(function(){ loadTour(function(){ if (window.shTour) window.shTour.start(); }); }, 0);    /* after the menu has closed */
-  });
-  /* daily drill (widget/drill.js): a short set each day from what you missed + high-yield questions */
+  /* daily drill (widget/drill.js): today's set, from what you missed, what's due and high-yield questions, which the hub
+     shows as a set of its Question Bank (#questions/drill) */
   if (!EXPORT_ONLY) widgetFile("drill.js", function(){ if (window.shDrill) window.shDrill.mount(window.shEggHooks); });
   /* archived notice: the dashboard archives a hub at 10 pm on the day of its last exam (index.html, ARCHIVE_HOUR; an exam's
      archiveHour overrides it, e.g. 24 for one due at 11:59 pm; SH_EXPORT.archiveOn can override the date for a temporary reopen);
@@ -3936,81 +3337,19 @@
       document.body.appendChild(box);
     }
   })();
-  /* ---------- lecture notes: a lecture list that scrolls on its own, Previous / Next and Report under each lecture's notes,
-     and drawn figures that fit on screen with their controls (Sam, 2026-11-03). Works on any hub whose notes are a
-     .notes-layout with a .lec-nav of buttons (the active one .is-active or aria-current="true") and an article.reading.
-     The hub's own nav buttons do the switching: Previous / Next just click them.
-     --sh-head-h (the sticky top bar) and --sh-vh (the screen height in the page's zoomed px; the text-size setting zooms
-     <html>, where 100vh overshoots) let v3.css size the list and the figures. ---------- */
+  /* ---------- lecture notes: drawn figures that fit on screen with their controls (Sam, 2026-11-03). --sh-vh (the screen
+     height in the page's zoomed px; the text-size setting zooms <html>, where 100vh overshoots) lets widget/hub.css and
+     v3.css size the figures and the notes' lecture list. The old pages' lecture pager (Previous / Next and Report under
+     their .notes-layout) and its measuring of their top bar came out on 2026-11-25: the engine draws its own
+     (widget/hub.js). ---------- */
   if (!EXPORT_ONLY) (function(){
     var root = document.documentElement;
     function zoom(){ try { return parseFloat(getComputedStyle(root).zoom) || parseFloat(root.style.zoom) || 1; } catch (e) { return 1; } }
-    function headH(){ var h = document.querySelector("header.hub-header, .hub-header"); return h ? h.offsetHeight : 0; }
-    /* measure first, then write, and only what changed: writing --sh-vh before measuring the bar made the browser lay the
-       whole page out twice on every call (a slow phone felt it after Home, 2026-11-20) */
+    /* write only what changed: a write makes the browser lay the page out again (a slow phone felt it after Home, 2026-11-20) */
     function setVar(k, v){ if (root.style.getPropertyValue(k) !== v) root.style.setProperty(k, v); }
     function fit(){
-      var vh = (window.innerHeight / zoom()) + "px", hh = headH() + "px";
-      setVar("--sh-vh", vh);
-      setVar("--sh-head-h", hh);
+      setVar("--sh-vh", (window.innerHeight / zoom()) + "px");
       fitFigs();
-    }
-    function esc(t){ return String(t == null ? "" : t).replace(/[&<>"]/g, function(c){ return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
-    function navBtns(nav){ return Array.prototype.slice.call(nav.querySelectorAll("button")).filter(function(b){ return !b.closest(".sh-lec-pager"); }); }
-    function isCur(b){ return b.classList.contains("is-active") || b.getAttribute("aria-current") === "true"; }
-    function lecId(b){ return b.getAttribute("data-lec") || b.getAttribute("data-goto-lecture") || b.getAttribute("data-id") || ""; }
-    function info(b){
-      var num = b.querySelector(".lec-num, .snum"), t = b.querySelector(".t");
-      var n = num ? num.textContent.trim() : "", title = t ? t.textContent.trim() : b.textContent.trim();
-      return { id: lecId(b), num: n, title: title, label: (n ? n + " · " : "") + title };
-    }
-    var FLAG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4"/><path d="M5 4h11l-2 4 2 4H5"/></svg>';
-    function side(dir, x){
-      return '<button type="button" class="sh-lec-pg sh-lec-pg-' + dir + '" data-sh-pager="' + dir + '">' +
-        '<span class="sh-lec-pg-k">' + (dir === "prev" ? "&larr; Previous" : "Next &rarr;") + '</span>' +
-        '<span class="sh-lec-pg-t">' + esc(x.label) + '</span></button>';
-    }
-    function go(lay, i){
-      var b = navBtns(lay.querySelector(".lec-nav"))[i]; if (!b) return;
-      b.click();
-      setTimeout(function(){
-        var nl = document.querySelector(".notes-layout"); if (!nl) return;
-        var top = nl.getBoundingClientRect().top + window.pageYOffset - headH() - 10;
-        window.scrollTo(0, Math.max(0, top));
-      }, 40);
-    }
-    function decorate(lay){
-      var nav = lay.querySelector(":scope > .lec-nav"), art = lay.querySelector("article.reading");
-      if (!nav || !art) return;
-      var btns = navBtns(nav), cur = -1;
-      btns.forEach(function(b, i){ if (cur < 0 && isCur(b)) cur = i; });
-      if (cur < 0) return;
-      /* keep the open lecture in view in the list (down the side on wide screens, across the top on phones) */
-      if (!nav.__shSeen) {
-        nav.__shSeen = 1;
-        var b = btns[cur], nr = nav.getBoundingClientRect(), br = b.getBoundingClientRect();
-        if (nav.scrollHeight > nav.clientHeight + 2 && (br.bottom > nr.bottom || br.top < nr.top)) nav.scrollTop += br.top - nr.top - nav.clientHeight / 2 + br.height / 2;
-        if (nav.scrollWidth > nav.clientWidth + 2 && (br.right > nr.right || br.left < nr.left)) nav.scrollLeft += br.left - nr.left - 12;
-      }
-      if (art.querySelector(":scope > .sh-lec-pager")) return;
-      var me = info(btns[cur]), prev = btns[cur - 1], next = btns[cur + 1];
-      var bar = document.createElement("nav");
-      bar.className = "sh-lec-pager"; bar.setAttribute("aria-label", "Other lectures"); bar.setAttribute("data-sh-noread", "");
-      bar.innerHTML = (prev ? side("prev", info(prev)) : '<span class="sh-lec-pg-gap"></span>') +
-        '<button type="button" class="sh-lec-flag" data-sh-lecflag="1" title="Something wrong or confusing in these notes? Tell us.">' + FLAG + '<span>Report a problem with these notes</span></button>' +
-        (next ? side("next", info(next)) : '<span class="sh-lec-pg-gap"></span>');
-      bar.addEventListener("click", function(e){
-        var t = e.target.closest("button"); if (!t) return;
-        if (t.hasAttribute("data-sh-lecflag")) {
-          if (window.shTrack) window.shTrack("notes:report");
-          if (window.shOpenFlag) window.shOpenFlag({ lec: me.id, label: me.label });
-          return;
-        }
-        var dir = t.getAttribute("data-sh-pager");
-        if (window.shTrack) window.shTrack("notes:" + dir);
-        go(lay, dir === "prev" ? cur - 1 : cur + 1);
-      });
-      art.appendChild(bar);
     }
     /* A drawn figure with controls (.anima: figure.iso-figure, then .am-controls and readouts) stays pinned under the top bar
        while its controls and explanation scroll up beside it, so the picture and what you change are on screen together.
@@ -4018,7 +3357,7 @@
     function fitFigs(){
       var all = document.querySelectorAll(".anima"); if (!all.length) return;
       var wide = window.matchMedia("(min-width: 861px)").matches;
-      var room = window.innerHeight / zoom() - headH();
+      var room = window.innerHeight / zoom();
       all.forEach(function(a){
         var figs = a.querySelectorAll(":scope > figure.iso-figure"), ctl = a.querySelector(":scope > .am-controls");
         var f = figs.length === 1 && ctl ? figs[0] : null;
@@ -4032,7 +3371,6 @@
     var queued = false, lastFigs = [];
     function scan(){
       queued = false;
-      document.querySelectorAll(".notes-layout").forEach(decorate);
       /* re-measure figures only when the set on the page changed (the page changes a lot: clocks, timers, animations) */
       var figs = Array.prototype.slice.call(document.querySelectorAll(".anima"));
       if (figs.length !== lastFigs.length || figs.some(function(f, i){ return f !== lastFigs[i]; })) { lastFigs = figs; fitFigs(); }
@@ -4040,23 +3378,15 @@
     function queue(){ if (!queued) { queued = true; requestAnimationFrame(scan); } }
     function start(){
       fit(); scan();
-      new MutationObserver(function(muts){
-        for (var i = 0; i < muts.length; i++) {
-          var t = muts[i].target;
-          if (t.nodeType === 1 && t.closest && t.closest(".sh-lec-pager")) continue;
-          queue(); return;
-        }
-      }).observe(document.body, { childList: true, subtree: true });
+      new MutationObserver(queue).observe(document.body, { childList: true, subtree: true });
       window.addEventListener("resize", fit);
       /* a tab or mode switch can show figures that were already on the page, hidden */
       document.addEventListener("click", function(){ setTimeout(fitFigs, 80); }, true);
-      var h = document.querySelector("header.hub-header, .hub-header");
-      if (h && window.ResizeObserver) new ResizeObserver(fit).observe(h);
       document.addEventListener("sh:pref", function(){ setTimeout(fit, 30); });
     }
-    /* in the next frame, not in the script that loads the widget: fit() measures the bar, and with v3.css just put in
-       that laid the whole page out inside this script (about 65 ms of its 190 on perf.js's slow phone, 2026-11-20); in a
-       frame the browser lays the page out once anyway (a tab opened in the background runs it when it's first shown) */
+    /* in the next frame, not in the script that loads the widget: fit() measures, and with v3.css just put in that laid the
+       whole page out inside this script (about 65 ms of its 190 on perf.js's slow phone, 2026-11-20); in a frame the browser
+       lays the page out once anyway (a tab opened in the background runs it when it's first shown) */
     function soon(){ if (window.requestAnimationFrame) requestAnimationFrame(start); else start(); }
     if (document.body) soon(); else document.addEventListener("DOMContentLoaded", soon);
   })();
