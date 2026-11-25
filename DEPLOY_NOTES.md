@@ -32,7 +32,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
-- **2026-11-25 (the old pages' parts out of `widget/v3.js`, #TBD, Claude Code)** — The package "Take the old pages' parts
+- **2026-11-25 (the old pages' parts out of `widget/v3.js`, #568, Claude Code)** — The package "Take the old pages' parts
   out of `widget/v3.js`" (the inbox line; Sam, 2026-11-24: "The cleanup sounds good"). v3.js no longer builds what only the
   old single-file hub pages (down since 2026-11-19) drew or what a hub on the engine always hid: the desktop launcher and
   its menu, the phone bar and its More sheet, the name badge, the inbox ribbon and its tour button, the old Settings panel
