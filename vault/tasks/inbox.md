@@ -170,8 +170,22 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   T-16 and T-17** (Chairside's core, then its art and sound, each rebased onto the engine move), then close as landed. **The
   other ten are finished as they are**: #87, #91, #94, #98, #99, #103, #104, #106, #110 and #111, each with the small fix,
   checker or quote pass, or read section 6 gives it. None merges `main` in on its own, and once T-07 has landed they merge
-  without a page rebuild. Merging any of them is Sam's call ([boards](../hubs/boards.md),
+  without a page rebuild. **T-07 landed 2026-11-25 (#562).** Of the twelve still open, only #111 touches a file T-07 replaced
+  (the generated `hubs/boards/index.html`): take `claude/boards-hub`'s settings page and run `node tools/build-boards.js`. Merging any of them is Sam's call ([boards](../hubs/boards.md),
   [the task](2026-11-22-boards-onto-the-engine.md)).
-- [ ] **Boards: the High Likelihood check skips boards when its first unit is published** (Sam, 2026-11-21: "I have no idea so
+- [x] **Boards: the High Likelihood check skips boards when its first unit is published** (Sam, 2026-11-21: "I have no idea so
   maybe just take it out for now"): on `claude/boards-hub`, `tools/ci/smoke.js`'s check for a lecture with questions but no
-  topics skips the boards hub, and `LIKELY_TOPICS` stays empty ([boards](../hubs/boards.md)).
+  topics skips the boards hub, and `LIKELY_TOPICS` stays empty ([boards](../hubs/boards.md)). Done in T-07 (#562): `boards` is
+  in `LIKELY_SKIP`, and the build writes `"likelyTopics": []`.
+- [ ] **Boards: which INBDE component anat, physio, micro and gpath go under** (2026-11-25, T-07, #562): Sam's call, needed
+  before the first of them is published. The engine groups the units by the INBDE's three components (`GROUPS` in
+  `src/boards/config.js` on `claude/boards-hub`: D&TP, OHM, P&P, from each unit's home CCs), and these four foundation units
+  have no home CC. The build refuses to publish a unit in no group ([boards](../hubs/boards.md)).
+- [ ] **Boards: the T-06 brief's `--out` command** (2026-11-25, T-07, #562): `docs/boards/tasks/T-06.md` on `claude/boards-hub`
+  still says `--out /tmp/boards-medcx/index.html`; since T-07, `--out` takes a folder (`--out /tmp/boards-medcx`, which gets
+  `content/` and `game/`). Fix it in the next PR that touches that brief.
+- [ ] **Boards: bring T-07's shared-tool changes to `main`** (2026-11-25, #562): on `claude/boards-hub`, `tools/hub-next/build.mjs`
+  exports `buildFrom()` and lets a hub whose lectures are all still coming have no questions; `tools/ci/smoke.js` takes its
+  one-hub checks from the first hub with questions (`firstHub`); `tools/timmy/test.mjs` picks a hub with published content.
+  Each keeps Review of Systems the same. They come to `main` with the boards merge, or sooner in their own PR. Either way,
+  merge them by hand, not by taking one side.

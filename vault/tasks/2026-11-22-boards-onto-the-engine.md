@@ -7,7 +7,7 @@ requested-by: Sam
 due:
 waiting-on:
 agent: Claude Code
-pr: https://github.com/smcmurry6-source/study-hubs/pull/532 (the plan, merged into claude/boards-hub)
+pr: https://github.com/smcmurry6-source/study-hubs/pull/532 (the plan), https://github.com/smcmurry6-source/study-hubs/pull/562 (T-07), both merged into claude/boards-hub
 ---
 
 # Move the boards hub onto the engine
@@ -49,8 +49,8 @@ engine reach it without a second copy.
       (`docs/boards/tasks/T-NN.md`), each one PR. Sam's questions in one message.
 - [x] Sam approves the plan (2026-11-22, keeping Chairside).
 - [ ] The build, brief by brief, into `claude/boards-hub`.
-- [ ] `tools/ci/smoke.js` and the bank lint walk boards as an engine hub (its separate walk comes out), and the hub note
-      says it's on the engine.
+- [x] `tools/ci/smoke.js` and the bank lint walk boards as an engine hub (its separate walk comes out), and the hub note
+      says it's on the engine (T-07, #562; the hub note 2026-11-25).
 - [ ] [Package 3](2026-11-22-sustainable-for-years.md)'s box ticked when the storage bound is built.
 
 ## Log
@@ -62,6 +62,16 @@ engine reach it without a second copy.
   rolling per-item store for boards (T-13, with package 3); Chairside is built on the engine (T-16, T-17), with #95 and
   #101 landing through them; #81, #97, #100 and #102 closed as replaced by the engine; the other ten open PRs finished and
   merged as they are. Next: T-07.
+- 2026-11-25: **T-07 merged into `claude/boards-hub`** (#562, squash 291153b).
+  - `tools/build-boards.js` is a converter: it writes `hubs/boards/content/` (core, questions, notes, study, facts) and lays
+    it out through `tools/hub-next/build.mjs`'s new `buildFrom()`.
+  - `hubs/boards/index.html` is an engine settings page, and the old app, CSS and shell are gone.
+  - `tools/ci/smoke.js` walks boards as an engine hub, `lintBoards` reads `content/`, and `boards` is in `LIKELY_SKIP`.
+  - pharm and medcx are listed as coming (the engine can't draw a hub with no lectures), the units are grouped by the
+    INBDE's three components, and nothing is published yet.
+  - Left: the four foundation units' component (Sam's call), the T-06 brief's `--out` command, and the shared-tool changes
+    to bring to `main` (the inbox).
+  - Next: T-08 to T-12 and T-14.
 
 ## Outcome
 
