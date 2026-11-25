@@ -32,6 +32,17 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-25 (Timmy's place: a quicker Customize, #567, Claude Code)** — Sam: "I also want a better way to do the customization
+  for Timmys place. Its clunky and inefficient". Customize is one panel now: four tabs (Timmy, Home, Scene, Yard, with the
+  yard's five spots as a row under its tab) over one list of what you own of that kind, grouped New since you last looked,
+  Classics, each collection and season, Rank rewards (locked ones say what unlocks them). It opens on the newest piece you
+  haven't seen, else where you were last (`sh_place_cz`), the Yard tab on the first empty spot; tapping the house, the
+  yard or Timmy on the stage opens that tab; Surprise me, Shop and Done stay at the panel's foot on a phone too. Every tap
+  marks the card at once and the stage follows after the frame (an outfit swaps only Timmy); each kind's list is kept;
+  Customize no longer waits for every set's file. At 4x slowdown a piece answers in 88-168 ms (was 240-600), a tab in
+  96-152 (was 176-304); numbers and the new rules in [motion-cost](vault/reference/motion-cost.md). Saving is unchanged
+  (`equip_item` on each pick, no migration), every button keeps a fixed `data-tp`. The About page's Customize paragraph is
+  rewritten; `sw.js` is `sh-v82`. Left for later: [the inbox](vault/tasks/inbox.md).
 - **2026-11-25 (the old pages' parts out of `widget/v3.js`, #568, Claude Code)** — The package "Take the old pages' parts
   out of `widget/v3.js`" (the inbox line; Sam, 2026-11-24: "The cleanup sounds good"). v3.js no longer builds what only the
   old single-file hub pages (down since 2026-11-19) drew or what a hub on the engine always hid: the desktop launcher and
