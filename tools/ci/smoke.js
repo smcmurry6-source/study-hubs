@@ -1021,11 +1021,11 @@ function lint(hub, A){
       page.on('request', r => { if (/\/widget\/(place\.(js|css)|hub-art\/place)/.test(r.url())) asked.push(r.url().replace(/^.*\/widget\//, '')); });
       await page.addInitScript(() => { try { localStorage.setItem('sh_pet_born', '2026-10-01'); localStorage.setItem('sh_rank_g', '4'); localStorage.setItem('sh_rank_tier', '1'); localStorage.setItem('sh_rank_step', '4'); } catch (e) {} });
       const rank = { xp: 2400, journey: 0, tier: 1, level: 2, step: 4, gtier: 1, step_at: 2000, next_at: 3000, tier_at: 1500, steps: 63, answers: 300, correct: 220, days: 12, badges: [], dark_seen: [], boost: null };
-      const equipped = { 'yard-left': 'garden' };
+      const equipped = { 'yard-left': 'garden' }, recent = new Date(Date.now() - 3600e3).toISOString();   /* the floss mummy came an hour ago: New */
       const shop = () => ({ day: '2026-11-12', seasons: [], throwback: false, wallet: { balance: 0 }, items: [], costumes: [], snacks_today: 0, boost: null,
         /* all of Desert ranch (migration_v65's collection), for the Collections view below */
         inventory: ['garden', 'mailbox', 'bowling-lane', 'castle', 'cowboy-hat', 'floss-mummy', 'adobe-ranch', 'red-rocks', 'bandana', 'sheriff-vest', 'cactus-garden', 'windmill-pump', 'covered-wagon']
-          .map(id => ({ id, at: '2026-11-01', how: 'bought' })).concat([{ id: 'rank-antique-outfit', at: '2026-11-02', how: 'rank' }]),
+          .map(id => ({ id, at: id === 'floss-mummy' ? recent : '2026-11-01', how: 'bought' })).concat([{ id: 'rank-antique-outfit', at: '2026-11-02', how: 'rank' }]),
         locked: [{ id: 'rank-bronze-outfit', name: 'Bronze outfit', kind: 'outfit', rarity: 'rare', rank_tier: 2 }, { id: 'rank-modu-gold-outfit', name: 'Gold crown and velvet cape', kind: 'outfit', rarity: 'legendary', rank_tier: 11 }], equipped: Object.assign({}, equipped) });
       await page.route(/supabase\.co\/rest\/v1\/rpc\/get_widget_bootstrap_v2/, route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ rank, mastery: [], shop: shop() }) }));
       await page.route(/supabase\.co\/rest\/v1\/rpc\/get_my_shop/, route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(shop()) }));
@@ -1087,42 +1087,65 @@ function lint(hub, A){
           await page.click('dialog.tpv .tp-timmy', { force: true }); await page.waitForTimeout(500);
           const said = await page.evaluate(() => { const b = document.querySelector('dialog.tpv .tpv-stage').shadowRoot.querySelector('.tp-bubble'); return b ? b.textContent : ''; });
           if (!said) problems.push(`${name} (${label}): Timmy said nothing when tapped at his place`);
-          await page.click('dialog.tpv [data-tp="customize"]'); await page.waitForSelector('dialog.tpv .tpv-tile[data-pick="front"]', { timeout: 8000 }).catch(() => null);
-          const front = await page.$('dialog.tpv .tpv-tile[data-pick="front"]');
-          if (!front) problems.push(`${name} (${label}): Customize didn't show the yard's spots`);
+          /* Customize (2026-11-25): four tabs over one list. It opens at once, on the newest piece not seen yet (the floss
+             mummy, an hour old: Timmy's tab, first under New); a tap marks its card in the same task, before the stage
+             follows; the yard opens on its first empty spot */
+          await page.click('dialog.tpv [data-tp="customize"]'); await page.waitForSelector('dialog.tpv .tpv-cats', { timeout: 8000 }).catch(() => null);
+          const cz = await page.evaluate(() => { const d = document.querySelector('dialog.tpv'), g = d.querySelector('.tpv-grp');
+            return { tabs: [...d.querySelectorAll('.tpv-cat')].map(b => b.dataset.pick + (b.getAttribute('aria-pressed') === 'true' ? '*' : '')).join(), first: g ? g.querySelector('.tpv-seth').textContent + ': ' + [...g.querySelectorAll('[data-item]')].map(b => b.dataset.item).join() : '',
+              stamp: !!d.querySelector('.tpv-grp.is-new [data-item="floss-mummy"] .tpv-stamp.is-new'), foot: (() => { const f = d.querySelector('.tpv-foot'); if (!f) return false; const r = f.getBoundingClientRect(); return r.bottom <= innerHeight + 1 && r.top >= 0; })() }; });
+          if (cz.tabs !== 'timmy*,home,scene,yard') problems.push(`${name} (${label}): Customize should open on Timmy's tab, the newest piece's (${cz.tabs})`);
+          if (cz.first !== 'New since you last looked: floss-mummy' || !cz.stamp) problems.push(`${name} (${label}): a piece that came since the last visit should be first, under New, stamped New (${cz.first})`);
+          if (!cz.foot) problems.push(`${name} (${label}): Customize's foot (Surprise me, Shop, Done) should be on the screen without scrolling`);
+          await page.click('dialog.tpv .tpv-cat[data-pick="yard"]').catch(() => {}); await page.waitForTimeout(400);
+          const front = await page.$('dialog.tpv .tpv-spot[data-pick="front"]');
+          if (!front) problems.push(`${name} (${label}): Customize's Yard tab didn't show the yard's spots`);
           else {
-            await front.click(); await page.waitForTimeout(400);
-            const cards = await page.$$eval('dialog.tpv .tpv-card[data-item]', els => els.map(e => e.dataset.item));
+            const at = await page.evaluate(() => window.shPlace.state().spot);
+            if (at !== 'front') problems.push(`${name} (${label}): the Yard tab should open on the first empty spot, the path's right (${at})`);
+            const cards = await page.$$eval('dialog.tpv .tpv-pane:not([hidden]) .tpv-card[data-item]', els => els.map(e => e.dataset.item));
             if (!cards.includes('mailbox') || cards.includes('campfire')) problems.push(`${name} (${label}): the customizer should offer what's owned and nothing else (${cards.join(', ')})`);
-            const mb = await page.$('dialog.tpv .tpv-card[data-item="mailbox"]'); if (mb) await mb.click();
+            /* the card answers in the click's own task: pressed, and the line under the heading says so */
+            const now = await page.evaluate(() => { const b = document.querySelector('dialog.tpv .tpv-pane:not([hidden]) .tpv-card[data-item="mailbox"]'); b.click();
+              return { pressed: b.getAttribute('aria-pressed'), line: document.querySelector('dialog.tpv .tpv-now').textContent }; });
+            if (now.pressed !== 'true' || !/mailbox/.test(now.line)) problems.push(`${name} (${label}): a pick should show on the panel at once (${JSON.stringify(now)})`);
             await page.waitForTimeout(900);
-            await page.click('dialog.tpv .tpv-tile[data-pick="side"]'); await page.waitForTimeout(400);
-            const lane = await page.$('dialog.tpv .tpv-card[data-item="bowling-lane"]'); if (lane) await lane.click();
+            await page.click('dialog.tpv .tpv-spot[data-pick="side"]'); await page.waitForTimeout(400);
+            const lane = await page.$('dialog.tpv .tpv-pane:not([hidden]) .tpv-card[data-item="bowling-lane"]'); if (lane) await lane.click();
             await page.waitForTimeout(1200);
-            const after = await page.evaluate(() => ({ eq: window.shPlace.state().equipped, corner: !!document.querySelector('dialog.tpv .tpv-tile[data-pick="corner"]'),
-              locked: (() => { return document.querySelectorAll('dialog.tpv .tpv-card.is-locked').length; })(), w: (() => { const d = document.querySelector('dialog.tpv'); return d.scrollWidth - d.clientWidth; })() }));
+            const after = await page.evaluate(() => ({ eq: window.shPlace.state().equipped, corner: !!document.querySelector('dialog.tpv .tpv-spot[data-pick="corner"]'),
+              w: (() => { const d = document.querySelector('dialog.tpv'); return d.scrollWidth - d.clientWidth; })() }));
             if (calls.join() !== 'yard-front=mailbox,yard-side=bowling-lane') problems.push(`${name} (${label}): the customizer should save each change through equip_item (${calls.join(', ') || 'no calls'})`);
             if (after.eq['yard-front'] !== 'mailbox' || after.eq['yard-side'] !== 'bowling-lane' || after.eq['yard-left'] !== 'garden') problems.push(`${name} (${label}): after two changes the place has ${JSON.stringify(after.eq)}`);
             if (after.corner) problems.push(`${name} (${label}): with the bowling lane in the side yard, the front corner should not be offered`);
             if (after.w > 1) problems.push(`${name} (${label}): Customize scrolls sideways by ${after.w}px`);
-            await page.click('dialog.tpv .tpv-tile[data-pick="timmy"]'); await page.waitForTimeout(400);
-            /* a year-round collection's piece (the desert's cowboy hat, migration_v65) is under its own tab, Collections,
-               headed by its collection, and its drawings (hub-art/place/desert.js) are fetched only because it's owned */
-            const co = await page.$('dialog.tpv [data-src="coll"]'); if (co) { await co.click(); await page.waitForTimeout(600); }
-            const coll = await page.evaluate(() => ({ cards: [...document.querySelectorAll('dialog.tpv .tpv-card[data-item]')].map(e => e.dataset.item), head: [...document.querySelectorAll('dialog.tpv .tpv-seth')].map(e => e.textContent),
-              tabs: (() => { const t = document.querySelector('dialog.tpv .tpv-tabs'); return t ? Math.round(t.getBoundingClientRect().right - t.parentElement.getBoundingClientRect().right) : 0; })(), w: (() => { const d = document.querySelector('dialog.tpv'); return d.scrollWidth - d.clientWidth; })() }));
-            if (!co || !coll.cards.includes('cowboy-hat') || coll.head.join() !== 'Desert ranch') problems.push(`${name} (${label}): an owned collection piece should be under Collections, headed by its collection (${JSON.stringify(coll)})`);
-            /* four tabs now (Classics, Collections, Seasonal, Rank): they fit the panel on a phone */
-            if (coll.tabs > 1 || coll.w > 1) problems.push(`${name} (${label}): the outfit tabs run ${coll.tabs}px past their panel (the view scrolls sideways by ${coll.w}px)`);
+            /* the stage's own tap areas pick too: the house opens the Home tab */
+            await page.evaluate(() => { const h = document.querySelector('dialog.tpv .tpv-stage').shadowRoot.querySelector('.tp-hithome'); if (h) h.dispatchEvent(new MouseEvent('click', { bubbles: true })); });
+            await page.waitForTimeout(400);
+            const cat = await page.evaluate(() => window.shPlace.state().cat);
+            if (cat !== 'home') problems.push(`${name} (${label}): tapping the house on the stage should open the Home tab (${cat})`);
+            await page.click('dialog.tpv .tpv-cat[data-pick="timmy"]'); await page.waitForTimeout(400);
+            /* a year-round collection's piece (the desert's cowboy hat, migration_v65) is in the one list under its
+               collection's name, and its drawings (hub-art/place/desert.js) are fetched only because it's owned */
+            const coll = await page.evaluate(() => { const gs = [...document.querySelectorAll('dialog.tpv .tpv-pane:not([hidden]) .tpv-grp')], g = gs.filter(x => x.querySelector('.tpv-seth').textContent === 'Desert ranch')[0];
+              return { head: gs.map(x => x.querySelector('.tpv-seth').textContent), hat: !!(g && g.querySelector('[data-item="cowboy-hat"]')),
+                tabs: (() => { const t = document.querySelector('dialog.tpv .tpv-cats'); return t ? Math.round(t.getBoundingClientRect().right - t.parentElement.getBoundingClientRect().right) : 0; })(), w: (() => { const d = document.querySelector('dialog.tpv'); return d.scrollWidth - d.clientWidth; })() }; });
+            if (!coll.hat) problems.push(`${name} (${label}): an owned collection piece should be in the list under its collection's name (${coll.head.join(' | ')})`);
+            if (coll.tabs > 1 || coll.w > 1) problems.push(`${name} (${label}): the four tabs run ${coll.tabs}px past their panel (the view scrolls sideways by ${coll.w}px)`);
             if (!asked.includes('hub-art/place/desert.js') || asked.some(u => /hub-art\/place\/(dino|moonbase|reef|arcade|rockshow)\.js/.test(u))) problems.push(`${name} (${label}): only the owned collection's drawings should load (${asked.join(', ')})`);
-            const rk = await page.$('dialog.tpv [data-src="rank"]'); if (rk) { await rk.click(); await page.waitForTimeout(300); }
-            const lk = await page.evaluate(() => { const l = document.querySelector('dialog.tpv .tpv-card.is-locked'); return l ? l.textContent : ''; });
+            const lk = await page.evaluate(() => [...document.querySelectorAll('dialog.tpv .tpv-pane:not([hidden]) .tpv-card.is-locked')].map(l => l.textContent).join(' | '));
             if (!/Reach Bronze/.test(lk)) problems.push(`${name} (${label}): a rank outfit not reached yet should show locked, with the rank that gives it (${lk})`);
             /* a later journey's piece (migration_v91) names its journey: "Reach ModuPro Gold" */
-            const lk2 = await page.evaluate(() => [...document.querySelectorAll('dialog.tpv .tpv-card.is-locked')].map(l => l.textContent).join(' | '));
-            if (!/Reach ModuPro Gold/.test(lk2)) problems.push(`${name} (${label}): a ModuPro rank outfit not reached yet should show locked with "Reach ModuPro Gold" (${lk2})`);
+            if (!/Reach ModuPro Gold/.test(lk)) problems.push(`${name} (${label}): a ModuPro rank outfit not reached yet should show locked with "Reach ModuPro Gold" (${lk})`);
             const names = await page.$$eval('dialog.tpv button, dialog.tpv [role="button"]', bs => bs.filter(b => !(b.getAttribute('aria-label') || b.textContent || '').trim()).length);
             if (names) problems.push(`${name} (${label}): ${names} button(s) in the place's full view have no name`);
+            /* every button names its click by a fixed data-tp, never a piece (widget/clicks.js reads the first data-*) */
+            const tps = await page.$$eval('dialog.tpv .tpv-cz button', bs => bs.filter(b => { const a = [...b.attributes].filter(x => /^data-/.test(x.name) && x.value)[0]; return !a || a.name !== 'data-tp'; }).length);
+            if (tps) problems.push(`${name} (${label}): ${tps} Customize button(s) don't name their click by a fixed data-tp first`);
+            /* Done, and Customize again: what was New has been seen */
+            await page.click('dialog.tpv [data-tp="done"]'); await page.waitForTimeout(400);
+            await page.click('dialog.tpv [data-tp="customize"]'); await page.waitForTimeout(500);
+            if (await page.$('dialog.tpv .tpv-grp.is-new')) problems.push(`${name} (${label}): after Done, the pieces marked New should have been seen`);
           }
           await page.keyboard.press('Escape'); await page.waitForTimeout(500);
           if (await page.$('dialog.tpv[open]')) problems.push(`${name} (${label}): Escape didn't close the place's full view`);
@@ -1986,7 +2009,7 @@ function lint(hub, A){
         else {
           await card.click(); await page.waitForSelector('dialog.tpv[open]', { timeout: 8000 }).catch(() => {});
           await page.click('dialog.tpv [data-tp="customize"]').catch(() => {}); await page.waitForTimeout(500);
-          await page.click('dialog.tpv .tpv-tile[data-pick="timmy"]').catch(() => {}); await page.waitForTimeout(500);
+          await page.click('dialog.tpv button[data-pick="timmy"]').catch(() => {}); await page.waitForTimeout(500);
           const hat = await page.$('dialog.tpv .tpv-card[data-item="sun-hat"]');
           if (!hat) problems.push(`${name} (${label}): the customizer has no sun hat to put on`);
           else {

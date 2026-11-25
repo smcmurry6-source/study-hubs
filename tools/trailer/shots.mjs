@@ -175,7 +175,9 @@ export const SHOTS = {
     await K.point([900, 420], 100);
     await K.rec.start();
     await K.at(K.word(1, "a home") - 0.95); await K.tap("[data-tp=customize2]", 320);
+    await K.at(K.word(1, "a home") - 0.5); await K.tap("[data-tp=pick-home]", 200);   /* Customize's tabs (2026-11-25) */
     await K.at(K.word(1, "a home") - 0.05); await K.tap(".tpv-card:has-text('Treehouse')", 320);
+    await K.at(K.word(1, "a yard") - 0.5); await K.tap("[data-tp=pick-yard]", 200);
     await K.at(K.word(1, "a yard") - 0.1); await K.tap("[data-tp=pick-side]", 300);
     await K.at(K.word(1, "and me") - 0.4); await K.tap("[data-tp=pick-timmy]", 300);
     await K.at(K.word(1, "dressed") - 0.45); await K.tap(".tpv-card:not(.on):visible >> nth=1", 300);
