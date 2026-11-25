@@ -2187,14 +2187,15 @@ function lint(hub, A){
       });
       bad.forEach(b => problems.push(`${url} (${label}): ${b}`));
       // the Settings sheet at the largest text (BUG-013): every row of buttons stays inside the sheet and the screen
+      // (a hub's Settings is its own page, #more/settings, since the widget's old Settings panel came out on 2026-11-25)
       if (tb.size) {
+        if (url.startsWith('hubs/')) { await page.evaluate(() => { location.hash = '#more/settings'; }); await page.waitForTimeout(500); }
         const off = await page.evaluate(() => {
           const btn = document.getElementById('setBtn'); if (btn) btn.click();
-          const sp = document.getElementById('shstat-settingspanel'); if (sp) sp.classList.add('is-open');
           const out = [], vw = document.documentElement.getBoundingClientRect();
-          document.querySelectorAll('.set-seg button, .shset-seg button, .dx-dlg .seg button').forEach(b => {
+          document.querySelectorAll('.set-seg button, .hx-main .settings .seg button, .dx-dlg .seg button').forEach(b => {
             const r = b.getBoundingClientRect(); if (!r.width) return;
-            const box = (b.closest('#shstat-settingspanel') || b.closest('.dx-dlgcard') || document.documentElement).getBoundingClientRect();
+            const box = (b.closest('.hx-main .settings') || b.closest('.dx-dlgcard') || document.documentElement).getBoundingClientRect();
             if (r.right > Math.min(vw.right, box.right) + 1 || r.left < Math.max(vw.left, box.left) - 1) {
               const seg = b.parentElement; out.push(`Settings: "${b.textContent.trim()}" (${seg.dataset.set || seg.dataset.key || seg.dataset.pref || 'a row'}) runs past the sheet's edge`);
             }

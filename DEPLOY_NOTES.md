@@ -32,6 +32,25 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-25 (the old pages' parts out of `widget/v3.js`, #TBD, Claude Code)** — The package "Take the old pages' parts
+  out of `widget/v3.js`" (the inbox line; Sam, 2026-11-24: "The cleanup sounds good"). v3.js no longer builds what only the
+  old single-file hub pages (down since 2026-11-19) drew or what a hub on the engine always hid: the desktop launcher and
+  its menu, the phone bar and its More sheet, the name badge, the inbox ribbon and its tour button, the old Settings panel
+  (with its background music and the study-music player, `window.shMusic`), and its old-page paths: the fixed top bar
+  (`#sh-topbar`, `reserveTopClearance`), the top-bar fitter for `header.hub-header` (`--sh-head-h`, always 0 on the
+  engine: `widget/v3.css`'s two rules that used it now read the same without it), the class picks' paint (`.sh-cp`; the
+  engine draws its own), the lecture pager, and the dark streak pill and update banner for a page without `shToast`.
+  `widget/drill.js` keeps only the picking (`shDrill.set/more/mark/streak`: the Daily Drill is a set of the Question Bank,
+  `#questions/drill`), not its dialog; `widget/fx.js` loses its marks on the old choices (`.qcard-choice`) and the
+  countdown pill. `widget/hub.js` opens Search, Class stats and Suggest with `window.shWidgetPanel()` instead of clicking
+  the hidden launcher's pills (so `widget/clicks.js` no longer counts those clicks as `widget:#shstat-*-pill` too), and
+  `widget/ranks-hub.js` reads the rank on `sh:stats-open`; `widget/hub.css` loses the rules that hid the parts that are
+  gone. v3.js 4,076 to 3,406 lines, drill.js 437 to 146, fx.js 335 to 229; `widget/hub-rest.bundle.js` 448 to 396 KB
+  (125 to 110 KB gzipped). Fixed on the way (BUG-202): a mock's results card's "See what I missed" looked for the old
+  pages' list and did nothing; it now turns on the mock's "Show only the misses". STYLE_RESULT Bundles rebuilt,
+  `sw.js` sh-v81; the smoke test's largest-text Settings check reads the hub's own Settings page (`#more/settings`).
+  Left, in [the inbox](vault/tasks/inbox.md): the same cleanup in `widget/tour.js`, `widget/linkask.js`,
+  `widget/clicks.js` and `widget/eggs.js`, and Sam's call on the study-music loops (`widget/audio/`), which nothing plays now.
 - **2026-11-25 (the boards' tie order and Link my devices' timing, Claude Code)** — two lines of the to-do list, one
   migration (`migration_v103.sql`, applied after the merge at 1-5 am Central). **The boards**: people tied on a place on
   the Ranks, streaks, right-in-a-row, arcade and fairy boards came back in whatever order the database read them, so they

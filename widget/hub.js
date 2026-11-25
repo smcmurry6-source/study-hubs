@@ -476,13 +476,12 @@
     document.body.appendChild(shell);
     shell.addEventListener("click", function(e){
       if (!e.target.closest("[data-search-open]")) return;
-      var p = document.getElementById("shstat-search-pill");
-      if (p) { p.click(); track("bar:search"); } else toast("Search is still loading. Try again in a moment.", "wait");
+      if (window.shWidgetPanel) { window.shWidgetPanel("search"); track("bar:search"); } else toast("Search is still loading. Try again in a moment.", "wait");
     });
     HX.paintMeters();
   }
   /* how many are studying this hub right now, you included (Sam, 2026-11-06: "a live study count everyone can see"):
-     the shared widget's presence channel, the same count the live hubs show on their widget button; a total, nothing
+     the shared widget's presence channel (sh:online, widget/v3.js); a total, nothing
      about who */
   var LIVE = 0;
   function liveNow(){ if (LIVE) return LIVE; try { return (window.shEggHooks && window.shEggHooks.online && window.shEggHooks.online()) || 1; } catch (e) { return 1; } }
@@ -1409,7 +1408,7 @@
       "</ul></section></div>";
     $$("[data-open]", el).forEach(function(b){ b.addEventListener("click", function(){
       var k = b.getAttribute("data-open"); if (k === "flag" && window.shOpenFlag) { window.shOpenFlag(); return; }
-      var open = function(){ var p = document.getElementById("shstat-" + k + "-pill"); if (p) p.click(); };
+      var open = function(){ if (window.shWidgetPanel) window.shWidgetPanel(k); };
       /* the Suggest box's "Also post it on the idea board" tick is the idea board's (widget/ideas.js): load it first */
       if (k === "suggest") loadScript(WIDGET + "ideas.js").then(open, open); else open();
     }); });
@@ -1588,7 +1587,7 @@
         rows.map(function(r){ return '<tr><th scope="row">' + lecDot(r.l.id) + esc(lecName(r.l.id)) + '</th><td class="r num">' + r.tried + " of " + r.total + '</td><td class="r num">' + r.right + '</td><td class="r num">' + (r.pct === null ? "–" : r.pct + "%") + "</td></tr>"; }).join("") + "</tbody></table></div></section>" +
       '<section class="panel wide" aria-labelledby="saH"><h2 id="saH">Achievements</h2><ul class="ach">' + (CORE.achievements || []).map(function(a){ var got = achMap()[a.id]; return '<li class="' + (got ? "got" : "") + '">' + icon(got ? "check" : "goal", 20) + "<span><b>" + esc(a.name) + "</b><small>" + esc(a.desc) + (typeof got === "string" ? " · " + esc(dateLabel(got)) : "") + "</small></span></li>"; }).join("") + "</ul></section>" +
       "</div>";
-    function boards(){ var b = document.getElementById("shstat-stats-pill"); if (b) b.click(); track("more:trophies"); }
+    function boards(){ if (window.shWidgetPanel) window.shWidgetPanel("stats"); track("more:trophies"); }
     if (useCase) {
       /* the rest of the page in the case's style (Sam, 2026-11-13: "the rest of the page doesnt match the epicness"): its
          look is in widget/trophies.css, so it shows once that is here */
@@ -1662,7 +1661,7 @@
     return h;
   }
   /* Settings: the cuts (font, background music, accent metal) are gone; text size and theme stay, plus the goal.
-     The extras use the same keys as widget/v3.js (EXTRAS) and the dashboard: keep the three in step. */
+     The extras use the same keys as the dashboard's (widget/dash.js, EXTRAS): keep the two in step. */
   var EXTRAS = [
     ["sh_pref_pet", "Timmy Tooth", "Your cartoon tooth buddy, on the bar: tap him to ask about the notes. He hides during mock exams. Off, an Ask button takes his place.", [["on", "On"], ["dash", "Dashboard only"], ["off", "Off"]]],
     ["sh_pref_eggs", "Hidden secrets", "Holidays, magic words and the other easter eggs. Clues are in the trophy case."],
@@ -1872,8 +1871,7 @@
     }
   };
   window.SH_DRILL = {
-    pool: function(){ return IDX.filter(function(q){ return isExamLec(q.lec) || isReview(q.lec); }).map(function(q){ var s = ansOf(q.id); return { id: q.id, lec: q.lec, last: s ? !!s.last : null, hy: (CORE.drillHy || {})[q.src] || "" }; }); },
-    render: function(el, qid){ var q = QBY[qid]; if (!q) return false; el.innerHTML = ""; el.appendChild(HX.card(q, { ctx: "drill" })); return true; }
+    pool: function(){ return IDX.filter(function(q){ return isExamLec(q.lec) || isReview(q.lec); }).map(function(q){ var s = ansOf(q.id); return { id: q.id, lec: q.lec, last: s ? !!s.last : null, hy: (CORE.drillHy || {})[q.src] || "" }; }); }
   };
   window.SH_PINS = true;
   window.SH_SECTION = section;

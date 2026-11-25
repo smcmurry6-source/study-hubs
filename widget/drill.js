@@ -9,52 +9,36 @@
         exam-review guide...). No more than 3 from one lecture in this pass.
    Any shortfall is filled from what's left. The set is picked once a day and saved, so it doesn't
    change under you; "10 more" picks another set that skips everything already seen today.
-   Length (survey round 2, 2026-10-20): 10, 20 or 30 questions, picked on the intro screen and remembered for every
-   hub in sh_drill_size; the caps above scale with it (spaced review up to 60% of the set, misses 80%, 30% per lecture).
-   Switching before you start grows the set (keeps what was picked, adds more) or trims it. The finish screen offers
-   more in any of the three lengths.
+   Length (survey round 2, 2026-10-20): 10, 20 or 30 questions; the day's first set is 10, or the length last picked in
+   the old drill dialog (sh_drill_size), and the caps above scale with it (spaced review up to 60% of the set, misses 80%,
+   30% per lecture). "More" offers another set in any of the three lengths.
 
-   The hub supplies the questions and draws each card with its own renderer (so every question type,
-   the explanation, class % and Report button look the way they do everywhere else):
+   The hub supplies the questions and shows the set as a set of its Question Bank (#questions/drill, widget/hub-bank.js;
+   the dashboard and #drill link there):
      window.SH_DRILL = {
        pool(): [{ id, lec, last: true | false | null (your latest try on this device),
-                  hy: "" or why it's high-yield, e.g. "On the class quiz" }],
-       render(el, qid): draw that question's card into el, wired to the hub's own answer handler;
-                        return false if the id is unknown
-       scope: optional label (string or function), e.g. "Midterm scope: sessions 1-4"
+                  hy: "" or why it's high-yield, e.g. "On the class quiz" }]
      }
-   Answers go through the hub's normal path (its answered event), so class stats, spaced review, XP
-   and Weak Spots all update as usual. Any element with data-sh-drill opens the drill; so does
-   opening a hub at #drill (the dashboard links there).
+     shDrill.set(cb): today's set, picked once and saved; shDrill.more(n, cb): n more that skip today's;
+     shDrill.mark(qid, correct): an answer to one of its questions (widget/hub-rewards.js); shDrill.streak().
 
-   This device only: sh_drill_size = "10" | "20" | "30"; sh_drill_<hub> = { day, items:[{id, why, note}], res:{qid: 1 | 0 | "s"},
-   start (first item of the current set), done (the day's first set is finished), cheer };
+   This device only: sh_drill_<hub> = { day, items:[{id, why, note}], res:{qid: 1 | 0 | "s"},
+   start (first item of the current set), done (the day's first set is finished) };
    sh_drill_days = { "YYYY-MM-DD": 1 } for the drill streak (a finished set in any hub counts). ============ */
 (function(){
   if (window.shDrill) return;
   var SIZES = [10, 20, 30];
   function size(){ var n = 10; try { n = +localStorage.getItem("sh_drill_size") || 10; } catch (e) {} return SIZES.indexOf(n) >= 0 ? n : 10; }
-  function setSize(n){ try { localStorage.setItem("sh_drill_size", String(n)); } catch (e) {} try { if (window.shTrack) window.shTrack("drill:size=" + n); } catch (e) {} }
   var H = null, HUB = "", KEY = "", DAYS_KEY = "sh_drill_days";
-  var dlg = null, body = null, opener = null, isOpen = false, cur = -1, stats = null;
+  var stats = null;
 
-  function svg(d){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + d + '</svg>'; }
-  var IC_BOLT = svg('<path d="M13 3 5 13.5h6L10 21l8-10.5h-6z"/>');
-  var IC_CHECK = svg('<path d="m5 12.5 4.2 4.2L19 7"/>');
-  var IC_X = svg('<path d="M7 7l10 10M17 7 7 17"/>');
-  var IC_SKIP = svg('<path d="M6 12h12"/>');
-  var IC_FLAME = svg('<path d="M12 21c3.6 0 6-2.4 6-5.6 0-3.4-2.4-5.3-3.4-8.4-.4 1.9-1.4 3.1-2.6 3.7.2-2.7-.9-5.3-3.2-6.7.3 3.1-2.8 5.4-2.8 9.3C6 18.6 8.4 21 12 21z"/>');
-
-  function still(){ try { return window.matchMedia("(prefers-reduced-motion: reduce)").matches; } catch (e) { return false; } }
-  function hook(){ var d = window.SH_DRILL; return d && typeof d.pool === "function" && typeof d.render === "function" ? d : null; }
-  function esc(s){ return H.esc(s); }
+  function hook(){ var d = window.SH_DRILL; return d && typeof d.pool === "function" ? d : null; }
   function today(){ return H.day(0); }
   function lsGet(k){ try { return JSON.parse(localStorage.getItem(k) || "null"); } catch (e) { return null; } }
   function lsSet(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
   function loadSet(){ var s = lsGet(KEY); return s && s.day === today() && Array.isArray(s.items) && s.items.length ? s : null; }
   function saveSet(s){ lsSet(KEY, s); }
   function pool(){ try { var p = hook().pool(); return Array.isArray(p) ? p.filter(function(x){ return x && x.id; }) : []; } catch (e) { return []; } }
-  function scopeLabel(){ try { var s = hook().scope; return String((typeof s === "function" ? s() : s) || ""); } catch (e) { return ""; } }
   function shuffle(a){ a = a.slice(); for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
   /* the current set, minus any question that has left the bank since it was picked (res "x") */
   function round(s){ return s.items.slice(s.start || 0).filter(function(it){ return s.res[it.id] !== "x"; }); }
@@ -122,269 +106,19 @@
     return shuffle(out);
   }
 
-  /* ---------- the dialog ---------- */
-  function build(){
-    dlg = document.createElement("div");
-    dlg.id = "sh-drill"; dlg.className = "sh-drill"; dlg.hidden = true;
-    dlg.setAttribute("role", "dialog"); dlg.setAttribute("aria-modal", "true"); dlg.setAttribute("aria-labelledby", "shd-title");
-    dlg.innerHTML = '<div class="shd-panel" tabindex="-1"></div>';
-    document.body.appendChild(dlg);
-    body = dlg.querySelector(".shd-panel");
-    dlg.addEventListener("click", function(e){
-      if (e.target === dlg) { close(); return; }
-      var b = e.target.closest && e.target.closest("[data-shd]"); if (!b || !dlg.contains(b)) return;
-      var act = b.getAttribute("data-shd");
-      if (act === "close") close();
-      else if (act === "start") { var s = loadSet(); if (s) showQ(s, Math.max(firstOpen(s), 0)); }
-      else if (act === "skip") skip();
-      else if (act === "next") next();
-      else if (act === "more") more(+b.getAttribute("data-n") || size());
-      else if (act === "size") resize(+b.getAttribute("data-n"));
-    });
-  }
-  function top(right){
-    return '<div class="shd-top"><span class="shd-kicker">' + IC_BOLT + 'Daily drill</span>' + (right || '') +
-      '<button type="button" class="shd-x" data-shd="close" aria-label="Close the daily drill">&times;</button></div>';
-  }
-  /* roll: the set that was just finished started today's streak day, so the number rolls up from yesterday's */
-  function streakLine(done, roll){
-    var n = streak(), counted = !!(lsGet(DAYS_KEY) || {})[today()];
-    if (!n) return done ? '' : '<p class="shd-streak">' + IC_FLAME + 'Finish a set today to start a drill streak.</p>';
-    var num = roll ? '<span class="shd-roll"><i class="o" aria-hidden="true">' + (n - 1) + '</i><i class="n">' + n + '</i></span>' : n;
-    if (done || counted) return '<p class="shd-streak">' + IC_FLAME + '<span><b>' + num + '-day</b> drill streak' + (n === 1 ? '. Come back tomorrow to keep it going.' : '. A set in any hub counts.') + '</span></p>';
-    return '<p class="shd-streak">' + IC_FLAME + '<span><b>' + n + '-day</b> drill streak. Finish today\'s set to make it ' + (n + 1) + '.</span></p>';
-  }
-  function questionText(id){
-    var ex = window.SH_EXPORT, qs = (ex && ex.questions) || [];
-    for (var i = 0; i < qs.length; i++) if (qs[i].id === id) { var t = String(qs[i].text || id); return t.length > 130 ? t.slice(0, 128) + "…" : t; }
-    return id;
-  }
-  function focusPanel(){ try { body.focus({ preventScroll: true }); } catch (e) {} dlg.scrollTop = 0; }
-
-  function showEmpty(){
-    cur = -1;
-    body.innerHTML = top() + '<h2 id="shd-title">Nothing to drill yet</h2>' +
-      '<p class="shd-how">Answer some questions in this hub first. The ones you miss, and high-yield ones from the lectures you study, will show up here each day.</p>' +
-      '<div class="shd-actions"><button type="button" class="shd-btn is-primary" data-shd="close">Close</button></div>';
-  }
-  function showIntro(s){
-    cur = -1;
-    var items = round(s), mix = {}, sc = scopeLabel();
-    items.forEach(function(it){ mix[it.why] = (mix[it.why] || 0) + 1; });
-    var rows = [["missed", "you missed last time"], ["due", "due for spaced review"], ["hy", "high-yield"], ["fresh", "to keep fresh"]]
-      .filter(function(r){ return mix[r[0]]; })
-      .map(function(r){ return '<li class="shd-mix-' + r[0] + '"><b>' + mix[r[0]] + '</b>' + r[1] + '</li>'; }).join("");
-    body.innerHTML = top() +
-      '<h2 id="shd-title">Today\'s drill</h2>' +
-      '<p class="shd-lead">' + items.length + (items.length === 1 ? ' question' : ' questions') + ', about ' + Math.max(2, Math.round(items.length * .6)) + ' minutes' + (sc ? ' · ' + esc(sc) : '') + '</p>' +
-      '<ul class="shd-mix">' + rows + '</ul>' +
-      (s.start || countDone(s) ? "" : lengthHTML()) +
-      '<p class="shd-how">Miss one and it comes back tomorrow. Get it right and it comes back after 1, 2, 4, then 7 days, and never later than the day before the exam, so what you studied stays fresh. A new set is picked every day.</p>' +
-      '<div class="shd-actions"><button type="button" class="shd-btn is-primary" data-shd="start">Start</button></div>' +
-      streakLine(false);
-  }
-  /* how many questions: 10, 20 or 30 (only before the day's first set is started) */
-  function lengthHTML(){
-    return '<div class="shd-len" role="group" aria-label="How many questions"><span>Length</span>' + SIZES.map(function(n){
-      return '<button type="button" class="shd-len-btn" data-shd="size" data-n="' + n + '" aria-pressed="' + (n === size()) + '">' + n + '</button>';
-    }).join("") + '</div>';
-  }
-  function resize(n){
-    if (SIZES.indexOf(n) < 0) return;
-    var s = loadSet(); setSize(n);
-    if (!s || s.start || countDone(s)) { if (s) showIntro(s); return; }
-    if (s.items.length > n) { s.items = s.items.slice(0, n); saveSet(s); showIntro(s); refreshEntry(); return; }
-    loadStats(function(){
-      var seen = {}; s.items.forEach(function(it){ seen[it.id] = 1; });
-      s.items = s.items.concat(pick(n - s.items.length, seen)); saveSet(s);
-      if (isOpen) showIntro(s);
-      refreshEntry();
-    });
-  }
-  function showQ(s, i){
-    var it = s.items[i]; if (!it) { showDone(s); return; }
-    cur = i;
-    var items = round(s), total = items.length, pos = items.indexOf(it) + 1, answered = s.res[it.id] === 1 || s.res[it.id] === 0;
-    var last = firstOpenAfter(s, i) < 0;
-    body.innerHTML = top('<span class="shd-count">' + pos + ' of ' + total + '</span>') +
-      '<div class="shd-bar" aria-hidden="true"><i style="width:' + Math.round(100 * countDone(s) / total) + '%"></i></div>' +
-      '<h2 id="shd-title" class="shd-sr">Daily drill, question ' + pos + ' of ' + total + '</h2>' +
-      '<div class="shd-why shd-why-' + it.why + '">' + esc(it.note) + '</div>' +
-      '<div class="shd-card"></div>' +
-      '<div class="shd-nav"><button type="button" class="shd-btn is-quiet" data-shd="skip"' + (answered ? ' hidden' : '') + '>Skip</button>' +
-      '<button type="button" class="shd-btn is-primary" data-shd="next"' + (answered ? '' : ' hidden') + '>' + (last ? 'Finish' : 'Next') + '</button></div>';
-    var ok = false;
-    try { ok = hook().render(body.querySelector(".shd-card"), it.id) !== false; } catch (e) { ok = false; }
-    if (!ok) { s.res[it.id] = "x"; finishCheck(s); saveSet(s); next(); return; }  /* no longer in the bank */
-    focusPanel();
-  }
-  function countDone(s){ return round(s).filter(function(it){ return has(s, it.id); }).length; }
-  function firstOpenAfter(s, i){
-    for (var j = i + 1; j < s.items.length; j++) if (!has(s, s.items[j].id)) return j;
-    for (j = s.start || 0; j < i; j++) if (!has(s, s.items[j].id)) return j;
-    return -1;
-  }
-  var freshDay = false;   // the set just finished was the first one today (showDone rolls the streak number)
+  /* the day's set is finished: count the day for the drill streak (once) */
   function finishCheck(s){
     if (firstOpen(s) >= 0) return;
-    if (!s.done) { s.done = true; freshDay = !(lsGet(DAYS_KEY) || {})[today()]; markDay(); }
+    if (!s.done) { s.done = true; markDay(); }
   }
-  function next(){
-    var s = loadSet(); if (!s) { close(); return; }
-    var j = cur < 0 ? firstOpen(s) : firstOpenAfter(s, cur);
-    if (j < 0) showDone(s); else showQ(s, j);
-    refreshEntry();
-  }
-  function skip(){
-    var s = loadSet(); if (!s || cur < 0) return;
-    var id = s.items[cur].id; if (!has(s, id)) s.res[id] = "s";
-    finishCheck(s); saveSet(s); next();
-  }
-  function showDone(s){
-    cur = -1;
-    var items = round(s), right = 0, wrong = 0, skipped = 0;
-    items.forEach(function(it){ var r = s.res[it.id]; if (r === 1) right++; else if (r === 0) wrong++; else skipped++; });
-    var extra = (s.start || 0) > 0, fresh = s.cheer !== s.items.length && right + wrong > 0, roll = fresh && freshDay;
-    freshDay = false;
-    /* the check draws itself, the score counts up, the results tick in one by one (CSS in v3.css) */
-    body.innerHTML = top() + '<div class="shd-done' + (fresh ? ' is-fresh' : '') + '">' +
-      '<div class="shd-done-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path pathLength="1" d="m5 12.5 4.2 4.2L19 7"/></svg></div>' +
-      '<h2 id="shd-title">' + (extra ? 'Extra set done' : 'Drill done for today') + '</h2>' +
-      '<p class="shd-lead">' + (right + wrong ? '<b class="shd-cnt">' + right + '</b> of ' + (right + wrong) + ' right' : 'All skipped') + (skipped && right + wrong ? ' · ' + skipped + ' skipped' : '') + '</p>' +
-      '<p class="shd-how">' + (wrong ? (wrong === 1 ? 'The one you missed comes back tomorrow. ' : 'The ' + wrong + ' you missed come back tomorrow. ') : '') +
-        (right ? 'The ones you got right come back in a day or two, a little later each time, and before the exam.' : '') + '</p>' +
-      streakLine(true, roll) +
-      '<div class="shd-actions">' + SIZES.map(function(n){ return '<button type="button" class="shd-btn' + (n === size() ? ' is-primary' : '') + '" data-shd="more" data-n="' + n + '">' + n + ' more</button>'; }).join("") +
-      '<button type="button" class="shd-btn is-quiet" data-shd="close">Close</button></div>' +
-      '<ol class="shd-results" aria-label="How you did">' + items.map(function(it, i){
-        var r = s.res[it.id], cls = r === 1 ? "ok" : r === 0 ? "bad" : "skip";
-        return '<li class="is-' + cls + '" style="--i:' + Math.min(i, 14) + '"><span class="shd-res-ic" role="img" aria-label="' + (r === 1 ? 'Right' : r === 0 ? 'Missed' : 'Skipped') + '">' + (r === 1 ? IC_CHECK : r === 0 ? IC_X : IC_SKIP) + '</span><span>' + esc(questionText(it.id)) + '</span></li>';
-      }).join("") + '</ol></div>';
-    var cnt = body.querySelector(".shd-cnt");
-    if (cnt && right > 1 && !still()) {
-      var t0 = performance.now() + 250;
-      cnt.textContent = "0";
-      (function tick(now){
-        var u = Math.max(0, Math.min(1, (now - t0) / 700));
-        cnt.textContent = Math.round(right * (1 - Math.pow(1 - u, 3)));
-        if (u < 1 && cnt.isConnected) requestAnimationFrame(tick);
-      })(performance.now());
-    }
-    if (fresh) { s.cheer = s.items.length; saveSet(s); try { H.confetti(); } catch (e) {} }
-    focusPanel();
-  }
-  function more(n){
-    var s = loadSet(); if (!s) return;
-    if (n !== size()) setSize(n);
-    try { if (window.shTrack) window.shTrack("drill:more=" + n); } catch (e) {}
-    var btns = body.querySelectorAll('[data-shd="more"]');
-    btns.forEach(function(b){ b.disabled = true; });
-    loadStats(function(){
-      var seen = {}; s.items.forEach(function(it){ seen[it.id] = 1; });
-      var add = pick(n, seen);
-      if (!add.length) {
-        btns.forEach(function(b){ b.hidden = true; });
-        var how = body.querySelector(".shd-how"); if (how) how.textContent = "That's every question in scope for today. Come back tomorrow for a fresh set.";
-        return;
-      }
-      s.start = s.items.length; s.items = s.items.concat(add); saveSet(s);
-      showQ(s, s.start); refreshEntry();
-    });
-  }
-  function route(s){
-    if (!s) { showEmpty(); return; }
-    var i = firstOpen(s);
-    if (i < 0) showDone(s);
-    else if (!(s.start || 0) && !countDone(s)) showIntro(s);
-    else showQ(s, i);
-  }
-
-  function open(from){
-    if (!hook() || isOpen) return;
-    if (window.shCloseWidgetPanels) window.shCloseWidgetPanels();
-    opener = from && from.focus ? from : document.activeElement;
-    if (!dlg) build();
-    dlg.hidden = false; isOpen = true;
-    document.documentElement.classList.add("sh-drill-open");
-    var s = loadSet();
-    if (s) route(s);
-    else {
-      body.innerHTML = top() + '<p class="shd-lead" id="shd-title">Picking today\'s questions…</p>';
-      loadStats(function(){
-        if (!isOpen) return;
-        var s2 = loadSet();
-        if (!s2) { var items = pick(size(), {}); if (items.length) { s2 = { day: today(), items: items, res: {}, start: 0 }; saveSet(s2); } }
-        route(s2);
-        refreshEntry();
-      });
-    }
-    focusPanel();
-    refreshEntry();
-  }
-  function close(){
-    if (!isOpen) return;
-    isOpen = false; cur = -1; dlg.hidden = true; body.innerHTML = "";
-    document.documentElement.classList.remove("sh-drill-open");
-    refreshEntry();
-    try { if (opener && opener.focus && document.contains(opener)) opener.focus({ preventScroll: true }); } catch (e) {}
-    try { document.dispatchEvent(new CustomEvent("sh:drill-close")); } catch (e) {}
-  }
-
-  function onAnswered(e){
-    if (!isOpen || cur < 0) return;
-    var s = loadSet(), d = (e && e.detail) || {}; if (!s) return;
-    var it = s.items[cur];
-    if (!it || String(d.qid) !== it.id || s.res[it.id] === 1 || s.res[it.id] === 0) return;
-    s.res[it.id] = d.correct ? 1 : 0;
-    finishCheck(s); saveSet(s);
-    var sk = body.querySelector('[data-shd="skip"]'), nx = body.querySelector('[data-shd="next"]'), bar = body.querySelector(".shd-bar i");
-    if (sk) sk.hidden = true;
-    if (nx) nx.hidden = false;
-    if (bar) bar.style.width = Math.round(100 * countDone(s) / round(s).length) + "%";
-    refreshEntry();
-  }
-
-  /* ---------- entry points: the menu / phone-bar item and the desktop chip ---------- */
-  function status(){
-    var s = loadSet();
-    if (s && s.done) return { state: "done" };
-    if (s) return { state: "going", n: countDone(s), total: round(s).length };
-    var srs = H.srs() || {}, t = today(), n = 0;
-    pool().forEach(function(p){ var r = srs[p.id]; if (r && r.due && r.due <= t) n++; });
-    return { state: "new", due: n };
-  }
-  function refreshEntry(){
-    var pill = document.getElementById("shstat-drill-pill"), chip = document.getElementById("sh-drill-chip");
-    if (!hook()) { if (pill) pill.hidden = true; if (chip) chip.hidden = true; return; }
-    var st = status();
-    if (pill) {
-      pill.hidden = false;
-      var badge = pill.querySelector(".shd-badge");
-      if (badge) {
-        badge.hidden = !(st.state === "going" || (st.state === "new" && st.due) || st.state === "done");
-        badge.className = "shd-badge" + (st.state === "done" ? " is-done" : "");
-        badge.innerHTML = st.state === "done" ? IC_CHECK : st.state === "going" ? st.n + "/" + st.total : String(st.due || "");
-      }
-      pill.setAttribute("aria-label", "Daily drill: " + (st.state === "done" ? "done for today" : st.state === "going" ? st.n + " of " + st.total + " done" : st.due ? st.due + " due for review" : "today's questions"));
-    }
-    if (chip) {
-      chip.hidden = st.state === "done" || isOpen;
-      var lab = chip.querySelector(".shd-chip-sub");
-      if (lab) lab.textContent = st.state === "going" ? st.n + " of " + st.total : st.due ? st.due + " due" : size() + " questions";
-    }
-  }
-
   window.shDrill = {
-    /* the redesigned hubs (widget/hub.js, not live yet) show the day's set as a preset of their question bank instead
-       of this dialog: set(cb) hands over today's set, picked and saved exactly as the dialog does it, and mark() records
-       an answer to one of its questions. The live hubs never call these. */
     set: function(cb){
       if (!H || !hook()) { cb(null); return; }
       var s = loadSet(); if (s) { cb(s); return; }
       loadStats(function(){
         var s2 = loadSet();
         if (!s2) { var items = pick(size(), {}); if (items.length) { s2 = { day: today(), items: items, res: {}, start: 0 }; saveSet(s2); } }
-        refreshEntry(); cb(s2 || null);
+        cb(s2 || null);
       });
     },
     more: function(n, cb){
@@ -395,43 +129,18 @@
       if (!items.length) { cb(s); return; }
       s.start = s.items.length; s.items = s.items.concat(items); s.done = false; saveSet(s);
       try { if (window.shTrack) window.shTrack("drill:more=" + n); } catch (e) {}
-      refreshEntry(); cb(s);
+      cb(s);
     },
     mark: function(qid, correct){
-      var s = loadSet(); if (!s || isOpen) return;
+      var s = loadSet(); if (!s) return;
       var it = round(s).filter(function(x){ return x.id === String(qid); })[0];
       if (!it || s.res[it.id] === 1 || s.res[it.id] === 0) return;
-      s.res[it.id] = correct ? 1 : 0; finishCheck(s); saveSet(s); refreshEntry();
+      s.res[it.id] = correct ? 1 : 0; finishCheck(s); saveSet(s);
     },
     streak: function(){ return H ? streak() : 0; },
     mount: function(hooks){
       if (H || !hooks) return;
       H = hooks; HUB = hooks.hub; KEY = "sh_drill_" + HUB;
-      document.addEventListener(hooks.answeredEvent, onAnswered);
-      document.addEventListener("click", function(e){
-        var b = e.target.closest && e.target.closest("[data-sh-drill]");
-        if (b) { e.preventDefault(); open(b); }
-      });
-      /* Esc closes the drill, unless a widget sheet (e.g. Report) is open on top of it: that closes first */
-      document.addEventListener("keydown", function(e){
-        if (!isOpen) return;
-        if (e.key === "Escape") { if (!document.body.classList.contains("sh-sheet-open")) close(); return; }
-        if (e.key === "Enter" && cur >= 0) {
-          var t = e.target, tag = t && t.tagName;
-          if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || (tag === "BUTTON" && !t.disabled && t !== body)) return;
-          var nx = body.querySelector('[data-shd="next"]'); if (nx && !nx.hidden) { e.preventDefault(); next(); }
-        }
-      }, true);
-      document.addEventListener("visibilitychange", function(){ if (document.visibilityState === "visible") refreshEntry(); });
-      refreshEntry();
-      if (/^#drill$/.test(location.hash) && hook()) {
-        try { history.replaceState(null, "", location.pathname + location.search); } catch (e) {}
-        setTimeout(function(){ open(); }, 350);
-      }
-    },
-    open: open,
-    close: close,
-    isOpen: function(){ return isOpen; },
-    status: function(){ return H && hook() ? status() : null; }
+    }
   };
 })();

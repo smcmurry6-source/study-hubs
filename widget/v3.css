@@ -774,11 +774,12 @@ mark.sh-hl.sh-hl-c-o{background:rgba(255,140,30,.38);} [data-theme="dark"] mark.
 .sh-hl-swatch{width:12px; height:12px; border-radius:3px; background:#ffd400;}
 
 /* ---------- lecture notes (v3.js "lecture notes" block): drawn figures that fit on screen with their controls.
-   --sh-head-h and --sh-vh come from v3.js (--sh-vh is the screen height in the page's own px, which 100vh isn't once
-   the text size zooms <html>). */
+   --sh-vh comes from v3.js (the screen height in the page's own px, which 100vh isn't once the text size zooms <html>).
+   The pinned figure's top is widget/hub.css's, under the bar. (--sh-head-h, the old pages' top bar, was 0 on a hub on the
+   engine; it came out on 2026-11-25.) */
 @media (min-width:861px){
-  .anima .iso-plate svg{max-height:max(220px, calc((var(--sh-vh, 100vh) - var(--sh-head-h, 56px)) * .62 - 85px))}
-  .anima > figure.sh-fig-pin{position:sticky;top:calc(var(--sh-head-h, 56px) + 6px);z-index:4;background:var(--surface, #fff);
+  .anima .iso-plate svg{max-height:max(220px, calc(var(--sh-vh, 100vh) * .62 - 85px))}
+  .anima > figure.sh-fig-pin{position:sticky;top:6px;z-index:4;background:var(--surface, #fff);
     border-radius:var(--radius, 12px);box-shadow:0 10px 18px -14px rgba(0,0,0,.45)}
 }
 

@@ -2463,8 +2463,7 @@ return '<a class="hx-tab" href="#' + v[0] + '" data-mode="' + v[0] + '">' + icon
 document.body.appendChild(shell);
 shell.addEventListener("click", function(e){
 if (!e.target.closest("[data-search-open]")) return;
-var p = document.getElementById("shstat-search-pill");
-if (p) { p.click(); track("bar:search"); } else toast("Search is still loading. Try again in a moment.", "wait");
+if (window.shWidgetPanel) { window.shWidgetPanel("search"); track("bar:search"); } else toast("Search is still loading. Try again in a moment.", "wait");
 });
 HX.paintMeters();
 }
@@ -3261,7 +3260,7 @@ MORE_ROWS.map(function(m){ return '<li><a href="#more/' + m[0] + '">' + icon(m[1
 "</ul></section></div>";
 $$("[data-open]", el).forEach(function(b){ b.addEventListener("click", function(){
 var k = b.getAttribute("data-open"); if (k === "flag" && window.shOpenFlag) { window.shOpenFlag(); return; }
-var open = function(){ var p = document.getElementById("shstat-" + k + "-pill"); if (p) p.click(); };
+var open = function(){ if (window.shWidgetPanel) window.shWidgetPanel(k); };
 if (k === "suggest") loadScript(WIDGET + "ideas.js").then(open, open); else open();
 }); });
 var t = $("[data-tour]", el); t.addEventListener("click", function(){ track("more:tour"); startTour(); });
@@ -3416,7 +3415,7 @@ var grid = '<div class="stats-grid">' + rankPanel +
 rows.map(function(r){ return '<tr><th scope="row">' + lecDot(r.l.id) + esc(lecName(r.l.id)) + '</th><td class="r num">' + r.tried + " of " + r.total + '</td><td class="r num">' + r.right + '</td><td class="r num">' + (r.pct === null ? "–" : r.pct + "%") + "</td></tr>"; }).join("") + "</tbody></table></div></section>" +
 '<section class="panel wide" aria-labelledby="saH"><h2 id="saH">Achievements</h2><ul class="ach">' + (CORE.achievements || []).map(function(a){ var got = achMap()[a.id]; return '<li class="' + (got ? "got" : "") + '">' + icon(got ? "check" : "goal", 20) + "<span><b>" + esc(a.name) + "</b><small>" + esc(a.desc) + (typeof got === "string" ? " · " + esc(dateLabel(got)) : "") + "</small></span></li>"; }).join("") + "</ul></section>" +
 "</div>";
-function boards(){ var b = document.getElementById("shstat-stats-pill"); if (b) b.click(); track("more:trophies"); }
+function boards(){ if (window.shWidgetPanel) window.shWidgetPanel("stats"); track("more:trophies"); }
 if (useCase) {
 grid = '<div class="stats-grid stx" style="visibility:hidden">' + statsEpic(rows, answered, rightN, acc, days) + "</div>";
 if (host) $(".stats-grid", body).outerHTML = grid;
@@ -3663,8 +3662,7 @@ else if (Date.now() - LOADED < 8000 && view === "questions" && !HX.SESSION.n && 
 }
 };
 window.SH_DRILL = {
-pool: function(){ return IDX.filter(function(q){ return isExamLec(q.lec) || isReview(q.lec); }).map(function(q){ var s = ansOf(q.id); return { id: q.id, lec: q.lec, last: s ? !!s.last : null, hy: (CORE.drillHy || {})[q.src] || "" }; }); },
-render: function(el, qid){ var q = QBY[qid]; if (!q) return false; el.innerHTML = ""; el.appendChild(HX.card(q, { ctx: "drill" })); return true; }
+pool: function(){ return IDX.filter(function(q){ return isExamLec(q.lec) || isReview(q.lec); }).map(function(q){ var s = ansOf(q.id); return { id: q.id, lec: q.lec, last: s ? !!s.last : null, hy: (CORE.drillHy || {})[q.src] || "" }; }); }
 };
 window.SH_PINS = true;
 window.SH_SECTION = section;
