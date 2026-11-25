@@ -166,18 +166,21 @@ try {
   `);
   /* v96: a hub down 40 days ('ret-gone'): pk-K's answers 45 and 44 days old (the release's kind, with their awards) and one
      on a live hub, pk-H's 50 days old with a Bronze medal; pk-G's like pk-K's but with one sent 10 days ago, so all of
-     pk-G's wait (a person's answers on a hub are packed together); a hub down only 10 days ('ret-soon') isn't due yet */
+     pk-G's wait (a person's answers on a hub are packed together); a hub down only 10 days ('ret-soon') isn't due yet.
+     Each day's answers start at noon Central of that day (noonCT), not at now() less the days: the summaries count
+     Central days, and a run late in the evening crossed midnight with them (BUG-203) */
+  const noonCT = days => `((((now() at time zone 'America/Chicago')::date - ${days}) + time '12:00') at time zone 'America/Chicago')`;
   sql(`
     insert into hubs_down (hub, day) values ('ret-gone', current_date - 40), ('ret-soon', current_date - 10);
     insert into personal_answers (visitor_id, hub, qid, correct, answered_at)
-      select v, 'ret-gone', 'g' || (g % 7), g % 3 <> 0, now() - interval '45 days' + g * interval '40 seconds' from generate_series(1, 30) g, unnest(array['pk-G', 'pk-K']) v;
+      select v, 'ret-gone', 'g' || (g % 7), g % 3 <> 0, ${noonCT(45)} + g * interval '40 seconds' from generate_series(1, 30) g, unnest(array['pk-G', 'pk-K']) v;
     insert into personal_answers (visitor_id, hub, qid, correct, answered_at)
-      select v, 'ret-gone', 'g' || (g % 5), g % 2 = 0, now() - interval '44 days' + g * interval '40 seconds' from generate_series(1, 12) g, unnest(array['pk-G', 'pk-K']) v;
+      select v, 'ret-gone', 'g' || (g % 5), g % 2 = 0, ${noonCT(44)} + g * interval '40 seconds' from generate_series(1, 12) g, unnest(array['pk-G', 'pk-K']) v;
     insert into personal_answers (visitor_id, hub, qid, correct, answered_at)
-      select 'pk-H', 'ret-gone', 'h' || g, true, now() - interval '50 days' + g * interval '50 seconds' from generate_series(1, 22) g;
+      select 'pk-H', 'ret-gone', 'h' || g, true, ${noonCT(50)} + g * interval '50 seconds' from generate_series(1, 22) g;
     insert into personal_answers (visitor_id, hub, qid, correct, answered_at) values
-      ('pk-G', 'ret-gone', 'g1', true, now() - interval '10 days'), ('pk-K', 'ret-live', 'l1', true, now() - interval '45 days' + interval '1 hour'),
-      ('pk-H', 'ret-soon', 's1', true, now() - interval '50 days');
+      ('pk-G', 'ret-gone', 'g1', true, now() - interval '10 days'), ('pk-K', 'ret-live', 'l1', true, ${noonCT(45)} + interval '1 hour'),
+      ('pk-H', 'ret-soon', 's1', true, ${noonCT(50)});
     insert into answer_xp (answer_id, ctx, kind) select id, 'bank', 'one' from personal_answers where visitor_id in ('pk-G', 'pk-H', 'pk-K');
     select sh_xp_rebuild(array['pk-G', 'pk-H', 'pk-K']);
     insert into achievements (visitor_id, kind, hub, created_at) values ('pk-H', 'mastery-bronze', 'ret-gone', now() - interval '45 days');
