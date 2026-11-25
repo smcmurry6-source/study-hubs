@@ -32,6 +32,19 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-25 (the boards' tie order and Link my devices' timing, Claude Code)** — two lines of the to-do list, one
+  migration (`migration_v103.sql`, applied after the merge at 1-5 am Central). **The boards**: people tied on a place on
+  the Ranks, streaks, right-in-a-row, arcade and fairy boards came back in whatever order the database read them, so they
+  could swap between loads (and at a board's limit, who showed could change); now a tie is by the name shown, case aside,
+  then the id, as the Crowns board already was (`get_rank_board_v2` is PL/pgSQL now). **Link my devices** ran out of
+  anon's 3 s for people with many answers: the Postgres logs held 24 timed-out links from 2026-11-18 (19 of them that
+  overloaded day), and the 7 that finished took 2.0 s on average, up to 2.7 s. It rebuilt XP twice (the answers' update
+  trigger, then its own rebuild); now once (`sh.linking`, which `sh_xp_on_update` skips on), and the rebuild's replay looks
+  a boost up inline instead of a PL/pgSQL call per answer: 770 → 350 ms on a throwaway copy with a 10,000-answer visitor,
+  every total, award and day the same. `tools/release/xp.js` section 21; section 16 compares the boards in the order they
+  come back. Left on the to-do list: the page's "That code didn't work" after a timeout, and reading the link times a week
+  after the apply ([game-server](vault/reference/game-server.md)).
+
 - **2026-11-24 (Review of Systems: every question vetted, Claude Code)** — Sam: "Vet all questions, the answer key, and
   explanations in review of systems for accuracy, clarity, effectiveness, completeness. Make any necessary changes." All
   1,369 questions were read in 19 slices (a course or part of one each): answered cold, then the key, the explanation and
