@@ -16,7 +16,11 @@ tags: [widget, supabase]
   which is what the widget reads for search and "toughest questions". A hub with review-only questions (questions it keeps for
   review but leaves out of its totals) adds `uncounted()`, returning `{ n, right }` (how many, how many right on the
   latest try), and `widget/ranks.js` takes them off both sides of the mastery medal (Heme & Endo Exam 2's Exam 1
-  Refresher, 2026-11-06).
+  Refresher, 2026-11-06). A hub on the engine opens the widget's panels with `window.shWidgetPanel("search" | "stats" | "suggest")`
+  and Report with `window.shOpenFlag()`; opening Class stats sends `sh:stats-open`, on which `widget/ranks-hub.js` reads
+  the rank again. What v3.js drew only for the old single-file pages (the launcher, the name badge, the inbox ribbon, the
+  old Settings panel, the Daily Drill dialog, the top bar and its fitter, the lecture pager, the class picks' paint) came
+  out on 2026-11-25; the Daily Drill is a set of the Question Bank (`#questions/drill`), picked by `widget/drill.js`.
 - **The dashboard and the hubs on the engine load the widget from bundles** (2026-11-13): `widget/rest.bundle.js`
   and, on a hub, `widget/hub-rest.bundle.js` hold the files above, built from them by `node tools/bundle/build.mjs`
   ([bundles](bundles.md)). `widgetFile()` in `widget/v3.js` is the one place v3.js loads its other files: it runs a
@@ -55,8 +59,8 @@ tags: [widget, supabase]
   every short message on the dashboard and a hub (a tip, "still loading", "couldn't open", a sync, a streak cheer, an
   achievement, Focus mode, "a newer version is live") is a sticker in the reward card's family, its styles `.hx-toast` in
   `widget/hub.css`. It runs first in `hub.bundle.js` and `dash.bundle.js`; `hub.js`'s and `dash.js`'s `toast()` call it,
-  and `widget/v3.js` (the streak cheer, Welcome back, the update notice) and `widget/pet.js` use it when it's there (an
-  old page without it keeps the dark pill). **A new message calls it with a kind** (the list is at the top of the file);
+  and `widget/v3.js` (the streak cheer, Welcome back, the update notice) goes through it only (its dark pill and update
+  banner for a page without it came out on 2026-11-25), and `widget/pet.js` uses it when it's there. **A new message calls it with a kind** (the list is at the top of the file);
   what pays XP or crowns goes on the gold reward card (`widget/prize.js`) instead ([decisions](../decisions.md)).
 - **`widget/teeth.js`** (`window.SH_TEETH`; `require()` in Node): the tooth library (Patient Box v2, 2026-11-20): Wheeler's
   sizes and outlines and one catalogue entry for each of the 32 teeth. The case kit reads it and the figure builds import it

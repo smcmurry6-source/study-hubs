@@ -1174,14 +1174,12 @@ button.likely[aria-expanded="true"] .chev .ic { transform: rotate(90deg); }
 :root .cg-tag { font-family: var(--font); font-size: 12px; letter-spacing: 0; text-transform: none; }
 
 /* ---------- the shared widget, inside the new hub only ---------- */
-:root #shstat-menu, :root .shstat-launchrow, :root #sh-topbar, :root #shname-badge,
-:root body > .sh-ribbon-inbox { display: none !important; }   /* the old top bar's Inbox and Tour buttons: More has both */
 :root #shstat-root { right: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); }
 /* the widget's panels open from the new hub's own buttons (More, the search button); closed, they're not on the page */
 :root #shstat-panel:not(.is-open), :root #shstat-flagpanel:not(.is-open), :root #shstat-suggestpanel:not(.is-open),
-:root #shstat-searchpanel:not(.is-open), :root #shstat-settingspanel:not(.is-open) { display: none !important; }
-:root #shstat-root, :root #shstat-backdrop, :root .sh-egg, :root .sh-egg-board, :root .sh-rank-sec, :root .sh-name-dlg, :root .sh-drill,
-:root .sh-update-toast, :root .shstat-streaktoast { --shw-shadow: var(--float-shadow); }
+:root #shstat-searchpanel:not(.is-open) { display: none !important; }
+:root #shstat-root, :root #shstat-backdrop, :root .sh-egg, :root .sh-egg-board, :root .sh-rank-sec,
+:root .sh-name-dlg { --shw-shadow: var(--float-shadow); }
 :root .sh-reply { box-shadow: var(--float-shadow); font-family: var(--font); }
 :root #shstat-root h5, :root #shstat-root label, :root .sh-rank-eyebrow, :root .sh-trophies-h, :root .sh-trophies-h * {
   text-transform: none; letter-spacing: 0; font-family: var(--font); }
@@ -1400,7 +1398,7 @@ html.hx-still .eve-card *, html.hx-still .eve-mini *, html.hx-still .sh-egg-eve 
   :root .hx .pod-x .sh-pod-ch { grid-template-columns: 48px minmax(0, 1fr) auto; padding: 10px 12px; }
 }
 :root .sh-tts-dock { font-family: var(--font); }
-:root #shstat-panel, :root #shstat-flagpanel, :root #shstat-suggestpanel, :root #shstat-searchpanel, :root #shstat-settingspanel { font-family: var(--font); border-radius: var(--r-panel); }
+:root #shstat-panel, :root #shstat-flagpanel, :root #shstat-suggestpanel, :root #shstat-searchpanel { font-family: var(--font); border-radius: var(--r-panel); }
 
 /* ---------- tablet: the meters move to the strip under the bar ---------- */
 @media (max-width: 1100px) {

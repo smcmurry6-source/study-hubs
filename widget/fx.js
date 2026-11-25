@@ -2,140 +2,47 @@
    Small motion for the things that happen all the time, so studying feels responsive without slowing anyone down
    (the big moments, rank-ups, trophies and the mock results card, live in widget/rankup.js):
 
-   - Answer feedback. Answer a question card (bank, weak spots, drill, review) and the right choice pops with a ring and
-     a check mark that draws itself; a wrong pick shakes and gets an X, then the right one lights up. Select-all,
-     ordering and matching cards mark each option in turn, and the explanation slides open. It watches the hub's own
-     card states (.is-correct / .is-wrong / .is-matched / .is-missed-right, perio's data-state) right after a tap inside
-     that card, so hubs need no changes and cards drawn already answered (filters, mock results) stay still.
+   - Answer feedback. Answer a question card and its explanation slides open: it watches for the card's .is-answered right
+     after a tap inside that card, so cards drawn already answered (filters, mock results) stay still. The engine marks the
+     choices itself (widget/hub.css); the marks this drew on the old pages' choices (.qcard-choice) came out on 2026-11-25.
    - Streak flame. From 3 right in a row (v3.js's session streak, sent as sh:streak) a flame in the bottom-right counts
      the run, with a ring filling toward 100 (the tactical nuke). It grows and changes color at 5, 10, 25, 50 and 100
      and fizzles out when the run breaks. Off with Settings -> Extras -> Streak flame; hidden on the mock exam tab and in the arcade.
-   - Progress bars (.bar, .weak-meter, the rank, mastery and drill bars) fill from where they were, or from empty the
-     first time they show, instead of jumping.
+   - Progress bars (.bar, the rank and mastery bars) fill from where they were, or from empty the first time they show,
+     instead of jumping.
    - Switching modes, tabs and lectures fades the new content in.
-   - The ribbon's exam countdown pill (#countdownPill) glows the day before an exam and pulses on exam day.
    - Mock exams. On sh:mock-done ({ correct, total, byLec }) it asks widget/rankup.js for the results card, with this
      device's best score in the hub (sh_mock_best_<hub>).
-   Reduced motion (or Settings -> Extras -> Answer animations off) keeps the check and X marks and the results card and drops the rest. */
+   Reduced motion (or Settings -> Extras -> Answer animations off) keeps the results card and drops the rest. */
 (function(){
   "use strict";
   if (window.shFx) return;
   var H = null;
   var RM = window.matchMedia ? window.matchMedia("(prefers-reduced-motion: reduce)") : null;
-  /* Settings → Extras → Answer animations off works like reduced motion: marks and the results card stay, motion goes */
+  /* Settings → Extras → Answer animations off works like reduced motion: the results card stays, motion goes */
   function still(){ return !!(RM && RM.matches) || pref("sh_pref_fx") === "off"; }
   function ls(k, v){ try { if (v === undefined) return localStorage.getItem(k); if (v === null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) { return null; } }
   function pref(k){ try { return localStorage.getItem(k) || "on"; } catch (e) { return "on"; } }
   function flameOn(){ return pref("sh_pref_flame") !== "off"; }
   function section(){ try { return String(H && H.section ? H.section() : "").toLowerCase(); } catch (e) { return ""; } }
-  function rgba(color, a){
-    var m = /rgba?\(\s*(\d+)[\s,]+(\d+)[\s,]+(\d+)/.exec(color || "");
-    return m ? "rgba(" + m[1] + "," + m[2] + "," + m[3] + "," + a + ")" : "rgba(46,158,91," + a + ")";
-  }
   function anim(el, frames, opt){ if (!still() && el && el.animate) { try { return el.animate(frames, opt); } catch (e) {} } return null; }
 
-  /* ---------- answer feedback ---------- */
-  var SVG_OK = '<svg viewBox="0 0 24 24"><path pathLength="1" d="M6 12.6l4 4L18 8"/></svg>';
-  var SVG_BAD = '<svg viewBox="0 0 24 24"><path pathLength="1" d="M8 8l8 8"/><path pathLength="1" style="--d2:90ms" d="M16 8l-8 8"/></svg>';
-  var CHOICE = ".qcard-choice, .qcard-match-item";
-  var tap = null, pend = [], pendEx = [], flushing = false;
-
-  /* the answer state a card option is in: "ok", "bad", "miss" (a right answer that wasn't picked) or "" */
-  function stateFrom(cls, ds){
-    if (ds === "correct") return "ok";
-    if (ds === "incorrect") return "bad";
-    if (ds === "missed") return "miss";
-    cls = " " + (cls || "") + " ";
-    if (/ is-(correct|matched) /.test(cls)) return "ok";
-    if (/ is-wrong /.test(cls)) return "bad";
-    if (/ is-missed-right /.test(cls)) return "miss";
-    return "";
-  }
+  /* ---------- answer feedback: the explanation opens ---------- */
+  var tap = null, pendEx = [], flushing = false;
   function gained(r, cls){
     return (" " + (r.target.getAttribute("class") || "") + " ").indexOf(" " + cls + " ") >= 0 && (" " + (r.oldValue || "") + " ").indexOf(" " + cls + " ") < 0;
   }
   function answerRec(r){
     var t = r.target;
-    if (t.nodeType !== 1 || !tap.card.contains(t)) return;
-    if (t.matches(CHOICE)) {
-      var ds = r.attributeName === "data-state";
-      var cur = ds ? stateFrom("", t.getAttribute("data-state")) : stateFrom(t.getAttribute("class"), null);
-      var was = ds ? stateFrom("", r.oldValue) : stateFrom(r.oldValue, null);
-      if (cur && cur !== was) { pend.push({ el: t, k: cur }); schedule(); }
-    } else if (r.attributeName === "class") {
-      var ex = t.matches(".qcard") && gained(r, "is-answered") ? t.querySelector(".qcard-explain") : t.matches(".qcard-explain") && gained(r, "shown") ? t : null;
-      if (ex && pendEx.indexOf(ex) < 0) { pendEx.push(ex); schedule(); }
-    }
+    if (t.nodeType !== 1 || r.attributeName !== "class" || !tap.card.contains(t)) return;
+    var ex = t.matches(".qcard") && gained(r, "is-answered") ? t.querySelector(".qcard-explain") : null;
+    if (ex && pendEx.indexOf(ex) < 0) { pendEx.push(ex); schedule(); }
   }
   function schedule(){ if (!flushing) { flushing = true; requestAnimationFrame(flush); } }
   function flush(){
     flushing = false;
-    var evs = pend, exs = pendEx, btn = tap && tap.btn;
-    pend = []; pendEx = [];
-    var choices = [];
-    evs.forEach(function(e){
-      if (!e.el.isConnected) return;
-      if (e.el.classList.contains("qcard-match-item")) { if (e.k === "ok") pop(e.el, 0); else if (e.k === "bad") shake(e.el, 0, true); }
-      else choices.push(e);
-    });
-    var mine = null;
-    choices.forEach(function(e){ if (e.el === btn) mine = e; });
-    var lag = 0;
-    if (mine && choices.length <= 2) {
-      /* one pick: celebrate it, or shake it and then light up the right answer */
-      if (mine.k === "ok") { pop(mine.el, 0); mark(mine.el, "ok", 40); }
-      else {
-        shake(mine.el, 0); mark(mine.el, "bad", 30);
-        choices.forEach(function(e){ if (e.k === "ok") { ring(e.el, 280, 1100); mark(e.el, "ok", 320); } });
-        lag = 120;
-      }
-    } else {
-      /* a whole card graded at once (select-all, ordering): each option in turn */
-      choices.forEach(function(e, i){
-        var d = i * 70;
-        if (e.k === "ok") { pop(e.el, d); mark(e.el, "ok", d + 40); }
-        else if (e.k === "bad") { shake(e.el, d); mark(e.el, "bad", d + 40); }
-        else ring(e.el, d, 1100);
-      });
-      lag = Math.min(350, choices.length * 70);
-    }
-    exs.forEach(function(ex){ openExplain(ex, lag); });
-  }
-  /* a right answer: a soft wash of its own color sweeps across it and fades, with one quick glow. The option itself
-     never moves or scales (scaling a block of text makes it wobble). */
-  function pop(el, delay){
-    if (still() || !el.animate) return;
-    var c = getComputedStyle(el).borderTopColor, w = document.createElement("span");
-    w.className = "sh-fx-sweep";
-    w.setAttribute("aria-hidden", "true");
-    w.style.background = "linear-gradient(90deg, " + rgba(c, .22) + ", " + rgba(c, .1) + ")";
-    el.classList.add("sh-fx-host");
-    el.appendChild(w);
-    var a = anim(w, [{ transform: "scaleX(0)", opacity: 1, easing: "cubic-bezier(.22,.8,.3,1)" }, { transform: "scaleX(1)", opacity: 1, offset: .32 },
-      { transform: "scaleX(1)", opacity: 1, offset: .5, easing: "ease-in-out" }, { transform: "scaleX(1)", opacity: 0 }],
-      { duration: 720, delay: delay, fill: "both" });
-    if (a) a.onfinish = a.oncancel = function(){ w.remove(); }; else w.remove();
-    ring(el, delay, 520);
-  }
-  function ring(el, delay, dur){
-    var c = getComputedStyle(el).borderTopColor;
-    anim(el, [{ boxShadow: "0 0 0 0 " + rgba(c, .45) }, { boxShadow: "0 0 0 6px " + rgba(c, 0) }], { duration: dur, delay: delay, easing: "cubic-bezier(.22,.8,.3,1)" });
-  }
-  function shake(el, delay, isMatch){
-    /* the class-based hubs already shake a wrong matching pick in their own CSS */
-    if (isMatch && getComputedStyle(el).animationName !== "none") return;
-    anim(el, [{ transform: "none" }, { transform: "translateX(-7px)" }, { transform: "translateX(6px)" }, { transform: "translateX(-4px)" }, { transform: "translateX(2px)" }, { transform: "none" }],
-      { duration: 420, delay: delay, easing: "ease-out" });
-  }
-  function mark(el, k, delay){
-    if (el.querySelector(".sh-fx-mark")) return;
-    var m = document.createElement("span");
-    m.className = "sh-fx-mark is-" + k + (still() ? "" : " is-anim");
-    m.setAttribute("aria-hidden", "true");
-    m.style.setProperty("--d", (delay || 0) + "ms");
-    m.innerHTML = k === "ok" ? SVG_OK : SVG_BAD;
-    el.classList.add("sh-fx-host");
-    el.appendChild(m);
+    var exs = pendEx; pendEx = [];
+    exs.forEach(function(ex){ openExplain(ex, 0); });
   }
   /* the explanation grows open from nothing instead of appearing all at once */
   function openExplain(ex, delay){
@@ -149,7 +56,7 @@
   }
 
   /* ---------- progress bars ---------- */
-  var BAR_SEL = ".bar > i, .weak-meter > i, .sh-rank-bar > i, .sh-mastery-bar > i, .shd-bar > i";
+  var BAR_SEL = ".bar > i, .sh-rank-bar > i, .sh-mastery-bar > i";
   var barMem = {};
   function barKey(bar){
     var host = bar.parentElement, row = host && host.parentElement, scope = bar.closest("[id]");
@@ -176,16 +83,15 @@
   }
 
   /* ---------- view fades: modes, tabs, lectures ---------- */
-  var NAV_ATTRS = ["data-mode", "data-sub", "data-lec", "data-go", "data-group", "data-qs", "data-view", "data-goto-lecture", "data-rv-lec"];
-  var NAV_SEL = NAV_ATTRS.map(function(a){ return "[" + a + "]"; }).join(", ") + ', [role="tab"], .subtab';
-  var NAV_SKIP = ".qcard, #shstat-root, .sh-drill, .gm-stage, [data-overlay], .sh-mk, .sh-ru";
+  var NAV_ATTRS = ["data-mode", "data-sub", "data-lec", "data-go", "data-qs", "data-view"];
+  var NAV_SEL = NAV_ATTRS.map(function(a){ return "[" + a + "]"; }).join(", ") + ', [role="tab"]';
+  var NAV_SKIP = ".qcard, #shstat-root, .gm-stage, [data-overlay], .sh-mk, .sh-ru";
   var nav = null;
   function navClick(e){
     var b = e.target && e.target.closest ? e.target.closest(NAV_SEL) : null;
     if (!b || b.closest(NAV_SKIP)) return;
     var kind = '[role="tab"]';
     for (var i = 0; i < NAV_ATTRS.length; i++) if (b.hasAttribute(NAV_ATTRS[i])) { kind = "[" + NAV_ATTRS[i] + "]"; break; }
-    if (kind === '[role="tab"]' && b.classList.contains("subtab")) kind = ".subtab";
     nav = { added: [], shown: [], kind: kind };
     requestAnimationFrame(function(){ var n = nav; nav = null; if (n) fadeIn(n); });
   }
@@ -222,10 +128,10 @@
       /* measured just before the next frame, once for everything added since: a page redrawn twice in a row (Home, then
          the synced answers) is laid out once, outside the script that drew it */
       if (fill.length) { if (!barQ.length) requestAnimationFrame(function(){ var q = barQ; barQ = []; fillBars(q); }); barQ.push.apply(barQ, fill); }
-    }).observe(document.body, { subtree: true, childList: true, attributes: true, attributeOldValue: true, attributeFilter: ["class", "data-state", "hidden"] });
+    }).observe(document.body, { subtree: true, childList: true, attributes: true, attributeOldValue: true, attributeFilter: ["class", "hidden"] });
     document.addEventListener("click", function(e){
       var c = e.target && e.target.closest ? e.target.closest(".qcard") : null;
-      tap = c ? { card: c, btn: e.target.closest("button"), until: performance.now() + 900 } : null;
+      tap = c ? { card: c, until: performance.now() + 900 } : null;
       navClick(e);
     }, true);
     /* bars already on the page when this loads */
@@ -283,23 +189,16 @@
   }
   function flameHide(){ if (flame) { clearTimeout(flOut); flame.classList.remove("is-on", "is-fizz"); } }
 
-  /* ---------- the exam countdown pill ---------- */
-  function ymd(d){ return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); }
-  function countdownPill(){
-    var pill = document.getElementById("countdownPill"); if (!pill) return;
-    var ex = (window.SH_EXPORT && window.SH_EXPORT.exams) || [], now = new Date(), tm = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
-    var today = ymd(now), tomorrow = ymd(tm);
-    var day = ex.some(function(x){ return x && x.date === today; }), eve = !day && ex.some(function(x){ return x && x.date === tomorrow; });
-    pill.classList.toggle("sh-cd-day", day); pill.classList.toggle("sh-cd-eve", eve);
-  }
-
   /* ---------- mock exam results ---------- */
+  /* the results card's "See what I missed": the mock's own "Show only the misses" (widget/hub-bank.js, [data-onlymissed]),
+     turned on; until 2026-11-25 it looked for the old pages' #mockMissed and #examMissedList and did nothing (BUG-202) */
   function showMissed(){
     setTimeout(function(){
-      var b = document.getElementById("mockMissed");
-      if (b) { if (b.getAttribute("aria-pressed") !== "true") b.click(); return; }
-      var l = document.getElementById("examMissedList"), h = l && l.previousElementSibling;
-      if (l) (h || l).scrollIntoView({ behavior: still() ? "auto" : "smooth", block: "start" });
+      var b = document.querySelector("[data-onlymissed]");
+      if (!b) return;
+      if (b.getAttribute("aria-pressed") !== "true") b.click();
+      var n = document.querySelector("[data-onlymissed]") || b;
+      try { n.scrollIntoView({ behavior: still() ? "auto" : "smooth", block: "start" }); } catch (e) {}
     }, 80);
   }
   function mockDone(e){
@@ -327,8 +226,6 @@
     document.addEventListener("sh:pref", function(){ if (!flameOn()) flameHide(); });
     /* like Timmy Tooth, the flame steps aside on the mock exam tab, and it stays off arcade boards and fullscreen */
     setInterval(function(){ if (flame) flame.classList.toggle("is-away", /(^|\/)(mock|arcade)/.test(section()) || !!document.fullscreenElement); }, 1500);
-    countdownPill();
-    setInterval(countdownPill, 10 * 60 * 1000);
     document.addEventListener("sh:mock-done", mockDone);
   }
   window.shFx = { mount: mount };

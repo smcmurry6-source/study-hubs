@@ -174,7 +174,7 @@ const QUICK = process.argv.includes('--quick');
         if (!page.url().includes(`hubs/${hub}/`) || !(await page.$('#modeSwitch'))) problems.push(`history (${label}): Forward didn't bring ${hub} back`);
         /* the way back to the dashboard, always on the screen: the bar's "All hubs", or on a phone on the engine "Hubs"
            at the start of the top strip (Sam, 2026-11-13: "a convenient back to dashboard button when you are in a hub") */
-        const backSel = (await page.isVisible('#sh-ribbon-back')) ? '#sh-ribbon-back' : (await page.isVisible('.hx-strip .hx-home')) ? '.hx-strip .hx-home' : '#shhome-pill';
+        const backSel = (await page.isVisible('#sh-ribbon-back')) ? '#sh-ribbon-back' : (await page.isVisible('.hx-strip .hx-home')) ? '.hx-strip .hx-home' : '#sh-ribbon-back';
         await page.click(backSel, { timeout: 3000 }).catch(() => problems.push(`history (${label}): no back-to-dashboard button on the screen in ${hub}`));
         await page.waitForLoadState(); await L.settle(page);
         if (page.url().includes('/hubs/')) problems.push(`history (${label}): ${hub}'s back button didn't open the dashboard`);
