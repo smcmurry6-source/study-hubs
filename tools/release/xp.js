@@ -1837,8 +1837,9 @@ try {
          insert into visitor_links (alias_id, primary_id) values ('xp-WLa', 'xp-WLp')`);
     eq([num(`select count(*) from week_pennants where visitor_id = 'xp-WLa'`), rows(`select week::text, n from week_pennants where visitor_id = 'xp-WLp' order by week`)],
        [0, [{ week: '2030-02-25', n: 51 }, { week: D0, n: 60 }]], 'Link my devices moves the pennants to the primary id');
-    // from the page, on the real clock; refusals; no visitor id in a reply
-    many('xp-WN', 100, `now() - interval '1001 seconds'`, 'xh', 5);
+    // from the page, on the real clock; refusals; no visitor id in a reply. The answers start no earlier than this
+    // week's Monday 00:00 Central, so a run just after it doesn't put some in last week (BUG-204)
+    many('xp-WN', 100, `greatest(now() - interval '1001 seconds', sh_week_of(now())::timestamp at time zone 'America/Chicago')`, 'xh', 5);
     const wn = anonJson(`claim_week_v2('xp-WN')`), gm = anonJson(`get_my_week_v2('xp-WN')`);
     eq([wn.xp, wn.pennant, gm.done, gm.n, gm.pennants.length], [500, true, true, 100, 1], 'claim_week_v2 and get_my_week_v2 from the page');
     eq([anonJson(`claim_week_v2('')`).error, anonJson(`claim_week_v2(null)`).error, anonJson(`get_my_week_v2(null)`).n, anonJson(`get_my_week_v2(null)`).pennants],
