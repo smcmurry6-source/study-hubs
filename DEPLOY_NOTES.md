@@ -38,9 +38,10 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   bodies md5-checked before and after, the new table admin-only; `sh_insights` 4.95 s cold, 1.0 s warm (the admin cache job
   gives it 10 s). **v103** (#563: the boards keep a tie in one order; Link my devices rebuilds XP once): all nine bodies
   md5-checked before and the eight replaced after, `get_rank_board_v2` PL/pgSQL, the five boards answered as anon. Timed
-  live the same night ([game-server](vault/reference/game-server.md)): the heaviest visitors' replay is 0.35-0.57 s after
-  v103 (0.5-0.7 s before), all from cache, but a rebuild can still run past anon's 3 s on a slow minute of the shared CPU, so
-  Link my devices can still time out for the very heaviest; the next cut is a new inbox line. `supabase/schema.sql` has both
+  live the same night ([game-server](vault/reference/game-server.md)): v103 halves the work (one XP rebuild instead of two),
+  but the heaviest visitor's one rebuild still ran past 5 s after it (rolled back), so Link my devices can still time out
+  for the very heaviest; the time is in the rebuild's other statements, not the replay (0.35-0.57 s), and the next cut is a
+  new inbox line. The students' changelog line says only the boards' tie order until that's fixed. `supabase/schema.sql` has both
   files, `supabase/pending-migrations.txt` lists none, and `redeem_link_code`'s numbers at the apply are in the week-after
   inbox line.
 - **2026-11-25 (the old pages' parts out of `widget/v3.js`, #568, Claude Code)** — The package "Take the old pages' parts
