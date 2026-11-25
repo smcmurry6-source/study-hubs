@@ -91,9 +91,11 @@ Sam: "a better way to do the customization for Timmys place. Its clunky and inef
   the screen. Customize opens with the kit's own pieces at once; a set's pieces show as named cards until its file comes.
   Where the list is scrolled to is kept from its scroll events, so a tap reads no layout.
 - **The numbers** (`Emulation.setCPUThrottlingRate` 4, the preview's `returning` persona on a phone / `high-xp` on a laptop;
-  each tap's Event Timing duration, the median of its kind): a piece of Timmy's outfit 272 → 80 ms / 600 → 144 ms; a yard
-  piece 240 → 88 / 440 → 128; switching what you change 176 → 64 / 304 → 192; Customize open to its first card 226 → 91 /
-  265 → 90. Long tasks over the same walk: 2.9 → 2.1 s (phone, `returning`), 5.7 → 4.4 s (phone, `high-xp`).
+  each tap's Event Timing duration, the median of its kind; two runs differ by about 30 ms): a piece of Timmy's outfit
+  272 → 88 ms / 600 → 168 ms; a yard piece 240 → 96 / 440 → 144; switching what you change 176 → 96 / 304 → 152. The tap on
+  Customize paints in about the time it did (216 / 272 ms), but its first frame now has the cards in it: they used to come
+  226-265 ms after the tap, in a later frame. Long tasks over the same walk: 2.9 → 2.7 s (phone, `returning`), 5.7 → 4.5 s
+  (phone, `high-xp`).
 - **What's left:** a home, scene or yard pick still draws the whole stage once, after the tap's frame (the kit could swap
   one piece, [the inbox](../tasks/inbox.md)).
 

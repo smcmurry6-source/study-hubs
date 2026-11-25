@@ -184,14 +184,15 @@ dialog.tpv::backdrop { background: rgba(20, 14, 20, .72); }
 .tpv-cz { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; }
 .tpv-cats { flex: none; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 2px; margin: 18px 20px 0; padding: 4px; border-radius: 999px;
   background: var(--ar-deep); box-shadow: inset 0 0 0 1px rgba(255, 224, 138, .32); }
-.tpv-cat { min-width: 0; min-height: 44px; padding: 0 6px; border: 0; border-radius: 999px; background: transparent; color: var(--ar-soft);
+/* these buttons are named with .tpv so their type wins over `.tpv button { font: inherit; color: inherit }` */
+.tpv .tpv-cat { min-width: 0; min-height: 44px; padding: 0 6px; border: 0; border-radius: 999px; background: transparent; color: var(--ar-soft);
   font-size: var(--fs-label); font-weight: var(--w-head); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer;
   transition: color var(--t-hover, 120ms) ease-out, background var(--t-hover, 120ms) ease-out; }
 .tpv-cat:hover { color: #fff; background: rgba(255, 255, 255, .08); }
 .tpv-cat[aria-pressed="true"] { background: var(--ar-gold); color: var(--ar-ink); }
 .tpv-spots { flex: none; display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 6px; margin: 10px 20px 0; }
 .tpv-spots[hidden] { display: none; }
-.tpv-spot { display: grid; gap: 3px; justify-items: center; min-width: 0; padding: 5px 2px 6px; border: 2px solid transparent; border-radius: var(--r-row); background: var(--ar-row);
+.tpv .tpv-spot { display: grid; gap: 3px; justify-items: center; min-width: 0; padding: 5px 2px 6px; border: 2px solid transparent; border-radius: var(--r-row); background: var(--ar-row);
   color: #fff; font-size: 12px; font-weight: var(--w-body); line-height: 1.2; text-align: center; cursor: pointer;
   transition: background var(--t-hover, 120ms) ease-out, border-color var(--t-hover, 120ms) ease-out; }
 .tpv-spot:hover { background: var(--active); }
@@ -252,7 +253,7 @@ button.tpv-card:active { transform: translateY(1px); }
 .tpv-extra { margin: 18px 0 0; }
 .tpv-extra h4 { margin: 0 0 8px; font-size: var(--fs-label); font-weight: var(--w-head); }
 .tpv-opts { display: flex; flex-wrap: wrap; gap: 8px; }
-.tpv-upg { display: grid; gap: 0; min-height: var(--control-h); padding: 4px 14px; border: 2px solid var(--border); border-radius: var(--r-row); background: var(--ar-row);
+.tpv .tpv-upg { display: grid; gap: 0; min-height: var(--control-h); padding: 4px 14px; border: 2px solid var(--border); border-radius: var(--r-row); background: var(--ar-row);
   font-size: var(--fs-meta); line-height: 1.25; text-align: left; cursor: pointer; }
 .tpv-upg b { font-weight: var(--w-strong); }
 .tpv-upg small { color: var(--muted); font-size: 12px; }
@@ -399,7 +400,7 @@ dialog.tpv.is-trip::backdrop { background: transparent; }
 @media (prefers-reduced-motion: reduce) {
   .tpv-top::before, .tpv-stagewrap::before, .tpv-stagewrap::after, .tpv-meter i, .tpv-host > *, .tpv-guest > * { animation: none; }
   .tpv-clouds { display: none; }
-  .tpv-vnav, .tpv-chip, .tpv-btn, .tpv-cat, .tpv-spot, .tpv-card, .tpv-x, .tpv-swatch, .tpv-seg button { transition: none; }
+  .tpv-vnav, .tpv-chip, .tpv-btn, .tpv .tpv-cat, .tpv .tpv-spot, .tpv-card, .tpv-x, .tpv-swatch, .tpv-seg button { transition: none; }
   .tpv-x:hover, button.tpv-card:hover, .tpv-swatch:hover { transform: none; }
 }
 html.hx-still .tpv-top::before, html.hx-still .tpv-stagewrap::before, html.hx-still .tpv-stagewrap::after, html.hx-still .tpv-meter i,
@@ -433,7 +434,7 @@ html.hx-still .tpv-host > *, html.hx-still .tpv-guest > * { animation: none; }
   /* Customize on a phone: the tabs, the spots and the line over the list, the foot under it, snug */
   .tpv-cats { margin: 10px 12px 0; }
   .tpv-spots { gap: 4px; margin: 8px 12px 0; }
-  .tpv-spot { gap: 2px; padding: 4px 1px 5px; font-size: 11.5px; }
+  .tpv .tpv-spot { gap: 2px; padding: 4px 1px 5px; font-size: 11.5px; }
   .tpv-spic { max-width: 32px; }
   .tpv-sname { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .tpv-czhead { margin: 10px 16px 0; }
