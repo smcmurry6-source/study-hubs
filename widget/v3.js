@@ -165,6 +165,10 @@
     var bestVoice = null;
     var VOICE_PREF_KEY = "sh_tts_voice_name";
     var pickers = [];
+    /* one speed for both readers: the recording player's select and the device voice's (BUG-199), saved as sh_tts_rate */
+    var RATE_KEY = "sh_tts_rate", RATES = [1, 1.25, 1.5, 1.75, 2];
+    var RATE_OPTS = RATES.map(function(r){ return '<option value="' + r + '">' + r + "×</option>"; }).join("");
+    function rateNow(){ var r = parseFloat(prefGetSafe(RATE_KEY)); return RATES.indexOf(r) >= 0 ? r : 1; }
 
     function scoreVoice(v){
       var n = v.name || "";
@@ -244,14 +248,25 @@
         if (!chosen) return;
         saveVoiceName(chosen.name);
         bestVoice = chosen;
-        if (activeBtn === btn && activeWords) {
-          var resumeIdx = Math.max(wordCursor, 0);
-          if (synth) { try { synth.cancel(); } catch (e) {} }
-          speakFrom(activeWords, resumeIdx, btn);
-        }
+        if (vs && vs.btn === btn) { vs.voice = chosen; vs.retried = false; if (!vs.paused) again(vs); }
       });
       btn.insertAdjacentElement("afterend", select);
       pickers.push(select);
+      /* the device voice's speed (BUG-199): the recording player's 1x to 2x select, as the utterance's rate. A change
+         takes effect at once: the voice starts again from the word it reached, at the new speed. */
+      var rate = document.createElement("select");
+      rate.className = "sh-tts-rate sh-tts-voice-rate";
+      rate.title = "Reading speed";
+      rate.setAttribute("aria-label", "Reading speed");
+      rate.innerHTML = RATE_OPTS;
+      rate.value = String(rateNow());
+      rate.addEventListener("click", function(ev){ ev.stopPropagation(); });
+      rate.addEventListener("change", function(){
+        var r = parseFloat(rate.value) || 1;
+        try { localStorage.setItem(RATE_KEY, String(r)); } catch (e) {}
+        if (vs && vs.btn === btn && !vs.paused) again(vs);
+      });
+      select.insertAdjacentElement("afterend", rate);
     }
     function scanForButtons(){
       var btns = document.querySelectorAll(".sh-tts-btn");
@@ -292,7 +307,8 @@
         try { activeAudioEl.pause(); } catch (e) {}
         activeAudioEl = null;
       }
-      if (synth) { try { synth.cancel(); } catch (e) {} }
+      if (vs) { drop(vs); vs = null; }
+      hush();
       if (activeBtn) setState(activeBtn, "idle");
       clearHighlight();
       activeBtn = null; activeWords = null; wordCursor = -1;
@@ -334,47 +350,144 @@
       return words;
     }
 
-    function speakFrom(words, startIdx, btn, voiceOverride){
+    /* The device's voice (BUG-199, 2026-11-24): a hub without recordings reads with the browser's speech synthesis.
+       It speaks a sentence or so at a time, one piece after another. One utterance for a whole part (Review of Systems'
+       As taught runs to 27,000 characters) is what Chrome's network voices cut off or fail on, and a short first piece
+       starts sooner after a tapped word. Pause cancels and Resume speaks again from the word it reached (Android's
+       pause() doesn't hold, and pause/resume across pieces would be ours anyway). A speak() right after a cancel()
+       waits a moment, which iOS Safari can otherwise drop. An error tries the piece once more on a plain local voice,
+       then moves on to the next piece; three in a row, or one that never starts, stop it with a toast that says so.
+       Speed is the recording player's select (rateNow(), the utterance's rate). Logged: tts:voice-error=<code> and
+       tts:secs (seconds spoken, times the speed, as a recording's are content seconds), tts:end at the last word. */
+    var vs = null, hushAt = 0, litEl = null;   // the voice's session; when we last cut speech off; the word lit now
+    var SOFT = 120, HARD = 200;   // a piece's length in characters: it ends at a comma past SOFT, anywhere past HARD (about 12 s at 1x)
+    var ABBR = /^(?:[a-z]\.){1,3}$|^(?:e\.g|i\.e|vs|cf|dr|mr|mrs|ms|st|fig|figs|approx|no)\.$/i;
+    var BLOCKS = "p,li,h1,h2,h3,h4,h5,h6,td,th,dt,dd,blockquote,figcaption,caption,summary,pre,div,section,article";
+    var START_MS = 7000;   // a piece that hasn't started by then counts as an error ("no-start")
+    function hush(){
       if (!synth) return;
-      var text = words.slice(startIdx).map(function(w){ return w.text; }).join(" ").replace(/\s+/g, " ").trim();
-      if (!text) return;
-      var u = new SpeechSynthesisUtterance(text);
-      u.rate = 1; u.pitch = 1;
-      var chosenVoice = voiceOverride !== undefined ? voiceOverride : bestVoice;
-      if (chosenVoice) u.voice = chosenVoice;
-      wordCursor = startIdx - 1;
-      var handledError = false;
-      u.onboundary = function(ev){
-        if (ev.name && ev.name !== "word") return;
-        wordCursor++;
-        clearHighlight();
-        var w = words[wordCursor];
-        if (w) w.el.classList.add("sh-tts-active");
+      try { if (synth.speaking || synth.pending || synth.paused) hushAt = Date.now(); synth.cancel(); } catch (e) {}
+    }
+    function blockOf(w){ if (!("blk" in w)) w.blk = w.el.closest ? w.el.closest(BLOCKS) : null; return w.blk; }
+    /* where the piece starting at word s ends (exclusive): a sentence's end, a block's end (a heading, a list item, a
+       table cell), or a comma, colon, semicolon or dash once it's long */
+    function pieceEnd(words, s){
+      var len = 0, j = s;
+      for (; j < words.length - 1; j++) {
+        var t = words[j].text; len += t.length + 1;
+        if (/[.!?]["'”’)\]]*$/.test(t) && !ABBR.test(t)) break;
+        if (blockOf(words[j]) !== blockOf(words[j + 1])) break;
+        if (len >= HARD || (len >= SOFT && /[,;:–—]["'”’)\]]*$/.test(t))) break;
+      }
+      return j + 1;
+    }
+    function lastAtOrBefore(offs, c){ var lo = 0, hi = offs.length - 1; while (lo < hi) { var m = (lo + hi + 1) >> 1; if (offs[m] <= c) lo = m; else hi = m - 1; } return lo; }
+    function mark(sess, i){
+      wordCursor = i;
+      if (litEl) litEl.classList.remove("sh-tts-active");
+      var w = sess.words[i];
+      litEl = w ? w.el : null;
+      if (w) {
+        w.el.classList.add("sh-tts-active");
         /* a folded topic of the notes opens as the voice reaches it (widget/hub.js foldTopics) */
-        if (w && w.el.closest && w.el.closest("[hidden]")) { try { w.el.dispatchEvent(new CustomEvent("sh:reveal", { bubbles: true })); } catch (e) {} }
-        dockProgress(words.length ? (wordCursor + 1) / words.length : 0, "");
+        if (w.el.closest && w.el.closest("[hidden]")) { try { w.el.dispatchEvent(new CustomEvent("sh:reveal", { bubbles: true })); } catch (e) {} }
+      }
+      dockProgress(sess.words.length ? (i + 1) / sess.words.length : 0, "");
+    }
+    /* seconds heard on this piece so far (feature events: tts:secs, at 1x like a recording's) */
+    function heard(sess){
+      if (!sess.t0) return;
+      var secs = (Date.now() - sess.t0) / 1000;
+      sess.t0 = 0;
+      var n = Math.round(secs * (sess.rate || 1) * 10) / 10;
+      if (n > 0 && secs < 120) shTrackSafe("tts:secs", n);   // never a 0: shTrack counts it as 1
+    }
+    /* let go of the piece being spoken: its events are ignored from here on */
+    function drop(sess){ heard(sess); clearTimeout(sess.timer); sess.u = null; }
+    /* the word the voice is on, or the piece's first if it hasn't said one yet */
+    function here(sess){ return wordCursor >= sess.at && wordCursor < sess.end ? wordCursor : sess.at; }
+    function again(sess){ sess.at = here(sess); drop(sess); hush(); speakPiece(sess); }
+    function speakPiece(sess){
+      if (vs !== sess || sess.paused) return;
+      var words = sess.words, s = sess.at, e, text, offs;
+      for (;;) {
+        if (s >= words.length) { endVoice(sess); return; }
+        e = pieceEnd(words, s); text = ""; offs = [];
+        for (var k = s; k < e; k++) { if (text) text += " "; offs.push(text.length); text += words[k].text; }
+        if (/[0-9A-Za-z\u00C0-\u024F\u0370-\u03FF]/.test(text)) break;   // a piece of only bullets or dashes is skipped
+        s = e;
+      }
+      sess.at = s; sess.end = e; sess.rate = rateNow();
+      var u = new SpeechSynthesisUtterance(text), started = false;
+      u.rate = sess.rate; u.pitch = 1;
+      if (sess.voice) { u.voice = sess.voice; if (sess.voice.lang) u.lang = sess.voice.lang; }
+      sess.u = u;   // held here, or Chrome can collect it before its end event
+      function mine(){ return vs === sess && sess.u === u; }
+      u.onstart = function(){
+        if (!mine()) return;
+        started = true; sess.fails = 0; sess.t0 = Date.now(); clearTimeout(sess.timer);
+        mark(sess, s);
+      };
+      u.onboundary = function(ev){
+        if (!mine() || (ev.name && ev.name !== "word")) return;
+        var i = typeof ev.charIndex === "number" ? lastAtOrBefore(offs, ev.charIndex) : wordCursor - s + 1;
+        mark(sess, s + Math.max(0, Math.min(i, e - s - 1)));
       };
       u.onend = function(){
-        if (handledError) return;
-        if (activeBtn === btn) { setState(btn, "idle"); activeBtn = null; clearHighlight(); dockSync(); }
+        if (!mine()) return;
+        drop(sess);
+        sess.at = e; speakPiece(sess);
       };
-      // Some cloud-backed voices ("Online"/"Natural") can silently fail if
-      // their network call doesn't go through. Rather than going dead with
-      // no sound and no feedback, retry once on a plain local voice so
-      // something is always audible.
-      u.onerror = function(){
-        handledError = true;
-        var fallback = pickFallbackVoice();
-        if (fallback && (!chosenVoice || chosenVoice.name !== fallback.name)) {
-          speakFrom(words, startIdx, btn, fallback);
-          return;
-        }
-        if (activeBtn === btn) { setState(btn, "idle"); activeBtn = null; clearHighlight(); }
+      u.onerror = function(ev){
+        if (!mine()) return;
+        drop(sess);
+        failed(sess, ev && ev.error);
       };
-      activeBtn = btn;
-      activeWords = words;
+      mark(sess, s);
+      function go(){
+        if (!mine()) return;
+        try { if (synth.paused) synth.resume(); synth.speak(u); } catch (er) { drop(sess); failed(sess, "speak"); return; }
+        sess.timer = setTimeout(function(){ if (mine() && !started) { drop(sess); hush(); failed(sess, "no-start"); } }, START_MS);
+      }
+      /* straight away when nothing was just cut off (iOS lets the first speak() through only inside the tap) */
+      var wait = 150 - (Date.now() - hushAt);
+      if (wait > 0) setTimeout(go, wait); else go();
+    }
+    function failed(sess, code){
+      code = String(code || "unknown").toLowerCase().replace(/[^a-z-]+/g, "").slice(0, 24) || "unknown";
+      shTrackSafe("tts:voice-error=" + code);
+      /* not ours (ours are dropped before they arrive): another app took the audio, or the browser wants a tap */
+      if (code === "interrupted" || code === "canceled" || code === "not-allowed") { pauseVoice(sess); return; }
+      sess.fails++;
+      var fb = pickFallbackVoice();
+      if (!sess.retried && fb && (!sess.voice || sess.voice.name !== fb.name)) { sess.retried = true; sess.voice = fb; speakPiece(sess); return; }
+      if (sess.fails >= 3 || code === "no-start") { endVoice(sess, true); return; }
+      sess.at = sess.end; speakPiece(sess);   // move on to the next piece
+    }
+    function pauseVoice(sess){
+      sess.at = here(sess); drop(sess); sess.paused = true; hush();
+      if (activeBtn === sess.btn) setState(sess.btn, "paused");
+    }
+    function resumeVoice(sess){
+      sess.paused = false; sess.fails = 0;
+      if (activeBtn === sess.btn) setState(sess.btn, "playing");
+      speakPiece(sess);
+    }
+    function endVoice(sess, broke){
+      drop(sess);
+      if (vs === sess) vs = null;
+      if (!broke) shTrackSafe("tts:end");
+      if (activeBtn === sess.btn) { setState(sess.btn, "idle"); activeBtn = null; clearHighlight(); activeWords = null; wordCursor = -1; dockSync(); }
+      if (broke) try { if (window.shToast) window.shToast("Your device's voice didn't read this. Pick another voice in the list next to Listen and try again.", { kind: "err", title: "Couldn't read aloud" }); } catch (e) {}
+    }
+    function speakFrom(words, startIdx, btn){
+      if (!synth) return;
+      if (vs) drop(vs);
+      hush();
+      var sess = vs = { words: words, btn: btn, at: Math.max(0, startIdx || 0), end: 0, voice: bestVoice, fails: 0, retried: false, paused: false, u: null, t0: 0, timer: 0, rate: 1 };
+      activeBtn = btn; activeWords = words; wordCursor = sess.at - 1;
       setState(btn, "playing");
-      synth.speak(u);
+      speakPiece(sess);
     }
 
     function speakWithSynth(container, btn){
@@ -386,10 +499,8 @@
       words.forEach(function(w, i){
         if (w.el.__shTTSWired) return;
         w.el.__shTTSWired = true;
-        w.el.addEventListener("click", function(){
-          if (synth) { try { synth.cancel(); } catch (e) {} }
-          speakFrom(words, i, btn);
-        });
+        /* a tapped word: the voice starts again from it */
+        w.el.addEventListener("click", function(){ speakFrom(words, i, btn); });
       });
       speakFrom(words, 0, btn);
     }
@@ -403,7 +514,7 @@
     /* Player strip for pre-generated narration: seek bar, 15 s back / forward, speed, and the
        position remembered per file (localStorage) so a long lecture resumes where you stopped.
        Lock-screen / headphone controls come from the Media Session API where supported. */
-    var RATE_KEY = "sh_tts_rate", POS_PREFIX = "sh_tts_pos:";
+    var POS_PREFIX = "sh_tts_pos:";
     function fmtTime(sec){ sec = Math.max(0, Math.floor(sec || 0)); return Math.floor(sec / 60) + ":" + String(sec % 60).padStart(2, "0"); }
     function savedPos(url){ try { return parseFloat(localStorage.getItem(POS_PREFIX + url)) || 0; } catch (e) { return 0; } }
     function savePos(url, t){ try { if (t > 0) localStorage.setItem(POS_PREFIX + url, String(Math.floor(t))); else localStorage.removeItem(POS_PREFIX + url); } catch (e) {} }
@@ -416,7 +527,7 @@
         '<input type="range" class="sh-tts-seek" min="0" max="1000" value="0" step="1" aria-label="Position in the narration">' +
         '<button type="button" class="sh-tts-skip" data-skip="15" aria-label="Forward 15 seconds">+15</button>' +
         '<span class="sh-tts-time">0:00</span>' +
-        '<select class="sh-tts-rate" aria-label="Playback speed"><option value="1">1×</option><option value="1.25">1.25×</option><option value="1.5">1.5×</option><option value="1.75">1.75×</option><option value="2">2×</option></select>';
+        '<select class="sh-tts-rate" aria-label="Playback speed">' + RATE_OPTS + "</select>";
       var row = btn.parentNode;
       (row && row.parentNode ? row.parentNode : btn.parentNode).insertBefore(el, row && row.nextSibling);
       btn.__shPlayer = el;
@@ -589,10 +700,7 @@
           else { activeAudioEl.pause(); setState(btn, "paused"); }
           return;
         }
-        if (synth && activeWords) {
-          if (synth.speaking && !synth.paused) { synth.pause(); setState(btn, "paused"); return; }
-          if (synth.paused) { synth.resume(); setState(btn, "playing"); return; }
-        }
+        if (vs && vs.btn === btn) { if (vs.paused) resumeVoice(vs); else pauseVoice(vs); return; }
       }
       stop();
       /* feature events (widget/clicks.js, migration_v37): who starts narration, at which level, for which lecture */
@@ -604,7 +712,7 @@
     }
 
     /* true while a lecture is being read aloud (pre-recorded narration or the browser voice) */
-    function listening(){ return !!(activeAudioEl && !activeAudioEl.paused && !activeAudioEl.ended) || !!(synth && synth.speaking && !synth.paused); }
+    function listening(){ return !!(activeAudioEl && !activeAudioEl.paused && !activeAudioEl.ended) || !!(vs && !vs.paused); }
     /* the narration file playing now, if any (read-only: the read-along highlight in widget/hub.js reads its time) */
     function audioEl(){ return activeAudioEl; }
     return { supported: !!synth, speak: speak, stop: stop, listening: listening, audio: audioEl };
