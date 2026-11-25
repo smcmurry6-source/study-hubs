@@ -671,6 +671,14 @@ try {
   notes.push('the shop: rotation, seasons (3 years against pet.js), buying, boosts, equipping, costumes');
 
   /* ---------- 11. the idea board ---------- */
+  /* The day's three count Central dates (post_idea) and back() moves idea-vis-1's ideas 30 seconds back at a time, so a
+     run just after Central midnight put them on yesterday, and one just before it posted them on two days (BUG-205). The
+     block starts at least 30 seconds after midnight and 2 minutes before the next, waiting out the gap if it has to, and
+     back() never moves an idea past today's midnight (an idea there is still more than 20 seconds old). */
+  const midnightCT = d => `(((now() at time zone 'America/Chicago')::date + ${d})::timestamp at time zone 'America/Chicago')`;
+  const ideaWait = Number(one(`select greatest(0, 30 - extract(epoch from now() - ${midnightCT(0)}),
+    case when ${midnightCT(1)} - now() < interval '2 minutes' then extract(epoch from ${midnightCT(1)} - now()) + 30 else 0 end)`));
+  if (ideaWait > 0) { sql(`select pg_sleep(${Math.ceil(ideaWait)})`); notes.push(`the idea board waited ${Math.ceil(ideaWait)} s out the minutes around Central midnight`); }
   const post = (v, t, b, hub, cat, src, req) => anonJson(`post_idea(${q(v)}, ${q(t)}, ${q(b)}, ${hub == null ? 'null' : q(hub)}, ${q(cat)}, ${q(src || 'board')}, ${req ? q(req) : 'null'})`);
   eq(post('idea-vis-1', 'Study rooms', 'Answer together', 'xh', 'feature').error, 'name', 'no leaderboard name: asked for one');
   anon(`select set_display_name('idea-vis-1', 'Idea One'); select set_display_name('idea-vis-2', 'Idea Two'); select set_display_name('idea-vis-3', 'Idea Three'); select set_display_name('idea-vis-4', 'Idea Four'); select set_display_name('idea-vis-5', 'Idea Five')`);
@@ -682,7 +690,7 @@ try {
   ok(i1.ok && i1.name === 'Idea One', 'posted at once under the leaderboard name');
   ok(post('idea-vis-1', 'Study rooms', '', 'xh', 'feature', 'board', 'idea-req-0001').repeat === true && num(`select count(*) from ideas where visitor_id = 'idea-vis-1'`) === 1, 'a replayed post posts once');
   eq(post('idea-vis-1', 'Another idea', '', null, 'fun').error, 'slow', 'one every 20 seconds');
-  const back = () => sql(`update ideas set created_at = created_at - interval '30 seconds' where visitor_id = 'idea-vis-1'`);
+  const back = () => sql(`update ideas set created_at = greatest(created_at - interval '30 seconds', ${midnightCT(0)} + interval '1 second') where visitor_id = 'idea-vis-1'`);
   back(); ok(post('idea-vis-1', 'Another idea', '', null, 'fun', 'checkin').ok, 'a second idea, from a check-in');
   back(); ok(post('idea-vis-1', 'A third idea', '', null, 'look').ok, 'a third');
   back(); eq(post('idea-vis-1', 'A fourth idea', '', null, 'other').error, 'limit', 'three a day');
@@ -740,7 +748,7 @@ try {
   ok(post('idea-vis-1', 'A fifth idea', '', null, 'other').ok, 'a deleted idea no longer counts toward the day\'s three');
   const i5 = num(`select id from ideas where title = 'A fifth idea'`);
   ok(anonJson(`delete_my_idea('idea-vis-1', ${i5})`) === true && post('idea-vis-1', 'A sixth idea', '', null, 'other').ok, 'or toward the 20 seconds: deleted at once, the next one posts at once');
-  sql(`update ideas set created_at = created_at - interval '30 seconds' where visitor_id = 'idea-vis-1'`);
+  back();
   eq(post('idea-vis-1', 'A seventh idea', '', null, 'other').error, 'limit', 'three standing ideas still make the limit');
   raises(() => anon(`select admin_post_starter_idea('wrong', 'Timmy Tooth', 'Study rooms', '', null, 'feature')`), '28000', 'a starter idea with a wrong secret');
   const si = num(`select admin_post_starter_idea(${S}, 'Number thirty-one', 'Build my own mock', 'Pick the lectures, how many and the time.', null, 'feature')`);
