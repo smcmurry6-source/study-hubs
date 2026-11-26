@@ -32,6 +32,14 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-26 (the study-music loops deleted, #PRNUM, Claude Code)** — Sam: "Delete study music loops". The five loops in
+  `widget/audio/` (cafe, lo-fi, piano, rain and waves, 9.7 MB) are gone from the site: only the old Settings panel's
+  background music played them, and that came out of `widget/v3.js` in #568, so nothing students see changes (no changelog
+  line). The public-repo check (`tools/release/secrets.js`) no longer allows media in `widget/audio/`; the nuke egg's
+  `widget/sfx/` and `widget/vid/` (2.7 MB) stay ([no-narration-in-the-repo](vault/rules/no-narration-in-the-repo.md), fixed
+  to say so). Git keeps them: `git checkout f5daf2d0 -- widget/audio`, and put `audio` back in `MEDIA_OK`. Left on the
+  inbox: `widget/clicks.js`'s daily settings snapshot still records the music setting.
+
 - **2026-11-25 (migration_v101 and v103 applied, Claude Code)** — At 2:10 and 2:13 am Central, through the connector in one
   call each, with the class asleep. **v101** (#545: the year-spanning readers read the totals; `insight_cards_kept`,
   `sh_insights`, `get_hub_recap`, `sh_retention_run`): nothing changes until the first collapse (about 2027-09-13); the three

@@ -28,8 +28,11 @@ Sam's call: leave the history as it is, and stop the growth.
   the same account is served from the same address, `smcmurry6-source.github.io/<repo>/`, so the page can fetch its words
   files without any cross-site setup). Nothing points at that repo's history, so it can be wiped at every archiving.
   Building it is a package of [the sustainability task](../tasks/2026-11-22-sustainable-for-years.md).
-- **Not covered:** the widget's own fixed sounds (`widget/audio/`, the study-music loops; `widget/sfx/`, the nuke), about
-  11 MB that don't change. They stay.
+- **Not covered:** the widget's own fixed sounds and clips, the nuke egg's (`widget/sfx/` and `widget/vid/`), about 2.7 MB
+  that don't change. They stay, and they are the only media the public-repo check allows outside a hub. The study-music
+  loops that were in `widget/audio/` (9.7 MB) were deleted on 2026-11-26 (Sam: "Delete study music loops"): nothing had
+  played them since the old Settings panel came out. Git keeps them: `git checkout f5daf2d0 -- widget/audio`, with `audio`
+  put back in `MEDIA_OK` in `tools/release/secrets.js`.
 - [Text and audio must never drift](text-and-audio-never-drift.md) still holds, wherever the recordings live.
 
 Related: [archived-hubs-drop-their-audio](archived-hubs-drop-their-audio.md) ·
