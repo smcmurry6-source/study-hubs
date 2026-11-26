@@ -15,6 +15,13 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   stage once after the tap's frame (the kit could swap the one piece, as an outfit swaps only Timmy:
   [motion-cost](../reference/motion-cost.md)); the launch trailer's place shot (`tools/trailer/shots.mjs`) taps the new tabs
   but hasn't been recorded again to check it.
+- [ ] **Review of Systems' narration, when Sam asks** (2026-11-26, Sam: "we can handle the review of systems recordings later"):
+  the hub has no recordings (`"audio": "off"`), and none can go in this repo ([no-narration-in-the-repo](../rules/no-narration-in-the-repo.md)).
+  When Sam asks: Sam creates an empty public repo for the audio with Pages on `main` (for example `study-hubs-audio`, served
+  from the same address), then one session builds what [the sustainability task](2026-11-22-sustainable-for-years.md)'s
+  "When narration comes back" box says (narrate.py writing there, the engine fetching from it, wiping its history at each
+  archiving) and records the levels Sam picks (the recommendation: Plain English and High yield, which High yield's build
+  keeps in step with the notes). Not before Sam says so ([decisions](../decisions.md)).
 - [ ] **Review of Systems: Sam's calls from the full read of the bank** (2026-11-24, every question vetted). **Changed from
   current references, say if the course's own wording should come back:** choking is back blows and abdominal thrusts (AHA
   2025; the lecture: abdominal thrusts); the do-not-use list is µg and q.o.d. (the notes had mcg and q.a.d.); `om-caries-15`
