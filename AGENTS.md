@@ -40,7 +40,7 @@ top entries and grep all of them for your hub or feature (`grep -n "<hub>" DEPLO
 - **Never push `main` and never force-push a shared branch.** Start a branch from a fresh `origin/main` (other agents
   push here too: fetch and rebase before you push), open a pull request into `main` (a draft is fine). When Sam says "merge", merge it; or Sam merges it.
   Claude Code cloud sessions push their own `claude/...` branch.
-- **Boards hub work** (INBDE + ADEX) is the exception: it lives on the `claude/boards-hub` branch with its own briefs
+- **Boards hub work** (the INBDE) is the exception: it lives on the `claude/boards-hub` branch with its own briefs
   under `docs/boards/` there. Branch from it and open the PR into it. Its rules: [vault/hubs/boards.md](vault/hubs/boards.md).
 - **Before the PR:** `node tools/ci/syntax.js` and `node tools/ci/vault.js`; `node tools/ci/smoke.js` too if you have
   Playwright (CI runs them on every PR, with the secrets, database-permission and preview-safety checks). Details:
