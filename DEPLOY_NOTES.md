@@ -32,7 +32,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
-- **2026-11-26 (the study-music loops deleted, #PRNUM, Claude Code)** — Sam: "Delete study music loops". The five loops in
+- **2026-11-26 (the study-music loops deleted, #572, Claude Code)** — Sam: "Delete study music loops". The five loops in
   `widget/audio/` (cafe, lo-fi, piano, rain and waves, 9.7 MB) are gone from the site: only the old Settings panel's
   background music played them, and that came out of `widget/v3.js` in #568, so nothing students see changes (no changelog
   line). The public-repo check (`tools/release/secrets.js`) no longer allows media in `widget/audio/`; the nuke egg's
