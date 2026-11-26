@@ -138,7 +138,7 @@ Archived
   GI Exam 2 (`hepatobiliary`), Genetics, Fixed Pros.
 
 Being built on its own branch
-- [Boards (INBDE + ADEX)](hubs/boards.md): on `claude/boards-hub`, not on `main` yet.
+- [Boards (INBDE)](hubs/boards.md): on `claude/boards-hub`, not on `main` yet.
 
 Which hubs are live, and every exam date, comes from `hubs.js`: if this list disagrees, the code is right
 and this list needs fixing. A new hub gets a note from [the hub template](templates/hub.md).

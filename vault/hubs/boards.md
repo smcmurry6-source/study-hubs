@@ -5,12 +5,12 @@ hub: boards
 status: building
 ---
 
-# Boards (INBDE + ADEX)
+# Boards (INBDE)
 
-A hub for the INBDE and ADEX licensure exams (roughly August 2028): notes, a large question bank written for this site,
+A hub for the INBDE licensure exam (roughly August 2028; INBDE only since 2026-11-26, Sam: "Lets do inbde only"): notes, a large question bank written for this site,
 and a game built around the questions (Chairside). It is being built on its own branch, `claude/boards-hub`, in draft
 PR https://github.com/smcmurry6-source/study-hubs/pull/70. Nothing of it is on the live site yet. Last worked on
-2026-11-25 (T-07: onto the engine, #562).
+2026-11-26 (INBDE only and the Foundation knowledge group).
 
 ## Before you work on it
 
@@ -39,7 +39,8 @@ PR https://github.com/smcmurry6-source/study-hubs/pull/70. Nothing of it is on t
   `docs/boards/ENGINE_PLAN.md` on the branch (approved 2026-11-22, Chairside kept), built as briefs T-07 to T-17.
   **Since T-07 (2026-11-25, #562) it is a hub on the engine**: `hubs/boards/content/` drawn by `widget/hub.js`, and
   `tools/ci/smoke.js` walks it as one, with the bank lint and `lintBoards` reading `content/`. The units are its
-  lectures, grouped by the INBDE's three components (`GROUPS` in `src/boards/config.js`); pharm and medcx are listed as
+  lectures, grouped by the INBDE's three components and Foundation knowledge, the four units with no home CC (anat,
+  physio, micro, gpath; Sam, 2026-11-26: "Group name is okay"; `GROUPS` in `src/boards/config.js`); pharm and medcx are listed as
   coming, since the engine draws Home and Notes only with a lecture, and nothing is published until a unit's items are
   checked. Its narration is off (`"audio": "off"`). Still to come: the levels' names and the coming units (T-08, T-09),
   the exam card without dates (T-09), the case box on a card (T-10), and its art, `hubs.js`, `sw.js` and the dashboard

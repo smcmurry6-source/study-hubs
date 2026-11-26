@@ -226,13 +226,14 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   maybe just take it out for now"): on `claude/boards-hub`, `tools/ci/smoke.js`'s check for a lecture with questions but no
   topics skips the boards hub, and `LIKELY_TOPICS` stays empty ([boards](../hubs/boards.md)). Done in T-07 (#562): `boards` is
   in `LIKELY_SKIP`, and the build writes `"likelyTopics": []`.
-- [ ] **Boards: which INBDE component anat, physio, micro and gpath go under** (2026-11-25, T-07, #562): Sam's call, needed
+- [x] **Boards: which INBDE component anat, physio, micro and gpath go under** (2026-11-25, T-07, #562): Sam's call, needed
   before the first of them is published. The engine groups the units by the INBDE's three components (`GROUPS` in
   `src/boards/config.js` on `claude/boards-hub`: D&TP, OHM, P&P, from each unit's home CCs), and these four foundation units
-  have no home CC. The build refuses to publish a unit in no group ([boards](../hubs/boards.md)).
-- [ ] **Boards: the T-06 brief's `--out` command** (2026-11-25, T-07, #562): `docs/boards/tasks/T-06.md` on `claude/boards-hub`
+  have no home CC. The build refuses to publish a unit in no group ([boards](../hubs/boards.md)). Sam, 2026-11-26: "Group
+  name is okay": they are a fourth group, Foundation knowledge ([decisions](../decisions.md), #574).
+- [x] **Boards: the T-06 brief's `--out` command** (2026-11-25, T-07, #562): `docs/boards/tasks/T-06.md` on `claude/boards-hub`
   still says `--out /tmp/boards-medcx/index.html`; since T-07, `--out` takes a folder (`--out /tmp/boards-medcx`, which gets
-  `content/` and `game/`). Fix it in the next PR that touches that brief.
+  `content/` and `game/`). Fix it in the next PR that touches that brief. Fixed with the INBDE-only change (#574).
 - [ ] **Boards: bring T-07's shared-tool changes to `main`** (2026-11-25, #562): on `claude/boards-hub`, `tools/hub-next/build.mjs`
   exports `buildFrom()` and lets a hub whose lectures are all still coming have no questions; `tools/ci/smoke.js` takes its
   one-hub checks from the first hub with questions (`firstHub`); `tools/timmy/test.mjs` picks a hub with published content.
