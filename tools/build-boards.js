@@ -61,11 +61,11 @@ const stripTags = h => String(h).replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' '
 function freshRequire(p) { const abs = path.resolve(p); delete require.cache[abs]; return require(abs); }
 
 // Fields that go into questions.json and core.json's cases, in this order (stable output). The engine doesn't read every
-// one of them yet (refs, sec, exam, fixed, pin, the blueprint fields: ENGINE_PLAN section 2); `checked`, `bench`, a
-// case's `beats` and authoring notes stay in the sources.
+// one of them yet (refs, sec, fixed, pin, the blueprint fields: ENGINE_PLAN section 2); `checked`, `bench`, a case's
+// `beats`, authoring notes and the exam tags (gone since the hub became INBDE only, 2026-11-26) stay in the sources.
 const ITEM_FIELDS = ['id', 'lec', 'type', 'fmt', 'pbox', 'img', 'stem', 'choices', 'answer', 'fixed', 'pin', 'ex', 'why', 'cue', 'refs',
-  'exam', 'ov', 'cc', 'cc2', 'fk', 'fk2', 'cog', 'diff', 'concept', 'sec', 'hy', 'case', 'phase', 'added'];
-const CASE_FIELDS = ['id', 'units', 'box', 'stim', 'items', 'exam', 'added'];
+  'ov', 'cc', 'cc2', 'fk', 'fk2', 'cog', 'diff', 'concept', 'sec', 'hy', 'case', 'phase', 'added'];
+const CASE_FIELDS = ['id', 'units', 'box', 'stim', 'items', 'added'];
 const VOID = new Set(['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'source', 'track', 'wbr']);
 
 // ---------- the build ----------
@@ -145,8 +145,8 @@ function build(opt) {
     if (m.id !== u.id) fail(where, `id "${m.id}" must match the folder name "${u.id}"`);
     if (!Number.isInteger(m.num)) fail(where, 'num must be an integer');
     for (const k of ['title', 'short']) if (!m[k] || !String(m[k]).trim()) fail(where, `${k} is required`);
-    if (!Array.isArray(m.exam) || !m.exam.length || m.exam.some(e => !['inbde', 'adex'].includes(e))) fail(where, "exam must list 'inbde' and/or 'adex'");
     if (!['taught', 'preview'].includes(m.status)) fail(where, "status must be 'taught' or 'preview'");
+    if (m.exam !== undefined) note(where, 'exam is no longer read: the hub is INBDE only (Sam, 2026-11-26), so drop it');
     if (typeof m.audio !== 'boolean') fail(where, 'audio must be true or false (false in release 1)');
     if (!/^\d{4}-\d{2}-\d{2}$/.test(m.added || '')) fail(where, 'added must be a YYYY-MM-DD date');
     for (const it of u.items) if (it.lec !== u.id) fail(rel(path.join(u.dir, 'items.js')), `${it.id}: lec "${it.lec}" (an item lives in its home unit's items.js)`);
@@ -186,7 +186,7 @@ function build(opt) {
     counts[u.id] = {
       status: u.meta && u.meta.status, source: u.items.length, published: mine.length,
       standalone: mine.filter(it => !it.case).length, caseItems: mine.filter(it => it.case).length,
-      cases: pubCases.filter(c => c.id.startsWith(`c-${u.id}-`)).length, fk: tally('fk'), cc: tally('cc'), cog: tally('cog'), exam: tally('exam'),
+      cases: pubCases.filter(c => c.id.startsWith(`c-${u.id}-`)).length, fk: tally('fk'), cc: tally('cc'), cog: tally('cog'),
     };
   }
 
@@ -198,15 +198,16 @@ function build(opt) {
   }
   const pubUnits = units.filter(u => u.meta);
   const lectures = pubUnits.map(u => {
-    const m = u.meta, ex = (m.exam || []).slice();
-    if (!groupOf[u.id]) fail('config.js GROUPS', `${u.id} is in no group: put it under one of the INBDE components`);
+    const m = u.meta;
+    if (!groupOf[u.id]) fail('config.js GROUPS', `${u.id} is in no group: put it under one of the groups`);
     return pick({ id: u.id, num: m.num, label: 'U' + m.num, title: m.title, short: m.short, group: groupOf[u.id],
-      status: taught.has(u.id) ? 'taught' : 'upcoming', tag: ex.includes('adex') ? 'BOTH' : 'INBDE', exam: ex,
-      who: ex.includes('adex') ? 'INBDE and ADEX' : 'INBDE only', from: 'written from primary sources', added: m.added },
-      ['id', 'num', 'label', 'title', 'short', 'group', 'status', 'tag', 'exam', 'who', 'from', 'added']);
+      // who and from make the notes' meta line ("INBDE · written from primary sources · 3 questions")
+      status: taught.has(u.id) ? 'taught' : 'upcoming', who: 'INBDE', from: 'written from primary sources', added: m.added },
+      ['id', 'num', 'label', 'title', 'short', 'group', 'status', 'who', 'from', 'added']);
   });
   const questions = pubItems.map(it => {
     const q = pick(it, ITEM_FIELDS);
+    if (q.ov) { if (q.ov.inbde) q.ov = { inbde: q.ov.inbde }; else delete q.ov; }   /* the INBDE's outline version only */
     if (q.pbox) q.pbox = boxRows(q.pbox);
     q.src = 'ref';
     return q;
@@ -244,7 +245,7 @@ function build(opt) {
   const nMock = Object.values(blueprint).reduce((a, b) => a + b, 0);
   const core = {
     hub: config.HUB, title: config.TITLE, stateKey: config.STATE_KEY, audio: 'off',
-    exams: [{ id: 'inbde', label: 'INBDE' }, { id: 'adex', label: 'ADEX' }], examNote: config.EXAM_NOTE,
+    exams: [{ id: 'inbde', label: 'INBDE' }], examNote: config.EXAM_NOTE,
     groups: (config.GROUPS || []).map(g => pick(g, ['id', 'title', 'code'])),
     lectures, likelyTopics: [], cases,
     mock: { blueprint, limit: nMock * ((config.MOCK || {}).standaloneSec || 63),
@@ -420,7 +421,7 @@ async function main() {
   const unitsLine = r.scope.length ? r.scope.map(u => {
     const c = r.counts[u.id];
     return `  ${u.id} (${c.status}): ${c.published} of ${c.source} items published (${c.standalone} standalone, ${c.caseItems} in cases; ${c.cases} cases homed here)` +
-      (c.published ? `; FK ${fmtTally(c.fk)}; CC ${fmtTally(c.cc)}; cog ${fmtTally(c.cog)}; exam ${fmtTally(c.exam)}` : '');
+      (c.published ? `; FK ${fmtTally(c.fk)}; CC ${fmtTally(c.cc)}; cog ${fmtTally(c.cog)}` : '');
   }).join('\n') : '  no units yet (the hub shows no units until the first one is listed in config.UNITS)';
   console.log(`\nboards: ${r.units.length} units, ${r.pub.items.length} items and ${r.pub.cases.length} cases published${opt.drafts ? ' (DRAFTS INCLUDED)' : ''}\n${unitsLine}`);
   if (opt.report) console.log('\nReport\n' + report(r));

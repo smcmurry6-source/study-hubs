@@ -1,5 +1,7 @@
 # Boards hub: architecture and build contract
 
+> **2026-11-26: INBDE only** (`docs/boards/DECISIONS.md`). Written when the hub had two exams: the `exam:['inbde','adex']` tags, the two `exams` and the ADEX block below are gone (one exam, no tags).
+
 Status: complete (written 2026-10-04 against main @ e2c3fc6). File:line references are to that commit.
 
 ## 1. Summary

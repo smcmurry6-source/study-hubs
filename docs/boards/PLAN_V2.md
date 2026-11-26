@@ -1,5 +1,7 @@
 # Boards hub: plan v2 after external review (2026-10-08)
 
+> **2026-11-26: INBDE only** (`DECISIONS.md`). Written when the hub also aimed at the ADEX; the ADEX parts below (tags, the Lab Bench) are background, not plans.
+
 **Status: approved by Sam 2026-10-11.** Until Codex and opencode are set up, everything runs through Claude
 (interim mode, see `NEXT.md`). Supersedes the content-pipeline and tooling parts of
 `BUILD_SPEC.md` (sections 7-9) and the cost notes in `REVIEW_BRIEF.md`. Everything else in BUILD_SPEC stands.

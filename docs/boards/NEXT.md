@@ -1,4 +1,4 @@
-# Boards hub: what the next session does (handoff, updated 2026-11-22: the move onto the engine)
+# Boards hub: what the next session does (handoff, updated 2026-11-26: INBDE only)
 
 ## First: the move onto the engine (2026-11-22)
 
@@ -16,9 +16,15 @@ step 5 called T-07).
 from `src/boards/` (run it after any change there and commit both; CI runs `--check`), `hubs/boards/index.html` is a
 hand-written settings page, and `tools/ci/smoke.js` walks boards as an engine hub. `config.UNITS` lists pharm and medcx
 (still preview: their titles show as coming), and `config.GROUPS` puts each unit under its INBDE component; anat, physio,
-micro and gpath have no home CC, so their group is decided before the first of them is published. Until T-08 and T-09
+micro and gpath, with no home CC, are a fourth group, Foundation knowledge (Sam, 2026-11-26). Until T-08 and T-09
 the engine shows Core and Deep dive as "Plain English" and "As taught", and the dateless exam card counts down "NaN";
 until T-15 the masthead is blank. Next: T-08 to T-12 and T-14, in any order.
+
+**INBDE only (2026-11-26):** Sam: "Lets do inbde only" (`DECISIONS.md`). One exam, the INBDE: units, items and cases carry
+no `exam` tags (the lint warns on one left over, and on an `ov.adex`), an item's `ov` is `{ inbde: 'DoD2018/CG2026' }`,
+T-09 has no exam filter, and the ADEX formats, the Lab Bench and the Gauntlet's ADEX stations are dropped.
+`research/adex.md` is background only. The fact records still carry `exam: ["inbde", "adex"]`, which nothing reads; they
+lose it when next edited.
 
 What follows is the earlier handoff (2026-10-14, after Session 7); where it talks about rebuilding
 `hubs/boards/index.html`, the generated page, read it as rebuilding `hubs/boards/content/` (T-07).
@@ -227,4 +233,4 @@ words, CI green, then PR #70 out of draft for Sam to merge.
 
 - UAB course calendar from D2 spring to D4 (unit order, cram windows).
 - A D4 or faculty member willing to look at high-risk questions.
-- Names: "Chairside" and "Boards Hub: INBDE + ADEX" are the working names.
+- Names: "Chairside" and "Boards Hub: INBDE" are the working names.

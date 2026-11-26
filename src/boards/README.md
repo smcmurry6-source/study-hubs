@@ -45,7 +45,7 @@ node tools/boards/lint-items.mjs          # item and fact checks on their own (a
 
 | Path | What it is |
 |---|---|
-| `config.js` | Hub id `boards`, title, exam note, state key, `UNITS` (teaching order; a unit is built only when it is listed), `GROUPS` (the INBDE's three components and their units), `ENABLED_TYPES` (`['mcq']` in release 1), spaced-review and daily-plan settings (for T-12), exam-block timing, size limits |
+| `config.js` | Hub id `boards`, title, exam note, state key, `UNITS` (teaching order; a unit is built only when it is listed), `GROUPS` (the INBDE's three components and Foundation knowledge, with their units), `ENABLED_TYPES` (`['mcq']` in release 1), spaced-review and daily-plan settings (for T-12), exam-block timing, size limits |
 | `app/45-readiness-plan.js` | The readiness and daily-plan core, tested by `tools/ci/boards-plan.test.js`; T-12 moves it to `widget/plan.js`. The rest of the old page (its app, CSS and shell) was retired by T-07: the engine draws the hub |
 | `facts/` | The fact records questions cite in `refs` (`facts/README.md`). A cited fact must exist and must not be `unverified`. Only each cited fact's sources (name, publisher, link, date) reach `content/facts.json`; claims and quotes stay here |
 | `units/<unit>/` | One folder per unit (added as units are written): `unit.js`, `items.js`, `notes.core.html`, `notes.deep.html`, `blueprint.json` |
@@ -56,7 +56,8 @@ node tools/boards/lint-items.mjs          # item and fact checks on their own (a
 
 A unit folder holds:
 
-- `unit.js`: `module.exports = { id, num, title, short, exam: ['inbde', 'adex'], status: 'taught' | 'preview', audio: false, added: 'YYYY-MM-DD' }`
+- `unit.js`: `module.exports = { id, num, title, short, status: 'taught' | 'preview', audio: false, added: 'YYYY-MM-DD' }`.
+  No exam tags: the hub is INBDE only since 2026-11-26 (`docs/boards/DECISIONS.md`), and the build notes a unit that still has one
 - `items.js`: `module.exports = { items: [...], cases: [...] }`, one item per block, schema in BUILD_SPEC 4.4. Item ids
   are `b-<unit>-NNNN` and cases `c-<unit>-NNNN`; ids are never reused.
 - `notes.core.html` and `notes.deep.html`: HTML fragments, markup in BUILD_SPEC 5.2. Both have the same
@@ -67,7 +68,7 @@ the notes of the `taught` ones, and only the items and cases that passed verific
 published only when it and all of its items are checked. Drafts stay in the sources. The engine needs at least one
 lecture to draw Home and Notes, so `UNITS` lists release 1's first units (pharm, medcx) while they are still `preview`.
 
-To add a unit: create its folder, add its id to `UNITS` and to its component in `GROUPS`, run
+To add a unit: create its folder, add its id to `UNITS` and to its group in `GROUPS`, run
 `node tools/build-boards.js --unit <id>` until it is clean, then rebuild.
 
 ## Test fixtures

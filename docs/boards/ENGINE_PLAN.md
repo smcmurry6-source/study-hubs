@@ -6,6 +6,10 @@ chairside. I want to keep it"; `DECISIONS.md`). Nothing in this plan is built ye
 (2026-11-22, `vault/decisions.md` on `main`). The briefs in `docs/boards/tasks/T-07.md` to `T-17.md` are built in order, one
 PR each.
 
+**2026-11-26: INBDE only** (Sam: "Lets do inbde only"; `DECISIONS.md`). The hub has one exam, the INBDE: no ADEX exam,
+exam tags, exam filter or ADEX formats. The four units with no home CC (anat, physio, micro, gpath) go under a fourth
+group, **Foundation knowledge** (Sam: "Group name is okay"). The rows and briefs below are written that way.
+
 Sam's calls that still hold and shape this plan:
 
 - `DECISIONS.md` (this folder): exams roughly August 2028 and never auto-archived on a guessed date; original questions
@@ -34,8 +38,8 @@ them into `content/`.
 | Today (`src/boards/`) | On the engine | Who gains |
 |---|---|---|
 | `config.js`: hub id, title, `STATE_KEY`, `UNITS`, modes | `hubs/boards/index.html`'s `SH_HUB` (hub `boards`, state key `boards-state-v1`, answered event `boards:answered`, the hub's wording) and `content/core.json` (`lectures`, `exams`, `examNote`). The five modes become the engine's four views (below) | boards |
-| Units (`units/<id>/unit.js`, 19 planned, each tagged INBDE or BOTH) | One engine **lecture per unit** (`core.json` `lectures`: `id`, `num`, `title`, `status`, `tag`; no `who`). `status: 'taught'` → `taught`, `'preview'` → `upcoming` (shown as "coming", no questions). **Two exams** → `core.json` `exams` holds `inbde` and `adex` with **no dates** (`date` absent) and `examNote: "INBDE + ADEX ~Aug 2028"`; each lecture and question carries `exam: ['inbde','adex']` | boards; the no-date exam card helps any hub whose date isn't announced yet |
-| INBDE components (D&TP / OHM / P&P) | `core.json` `groups` (as Review of Systems groups its courses), so Notes, the bank's panel and progress by lecture group the 19 units into three | boards |
+| Units (`units/<id>/unit.js`, 19 planned; the INBDE and BOTH tags were dropped 2026-11-26, every unit is simply the hub's) | One engine **lecture per unit** (`core.json` `lectures`: `id`, `num`, `title`, `status`, `group`, `who: "INBDE"` for the notes' meta line). `status: 'taught'` → `taught`, `'preview'` → `upcoming` (shown as "coming", no questions). **One exam** → `core.json` `exams` holds `inbde` with **no date** (`date` absent) and `examNote: "INBDE ~Aug 2028"`; no exam tags on units or questions, and a question's `ov` keeps only `inbde` | boards; the no-date exam card helps any hub whose date isn't announced yet |
+| INBDE components (D&TP / OHM / P&P) and Foundation knowledge | `core.json` `groups` (as Review of Systems groups its courses), so Notes, the bank's panel and progress by lecture group the 19 units into four: Foundation knowledge (anat, physio, micro, gpath, the units with no home CC; Sam, 2026-11-26), then the three components | boards |
 | Notes: Core and Deep dive (`notes.core.html`, `notes.deep.html`, same section ids) | `notes.json` `plain` = Core, `full` = Deep dive, with the two buttons **labeled by the hub** ("Core", "Deep dive") instead of "Plain English" / "As taught". **High yield off** for boards (`core.json` `"hy": false`: no third level, nothing built from `likelyTopics`, which is `[]`). Listen reads in the device's voice (`"audio": "off"` from the start: no recordings in the repo) | every hub can name its levels and switch High yield off |
 | Section ids and "Practice this section" (`data-practice`, an item's `sec`) | Each section heading in the notes gets a "Practice this section" button that opens the bank on `#questions` filtered to that `sec`; `sec` kept on each question | every hub (sections are optional) |
 | Fact citations (`refs: ['IE-5', 'https://…']`, notes' `data-ref`) | **Source chips** under an explanation and in the notes: each fact id shows its source's name and date and links to the source URL; `content/facts.json` holds only the public part of each cited fact (id, source name, URL, date; never the quotes, which stay in `src/boards/facts/`). The engine's `src` label ("Board fact") stays the one-line source line | every hub can cite sources (`refs` optional) |
@@ -45,7 +49,7 @@ them into `content/`.
 | Readiness and the daily plan (`app/45-readiness-plan.js`, pure, Node-tested; #80 merged, #111's fix open) | `widget/plan.js` (`window.shPlan`), the same pure core with #111's fix and its tests moved to `tools/ci/plan.test.js`, used when `core.json` has `plan` (boards: `{ daily: 12, newPerDay: 4, governor: 0.8, retireStep: 120, retireStreak: 3, retiredSamplePerMonth: 4 }`). Home's **Today** gets "Today's 12" (the drill set from `shPlan`, through `SH_DRILL.plan`) and **readiness per unit** ("Likely right 64%", "Seen 120 of 180") in progress by lecture; the Daily Drill is the same set | opt-in for any hub; boards first |
 | Spaced review (`SRS: steps [1,3,7,14,30,60,120], examCap:false, fuzz:0.1, server:true`) | `core.json` `srs` read by `widget/v3.js` (its `SRS_STEPS` are fixed at `[1,2,4,7]` today); the server copy is the per-item state of section 5, so a phone change or Safari's 7-day eviction doesn't reset two years of spacing | opt-in for any hub |
 | Exam blocks (`app/50-mock.js`; #102: standalone 63 s/item, case 95 s/item, no feedback until the end) | The engine's mock with **block presets** (`core.json` `mock.blocks`: `standalone` and `cases`, each with seconds per item and a size), on top of its blueprint mock. The engine's mock already has no feedback until submit, the review and `sh:mock-done` | every hub (a preset is optional) |
-| Bank: Practice, Cases, Missed, filters (unit, section, exam tag, standalone/case, new, hard) | The engine's bank and panel: lecture = unit, `#questions/misses`, `weak`, `drill`; **new**: the `cases` set (above) and an **exam filter** ("INBDE and ADEX" / "INBDE only") in the panel when the hub has two exams with `exam` tags. Section comes from the notes' button | exam filter: any multi-exam hub |
+| Bank: Practice, Cases, Missed, filters (unit, section, standalone/case, new, hard) | The engine's bank and panel: lecture = unit, `#questions/misses`, `weak`, `drill`; **new**: the `cases` set (above). No exam filter (INBDE only since 2026-11-26). Section comes from the notes' button | — |
 | Cards (#81: full card, Rounds, cover the options) | The engine's question card. "Cover the options" (answer before the choices show) is Learn's recall step today; a per-hub setting isn't needed for R1. #81's walk-through findings become acceptance tests for the case-set brief | none new |
 | Home (`app/60-home.js`) | The engine's Home ([hub-home-page](../../vault/rules/hub-home-page.md) on `main`): masthead, exam card (no date: "~Aug 2028" and "Dates aren't announced yet"), quick links, Where to next, Today, progress by unit, the course timeline left out (no `courseDates`) | — |
 | Clinic / Chairside (`app/80-clinic.js` placeholder; #95 game core, #101 art; BUILD_SPEC 6) | **Kept** (Sam, 2026-11-22). Chairside becomes **boards' arcade game on the engine**: More's Arcade lists it (`SH_HUB.arcade.games`, `arcade.first: "chairside"`), `content/arcade.js` is a thin skin that loads `hubs/boards/game/chairside.js` (built from `src/boards/game/` by the converter, under BUILD_SPEC's 110 KB gzip budget) on first start, with the boards look ([arcade-skins](../../vault/rules/arcade-skins.md)). BUILD_SPEC 6.1-6.2's rules stand. What changes: the adapter (6.3) is built on the engine (`HX`: the bank, the card, case sets from T-10, the answer path with `ctx: "game"` and `conf`); Today's shift is the Daily Drill's set from `shPlan` (T-12); the long-term frame (readiness windows, practice days) is worked out from answers and `item_state` (T-13), so **no `game_saves` table**: a shift in progress is kept on the device for the day. Answers pay as answers, and a finished shift pays the engine's game bonus. T-16 and T-17 | boards (the engine's arcade API gains a game that answers bank questions) |
@@ -60,8 +64,8 @@ them into `content/`.
 
 For every hub (each opt-in, a hub without the setting draws exactly as today; each needs its smoke-test check):
 
-1. An exam card and Home for exams **with no date yet** (`exams` without `date`, `examNote`), and an **exam filter** for
-   two exams in one bank. (T-09)
+1. An exam card and Home for an exam **with no date yet** (`exams` without `date`, `examNote`). (T-09; the exam filter
+   for two exams in one bank was dropped with ADEX, 2026-11-26)
 2. **Reading-level labels** set by the hub, **High yield off** per hub, and **"Practice this section"** from a notes
    section. (T-08)
 3. **Case sets** with a plain shared box and a Cases set in the bank. (T-10)
@@ -154,7 +158,7 @@ None of them should merge `main` in on their own; content and tool PRs touch onl
 |---|---|---|---|
 | T-07 | Converter (`tools/build-boards.js` → `content/`), the settings page, the CI switch to the engine walk for boards (with `lintBoards` kept) | `claude/boards-hub` | this plan approved |
 | T-08 | Engine: level labels, High yield off, Practice this section | see question 1 | T-07 |
-| T-09 | Engine: exams without dates, the exam note, the exam filter | see question 1 | T-07 |
+| T-09 | Engine: an exam without a date, the exam note | see question 1 | T-07 |
 | T-10 | Engine: case sets (plain box, Cases set, feedback after the last item) | see question 1 | T-07 |
 | T-11 | Engine: source chips and `facts.json`; card `fixed`, `pin`, `not`/`least`, `cue` | see question 1 | T-07 |
 | T-12 | `widget/plan.js` (with #111), per-hub `srs` in `widget/v3.js`, Today's 12 and readiness per unit | see question 1 | #111, T-07 |

@@ -1,14 +1,14 @@
-# Boards hub (INBDE + ADEX): decisions so far
+# Boards hub (INBDE): decisions so far
 
 Living record of what Sam decided while this hub is being planned and built. Newest last.
 
 ## 2026-10-03
 
-- **Exams**: INBDE (and ADEX) roughly **August 2028**; Sam is "not 100%" sure. Sam's class is in D2 now (fall 2026).
+- **Exams**: INBDE (and ADEX, dropped 2026-11-26) roughly **August 2028**; Sam is "not 100%" sure. Sam's class is in D2 now (fall 2026).
   Show dates as approximate ("~Aug 2028") and never let the dashboard auto-archive the hub on a guessed date (the
   dashboard archives at 10 pm on the last date in `exams`). Sam updates the real dates later.
-- **Content**: Sam has no question material. We write original questions and notes to the official INBDE and ADEX
-  outlines, fact-checked against public sources (CDC, FDA, ADA, AHA, AAP, AAE, AAOMS, AAPD...). Never copy
+- **Content**: Sam has no question material. We write original questions and notes to the official INBDE (and ADEX, until
+  2026-11-26) outlines, fact-checked against public sources (CDC, FDA, ADA, AHA, AAP, AAE, AAOMS, AAPD...). Never copy
   prep-company banks, released exam items or textbook text; this repo is public.
 - **Hub** = notes + question bank + one deep game.
 - **Website access**: the cloud environment now has full network access (Sam changed it 2026-10-03).
@@ -25,8 +25,8 @@ Living record of what Sam decided while this hub is being planned and built. New
   hubs that go live a week before an exam. Make it a per-hub option, not a change for every hub.
 - Staged releases: v1 is a solid core (some units complete plus the game's first slice); units are added over months,
   lined up where possible with the courses the class is taking.
-- Every item records the outline version it was written against (INBDE Domain of Dentistry; ADEX manual year); a
-  yearly re-check catches outline changes.
+- Every item records the outline version it was written against (INBDE Domain of Dentistry; the ADEX manual year
+  too until 2026-11-26); a yearly re-check catches outline changes.
 - The game needs long-term progression (months to years) and seasons or events, not just a single run.
 - A countdown to a date two years out isn't motivating; prefer readiness per unit.
 
@@ -55,3 +55,14 @@ Living record of what Sam decided while this hub is being planned and built. New
   `hubs/boards/content/`; one answer path with a rolling per-item store for boards; the open PRs as section 6 says), and
   **Chairside stays**: it is built as boards' arcade game on the engine (briefs T-16 and T-17), and #95 and #101 land
   through them.
+
+## 2026-11-26
+
+- **INBDE only** (Sam, in the merging session: **"Lets do inbde only."**). The hub prepares for one exam, the INBDE. ADEX
+  is no longer a target: no ADEX exam on Home, no exam tags on units, items or cases (an item's `ov` keeps only `inbde`),
+  no exam filter in the bank (dropped from T-09), and the ADEX-only formats and plans (BUILD_SPEC 4.2: `dlmulti`, `rx`,
+  `spot`, `facts-adex.md`, the Lab Bench and the Gauntlet's ADEX stations) are dropped. Units tagged INBDE or BOTH are
+  simply the hub's units. `research/adex.md` stays as background only. Supersedes the ADEX half of the 2026-10-03 lines
+  above.
+- **Foundation knowledge** (Sam: **"Group name is okay"**): anat, physio, micro and gpath, the four units with no home CC,
+  are a fourth group in Notes, the bank's panel and Home's progress, named "Foundation knowledge" (`config.js` `GROUPS`).

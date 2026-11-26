@@ -1,8 +1,8 @@
 // Boards hub benchmark (repaired after run 1; run1/items.js is the version the checker saw): 20 deliberately hard INBDE-style items written from src/boards/facts (PLAN_V2 item 8).
 // Categories: factual 1-4, pharmacology 5-8, clinical decisions 9-12, calculations 13-14, ambiguity-prone 15-16,
 // case set 17-20 (c-perio-0001). Not yet verified (checked:null); not part of the hub.
-const OV = { inbde: 'DoD2018/CG2026', adex: 'DLM2026-27' }, EX = ['inbde', 'adex'], ADDED = '2026-10-11';
-const base = { type: 'mcq', exam: EX, ov: OV, added: ADDED, checked: null };
+const OV = { inbde: 'DoD2018/CG2026' }, ADDED = '2026-10-11'; // INBDE only since 2026-11-26 (docs/boards/DECISIONS.md)
+const base = { type: 'mcq', ov: OV, added: ADDED, checked: null };
 
 const items = [
 // ---------- factual ----------
@@ -327,7 +327,7 @@ const cases = [
     findings: ['BP 138/84, pulse 78', '25 teeth present', 'Probing depths of 5-7 mm with bleeding on probing at 64% of sites',
       'Interdental clinical attachment loss of 5-7 mm on 18 of 25 teeth; greatest loss 7 mm, on tooth 30', 'Radiographs: horizontal bone loss to the middle third of the roots; 4-mm vertical defect on the mesial of tooth 30; bone loss at the worst site about 50% of the root',
       'Tooth 30: class II furcation involvement; mobility degree 1'] },
-  stim: [], items: ['b-perio-0002', 'b-perio-0003', 'b-medcx-0006', 'b-medcx-0007'], beats: {}, exam: EX, added: ADDED, checked: null },
+  stim: [], items: ['b-perio-0002', 'b-perio-0003', 'b-medcx-0006', 'b-medcx-0007'], beats: {}, added: ADDED, checked: null },
 ];
 
 // Verification record (stage 4/4b): two independent checker passes, both pass (docs/boards/bench/recheck-*).

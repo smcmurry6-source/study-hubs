@@ -14,19 +14,20 @@
 <meta name="theme-color" content="#3b2e3a">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Boards Hub">
-<meta property="og:description" content="Notes and a board-style question bank for the INBDE and ADEX, written from primary sources, growing unit by unit.">
+<meta property="og:description" content="Notes and a board-style question bank for the INBDE, written from primary sources, growing unit by unit.">
 <meta property="og:url" content="https://smcmurry6-source.github.io/study-hubs/hubs/boards/">
 <meta property="og:image" content="https://smcmurry6-source.github.io/study-hubs/assets/og-dashboard.png">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="description" content="Boards Hub for the INBDE and ADEX: notes at two levels (Core and Deep dive), a board-style question bank with patient boxes and case sets, timed exam blocks and Chairside, a clinic game built on the same questions. Every question is written from primary sources. Grows unit by unit.">
+<meta name="description" content="Boards Hub for the INBDE: notes at two levels (Core and Deep dive), a board-style question bank with patient boxes and case sets, timed exam blocks and Chairside, a clinic game built on the same questions. Every question is written from primary sources. Grows unit by unit.">
 <link rel="preload" href="../../assets/fonts/nunito-sans-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="content/core.json" as="fetch" type="application/json" crossorigin>
 <link rel="stylesheet" href="../../widget/site.bundle.css">
 <script>
 /* This hub's settings for the engine (widget/hub.js). Its content in content/ is generated: tools/build-boards.js
    writes it from src/boards/ (the units, their notes and items, the fact records), so edit those and rebuild, never the
-   JSON (vault/hubs/boards.md, docs/boards/ENGINE_PLAN.md). The words below are the hub's own. Two exams with no dates
-   yet (core.json's exams and examNote), the 19 units grouped by the INBDE's three components (core.json's groups), no
+   JSON (vault/hubs/boards.md, docs/boards/ENGINE_PLAN.md). The words below are the hub's own. One exam, the INBDE, with
+   no date yet (core.json's exams and examNote; INBDE only since 2026-11-26, Sam: "Lets do inbde only"), the units grouped
+   by the INBDE's three components and Foundation knowledge (core.json's groups), no
    narration recordings ("audio": "off": Listen reads in the device's voice) and no High Likelihood (Sam, 2026-11-21).
    No drawn art yet (T-15), so the page loads no widget/hub-art/boards.js and the engine's own emblem shows. */
 window.SH_HUB = {
@@ -40,12 +41,9 @@ window.SH_HUB = {
   back: "../../",
   about: "../../about/",
   home: {
-    title: "INBDE + ADEX",
+    title: "INBDE",
     when: "About August 2028 · dates aren't announced yet",
     chips: ["Written from primary sources", "Grows unit by unit"],
-    byExam: {
-      adex: { title: "ADEX", when: "About August 2028 · dates aren't announced yet" }
-    },
     prof: "the board outlines",
     onExam: "On the boards"
   },
@@ -53,7 +51,7 @@ window.SH_HUB = {
   hints: {
     prof: "the board outlines",
     words: "What the board outlines cover",
-    wordsNote: "From the INBDE and ADEX content outlines.",
+    wordsNote: "From the INBDE content outline.",
     banner: "Each unit's notes, with every fact traced to its source."
   },
   mock: {

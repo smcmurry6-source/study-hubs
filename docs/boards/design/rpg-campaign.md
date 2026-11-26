@@ -1,5 +1,7 @@
 # Open Practice: a career-campaign RPG for the boards hub (design)
 
+> **2026-11-26: INBDE only** (`docs/boards/DECISIONS.md`). The ADEX lab cases and DLOSCE formats below are dropped.
+
 Status: design draft, 2026-10-04. Owner: boards hub. Read with `docs/boards/DECISIONS.md`, `LESSONS.md` and
 `docs/boards/research/architecture.md` (the hub contract this plugs into: hub id `boards`, event `boards:answered`,
 item ids `b-<unit>-NNNN`, game files loaded on demand from `hubs/boards/game/`). Exam facts come from

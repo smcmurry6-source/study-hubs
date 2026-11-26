@@ -16,8 +16,10 @@ const ROOT = path.resolve(__dirname, '../..');
 const FACTS_DIR = path.join(ROOT, 'src/boards/facts');
 
 const ENABLED_TYPES = ['mcq'];
-const OV_KNOWN = { inbde: ['DoD2018/CG2026'], adex: ['DLM2026-27'] };
-const REQUIRED = ['id', 'lec', 'type', 'stem', 'choices', 'answer', 'ex', 'why', 'refs', 'exam', 'ov', 'cc', 'fk', 'cog', 'diff', 'concept', 'sec', 'added'];
+// INBDE only since 2026-11-26 (Sam: "Lets do inbde only"; docs/boards/DECISIONS.md): an item records the INBDE outline
+// version it was written against (ov.inbde) and no longer carries exam tags.
+const OV_KNOWN = { inbde: ['DoD2018/CG2026'] };
+const REQUIRED = ['id', 'lec', 'type', 'stem', 'choices', 'answer', 'ex', 'why', 'refs', 'ov', 'cc', 'fk', 'cog', 'diff', 'concept', 'sec', 'added'];
 const UNITS = ['anat', 'physio', 'micro', 'gpath', 'opath', 'rad', 'perio', 'endo', 'oper', 'pros', 'ortho', 'peds', 'oms', 'anes', 'pharm', 'medcx', 'infect', 'prof', 'pubh'];
 const BRITISH = /\b(colour\w*|favour\w*|centre\w*|behaviour\w*|haem\w*|anaesth\w*|paediatric\w*|oesophag\w*|labelled|organis(e|ed|ing|ation)\w*|analys(e|ed|ing)|programme|licence|defence|tumour\w*|fibre\w*|litre\w*|metre\w*|grey|manoeuvre|orthopaedic\w*|ischaemi\w*|oedema|foetal|leukaemia|aetiology|practise[ds]?)\b/i;
 const STEM_WORDS_MIN = 40, STEM_WORDS_MAX = 110;
@@ -152,7 +154,7 @@ function lintItems(L, { all, cases }, { facts, sources }, opts = {}) {
     if (it.type && !enabledTypes.includes(it.type)) err(id, 'type', `type ${it.type} not enabled (${enabledTypes.join(', ')})`);
     const ch = it.choices || [];
     // 2 options
-    if ((it.exam || []).includes('inbde') && it.type === 'mcq' && (ch.length < 3 || ch.length > 5)) err(id, 'choices', `INBDE items have 3-5 options (has ${ch.length})`);
+    if (it.type === 'mcq' && (ch.length < 3 || ch.length > 5)) err(id, 'choices', `INBDE items have 3-5 options (has ${ch.length})`);
     if (!(Number.isInteger(it.answer) && it.answer >= 0 && it.answer < ch.length)) err(id, 'answer', 'answer index out of range');
     for (const c of ch) if (/\b(all|none) of the above\b|\bboth [a-d] and [a-d]\b/i.test(c)) err(id, 'forbidden-option', `"${c}"`);
     const normCh = ch.map(c => words(c).join(' '));
@@ -187,11 +189,10 @@ function lintItems(L, { all, cases }, { facts, sources }, opts = {}) {
       for (const c of f.cites) { const s = sources[c.src]; if (s && s.date && +s.date.slice(0, 4) < new Date().getFullYear() - SOURCE_MAX_AGE_Y) warn(id, 'source-date', `${r} rests on ${c.src} dated ${s.date}`); }
     }
     it._risk = risk;
-    // 7 outline versions
-    for (const ex of it.exam || []) {
-      if (!it.ov || !it.ov[ex]) err(id, 'ov', `no outline version for ${ex}`);
-      else if (OV_KNOWN[ex] && !OV_KNOWN[ex].includes(it.ov[ex])) warn(id, 'ov', `unknown ${ex} outline version ${it.ov[ex]}`);
-    }
+    // 7 outline version (the INBDE's); ADEX tags left from before 2026-11-26 are a warning, so they come out as items are edited
+    if (it.ov && !it.ov.inbde) err(id, 'ov', 'no INBDE outline version (ov.inbde)');
+    else if (it.ov && !OV_KNOWN.inbde.includes(it.ov.inbde)) warn(id, 'ov', `unknown INBDE outline version ${it.ov.inbde}`);
+    if ((it.exam || []).includes('adex') || (it.ov && it.ov.adex)) warn(id, 'exam', 'the hub is INBDE only (2026-11-26): drop exam and ov.adex');
     // 8 style
     const box = it.case ? (cases.find(c => c.id === it.case) || {}).box : it.pbox;
     const all8 = [it.stem, ...ch, it.ex, ...why, it.cue, boxText(box)].join(' \n ');
@@ -271,7 +272,7 @@ function lintItems(L, { all, cases }, { facts, sources }, opts = {}) {
         if (key && key.length > 12 && [p.stem, p.ex, ...(p.why || [])].join(' ').toLowerCase().includes(key.toLowerCase())) warn(iid, 'leak', `earlier item ${prev} contains this item's key text`);
       }
     });
-    if (c.exam && !c.exam.length) err(id, 'case', 'exam tags empty');
+    if ((c.exam || []).includes('adex')) warn(id, 'exam', 'the hub is INBDE only (2026-11-26): drop exam');
   }
   for (const it of items) if (it.case && !cases.find(c => c.id === it.case)) err(it.id, 'case', `case ${it.case} not found`);
 
