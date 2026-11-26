@@ -24,9 +24,11 @@ const PATTERNS = [
   ['a database URL with a password', /postgres(ql)?:\/\/[^:\s/]+:[^@\s<]{4,}@(?!localhost|127\.0\.0\.1)/],
   ['the admin secret written out', /\b(ADMIN_SECRET|p_secret)\s*[:=]\s*["'](?!<|\$|preview-admin|rls-test-secret|not-the-secret)[^"'\s]{8,}["']/]
 ];
-/* course material and student data never live here; the site's own media are the widget's fixed sounds and short clips */
+/* course material and student data never live here; the site's own media are the widget's fixed sounds and short clips
+   (widget/sfx/, widget/vid/: the nuke). The study-music loops in widget/audio/ were deleted on 2026-11-26 (Sam: "Delete study
+   music loops"), so a file put back there fails as media outside these folders. */
 const BANNED_EXT = /\.(pdf|pptx?|key|docx?|vtt|srt|m4a|mov|wav|aiff?|zip|csv|tsv|xlsx?|numbers|sqlite|db|dump)$/i;
-const MEDIA_OK = /^widget\/(audio|sfx|vid)\/[^/]+\.(mp3|mp4|webm)$/;
+const MEDIA_OK = /^widget\/(sfx|vid)\/[^/]+\.(mp3|mp4|webm)$/;
 /* no narration (<lecture>-full/-plain/-hy.mp3, guide.mp3, their .words.json) or Timmy Time episode is committed again:
    git keeps every file it was ever given (vault/rules/no-narration-in-the-repo.md). The widget's fixed sounds stay. */
 const RECORDING = /^hubs\/[^/]+\/audio\/|(^|\/)timmy-time\.mp3$/;
