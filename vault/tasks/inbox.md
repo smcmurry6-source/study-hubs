@@ -111,9 +111,21 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
 - [ ] **Read Link my devices' times a week after `migration_v103` is applied** (2026-11-25, #563): before it, the 7 links
   that finished from 2026-11-18 took 2.0 s on average (2.7 s at most) and the logs held 24 timeouts. A week after: the
   week's calls and mean time (`select calls, total_exec_time, max_exec_time from extensions.pg_stat_statements where
-  toplevel and query ilike '%redeem_link_code%'`, less the calls and total written in #563 at the apply), and the
-  Postgres logs for `canceling statement due to statement timeout` with `redeem_link_code` in `parsed.context` (one 24-hour
-  slice a call). Totals only. If a link still runs out of time, the next cut is the rebuild's rewrite of every award row.
+  toplevel and query ilike '%redeem_link_code%'`, less what it read at the apply: 7 calls, 14,274 ms in all, 2,686 ms at
+  most, counted since the 2026-11-18 20:57 UTC stats reset; v103 went in on 2026-11-25 at 08:13 UTC, so read it from
+  2026-12-02), and the Postgres logs for `canceling statement due to statement timeout` with `redeem_link_code` in
+  `parsed.context` (one 24-hour slice a call). Totals only. If a link still runs out of time, the next cut is the line
+  below.
+- [ ] **Link my devices can still run out of time on a heavy visitor's first, cold link after `migration_v103`** (2026-11-25): one
+  `sh_xp_rebuild` of the visitor with the most answers took over 5 s on the live database at 1:36 am Central (rolled back,
+  nothing else running), against anon's 3 s and 324 ms on a throwaway copy, and after v103 (08:14 UTC) it still did. The
+  rebuild timed statement by statement right after took 1.2 s warm (the replay's insert into `xp_awards` 0.61 s, the
+  `xp_days` insert 0.32 s, the `xp_seen` insert 0.19 s: [game-server](../reference/game-server.md)), and one full warm call
+  0.80 s, so a warm link fits and a first, cold one for a heavy visitor may not. First tell cold pages from the shared CPU: at a quiet hour, one full
+  `sh_xp_rebuild` twice in a row in one rolled-back call, with `explain (analyze, buffers)` on the replay's insert for its
+  shared reads. Then the cut: answer the link at once and rebuild in a pg_cron job a minute later, or move the second
+  device's awards instead of rebuilding when their days don't overlap, or rebuild only the rows that change. The
+  week-after read of the link times (the line above) says how many people this hits.
 - [ ] **The mastery read is slower a call than before the optimization pass** (2026-11-20, its readout): `get_hub_mastery`
   236 → 349 ms on the server on average (673 calls since phase 1), the evening's median 242 → 709 ms on 77 calls, 11% of the
   database's time. Since #459 the page works out the rank between answers, so the reads left are the ones when a hub's page

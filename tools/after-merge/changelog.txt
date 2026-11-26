@@ -111,3 +111,4 @@ all | Listen in your device's voice (hubs without recorded narration) has a spee
 all | Your progress ring on the dashboard now shows on a new or linked device too, counted from your saved answers.
 all | Fixed: after a mock exam, "See what I missed" on the results card now shows only the questions you missed (it did nothing before). Tap "Show every question" to see them all again.
 all | Customizing Timmy's place is quicker: four tabs (Timmy, Home, Scene and Yard) over one list of everything you own, with what you just got first and marked New. Customize opens where you'll want it, the Yard tab on the first empty spot, and every tap shows at once.
+all | On the leaderboards, people tied on a place now keep the same order every time you look.

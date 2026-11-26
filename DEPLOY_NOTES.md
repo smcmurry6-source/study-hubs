@@ -32,6 +32,18 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-25 (migration_v101 and v103 applied, Claude Code)** — At 2:10 and 2:13 am Central, through the connector in one
+  call each, with the class asleep. **v101** (#545: the year-spanning readers read the totals; `insight_cards_kept`,
+  `sh_insights`, `get_hub_recap`, `sh_retention_run`): nothing changes until the first collapse (about 2027-09-13); the three
+  bodies md5-checked before and after, the new table admin-only; `sh_insights` 4.95 s cold, 1.0 s warm (the admin cache job
+  gives it 10 s). **v103** (#563: the boards keep a tie in one order; Link my devices rebuilds XP once): all nine bodies
+  md5-checked before and the eight replaced after, `get_rank_board_v2` PL/pgSQL, the five boards answered as anon. Timed
+  live the same night ([game-server](vault/reference/game-server.md)): v103 halves the work (one XP rebuild instead of two),
+  but the heaviest visitor's one rebuild still ran past 5 s after it (rolled back), so Link my devices can still time out
+  for the very heaviest; the time is in the rebuild's other statements, not the replay (0.35-0.57 s), and the next cut is a
+  new inbox line. The students' changelog line says only the boards' tie order until that's fixed. `supabase/schema.sql` has both
+  files, `supabase/pending-migrations.txt` lists none, and `redeem_link_code`'s numbers at the apply are in the week-after
+  inbox line.
 - **2026-11-25 (Timmy's place: a quicker Customize, #567, Claude Code)** — Sam: "I also want a better way to do the customization
   for Timmys place. Its clunky and inefficient". Customize is one panel now: four tabs (Timmy, Home, Scene, Yard, with the
   yard's five spots as a row under its tab) over one list of what you own of that kind, grouped New since you last looked,

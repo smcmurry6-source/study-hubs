@@ -724,6 +724,20 @@ crowns and nothing else.
   on the live site) a link went from 770 to 350 ms. **Keep it that way**: anything added to `redeem_link_code` that changes
   answers runs inside `sh.linking`, or it pays for another whole rebuild; and anything that makes the rebuild slower makes
   linking slower for the people with the most answers, who are the ones most likely to link.
+- **Timed on the live database** on 2026-11-25, 1:36 to 2:45 am Central (nobody studying, no other query running; each
+  write in a call that rolled back). Before v103, one `sh_xp_rebuild` of the visitor with the most answers ran past 5 s
+  and was canceled, inside `sh_xp_replay`'s insert into `xp_awards`; after v103 (08:14 UTC) the same call still did, at the
+  same place. The throwaway copy's made-up 10,000-answer visitor takes 324 ms for the whole rebuild. The replay's body
+  alone is cheap and all from cache: 0.35-0.57 s for the five heaviest after v103 (0.5-0.7 s before). v103 halves the
+  work (one rebuild instead of two). Each statement of the heaviest visitor's rebuild, timed separately right after
+  (rolled back): 1.2 s in all, the replay's insert into `xp_awards` 0.61 s, the `xp_days` insert 0.32 s, the `xp_seen`
+  insert 0.19 s, the deletes 0.09 s, the rest under 20 ms; the replay function alone 0.57 s, then 0.33 s. So warm, the
+  heaviest visitor's link fits under anon's 3 s, but both full calls that night that ran past 5 s were the first touch of
+  the write path (the night's first heavy call, and the first after the migration replaced `sh_xp_replay`): a first, cold
+  Link my devices for a heavy visitor can still run out of time. One full warm call right after took 0.80 s (rolled back),
+  well under anon's 3 s. Cold pages or a slow minute on the shared CPU, the timings can't tell apart. The next cut is on the to-do list
+  ([inbox](../tasks/inbox.md)). **Time this plain**: on the live database `explain analyze`'s per-node timing triples the
+  replay's window plan (1,126 against 352 ms).
 
 ## Tests
 
