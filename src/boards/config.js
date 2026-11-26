@@ -6,7 +6,8 @@
 module.exports = {
   HUB: 'boards',                                   // core.json's hub, RPC p_hub, the widget's data-hub (BUILD_SPEC 1.1)
   TITLE: 'Boards Hub',                             // core.json's title
-  EXAM_NOTE: 'INBDE + ADEX ~Aug 2028',             // core.json's examNote; the exams have no dates until Sam gives real ones
+  EXAM_NOTE: 'INBDE ~Aug 2028',                    // core.json's examNote; the exam has no date until Sam gives a real one
+                                                   // INBDE only since 2026-11-26 (Sam: "Lets do inbde only"; DECISIONS.md)
   STATE_KEY: 'boards-state-v1',                    // core.json's stateKey (and SH_HUB's)
 
   // Units in teaching order. A listed unit is a lecture on the hub: a 'preview' one shows as coming (its title only),
@@ -14,17 +15,18 @@ module.exports = {
   // perio. The engine draws Home and Notes only with a lecture, so pharm and medcx are listed while still 'preview'.
   UNITS: ['pharm', 'medcx'],
 
-  // The INBDE's three components, which group the units in Notes, the bank's panel and Home's progress (core.json's
-  // groups). A unit goes under the component of its home CCs (BUILD_SPEC 3.1: D&TP CC1-15, OHM CC16-38, P&P CC39-56).
-  // anat, physio, micro and gpath have no home CC (foundation knowledge): which component they go under is decided
-  // before the first of them is published (the build fails on a published unit in no group).
+  // The groups of units in Notes, the bank's panel and Home's progress (core.json's groups): the INBDE's three
+  // components, each unit under the component of its home CCs (BUILD_SPEC 3.1: D&TP CC1-15, OHM CC16-38, P&P CC39-56),
+  // and Foundation knowledge for the four units with no home CC (Sam, 2026-11-26: "Group name is okay"; DECISIONS.md).
+  // The build fails on a published unit in no group or in two.
   GROUPS: [
+    { id: 'fnd', code: 'FK', title: 'Foundation knowledge', units: ['anat', 'physio', 'micro', 'gpath'] },
     { id: 'dtp', code: 'D&TP', title: 'Diagnosis and Treatment Planning', units: ['opath', 'rad', 'medcx'] },
     { id: 'ohm', code: 'OHM', title: 'Oral Health Management', units: ['perio', 'endo', 'oper', 'pros', 'ortho', 'peds', 'oms', 'anes', 'pharm'] },
     { id: 'pp', code: 'P&P', title: 'Practice and Profession', units: ['infect', 'prof', 'pubh'] },
   ],
 
-  ENABLED_TYPES: ['mcq'],                          // ADEX-only formats (dlmulti, rx, spot) stay off until their release
+  ENABLED_TYPES: ['mcq'],                          // the INBDE's single best answer (the ADEX formats were dropped 2026-11-26)
 
   // Spaced review (BUILD_SPEC 1.5) and the daily plan's budget: not written yet. T-12 puts them in core.json (srs, plan)
   // for widget/plan.js and widget/v3.js. Budget: 12 items a day, at most 4 new, new items only while the projected

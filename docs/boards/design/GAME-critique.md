@@ -1,5 +1,7 @@
 # Chairside: critique of GAME.md
 
+> **2026-11-26: INBDE only** (`docs/boards/DECISIONS.md`). The Lab Bench and the Gauntlet's ADEX stations discussed below are dropped.
+
 Status: review, 2026-10-06. Reviews `docs/boards/design/GAME.md` (the 2026-10-06 complete design) from three lenses:
 the player, engineering, and learning science. Claims about the repo were checked against `widget/v3.js`,
 `widget/drill.js`, `widget/ranks.js`, `tools/ci/smoke.js` and `docs/boards/research/architecture.md`; usage claims

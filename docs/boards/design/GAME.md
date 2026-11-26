@@ -1,5 +1,7 @@
 # Chairside: the boards hub's game (complete design)
 
+> **2026-11-26: INBDE only** (`docs/boards/DECISIONS.md`). Written when the hub also aimed at the ADEX. The ADEX parts below (the Lab Bench, 4.5; the Licensure Gauntlet's ADEX and DLOSCE stations, section 10; `spot` items, `exam` tags and the ADEX rows of the roadmap) are dropped: background, not plans. Chairside itself stays (2026-11-22).
+
 Status: design, 2026-10-06. Owner: boards hub. Supersedes the partial drafts `roguelite-clinic.md` (Chairside) and
 `rpg-campaign.md` (Open Practice), whose best parts are grafted in here. Read with `docs/boards/DECISIONS.md`,
 `LESSONS.md`, `docs/boards/research/architecture.md` (build contract), `inbde.md` and `adex.md` (exam facts) and

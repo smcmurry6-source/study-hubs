@@ -1,4 +1,6 @@
-# Lessons for the boards hub (INBDE + ADEX)
+# Lessons for the boards hub
+
+> **2026-11-26: INBDE only** (`docs/boards/DECISIONS.md`). Where this says INBDE + ADEX, read INBDE.
 
 What the class's use of the existing hubs says about designing a new, long-lived hub with notes, a large question
 bank and one deep game. Written 2026-10-04 from `LESSONS.md` (refreshed the same day) and a fresh read of all

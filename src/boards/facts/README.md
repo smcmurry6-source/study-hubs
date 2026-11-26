@@ -33,7 +33,7 @@ drug-influenced enlargement. Pharmacokinetics basics are `PK-3` onward in `pharm
 | `data` | Numbers in structured form, for calculation items (`lint-items.mjs` recomputes an item's `calc` from them). |
 | `cites` | `[{src, loc, quote}]`. `quote` is a short verbatim excerpt from the source (`null` when the source blocks scripts). |
 | `see` | Related fact ids. |
-| `units`, `topic`, `exam` | Tags. |
+| `units`, `topic` | Tags. (Records written before 2026-11-26 also carry `exam: ["inbde", "adex"]`; nothing reads it since the hub went INBDE only, so new records leave it out and old ones lose it when next edited.) |
 | `errata` | Corrections made after recording, with the date. |
 | `recorded` | Date first recorded. |
 

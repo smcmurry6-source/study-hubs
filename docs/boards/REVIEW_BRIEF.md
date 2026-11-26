@@ -1,4 +1,6 @@
-# Boards Hub (INBDE + ADEX): plan and situation, for independent review
+# Boards Hub (then INBDE + ADEX): plan and situation, for independent review
+
+> **2026-11-26: INBDE only** (`DECISIONS.md`). Written when the hub also aimed at the ADEX; the ADEX parts below are background, not plans.
 
 Written 2026-10-06 by the Claude Code session that planned this hub, so another AI (or person) can review the plan.
 Please be critical: what is wrong, risky, missing, or could be done better or cheaper without losing quality.

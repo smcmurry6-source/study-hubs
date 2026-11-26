@@ -5,6 +5,11 @@ When documents disagree, the order is: `DECISIONS.md` (Sam's decisions) > this f
 `design/GAME.md` > `research/architecture.md`. Research files (`research/*.md`) stay as the evidence; facts of record
 (`research/facts-*.md`) stay the only place keyed facts come from.
 
+**2026-11-26: INBDE only** (Sam: "Lets do inbde only"; `DECISIONS.md`). The hub prepares for one exam. Units, items and
+cases carry no `exam` tags, an item's `ov` is `{inbde:'DoD2018/CG2026'}`, section 4.2 (the ADEX and DLOSCE formats) and the
+ADEX parts of R5 and R6 are dropped, and the four units with no home CC are the **Foundation knowledge** group. Sections
+1 and 2 describe the single-file hub of release 1a, which `ENGINE_PLAN.md` replaced (the hub is on the engine since T-07).
+
 Contents
 
 1. Hub identity and integration
@@ -28,7 +33,7 @@ Contents
 |---|---|
 | Hub id (`data-hub`, RPC `p_hub`, `HUB_LABEL` key) | `boards` |
 | Folder | `hubs/boards/` (generated; sources in `src/boards/`, section 2) |
-| Page title / dashboard title | `Boards Hub` / "Boards Hub: INBDE + ADEX" (code line "Boards · INBDE + ADEX") |
+| Page title / dashboard title | `Boards Hub` / "Boards Hub: INBDE" (code line "Boards · INBDE") |
 | Widget tag | `<script src="../../widget/v3.js" data-hub="boards" data-answered-event="boards:answered" data-default-mode="home" defer>` |
 | Answered event | `boards:answered`, detail `{qid, lec, correct, choice, conf, ctx}`; `choice` is always the **authored** index; `conf` = `sure`/`unsure`/`guess` from the game, absent elsewhere; `ctx` = `bank`/`case`/`mock`/`drill`/`game` |
 | Hub state key | `boards-state-v1`, perio shape: `{answered:{qid:{lastCorrect, n, t, first}}, totalSeen, activeDates:[], ui:{level, coverOptions, unit}, retired:{qid:date}}` so the dashboard's `readProgress` works unchanged |
@@ -57,7 +62,7 @@ nothing in the bottom-left 90 x 90 px (Timmy) or under the launcher / phone bar.
 
 ### 1.3 Globals the hub provides (in this order inside the one inline IIFE)
 
-- `var LECTURES` = units: `{id, num, title, short, exam:['inbde','adex'], status:'taught'|'preview', audio:false, added}`.
+- `var LECTURES` = units: `{id, num, title, short, status:'taught'|'preview', audio:false, added}`.
   `status:'taught'` = released (keeps the widget's Golden Probe and mastery semantics); `'preview'` = announced, hidden
   from the bank, drill and game. No `who` (no professors), so the professor-quote egg stays off by itself.
 - `var QUESTIONS`, `var CASES`, `var READINGS` (Core HTML per unit), `var READINGS_DEEP`, `var READINGS_PLAIN = {}`.
@@ -72,9 +77,9 @@ nothing in the bottom-left 90 x 90 px (Timmy) or under the launcher / phone bar.
 
 ```js
 // HUBS
-{ id:"boards", cls:"boards", title:"Boards Hub: INBDE + ADEX", code:"Boards · INBDE + ADEX",
+{ id:"boards", cls:"boards", title:"Boards Hub: INBDE", code:"Boards · INBDE",
   exams:[],                                  // stays empty until real dates: no hero countdown, no check-ins, no auto-archive
-  examNote:"INBDE + ADEX ~Aug 2028",         // display only
+  examNote:"INBDE ~Aug 2028",                 // display only
   updated:"<release date>",
   desc:"Notes, a board-style question bank and Chairside, a clinic game built on the same questions. Grows unit by unit.",
   modes:["Today","Notes","Questions","Exam blocks","Clinic"],
@@ -84,8 +89,8 @@ nothing in the bottom-left 90 x 90 px (Timmy) or under the launcher / phone bar.
 
 Plus `--c-boards` / `--c-boards-soft` in the three token blocks, and two reads of `examNote` (in `hubCardHTML`'s due
 line and in the hero's no-exam fallback). `ARCADES` gets no entry in release 1 (no leaderboard yet). The card's drill
-row works unchanged (`hubs/boards/#drill`). When real dates arrive: put both into `HUBS.exams` and `SH_EXPORT.exams`,
-set `SH_SRS.examCap:true`, and use `hideCardOn` if the ADEX parts come months after the INBDE.
+row works unchanged (`hubs/boards/#drill`). When the real date arrives: put it into `HUBS.exams` and `SH_EXPORT.exams`,
+and set `SH_SRS.examCap:true`.
 
 ### 1.5 Spaced review: long intervals, server copy, daily budget
 
@@ -180,7 +185,7 @@ admin RPC is added). `apply_migration` is pre-approved; log "applied via the con
 
 ### 1.9 About page entry (R1a; Chairside part in R1b)
 
-Part 3, "Boards Hub (INBDE + ADEX)", tag `new`: what each mode does; readiness in plain words ("Likely right" is the
+Part 3, "Boards Hub (INBDE)", tag `new`: what each mode does; readiness in plain words ("Likely right" is the
 chance of getting an average question in that unit right today, not a predicted score; "Seen" is coverage); case sets
 show answers after the last question, as on the exam; options are shuffled each time; the hub grows unit by unit.
 Part 2: "Long review gaps on the boards hub (1, 3, 7, 14, 30, 60, 120 days), saved to your account so a new phone keeps
@@ -192,7 +197,7 @@ days and rest weeks. Part 9: First Shift (`cs-shift`), Kept Week (`cs-week`); up
 
 DEPLOY_NOTES (top of "Recent major changes", after merge):
 
-> **<date> (Boards hub R1a, Claude Code)**: new hub `hubs/boards/` (INBDE + ADEX, ~Aug 2028, `exams: []` so it never
+> **<date> (Boards hub R1a, Claude Code)**: new hub `hubs/boards/` (INBDE, ~Aug 2028, `exams: []` so it never
 > auto-archives; "~Aug 2028" via `examNote`). **Generated file: edit `src/boards/`, run `node tools/build-boards.js`;
 > CI fails if the build is stale.** Units: medcx, pharm (perio in R1b). `migration_v33.sql` (applied via the connector):
 > `game_saves`, `srs_state`, `get_my_srs`/`upsert_srs`, `get_my_latest`, `get_question_stats_lite`, `get_today_reach`,
@@ -275,39 +280,38 @@ Game files are covered by syntax (parse), smoke and game-smoke (`pageerror`, one
 
 The 19 units of `research/inbde.md` 4.2 are kept (shares are this project's estimate; JCNDE publishes only component
 and FK weights). Changes: short ids; case share raised in clinical units (cases cross units, and each item counts in
-its own unit) so the bank reaches the exam's 40%; DLOSCE areas mapped from `research/adex.md` 5. Tag: **BOTH** = INBDE
-and ADEX/DLOSCE; **INBDE** = not on the DLOSCE outline. ADEX is retiring the DSE OSCE: the class takes the JCNDE
-**DLOSCE** (150 items; select-one-or-more and prescription tasks) plus the ADEX clinical parts.
+its own unit) so the bank reaches the exam's 40%. (The INBDE and BOTH tags, which said whether a unit was also on the DLOSCE
+outline, were dropped with ADEX on 2026-11-26: every unit is simply the hub's.) Groups: units with home CCs go under
+their component (D&TP CC1-15, OHM CC16-38, P&P CC39-56); U1-U4 have none and are **Foundation knowledge**.
 
-| # | id | Unit | Home CCs (also) | Main FKs | Tag (DLOSCE area) | Items | Case items |
-|---|---|---|---|---|---|---|---|
-| U1 | `anat` | Head and neck anatomy, oral histology, embryology | none (CC3, CC5, CC19, CC33) | FK1, FK4, FK2 | INBDE | 60 | 18 |
-| U2 | `physio` | Physiology, biochemistry, nutrition, genetics | none (CC5, CC8, CC9, CC21) | FK1, FK2, FK4 | INBDE | 36 | 11 |
-| U3 | `micro` | Microbiology and immunology | none (CC4, CC18, CC22, CC23, CC51) | FK7, FK5 | INBDE | 60 | 18 |
-| U4 | `gpath` | General and systemic pathology | none (CC4, CC8, CC9) | FK6, FK5 | INBDE | 36 | 11 |
-| U5 | `opath` | Oral pathology and oral medicine | CC3, CC4, CC5, CC23 (CC10, CC14) | FK6, FK4, FK5, FK7 | BOTH (oral path, pain, TMD 13%) | 84 | 42 |
-| U6 | `rad` | Oral radiology and imaging | CC6, CC7, CC10 (CC5) | FK3, FK1, FK10 | BOTH (image reads) | 60 | 30 |
-| U7 | `perio` | Periodontics | CC22, CC36, CC37 (CC9, CC52) | FK5, FK7, FK6, FK1 | BOTH (perio 10%) | 84 | 42 |
-| U8 | `endo` | Endodontics and dental pain diagnosis | CC20, CC28, CC17 (CC6, CC18) | FK1, FK6, FK7 | BOTH (endo 8%) | 72 | 36 |
-| U9 | `oper` | Operative dentistry, cariology, dental materials | CC21, CC30, CC38, CC52 | FK2, FK3, FK7 | BOTH (restorative 24%) + ADEX prep critique | 84 | 34 |
-| U10 | `pros` | Prosthodontics: fixed, removable, implants | CC29, CC31, CC56 (CC36-38) | FK3, FK1 | BOTH (prosth 19%) + ADEX crown preps | 84 | 42 |
-| U11 | `ortho` | Orthodontics, occlusion, TMD | CC34, CC35 | FK1, FK4 | BOTH (ortho 6%; TMD) | 48 | 19 |
-| U12 | `peds` | Pediatric dentistry | CC14, CC24 (CC17, CC21, CC34) | FK4, FK9, FK8 | BOTH (ortho/peds, space mgmt) | 60 | 24 |
-| U13 | `oms` | Oral and maxillofacial surgery, infection, trauma | CC18, CC32, CC33 (CC17, CC36) | FK1, FK6, FK7 | BOTH (oral surgery 9%) | 48 | 24 |
-| U14 | `anes` | Local anesthesia, sedation, pain control | CC19 (CC15, CC27) | FK1, FK8, FK9 | BOTH | 36 | 13 |
-| U15 | `pharm` | Pharmacology and therapeutics, substance use | CC25, CC26, CC27 | FK8 | BOTH (prescriptions 5%) + ADEX Rx tasks | 84 | 38 |
-| U16 | `medcx` | Medically complex patients, medical emergencies | CC1, CC8, CC9, CC11, CC16 | FK6, FK8, FK5 | BOTH (med emergencies 6%) | 84 | 42 |
-| U17 | `infect` | Infection control and occupational safety | CC48, CC51 (CC47) | FK7, FK3 | INBDE (+ ADEX clinic-floor conduct) | 36 | 9 |
-| U18 | `prof` | Behavioral science, communication, ethics, law, practice management | CC13, CC15, CC42, CC44-47, CC49, CC50, CC55 | FK9, FK10 | INBDE | 72 | 22 |
-| U19 | `pubh` | Research, biostatistics, epidemiology, community oral health | CC39-41, CC43, CC53, CC54 | FK10, FK7, FK9 | INBDE | 72 | 18 |
-| | | **Total** | 56 CCs | | | **1,200** | **~493 (41%)** |
+| # | id | Unit | Home CCs (also) | Main FKs | Items | Case items |
+|---|---|---|---|---|---|---|
+| U1 | `anat` | Head and neck anatomy, oral histology, embryology | none (CC3, CC5, CC19, CC33) | FK1, FK4, FK2 | 60 | 18 |
+| U2 | `physio` | Physiology, biochemistry, nutrition, genetics | none (CC5, CC8, CC9, CC21) | FK1, FK2, FK4 | 36 | 11 |
+| U3 | `micro` | Microbiology and immunology | none (CC4, CC18, CC22, CC23, CC51) | FK7, FK5 | 60 | 18 |
+| U4 | `gpath` | General and systemic pathology | none (CC4, CC8, CC9) | FK6, FK5 | 36 | 11 |
+| U5 | `opath` | Oral pathology and oral medicine | CC3, CC4, CC5, CC23 (CC10, CC14) | FK6, FK4, FK5, FK7 | 84 | 42 |
+| U6 | `rad` | Oral radiology and imaging | CC6, CC7, CC10 (CC5) | FK3, FK1, FK10 | 60 | 30 |
+| U7 | `perio` | Periodontics | CC22, CC36, CC37 (CC9, CC52) | FK5, FK7, FK6, FK1 | 84 | 42 |
+| U8 | `endo` | Endodontics and dental pain diagnosis | CC20, CC28, CC17 (CC6, CC18) | FK1, FK6, FK7 | 72 | 36 |
+| U9 | `oper` | Operative dentistry, cariology, dental materials | CC21, CC30, CC38, CC52 | FK2, FK3, FK7 | 84 | 34 |
+| U10 | `pros` | Prosthodontics: fixed, removable, implants | CC29, CC31, CC56 (CC36-38) | FK3, FK1 | 84 | 42 |
+| U11 | `ortho` | Orthodontics, occlusion, TMD | CC34, CC35 | FK1, FK4 | 48 | 19 |
+| U12 | `peds` | Pediatric dentistry | CC14, CC24 (CC17, CC21, CC34) | FK4, FK9, FK8 | 60 | 24 |
+| U13 | `oms` | Oral and maxillofacial surgery, infection, trauma | CC18, CC32, CC33 (CC17, CC36) | FK1, FK6, FK7 | 48 | 24 |
+| U14 | `anes` | Local anesthesia, sedation, pain control | CC19 (CC15, CC27) | FK1, FK8, FK9 | 36 | 13 |
+| U15 | `pharm` | Pharmacology and therapeutics, substance use | CC25, CC26, CC27 | FK8 | 84 | 38 |
+| U16 | `medcx` | Medically complex patients, medical emergencies | CC1, CC8, CC9, CC11, CC16 | FK6, FK8, FK5 | 84 | 42 |
+| U17 | `infect` | Infection control and occupational safety | CC48, CC51 (CC47) | FK7, FK3 | 36 | 9 |
+| U18 | `prof` | Behavioral science, communication, ethics, law, practice management | CC13, CC15, CC42, CC44-47, CC49, CC50, CC55 | FK9, FK10 | 72 | 22 |
+| U19 | `pubh` | Research, biostatistics, epidemiology, community oral health | CC39-41, CC43, CC53, CC54 | FK10, FK7, FK9 | 72 | 18 |
+| | | **Total** | 56 CCs | | **1,200** | **~493 (41%)** |
 
 Bank-level quotas (checked by `--report`, enforced at each release for the units released so far): primary FK within
 about 1 point of the TS weights; component shares 36 / 42 / 22% (D&TP CC1-15 / OHM CC16-38 / P&P CC39-56); at least half
 of each clinical unit's items carry a primary FK from FK1-FK7 (biomedical science asked inside clinical decisions);
 negatives 10-20% per unit; cognitive levels about 25% L1 / 45% L2 / 30% L3. "Case spine" CCs (CC2, CC12, CC13, CC37)
-are counted in the unit the case is homed in. ADEX-only items (prep critique, Rx tasks, DLOSCE select-one-or-more)
-come in R5 and are about 5% of the final bank, inside `oper`, `pros` and `pharm`.
+are counted in the unit the case is homed in.
 
 ### 3.2 Notes outlines (section headings; Core and Deep dive share them)
 
@@ -343,13 +347,11 @@ come in R5 and are about 5% of the final bank, inside `oper`, `pros` and `pharm`
   post-treatment evaluation; Restoring the treated tooth.
 - **oper**: The caries process and risk assessment; Detection and the ADA Caries Classification System; Fluoride,
   sealants and SDF; When to restore; Preparation design; Isolation; Amalgam; Composite and adhesion; Glass ionomer and
-  RMGI; Indirect restorations and cements; Materials science and biocompatibility; Esthetic treatment; ADEX Class II/III
-  criteria (R5).
+  RMGI; Indirect restorations and cements; Materials science and biocompatibility; Esthetic treatment.
 - **pros**: Diagnosis and planning for missing teeth; Occlusion for prosthodontics; Fixed: abutments, preparation
   principles, materials, impressions, provisionals, cementation; Removable partial dentures: Kennedy, Applegate,
   components, design; Complete dentures: records, VDO and rest space, delivery and complaints; Implants: planning,
-  spacing, osseointegration, restoration, complications; Lab communication and evaluating the result; ADEX crown
-  preparation criteria (R5).
+  spacing, osseointegration, restoration, complications; Lab communication and evaluating the result.
 - **ortho**: Growth of the face and jaws; Development of the occlusion; Malocclusion classification; Screening and
   referral timing; Space management; Tooth-movement biology and appliances; TMJ function; TMD diagnosis and conservative
   care; Orofacial pain differential.
@@ -366,7 +368,7 @@ come in R5 and are about 5% of the final bank, inside `oper`, `pros` and `pharm`
   ADA approach to acute pain); Antibiotics: when, which, stewardship; Prophylaxis regimens; Antifungals and antivirals;
   Drugs that change dental care (anticoagulants, antiplatelets, antiresorptives, diabetes and cardiac drugs, psychiatric
   drugs); Adverse effects with oral signs; Substance use disorders and tobacco cessation; Pregnancy and lactation;
-  Prescription writing (ADEX Rx, R5).
+  Prescription writing.
 - **medcx**: The medical history and ASA status; Vital signs and blood-pressure thresholds; Cardiovascular disease and IE
   prophylaxis; Prosthetic joints; Bleeding risk and anticoagulation; Diabetes; Asthma and COPD; Kidney, liver, thyroid
   and adrenal disease; Cancer therapy, MRONJ and radiation; Pregnancy; Infectious disease patients; Sickle cell,
@@ -387,8 +389,7 @@ come in R5 and are about 5% of the final bank, inside `oper`, `pros` and `pharm`
 ### 3.3 Release-1 units
 
 **medcx, pharm, perio**, 60 items each in R1 (topped up to 84 in R3), about half in case sets (30 / 27 / 30 case items,
-about 24 cases in all; cases may cross these three units). Why these: the three largest INBDE units (7% each) and all
-BOTH-tagged (DLOSCE periodontics 10%, medical emergencies 6%, prescriptions 5%); the class is in perio and
+about 24 cases in all; cases may cross these three units). Why these: the three largest INBDE units (7% each); the class is in perio and
 pharmacology-heavy coursework now; and their facts of record already exist (facts-medical 1-8, facts-dental 1), so
 research cost is the lowest of any unit. Endo (facts-dental 2 done) leads R2.
 
@@ -428,7 +429,10 @@ research cost is the lowest of any unit. Endo (facts-dental 2 done) leads R2.
   items may come from different units and CCs (a medicated perio patient: drug mechanism FK8, staging CC22, consent
   CC13). Explanations use only facts in the case (lesson 11).
 
-### 4.2 ADEX / DLOSCE items
+### 4.2 ADEX / DLOSCE items (dropped 2026-11-26)
+
+The hub is INBDE only (`DECISIONS.md`): no item is tagged for the ADEX, and none of the formats below will be built. Kept
+as the record of what was planned.
 
 - Clinical diagnosis and planning items fit both exams: tag `exam:['inbde','adex']` whenever the item fits a DLOSCE area
   (adex.md 5 area map). Most R1 items are BOTH.
@@ -452,8 +456,8 @@ research cost is the lowest of any unit. Endo (facts-dental 2 done) leads R2.
   FDA label on DailyMed, CDC, ADA, AAP, AAE, AAOMS, AAPD, AHA) with the location after `#` or in `refs` text
   (`'https://...#Table 5'`). The refs must support the key **and** each distractor's "why not". Never cite prep
   companies, released exam items or textbooks we can't link.
-- `ov`: outline version per tagged exam: `{inbde:'DoD2018/CG2026'}` and/or `{adex:'DLM2026-27'}`; the yearly re-check
-  greps by it.
+- `ov`: the INBDE outline version the item was written against, `{inbde:'DoD2018/CG2026'}`; the yearly re-check greps
+  by it (the lint warns on an `ov.adex` or `exam` left from before 2026-11-26).
 - `cog` 1-3 (recall / application / reasoning, IDG levels); `diff` 1-3 (author's estimate; class data replaces it once
   an item has 8+ attempts); `concept` (kebab tag; siblings share it); `hy` (optional high-yield reason, used by the drill).
 
@@ -472,10 +476,10 @@ module.exports = {
     choices:['...','...','...','...'],   // 3-5 (INBDE)
     answer:2,                    // authored index of the key
     fixed:false,                 // true = keep authored (logical/numeric) order; else shuffled on every render
-    pin:undefined,               // indexes always rendered last (ADEX "All criteria acceptable")
+    pin:undefined,               // indexes always rendered last ("None of the above" style lists)
     ex:'...', why:['...','...','...','...'], cue:'...',
     refs:['IE-5','https://...#section'],
-    exam:['inbde','adex'], ov:{inbde:'DoD2018/CG2026', adex:'DLM2026-27'},
+    ov:{inbde:'DoD2018/CG2026'},
     cc:'CC26', cc2:['CC8'], fk:'FK8', fk2:['FK7'],
     cog:2, diff:2, concept:'ie-prophylaxis-allergy', sec:'pharm-antibiotics', hy:undefined,
     case:undefined, phase:'clear',     // case id when in a set; phase: clear|dx|plan|tx|fu|prev|prof
@@ -488,7 +492,7 @@ module.exports = {
     stim:[],                     // figure keys shown with the box
     items:['b-...','b-...'],     // 2-6, in visit order
     beats:{ 'b-...':'one flavor sentence before this item' },   // game only; never carries a fact an item needs
-    exam:['inbde','adex'], added:'2026-11-02', checked:null }
+    added:'2026-11-02', checked:null }
   ]
 };
 ```
@@ -515,7 +519,7 @@ module.exports = {
        'Removed from the AHA dental regimens in 2021 because of more frequent and severe reactions, including C. difficile infection after one dose.'],
   cue:'Hives or swelling with penicillin: both "C" drugs are out (no cephalexin, no clindamycin).',
   refs:['IE-2','IE-4','IE-5','IE-6','IE-7','IE-8'],
-  exam:['inbde','adex'], ov:{inbde:'DoD2018/CG2026', adex:'DLM2026-27'},
+  ov:{inbde:'DoD2018/CG2026'},
   cc:'CC26', cc2:['CC8','CC1'], fk:'FK8', fk2:['FK7'], cog:2, diff:2,
   concept:'ie-prophylaxis-allergy', sec:'pharm-prophylaxis', phase:'clear',
   hy:'AHA 2021 removed clindamycin', added:'2026-10-06', checked:null }
@@ -534,7 +538,7 @@ module.exports = {
        'Divides by 34 mg per cartridge (2% = 20 mg/mL), but 4% articaine is 40 mg/mL, 68 mg per 1.7 mL.'],
   cue:'Percent x 10 = mg/mL: 4% = 40 mg/mL = 68 mg in a 1.7-mL cartridge.',
   refs:['LA-1','LA-3','LA-5','LA-6','VC-1','VC-8'],
-  exam:['inbde','adex'], ov:{inbde:'DoD2018/CG2026', adex:'DLM2026-27'},
+  ov:{inbde:'DoD2018/CG2026'},
   cc:'CC19', fk:'FK8', cog:2, diff:2, concept:'la-max-dose-calc', sec:'anes-max-doses', phase:'tx',
   added:'2026-10-06', checked:null }
 ```
@@ -557,7 +561,7 @@ module.exports = {
         'Periapical radiograph: widened PDL space at the mesial root apex of tooth 30; no periapical radiolucency'] },
   stim:[], items:['b-endo-0001','b-medcx-0001','b-medcx-0002'],
   beats:{ 'b-medcx-0001':'He thinks it over and comes back on Thursday.' },
-  exam:['inbde','adex'], added:'2026-10-06', checked:null }
+  added:'2026-10-06', checked:null }
 
 { id:'b-endo-0001', lec:'endo', type:'mcq', case:'c-endo-0001', phase:'dx',
   stem:'What is the most likely pulpal and apical diagnosis for tooth 30?',
@@ -572,7 +576,7 @@ module.exports = {
        'A necrotic pulp does not respond to cold, and an acute apical abscess brings rapid swelling; tooth 30 responds to cold and has no swelling.'],
   cue:'Cold tells the pulp, tap tells the apex.',
   refs:['EN-4','EN-6','EN-9','EN-10','EN-11','EN-13','EN-14','EN-15'],
-  exam:['inbde','adex'], ov:{inbde:'DoD2018/CG2026', adex:'DLM2026-27'},
+  ov:{inbde:'DoD2018/CG2026'},
   cc:'CC20', cc2:['CC7','CC28'], fk:'FK6', fk2:['FK1'], cog:2, diff:2,
   concept:'endo-dx-pair', sec:'endo-aae-diagnoses', added:'2026-10-06', checked:null }
 
@@ -589,7 +593,7 @@ module.exports = {
        'Changing his anticoagulant is not needed for one extraction, and any change to it is his physician\'s decision.'],
   cue:'INR is for warfarin. DOAC: keep taking it, pack the socket.',
   refs:['AC-1','AC-3','AC-5'],
-  exam:['inbde','adex'], ov:{inbde:'DoD2018/CG2026', adex:'DLM2026-27'},
+  ov:{inbde:'DoD2018/CG2026'},
   cc:'CC8', cc2:['CC27','CC33'], fk:'FK8', cog:2, diff:2,
   concept:'doac-dental-mgmt', sec:'medcx-bleeding', added:'2026-10-06', checked:null }
 
@@ -606,7 +610,7 @@ module.exports = {
        'Correct. None of his conditions is one of the four AHA high-risk categories.'],
   cue:'IE prophylaxis has four boxes: prosthetic valve, prior IE, certain CHD, transplant valvulopathy. A-fib is not a box.',
   refs:['IE-1','IE-2','IE-3','IE-4','IE-6'],
-  exam:['inbde','adex'], ov:{inbde:'DoD2018/CG2026', adex:'DLM2026-27'},
+  ov:{inbde:'DoD2018/CG2026'},
   cc:'CC8', cc2:['CC26'], fk:'FK7', fk2:['FK8'], cog:2, diff:1,
   concept:'ie-prophylaxis-who', sec:'medcx-cardiac', added:'2026-10-06', checked:null }
 ```
@@ -827,8 +831,7 @@ runs only during short transitions and honors reduced motion. Budgets: core bund
 
 Later bundles (each gated, section 6.7): `chairside-social.js` (Board Day weekly seeded run with `bd-<yy>w<ww>` scores,
 class median and item split, census line), `chairside-bosses.js` (Code Blue, Brown Bag, Shadow Play, Phantom Pain; each
-falls back to the attending's case when the bank can't meet it, S12), `chairside-lab.js` (Lab Bench `spot` items on
-code-drawn preparations and the ADEX Gauntlet stations; R5), `chairside-audio.js` (one music layer). Cut: Grand Rounds
+falls back to the attending's case when the bank can't meet it, S12), `chairside-audio.js` (one music layer). Cut: Grand Rounds
 live raid, the INBDE simulation inside the game (it lives in the hub's Exam blocks), the 2.5D/WebGL map, decor shop,
 seasons and mentor story lines until a gate shows return.
 
@@ -848,7 +851,7 @@ seasons and mentor story lines until a gate shows return.
 
 R1b ships the table in 6.5: Today's shift, Quick, Half and Full shifts, booked / walk-in / recall / callback patients,
 Rounds, attending's case, 6 protocols, home facade, portraits, sfx, two trophies, About entry, tests. Out of R1:
-Composure, Board Day, ghosts, census, raids, boss gimmicks, Lab Bench, Gauntlet, map, music, decor, seasons, mentors
+Composure, Board Day, ghosts, census, raids, boss gimmicks, Gauntlet, map, music, decor, seasons, mentors
 beyond the authored `cue`, `spot` items.
 
 **R1 exit gate** (4 weeks outside exam eves, from pings with the device field): at least 25% of hub visitors start a
@@ -893,7 +896,7 @@ shares context with the writers.
    and correct.
 
 After release: student reports (Inbox) on boards items are read in each `/lessons-audit`; a fix gets a reply; a fact
-change updates `facts-*.md` first, then every item citing it is re-verified. Every August (ADEX manual) and on any JCNDE
+change updates `facts-*.md` first, then every item citing it is re-verified. On any JCNDE
 update, `--report` lists items by `ov` for the yearly re-check.
 
 ---
@@ -936,9 +939,9 @@ to serve.
 | R2 | endo, anes, opath; game R2 if the R1 gate passes (Board Day, class median, census line, 3-4 bosses) | Feb-Mar 2027 |
 | R3 | rad, oper, infect; top up medcx, pharm, perio to 84 with sibling items | Apr-May 2027 |
 | R4 | pros, oms, peds, ortho | Aug-Sep 2027 (D3) |
-| R5 | anat, physio, micro, gpath; ADEX track: `facts-adex.md`, `spot`, `rx`, `dlmulti`, Lab Bench | Nov 2027 - Jan 2028 |
-| R6 | prof, pubh; full-length INBDE simulation in Exam blocks; ADEX Gauntlet stations; final quota balancing | Feb-Apr 2028 |
-| Yearly | outline re-check by `ov`; JCNDE update list; ADEX manual each August | every Aug + on changes |
+| R5 | anat, physio, micro, gpath (Foundation knowledge) | Nov 2027 - Jan 2028 |
+| R6 | prof, pubh; full-length INBDE simulation in Exam blocks; final quota balancing | Feb-Apr 2028 |
+| Yearly | outline re-check by `ov`; JCNDE update list | every Aug + on changes |
 
 Before each release: `LESSONS.md` refresh check (CLAUDE.md), read the boards Live signals, and route the drill toward
 the new unit for its first two weeks (lesson 18).
@@ -1012,10 +1015,10 @@ Merge order: `int-v33` -> `int-widget` (own PR, perio/MSK smoke-tested) -> R1a h
 1. **Course calendar**: which courses (and exam dates) does the class have from D2 spring to D4? It sets the unit
    order, the "Keep it" lines and the course-exam cram waves.
 2. **Release 1 units**: OK to start with medcx, pharm and perio, and to ship in three weekly drops (hub + medcx first)?
-3. **Exam timing**: when does UAB expect the INBDE, and which ADEX parts (DLOSCE plus which clinical exams, CIF or not)?
+3. **Exam timing**: when does UAB expect the INBDE? (ADEX: dropped, 2026-11-26.)
    Until then `exams: []` and "~Aug 2028".
 4. **Server copy of review schedules** (`srs_state`) and game saves tied to the visitor id: OK?
 5. **Your review role**: screenshots of each visual piece before merge (game art), plus a spot check of 10 random items
    per unit?
 6. **Images**: code-drawn figures only, or also openly licensed real radiographs and photos (CC0 / CC BY, credited)?
-7. **Names**: "Chairside" for the game and "Clinic" for its tab; "Boards Hub: INBDE + ADEX" for the hub?
+7. **Names**: "Chairside" for the game and "Clinic" for its tab; "Boards Hub: INBDE" for the hub?

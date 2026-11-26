@@ -1,5 +1,7 @@
 # ADEX dental exam series (American Board of Dental Examiners): research notes
 
+> **Background only (2026-11-26).** The hub is INBDE only since Sam's "Lets do inbde only" (`docs/boards/DECISIONS.md`). Nothing here is a target any more: no ADEX items, formats or Lab Bench are planned. It stays because the INBDE notes cross-reference it (the DLOSCE moving to ADEX) and as the record if ADEX ever comes back.
+
 Status: full draft 2026-10-04, second pass the same day (thin DLOSCE areas filled: prosthodontics, perio case
 definitions, orthodontics, emergencies, infection control; remaining gaps marked UNVERIFIED). Outline version: **ADEX 2026-2027 exam season**
 (Aug 1, 2026 - Jul 31, 2027). Re-check every year: ADEX publishes a new manual set each August.

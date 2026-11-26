@@ -4,7 +4,7 @@
 > verbatim quotes checked by `tools/boards/check-quotes.mjs`. **The JSON is the authority; edit it, not this file.**
 > Corrections found during conversion are logged in each record's `errata`. Keep this file as background notes.
 
-Compiled 2026-10-04 for the boards hub (INBDE + ADEX). Every question and note that touches these topics must match
+Compiled 2026-10-04 for the boards hub (then INBDE + ADEX; INBDE only since 2026-11-26). Every question and note that touches these topics must match
 the statements below. Each fact is paraphrased (no copied text) and cites the source opened, with page or section.
 Anything marked **UNVERIFIED** could not be confirmed from an opened source and must not be used as a keyed answer
 until someone verifies it.
