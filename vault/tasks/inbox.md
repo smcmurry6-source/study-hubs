@@ -196,14 +196,14 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   day against 11-14 to 11-18's) and the edge logs' `turn` lines (`content`: `part`, `part+full`, `full`). In the eval, 16 of 50
   first questions were asked again with the whole content; if real students' share is much higher, the part costs more than it
   saves: send more with it (another lecture, the review tables) or turn it off (`WARM_MS` in `supabase/functions/timmy/core.js`).
-  **Done** (2026-11-27, #PRNUM): 23 turns from about 15 people took the part (Perio, Heme & Endo Exam 3, Review of Systems
+  **Done** (2026-11-27, #576): 23 turns from about 15 people took the part (Perio, Heme & Endo Exam 3, Review of Systems
   before its course path); 2 were asked again with the whole content, about 1 in 10 against the eval's 16 in 50, so it saves
   and stays as it is. Numbers in [ask-timmy](../reference/ask-timmy.md). The course path's read is the line below.
 - [x] **Ask Timmy's quote check fails a table cell under three words** (2026-11-19, the eval's pe-02 on the whole content):
   he cited R1.3 with "≥10 cigarettes/day", which is in the table, but `quoteIn` wants at least three words or the whole unit, so
   the link was dropped and the eval failed. Either accept a whole table cell (the text between two ` · `) as a quote, or say in
   `RULES` that a table quote takes the row's label with it.
-  **Done** (2026-11-27, #PRNUM): `quoteIn` accepts the whole of one table cell in the unit the model cited (not when it points a
+  **Done** (2026-11-27, #576): `quoteIn` accepts the whole of one table cell in the unit the model cited (not when it points a
   link at another unit, where a short cell could match many rows); `RULES` unchanged, so the prompt cache stays. Tests in
   `tools/timmy/test.mjs`. Deployed by the After merge workflow.
 - [ ] **Ask Timmy's course path, a week into the next hub of courses or once 5 people have used it** (2026-11-27, from the v85

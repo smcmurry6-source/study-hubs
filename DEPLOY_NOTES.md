@@ -32,7 +32,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
-- **2026-11-27 (the week-after reads, and a table cell as a quote, #PRNUM, Claude Code)** — Three to-dos. (1) What
+- **2026-11-27 (the week-after reads, and a table cell as a quote, #576, Claude Code)** — Three to-dos. (1) What
   `migration_v85`'s part saved: 23 turns from about 15 people took it before the hubs it served came down (19 `part`, 2
   `part+full`, 2 `full`), about 1 in 10 asked again against the eval's 16 in 50, so it stays as it is
   ([ask-timmy](vault/reference/ask-timmy.md)); Review of Systems' course path had too few people to judge, so its read waits
