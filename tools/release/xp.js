@@ -625,7 +625,9 @@ try {
   ok(qbs.boost && Date.parse(qbs.boost.until) === Date.parse(qb2.boost_until) && qbs.wallet.spent === 550, `the shop's boost and wallet (${JSON.stringify([qbs.boost, qbs.wallet.spent])})`);
   // equip
   sql(`insert into pet_inventory (visitor_id, item_id) values ('xp-B', 'garden'), ('xp-B', 'castle'), ('xp-B', 'porch'), ('xp-B', 'bowling-lane'), ('xp-B', 'mailbox') on conflict do nothing`);
-  eq(anonJson(`equip_item('xp-B', 'outfit', 'white-coat')`).error, 'not-owned', 'equipping something not owned');
+  // an outfit xp-B doesn't have: not a fixed one, which fails on the day the shop's first daily item, bought above, is that one (BUG-206)
+  const notMine = one(`select id from shop_items where kind = 'outfit' and rank_tier is null and id not in (select item_id from pet_inventory where visitor_id = 'xp-B') order by id limit 1`);
+  eq(anonJson(`equip_item('xp-B', 'outfit', ${q(notMine)})`).error, 'not-owned', `equipping something not owned (${notMine})`);
   eq(anonJson(`equip_item('xp-B', 'home', 'garden')`).error, 'slot', 'a yard item can\'t be the home');
   ok(anonJson(`equip_item('xp-B', 'home', 'castle')`).equipped.home === 'castle', 'move into the castle');
   anon(`select equip_item('xp-B', 'yard-left', 'garden')`);
