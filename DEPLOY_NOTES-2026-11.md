@@ -6,6 +6,840 @@ Entries of [DEPLOY_NOTES.md](DEPLOY_NOTES.md)'s "Recent major changes" dated Nov
 
 ## Entries
 
+- **2026-11-19 ("Is this your other device?" fixed, BUG-193, Claude Code)** — Sam asked who had a custom name (19 names on 24 devices), then to reprompt the ones on more than one device. The card already asked them every few days, so the data said why it wasn't working: some were asked many times about a device nobody had opened in a month, and some tapped Yes again and again without linking, because the Yes screen said "when this card shows up there, tap Yes and type this code": it shows up there a day later, after the code's 10 minutes, and Yes there makes a new code. Sam: "do 1 and 2, skip the notice". `migration_v87.sql`: `name_shared` (and so the v2 bootstrap's `name_shared`) needs the other device, or the person it's linked to, to have a visit in the last 21 days; PL/pgSQL. `widget/linkask.js`: the Yes screen says to type the code on the other device now (Settings, Link my devices), with a line that a home-screen app should type the code rather than open the link (on an iPhone it keeps its own storage, apart from Safari); the first screen has a "Have a code from your other device?" box; Escape closes the card from anywhere on the page. Link my devices' card has the same home-screen line. About page (both entries), `site.json`, `rest.bundle.js`. Tests: `tools/release/xp.js` section 8a. **v87 applied live at the merge** (about 6 pm Central, through the connector, md5-checked; in `supabase/schema.sql`).
+- **2026-11-19 (The six old single-file hub pages come down, Claude Code)** — Sam: "lets go ahead and take down all old pages. that should make things run a bit better". `hubs/heme-endo-exam1/` (its page and painted case images), `hubs/heme-endo-exam2/`, `hubs/msk-exam3/`, `hubs/msk-exam4/`, `hubs/pcd-exam3/` and `hubs/pcd-implants-exam1/` are removed, with `assets/og-heme-endo-exam1.png`, `og-msk-exam3.png`, `og-msk-exam4.png` and `og-pcd-exam3.png`: about 6 MB off every publish, and no hub on the site is an old single-file page any more (Heme & Endo Exam 3, on the engine, is the only hub up). All six were archived, with their retrospectives, recaps and audio already done, and none was in `sw.js`'s `HUBS`, so the dashboard (which links only live hubs) and the service worker are unchanged. Their About entries came off (Older hubs, the Feedback Loop, Osseo and Exam 2 arcade columns, the MSK and PCD nine-games line, their diagrams, Heme & Endo Exam 1's painted patient pictures and High Likelihood paragraph, Heme & Endo Exam 2's Exam 1 Refresher), and the lines that named PCD Implants as an example now name Heme & Endo Exam 3; Ask Timmy's site help rebuilt. Their perf budget lines are gone. Their `hubs.js` entries (and `legacy`), `tools/question-ids/`, art, figure kits and podcast scripts stay; each hub note says which commit still has its page (`a897c0c`) and the repo map how to dump its bank from it. The shared-code cleanup the old pages held up (the `NEW` gates, the old cards, `rpc2` fallbacks) is next, in its own PR (the inbox).
+- **2026-11-19 (Charts: Cover the answers, Claude Code)** — Sam: "yes to the table cover button too" (a survey answer had asked to "hide the answers in the charts"). Every chart section the engine draws as a table or as cards (`sectionHTML` in `widget/hub.js`: a lecture's "Charts for this lecture" and More, Side by side) has a **Cover the answers** button beside its title. Pressed, every cell but a row's first (a table's `td`, a card's `dd`) keeps its size with its words hidden (`visibility`, so from screen readers too) under a **Show** button that reveals that one (from the keyboard, focus goes on to the next); the button becomes **Show all**, and after the last Show it is Cover the answers again (`coverSection`, one click listener on the document). Fixed `data-rvcover` and `data-rvpeek` values, so click counts never hold a cell's words. CSS in `widget/hub.css` (`.rv-head`, `.rv-cover`, `.rv-hid`, `.rv-peek`); bundles rebuilt; About page (Notes) and Ask Timmy's site help. Old single-file hubs don't have it (they don't draw charts with the engine).
+- **2026-11-19 (Lessons refresh, the Heme & Endo Exam 3 eve; test runs out of the class's data, Claude Code)** — Sam: "lessons audit". Read at 4:40-6 pm Central, the evening before Exam 3. (1) **Four explanations** in `hubs/heme-endo-exam3/content/questions.json` now answer the class's favorite wrong pick: `ea-tf-ratio` (cypionate is the slow-release depot: it changes how long testosterone lasts, not its anabolic-to-androgenic ratio), `pg-no-milk` (dopamine comes from the hypothalamus, and prolactin is already rising, so progesterone blocks its action in the breast), `ea-tf-proscar` (two brand names, one drug) and `dc-acro` (report #67: why a 47-year-old man fits acromegaly), with their whys; ids, keys and choices unchanged, so the class's picks stay right. Every key question health flagged (12, on 8-13 first tries) was read against the notes and is right; with Sam's yes, `ea-tf-proscar`'s stem now asks whether Proscar and Propecia "have different active ingredients" (it said "are two different drugs", true as two products; key and choices unchanged). (2) **BUG-192**: since #459 that morning, a closing test page's keepalive flush skipped Playwright's routing, so every CI and local run of `tools/ci/smoke.js` (which hides `navigator.webdriver`) wrote its game-layer check into Heme & Endo Exam 3's live clicks, events and question health (68 made-up visitors by 5 pm). `tools/ci/no-leaks.js` answers, inside the page, what it sends once it is really leaving (every context in `smoke.js` and `quiet.js`), and `tools/data-fixes/2026-11-19-test-runs.sql` (After merge) removes the rows; [verify-before-pushing](vault/how-to/verify-before-pushing.md) has the rule. (3) `LESSONS.md`: Live signals rewritten (the eve, the economy read again: unchanged, Sam's "prices are good" stands), the Perio final's 9 check-ins and the Occlusion final's 36 in their retrospectives, a standing lesson from #67.
+- **2026-11-19 (Older exam check-ins closed, on the page and on the server, Claude Code)** — Sam: "close all current check ins
+  except for perio and occlusion final. no one should be able to submit for any older exams" (the data showed check-ins still
+  coming in for the Occlusion midterm and Heme & Endo Exam 2 that hour). `checkinClosed:true` in `hubs.js` on Heme & Endo Exam 2,
+  the Occlusion midterm and Heme & Endo Exam 1 (already past its `checkinUntil`), so `pastExams()` in `widget/dash.js` leaves them
+  out of Past hubs and the pop-up. **The server refuses them too** (`migration_v86.sql`, applied live at about 2 pm Central, ahead
+  of the pending v83 to v85; written as v85 and renumbered when #469's Ask Timmy cache took that number): `exam_checkins_closed` (hub, exam date; closed to anon) lists the closed ones, and
+  `sh_submit_exam_debrief` answers `{ok: false, closed: true}` for one before anything is saved or paid; the dashboard then says
+  "This check-in is closed." instead of "try again". The After merge workflow keeps the table equal to `hubs.js` (its new
+  `checkins` step, whenever a push changes `hubs.js`), so closing or reopening a check-in is still only `checkinClosed`. Still
+  open: the Perio final and the Occlusion final; Heme & Endo Exam 3's opens on exam day (Fri 11-20, 10 am). Check-ins already sent
+  stay on `review/` → Check-ins. Tested: `tools/release/xp.js` (a closed check-in is refused, saves and pays nothing) and `rls.js`.
+  The rewards already paid for those two stay (Sam: "dont take it back"). Then Sam: "repush the perio check in pop up for
+  everyone": the Perio final's pop-up (out since 1 pm, `promptHour: 13`, #464) goes out once more to every device that opened
+  it without sending (`askAgain: "2026-11-19"`). Fixed with it in `widget/dash.js`: a device that first saw a check-in after its
+  `askAgain` round was set was asked a second time on its next visit; seeing it now counts as the round's showing.
+- **2026-11-19 (Perio's page comes down, Claude Code)** — Sam, after the lessons audit: "you can take perio down now. merge when ready". `hubs/perio/` (the page, its content JSON, its A/B wordings, its images) and `assets/og-perio.png` are removed, as Occlusion's were the day before. `hubs.js` archives it at 1 pm that day (`archiveOn`), so the dashboard has no card linking to the missing page before 10 pm, and the final's check-in pop-up goes out from 1 pm (`promptHour: 13`; the exam was that morning). It left `HUBS` in `sw.js` (`sh-v66`, Heme & Endo Exam 3 alone). Its About page entries came off (its mock's format, Stage & Grade, the A/B wordings, its diagrams, its redesign entry, its arcade column), and the lines that named Perio as an example now name the hubs still up; Ask Timmy's site help rebuilt. Its budget line, its figure build in "Check hubs" and Ask Timmy's 41 test cases for it are gone; `tools/release/xp.js` now grades the newest engine hub's real bank (with a made-up ordering and matching item, since Heme & Endo Exam 3 has neither), and `admin-ui.js` and `quiet.js` use Heme & Endo Exam 3's page. Its `hubs.js` entry (the check-ins), `tools/question-ids/perio.txt`, its art, the figure kit and the podcast scripts stay. [The hub note](vault/hubs/perio.md).
+- **2026-11-19 (Lessons refresh: the Perio retrospective, Claude Code)** — Sam: "lessons audit. perio is over". Perio's final (cumulative) was that morning, so the audit wrote its retrospective in `LESSONS.md` (both exams: 173 people, 759 h, 53,710 answers; the final's eve the biggest of any hub, 283 h from 87 people), published its recap to the dashboard (`tools/publish-recap.js`, Sam's standing OK; featured `q3-S02`), and took its narration and Timmy Time off the site ([archived-hubs-drop-their-audio](vault/rules/archived-hubs-drop-their-audio.md)): the 28 mp3s and their words files (289 MB; the site 656 → 367 MB), `"audio": "off"` in `hubs/perio/content/core.json` (the build emptied `hyAudio`), and the `podcast`, Listen and Timmy Time out of its `hubs.js` entry, so the dashboard offers no episode before 10 pm. `sw.js` keeps `perio` in `HUBS` until the dashboard archives it (10 pm): `tools/ci/syntax.js` fails a live engine hub missing from it, so that line is a follow-up ([the task](vault/tasks/done/2026-11-12-audio-off-at-archiving.md)). Live signals and the game economy rewritten (median study day about 1,400 crowns; the median wallet 9,300; 11% of crowns spent; Sam's "prices are good for now" stands). The audit now reads the database's size every run (`tools/lessons-refresh.md` step 1: 323 MB). Heme & Endo Exam 3, the one live hub, had nothing to fix (no reports, no flags yet).
+- **2026-11-19 (Mock and game answers that ride out a busy database, Claude Code)** — (1) A mock's or an arcade game's
+  answers go at once and try twice more (4 and 10 s); when all three failed in a busy minute they were lost, and with them
+  the mock's score, its +50 and their XP. Now `widget/v3.js` puts such an answer in the answer line with its session (8 tries,
+  kept on the device when the page is hidden or they run out), and `finishSession` holds the finish behind it in the same
+  line (`sessionHold`; it answers `{ ok: true, held: true }`, so `widget/games.js` doesn't also send the score the old way),
+  kept on the device with the answers, so the hub's next page sends the answers, then the finish. The page that sends it says
+  what it paid (`sh:session-paid` now carries `kind` and `game`; `widget/hub-rewards.js` names a game it never ran).
+  (2) With the bootstrap timed out, Timmy Time's minutes (`widget/podcast.js`) weren't counted, Timmy's HP days
+  (`widget/pet.js`) left out the snacks' HP and the Inbox (`widget/replies.js`) the idea board's notes until the first
+  answer's reply: they ask `shGame.live()` now (a hub passes the Inbox its `v2`, it passed none; the dashboard passes `V2 !==
+  false` to both), and the last two fall back to today's call when the v2 one is missing. `tools/ci/quiet.js` checks both
+  (`mock()`, `timedOut()`). About page ("What the hubs record") and Ask Timmy's site help updated; bundles rebuilt.
+- **2026-11-19 (Heme & Endo Exam 3: High Likelihood made higher yield, Claude Code)** — Sam: "There are a lot of high
+  likelihood questions ... make sure that those need to be high likelihood and see if we can make it a little bit higher
+  yield." 410 of 460 questions were tagged, so the tag no longer picked anything out. Every topic was read against Dr.
+  Herr's study guide and the recorded hints: each guide item and each hint keeps its topic, and a question stays tagged only
+  when it tests what the item or hint names. 108 questions on details neither names came off the tag (a slide's number or
+  name, a side fact, a second question on the same point, a key that rests on a content flag), and five topics resting on
+  neither came off whole (L17 capacitation and maternal hormones, L19 splenic sinuses and MALT and tonsils, L20 plasma cell
+  neoplasms): 410 → 284 High Likelihood, 86 → 81 topics, 42 topic titles trimmed to what stays. No question was edited or
+  retired; Lecture A is unchanged (Sam: "lecture a shouldnt be ranked lower"). The mock (no `likelyShare` here) is
+  unchanged. High yield, built from the topics, is shorter for L17-L22 and was recorded again (`<lec>-hy.mp3`). Decision
+  and the rule for new questions: `vault/decisions.md`, `vault/hubs/heme-endo-exam3.md`.
+- **2026-11-19 (Ask Timmy: "What should I study tonight?" from the server, and a cheaper first question, Claude Code)** —
+  On the dashboard, "What should I study tonight?" now also reads the student's own answers from the server
+  (`get_my_answers`, one call a live hub, skipped in a quiet spell, 4 s at most), merged with this device's (a question
+  keeps whichever copy has more tries), so a new or linked device no longer sees nothing until a hub page has synced
+  (`serverSeen`/`withServer` in `widget/ask.js`; the smoke test stubs it). And, Sam's call: the first question on a hub
+  after nobody read its whole content for 55 minutes gets **a part of it** (the exam facts, cram sheet, Exam Hints, High
+  likelihood topics and the lecture on screen or the answered question's; every other lecture as one line with its title),
+  with the site help moved ahead of it so its cache is shared by every hub; when the part doesn't have the answer
+  ("not_covered"), he's asked again with the whole content, which is then marked as cached (`timmy_cache`,
+  `migration_v85.sql`: one small table, the service role only; applied through the connector right after the merge,
+  md5-checked; without it the function sends the whole content, as before). The eval in that mode (`node tools/timmy/eval.mjs --part`, $5.28 for all 50 cases): 49 passed, 34 answered
+  from the part, 16 asked again; the one failure was a two-word quote from a table cell on a whole-content answer.
+  Also: `tools/timmy/test.mjs` defines the `C` that `exportSections` reads since the study guide (it failed on `main`).
+  [Ask Timmy](vault/reference/ask-timmy.md), "Limits and money".
+- **2026-11-19 (The dashboard: room under its budget, then the gold reward card, Claude Code, #466)** — Sam's package from the to-do list. **Room:** `widget/ranks.js`'s hub widget (`mount()`: the rank card, hub mastery and the trophy case in Stats, the accent colors, Link my devices) is now `widget/ranks-hub.js`, which `widget/v3.js` loads right after `ranks.js` on a hub only (held in `hub-rest.bundle.js` on the engine, by name on an old single-file page); `ranks.js` hands it what it draws with as `shRanks._hub`. `rest.bundle.js` 131.3 → 125.4 KB gzipped. **One call:** the dashboard's clicks and events go in one `record_analytics` call (migration_v82), as a hub's do: `widget/dash.js` gives `widget/clicks.js` a client that joins its two calls (the two calls again if the function is missing). **The card:** the hubs' gold reward card is `widget/prize.js` (`window.shPrize.show(lines, opts, env)`, its styles inside), run in `hub.bundle.js` ahead of `widget/hub-rewards.js` (which batches and calls it, unchanged to the eye); the dashboard fetches it the first time a prize pays (the daily visit, the leaderboard name, a trophy, a collection) in place of the dark toast: under its bar on a phone, inside Timmy's place when a visit pays there, the stars flying into the crowns; the toast only if the file can't be fetched. `sw.js` precaches it (`sh-v65`). **The toast on a phone:** already at the top since #458 (the rule is in `widget/hub.css`), nothing covers it. `node tools/release/perf.js`: the dashboard 345.4 → 340 KB of 346 (budget unchanged), Perio 877 → 878 KB. Found, on the to-do list: a hub's report-reply pop-up covers the card on a phone.
+- **2026-11-19 (The database pass's phase 3: the bootstrap's answers, Claude Code)** — A hub page keeps its answer history on the device (`sh_answers_hist:<hub>` in `widget/v3.js`, the newest 5,000) and sends the bootstrap, and the sync every 3 minutes, the newest answer's id and the count; the server sends only the answers after it (`migration_v84.sql`: `sh_answers_since`, `get_my_answers_since`, two new arguments on `get_widget_bootstrap_v2`), or the whole history when the count doesn't add up (Link my devices). Timmy's days (`get_pet_days`) read the one boundary day by its end too. On a throwaway copy, a heavy student: the bootstrap 14.3 → 6.9 ms, the sync 6.6 → 1.3 ms, Timmy's days 2.1 → 0.1 ms; the same rows (checked old against new). A database without v84 gets asked again without the cursor. Nothing students see changes. `tools/ci/quiet.js`, `tools/release/xp.js` and `rls.js` check it. Applied live at night: [the task](vault/tasks/2026-11-18-database-optimization-pass.md).
+- **2026-11-19 (Heme & Endo Exam 3: the study guide made short, with the in-class hints, Claude Code)** — Sam, the evening before the exam: "the study guide is really long. can we combine the study guide with in class exam hints to make it much higher yield". Dr. Herr's study guide page (`#notes/guide`) went from about 14,000 words to about 6,500: each of its 31 items is now a "Said in class" box (short quotes from `study.json`'s hints, `.gd-said`), a short "Know this" and a one-line "Watch for"; the lead paragraphs and most tables went (three stay: L19's organs, L20's translocations, L22's lichens). Each lecture adds `more` sections that aren't on the guide: "Also stressed in class" (L17, L21, L22) and "Said not needed" (all six), and its key terms are one line each. `widget/guide.js` and `tools/hub-next/guide.mjs` draw and speak `guide[].more` after the items; `widget/guide.css` has the new boxes. The recording (`audio/guide.mp3`) was made again from the new text; `SH_HUB.notes.guide`'s wording, the About page's entry and Ask Timmy's site help (`supabase/functions/timmy/site.json`) say what's on it now. Lecture A stays off the page (Sam's call of the same day).
+- **2026-11-19 (the admin page's heavy reads worked out ahead, Claude Code, [#456](https://github.com/smcmurry6-source/study-hubs/pull/456))** — the database-load task's first
+  box. `migration_v83.sql`: the admin page's slow reads (Insights' three, Question health, the visitor totals, check-ins,
+  clicks and features) come from a small table, `admin_cache`, that pg_cron's `sh-admin-cache` job fills one read at a time:
+  every 15 minutes while the page is in use, every hour while 20 or more people are studying, at once after an edit or
+  Refresh, nightly for a week after, nothing while nobody looks. The functions keep their arguments and results (all 22 reads
+  compared exactly on a copy); question health lays today's reviews and reports over the copy. Two lookups got cheaper too
+  (`sh_surface` once a section, not once a row: insights 1.05 → 0.43 s, data quality 0.98 → 0.37 s on the copy). The page
+  shows when each read was worked out and "newer numbers on the way" after Refresh, and looks again until they come. The
+  lessons audit and agents read the kept copies (`tools/lessons-refresh.md`, [admin-operations](vault/reference/admin-operations.md)).
+  Applied live at night (the task note's Log).
+- **2026-11-19 (Large text: the shop, Ask Timmy, the tour, bowling, and Home's Timmy Time card; BUG-190, BUG-191, Claude Code)** —
+  The rest of #462's sweep. Timmy's Shop and an item's sheet (`widget/shop.css`) are sized in % of the screen with a flex
+  column that shrinks and scrolls (at 1280 px XX-Large the shop was 1,537 px wide and its Close button off the top). Ask
+  Timmy's panel (`widget/ask.css`): % of its fixed box, a one-column footer whose starters wrap (it scrolled 50 px sideways
+  at 320 px XX-Large), an intro note that scrolls inside 22% of the panel, no avatar under 260 px. The tour (`widget/tour.js`):
+  cards in %, and **positions worked out in screen px and divided by the zoom** (`getBoundingClientRect` is in screen px,
+  `style.left` and `offsetWidth` in the zoomed page's px; at a laptop's X-Large the cards landed off the screen). The bowling
+  card (`widget/bowling.js`) in %; the update prompt, the reply pop-up's cap, the survey's margin and the notes' lecture list
+  off `vw`/`vh`. Home's Timmy Time card (`widget/hub.css`) is a container: a narrow card drops the minutes from "Listen ·
+  52 min", gives the title the full width, and shrinks Timmy at X-Large and XX-Large. `tools/ci/smoke.js` opens the shop, an
+  item and Ask Timmy at 320 px XX-Large and 375 px X-Large. Also retested BUG-184 to BUG-188, BUG-168, BUG-126 and BUG-009 (done).
+- **2026-11-19 (Timmy's place fixes: the front yard, the kit niceties, visiting from a hub's boards, Claude Code)** — Three
+  inbox lines. **Front yard**: Timmy at the door is drawn over a tall piece in the front slot (Sam: "draw Timmy on top"):
+  `layout()` in `tools/figures/site/place.mjs` keeps the front piece's depth (`frontZ`) and `timmyZ(layout, p)`, used by
+  `render()` and by `widget/place.js`'s hops, lifts him over it within 1.3 of the door spot on the ground. **Kit
+  niceties**: a yard piece's `move` ({ "": the whole piece, ".tp-spin" or another class: a part }) plays while its egg
+  does, and `T.spinner(c, u, v, inner)` draws a part in its own plane under a matrix so a CSS rotate turns it like a real
+  wheel (`vector-effect` keeps the strokes): the moon rover rolls out and back with its wheels turning, the satellite dish
+  swings to aim, the windmill's wheel and the wagon's wheels turn (their blurs are gone). A scene's own `tree(b, o)`
+  replaces `treeKind`: the reef has a coral tree, the lunar plains a plain tree under a glass dome (the night sky keeps its
+  crystal tree). `noSnow` on the reef: no snow, snowfall or snowman there in the winter holidays (the lights stay).
+  **Visiting from a hub**: `window.shVisitPlace(key)` in `widget/hub-timmy.js` (get_place, then `shPlace.open({ place })`,
+  the day's visit bonus through `claim_visit_v2`), and every `button[data-sh-visit]` on a hub's page opens its `data-key`'s
+  place; Perio's and Heme & Endo Exam 3's arcades (`content/arcade.js`) read `get_arcade_leaderboard_v2` (the old call when
+  it's missing) and draw a classmate's name as that button. The inbox line said the boards were in `widget/v3.js`'s panel;
+  that panel has no leaderboards any more, and a hub's own boards are its arcade's.
+- **2026-11-19 (The database pass's phase 2 applied live, Claude Code)** — Sam, at noon the day before Heme & Endo Exam 3: "the hubs are quiet right now. go ahead and run the migrations you were waiting on" (4 people on, 2 answers in 10 minutes). Through the connector, one call at a time, 12:10-12:13 pm Central: `migration_v79.sql` (the awards' running totals; no total off from its sum, the three most active students' balances the same), `migration_v80.sql` (`answer_xp` once an answer), `migration_v81.sql` (`drop index concurrently`, then `cluster` of `activity_visits` and `xp_seen`: **the database 349 → 323 MB**, `xp_seen` 53 → 31 MB) and `migration_v82.sql` (`get_class_numbers`, `record_analytics`, `shop_days` with its hourly pg_cron job, the lighter bootstrap, `get_my_answers`, `anon_name`). Every live body md5-checked against its file before and after; no request failed in the edge logs, and the pages took the two new calls within a minute. All four are in `supabase/schema.sql`; `supabase/pending-migrations.txt` lists none. Nothing students see changes. [The task note](vault/tasks/2026-11-18-database-optimization-pass.md) has the numbers.
+- **2026-11-19 (Large text on a phone: BUG-184 to BUG-188, Claude Code)** — The text-size setting zooms `<html>`, and inside a zoomed page
+  `100vw` and `100vh` are bigger than the screen, so four pop-ups sized that way ran off it at X-Large and XX-Large. The dashboard's More menu is
+  at most the top bar's content wide (`100cqw - 4px`, the bar is a container: `widget/dash.css`); Timmy's place's full view is sized in % of the
+  screen and its stage in `cqh` of the dialog, now a container, with a two-row header and a smaller "Timmy today" card under 310 px
+  (`widget/place.css`), and his speech bubble stays inside the picture (`widget/place.js`); Settings' rows can be
+  narrower than 220 px and its button wraps (`widget/hub.css`, Focus mode on a hub's Settings too); the dashboard's dialogs and Timmy's cards
+  (`widget/pet.js`) take `max-height: 100%` in place of `calc(100vh - 32px)`, so their Close button is on the screen; the checkup's Show me row
+  wraps. Home's Timmy Time card on a phone keeps the XP line out of the notes' column (`.pm-earn`). Default text is unchanged to the pixel.
+  `tools/ci/smoke.js` opens the four pop-ups at 320 px XX-Large and 375 px X-Large. Found doing it, logged: BUG-190 (Timmy's Shop and the
+  other `vw`/`vh` sizes) and BUG-191 (Home's Timmy Time card at about 900 px puts its Listen button over Timmy).
+- **2026-11-19 (The hub bar fits on every laptop, BUG-083, Claude Code)** — Sam: "do the heme and endo bug fix". On Heme & Endo Exam 3 (and Perio) the top bar ran 26-95 px past the screen between 1,101 and about 1,190 px wide, with Search half off and Settings gone, even with the rank pill down to its medallion. `fitPill()` in `widget/hub-rewards.js` now takes two more steps: the hub name folds to its emblem (`.hx-bar.is-cramped`; still read out as the link's name) and the pill gets its XP back if that leaves room; past that, at Large text and up on a laptop (the setting zooms the page, which the 1,100 px breakpoint can't see), the meters move to the strip under the bar as on a tablet (`.hx-bar.no-meters`, `.hx.is-strip` in `widget/hub.css`). It also measures again when the live count changes and when the fonts arrive. Scripted on the preview's made-up data at 1,101-1,920 px and every text size: nothing runs past the screen; below 1,101 px nothing changed. Bundles rebuilt.
+- **2026-11-19 (the database optimization pass, phase 2: fewer calls from the page, Claude Code, [#459](https://github.com/smcmurry6-source/study-hubs/pull/459))** — nothing students see
+  or earn changes; the pages make fewer requests and the bootstrap does less. `migration_v82.sql` (**pending: apply at
+  night after Fri 2026-11-20, 9:30 am**, after #457's v79 to v81, `supabase/pending-migrations.txt`; written as v79, renumbered at the merge): `get_class_numbers` (a card's class numbers,
+  `question_stats` and `question_choices`, in one call instead of two REST reads: they were a fifth of every request),
+  `record_analytics` (question health's rows, the clicks and the events in one call instead of three), the shop's picks of
+  the day stored once for everyone (`shop_days`, filled by pg_cron hourly, cleared by a trigger on `shop_items`),
+  `get_widget_bootstrap_v2` built once (it worked out v1's rank, Timmy's days and Inbox and threw them away),
+  `get_my_answers` in PL/pgSQL, and `anon_name` by an index on the name's base. The bootstrap 38.7 / 26.9 / 19.4 → 22.5 /
+  13.8 / 10.2 ms on a throwaway copy, every value the same. Page side, working with or without the migration (the old
+  calls when it's missing): `widget/v3.js` (`classNumbers`, `shAnalytics.send`; `widget/qhealth.js` hands its rows to it,
+  and `widget/clicks.js`, unchanged, sends through a client v3.js gives it; the dashboard keeps its two calls, its 345 KB
+  page budget had no room), and `shRankLocal` in `widget/v3.js`, which `widget/ranks.js` asks first: the rank and this
+  hub's mastery after every tenth answer from the replies and the answers the page holds, reading the server only when
+  something it can't count changed (`sh:trophy-sent` from `widget/eggs.js` and the bowling egg, a medal, a new day, the
+  100/1,000 answers and 25/100 runs, mocks and games, at least every 50 answers).
+  Tested by `tools/release/xp.js` (a new section), `rls.js` (`shop_days` and its helpers closed to anon) and
+  `tools/ci/quiet.js` (both ways). [The task](vault/tasks/2026-11-18-database-optimization-pass.md).
+- **2026-11-19 (Phone and large-text fixes on the hubs: BUG-168, BUG-126, BUG-009, Claude Code, [#458](https://github.com/smcmurry6-source/study-hubs/pull/458))** — Sam's package of
+  three bugs. **Nothing on a hub scrolls sideways on a phone at the largest text** (BUG-168): the text sizes zoom the page,
+  so XX-Large on a 320 px phone lays out in 220 px, and the arcade lobby, the Question Bank, Notes, Exam Hints, the cram
+  sheet, Stats and Settings all ran past the screen there (Exam Hints and the cram sheet at 320 px at every size). In
+  `widget/hub.css` every grid's column minimum is `min(Npx, 100%)` (the lobby's beats each hub's own `arcade.css`), the
+  bank's filter panel is one column, a long word breaks instead of running off in a lecture title, Exam Hints' quotes and the
+  hint, cram and flow lists (only there: a word a hair too wide elsewhere stays whole), Exam Hints' "Notes" goes under a
+  long title, and on a phone a button or chip too long for the screen wraps its words; the Study as buttons drop their icons under 300 px
+  and stack under 240 px. In `widget/trophies.css` the Stats gauge's turning rays stop at the board on a narrow phone and
+  the badges' words break, and the rank's medal goes above its name in a narrow card. `tools/ci/smoke.js` opens 12 views of each hub on the engine at 320 px with the largest text
+  (it opened only Home before). **Toasts on a phone drop in at the top**, under the strip, as the reward card and the
+  reply pop-up do (BUG-126): at the bottom they sat under Timmy, his bubble, the streak flame and the Listen player; the
+  smoke test checks one is clear. **Small controls** (BUG-009): the four of 11-04 were on the old single-file pages;
+  `tools/release/matrix.js` now checks every screen and fails a control under 24x24 px, naming it, and its first run found
+  the mastery-medal button beside a name on the dashboard's boards (22x20 at 1920 px), now 24x24 (`widget/ranks.js`).
+  Bundles rebuilt. **The dashboard's budget is 346 KB** (was 345, BUG-189): `main` measured 345.40 KB and these rules add
+  about 150 bytes gzipped to `widget/site.bundle.css`, which the dashboard loads too; it's the page with the least room.
+- **2026-11-19 (the database optimization pass, phase 2: the answer save and its tables, Claude Code, [#457](https://github.com/smcmurry6-source/study-hubs/pull/457))** —
+  three migrations, written and tested, **not applied yet** (Sam: nothing live before Heme & Endo Exam 3, the rewrites at night;
+  set for Sat 11-21, 1:30 am Central, and listed in `supabase/pending-migrations.txt` until then). `migration_v79.sql`:
+  `xp_award_totals`, each student's awards summed by kind, kept by statement-level triggers on `xp_awards`, so the crown
+  balance in every answer's reply (`sh_wallet`) reads a row a kind instead of every award; filled in the same transaction
+  (63,000 awards live). `migration_v80.sql`: `sh_answer` inserts its `answer_xp` row once, with the reply, instead of an
+  insert and an update. `migration_v81.sql`: `activity_visits_last_idx` dropped (every ping's update of its visit was a new
+  row and three index entries; the admin page's visitor summary gives the same numbers without it). Then `cluster` of
+  `activity_visits` and of `xp_seen` (54.7 MB, about twice what its rows need). On two throwaway copies
+  (`tools/release/bench-answers.js`, new, for the next phase): the same replies to 37,630 calls, wallets and rows in every
+  table; an answer save 3.81 → 2.19 ms for a heavy student, 2.86 → 2.12 middling, 2.53 → 2.01 light. Nothing students see
+  or earn changes. `tools/release/xp.js` checks the totals against the sums; `pg.js` takes extra server settings.
+  [The task note](vault/tasks/2026-11-18-database-optimization-pass.md) has the numbers; tonight's readout goes there too.
+- **2026-11-19 (The check-in's last question, Claude Code)** — Sam: "Lets change the free response question to just asking what the hub could
+  have done better". The exam check-in's text step (`DEBRIEF_QS` in `widget/dash.js`) now asks "What could the hub have done better?" and its box
+  has no placeholder (it was "e.g. more on suture types, more EXCEPT questions", from the 2026-10-02 version that asked for topics the hub
+  missed). Timmy's line on that step is "What could I have done better?" when the check-in no longer pays. The honor-code note stays, and the
+  answer key is still `missed`, so the admin page (its heading now "What the hub could have done better"), `/lessons-audit` and the idea board's tick
+  read it as before. About page, Ask Timmy's site help and the lessons-audit skill updated.
+- **2026-11-19 (About page accessibility, Claude Code, [#453](https://github.com/smcmurry6-source/study-hubs/pull/453))** — the last three accessibility bugs from
+  the release dry run, all on `about/index.html`: BUG-007, the nine contents links at the top turned their focus outline off
+  (`nav.toc a:focus-visible{outline:none}`), so a keyboard user couldn't see where they were; they now get the page's ring.
+  BUG-006, a table wider than its box (the seasonal bosses' on a laptop, all five on a phone) couldn't be scrolled from the
+  keyboard: while it scrolls it is now a named region in the Tab order (`tabindex`, `role="region"`, its `data-label`), set by
+  a `ResizeObserver` in the page's script, and one that fits stays out of the Tab order. BUG-002's last part, light mode's
+  `--gold` (#8A6417 → #7D5A13) and `--ink-3` (#5F6D78 → #56636E) a shade darker, so the trophy tags and the hidden-spoiler hint on
+  the gold note pass AA. The About entry in `tools/release/baselines/a11y.json` is now 0 everywhere. Found while doing it
+  (inbox): a11y.js checks the About page only in light mode at 1280 px.
+- **2026-11-19 (No more "A miss fixed" bonus, Claude Code)** — Sam asked why "A miss fixed" kept coming up, then: "we can just take out the miss fixed bonus alltogether". It paid +5 XP (doubled by a boost) the first time a question missed on an earlier day was answered right, once per question; since the reward card (2026-11-18) each one was a gold card with confetti, on nearly every right answer in Yesterday's misses, Missed last time and the drill. **`migration_v78.sql`**: `sh_answer` (v72's) no longer pays it; `sh_xp_replay` (v68's) no longer works it out, and drops the three windows only it read; `sh_xp_rebuild` (v54's) keeps the `fix` awards already paid (3,695 XP to 48 people since 11-14, about 0.5% of the game layer's XP) instead of replaying them, so no balance goes down. All three md5-checked against the live bodies; only functions, so any hour. The page drops its label (`widget/hub-rewards.js`, `widget/hub.bundle.js`), the preview's fake server drops it (`tools/preview/runtime/preview.js`), `tools/release/xp.js` checks that it no longer pays and that an old one survives the rebuild (599 checks), and the About page's "More ways to earn XP" and Ask Timmy's site help lose it. The `fix` source stays in `xp_awards`' check for the old rows.
+- **2026-11-19 (Heme & Endo Exam 3: L21 and L22 checked against their slides, Claude Code, [#449](https://github.com/smcmurry6-source/study-hubs/pull/449))** — the inbox's last item for the
+  hub: Sam put smaller copies of Dr. Dal Zotto's two decks in the Drive folder, so both lectures, written from their recordings
+  on 11-18, were compared with every slide. The notes (both levels) gained what only the slides say, marked "the slide":
+  bladder cancer's eighth place among deaths, urothelial carcinoma's sites and the low- and high-grade papillary behavior,
+  PeIN's 30 vs 2-8 percent, penile carcinoma's numbers, hydrocele, epididymitis and orchitis (mumps), torsion's hemorrhagic
+  infarct and the hernia's bowel sounds, cryptorchidism's 3 and 30 percent and its complications, germ cell tumors' risk
+  factors and peak, PSA after treatment; CIN1-3, the cervical cancer numbers, serous and clear cell carcinoma, leiomyoma vs
+  leiomyosarcoma, vaginal clear cell adenocarcinoma, lichen planus's look and histology, the breast lesions' risk scale and the
+  male breast. 23 new questions (`src: "slides"`, L21 75 and L22 72, 460 in the hub), two fixed: `mr-tf-pein30` says
+  "HPV-associated", and `fr-tf-ls-only` now asks about lichen simplex chronicus (keyed False), because the slide lists lichen
+  planus beside lichen sclerosus for the HPV-independent vulvar carcinoma. Topics, hints, cram, review tables and the study
+  guide page follow; the reading-notes and `core.json` notes saying "not checked against the slides" are gone. Narration of
+  both lectures (three levels) and the guide recorded again, seven words added to `tools/podcast/lexicon.json`, and Timmy
+  Time's lichen lines reworded and the episode rebuilt.
+- **2026-11-19 (Perio report #65, Claude Code)** — `q4-L27`'s fourth pair, the one #59 reworded the day before, was read
+  as the Phase I re-evaluation itself by a second student ("the re-eval is 4-6 months, not 2 weeks"). The item was right as
+  taught (Dr. Kaur: re-evaluate at 4-6 weeks; calculus left then is removed and evaluated again 2 weeks later), so the key
+  stays; the row now reads "A second Phase I evaluation, after calculus left at the first one is removed", and the
+  explanation and cue say the evaluation itself is at 4-6 weeks, not months. Same id, same key; High yield unchanged.
+- **2026-11-19 (the database optimization pass, phase 1, Claude Code, [#444](https://github.com/smcmurry6-source/study-hubs/pull/444))** — Sam's package: measure the optimization
+  pass's ideas 1-5 on a throwaway copy and ship the ones worth it; nothing students see or earn changes. Measured with a
+  made-up class of 200 (188,000 answers) and `pg_stat_statements` timing every statement inside a call
+  ([the task](vault/tasks/2026-11-18-database-optimization-pass.md) has the table). **`migration_v76.sql`**: 60-66% of
+  every answer save was the crown balance in its reply, most of it planning: a SQL-language function with its own
+  `search_path` is planned again on every call, and the balance called six of them. 18 small functions (`sh_rank`,
+  `sh_tier`, `sh_step`, `sh_key`, `sh_xp_mult`, `sh_boost_json`, `sh_time_crowns`, `sh_crowns`, `qh_int`, the
+  `record_answer_v2` and `record_card_v2` wrappers and others) are PL/pgSQL with the same bodies; the medal check is
+  skipped while under half the hub's bank was ever answered right; `get_hub_mastery` looks up each question's latest
+  answer. On the copy an answer goes from 6.9 / 5.7 / 4.8 ms (heavy / middling / light student) to 4.4 / 3.6 / 2.4, a
+  question-health batch from 1.9 to 0.75 ms, `get_hub_mastery` from 7.9 to 3.4 ms. **`migration_v77.sql` and
+  `widget/v3.js`**: a page's study-time pings go out together once a minute (`record_activity_pings`, each ping saved at
+  the time it was counted: the same rows and totals), 58% fewer ping calls; they were 18% of every request. **The
+  changelog read** (`widget/v3.js`, `widget/dash.js`): the newest row's time is kept on the device for half an hour and
+  shared by every tab, so the "updated" banner asks the database twice an hour a device, not every four minutes a page
+  (5% of requests); it now comes up to half an hour after a deploy. Fillfactor wasn't worth it (the hot tables already
+  update in place), but `activity_visits` can't, because every ping moves an indexed column: on the to-do list with the
+  awards' running totals and the rest of phase 2. `tools/ci/quiet.js` checks the pings and the changelog read on a fake
+  database. BUG-181's retest: the evening before the Perio final, 20 of about 11,900 answer saves failed their first try
+  (no burst; the page sends each again), against 9 in 10 the afternoon before. **Both migrations applied live** on
+  2026-11-19 at about 4:15 am Central, before the merge (through the connector, md5-checked before and after; in
+  `supabase/schema.sql`). The ping table's rewrite had run half an hour before (#445: `activity_pings` 179 MB to 31 MB, the
+  database 465 MB to 318 MB), and the live `pg_stat_statements` and same-page update numbers are in the task's Log.
+- **2026-11-19 (Perio: the implant cases' films read in words, Claude Code)** — a student report on `pc-h1` ("need more info
+  from the radiograph, it's just a sketch"). The four implant Patient Box cases (`implant-5`, `-19`, `-30`, `-14` in
+  `hubs/perio/content/core.json`, and the folded copies in their 15 questions' `pbox`) gain a row, "Today's film, in words",
+  with the bone level below the platform at the mesial and the distal, from each case's `spec`. Keys, ids and High yield unchanged.
+- **2026-11-19 (Heme & Endo Exam 3: the study guide narrated with Kokoro, Claude Code)** — Sam: "add kokoro". Dr. Herr's
+  study guide page (`#notes/guide`) has its own recording, `hubs/heme-endo-exam3/audio/guide.mp3` with its words file, so Listen
+  plays it in the notes' narrator's voice with Follow along and tap-a-word-to-jump. It is spoken from the page's readable part,
+  which `tools/hub-next/guide.mjs` writes (each lecture's heading, said "Lecture 17", its items and its key terms; not the badges,
+  question counts or buttons). `tools/narrate.py` has a `--level guide` (and reads `data-say`, `<h2>`, `<dt>`/`<dd>`, a power of
+  ten, 10<sup>9</sup>/L, as "10 to the ninth per liter", and /µL as "per microliter"). `tools/hub-next/build.mjs` writes
+  `notes.json`'s `guideAudio`, true only while the recording was spoken from today's guide (its words file's `h`, as for High
+  yield), and `widget/guide.js` offers the recording only then. The smoke test checks the recording against the text and
+  compares the page's readable text with `guide.mjs`'s. Follow along's button and wiring are shared helpers in `widget/hub.js`
+  (`followBtn`, `wireFollow`). `sw.js` sh-v64. The text-and-audio rule, the narration how-to, the hub note and the About page
+  say so.
+- **2026-11-18 (lessons refresh, the Perio final's eve, Claude Code)** — `/lessons-audit` again at 7:30 pm Central (the morning's
+  was #414). Perio report #62 ("Contradicts other lectures", `q6-T02`): the true/false on Dr. Geurs sometimes skipping initial
+  therapy before regeneration (9 of 18 answers had said False) is **retired** (Sam: "it can go"; `q6-T02 retired` in
+  `tools/question-ids/perio.txt`, out of `questions.json`, `variants.json` and its High Likelihood topic), so S6's High yield
+  changed and was recorded again (`periodontal-regeneration-hy.mp3` and its words file). `q6-L35`'s explanation and why separate the root's sides from a defect's bony walls (15 of
+  30 first tries took "3 or more sides" for contained). Report #63 (`q7-P01`, "not enough info in the question"): the case box
+  (and `q7-P02`'s, the same #31 case) says the loss is at #31's margin with the apex not involved, which its explanation relied on.
+  `LESSONS.md`: Live signals rewritten (Perio's biggest day, 80 people and 205 h by 7:30 pm; the economy over 11-18,
+  the first day of #403's rates: 630 crowns an hour, 13% of crowns spent), the later check-ins in the Occlusion and Heme & Endo
+  Exam 2 retrospectives, a reports lesson on exception items. Every query under the 5 s limit; `sh_data_quality()` stopped there,
+  so it and `qh_report` weren't read (`tools/lessons-refresh.md` step 1, the database-load task, the inbox).
+- **2026-11-19 (Heme & Endo Exam 3: Dr. Herr's study guide in Notes, Claude Code)** — Sam: "under notes, make a section for dr
+  herrs study guide. have each item as a heading and have [high] yield explainer of everything we need to know about that topic.
+  since it skips dr taylors lecture, dont include it". A **study guide page** at `#notes/guide`, first in the notes' lecture list,
+  for any hub whose `content/study.json` has a `guide` (one entry per lecture: the guide's items as headings with their
+  explainers, then its key terms), with jump buttons per lecture, Listen (the device's voice), Report, the highlighter, and each
+  lecture's notes and High likelihood questions at the end of its part. It is drawn by `widget/guide.js` + `widget/guide.css`,
+  which `widget/hub.js` fetches the first time Notes opens on a hub with a guide (Sam: "the study guide is only for this
+  particular heme test. why is it at the 805 limit": in the shared bundle it had put Occlusion 1 KB over its 800 KB budget; now
+  the bundle carries only the loader, about 0.4 KB, and no budget changed; both are precached, `sw.js` sh-v63). Search finds it
+  under its own "Study guide" group (`widget/v3.js` `SEARCH_GROUPS`), and Ask Timmy's place is none while it's open
+  (`widget/hub-timmy.js`). Exam 3's: 31 items and 35 key terms for L17 to L22, written from the hub's notes and keys; no
+  Lecture A. About page entry; bundles and Ask Timmy's site help rebuilt.
+- **2026-11-19 (Heme & Endo Exam 3: Timmy Time, Claude Code)** — Sam (11-18): "after you finish, start a new session for
+  timmy time". A 52-minute episode (`exam3-review`, 14 chapters): Dr. Taylor's Lecture A, then L17-L22 in order, each of
+  L17-L22 opening on Dr. Herr's study guide list word for word, the professors' hints quoted, the "you don't need" remarks,
+  then a 29-question lightning round. Written from the hub's own notes, hints, cram and High Likelihood topics only; it steers
+  around every content flag in the hub note (the script's header lists them). Lore (Sam's picks): number thirty-one's letter
+  about a bump ("That's your cusp"), "a tooth for every baby" is a saying, not physiology, and Timmy has blood too; one lore
+  comment (thirty-one's four cusps). 31 words added to `tools/podcast/lexicon.json` (finasteride, dutasteride, tamoxifen,
+  raloxifene, ulipristal, levonorgestrel, Sézary, Sjögren, the trophoblasts...). Wired in `content/core.json` `podcast`
+  (Home's quick link and More's tile), `hubs.js` (the dashboard) and the About page's episode list. Script
+  `tools/podcast/heme-endo-exam3/script.md`; the After merge workflow registers the episode for XP.
+- **2026-11-19 (the dashboard's hub card and What's new, Claude Code)** — Sam: "Make the timmy time card a part of the hub
+  blast on home dashboard. Make the whats new box take up that space between the hub card and the you and leaderboard
+  cards and look super cool, reformat and rework send luck to make space". `widget/dash.js` + `widget/dash.css` (bundles
+  rebuilt). **The stage** (the open hub's card) gets a foot, `.dx-dock`: the Timmy Time card is now a strip there (Timmy on
+  the air at the left, still animated, Listen at the right), and exam-day luck is a tile beside it (clover, count and
+  latest names, Send luck; the exam's name is the title just above, so it isn't repeated); either one alone spans the
+  foot. The hub's other exams moved under the countdown. **What's new** (`.dx-wn`, `newsHTML`/`drawNews`) replaces the
+  row under the stage (Timmy Time + the About card with its one-line What's new): a box on a night field of the hub's color
+  (dark in both themes) with a drawn megaphone, the hub's and the site's latest six changelog lines as paper cards on a
+  timeline, newest first (a gold ring on it), each with its time and hub tag on the timeline's line (gold for every hub),
+  the first clause bold when it is short, three lines and More for a long one; it scrolls sideways a card at a time
+  (arrows on a laptop, swipe on a phone). Then Sam: "make it a bit thinner. its taking up a lot of space": one-line
+  header, tags on the line, three-line cards, about 230 px tall on a laptop (it was about 400 in the first draft).
+  Then **"redo the send luck button"**: Send luck is a chunky game button (an ink outline, pressed into its shadow when
+  tapped, a shine across it, the clover on a gold coin that wiggles now and then), gold with "Luck sent!" once sent, and
+  the tile's separate clover circle is gone; on a phone the button takes its own full-width row. And **"do the art too"**:
+  exam-day luck's clover is drawn as a sticker (`CLOVER` in `widget/dash.js`: one heart-shaped leaf four times, the ink
+  outline under the green, a vein and a shine on each), on the coin, in the burst when you send it, as two small clovers
+  and a sparkle bobbing around the button, and as a big faint one in the tile's corner. One drawing reused, so it costs
+  about 0.5 KB: the dashboard is at 353,341 of the 353,791 bytes its 345 KB budget allows.
+  Changes since this device last saw that hub's box say New, with a count ("3 new since your last visit", "3 new" on a
+  phone; `sh_news_seen` in localStorage, per hub; a first visit counts the last day's). The hub's description opens
+  from "About this hub" in the box's header.
+  Event `news:more` (the arrows) replaces `news:open` ([event-taxonomy](vault/reference/event-taxonomy.md)). The About
+  page, the tour's steps and the preview's fixture changelog (five entries now) follow.
+  The shared stylesheet's growth (about 1.7 KB gzipped) put Occlusion's archived page at 801 KB of its 800 KB budget on
+  CI (800 on `main`); Sam: "occlusion can be retired since the exam has already happened", so `tools/release/perf.js` now
+  measures only live hubs, as a11y and the device matrix already did (`--page` still measures an archived one).
+  Then Sam: **"we can take the page down"**: **Occlusion's page is off the site** (`hubs/occlusion/`: the page, its content
+  JSON and 10 images, 3.5 MB; and `assets/og-occlusion.png`). Its retrospective and recap were done 2026-11-17 and its audio
+  was already off. With it: its About page entries (What cusp hits where?, its drawn and interactive diagrams, its arcade
+  column, its filters, formats and mock), its budget line, its figure build in "Check hubs" (`tools/figures/occlusion/`
+  stays, with nothing to write to), the smoke test's cusp-game checks, and Ask Timmy's 43 eval cases for it (two dashboard
+  cases now ask about Heme & Endo Exam 3). `tools/release/xp.js` grades Perio's real bank and `tools/release/admin-ui.js`
+  archives Perio by hand instead. Its `hubs.js` entry stays for its check-ins, and its id list, art and podcast scripts stay
+  ([hub note](vault/hubs/occlusion.md)).
+- **2026-11-19 (Collections, Claude Code)** — Sam: "in the timmy card i want there to be a button where you can view your
+  collections of items bought in the shop. holiday collections and other things. you can see your progress and all and
+  completing a collection gives 1000 xp and 1000 crowns as a bonus". A **Collections** button in Timmy's place (under
+  Customize and Shop, with "2/21"), on the dashboard's You card (beside Timmy's shop) and in a hub's More → Timmy's place
+  opens `widget/place.js`'s `openCollections` over the place: the 14 season sets (on sale now first), the 6 year-round
+  collections and the 10 rare costumes, each a card with a bar, its 8 (or 10) pieces in their rarity colors (owned with a
+  tick, the rest gray) and when it's in the shop; each card's drawings are fetched when it nears the screen. Finishing
+  one pays **1,000 XP and 1,000 crowns once** (`migration_v75.sql`: `shop_items.collection`, `get_my_collections`,
+  `claim_collections_v2`, key `collection:<k>`, `sh_prizes()`'s `collection`): the shop pays it when a purchase finishes one
+  (a gold banner on its "Got it" sheet), and a collection finished before shows a Claim button. Halloween 2026's gift set
+  pays nothing; rank sets aren't collections ([decisions](vault/decisions.md)). Tests: `tools/release/xp.js` 14d (596
+  checks), the smoke test's place section. `migration_v75.sql` was applied right after the merge, through the connector
+  (md5-checked), and is in `supabase/schema.sql` ([the task](vault/tasks/done/2026-11-19-shop-collections.md)).
+- **2026-11-19 (pages that ride out a busy database: answers kept on the device, and the rank pill, Claude Code)** — (1) An
+  answer still unsaved when its tab closed was lost (the line's retries lived in the page). Now `widget/v3.js` writes the
+  answers still in the line to the device when the page is hidden (`sh_answers_kept:<hub>`), takes them back when it shows
+  again, and the hub's next page sends them first, oldest first, with the same request ids (an answer that did reach the
+  server pays nothing new); a page that finds its answers taken by another drops them. An answer out of its 8 tries is kept
+  too. At most 3 days and 24 tries; the server stamps each when it arrives. A backlog (after a quiet spell, or kept) now goes
+  out spaced as it was answered, up to 2.1 s apart, so its misses pay and count toward a run as they would have (the speed
+  limit); live answers go at once as before. Mocks' and games' answers aren't kept (inbox). (2) With the bootstrap timed
+  out, `widget/ranks.js` read the old rank profile until the first answer: no double-XP chip, and from 50,000 XP the wrong
+  rank or journey (nobody is there yet). It asks `get_rank_profile_v2` when `shGame.live()` (a new `live` hook in
+  `shEggHooks`). The dashboard already asked v2 first. About page ("What the hubs record") and Ask Timmy's site help
+  updated; bundles rebuilt; `tools/ci/quiet.js` checks the kept answers. It also closes every WebSocket now: since #429 its
+  pages (not marked automated, so they act as visitors) opened the real realtime connection and showed in Perio's
+  "studying now" count for about a minute each CI run (nothing saved; the smoke test always closed them).
+- **2026-11-18 (rules for heavy queries, Claude Code)** — From the database-load task's second and third boxes: on
+  2026-11-18 the lessons audit's economy queries (11 and 13 s) and a migration's 43 s transaction failed students' answer
+  saves. Timed on a throwaway copy at 1.5 times the class's size: `tools/economy.sql`'s E3 worked every wallet out about ten
+  times (an inlined CTE), 4.7 s, now 0.5 s with `as materialized` and the same numbers; `tools/retro.sql`'s click list
+  counted people once a row, now in one pass (0.3 s to 0.03 s); every other audit query under 0.1 s. The connector runs as
+  `postgres` with a 2-minute limit, so every audit query is now its own call under `set local statement_timeout = '5s'`,
+  one at a time (`tools/lessons-refresh.md`, the `lessons-audit` skill, the SQL files' headers). New how-to:
+  [run-sql-on-the-live-database](vault/how-to/run-sql-on-the-live-database.md) (the class's quiet hours, 1 to 5 am Central;
+  a backfill at night or in batches; `create index concurrently`; `lock_timeout`; small data fixes). Nothing on the site
+  changes.
+- **2026-11-18 (Heme & Endo Exam 3: L21 and L22 in, Claude Code)** — Sam: "i just added the last endo lectures. update the hub.
+  no to all diagrams". Dr. Dal Zotto's **L21** Male reproductive and lower urinary tract pathology (`mpath`, 64 questions,
+  `mr-`) and **L22** Female reproductive pathology (`fpath`, 60, `fr-`), both taught 11/18, written from their recordings (the
+  slides were in Drive but too big for the connector to read: checking them is an inbox line). Notes at both levels, every
+  question format with every why (13 Patient Box cases), the study guide's focus hints and topics first, the "you don't need"
+  remarks as hints with no question keyed on them, tables, cram, processes, sort sets, all three narration levels. **No
+  figures** (Sam's call, replacing the 11-16 yes for these two). The mock is the exam's 35 in 90 minutes; the "join later"
+  wording is gone (`index.html`, `examInfo`, `hubs.js`). 437 questions, 86 topics. Shared: 29 words in
+  `tools/podcast/lexicon.json` and "WHO" read as W H O in `tools/narrate.py` (only new recordings change). Content flags
+  in `vault/hubs/heme-endo-exam3.md`; the task is done.
+- **2026-11-18 (the backlog board, Claude Code)** — Sam: "would it be effective to make the backlog into a trello board
+  artifact that i can initiate sessions from?", then "yes build it". `/backlog` now also redraws a private claude.ai
+  artifact, "Study Hubs Backlog": the packages in four columns (This week, Next, Later, Set aside; tabs on a phone), each
+  card with its items and where they're written, its prompt, Copy prompt, and Start session, which opens a cloud session
+  through the Claude Code Remote connector (the first time, claude.ai asks Sam to allow it; without it, Copy prompt).
+  `tools/todo/board.mjs` builds the page (`tools/todo/board.html`) from a packages file the agent writes in its scratch
+  space, filling every prompt from the template in `vault/how-to/package-the-to-dos.md`. A view only: the vault stays the
+  to-do list. Nothing on the site changes.
+- **2026-11-18 (the outage repairs and raw pings kept 3 days, Claude Code)** — Sam: "we can do fixes for 1 and 2. do 3 days.
+  dont cut anything for now". The evening outage (19:35-21:03 UTC) lost about 1,300 answer saves and about 2,900 activity
+  pings (about 20 hours of the class's time, with the crowns it pays) for the 53 people studying then, in Perio and Heme &
+  Endo Exam 3. (1) `tools/data-fixes/2026-11-18-outage-time.sql` (After merge runs it) fills each visit's 40 s to 10 minute
+  gaps in that window with the pings that would have been there: 2,691 (18.7 hours) for 52 people, under what was lost;
+  `activity_hourly` and the time crowns follow by the insert trigger; safe twice. (2) `migration_v73.sql` (applied live):
+  `restore_outage_v2` takes a device's kept day (answers, right, XP, ring met) and pays the missing answers' XP (crowns as
+  answers pay), the 20th answer, the day's first answer, the ring and the streak, once a person and hub, only for someone
+  studying in that hub during the outage, 3 answers a minute at most, until 11-21; `widget/hub-rewards.js` asks once, a few
+  seconds after a hub opens, and shows "Saved from Wednesday's outage". The answers themselves aren't added (the device
+  doesn't keep which choice was picked). (3) `migration_v74.sql` (applied live): raw pings kept 3 days, the retention job
+  nightly (`sh-retention-nightly`, 3:23 am Central); the admin page reads the nightly schedule; the About page says 3 days
+  and every night. `tools/release/xp.js` (569 checks) and `retention.js` updated.
+- **2026-11-18 (pages back off when the database fails: a quiet spell, Claude Code)** — In the evening outage each failed
+  answer retried on its own timer (#421), which doubled the answer calls while 9 in 10 failed, with every page's analytics
+  on top. Now (Sam: "Stay free, keep fixing") a call the server fails (a 5xx, or no answer) starts a quiet spell on that
+  page, `window.shDb` in `widget/v3.js`: 30 s, doubling to 5 minutes while failures go on, jittered; a saved answer ends
+  it. Answers wait in one line and go one at a time, a failed one again at the spell's end (up to 8 tries, about 20
+  minutes, the same request id, so nothing counts twice); clicks, events (`widget/clicks.js`) and question health
+  (`widget/qhealth.js`) keep their batches; mode opens, presence and searches are skipped; cards skip the class's
+  numbers. Study time and what a student does on purpose still go; mocks and games keep their two quick tries. Bundles
+  rebuilt. `tools/ci/quiet.js`, in CI's desktop smoke half, fails the first save on a fake database and checks it all.
+- **2026-11-18 (answer saves cost a quarter as much; the database is on the Free plan, Claude Code)** — Sam: "i am getting a
+  bunch of errors for the database and things are getting really slow". From 19:35 UTC answer saves failed in bursts, then
+  from 20:10 without letup (40-70% of every request for about 35 minutes), until even the connector couldn't connect; Sam
+  restarted the database from the dashboard at about 20:50 (unreachable until 20:57; no failures from 21:03). The cause: the project is on the **Free plan**,
+  whose shared CPU was starved (a one-row query took 442 ms to plan with everything in memory), and since `migration_v68`
+  that morning every answer worked out the whole crown balance and the hub's medal count. `migration_v72.sql` makes both
+  cheap with the same results: the awards summed by kind before `sh_is_prize` (13 → 2.9 ms for a student of 8,000
+  answers), and the medal count only on a right answer that turns a question right, one index lookup a question (5.7 →
+  1.6 ms); a heavy student's answer 20.5 → 5-7 ms on a throwaway copy, every balance and medal the same, `tools/release/xp.js`
+  passed. Also found: the Free plan's database goes read-only at 500 MB and it is 414 MB (166 MB of it the pings and their
+  bloated indexes): the rest is in [the task](vault/tasks/done/2026-11-18-database-load.md).
+- **2026-11-18 (right answers showed "+0 XP", Claude Code)** — Sam: "im getting 0xp for correct answers now ... it happened for 2
+  questions and then the third gave me 10". The server paid them; the card's number is the page's guess, which used the game
+  layer's rules only once the bootstrap or the first answer's reply confirmed it (`shGame.v2()`). With the bootstrap timed
+  out in a busy minute, it guessed by the old 600-a-day cap, so an active day showed +0 until a reply came back. Now
+  `widget/hub-rewards.js` `v2()` and `widget/games.js` `gameOn()` (the arcade's session and +50 had the same gap) ask
+  `shGame.live()`, and the card shows what the server paid when it differs from the guess (`paidOnCard`). Bundles rebuilt.
+  [BUG-183](vault/release/bug-log.md).
+- **2026-11-18 (Ask Timmy costs less after a merge, Claude Code)** — The 21 "When is the exam, and what is on it?" on
+  Heme & Endo Exam 3 in the admin page's Ask Timmy tab ($12.31) were the After merge workflow's own check, not students:
+  it asked one real question on the first live hub after every deploy, and a deploy follows nearly every About page change.
+  Now `tools/after-merge/run.js` asks a real question only when the function's code changed, on the live hub with the
+  soonest exam (where its cache write is read by students); an About-page-only deploy gets a free check (a question from a
+  mock exam, answered "paused" with no model call). And `buildRequest` in `supabase/functions/timmy/core.js` puts the site
+  help after the hub's content, each block with its own 1-hour cache mark, so an About page change no longer sends every
+  hub's 130-160k tokens to the cache again ([ask-timmy](vault/reference/ask-timmy.md), "Limits and money").
+- **2026-11-18 (study time counts listening with the screen off, Claude Code)** — Sam asked whether Perio's study time
+  was right on the day before the final, with so many people on it. It was: about 64 hours by 1 pm from 59 people, more than
+  twice the same time the day before, and the study-time saves nearly all reached the database (about 15 errors in 10,000).
+  It looked slow because people come and go: 45 people opened Perio in the noon hour, but about 16 were studying at any one
+  time. The one gap: the clock stopped when the tab was hidden or the phone locked, even with a lecture's narration or
+  Timmy Time still playing. Now (Sam: "add that study time tracking") `widget/v3.js` keeps counting while either one
+  plays hidden, by how far the audio played at its speed, so a locked phone's late timer credits what was heard and
+  nothing more. A pause stops it, and a play from the lock screen starts it again (`sh:audio-play`, from both players;
+  `shPodcast.audio()`). Bundles rebuilt. The admin page's notes, [event-taxonomy](vault/reference/event-taxonomy.md)
+  and the About page's "What the hubs record" say so (Ask Timmy's site help rebuilt).
+- **2026-11-18 (two indexes for saving an answer, Claude Code)** — `migration_v71.sql`: `personal_answers` gets
+  `(visitor_id, answered_at desc, id desc)` and `(visitor_id, hub, qid, answered_at desc, id desc)`. Every answer's speed limit,
+  double-tap check and per-question counts read all of the person's answers before (9,377 for the heaviest visitor; the
+  day's most frequent statement timeout). Built live with `create index concurrently` the same day (Sam: "Now, then
+  merge"), so saves went on while they built; the speed limit's read is now one row from an index
+  ([#423](https://github.com/smcmurry6-source/study-hubs/pull/423), [the task](vault/tasks/done/2026-11-18-database-load.md)).
+- **2026-11-18 (A gold reward card for XP and crowns, and the Today card's crowns back, Claude Code)** — Sam: "the Today card in the
+  question bank is no longer showing how many crowns youve earned. also when you reach a goal or other things like that where you get
+  xp or crowns, a black box comes up from the bottom of the screen to tell you. i want it to look much cooler and communicate that you
+  just got xp and crowns better". **The reward card** (`prizeCard`/`drawPrize` in `widget/hub-rewards.js`, its styles inside it so
+  the dashboard, at 342 of 345 KB, carries none of it): what an answer's bonuses, a prize (`sh:prize`), a medal, a finished mock or
+  game and Timmy Time pay comes up as a gold card in place of the dark toast: a title ("10 right in a row!"), the XP and the crowns in
+  two pills counting up from 0, a turning sunburst behind the coin, confetti, and on closing the stars and coins fly to the rank pill.
+  Rewards from one reply share a card (260 ms). Crowns: as many as XP for a prize, XP + 50 for a medal, and for study XP (the 20th
+  answer, a mock, a game) 5 per 10 before a boost, shown only when that's exact (`studyCrowns`, the replies' `mult`). Today's goal
+  waits up to 5 s for the daily ring's prize and makes one card with it ("Today's goal met! 20 questions · 8 days in a row",
+  +100 XP, +100 crowns). Bottom center on a laptop, dropping in at the top on a phone (`.hx-prizes`, clear of Timmy, the tab bar
+  and the report button, BUG-126's spot); a tap closes it; still with reduced motion, Answer animations off or Focus mode
+  (`hx-still`). `widget/v3.js` adds `shGame.prizeName` (prizeText uses it). **The crowns tile (BUG-182)**: it came only from the
+  bootstrap, which timed out for up to one page in ten in the busy minutes ([#421](https://github.com/smcmurry6-source/study-hubs/pull/421)'s load);
+  `widget/hub-timmy.js` now takes the balance from the last paying reply and asks `get_my_shop` on its own (8-20 s later, once
+  more a minute after), and the tile says "+n today" (`t.c`, from `sh:crowns` gains). The smoke test reads the arcade's +50 from
+  the card. About page ("The reward card", the shop's balance line) and Ask Timmy's site help. An index for `sh_answer`'s
+  speed-limit reads was found and tested, and left to #421's database work ([inbox](vault/tasks/inbox.md)).
+- **2026-11-18 (the admin page's A/B versions page; answer saves that survive a busy database, Claude Code)** — Sam asked
+  for the A/B results on the admin page and reported its loading errors ("canceling statement due to statement timeout").
+  The Supabase logs showed the same timeouts failing students' answer saves in bursts of 1 to 5 minutes all day (242 of
+  about 3,900 `record_answer_v2` calls), each while something heavy ran on the small database: a migration, the lessons
+  audit's economy SQL, the admin page's reads sent all at once (BUG-181). Now: the admin page reads **one query at a time**
+  (`queued()` in `review/index.html`), tries a timed-out read once more after 5 s, and says "the database was busy" instead
+  of naming a migration; `widget/v3.js` retries a failed answer for about three minutes with the same request id (bundles
+  rebuilt); **A/B versions** (`#ab`) shows each hub's first tries on A against B with a z and a 95% range, by kind of
+  question, and the questions with 5+ people a side, biggest gap first, from `get_ab_summary` (`migration_v70.sql`, applied
+  through the connector; a partial index `question_events_ab`). Still to do: [the task](vault/tasks/done/2026-11-18-database-load.md)
+  (the heavy admin functions cached, the audits' queries short, migrations at night, Sam's call on a bigger database).
+- **2026-11-18 (Perio S6: five diagrams, Claude Code)** — Sam: "yes to all diagrams. merge when ready", to the five S6
+  candidates. Built as anima figures in `tools/figures/perio/` (`race.mjs`, `walls.mjs`, `dtree.mjs`, `vtoh.mjs`, `subtr.mjs`,
+  S6 · Figs 1-5) and placed at the end of their sections in the S6 notes, in As taught and Plain English (`FIG_PLACE` in
+  `content/figures.js`, `figByLec` in `core.json`): the race for the space (no barrier, a GTR membrane or a graft, over
+  time), counting the walls (3-, 2-, 1-wall, the opening case and horizontal loss, with the film each gives), the
+  regeneration decision tree walked step by step or along a case, the canine case's vertical-to-horizontal fill with its
+  H-shaped root and the brush, and subtraction radiography in five steps. `figures.js` 121 → 157 KB gzipped; it loads with
+  Notes, so the Perio budget (864 of 885 KB on a Home visit) is unchanged. About page's Diagrams entry: twenty for Perio.
+  [The task](vault/tasks/done/2026-11-18-perio-s6-diagrams.md), [#420](https://github.com/smcmurry6-source/study-hubs/pull/420).
+- **2026-11-18 (Perio S6: Periodontal Regeneration taught, Claude Code)** — Sam: "take Perio Session 6 (Periodontal
+  Regeneration) from slides only to taught", the day before the final. Source: the class recording's transcript in Drive
+  (Periodontology/hubs, `en-FA2026_DENT2145-VT_Lecturecapture_AVLC (1).txt`; read, never committed), with the deck and the
+  exam-review guide. S6 `preview` → `taught`; both reading levels rewritten from the class and all three narrations
+  (`periodontal-regeneration-full`, `-plain`, `-hy`) recorded again; 21 Exam Hints quoted (he said to study the decision
+  tree; the defect-morphology slide's studies are "not there for you to read", so `q6-L38` was retired and `q6-L06`,
+  `q6-L08` lost their study names); 14 High Likelihood topics re-ranked from what he stressed; cram rewritten; 24 new
+  questions (8 true/false, 2 two-statement, 4 numbered, 2 which, 2 which-false, 6 multiple choice, `q6-T*`, `S05`-`S06`,
+  `N*`, `W*`, `F02`-`F07`), each with a why per choice and its version B in `content/variants.json`; S6 56 → 79, the bank
+  674 → 697 (after #414 retired `q5-L14`). Timmy Time's section 6 rewritten from the class (it said "what we have is his slides") with a new lightning
+  round line, and the episode rebuilt. Five diagram candidates put to Sam, all approved and built the same day (next entry up): [the task](vault/tasks/done/2026-11-18-perio-s6-diagrams.md).
+  [The task](vault/tasks/done/2026-11-03-perio-s6-regeneration-taught.md).
+- **2026-11-18 (A or B on the question cards, and the two-sided perio charts say they are one visit, Claude Code)** — Sam:
+  "address the reports. also instead of saying \"reworded\" on the question cards, just display A or B and have that be the
+  differentiator". A question that comes in versions (Perio's `variants.json`) shows the letter of the one on screen beside its
+  number on every card (`verTag` in `widget/hub-bank.js`, `HX.qParts.verTag`: the bank, the drill, misses, weak spots, the mock,
+  Learn and Flashcards; `.qc-ver` in `widget/hub.css`, small and muted: Sam, "The a and b should be smaller/less noticeable"), on the first try too, and "Last time: right · reworded" is just "Last
+  time: right". A report says "(version A)" or "(version B)" in the form and in its note (`widget/v3.js` `flagVersion()`; was
+  "(reworded: wording 2)" and nothing on A); Flashcards' Report now passes its version and statement order too. Perio report #61
+  (`pc-e3`, "two perio charts over the course of time?"): the case kit's chart (`widget/cases.js` `I.chart`) now heads each
+  surface FACIAL / LINGUAL above its strip, with a line at the top saying both are one chart from one visit and a rule between
+  them, on every case that draws both surfaces; `deep-pocket-19`'s chart and film are titled "today's re-evaluation" and
+  "today". The About page's "Questions come back reworded" entry says A or B.
+- **2026-11-18 ("Release tests" faster, and WebKit doesn't block a merge, Claude Code, #416; nothing on the site changes)** — Sam: "do both". The device matrix's Firefox and WebKit jobs run in Playwright's own image (`mcr.microsoft.com/playwright:v1.63.0-noble`, `--user 1001`), which already has the browsers and their system packages: installing those from Ubuntu's mirror took 22 minutes for WebKit and 11 for Firefox on today's runs, for one to two minutes of tests. WebKit's job is out of `release` ("devices in WebKit (doesn't block a merge)", `continue-on-error`). Found on the way (BUG-179): since the per-browser split of 2026-11-13 those two jobs stopped at `matrix.js`'s Chromium-only resilience part, which `run.js` called blocked and passed, so neither had tested anything. Now the resilience part runs only with Chromium, a browser that won't start is a problem in CI, and `run.js` fails a blocked suite in CI. The Chromium jobs keep `--with-deps` (it brings the fonts the layout checks and baselines were measured with).
+- **2026-11-18 (No more tiers for merging, Claude Code; nothing on the site changes)** — Sam: "i want to take out all the tier change rules for merging. it takes too long. it didnt use to take so long". Every change now ships one way: the checks for what you touched, a draft PR, CI, a screenshot for Sam when students will see a difference, Sam's "merge". No local release suites, test report, bug-log rows or preview offer, and no tier 3 extras. CI and the After merge workflow are unchanged. Rewritten: [preview-and-release-test](vault/rules/preview-and-release-test.md), [RELEASE_TEST_PLAN.md](RELEASE_TEST_PLAN.md) sections 1, 2, 6, 7 and 10, `AGENTS.md`, ship-a-change, verify-before-pushing, long-tests-once, preview-a-change, package-the-to-dos and `/backlog`, the PR template (no Tier, UAT or Bugs sections) and the test report template (optional now).
+- **2026-11-18 (statements in a new order on a later try, and the High likelihood tag says why, Claude Code, #417)** — Sam: "yes to
+  the two ideas" (Perio reports #55/#56 and #57). A numbered-statement or two-statement item that comes back (a second try, a
+  retry of a miss, Learn and Flashcards) shows its statements shuffled and renumbered, never in its own order on the second
+  try, and each choice relabeled to the same statements in canonical order: choice k still means what it meant, so the key,
+  grading, XP, class picks and question health are unchanged. The why lines and the explanation are renumbered with it
+  ("Statement 3 is false", "It leaves out 2, which is true", the B versions' bare "1 and 2 are true"); an item whose words
+  the kit can't follow keeps its own order (5 of 244). The kit is `widget/statements.js` (`window.shStatements`, in
+  `hub.bundle.js`); `hub-bank.js` calls it from `card()` and `HX.qParts.later` (Learn and Flashcards), the card carries
+  `data-order`, a report names the order it was shown in, and Ask Timmy gets the order (`o`) and renumbers the item the same
+  way on the server (`inOrder()` in `supabase/functions/timmy/core.js`), so he calls a statement by the number on the screen.
+  `node tools/ci/statements.js` (in "Check hubs") checks every order of every item and version against its key, and that
+  Ask Timmy's copy renumbers it exactly as the page does. The High likelihood tag on a card is a button: it opens why (the
+  predicted topic, its place in the lecture's list and what it rests on: the professor's hint, the review, the check-ins) and
+  links to Exam Hints. BUG-178 (bare numbers in the B versions' whys weren't renumbered) found and fixed before release.
+  The About page and the three rule notes say so.
+- **2026-11-18 (lessons refresh, and the game economy joins the audit, Claude Code, #414)** — Sam: "add to the lessons audit a review of xp
+  and crowns across the class to make sure earn rates are healthy. also include shop prices". A standing rule,
+  [earn-rates-stay-enjoyable](vault/rules/earn-rates-stay-enjoyable.md) (on demand, for anything that changes a rate, a prize or a
+  price), with a yardstick in median study days per rarity; `tools/economy.sql` (E0-E7: the live rules, crowns and XP per study day
+  and hour, the class's rhythm, wallets and spending, the price ladder in study days, ranks, the leaderboards), step 1b of `/lessons-audit` and a line in
+  `tools/lessons-refresh.md`. First reading in `LESSONS.md` ("The game economy"): about 700 crowns a median study day since
+  the crown raise (#403's migration, live on the database), everything under Legendary two to three times cheaper than the yardstick, half the active class able to buy anything,
+  4% spent (7% by the afternoon); Sam: "lets keep all the prices for now". **Perio, the day before its final**: `q5-L14` retired (furcation
+  entrance widths, which the final won't ask; its High Likelihood topic reworded and S5's High yield recorded again), `pc-d3`'s stem
+  states its assumption, `q7-P01` asks about the case (report #54), `q4-L27`'s "re-check" pair reworded (report #59), `q7-01`'s
+  explanation gives both bone-loss limits (report #60), their `variants.json` wordings too. Occlusion's retrospective has its 22 check-ins.
+- **2026-11-18 (The launch trailer's tools, Claude Code, #415; nothing on the site changes)** — Sam: "you can merge
+  the tools and notes in case we ever make another trailer". `tools/trailer/` made the redesign's launch trailer, a
+  94 second, 16:9 video narrated by Timmy from a newly drawn Timmy Time studio
+  ([the task](vault/tasks/done/2026-11-13-launch-trailer.md), [README](tools/trailer/README.md)): `script.md` (his lines),
+  `voice.py` (the show's Kokoro voice and lexicon), `audio.py` (a new music cue and sound effects from the show's
+  instruments, the master, and the timeline everything is cut to), `studio.mjs` (the studio in the site's ink style,
+  in layers, with its light), `shots.mjs` + `record.mjs` (the feature shots and where the camera looks, recorded a
+  frame at a time from a preview on made-up data at 2560 x 1440), `compose.mjs` (every frame: the cold open, the
+  "Rebuilt." title card, a chapter card before each feature, the recorded page on a screen the camera pushes in on,
+  Timmy's booth cam with his line in a bar beside it, the end card) and `cut.mjs` (the mp4 with `.vtt`/`.srt`).
+  **The video is not in the repo and not on the site** (Sam: "A link/file only"): `tools/trailer/out/` and
+  `names.local.json` (the leaderboard names its boards show, with Sam's OK) are in `.gitignore`. Ask Timmy's answer
+  in the footage is staged from Occlusion's notes (the preview has no model), and the idea board's notes are the
+  preview's made-up ideas under made-up names. Built 2026-11-14 on the release branch as #360, which was closed
+  unmerged on 2026-11-18 (Sam: "im done with the trailer"); this PR lands the same files on `main`. **The tools were last run against
+  the site as it was on 2026-11-14**: a new trailer starts by checking `shots.mjs`'s selectors and `record.mjs`'s
+  patches of the preview against the pages as they are then.
+- **2026-11-18 (the to-do list as packages, `/backlog`, and the to-do rule tightened, Claude Code)** — Sam: "give me a list
+  of all the open items on the to do and the inbox ... group them in packages that can be shipped in the same pr ... a really
+  big item should go alone in its own session ... make this a skill". `node tools/todo/list.mjs` prints every open item (task
+  notes and their unticked boxes, the inbox, pending migrations, the bug log's open and awaiting-retest rows, leftovers in
+  done tasks; `--ref origin/main`, `--full`, `--json`); [package-the-to-dos](vault/how-to/package-the-to-dos.md) says how to
+  set aside what's in a PR, waiting, Sam's or parked, group the rest into one-PR packages (S, M, L; an L always alone) and
+  write each one's launch prompt; `.claude/skills/backlog/` runs it in Claude Code. Sam's second ask, "make it a rule that
+  any sessions from now on will add open items to the to do list and check things off that have been done", went into the
+  existing rule ([to-dos-go-in-the-vault](vault/rules/to-dos-go-in-the-vault.md): check the list at the start, tick and add
+  in the PR, tick what you find already done) and the PR template's new "To-do list" section. The first run's vetting closed the launch trailer (done in #360, never merged; Sam: done), struck the Ask Timmy key line (Sam: not needed) and updated BUG-002, -003 and -004 from today's accessibility baselines. Nothing on the site changed.
+- **2026-11-18 (Perio's questions as A/B versions, Claude Code)** — Sam: "They are A/B versions of questions", "Split the
+  class". `abStart()` in `widget/hub.js` picks each question's first version by device (a mixed FNV hash of
+  `sh_visitor_id` and the id: about half the class on each, every question), later tries alternate; a mock keeps each
+  question's version (`STATE.mock.wv`) until it's submitted. Every Perio card says its version (`data-wording`, 0 = A, 1 = B),
+  `widget/qhealth.js` sends it (`w`), and `migration_v67.sql` (applied through the connector) keeps it on
+  `question_events.w`, splits first tries by version (`qh_report`'s `wordings`; the old function renamed `qh_report_v51`)
+  and adds the medium flag `ab_gap` (20+ points apart, z ≥ 1.96, 10+ people a version). The admin page shows "First try
+  by version" and version B's text. Tests: `tools/release/admin-ops.js` section 5. About page updated.
+- **2026-11-18 (The class's picks follow the version of a question's choices, Claude Code)** — the inbox's "class picks on
+  each choice ignore question versions" (BUG-023's general fix). `question_choices` was keyed by position only, so after an
+  edit the "% of the class picked it" beside a choice counted picks of the old choices: since the release, 169 Perio and
+  125 Occlusion questions had their choices rewritten (8 of Perio's only moved), and #404 rewrote 7 of Heme & Endo Exam 3's. `migration_v66.sql`: a one-choice or
+  select-all key carries `cv`, the version of its choices (`choiceVersion` in `tools/xp/keys.js`: the choices and the key;
+  the stem, the explanation and the whys don't count); `record_choice` / `record_choices` stamp each pick with the current
+  one (`question_choices.v`); when it changes, `admin_load_question_keys` moves the old picks to `question_choices_past`
+  (closed to the public, nothing deleted; an undone edit brings them back), with a backstop at the next pick
+  (`sh_choices_to`). The page, `sh_answer` and every reader of `question_choices` are unchanged. Picks from before versions
+  are kept as the current choices', except on the 301 questions whose choices changed since their content JSON shipped
+  (`tools/xp/choice-history.js`, from git), whose picks are set aside. Hubs without keys (the old pages) behave as before.
+  Takes effect when the After merge workflow reloads every engine hub's keys (it does for any change to `keys.js`). Tests:
+  `tools/release/xp.js` section 3b; `rls-expectations.json` closes the past table and the two helpers. About page entry.
+- **2026-11-18 (CI back on the newest Ubuntu, Claude Code, #407)** — The inbox to-do from #402. Every workflow is back on
+  `runs-on: ubuntu-latest` (Ubuntu 26.04 since 2026-11-18) with Playwright **1.63.0** in place of 1.56.1 (the
+  `playwright@` lines in `check.yml`, `release.yml` and `after-merge.yml`): 1.63.0 has Chromium, WebKit and Firefox
+  builds for `ubuntu26.04-x64`, and it is the copy preinstalled in Claude Code cloud sessions, so a session's run and CI's
+  use the same Chromium (build 1243). The 26.04 image has PostgreSQL 18 (24.04 had 16): `tools/release/pg.js` takes the
+  newest it finds. Run here on 1.63.0, the accessibility suite passed with nothing new or better than its baseline;
+  `tools/release/baselines/a11y.json` was re-recorded (`--update`) only to drop the archived Occlusion's and Heme & Endo
+  Exam 2's screens and add Heme & Endo Exam 3's 14, all at zero. The performance budgets passed and are unchanged:
+  `perf.js --update` would have raised several (budgets go up only with Sam's OK), and bytes and requests don't depend on
+  the browser. The site itself doesn't change. What to do the next time `ubuntu-latest` moves:
+  [verify-before-pushing](vault/how-to/verify-before-pushing.md).
+- **2026-11-17 (Crowns go up as you earn them, and prizes that pay XP and crowns, Claude Code, #403)** —
+  Sam: "my crowns are not increasing after i answer questions. make sure there is no cap on daily crown or xp earn rates",
+  then a list of prizes. The crowns were paid but never redrawn (BUG-177): `migration_v68.sql` puts `crowns` (the balance
+  after it) in every paying reply and `widget/v3.js` sends it as `sh:crowns` (the hub's meters, its shop, the dashboard's
+  wallet; a gold "+n crowns" under the rank). No daily cap on either (the 600 cap is the old pages' only). Prizes, one
+  `xp_awards` row each, paying as many crowns as XP (`sh_prizes()`, copied as `PRIZES` in `v3.js`): the name 500, the daily
+  ring 5 a question of the goal, a Plaque Boss's 500 by damage (`widget/eggs.js`), 10/25/50 in a row, day streaks
+  3-100, a nuke 10,000 (`launch_nuke_v2`), the all-time run record 20,000, a lecture read to the end 50 (timed on the
+  page, `widget/hub.js`), a new trophy 200 (`widget/ranks.js`), medals 250-1,000, the day's first game 100, a personal best
+  50 and a hub high score 250, a daily visit 50 (`widget/dash.js`), a fixed report's 100 crowns. Every card says what it
+  pays (Timmy Time, Mark as read, the arcade, the goal, the visit, the name, the nuke badge, the shop's list). About page,
+  [game-server](vault/reference/game-server.md), event taxonomy and retention updated; `xp.js` 519 checks.
+  Then Sam: "Every right answer should give xp": `sh_answer` pays every right answer graded from its key (a retired
+  question's too), with no speed limit and no limit a day (a double tap and the same question twice in a mock count once);
+  misses keep their limits, and the run toward the nuke still counts only answers at the speed limit. `sh_xp_replay` pays the
+  same, and the migration rebuilds every visitor from it, paying the right answers since the release that had paid nothing
+  (about 80 from about 25 people since the release, nearly all under 2 seconds after the one before). The page's guess
+  (`xpFor` in `widget/hub-rewards.js`), the About page's XP entry and More's note say the same.
+  Then "lets increase it to 5 crowns per 10xp": `sh_wallet` pays 5 crowns per 10 study XP (was 1), from all the XP so far
+  (the balance is worked out, so every balance went up); every card, the shop's list, the About page and the preview's
+  wallet say 5. The shop's prices weren't changed. And "also 100 crowns per hour of hub time": `sh_time_crowns` pays 100 an
+  hour from `activity_hourly` (all the time recorded, at most 144 pings in a clock hour), in the wallet's `from_time`;
+  the planned collapse of `activity_hourly` must keep it (inbox).
+  **Applied to the live project on 2026-11-18** through the connector (its confirmation answered by the new hook,
+  `.claude/hooks/supabase-confirm.js`), appended to `supabase/schema.sql`; every function's body matched the tested copy, and
+  the rebuild agreed with live XP for all 77 people with an answer since the release. Class-wide after it: 168 wallets, none
+  below zero, median about 1,200 crowns, about 300,000 of the 740,000 from hub time.
+  It was written and applied as "v64", but other sessions' v64 (matching items graded as an order), v65, v66 and v67 reached
+  `main` first (v66 and v67 while this PR waited to merge), so it is `migration_v68.sql`; applied after that v64, it had replaced `sh_answer` without
+  that v64's one branch (a cached page's matching answer, taken at its word), so `migration_v69.sql` puts it back (applied the
+  same day; no answer in between needed it). Bug BUG-177 (the numbers before it were taken). Before applying a migration, fetch `main` and
+  take the next free number, and fetch it again before merging ([repo map](vault/reference/repo-map.md)).
+- **2026-11-18 (more cosmetics: six year-round collections, five rare costumes, six paints, Claude Code)** — Sam: "Lets work on
+  timmy outfits and place cosmetics. Go crazy" ([the task](vault/tasks/done/2026-11-18-more-cosmetics.md)). **Six collections**
+  (`COLLECTIONS` in `tools/figures/site/sets.mjs`, one pack each in `tools/figures/site/packs/`: `dino`, `moonbase`, `reef`,
+  `desert`, `arcade`, `rockshow`), eight pieces each like a season's set (a Legendary home, an Epic scene, outfits Common to
+  Rare, yard pieces Uncommon to Epic), but everyday pieces in the daily and weekly picks all year: the rotation goes from 46
+  pieces to 100. Each is its own file (`widget/hub-art/place/<k>.js`), fetched only where a place shows one of its pieces, so
+  no page loads more. **Five more rare costumes** (the wizard, the robot, the firefighter, the shark, the legendary dragon;
+  `COSTUMES` in `sets.mjs`, drawn in `place.mjs`, lines in `tools/podcast/LORE.md`) and **six more paints** (coral, sage,
+  sand, rose, slate, teal). The kit marks a collection's piece `coll` (`SH_PLACE.collOf`); a pack outfit can say
+  `noLoupes`. Client: the customizer's Collections tab (`widget/place.js`), the shop names a piece's collection and stands
+  it in its own scene (`widget/shop.js`), ten costumes in `widget/hub-timmy.js`, `widget/dash.js` and `widget/shop.js`.
+  Server: `migration_v65.sql`, 59 rows into `shop_items` (240 in all) and nothing else, applied once the pages are live.
+  Tests: `tools/release/xp.js` (the collection rows are exactly `allCollectionItems()`, the ten costumes are `COSTUMES`, the
+  three client lists follow it), `tools/ci/smoke.js` (Collections in the customizer, only the owned collection's file
+  loads; ten costume shapes), the preview's catalog reads a later migration's inserts (`tools/preview/transform.js`). The
+  design page has a "year-round collections" gallery. About page (the shop's entry) and Ask Timmy's site help.
+  **A bug from before, fixed:** a set fetched late (`addPack`, which is how every page gets one) never added its yard eggs'
+  animation rules to the kit's CSS, so tapping a seasonal yard piece said its line but its egg stayed hidden; `addPack`
+  appends them now, and `tools/figures/site/build.mjs` fails if a late kit lacks any. Moon base's door spot moved out of the
+  front yard slot. Found by CI and fixed: the kit's lists after `addPack` dropped `coll` (BUG-172: an empty Collections tab),
+  and one `outfits.js` of all 88 outfits put the dashboard over its budget (BUG-173): it now holds the everyday and rank
+  outfits (9 KB), and `widget/hub-art/outfits/costumes.js`, `seasons.js` and `collections.js` are fetched only when someone
+  drawn wears one of theirs (`where`; `widget/pet.js`, `widget/dash.js`). Found by the local smoke test: on a phone the
+  customizer's four tabs ran past their panel (BUG-174, a phone rule in `widget/place.css` widened them). To do from it (the inbox): a tall front-slot piece
+  covers Timmy at the door; kit niceties the drawers asked for.
+- **2026-11-18 (Heme & Endo Exam 3: L19 and L20 taught, and every High Likelihood question marked, Claude Code, #404)** — `hubs/heme-endo-exam3/content/`, `tools/figures/heme-endo-exam3/`, `audio/hemeintro-*` and `audio/lymleuk-*`, `tools/hub-next/build.mjs`. L19 (Dr. Herr) and L20 (Dr. Borak) were checked against their 11/17 recordings: notes at both levels follow what was said, every key reread, L19 57 to 72 questions and L20 57 to 65 (`ll-hl-case`, `ll-2s-scatter` and `ll-specimen` retired: Hodgkin subtypes and flow cytometry, said not needed), 16 and 18 Exam Hints, topics re-ranked with the study guide's first, their ten figures corrected, and two new figures (Fig 23 `nkcheck`, Fig 24 `nodespread`); all three narration levels recorded again. BUG-164: the study guide's re-ranking (#393) had left 77 questions in a topic without their `likely` flag (the bank's toggle, the mock's share and the drill missed them); the content build now sets `likely` from `likelyTopics` on every engine hub (Occlusion and Perio unchanged). Flags: [the hub note](vault/hubs/heme-endo-exam3.md).
+- **2026-11-18 (Link my devices beside every name button, BUG-169 and BUG-170, Claude Code)** — Sam: "link my device is
+  nowhere to be found. add it to the settings page next to where you change your name. anywhere else that you can change
+  your name, add another button to link device". Since the redesign it lived only in an old hub's Stats panel, which the
+  new pages never show (the redesign's plan said "folded under the name dialog"; it never was). `widget/linkask.js` has
+  the whole thing now as one card, `shLinkAsk.link({ back, from })`: get a code (and send or copy the link), or type the
+  other device's code (it links at the sixth character), tracked as `link:open=<where>`, `link:code`, `link:share`,
+  `link:linked`, `link:fail`. Buttons for it: the dashboard's Settings (a row under Your name), its You card and its name
+  window (`widget/dash.js`); a hub's More → Settings (`widget/hub.js`), its name window, Timmy Time's and the idea board's
+  "Posting as … change" (`widget/v3.js` opens any `[data-sh-link]` button; `widget/podcast.js`, `widget/ideas.js`); an
+  old hub's Stats and Settings name boxes and its rank card (`widget/v3.js`, `widget/ranks.js`, `widget/v3.css`). A
+  hub's Settings now draws Your name and Link my devices before the shared widget is in (a tap waits for it): opened
+  straight on `#more/settings`, both rows were missing. About page, the dashboard tour's Settings step, Ask Timmy's site
+  help and the event taxonomy updated; bundles rebuilt.
+- **2026-11-18 (Perio's questions come back reworded, Claude Code, stacked on #402)** — Sam: "do one extra wording and only do it
+  for perio". `hubs/perio/content/variants.json` holds a second wording of each of the 652 Perio questions with choices (stem,
+  choices and whys; choice k is choice k reworded), written session by session from the notes and hints by 14 writers and
+  checked by 14 independent reviewers, who changed about 100. The engine (`worded()` in `widget/hub.js`) shows the original
+  on the first try and the next wording after (by the try count; Flashcards by its reviews): `card()` in `widget/hub-bank.js`
+  covers the bank, drill, misses, weak spots, the mock and Learn; Flashcards (`widget/study-modes.js`) and the arcade
+  (`widget/games.js`, `hubs/perio/content/arcade.js` `dealMCQ`) call it too. The file is fetched with the bank or the arcade,
+  not with Home or the notes, and isn't precached. Search, Find this in the notes, SH_EXPORT and question health keep the
+  original (the fingerprint is unchanged). A report says "reworded: wording 2"; Ask Timmy gets `ask.w` and the server swaps in
+  the wording (`wordingOf` in `supabase/functions/timmy/core.js`, `loadVariants` in `index.ts`). `tools/hub-next/build.mjs`
+  checks every wording (`checkVariants`) and counts it in `core.json`'s `variants`; `tools/ci/smoke.js` lints each one.
+  No High yield changed. Not done: recording which wording was shown on each answer (a migration; task note).
+- **2026-11-17 (Perio's Stage & Grade game, its bank audited against the final's hints, matching pays 10 XP, What's new on the
+  dashboard, the recap stays still, Claude Code, #402)** — Sam: "add an interactive visualization/game for staging and grading
+  using all of the criteria ... accessible on the home of perio hub, top of the question bank, and in the arcade", "using the
+  final exam hints dr abou arraj gave ... vet the whole question bank", "using all of the perio midterm check ins, see if there
+  are any additions", "matching questions are only giving 2xp instead of 10", "add the recent change log back".
+  **Stage & Grade** (`tools/figures/perio/stagegame.js` + `.css`, built into `hubs/perio/content/figures.js`/`.css` between
+  `stage:js`/`stage:css` markers by `tools/figures/perio/build.mjs`, `--check` in CI): ten made-up patients, each drawn as a
+  mouth chart (each tooth's own facial outline at its average size: incisal edges, canine cusps, premolars, molars with their roots; Sam: "make the mouth chart use teeth shapes instead of arbitrary rectangles") and a radiograph of its worst site, with their findings; call the stage, the extent and the grade, and the
+  finding that decided each call lights up gold. Explore sets every criterion by hand and the diagnosis follows, with why.
+  The rules follow Session 1's notes (CAL first, the bone-loss bands, the Stage 3 triggers, Stage 4 by teeth lost or
+  complexity, the grade by direct evidence or the bone-loss/age ratio, smoking and HbA1c lifting it); 20,000 dealt cases
+  checked against them. It sits at the top of the Question Bank (`bank.cuspGame`, the slot Occlusion's cusp game uses), on
+  Home as a wide quick link (`SH_HUB.home.links`, new in `widget/hub.js`: any hub can list extra links there) and in the
+  arcade as its seventh game (`#more/arcade/stage` opens it straight away; `GAME_IMPL.stage` in `content/arcade.js`, lobby art
+  `pStage` in `tools/figures/site/arcade.mjs`). Arcade plays earn the usual +50; it doesn't count in class stats.
+  **migration_v64.sql (applied live 2026-11-17):** `sh_answer` pays a matching question (an `order` key whose picks
+  arrive empty) as a self-graded one, 10 XP the first time right, instead of the flat 2; `submit_arcade_score` and
+  `sh_session_start` accept `stage`. `tools/release/xp.js` tests both. **The audit**
+  ([task](vault/tasks/done/2026-11-17-perio-final-hints-audit.md)): six reviewers read the bank session by session against the
+  notes and the Nov 12 hints; 111 questions fixed in place (ids kept: wrong or thin whys, unclear stems, one second
+  defensible answer, a sickle "toe"), 2 retired (`q3-20`, a third ask of one fact; `q1-E03`, a near-duplicate), 8 added:
+  suture materials from the midterm check-ins (`q2-F04`-`F06`; the final asks the materials, not the techniques), and
+  `q4-F06`, `q8-F03`, `q8-F04`, `q9-F03`, `q9-F04` for hinted facts the bank didn't ask. 669 → 675. High yield recorded again
+  for every session whose `hy` changed. **The dashboard:** a hub card's "Updated" opens What's new (its last few changelog
+  lines and the site's), and the hub recap plays its bars once, then stays still while you scroll. **CI:** every workflow is pinned to `ubuntu-24.04`: `ubuntu-latest` became 26.04 on 2026-11-18 and Playwright 1.56.1
+  can't install a browser there (a to-do in the inbox moves it back).
+- **2026-11-17 (the dashboard at the large text sizes, BUG-076 and BUG-163, Claude Code, #401)** — `widget/dash.css` (and
+  the rebuilt `widget/site.bundle.css`). On a 320 px phone at XX-Large the page scrolled 49 px sideways (10 px at X-Large):
+  the "You" card's week dots now shrink, still round, when the card is narrower than the week, and "Start studying" wraps
+  inside its row. That sideways scroll had also widened the layout so a reply to your report opened wider than the screen;
+  it fits now with no change of its own. Found while checking: at X-Large and XX-Large the rank card gave its words about
+  50 px beside the medallion ("Bronze I" broke in two, the Trophy case count was cut off, even at 390 px), so the "You"
+  column is a size container (`dxyou`) and under 260 px the medallion goes above the words, and the card's buttons wrap
+  between label and count. The hub card's exam block keeps to one column the card's width, and under a 215 px column
+  (`dxhubs`) the title is 21 px, so "Periodontology final" fits at 320 px. Default and Large measure as before.
+- **2026-11-17 (two inbox to-dos, notes and the schema record only, Claude Code, #401)** — `supabase/schema.sql` checked
+  against the live database by hash: every difference was text only. With comments, line endings, layout and the secret
+  left out, only three functions differed: `get_display_name` (laid out on four lines live) and `get_nuke_by_hub` and
+  `get_nuke_recent` (column labels live, which change nothing in a `returns table` function). The file now matches live,
+  and it has `question_flags_visitor_idx` (migration_v25). The same 210 functions and 114 indexes now hash the same on both
+  sides; the file's header says how to check again. Nothing was applied to the database. And the redesign's six task notes
+  still open after the release (phases 2, 3 and 4, the journeys, the shop, Timmy's place) are ticked, given their Outcome
+  and moved to `vault/tasks/done/`, with 383 links rewritten. The one thing left, BUG-076 (the dashboard at 320 px with the
+  largest text) and a report-reply pop-up cut off at that size, is a to-do in the inbox.
+- **2026-11-17 (The check-in and the survey in a window, Timmy peeking over it, a celebration for the reward, and one more ask, Claude Code, #398)** —
+  Sam: "make the check in and survey prompt more interesting and also advertise that it earns you 1000xp and 1000 gold crowns.
+  make it take up the center of the screen and a window. have timmy peek over the top of the window", then "the thank you stage
+  should show that you earned the crowns and xp. make it do a super epic and cool animation" and "push this new prompt to anyone
+  who has said no on the occlusion final check in and the new survey". `widget/dash.js`: `formWindow` (one window for both: the
+  middle of the screen over the dimmed page, a title bar in the hub's tint or gold, the same top for every step so it doesn't jump,
+  focus kept inside and given back, Escape / × / a tap outside = Not now or Later) with Timmy (`shPet.art`, in his outfit) cut at
+  its top edge and his hands drawn again over it (`PEEK_HANDS`), a line for each step in a bubble; the reward as two tiles before
+  sending (`lootHtml`, only when it would pay: a check-in already sent from this device doesn't offer it); the check-in's bar fills
+  toward a crown coin. `celebrate`: when `_v2` says it paid, a turning sunburst, a shockwave, 28 pieces of confetti, crowns and
+  stars, the tiles popping in and counting up, Timmy jumping with his arms up, and Collect (or ×, Escape, 12 s), which flies 12
+  crowns and stars from the tiles into the bar's rank (`#dxRank`, which glows) and only then calls `rewardPaid`, so a rank-up card
+  follows instead of covering it. All still with reduced motion or "Answer animations" off (the CSS stops every animation in
+  `.survey`; no flyers, no counting). **Ask again**: `hubs.js` `askAgain` on an exam (a device that showed the check-in and never
+  sent it gets it once more per round, `sh_debrief_again_*`) and `surveyAgain` (`{ "<id>": "<round>" }`: whoever said Later, i.e.
+  in the bootstrap's `survey` but not `survey_popup`, gets the pop-up once more, `sh_survey_again_*`); set for the Occlusion final
+  and survey 4, round `2026-11-17`. `rewardLine` gone. The preview: `submit_survey_v2` and `submit_exam_debrief_v2` pay as
+  migration_v60/v61 do (`formReward`, its crowns kept out of the 1-per-10 share), and "Later" now leaves the survey in the Inbox
+  (`get_my_survey`) while the pop-up (`get_active_survey`) stops, as on the live database. About page and Ask Timmy's site help.
+  The pop-ups now wait while another window is open (`whenUncovered`, on `lifeCovered()`): a classmate's place or the shop is a
+  `<dialog>` above everything, so the check-in opened hidden under it and took its Escape (CI's smoke test caught it). The smoke
+  test closes the window when it opens over the dashboard, like the tour and the archived notice, and checks a visit has none under it.
+- **2026-11-17 (Heme & Endo Exam 3: the exam's count per lecture, Claude Code)** — Sam gave the breakdown: A 3, L17 4, L18 6,
+  L19 8, L20 6, L21 4, L22 4. `core.json` `examCounts` (all seven; "n on the exam" under Most likely questions, and Ask Timmy's
+  exam facts through `examInfo`) and `mock.blueprint` (the five lectures in the hub, 27 questions in 69 minutes at the exam's
+  pace; L21 and L22 add theirs when they go in). The hints banner and mock blurb in `index.html`; the hub note and the L19-L22
+  task. High Likelihood topics unchanged.
+- **2026-11-17 (Ask Timmy looks up what the notes don't cover, Claude Code, #399)** — Sam: "the outside source would only be
+  used when there was something about the content that ask timmy doesnt have an answer for" (exostoses was the example),
+  then "we can do web search, the sites and others like them are good to go on the list, no limit on gap answers". When
+  the answer from the notes is `not_covered`, `supabase/functions/timmy/core.js` makes a second call (`gapRequest`: Sonnet
+  5.5 at effort low, `GAP_RULES`, the basic `web_search_20250305` tool, two searches at most, plain text) and keeps its few
+  sentences only when the model searched, didn't answer `NONE`, and every cited source is on `GAP_SITES` (`gapCheck`,
+  `gapSite`): the tool's `allowed_domains` didn't filter results when tried. The reply carries `gap: { text, sources }`;
+  `widget/ask.js` + `ask.css` draw it in a dashed "Not in your notes · looked up" box with the sources as links (the chat
+  waits 75 s now, was 45); the admin page's chat view shows it. Costs: about 4-5 cents and 2-6 seconds a lookup (8 real
+  calls tried, 28 cents). Off switch: the secret `TIMMY_LOOKUP=off`. The About page (Ask Timmy, What the hubs record), Ask
+  Timmy's site help, the privacy rule (the search words go to Anthropic's search provider), the event taxonomy, the Ask Timmy
+  reference, the tests and the eval's grading. The preview answers "what is an exostosis?" with a made-up lookup.
+- **2026-11-17 (The large text sizes on a phone: the tab bar and the journeys' scenes, Claude Code, #397)** — The inbox's 320px
+  line (BUG-161). The size setting zooms the page (`html` `zoom`, 1.45 at XX-Large), so a phone lays out in about 220-270px.
+  `widget/hub.css`: under 290px of bar (`@container hxbar`) the four tabs take their labels' widths at 11px instead of equal
+  widths ("Questions" was wider than its tab on any phone at XX-Large). `widget/journeys.js`: `vw`/`vh` don't follow the zoom,
+  so the scenes are a size container (`container: shj / size`, not on the design page's inline stills) and size the stage and
+  title in `cqw`/`cqh` with `100%` as a cap; `overflow-x` is hidden (the glow and rays scrolled the scene sideways a little at
+  every size); the eyebrows break only at their "·"; the small-screen rules also apply as container queries; on a scene under
+  420px the hand-off's track starts below Skip, and under 300px it shares the width and the seven ranks wrap. Bundles rebuilt.
+- **2026-11-17 (Heme & Endo Exam 3: its 22 figures and High yield narration, Claude Code, #396)** — Sam: "continue with where things
+  left off" (the hub was merged without them, #379). 22 anima figures, Fig 1-22 in lecture order: A's endocrine glands and
+  the mouth and the lamina dura in hyperparathyroidism; L17's oocyte, first weeks, implantation, estriol and breastfeeding
+  reflex; L18's testosterone's two fates, pulsed vs continuous GnRH, clots, the SERM map and the emergency contraception
+  window; L19's hematopoiesis, the five white cells, the thymus, the lymph node and the spleen; L20's neutrophil ladder, the
+  follicle, smear look-alikes, the head and neck map and five translocations. One module each in
+  `tools/figures/heme-endo-exam3/` (the `drafts/` folder is gone), built into `content/figures.js` (2.3 MB, fetched only with
+  the notes) and `figures.css`, placed by `FIG_PLACE`, `figByLec` and a "Diagrams" section in each Review group. High yield
+  recorded for L17-L20 (after the study guide's rebuild, #393), so every lecture has all three levels. `hubs.js` (Diagrams back
+  on the card), the About page's Diagrams entry, Ask Timmy's site help. Vault: the figures task is done
+  (`vault/tasks/done/2026-11-16-heme-endo-exam3-figures.md`), the hub note, the L19-L22 task (check L19's and L20's figures
+  against their recordings).
+- **2026-11-17 (A medal no longer runs over a bought boost; the Bowling trophy on the server, Claude Code, #395)** —
+  Two inbox lines. `migration_v63.sql`: **`sh_boost_bump`** (new), called by `sh_medal_check` when a new medal starts its 24
+  hours: what's left of the visitor's shop boosts (running or waiting) moves to start when the last medal boost ends, as one
+  row (`shop:moved:<time>`); the part already used stays. The medal's `boost_until` is then the moved boost's end (BUG-160,
+  the other order of #394's BUG-159). **`record_achievement` takes `bowling`**: `widget/v3.js` sends the bowling egg's trophy
+  once (`sh_bowl_trophy` set, `sh_bowl_trophy_sent` not), on `sh:bowl-trophy` or 5 s after a hub page loads, so it pays its
+  25 crowns (`sh_wallet` counts the badge) and gets a class share (`get_trophy_stats` counts every kind); the trophy case
+  already shows a share when the stats have one. Comments in `bowling.js`, `ranks.js`, `trophies.js`; the preview's medal
+  moves its shop boost too; `tools/release/xp.js` (a medal during a boost, a second medal, a medal with none, the trophy once,
+  its crowns and share); About page (Double XP, Timmy's shop, Bowling night), Ask Timmy's site help, game-server note.
+- **2026-11-17 (Double XP boosts: 150 and 400 crowns, and a boost bought during a medal's waits its turn, Claude Code, #394)** —
+  Sam: "Refine what double XP boosts cost" (the inbox). `migration_v62.sql`: `boost-1h` 600 → 150 crowns (Rare → Common),
+  `boost-3h` 1,500 → 400 (Epic → Uncommon), from the class's earning rate (Nov 14-17, 77 people: a median study day earns about 95
+  crowns, a median study hour about 270 XP; no boost had been bought). **BUG-159**: `sh_buy` started a shop boost at once, so one
+  bought during a medal's 24 hours ran under it and doubled nothing; a boost's time now goes after every boost running or waiting
+  (extending the last one when it's a shop boost), and `sh_boost_json`'s `until` runs on through a boost waiting right after the
+  running ones. `widget/shop.js`: the boost sheet says when it will start ("Double XP is already on until …, so this one starts
+  then and runs to …") and the always-shelf's note says so. The shop's art data (`tools/figures/site/shop.mjs` →
+  `widget/hub-art/shop.js`), the preview's catalog (`tools/preview/transform.js` now applies a later migration's
+  `update public.shop_items set ... where id = ...`) and its buy (`boostEnd`), `tools/release/xp.js` (the prices, the wait, the
+  chip's `until`), the About page, Ask Timmy's site help, `vault/reference/game-server.md`. Applied to the live project at the merge.
+- **2026-11-17 (Heme & Endo Exam 3: Dr. Herr's study guide, Claude Code)** — Sam: no in-class review for Exam 3; Dr. Herr's
+  study guide is "very indicative" and "everything on the study guide should be high likelihood questions". L17-L20: each
+  lecture's Exam Hints open with its focus list (`focus` hints in `study.json`), `likelyTopics` rewritten so every question on a
+  guide item is High Likelihood (62 topics, 260 of 290 questions; nothing previously High Likelihood dropped), five new
+  questions on the thinner items (`hi-sg-platelets`, `hi-tf-sg-neut`, `ll-sg-classify`, `ll-num-sg-leuk`, `ea-sg-pop`), a
+  "Study guide" row in Exam info and new Exam Hints wording. Only High yield text changed in the notes (L17-L20 read it in the
+  device's voice, so no narration to redo); Lecture A untouched. L21-L22's lists wait in the L19-L22 task note.
+- **2026-11-17 (Inbox: tap a word to jump the narration, the highlighter on phones and its colors, retries, crowns on Today, Claude Code, #391)** —
+  Sam: "Lets start working on the open to do items. Also for the highlighting fix, can we make sure it works on mobile too".
+  **Tap a word** (`widget/hub.js`, Follow along's `tapped()`): while a lecture's narration plays or is paused, a tap or click on a
+  word in the notes seeks the mp3 to that word's time from its `.words.json` and plays. It listens on `.reading-prose` itself, not
+  the document, because iPhone Safari only sends a tap's click to an element that listens for it (plus `cursor: pointer` on touch
+  screens and no gray tap flash, `widget/hub.css`); not on a link, a figure, a highlight or a selection, not after Stop, not with
+  Follow along off; a mouse's double-click doesn't jump; a finger gets 10 px of slack, a mouse 3. One tip toast per device
+  (`sh_tip_wordseek`); `notes:follow-seek` tracked. **BUG-157, the Highlight button on phones** (`widget/highlight.js`, every hub,
+  old pages too): the bar cancels touchstart to keep the selection, which also cancelled the tap's click, so a finger never made a
+  highlight since 10-15; it now acts on touchend (a mouse and the keyboard still click). **Retries** (`widget/hub-bank.js`): a missed
+  question comes back tinted with a dashed edge and a "Second try" / "Third try" band (`data-try`), one waiting retry per question,
+  and `bank:retry-shown` is sent again. **Crowns on Today** (`widget/hub-rewards.js`, `hub-timmy.js` `HX.wallet()`): a tile with the
+  bootstrap's `shop.wallet.balance` that opens `#more/shop`, repainted on `sh:shop`. **320px at XX-Large**: Home's ring caption wraps
+  under the ring (flex-wrap) and the timeline's words wrap. Bundles and Ask Timmy's site help rebuilt; About page updated. Checked in
+  headless Chromium as an iPhone 13, a Pixel 7 and a laptop on the preview's made-up data.
+  **BUG-158, highlight colors** (Sam: "Re add the ability to highlight in multiple colors"): on the engine's hubs every highlight was
+  drawn gold, because `hub.css`'s `.hx mark.sh-hl` tied with v3.css's pen colors and came later; each pen has its color again (`--hl`).
+- **2026-11-17 (Perio report #53, Claude Code)** — `q5-L06` (why a long root trunk is only initially favorable): the
+  keyed choice gave only the later drawback, while the favorable half sat in the explanation. Stem, choices and whys
+  rewritten so the key names both halves (more loss to reach the furcation; short roots left for resection). Same id and
+  key position; High yield unchanged, so no narration to redo.
+- **2026-11-17 (The survey and check-in reward goes to 1,000 XP, Claude Code)** — Sam: "Lets up the xp to 1000".
+  `migration_v61.sql`: `sh_form_reward` pays 1,000 XP (crowns stay 1,000: `sh_wallet` already leaves a reward row's whole
+  base out of the 1-per-10 share), and a one-time top-up moves every reward row paid at 500 to 1,000 and adds 500 to its
+  owner's XP (a second run changes nothing; the rebuild agrees). About page, Ask Timmy's site help, a changelog line.
+  `tools/release/xp.js` 14c checks 1,000 and the top-up.
+- **2026-11-17 (Dashboard contrast with Perio first, Claude Code, #387)** — Once Occlusion archived, Perio became the
+  dashboard's first hub and "Release tests" failed accessibility on every branch, `main` included: Perio's `#b4466f` is
+  4.05:1 as text on its light tint (`.dx-when`, the timeline's dates) and 4.4:1 under the Timmy Time card's .88-white
+  subtitle. `widget/dash.css` now gives Perio the darker text color the hub pages already use (`#9e3a60`, `widget/hub.css`)
+  and the subtitle full white, as on a hub's Home. Bundles rebuilt; `node tools/release/a11y.js` passes.
+- **2026-11-17 (A reward for surveys and check-ins, Claude Code, #387)** — Sam: "Also give 500xp and 1000 crowns as a reward for
+  completing a survey or check in. Only reward for the first submission of each". `migration_v60.sql`: two award kinds, `survey`
+  and `checkin`, +500 XP each through `sh_award` (one row per survey and per hub's exam, so a replay, a second check-in or a
+  linked device pays once; not boosted), and `sh_wallet` adds 1,000 crowns per reward row while leaving its XP out
+  of the 1-per-10 share. `submit_survey` and `submit_exam_debrief` keep their signatures (old pages) and pay too;
+  `submit_survey_v2` and `submit_exam_debrief_v2` answer `{ ok, xp, crowns }`.
+  Back pay (Sam: "You can implement backpay for the active survey and occlusion check in only"):
+  `tools/data-fixes/2026-11-17-reward-backpay.sql`, run by After merge, pays survey 4's answers and Occlusion's final
+  check-ins once each (the midterm's don't). The dashboard's check-in and survey cards and the
+  Inbox's survey (`widget/replies.js`) say what was paid and refresh the You card; both fall back to the old calls until the
+  migration is applied. About page updated (check-ins, surveys, the shop's crowns, More ways to earn XP). Tested in
+  `tools/release/xp.js` (section 14c).
+- **2026-11-17 (Lessons refresh: Occlusion archived, Claude Code)** — `/lessons-audit` the morning after the Occlusion final. Its
+  **retrospective** is in `LESSONS.md` ("Hub retrospectives": 104 people and 439 h for the final, 42% of it on exam day, the evening
+  exam's eve; the instrument look-alikes and Hanau's quint the hardest), its **recap is on the dashboard**, and **its narration, High
+  yield and Timmy Time came off the site** (51 files, 211 MB; `"audio": "off"` in `content/core.json`, rebuilt, out of `HUBS` in
+  `sw.js`, now `sh-v62`): the site is 427 MB. No question or notes changed on Perio or Heme & Endo Exam 3 (Perio's leads are 10 first
+  tries each, two days out). Occlusion's last reports (#49-#52) left open by Sam's call. Also: Sam asked that every session can run
+  SQL without a prompt, so `.claude/settings.json` pre-approves the Supabase connector's `execute_sql` (and its list and advisor
+  tools) beside `apply_migration`. The stale task for the final's format went to `done/` as dropped.
+  **The smoke test learned that a hub on the engine can be archived** (Occlusion is the first): it presses "Keep browsing" on the
+  archived dialog whenever it comes (it never closed it on the engine's pages, so every run failed from 10 pm on 11-16, `main`
+  included), expects no Ask icon on an archived hub (Timmy isn't there, `hub-timmy.js`), and checks Timmy Time's minute on a hub
+  whose audio is still up.
 - **2026-11-16 (Occlusion Question Bank, Codex)** — Restored **What cusp hits where?** at the top of the base Question Bank (`/hubs/occlusion/#questions`): students can choose **Contacts** or **Movements**, and the existing best-score behavior remains. The game had survived the redesign in the generated figures code, but its mount point had been removed. It is intentionally absent from Learn, Flashcards, Daily drill, Yesterday's misses, Weak spots and the mock; the Occlusion-only `SH_HUB.bank.cuspGame` configuration makes that explicit. `tools/ci/smoke.js` now holds that placement and launcher behavior.
 - **2026-11-16 (Occlusion, Claude Code)** — Sam: "fix the open reports in occlusion, send the replies, and merge." The
   drawn figures' base styles (letter pins, lines, labels: `.fg-pin`, `.fg-line`, `.fg-t`...) had been left behind on the old

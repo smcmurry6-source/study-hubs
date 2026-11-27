@@ -112,3 +112,4 @@ all | Your progress ring on the dashboard now shows on a new or linked device to
 all | Fixed: after a mock exam, "See what I missed" on the results card now shows only the questions you missed (it did nothing before). Tap "Show every question" to see them all again.
 all | Customizing Timmy's place is quicker: four tabs (Timmy, Home, Scene and Yard) over one list of everything you own, with what you just got first and marked New. Customize opens where you'll want it, the Yard tab on the first empty spot, and every tap shows at once.
 all | On the leaderboards, people tied on a place now keep the same order every time you look.
+review-of-systems | The Head & Neck notes now say which nerve covers which part of the ear: the great auricular the lower ear and the earlobe (with the angle of the jaw), the auriculotemporal the upper front of the ear. Two neck questions' explanations now name the answer most people picked by mistake.
