@@ -53,8 +53,10 @@ there and in [decisions](../decisions.md)); **deployed and applied at [the redes
    content came in at about 180k tokens; `claude-sonnet-5-5` from 2026-11-14, built and first tested on `claude-opus-5-5`),
    effort `medium`, structured output (the schema in `core.js`). Haiku has no server-side refusal fallback, so `withModel()`
    sends none and a declined question gets the refusal nap; on another model the fallback is on.
-4. The answer is checked: every cite's quote must really be in the unit it names, at least three words or the whole of a
-   shorter unit such as an exam date (a real quote under the wrong id is moved to the right unit). Only checked cites become links; the rest are stored as `unchecked` for the admin tab.
+4. The answer is checked: every cite's quote must really be in the unit it names, at least three words, the whole of a
+   shorter unit such as an exam date, or (since 2026-11-27) the whole of one cell of a review table's row, the text between two
+   ` · `, such as "≥10 cigarettes/day" (a real quote under the wrong id is moved to the right unit; a short cell isn't, since
+   it can be in many rows). Only checked cites become links; the rest are stored as `unchecked` for the admin tab.
 5. `timmy_finish` stores the answer with its tokens and estimated cost, and the browser gets:
    `{ ok, chat, message, kind, paragraphs: [{ text, cites: [{ id, hub, kind, label, quote, go }] }], offer, go, closest }`,
    plus `limited` (`limit`, `cap`, `off`, `busy`) on a "napping" line and `repeat` on a retried send. `message` is Timmy's
@@ -177,6 +179,15 @@ list, no limit on gap answers. they are uncommon" ([decisions](../decisions.md))
   $5.28 for all 50 cases, inflated by three cases writing the whole content at once): 49 passed; 34 turns answered from the
   part, 16 asked again (the six "not covered" cases among them, as they should); a part answer about 1-3 cents, a part written
   about 7-10 cents, the whole content written about $0.68 on Perio and $1.44 on the dashboard.
+  **The week after (read 2026-11-27, from the edge logs):** the part ran from v85's deploy (11-19, about 2 pm Central) until
+  the hubs it served came down, Perio that night and Heme & Endo Exam 3 on 11-20, then on Review of Systems until its course
+  path replaced it (11-23 evening). 23 turns took it, from about 15 people: 19 `part`, 2 `part+full` (both "not_covered", both
+  on Heme & Endo), 2 `full` (follow-ups within the warm hour). So about 1 in 10 parts was asked again, against the eval's 16 in
+  50: it saves. Per first question on Sonnet (before 11-20): a part written about $0.24-0.29 against the whole content's
+  $0.68-0.78; on Haiku a part written was about 1-2 cents (Heme & Endo) or 5-8 cents (Review of Systems' 100k-token part), a
+  `part+full` about 20 cents. Kept as it is; `WARM_MS` unchanged. No hub on the site uses it now: Review of Systems takes the
+  course path (`course`, `course+full` in the log), which had only a few people in its first days, so its read waits for the
+  next hub's first week (the inbox).
 
 ## The database (migration_v55)
 

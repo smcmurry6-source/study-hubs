@@ -534,13 +534,20 @@ export function renderTurn(input, corpora, question, now){
 const norm = s => clean(decodeEntities(String(s || "")).normalize("NFKC").toLowerCase().replace(/[‘’‚′`]/g, "'").replace(/[“”„″]/g, '"')
   .replace(/[‐-―−]/g, "-").replace(/·/g, " · ").replace(/ /g, " "));
 /* a quote is in a unit when every piece of it (split at an ellipsis) is there, in order, and it is at least three words,
-   or the whole of a shorter unit (an exam fact like "Final: 2026-11-19") */
+   or the whole of a shorter unit (an exam fact like "Final: 2026-11-19"), or the whole of one cell of a table row (the text
+   between two " · ", like "≥10 cigarettes/day": 2026-11-27). A cell counts only in the unit the model cited
+   (opts.cells false, for pointing a link at another unit: a short cell can be in many rows). */
 const trimEnds = s => s.replace(/^["'\s.,;:]+|["'\s.,;:]+$/g, "");
-export function quoteIn(quote, text){
+export function quoteIn(quote, text, opts){
   const pieces = trimEnds(norm(quote)).split(/\s*(?:\.\.\.|…)\s*/).map(p => p.replace(/^["'\s]+|["'\s]+$/g, "")).filter(Boolean);
   if (!pieces.length) return false;
   const t = norm(text);
-  if (pieces.join(" ").split(" ").length < 3) return pieces.length === 1 && pieces[0] === trimEnds(t);
+  if (pieces.join(" ").split(" ").length < 3) {
+    if (pieces.length !== 1) return false;
+    if (pieces[0] === trimEnds(t)) return true;
+    if (opts && opts.cells === false || pieces[0].length < 3) return false;
+    return String(text || "").split("\n").some(row => { const r = norm(row); return r.includes(" · ") && r.split(" · ").some(c => trimEnds(c) === pieces[0]); });
+  }
   let at = 0;
   for (const p of pieces) { const i = t.indexOf(p, at); if (i < 0) return false; at = i + p.length; }
   return true;
@@ -559,7 +566,7 @@ export function checkAnswer(parsed, units, ctx){
       let u = units.get(id);
       if (!(u && quoteIn(quote, u.text))) {
         /* the quote is real but the id is off by a line: point to the unit that has it */
-        const other = quote ? [...units.values()].find(v => v !== u && quoteIn(quote, v.text)) : null;
+        const other = quote ? [...units.values()].find(v => v !== u && quoteIn(quote, v.text, { cells: false })) : null;
         if (!other) { unchecked.push({ id, quote }); continue; }
         u = other; moved++;
       }

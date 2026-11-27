@@ -212,6 +212,14 @@ const base = { visitor: "visitor-1", hub: HUB, text: "What does this paragraph m
 // a quote under three words counts only when it is the whole unit (an exam fact like "Final: 2026-11-19")
 ok(T.quoteIn("Final: 2026-11-19", "Final: 2026-11-19") && T.quoteIn("final: 2026-11-19.", "Final: 2026-11-19"), "a short unit quoted whole checks out");
 ok(!T.quoteIn("Final: 2026", "Final: 2026-11-19") && !T.quoteIn("Final", "Final: 2026-11-19") && !T.quoteIn("2026-11-19 ... Final", "Final: 2026-11-19"), "part of a short unit doesn't");
+// a whole table cell is a quote (the eval's pe-02: "≥10 cigarettes/day" from a review table's row), only in the unit cited
+{
+  const row = "Smoking · ≥10 cigarettes/day · Grade C\nDiabetes · HbA1c ≥7.0% · Grade C";
+  ok(T.quoteIn("≥10 cigarettes/day", row) && T.quoteIn("HbA1c ≥7.0%", row) && T.quoteIn("Smoking", row), "a whole table cell checks out");
+  ok(!T.quoteIn("10 cigarettes", row) && !T.quoteIn("Grade", row) && !T.quoteIn("C", row), "part of a cell or a too-short cell doesn't");
+  ok(!T.quoteIn("≥10 cigarettes/day", row, { cells: false }), "a cell doesn't move a link to another unit");
+  ok(!T.quoteIn("cigarettes/day", "Patients smoking ≥10 cigarettes/day are grade C."), "a short phrase from prose still doesn't");
+}
 // offers, go and not covered
 {
   const lecIds = C.lectures.map(l => l.id);
