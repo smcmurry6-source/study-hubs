@@ -158,6 +158,11 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   After Mock 1 (Thu Dec 3, noon), read its exam check-ins (which courses felt heavy, what surprised people) and, before Mock 2
   (Dec 10), move the blueprint toward that, and add High likelihood topics for what the check-ins say came up
   ([hub note](../hubs/review-of-systems.md)).
+- [ ] **The lessons audit after Review of Systems' Mock 1** (2026-11-26, the lessons audit): read the shop's prices again (Sam,
+  2026-11-24: "prices are good for now", to be read after Mock 1; Thanksgiving week's long days put the cheapest Epic at 2.8
+  median study days, under the yardstick's 3, at the same crowns an hour), the course spread (a week out, 81% of the answers were
+  in the first three of the 14 courses), and `hn-neck-10`'s first tries since its notes were fixed (1 of 12 before). The numbers
+  are in `LESSONS.md`'s Live signals; totals only ([learner-data-privacy](../rules/learner-data-privacy.md)).
 - [x] **Retest BUG-197 a day after #524 merges** (2026-11-21): count `select count(*) from question_events where qid like 'pq-%'` (read-only, under `statement_timeout = '5s'`); 0 means the guard proxy holds: set BUG-197 to retested. Any rows: add a data fix like `tools/data-fixes/2026-11-20-quiet-test-rows.sql` and look for the path the guard missed. Done 2026-11-24 (#544): 2 rows, both from 12 minutes before #524 merged, none since; BUG-197 retested, and `tools/data-fixes/2026-11-24-bug-197-last-rows.sql` takes the two after the merge.
 - [ ] **The smoke test's game-layer wiring check runs again on the next hub with an arcade** (2026-11-20, Exam 3's page down):
   `tools/ci/smoke.js`'s `wiringCheck` (Million-Dollar Smile's sessions and answers, Timmy Time's minutes) needs a live engine hub

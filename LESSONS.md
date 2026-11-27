@@ -4,7 +4,7 @@ Sam's standing rule (2026-09-29): **every time a hub is archived, use all the da
 next hubs.** This file is where that lands. It is shared by every session (Claude Code, Cowork, each hub's Claude
 Project): read it before building or restructuring a hub, and add to it whenever one is archived.
 
-**Last refreshed: 2026-11-24** (7 to 9 am Central, Review of Systems' second week, nine days before its Mock 1; it found 52 answer keys one choice off and fixed them; the game economy is read too, Sam's rule since 11-18). Sam
+**Last refreshed: 2026-11-26** (6 to 8 pm Central, Thanksgiving, a week before Review of Systems' Mock 1; the 52 fixed keys' first tries rose to the bank's level, and one item's notes were fixed; the game economy is read too, Sam's rule since 11-18). Sam
 runs the lessons refresh by hand (`tools/lessons-refresh.md`): it updates this file from all tracked data, reports and suggestions
 and ships small fixes to the live hubs. **Before building a new hub, if this date isn't today, run steps 1-3 of
 `tools/lessons-refresh.md` first.**
@@ -64,6 +64,11 @@ What each signal tells an author, and what to do with it in the next hub (and in
   had a second defensible answer. Tell things apart by what both sources agree on (Miller & McEntire: molars, a number).
 - **The stem's word in one choice only** pulls picks to it: perio `q4-06` asked "Which scaler..." and only the wrong
   "H6/7 sickle scaler" said scaler, while the key was a bare "S204SD9". Name every choice the same way.
+- **A clue in the stem must be in the key's notes, not only in a distractor's** (Review of Systems `hn-neck-10`, 2026-11-26): the
+  stem asked for the nerve to "the angle of the mandible and the lower part of the ear"; the notes gave the great auricular the angle
+  and the auriculotemporal "the auricle", so 1 of 12 first tries picked the key and half picked the auriculotemporal. Before a
+  question ships, find each clue of its stem in the notes beside the key's fact; where only a distractor's lines carry it, say in the
+  notes what each one covers.
 - **A picture must sit where the thing sits**: PCD Implants' subperiosteal drawing had its lattice 12 px below the crest,
   so it read as set into the bone, and half of the recent tries picked "Blade". Draw on-the-bone parts on the crest line.
 - **A second wording doesn't change difficulty** (Perio's A/B versions, 11-18 to 11-19, half the class starting each question on B):
@@ -97,77 +102,78 @@ What each signal tells an author, and what to do with it in the next hub (and in
 
 ## Live signals (rewritten by each refresh)
 
-**2026-11-24, morning (data read 7 to 9 am Central).** "Since" = the last audit (11-20, 3 pm). Live hub: **Review of Systems** alone
-(two mock boards, Thu Dec 3 and Thu Dec 10). **The database is 287 MB** of the Free plan's 500 MB (358 at the last audit: the shorter
-analytics windows, `migration_v95`, and the archived hubs' answers packed, `v96`, took about 70 MB off; `personal_answers` 69 MB,
-`activity_pings` 34, `xp_seen` 32, `answer_xp` 27, `xp_awards` 20); **the repo 2.39 GB** as GitHub counts it (2.4 GB on 11-21: no
-growth); **the site 42 MB** of 1 GB. **Data quality** (the admin page's kept copy, 1 am today): no test rows in clicks, events, time or
-answers.
+**2026-11-26, evening (data read 6 to 8 pm Central, Thanksgiving).** "Since" = the last audit (11-24, 9 am). Live hub: **Review of
+Systems** alone (two mock boards, Thu Dec 3 and Thu Dec 10: Mock 1 is a week away). **The database is 296 MB** of the Free plan's 500
+MB (287 at the last audit; `personal_answers` 70 MB, `xp_seen` 35, `activity_pings` 34, `answer_xp` 29, `xp_awards` 21); **the repo
+2.40 GB** as GitHub counts it (2.39 on 11-24: no growth); **the site 33 MB** of 1 GB (42 on 11-24: the study-music loops came out,
+#572). **Data quality** (the admin page's kept copy, 1 am today): no test rows in clicks, events, time or answers.
 
-**Review of Systems has started, slowly** (the week after back-to-back exams, Thanksgiving week): 21 people ever, 16 hours, 7 under 5
-minutes, 10 on one day only, a median 11 minutes each; **Monday 11-23 was its first real day** (14 people, 651 minutes). 613 answers
-from 14 people, 68% right; no mocks yet. Time: notes 452 minutes (15 people), the bank 385 (11), Learn 57 (a couple), Home 40 (20).
-Reading levels: High yield 6 people, As taught 6, Plain English 4; one-page sheets 5; Ask Timmy a few. The bank opens on Head & Neck,
-the first course, so that is where the answers went: **12 of the 14 answerers, 328 answers**.
+**Review of Systems picked up in its second week**: 32 people ever, 55 hours, 7 under 5 minutes, 12 on one day only, 10 on 3+ days, a
+median 34 minutes each. 11-24 720 minutes (11 people), **11-25 1,245 (19 people), its busiest day so far**, Thanksgiving to 6 pm 435
+(8). Since the last audit: 21 people, 39 hours. Time ever: notes 1,652 minutes (25 people), the bank 1,452 (20), the drill 60 (a few),
+Home 57 (32), Learn 57 (a couple, none since 11-24). **2,720 answers from 24 people, 70% right (first tries 61% of 1,798)**; no mocks
+yet. Since 11-24: High yield 7 people, As taught 6, Plain English a couple; one-page sheets 5; "Try it again" shown to 14 (552 times,
+80% right); Listen a few (about 15 minutes).
 
-**52 answer keys were one choice off, and the class found them** (fixed in this audit). On 11-23 and this morning students reported 10
-Head & Neck questions and one Fundamentals I question as keyed wrong (two of the reports drafted by Ask Timmy from the notes). Each key
-pointed one choice past the right answer, the one its own explanation and why lines describe. Seven agents then read all 1,369 keys
-against their explanations and why lines, one or two courses each: **51 of Head & Neck's 68 single-answer items** (plain, EXCEPT,
-which-is-true and which-is-false) were shifted, every one by exactly one place, plus `f1-biomol-03`; Head & Neck's true/false,
-two-statement and numbered items and every other course were right. The keys were wrong from the build (11-19, #480), not from #541.
-The data says the class knew better: on **first tries** (before any explanation) 39 of 63 answers to these questions picked the true
-answer and were marked wrong, 11 picked the old key; on **retries** 25 of 35 switched to the hub's wrong key. The 52 keys are fixed,
-`tools/data-fixes/2026-11-24-review-of-systems-keys.sql` recounts their class numbers after the merge, and the After merge workflow
-loads the new keys. A question someone answered right and was told was wrong stays among their misses until they answer it again (an
-answer's pick isn't kept per person). The lesson is a standing one now ("A bank built by many drafting sessions"). The same read found
-a few slips, fixed: when troponin reaches the blood (`f2-genpath-20`, its notes and cram line said at 20-30 minutes, about when the
-cells die; it is a few hours later), the panoramic chin-down error (`rd-anatomy-07` and its notes said a "frown"; it is an exaggerated
-smile), two why lines swapped (`em-prevent-08`), a case about a woman that said "him" and "the extraction" at a scaling visit
-(`em-cardiac-02`), a why line that started "Also" though the choices are shuffled (`em-cardiac-15`), a cusp named wrong in a why line
-(`da-posterior-08`), a number that didn't match its stem (`f1-cells-18`), a typo, and an explanation that named a classmates' guide
-(`f1-molbio-02`). Two facts the read flagged were settled from standard references on Sam's word ("fix 5"): Gold's agar is
-mitis-salivarius with **20%** sucrose and bacitracin (`om-viral-01` and its notes said 15%, from a study guide), and B cells develop
-in the bone marrow and finish maturing in the spleen (`f1-innate-12` said they complete their development in the marrow, against
-`f1-hyper-10` and the notes).
+**The bank-order lean, at the size of a 14-course hub**: 81% of the answers (2,208 of 2,720) are in the first three courses, Head &
+Neck 776 (22 people), Fundamentals I 798 (9) and Dental Anatomy 634 (12); then Fundamentals II 142 (6) and Oral Microbiology 128 (a
+few), and the other nine courses under 70 answers each from a few people (Renal, Radiology, Cardio & Respiratory and MSK & GI under
+15). Each mock is 200 questions over all 14. It is the standing lesson on bank order (the class works down the list, and the lag
+closes by itself when there are days to spare); read it again on Dec 2, Mock 1's eve.
 
-**Listen** (report #68): on F1-1 the device voice "won't play or give options to speed up or slow down". The hub has no recordings, so
-Listen is the device's voice, which has a voice picker but no speed control, and reads a whole part as one utterance (up to about
-27,000 characters at As taught); started 6 times by a couple of people since 11-20. Not reproduced here (a headless browser has no
-voices): [BUG-199](vault/release/bug-log.md). Every new hub reads this way now ([no-narration-in-the-repo](vault/rules/no-narration-in-the-repo.md)).
+**Did the last refresh work? Yes.** The 52 keys fixed on 11-24 (#552, live from 12:25 pm): their **first tries went from 17% of 70 to
+64% of 154**, level with the rest of the bank (62% to 64%, 935 first tries since), while Head & Neck's other items went 51% to 57%;
+retries on them 71% to 86% (the rest 92%). A wrong key is the one fix a first try shows. **The reports stopped**: none about a key since
+the merge except #85 and #86 on `f2-virology-05`, one student's "i think it is keyed wrong" and, four minutes later, "nevermind, it is
+keyed correctly!" (it is: hepatitis B is the only DNA hepatitis virus).
 
-**Check-ins:** Heme & Endo Exam 3 has **16** (13 since the retrospective's first few): About right 13, Hub was harder 3, none "easier" or
-"different"; Better than expected 13, About what I expected 3, none worse; readiness median 3 of 5; their median 215 minutes in the hub
-against 68 for everyone (the standing lesson on heavy users holds). A few more for the Perio final and the Occlusion final, nothing
-written that names a topic. No survey answers. Searches: two in Review of Systems, nothing to add.
+**Every hard item read** (12+ tries, and question health's flags, from `qh_report` at 6:30 pm, this hub having no kept copy): every key
+matches the notes and standard references, and no key position leans (items keyed in the first place 72% right outside Head & Neck,
+against 71-77% for the others), so the shuffled card grades right. **Fixed: `hn-neck-10`** (numbness over the angle of the mandible
+and the lower ear after a facelift: the great auricular nerve) was **1 of 12 on first tries, half of them picking the
+auriculotemporal**. The stem's "lower part of the ear" led to the notes' only ear lines, which gave the auricle to the auriculotemporal
+and only the angle to the great auricular. The notes (As taught, Plain English, the cram line; High yield rebuilt) now give the great
+auricular the lower ear and the earlobe and the auriculotemporal the upper front of the ear, and the explanation and the
+auriculotemporal's why say so. `hn-neck-09`'s explanation now names the suprascapular nerve (6 of 14 first tries picked it). **Left as
+they are, fair and taught:** `hn-skull-02` (1 of 10 first tries, 7 of them "Both statements are true": "the petrosal sinuses empty
+into the cavernous sinus" reverses the flow the notes and the cram line teach, the word-swap trap of the standing lesson on a real
+fact), `da-anterior-13` (a numbered item on where each cingulum sits, 1 of 6; the notes say the maxillary central's is slightly
+distal), `da-numbering-15` and `da-occlusion-02` (none of 5 each), `hn-neck-06` (a false-keyed true/false, 5 of 11), `hn-neck-01`,
+`-04`, `-08` and `hn-skull-07` (27-39% of 11-18).
 
-**Did the last refresh work?** Nothing to measure: the last audit changed no question. **Read next time:** Head & Neck's first tries
-on the 52 fixed keys against the rest of the bank's (they should go from 17% "right" to about the bank's average), and whether the
-reports stop.
+**Check-ins:** Heme & Endo Exam 3 has **20** (4 since 11-24): About right 16, Hub was harder 4, none "easier" or "different"; better
+than expected 17, about what I expected 3; readiness median 3 of 5; their median 215 minutes in the hub (68 for everyone). None for
+any other hub since 11-24, and nothing written. Surveys: the redesign survey turned down 9 times since 11-20, no answers. Searches:
+none since 11-21.
+
+**Read next time:** Mock 1's check-ins against the mock's blueprint (Dec 3, [inbox](vault/tasks/inbox.md)); the course spread above;
+`hn-neck-10`'s first tries since tonight's fix.
 
 **The game economy** (Sam's standing rule since 2026-11-18, [earn-rates-stay-enjoyable](vault/rules/earn-rates-stay-enjoyable.md);
-`tools/economy.sql` over 11-21 to this morning, the first quiet days with today's rules: v92's seven prizes from 11-20, v97 to v99's
-eve boss, weekly pennant and mystery box from 11-22; prices unchanged since 11-18). **Skews:** a small sample of the heaviest users (13
-people, 18 study days), short days in a quiet week, and v92's and v89's back pay (11-20) still in the wallets.
-- **Earning:** the median study day earned **about 300 crowns** (25th percentile 90, 75th 600, 90th 875) in a median 24 minutes; per
-  hour **625 crowns and 920 XP** (exam week, 11-19 and 11-20: 650 and 1,195). The class's rhythm (E2, 28 days, 116 people): the median
-  student has 8 study days in four weeks (the middle half 2 to 14).
-- **The ladder in median study days** (at 300; a heavy day of 600 in brackets): Common 0.3-0.6 (0.2-0.3), Uncommon 0.8-1.5 (0.4-0.7),
-  Rare 2.3-4.0 (1.2-2.0), Epic 5.0-9.2 (2.5-4.6), Legendary 13-26 (6.6-13). **In a normal week every band sits on the yardstick** (Rare
-  2-4, Epic 5-10, Legendary 10-20); exam week's 950-crown days put every band under it. The prices fit the quiet weeks and run fast in
-  exam weeks.
-- **Wallets** (the 13 who answered since 11-21): median **16,840 crowns** (10th percentile 7,360, 90th 32,480); 11 of 13 could buy the
-  priciest piece (8,000), all 13 a Rare. **31% of what they earned has been spent** (12% across 74 people in exam week: a different,
-  heavier group). Since 11-21: 48 purchases, about 54,600 crowns, from a few people each day; 16 mystery boxes (12,000 crowns) since it
-  opened on 11-22; 7 people opened the shop and 7 their place. All time: 126 purchases from 24 people, about 177,500 crowns.
-  **Signs seen: too fast by the wallet test only** (the median wallet of these heavy users holds more than the priciest piece and
-  most could buy anything; an Epic takes 5-9 median days, not under 3); **not hoarding** (31%), not "too slow".
-- **The leaderboards** (E7a, totals): 50 names. The rank board's top ten hold 35,470-56,770 XP (median 42,320) against everyone's
-  middle half 17,260-34,550 (median 22,580). **Study streaks broke over the quiet weekend**: a couple of the 50 keep 3+ days (47 a week
-  ago). Arcade boards with 5+ players: the same eight, all archived hubs'.
-- **Sam's call** (2026-11-24, on #552's choice between keeping the prices and a shelf above Legendary): **"prices are good for
-  now"**. Read it again after Review of Systems' Mock 1; propose again only if a normal week shows a too-fast sign on the ladder,
-  not only in the wallets ([decisions](vault/decisions.md)).
+`tools/economy.sql` over 11-22 to tonight, the days with today's rules: v97 to v99's eve boss, weekly pennant and mystery box from
+11-22, and Learn's typed answers from 11-24, v102, used by a couple of people; prices unchanged since 11-18). **Skews:** a small,
+heavy group (23 people, 41 study days) in Thanksgiving week, with long days (a median 66 minutes, against 24 at the last audit).
+- **Earning:** the median study day earned **about 530 crowns** (25th percentile 230, 75th 860, 90th 1,675) and 610 XP; per hour
+  **595 crowns and 780 XP**, the last audit's rate (625 and 920): the days were longer, not richer. The class's rhythm (E2, 28 days,
+  117 people): the median student has 7 study days in four weeks (the middle half 2 to 13).
+- **The ladder in median study days** (at 530; a heavy day of 860 in brackets): Common 0.2-0.3 (0.1-0.2), Uncommon 0.5-0.8
+  (0.3-0.5), Rare 1.3-2.3 (0.8-1.4), Epic 2.8-5.3 (1.7-3.3), Legendary 7.5-15 (4.7-9.3). **At this week's long days every band sits
+  under the yardstick** (Rare 2-4, Epic 5-10, Legendary 10-20), and the cheapest Epic (1,500) takes under 3 days; at the last audit's
+  300-crown days every band sat on it. In hours nothing moved: an Epic is 2.5-4.7 hours of studying, a Legendary 6.7-13.
+- **Wallets** (the 23 who answered since 11-22): median **15,510 crowns** (10th percentile 1,750, 90th 34,470); 16 of 23 could buy
+  the priciest piece (8,000), 21 a Rare. **30% of what they earned has been spent** (31% at the last audit). Since 11-22: 74
+  purchases, about 83,600 crowns, from a few people a day; 31 mystery boxes (about 23,000 crowns); 9 people opened the shop and 9
+  their place. All time: 154 purchases from 24 people, about 207,400 crowns.
+  **Signs seen: too fast, by the wallet test** (as at the last audit) **and now on the ladder at Epic's low end**, both from a heavy
+  group's long holiday-week days; **not hoarding** (30%), not "too slow".
+- **Ranks** (E6, the 23): 12 at the Handpiece's tier 5 (28,600-47,500 XP), one at tier 6, 5 at tier 4, the rest lower; 22 of the 23
+  have moved up since the release.
+- **The leaderboards** (E7a, totals): 50 names. The rank board's top ten hold 38,720-56,770 XP (median 43,340) against everyone's
+  middle half 17,260-35,670 (median 22,580). **Study streaks over Thanksgiving:** 5 of the 50 keep 3+ days, one 7+. Arcade boards
+  with 5+ players: the same eight, all archived hubs'.
+- **Sam's call stands** (2026-11-24, "prices are good for now", to be read again after Review of Systems' Mock 1): no proposal from a
+  holiday week's heavy group. If Mock 1's week, a normal one, again puts the cheapest Epic under 3 median days, that audit gives Sam
+  numbers (for example the Epic floor from 1,500 to 1,800 crowns: 3.4 days at 530).
 
 **Older feature readings (kept for reference; the standing lessons carry what they mean):**
 - Heme & Endo (10-27 to 10-30): "Try it again" reached 63 of its 67 answerers (4,258 retries shown, 79% right); High likelihood order
@@ -386,7 +392,8 @@ each one is usually a pattern, not a one-off, so fix the pattern across the bank
   and why lines name, from the build (11-19) to the 11-24 audit. Its fixed-order formats (true/false, two-statement, numbered) were
   all right: a label like "Both statements are true" carries its meaning, an index into shuffled choices doesn't. The class caught it
   (first tries picked the true answer 39 of 63 times and were marked wrong, retries then took the hub's wrong key 25 of 35 times, 10
-  reports in a day), but only after a week of learning wrong anatomy. Reading every key against its explanation and why lines, one
+  reports in a day), but only after a week of learning wrong anatomy. Fixed, their first tries went from 17% to 64% in two days (154
+  tries), level with the rest of the bank, and the reports stopped (the 11-26 audit). Reading every key against its explanation and why lines, one
   agent per course of about 200 questions, took 2 to 4 minutes a course and found every reported item. Do that before a new bank or
   a batch of drafted questions ships (a step of [build-a-hub](vault/how-to/build-a-hub.md)'s Check since 2026-11-24: Sam,
   "adding the answer key step is good"), and when the first reports of one bank say "keyed wrong", check the whole course, not the one
