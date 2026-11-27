@@ -192,14 +192,30 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   numbers, which totals can't give, are kept per hub (`insight_cards_kept`) by the nightly job the night a hub's first day is
   collapsed, and the Insights tab reads them from there ([insights-dashboard](../reference/insights-dashboard.md)). The migration
   is applied after the merge, at 1-5 am Central (`supabase/pending-migrations.txt` until it is).
-- [ ] **A week after `migration_v85` is applied (2026-11-19), so on 2026-11-26, check what the part saved** (2026-11-19): the admin page's Ask Timmy tab (cost by
+- [x] **A week after `migration_v85` is applied (2026-11-19), so on 2026-11-26, check what the part saved** (2026-11-19): the admin page's Ask Timmy tab (cost by
   day against 11-14 to 11-18's) and the edge logs' `turn` lines (`content`: `part`, `part+full`, `full`). In the eval, 16 of 50
   first questions were asked again with the whole content; if real students' share is much higher, the part costs more than it
   saves: send more with it (another lecture, the review tables) or turn it off (`WARM_MS` in `supabase/functions/timmy/core.js`).
-- [ ] **Ask Timmy's quote check fails a table cell under three words** (2026-11-19, the eval's pe-02 on the whole content):
+  **Done** (2026-11-27, #PRNUM): 23 turns from about 15 people took the part (Perio, Heme & Endo Exam 3, Review of Systems
+  before its course path); 2 were asked again with the whole content, about 1 in 10 against the eval's 16 in 50, so it saves
+  and stays as it is. Numbers in [ask-timmy](../reference/ask-timmy.md). The course path's read is the line below.
+- [x] **Ask Timmy's quote check fails a table cell under three words** (2026-11-19, the eval's pe-02 on the whole content):
   he cited R1.3 with "≥10 cigarettes/day", which is in the table, but `quoteIn` wants at least three words or the whole unit, so
   the link was dropped and the eval failed. Either accept a whole table cell (the text between two ` · `) as a quote, or say in
   `RULES` that a table quote takes the row's label with it.
+  **Done** (2026-11-27, #PRNUM): `quoteIn` accepts the whole of one table cell in the unit the model cited (not when it points a
+  link at another unit, where a short cell could match many rows); `RULES` unchanged, so the prompt cache stays. Tests in
+  `tools/timmy/test.mjs`. Deployed by the After merge workflow.
+- [ ] **Ask Timmy's course path, a week into the next hub of courses or once 5 people have used it** (2026-11-27, from the v85
+  read above): Review of Systems answers every question from one course's part (`content` `course` or `course+full` in the
+  edge logs' `turn` lines, `course` names it, `none` for every course's cram sheet). In its first days (11-23 to 11-24) only a
+  few people asked, all `course`, none asked again: too few to judge. Read the share of `course+full` and the cost per first
+  question; if many are asked again, send more with the part (`COURSE_NOTE` in `supabase/functions/timmy/core.js`).
+  The v85 part (`part`, `part+full`) comes back with the next hub that isn't one of courses: read it again in its first week.
+- [ ] **"Is this your other device?": the new Yes screen, once it's used** (2026-11-27, BUG-193's retest): in the week after
+  v87 the card was shown about once, and nobody tapped Yes, so no `link-ask:yes` → `link-ask:linked` from the new screen has
+  been seen live. At the next lessons audit, read `feature_events` for `link-ask:%` since 2026-11-20; if people tap Yes and
+  don't link, reopen BUG-193.
 - [ ] **A "Delete my data" button, only if Sam asks** (2026-11-04, left unticked in [the retention task](done/2026-11-04-analytics-retention.md),
   moved here 2026-11-20): a button in Settings that deletes every row for this browser's id, and the id shown in Stats so a
   deletion request can be honored ([analytics-retention](../reference/analytics-retention.md)). Not asked for; build it only

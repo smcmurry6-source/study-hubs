@@ -32,6 +32,14 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-27 (the week-after reads, and a table cell as a quote, #PRNUM, Claude Code)** — Three to-dos. (1) What
+  `migration_v85`'s part saved: 23 turns from about 15 people took it before the hubs it served came down (19 `part`, 2
+  `part+full`, 2 `full`), about 1 in 10 asked again against the eval's 16 in 50, so it stays as it is
+  ([ask-timmy](vault/reference/ask-timmy.md)); Review of Systems' course path had too few people to judge, so its read waits
+  for the next hub (inbox). (2) BUG-193 retested: since v87 the "Is this your other device?" card was shown about once in a
+  week (22 times to 8 people the two weeks before); nobody reached the new Yes screen yet (inbox). (3) Ask Timmy's quote check
+  accepts the whole of one review-table cell ("≥10 cigarettes/day") in the unit cited, so such a cite stays a link
+  (`quoteIn` in `supabase/functions/timmy/core.js`, tests in `tools/timmy/test.mjs`); the After merge workflow deploys it.
 - **2026-11-26 (the study-music loops deleted, #572, Claude Code)** — Sam: "Delete study music loops". The five loops in
   `widget/audio/` (cafe, lo-fi, piano, rain and waves, 9.7 MB) are gone from the site: only the old Settings panel's
   background music played them, and that came out of `widget/v3.js` in #568, so nothing students see changes (no changelog
